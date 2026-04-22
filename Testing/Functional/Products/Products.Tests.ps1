@@ -173,6 +173,8 @@ BeforeAll {
     if ($ProductName -eq "sharepoint") {
         $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
         Import-Module $SPOHelperPath -Force
+        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
+        Import-Module $ConnectHelpersPath -Force
         $DomainPrefix = $TenantDomain.Split(".")[0]
         $script:SPOAdminUrl = switch ($M365Environment) {
             "gcchigh" { "https://$DomainPrefix-admin.sharepoint.us" }
@@ -180,18 +182,19 @@ BeforeAll {
             default   { "https://$DomainPrefix-admin.sharepoint.com" }
         }
         if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:SPOAccessToken = Get-SPOAccessToken `
+            $script:SPOAccessToken = Get-MsalAccessToken `
                 -CertificateThumbprint $Thumbprint `
                 -AppID $AppId `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -AdminUrl $script:SPOAdminUrl
+                -Scope "$($script:SPOAdminUrl)/.default"
         }
         else {
-            $script:SPOAccessToken = Get-SPOAccessTokenInteractive `
+            $script:SPOAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -AdminUrl $script:SPOAdminUrl
+                -ClientId "9bc3ab49-b65d-410a-85ad-de819febfddc" `
+                -Scope "$($script:SPOAdminUrl)/.default"
         }
     }
 
@@ -201,18 +204,24 @@ BeforeAll {
     if ($ProductName -eq "powerplatform") {
         $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
         Import-Module $PPHelperPath -Force
+        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
+        Import-Module $ConnectHelpersPath -Force
         $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+        $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
         if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:PPAccessToken = Get-PowerPlatformAccessToken `
+            $script:PPAccessToken = Get-MsalAccessToken `
                 -CertificateThumbprint $Thumbprint `
                 -AppID $AppId `
                 -Tenant $TenantDomain `
-                -M365Environment $M365Environment
+                -M365Environment $M365Environment `
+                -Scope $PPScope
         }
         else {
-            $script:PPAccessToken = Get-PowerPlatformAccessTokenInteractive `
+            $script:PPAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
-                -M365Environment $M365Environment
+                -M365Environment $M365Environment `
+                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -Scope $PPScope
         }
     }
 
@@ -393,9 +402,6 @@ Describe "Policy Checks for <ProductName>" {
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
                 $Details = $PolicyResultObj.ReportDetails
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
-                if ($IsCustomImplementation){
-                    $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
-                }
 
                 # Check final HTML output
                 $FoundPolicy = $false
@@ -497,11 +503,7 @@ Describe "Policy Checks for <ProductName>" {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
-                                    if ($IsCustomImplementation) {
-                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
-                                        $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
-                                    }
-                                    elseif ($IsNotChecked){
+                                    if ($IsNotChecked){
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {

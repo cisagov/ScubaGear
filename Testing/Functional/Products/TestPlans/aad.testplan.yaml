@@ -71,6 +71,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   ClientAppTypes:
                     - other
                     - exchangeActiveSync
@@ -107,6 +108,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -135,6 +137,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -176,6 +179,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -200,6 +204,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -241,6 +246,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -263,8 +269,7 @@ TestPlan:
                   Id: MicrosoftAuthenticator
                   State: disabled
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.AAD.3.3v2 Non-Compliant case - MS Auth App name and Geolocation disabled
         Preconditions:
           - Command: UpdateProviderExport
@@ -428,6 +433,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -464,6 +470,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -522,6 +529,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -575,6 +583,7 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: []
                     ExcludeApplications: []
@@ -603,6 +612,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:
@@ -628,6 +638,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:

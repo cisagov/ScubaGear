@@ -16,19 +16,19 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
                     try {
                         switch ($Command) {
-                            "Get-MgBetaOrganization" {
+                            "Get-SPOTenantRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{
-                                    VerifiedDomains = @(
-                                        @{
-                                            "isInitial" = $true;
-                                            "Name"      = "contoso.onmicrosoft.com";
-                                        }
-                                        @{
-                                            "isInitial" = $false;
-                                            "Name"      = "example.onmicrosoft.com";
-                                        }
-                                    )
+                                    SharingCapability = 0
+                                    ODBSharingCapability = 0
+                                    SharingDomainRestrictionMode = 0
+                                    DefaultSharingLinkType = 1
+                                    DefaultLinkPermission = 1
+                                    RequireAnonymousLinksExpireInDays = 30
+                                    FileAnonymousLinkType = 2
+                                    FolderAnonymousLinkType = 2
+                                    EmailAttestationRequired = $true
+                                    EmailAttestationReAuthDays = 30
                                 }
                             }
                             default {
@@ -73,33 +73,6 @@ InModuleScope -ModuleName ExportSharePointProvider {
                 return [MockCommandTracker]::New()
             }
 
-            # Mock REST API functions
-            function Get-SPOAccessTokenInteractive {}
-            Mock -ModuleName ExportSharePointProvider Get-SPOAccessTokenInteractive {
-                return "mock-access-token"
-            }
-
-            function Get-SPOTenantRest {}
-            Mock -ModuleName ExportSharePointProvider Get-SPOTenantRest {
-                return [pscustomobject]@{
-                    SharingCapability = 0
-                    ODBSharingCapability = 0
-                    SharingDomainRestrictionMode = 0
-                    DefaultSharingLinkType = 1
-                    DefaultLinkPermission = 1
-                    RequireAnonymousLinksExpireInDays = 30
-                    FileAnonymousLinkType = 2
-                    FolderAnonymousLinkType = 2
-                    EmailAttestationRequired = $true
-                    EmailAttestationReAuthDays = 30
-                }
-            }
-
-            function Get-SPOSiteRest {}
-            Mock -ModuleName ExportSharePointProvider Get-SPOSiteRest {
-                return [pscustomobject]@{}
-            }
-
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
@@ -119,39 +92,29 @@ InModuleScope -ModuleName ExportSharePointProvider {
         }
         Context 'When Running Interactively with REST API' {
             It "with -M365Environment 'commercial', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'commercial'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
             It "with -M365Environment 'gcc', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'gcc'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
             It "with -M365Environment 'gcchigh', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'gcchigh'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.us'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
             It "with -M365Environment 'dod', returns valid JSON" {
-                $Json = Export-SharePointProvider -M365Environment 'dod'
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint-mil.us'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
         }
         Context 'When running with Service Principals via REST API' {
             It "with -M365Environment commercial, returns valid JSON" {
-                Mock -ModuleName ExportSharePointProvider Get-SPOAccessToken {
-                    return "mock-access-token"
-                }
-                $ServicePrincipalParams = @{
-                    CertThumbprintParams = @{
-                        AppID = "test-app-id"
-                        CertificateThumbprint = "test-thumbprint"
-                        Organization = "contoso.onmicrosoft.com"
-                    }
-                }
-                $Json = Export-SharePointProvider -M365Environment commercial -ServicePrincipalParams $ServicePrincipalParams
+                $Json = Export-SharePointProvider -AccessToken 'mock-access-token' -AdminUrl 'https://contoso-admin.sharepoint.com'
                 $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }

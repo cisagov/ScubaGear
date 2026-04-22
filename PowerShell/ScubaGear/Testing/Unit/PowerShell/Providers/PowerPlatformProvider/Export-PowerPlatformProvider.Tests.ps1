@@ -55,15 +55,19 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                                     );
                                 }
                             }
-                            "Get-TenantSettings" {
+                            "Get-PowerPlatformTenantSettingsRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-AdminPowerAppEnvironment" {
+                            "Get-PowerPlatformEnvironmentsRest" {
                                 $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
+                                return @()
                             }
-                            "Get-AdminPowerAppEnvironment" {
+                            "Get-PowerPlatformDlpPoliciesRest" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{ value = @() }
+                            }
+                            "Get-PowerPlatformTenantIsolationRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -107,24 +111,6 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
             Mock -ModuleName ExportPowerPlatformProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
-            function Get-DlpPolicy {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-DlpPolicy {}
-            function Get-PowerAppTenantIsolationPolicy {}
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerAppTenantIsolationPolicy {}
-            function Get-PowerPlatformBaseUrl { return "https://api.bap.microsoft.com" }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformBaseUrl { return "https://api.bap.microsoft.com" }
-            function Get-PowerPlatformAccessTokenInteractive { return "mock-access-token" }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformAccessTokenInteractive { return "mock-access-token" }
-            function Get-PowerPlatformAccessToken { return "mock-access-token" }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformAccessToken { return "mock-access-token" }
-            function Get-PowerPlatformTenantSettingsRest { return [pscustomobject]@{} }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformTenantSettingsRest { return [pscustomobject]@{} }
-            function Get-PowerPlatformEnvironmentsRest { return @() }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformEnvironmentsRest { return @() }
-            function Get-PowerPlatformDlpPoliciesRest { return [pscustomobject]@{ value = @() } }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformDlpPoliciesRest { return [pscustomobject]@{ value = @() } }
-            function Get-PowerPlatformTenantIsolationRest { return [pscustomobject]@{} }
-            Mock -ModuleName ExportPowerPlatformProvider Get-PowerPlatformTenantIsolationRest { return [pscustomobject]@{} }
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]
@@ -148,7 +134,7 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                     Content = '{"tenant_region_scope": "NA","tenant_region_sub_scope": ""}'
                 }
             }
-            $Json = Export-PowerPlatformProvider -M365Environment 'commercial'
+            $Json = Export-PowerPlatformProvider -M365Environment 'commercial' -AccessToken 'mock-access-token' -BaseUrl 'https://api.bap.microsoft.com'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
@@ -158,7 +144,7 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                     Content = '{"tenant_region_scope": "NA","tenant_region_sub_scope": "GCC"}'
                 }
             }
-            $Json = Export-PowerPlatformProvider -M365Environment 'gcc'
+            $Json = Export-PowerPlatformProvider -M365Environment 'gcc' -AccessToken 'mock-access-token' -BaseUrl 'https://api.gov.bap.microsoft.us'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
@@ -168,7 +154,7 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                     Content = '{"tenant_region_scope": "USGov","tenant_region_sub_scope": "DODCON"}'
                 }
             }
-            $Json = Export-PowerPlatformProvider -M365Environment 'gcchigh'
+            $Json = Export-PowerPlatformProvider -M365Environment 'gcchigh' -AccessToken 'mock-access-token' -BaseUrl 'https://api.high.bap.microsoft.us'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
@@ -178,7 +164,7 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                     Content = '{"tenant_region_scope": "USGov","tenant_region_sub_scope": "DOD"}'
                 }
             }
-            $Json = Export-PowerPlatformProvider -M365Environment 'dod'
+            $Json = Export-PowerPlatformProvider -M365Environment 'dod' -AccessToken 'mock-access-token' -BaseUrl 'https://api.bap.appsplatform.us'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
@@ -188,7 +174,7 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                     Content = '{"tenant_region_scope": "EU","tenant_region_sub_scope": ""}'
                 }
             }
-            $Json = Export-PowerPlatformProvider -M365Environment 'commercial'
+            $Json = Export-PowerPlatformProvider -M365Environment 'commercial' -AccessToken 'mock-access-token' -BaseUrl 'https://api.bap.microsoft.com'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
