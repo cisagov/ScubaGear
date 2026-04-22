@@ -1099,6 +1099,41 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgPolicyDefaultAppManagementPolicy",
+        "apiResource": "/beta/policies/defaultAppManagementPolicy",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "Policy.Read.All"
+        ],
+        "higherPermissions": [
+            "Policy.Read.ApplicationConfiguration",
+            "Policy.ReadWrite.ApplicationConfiguration"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/tenantappmanagementpolicy-get",
+            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicydefaultappmanagementpolicy"
+        ],
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1 - Application Management Policy checks"
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyAssignment",
         "apiResource": "/beta/policies/roleManagementPolicyAssignments",
         "apiFilter": "",

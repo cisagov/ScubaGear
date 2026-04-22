@@ -311,3 +311,30 @@ BuiltinMultifactorAuthenticationAuthStrength := {
     "voice,federatedSingleFactor"
   ],
 }
+
+AppManagementPolicy := {
+    "ApplicationRestrictions": {
+        "PasswordCredentials": [
+            {"RestrictionType": "passwordAddition", "State": "enabled", "MaxLifetime": null},
+            {"RestrictionType": "symmetricKeyAddition", "State": "enabled", "MaxLifetime": null},
+            {"RestrictionType": "customPasswordAddition", "State": "enabled", "MaxLifetime": null},
+            {"RestrictionType": "passwordLifetime", "State": "enabled", "MaxLifetime": "P90D"},
+            {"RestrictionType": "symmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P90D"}
+        ],
+        "KeyCredentials": [
+            {"RestrictionType": "asymmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P180D"}
+        ]
+    },
+    "ServicePrincipalRestrictions": {
+        "PasswordCredentials": [
+            {"RestrictionType": "passwordAddition", "State": "enabled", "MaxLifetime": null},
+            {"RestrictionType": "symmetricKeyAddition", "State": "enabled", "MaxLifetime": null},
+            {"RestrictionType": "customPasswordAddition", "State": "enabled", "MaxLifetime": null},
+            {"RestrictionType": "passwordLifetime", "State": "enabled", "MaxLifetime": "P90D"},
+            {"RestrictionType": "symmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P90D"}
+        ],
+        "KeyCredentials": [
+            {"RestrictionType": "asymmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P180D"}
+        ]
+    }
+}
