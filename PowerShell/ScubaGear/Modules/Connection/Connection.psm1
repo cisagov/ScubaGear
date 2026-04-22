@@ -1,4 +1,4 @@
-$script:PowerBIToken = $null
+﻿$script:PowerBIToken = $null
 
 function Connect-Tenant {
     <#

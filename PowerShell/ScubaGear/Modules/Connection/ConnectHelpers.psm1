@@ -1,4 +1,4 @@
-# Module-scoped MSAL PublicClientApplication cache.
+﻿# Module-scoped MSAL PublicClientApplication cache.
 # Keyed by ClientId — enables silent token acquisition for a different scope after an initial
 # interactive login (e.g., PowerBI reuses the PowerPlatform sign-in, same ClientId 1950a258...).
 $script:MsalPublicClientApps = @{}
