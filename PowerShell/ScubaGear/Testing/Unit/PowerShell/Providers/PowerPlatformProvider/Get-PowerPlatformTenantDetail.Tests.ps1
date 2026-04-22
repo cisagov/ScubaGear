@@ -37,6 +37,20 @@ InModuleScope ExportPowerPlatformProvider {
                 }
                 $ValidJson
             }
+
+            function Invoke-GraphDirectly {}
+            Mock -ModuleName ExportPowerPlatformProvider Invoke-GraphDirectly {
+                return @{
+                    Value = [pscustomobject]@{
+                        DisplayName = "DisplayName"
+                        TenantId    = "TenantId"
+                        VerifiedDomains = @(
+                            @{ Name = "example.onmicrosoft.com"; IsInitial = $true }
+                            @{ Name = "contoso.onmicrosoft.com"; IsInitial = $false }
+                        )
+                    }
+                }
+            }
         }
         It "When called with -M365Environment 'commercial', returns valid JSON" {
             $Json = Get-PowerPlatformTenantDetail -M365Environment "commercial"
@@ -63,5 +77,4 @@ InModuleScope ExportPowerPlatformProvider {
 
 AfterAll {
     Remove-Module ExportPowerPlatformProvider -Force -ErrorAction SilentlyContinue
-    Remove-Module Microsoft.PowerApps.Administration.PowerShell -Force -ErrorAction SilentlyContinue
 }

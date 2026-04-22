@@ -126,7 +126,7 @@ Function Get-ScubaGearPermissions {
         [string]$Environment = 'commercial',
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('perms','modules', 'api', 'endpoint', 'support', 'role' , 'appId', 'all', 'apiHeader')]
+        [ValidateSet('perms','modules', 'api', 'endpoint', 'support', 'role' , 'appId', 'all', 'apiHeader', 'oauthScope')]
         [string]$OutAs ='perms'
     )
     Begin{
@@ -252,7 +252,7 @@ Function Get-ScubaGearPermissions {
                 #only get the api
                 Write-Verbose -Message "Command: `$collection | Where-Object {`$_.moduleCmdlet -like 'Connect-*'} | foreach-object {`$_.apiResource -replace '{id}',$Id -replace '{domain}',$Domain} | Select-Object -Unique"
                 #combine the apiResource and api filter if exists
-                $output += $collection | Where-Object $filterScript | Where-Object {$_.moduleCmdlet -like 'Connect-*'} | foreach-object {
+                $output += $collection | Where-Object $filterScript | Where-Object {$_.moduleCmdlet -like 'Connect-*' -or $_.moduleCmdlet -like '*REST API'} | foreach-object {
                     #$apiResource = $_.'apiResource'
 
                     If($_.apifilter){
@@ -320,6 +320,12 @@ Function Get-ScubaGearPermissions {
                 }Catch{
                     $output += $null
                 }
+            }
+            'oauthScope' {
+                Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty oauthScope -Unique"
+                $output += $collection | Where-Object $filterScript | ForEach-Object {
+                    $_.oauthScope -replace '{domain}',$Domain
+                } | Where-Object { $_ -ne '' } | Select-Object -Unique
             }
             'all' {
                 Write-Verbose -Message "Command: `$collection | Sort-Object"

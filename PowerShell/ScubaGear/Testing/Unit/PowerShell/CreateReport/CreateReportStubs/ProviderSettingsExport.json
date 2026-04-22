@@ -1,4 +1,4 @@
-﻿{
+{
   "baseline_version": "0.1",
   "module_version": "0.3.0",
   "date": "08/23/2023 12:23:24 Eastern Daylight Time",
@@ -18024,7 +18024,7 @@
       "OneDriveLoopDefaultSharingLinkRole": 0,
       "OneDriveRequestFilesLinkEnabled": true,
       "OneDriveRequestFilesLinkExpirationInDays": 1,
-      "OneDriveSharingCapability": 2,
+      "ODBSharingCapability": 2,
       "OneDriveDefaultShareLinkScope": -1,
       "OneDriveDefaultShareLinkRole": 0,
       "OneDriveDefaultLinkToExistingAccess": false,
@@ -18189,10 +18189,10 @@
   "OneDrive_PnP_Flag": false,
   "SharePoint_successful_commands": [
     "Get-MgBetaOrganization",
-    "Get-SPOTenant",
-    "Get-SPOSite",
-    "Get-PnPTenant",
-    "Get-PnPTenantSite"
+    "SharePoint REST API",
+    "SharePoint REST API",
+    "SharePoint REST API",
+    "SharePoint REST API"
   ],
   "SharePoint_unsuccessful_commands": [],
   "teams_tenant_info": [
@@ -19178,3 +19178,4 @@
   ],
   "teams_unsuccessful_commands": []
 }
+
