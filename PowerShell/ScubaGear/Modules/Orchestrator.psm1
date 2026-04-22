@@ -852,12 +852,7 @@ function Invoke-ProviderList {
                         "powerbi" {
                             $PBIProviderParams = @{
                                 'M365Environment' = $ScubaConfig.M365Environment
-                            }
-                            if (-not [string]::IsNullOrEmpty($ScubaConfig.AppID)) {
-                                $PBIProviderParams += @{
-                                    ClientID              = $ScubaConfig.AppID
-                                    CertificateThumbprint = $ScubaConfig.CertificateThumbprint
-                                }
+                                'AccessToken'     = Get-PowerBIToken
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }

@@ -1,3 +1,5 @@
+$script:PowerBIToken = $null
+
 function Connect-Tenant {
     <#
    .Description
@@ -108,7 +110,12 @@ function Connect-Tenant {
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
                    }
-                   Write-Verbose "Power BI uses REST API with on-demand MSAL token - no persistent connection needed"
+                   $PBIConnectParams = @{M365Environment = $M365Environment}
+                   if ($ServicePrincipalParams) {
+                       $PBIConnectParams.ServicePrincipalParams = $ServicePrincipalParams
+                   }
+                   $script:PowerBIToken = Connect-PowerBIHelper @PBIConnectParams
+                   Write-Verbose "Power BI access token acquired"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -251,7 +258,18 @@ function Disconnect-SCuBATenant {
 
 }
 
+function Get-PowerBIToken {
+   <#
+   .SYNOPSIS
+       Returns the Power BI access token acquired during Connect-Tenant.
+   .FUNCTIONALITY
+   Internal
+   #>
+   return $script:PowerBIToken
+}
+
 Export-ModuleMember -Function @(
    'Connect-Tenant',
-   'Disconnect-SCuBATenant'
+   'Disconnect-SCuBATenant',
+   'Get-PowerBIToken'
 )

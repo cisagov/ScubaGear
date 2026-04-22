@@ -1,4 +1,3 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function ConvertFrom-GraphHashtable, Invoke-GraphDirectly
 Import-Module -Name $PSScriptRoot/ProviderHelpers/PowerBIRestHelper.psm1 -Force
 
 function Export-PowerBIProvider {
@@ -19,13 +18,9 @@ function Export-PowerBIProvider {
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [string]
-        $ClientID,
-
-        [Parameter(Mandatory = $false)]
-        [string]
-        $CertificateThumbprint
+        $AccessToken
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -33,26 +28,10 @@ function Export-PowerBIProvider {
     $Tracker = Get-CommandTracker
 
     try {
-        # Acquire Power BI access token - service principal or interactive
-        $TenantDetails = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
-        $InitialDomain = ($TenantDetails.VerifiedDomains | Where-Object { $_.IsInitial }).Name
-
         $EnvironmentUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
-        if ((-not [string]::IsNullOrEmpty($ClientID)) -and (-not [string]::IsNullOrEmpty($CertificateThumbprint))) {
-            $PowerBIToken = Get-PowerBIAccessToken `
-                -CertificateThumbprint $CertificateThumbprint `
-                -AppID $ClientID `
-                -Tenant $InitialDomain `
-                -M365Environment $M365Environment
-        }
-        else {
-            $PowerBIToken = Get-PowerBIAccessTokenInteractive `
-                -Tenant $InitialDomain `
-                -M365Environment $M365Environment
-        }
 
         $headers = @{
-            Authorization  = "Bearer $PowerBIToken"
+            Authorization  = "Bearer $AccessToken"
             "Content-Type" = "application/json"
         }
 
