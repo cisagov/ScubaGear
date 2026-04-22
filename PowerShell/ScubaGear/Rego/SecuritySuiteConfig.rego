@@ -186,36 +186,13 @@ tests contains {
 #
 # MS.SECURITYSUITE.4.1v1
 #--
-
-# At a minimum, the alerts required by the EXO baseline SHALL be enabled.
-RequiredAlerts := {
-    "Suspicious email sending patterns detected",
-    "Suspicious Email Forwarding Activity",
-    "Messages have been delayed",
-    "Tenant restricted from sending unprovisioned email",
-    "User restricted from sending email",
-    "A potentially malicious URL click was detected",
-    "Suspicious connector activity"
-}
-
-# Save the names of all alerts that are enabled
-EnabledAlerts contains Alert.Name if {
-    some Alert in input.protection_alerts
-    Alert.Disabled == false
-}
-
-# If any of the required alerts are not enabled, the check should fail
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.4.1v1",
-    "Criticality": "Shall",
-    "Commandlet": ["Get-ProtectionAlert"],
-    "ActualValue": MissingAlerts,
-    "ReportDetails": ReportDetailsString(Status, ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
-    "RequirementMet": Status
-} if {
-    MissingAlerts := RequiredAlerts - EnabledAlerts
-    ErrorMessage := "disabled required alert(s) found:"
-    Status := count(MissingAlerts) == 0
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.4.1v1"),
+    "RequirementMet": false
 }
 #--
 
