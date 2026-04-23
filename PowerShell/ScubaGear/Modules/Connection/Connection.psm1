@@ -167,6 +167,8 @@
                        if (-not $LoginHint) {
                            $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
                        }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
                    }
 
                    # Acquire Power BI access token
