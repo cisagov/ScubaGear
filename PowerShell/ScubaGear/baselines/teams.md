@@ -310,7 +310,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. Unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.
-- _Last modified:_ August 2025
+- _Last modified:_ April 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
@@ -325,7 +325,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
 <!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting.
-- _Last modified:_ August 2025
+- _Last modified:_ April 2026
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -339,7 +339,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 <!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
-- _Last modified:_ August 2025
+- _Last modified:_ April 2026
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
@@ -376,46 +376,55 @@ organization](https://learn.microsoft.com/en-us/microsoftteams/manage-external-a
 
 To enable external access for only specific domains:
 
-1.  Sign in to the **Microsoft Teams admin center**.
+1.  Sign in to the **Microsoft Teams admin center.**
 
-2.  Select **Users** > **External access** > **Organization settings**.
+2.  Select **External Collaboration** > **External access.**
 
-3.  Next to **Teams and Skype for Business users in external organizations**,
-    select **Allow only specific external domains**
+3.  Select the **Organization settings** tab.
 
-4.  Select **Add external domains**. Enter domains allowed, and then select **Done**
+4.  Next to **Manageexternal domains for this organization**,
+    ensure the slider is set to **On**
+
+5.  Next to **Allow or block external domains**,
+    Click on the dropdown list and select **Allow only specific external domains**
+
+6.  Select **+ Add a domain** and enter domains allowed in the box below **Enter the external domain you want to allow**, and then select **add**
 
     **NOTE:** Domains will need to be added in this step in order for users to communicate with them.
 
-5.  Click **Save**.
+7.  Click **Done** once all domains have been added.
+
+8.  Click **Save**
 
 #### MS.TEAMS.2.2v2 Instructions
 
-1.  Sign in to the **Microsoft Teams admin center**.
+1.  Sign in to the **Microsoft Teams admin center.**
 
-2.  Select **Users > External access**.
+2.  Select **External Collaboration** > **External access.**
 
-3.  Select **Policies**.
+3.  Select the **Policies** tab.
 
-4.  Select **Global (Org-wide Default)**.
+4.  Select the policy named **Global (Org-wide Default)**.
 
 5. Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to one of the following:
     1. To completely block contact with unmanaged users, toggle the setting to **Off**.
     2. To allow contact with unmanaged users only if the internal user initiates the contact:
         - Toggle the setting to **On**.
-        - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
+        - Clear the check next to **People in my org can join external meetings and recieve new chats from users who have unmanaged Microsoft accounts.**
 
 #### MS.TEAMS.2.3v2 Instructions
 
-1.  Sign in to the **Microsoft Teams admin center**.
+1.  Sign in to the **Microsoft Teams admin center.**
 
-2.  Select **Users > External access**.
+2.  Select **External Collaboration** > **External access.**
 
-3.  Select **Policies**.
+3.  Select the **Policies** tab.
 
-4.  Select **Global (Org-wide Default)**.
+4.  Select **Global (Org-wide Default).**
 
-4.  To completely block contact with unmanaged users, under **Edit policy details**, set **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
+5.  To completely block contact with unmanaged users, under **Edit policy details**, set **People in my org can chat and have meetings with external users who have unmanaged Microsoft accounts** to **Off.**
+
+6.  Click **Save.**
 
 ## 4. Teams Email Integration
 This section helps reduce security risks related to Teams email integration. Teams provides an optional feature allowing channels to have an email address and receive email.
