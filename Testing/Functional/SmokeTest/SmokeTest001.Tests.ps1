@@ -75,7 +75,7 @@ Describe "Smoke Test: Generate Output" {
             @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports'; ItemType = 'Container'},
             @{Item = 'IndividualReports/AADReport.html'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/DefenderReport.html'; ItemType = 'Leaf'},
+            @{Item = 'IndividualReports/SecuritySuiteReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/EXOReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/PowerPlatformReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/SharePointReport.html'; ItemType = 'Leaf'},
@@ -109,7 +109,7 @@ Describe "Smoke Test: Generate Output" {
     Context "Verify Copy* exported commands" -ForEach @(
         @{Command='Copy-SCuBABaselineDocument'; CopiedFiles=@(
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/aad.md"),
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/defender.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/securitysuite.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/exo.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerbi.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerplatform.md"),
