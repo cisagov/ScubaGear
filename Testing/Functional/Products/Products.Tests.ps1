@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
