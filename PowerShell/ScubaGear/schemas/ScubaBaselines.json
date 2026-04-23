@@ -1,5 +1,5 @@
 {
-  "Version": "2.4.8 [updated 4/8/2026]",
+  "Version": "2.4.20 [updated 4/20/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -56,19 +56,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -113,19 +113,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -170,9 +170,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msaad22v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -196,6 +196,10 @@
           {
             "Name": "T1078.004: Cloud Accounts",
             "Url": "https://attack.mitre.org/techniques/T1078/004/"
+          },
+          {
+            "Name": "T1078.004: test new MITRE mapping",
+            "Url": "https://attack.mitre.org/techniques/T1078/005/"
           }
         ],
         "resources": [
@@ -217,19 +221,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -306,19 +310,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -399,19 +403,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -492,14 +496,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -562,14 +566,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -646,14 +650,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -738,19 +742,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -823,14 +827,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -911,14 +915,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -995,14 +999,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -1047,9 +1051,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msaad41v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -1094,14 +1098,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1146,14 +1150,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1198,14 +1202,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1240,14 +1244,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1304,14 +1308,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1380,14 +1384,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1444,14 +1448,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1508,19 +1512,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#privileged-user-policy-exclusions",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -1573,14 +1577,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1637,14 +1641,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1701,14 +1705,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1765,14 +1769,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1837,9 +1841,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1888,9 +1892,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1931,9 +1935,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -1974,9 +1978,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msaad83v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       }
@@ -2051,14 +2055,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2131,14 +2135,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2211,14 +2215,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2287,19 +2291,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -2368,19 +2372,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -2429,14 +2433,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -2485,14 +2489,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -2541,14 +2545,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -2601,9 +2605,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2661,14 +2665,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2730,9 +2734,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2790,9 +2794,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2836,9 +2840,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -2896,9 +2900,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msdefender45v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -2960,9 +2964,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msdefender46v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -2997,14 +3001,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -3039,9 +3043,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msdefender52v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -3111,14 +3115,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -3184,9 +3188,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msdefender63v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       }
@@ -3231,19 +3235,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/configuration.md#automatic-forwarding-to-remote-domains",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3292,19 +3296,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/parameters.md#preferreddnsresolvers",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3361,14 +3365,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/parameters.md#preferreddnsresolvers",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3425,19 +3429,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/parameters.md#preferreddnsresolvers",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3494,19 +3498,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/parameters.md#preferreddnsresolvers",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3555,19 +3559,19 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/parameters.md#preferreddnsresolvers",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3616,14 +3620,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "../../../docs/configuration/parameters.md#preferreddnsresolvers",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -3648,14 +3652,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -3700,14 +3704,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -3752,14 +3756,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -3800,14 +3804,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -3884,14 +3888,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       }
@@ -3930,9 +3934,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi11v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -3985,9 +3989,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi21v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4048,9 +4052,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi31v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4107,9 +4111,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi41v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4166,9 +4170,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi42v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4213,9 +4217,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi51v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4258,9 +4262,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi61v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4324,9 +4328,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerbi71v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       }
@@ -4373,14 +4377,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4415,14 +4419,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4471,14 +4475,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4527,9 +4531,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4568,14 +4572,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4600,9 +4604,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerplatform32v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4633,9 +4637,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mspowerplatform41v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -4666,9 +4670,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4711,9 +4715,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       }
@@ -4756,14 +4760,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "#",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -4804,14 +4808,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "#",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -4860,14 +4864,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Configurable",
+            "color": "005288",
             "linkUrl": "#",
-            "color": "005288"
+            "label": "Configurable"
           }
         ]
       },
@@ -4908,9 +4912,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -4963,14 +4967,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -5023,14 +5027,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -5083,14 +5087,14 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           },
           {
-            "label": "Requires Configuration",
+            "color": "981D20",
             "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
+            "label": "Requires Configuration"
           }
         ]
       },
@@ -5148,14 +5152,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5217,9 +5221,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5277,9 +5281,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5323,9 +5327,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5387,9 +5391,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msdefender46v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5424,14 +5428,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5466,9 +5470,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mssecuritysuite42v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5538,14 +5542,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5611,9 +5615,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#mssecuritysuite52v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5644,9 +5648,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msexo142v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5677,9 +5681,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msexo143v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5710,9 +5714,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msexo151v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5743,9 +5747,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msexo152v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5776,9 +5780,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
+            "color": "046B9A",
             "linkUrl": "#msexo153v1-instructions",
-            "color": "046B9A"
+            "label": "Manual"
           }
         ]
       },
@@ -5813,9 +5817,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5850,9 +5854,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       }
@@ -5899,14 +5903,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -5955,14 +5959,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6011,14 +6015,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6065,14 +6069,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6111,14 +6115,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6161,14 +6165,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6207,14 +6211,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6253,14 +6257,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       }
@@ -6305,9 +6309,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6360,14 +6364,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6410,9 +6414,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6455,9 +6459,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6500,9 +6504,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6545,9 +6549,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6590,9 +6594,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6645,14 +6649,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6701,14 +6705,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6757,9 +6761,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6798,14 +6802,14 @@
         ],
         "badges": [
           {
-            "label": "BOD 25-01 Requirement",
+            "color": "C41230",
             "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
-            "color": "C41230"
+            "label": "BOD 25-01 Requirement"
           },
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6842,9 +6846,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6885,9 +6889,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       },
@@ -6928,9 +6932,9 @@
         ],
         "badges": [
           {
-            "label": "Automated Check",
+            "color": "5E9732",
             "linkUrl": "#key-terminology",
-            "color": "5E9732"
+            "label": "Automated Check"
           }
         ]
       }
