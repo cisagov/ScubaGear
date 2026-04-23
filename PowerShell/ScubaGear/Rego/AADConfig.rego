@@ -688,7 +688,10 @@ BadPolicies := BadDefaultGrantPolicies if {
 default DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
     count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
-} else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
+} else := concat(" ", [
+    "authorization policies found that allow non-admin users to consent to", 
+    "third-party applications with risky delegated permission classifications"
+ ]) if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
 }
 
@@ -878,7 +881,12 @@ NotGlobalAdmins contains User.DisplayName if {
 }
 # Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error 
 default GetScoreDescription := "All privileged users are Global Admin"
-GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should be 1 or less)", sprintf("\nCalculated by %d global admins / %d privileged users without global admin role",[Count(GlobalAdmins),Count(NotGlobalAdmins)])]) if {
+# GetScoreDescription := concat("", ["Least Privilege Score Test = ", Score, " (should be 1 or less)"]) if {
+GetScoreDescription := concat("", [
+    "Least Privilege Score = ", Score, " (should be 1 or less)",
+    sprintf("\nCalculated by %d global admins / %d privileged users without global admin role",
+        [Count(GlobalAdmins), Count(NotGlobalAdmins)])
+]) if {
     Count(NotGlobalAdmins) > 0
     RawRatio := sprintf("%v", [Count(GlobalAdmins)/Count(NotGlobalAdmins)])
     CutOff := min([4, Count(RawRatio)])
