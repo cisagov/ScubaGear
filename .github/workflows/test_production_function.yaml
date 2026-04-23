@@ -29,6 +29,7 @@ on:
   #     - ".github/workflows/function_test_entra.yaml"
   #     - ".github/workflows/function_test_exchange.yaml"
   #     - ".github/workflows/function_test_powerplatform.yaml"
+  #     - ".github/workflows/function_test_powerbi.yaml"
   #     - ".github/workflows/function_test_sharepoint.yaml"
   #     - ".github/workflows/function_test_teams.yaml"
   #     - ".github/actions/extract-email/action.yaml"
