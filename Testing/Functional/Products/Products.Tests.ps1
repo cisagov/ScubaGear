@@ -159,6 +159,7 @@ BeforeAll {
         aad = "Azure Active Directory"
         defender = "Microsoft 365 Defender"
         exo = "Exchange Online"
+        powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"
         teams = "Microsoft Teams"
@@ -234,22 +235,21 @@ BeforeAll {
         $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
         Import-Module $ConnectHelpersPath -Force
         $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+        $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
         if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $ServicePrincipalParams = @{
-                CertThumbprintParams = @{
-                    CertificateThumbprint = $Thumbprint
-                    AppID                 = $AppId
-                    Organization          = $TenantDomain
-                }
-            }
-            $script:PBIAccessToken = Connect-PowerBIHelper `
+            $script:PBIAccessToken = Get-MsalAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ServicePrincipalParams $ServicePrincipalParams
+                -Scope $PBIScope
         }
         else {
-            $script:PBIAccessToken = Connect-PowerBIHelper `
+            $script:PBIAccessToken = Get-MsalAccessToken `
+                -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -Tenant $TenantDomain
+                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -Scope $PBIScope
         }
     }
 
