@@ -26,6 +26,10 @@ Initialize-SCuBA
 
 Interactive mode simply means that the user will be prompted for their credentials that are required to authenticate to the tenant. A prompt may popup for the user to select their profile **for each product being tested** but the user should only have to enter their credentials once.
 
+### SharePoint Authentication
+
+When assessing SharePoint, a browser window will automatically open to the Microsoft sign-in page. Sign in with an account that has **Global Reader or SharePoint Administrator** permissions. After successful sign-in, the token is acquired automatically and the assessment continues without any additional steps required.
+
 ### All Products
 
 To assess all products, use the `-ProductNames` flag with a wildcard:

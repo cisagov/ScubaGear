@@ -117,6 +117,9 @@ InModuleScope Orchestrator {
         }
         Mock -CommandName New-Item {}
         Mock -CommandName Copy-Item {}
+        Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
+        Mock -ModuleName Orchestrator Write-ScubaLog {}
+        Mock -ModuleName Orchestrator Get-ScubaRunDetails {}
     }
 
     Context  "Parameter override test"{

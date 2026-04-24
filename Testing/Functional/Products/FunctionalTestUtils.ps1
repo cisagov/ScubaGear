@@ -1,6 +1,235 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
 Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
+# -----------------------------------------------------------------------
+# Power Platform REST wrappers for functional test preconditions
+# These replace the removed Microsoft.PowerApps.Administration.PowerShell
+# cmdlets. $script:PPBaseUrl and $script:PPAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+function Get-TenantSettings {
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -ContentType "application/json"
+    return $Response
+}
+
+function Set-TenantSettings {
+    param([Parameter(Position=0)][object]$Settings, [hashtable]$RequestBody)
+    if ($RequestBody) { $Body = $RequestBody | ConvertTo-Json -Depth 10 }
+    else              { $Body = $Settings    | ConvertTo-Json -Depth 10 }
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+}
+
+function Get-AdminPowerAppEnvironment {
+    param([switch]$Default)
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    if ($Default) {
+        return $Response.value | Where-Object { $_.properties.isDefault -eq $true } | Select-Object -First 1 |
+               Select-Object @{ Name="EnvironmentName"; Expression={ $_.name } }
+    }
+    return $Response.value
+}
+
+function Get-DlpPolicy {
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    # Normalize ARM response: hoist properties.displayName and id to root to
+    # match original Get-DlpPolicy cmdlet output expected by test plan filters.
+    # id is preserved as the full ARM resource path for use in Remove-DlpPolicy.
+    $Normalized = $Response.value | ForEach-Object {
+        [PSCustomObject]@{
+            name        = $_.name
+            id          = $_.id
+            displayName = $_.properties.displayName
+        }
+    }
+    return [PSCustomObject]@{ value = @($Normalized) }
+}
+
+function Remove-DlpPolicy {
+    param([Parameter(ValueFromPipelineByPropertyName=$true)][string]$PolicyName)
+    process {
+        # PolicyName should be the full ARM resource id (e.g.
+        # /providers/.../environments/Default-xxx/apiPolicies/guid) so the
+        # DELETE hits the exact scoped path the API created the policy under.
+        # Fall back to the tenant-scoped path if only a bare GUID is supplied.
+        $Path = if ($PolicyName -match '^/providers/') {
+            $PolicyName
+        } else {
+            "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$PolicyName"
+        }
+        Invoke-RestMethod -Uri "$script:PPBaseUrl${Path}?api-version=2016-11-01" `
+            -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
+    }
+}
+
+function New-AdminDlpPolicy {
+    param([string]$DisplayName)
+    # The 2016-11-01 endpoint uses a legacy nested schema (properties.definition).
+    # Omitting environmentFilter1 creates an AllEnvironments policy.
+    $Body = @{
+        properties = @{
+            displayName = $DisplayName
+            definition  = @{
+                '$schema'  = "https://schema.management.azure.com/providers/Microsoft.BusinessAppPlatform/schemas/2016-10-01-preview/apiPolicyDefinition.json#"
+                apiGroups  = @{
+                    lbi = @{ description = "No business data allowed"; apis = @() }
+                    hbi = @{ description = "Business data only";       apis = @() }
+                }
+                defaultApiGroup = "lbi"
+                rules = @{
+                    dataFlowRule = @{
+                        type       = "DataFlowRestriction"
+                        parameters = @{ destinationApiGroup = "lbi"; sourceApiGroup = "hbi" }
+                        actions    = @{ blockAction = @{ type = "Block" } }
+                    }
+                }
+            }
+        }
+    } | ConvertTo-Json -Depth 10
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+}
+
+function Get-PowerAppTenantIsolationPolicy {
+    param([string]$TenantId)
+    $MaxAttempts = 3
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            return Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+                -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) { throw }
+            Write-Warning "Get-PowerAppTenantIsolationPolicy attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
+    }
+}
+
+function Set-PowerAppTenantIsolationPolicy {
+    param([string]$TenantId, [object]$TenantIsolationPolicy)
+    $Body = $TenantIsolationPolicy | ConvertTo-Json -Depth 10
+    $MaxAttempts = 3
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+                -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+            return
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) { throw }
+            Write-Warning "Set-PowerAppTenantIsolationPolicy attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
+    }
+}
+
+# -----------------------------------------------------------------------
+# SharePoint Online REST wrapper for functional test preconditions.
+# Replaces the removed Microsoft.Online.SharePoint.PowerShell Set-SPOTenant
+# cmdlet. $script:SPOAdminUrl and $script:SPOAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before this function is called.
+# -----------------------------------------------------------------------
+function Set-SPOTenant {
+    [CmdletBinding()]
+    param(
+        [string]$SharingCapability,
+        [string]$ODBSharingCapability,
+        [string]$SharingDomainRestrictionMode,
+        [string]$SharingBlockedDomainList,
+        [string]$SharingAllowedDomainList,
+        [string]$DefaultSharingLinkType,
+        [string]$DefaultLinkPermission,
+        [int]$RequireAnonymousLinksExpireInDays,
+        [string]$FileAnonymousLinkType,
+        [string]$FolderAnonymousLinkType,
+        [bool]$EmailAttestationRequired,
+        [int]$EmailAttestationReAuthDays
+    )
+
+    # Integer enum mappings matching the values returned by the SPO REST provider
+    # and consumed by SharepointConfig.rego:
+    #   0 = Disabled (Only People In Your Organization)
+    #   1 = ExternalUserSharingOnly (New and Existing Guests)
+    #   2 = ExternalUserAndGuestSharing (Anyone)
+    #   3 = ExistingExternalUserSharingOnly (Existing Guests)
+    $SharingCapabilityMap = @{
+        Disabled = 0; ExternalUserSharingOnly = 1; ExternalUserAndGuestSharing = 2; ExistingExternalUserSharingOnly = 3
+    }
+    $ODBSharingCapabilityMap = $SharingCapabilityMap
+    $SharingDomainRestrictionModeMap = @{ None = 0; AllowList = 1; BlockList = 2 }
+    # REST API / Rego values: 0=None, 1=Direct (Specific People, compliant), 2=Internal (Org only), 3=AnonymousAccess (Anyone)
+    $DefaultSharingLinkTypeMap       = @{ None = 0; Direct = 1; Internal = 2; AnonymousAccess = 3 }
+    $LinkPermissionMap               = @{ None = 0; View = 1; Edit = 2 }
+
+    $Headers = @{
+        Authorization    = "Bearer $script:SPOAccessToken"
+        Accept           = "application/json;odata=verbose"
+        "Content-Type"   = "application/json;odata=verbose"
+        "X-HTTP-Method"  = "MERGE"
+        "IF-MATCH"       = "*"
+    }
+
+    # Anonymous-link fields and EmailAttestation fields require SharingCapability to already
+    # be at the correct level before the API accepts them. If SharingCapability is being
+    # changed in the same call, always send it in a separate first request.
+    $HasSharingCapability = $PSBoundParameters.ContainsKey('SharingCapability')
+    $HasOtherFields = ($PSBoundParameters.Keys | Where-Object { $_ -ne 'SharingCapability' }).Count -gt 0
+
+    if ($HasSharingCapability -and $HasOtherFields) {
+        # First call: set SharingCapability alone
+        $FirstBody = @{
+            "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" }
+            SharingCapability = $SharingCapabilityMap[$SharingCapability]
+        }
+        Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+            -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+
+        # Second call: remaining fields (skip SharingCapability)
+        $RestBody = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
+        foreach ($Param in $PSBoundParameters.Keys | Where-Object { $_ -ne 'SharingCapability' }) {
+            $Value = $PSBoundParameters[$Param]
+            $Mapped = switch ($Param) {
+                'ODBSharingCapability'         { $ODBSharingCapabilityMap[$Value] }
+                'SharingDomainRestrictionMode' { $SharingDomainRestrictionModeMap[$Value] }
+                'DefaultSharingLinkType'       { $DefaultSharingLinkTypeMap[$Value] }
+                'DefaultLinkPermission'        { $LinkPermissionMap[$Value] }
+                'FileAnonymousLinkType'        { $LinkPermissionMap[$Value] }
+                'FolderAnonymousLinkType'      { $LinkPermissionMap[$Value] }
+                default                        { $Value }
+            }
+            $RestBody[$Param] = $Mapped
+        }
+        if ($RestBody.Count -gt 1) {
+            Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+                -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+        }
+        return
+    }
+
+    # Single call: no anonymous-link field dependency conflict
+    $Body = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
+    foreach ($Param in $PSBoundParameters.Keys) {
+        $Value = $PSBoundParameters[$Param]
+        $Mapped = switch ($Param) {
+            'SharingCapability'            { $SharingCapabilityMap[$Value] }
+            'ODBSharingCapability'         { $ODBSharingCapabilityMap[$Value] }
+            'SharingDomainRestrictionMode' { $SharingDomainRestrictionModeMap[$Value] }
+            'DefaultSharingLinkType'       { $DefaultSharingLinkTypeMap[$Value] }
+            'DefaultLinkPermission'        { $LinkPermissionMap[$Value] }
+            'FileAnonymousLinkType'        { $LinkPermissionMap[$Value] }
+            'FolderAnonymousLinkType'      { $LinkPermissionMap[$Value] }
+            default                        { $Value }
+        }
+        $Body[$Param] = $Mapped
+    }
+    Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+        -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+}
+
 # Helper functions for functional test
 function IsEquivalence{
   <#
