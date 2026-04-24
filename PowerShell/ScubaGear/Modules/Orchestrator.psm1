@@ -854,9 +854,27 @@ function Invoke-ProviderList {
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
                         "powerbi" {
+                            # Check for Power BI license via subscribed SKUs (requires Graph connection)
+                            $HasPBILicense = $true
+                            try {
+                                $SubscribedSkus = Get-MgBetaSubscribedSku -ErrorAction Stop
+                                if ($SubscribedSkus) {
+                                    $ActivePlans = $SubscribedSkus.ServicePlans |
+                                        Where-Object { $_.ProvisioningStatus -eq "Success" }
+                                    $PBIPlans = $ActivePlans |
+                                        Where-Object { $_.ServicePlanName -match "^(POWER_BI_PRO|BI_AZURE_P[0-9]|PBI_PREMIUM)" }
+                                    $HasPBILicense = ($null -ne $PBIPlans -and @($PBIPlans).Count -gt 0)
+                                }
+                            }
+                            catch {
+                                Write-Warning "Unable to check Power BI license status via Graph. Defaulting to licensed. Error: $($_.Exception.Message)"
+                                $HasPBILicense = $true
+                            }
+
                             $PBIProviderParams = @{
-                                'AccessToken'     = $ConnectionResult.PBIAccessToken
-                                'BaseUrl'         = $ConnectionResult.PBIBaseUrl
+                                'AccessToken'       = $ConnectionResult.PBIAccessToken
+                                'BaseUrl'           = $ConnectionResult.PBIBaseUrl
+                                'HasPowerBILicense' = $HasPBILicense
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
