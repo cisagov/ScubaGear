@@ -1,7 +1,5 @@
 package powerbi
 import rego.v1
-import data.utils.report.ReportDetailsString
-import data.utils.report.ReportDetailsBoolean
 import data.utils.key.FilterArray
 import data.utils.powerbi.ApplyLicenseWarning
 import data.utils.powerbi.ApplyLicenseWarningString

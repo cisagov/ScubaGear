@@ -1,6 +1,5 @@
 package utils.powerbi
 
-import data.utils.key.FAIL
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import rego.v1
