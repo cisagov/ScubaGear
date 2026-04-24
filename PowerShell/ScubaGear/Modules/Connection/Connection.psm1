@@ -45,6 +45,9 @@
 
    $ProdAuthFailed = @()
 
+   # Track whether Power BI license was found (defaults to true; set to false if SKU check fails)
+   $PBILicenseFound = $true
+
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
    $InitialDomainPrefix = $null
@@ -158,6 +161,7 @@
                        $LimitedGraphParams = @{
                            'M365Environment' = $M365Environment;
                            'ErrorAction' = 'Stop';
+                           'Scopes' = @("Organization.Read.All");
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
@@ -167,40 +171,72 @@
                        if (-not $LoginHint) {
                            $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
                        }
-                       Connect-GraphHelper @LimitedGraphParams
-                       $AADAuthRequired = $false
                    }
 
-                   # Acquire Power BI access token
-                   $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
-                   $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                           -Scope $PBIScope `
-                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                           -M365Environment $M365Environment
+                   # Check for Power BI license before attempting token acquisition.
+                   # This prevents triggering a second consent/browser window for the
+                   # Power BI API scope when the tenant has no PBI license at all.
+                   # Uses Invoke-MgGraphRequest instead of Get-MgBetaSubscribedSku to
+                   # avoid requiring the Beta Graph module to be loaded.
+                   $HasPBILicense = $true
+                   try {
+                       $SkuResponse = Invoke-MgGraphRequest -Method GET `
+                           -Uri "/beta/subscribedSkus" -ErrorAction Stop
+                       $SubscribedSkus = $SkuResponse.value
+                       if ($SubscribedSkus) {
+                           $AllPlans = $SubscribedSkus | ForEach-Object { $_.servicePlans } |
+                               Where-Object { $_.provisioningStatus -eq "Success" }
+                           $PBIPlans = $AllPlans |
+                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P[0-9]|PBI_PREMIUM)" }
+                           $HasPBILicense = ($null -ne $PBIPlans -and @($PBIPlans).Count -gt 0)
+                           if ($HasPBILicense) {
+                               $PlanNames = ($PBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
+                               Write-Verbose "Power BI license found: $PlanNames"
+                           }
+                       }
+                   }
+                   catch {
+                       Write-Warning "Unable to check Power BI license via Graph. Proceeding with token acquisition. Error: $($_.Exception.Message)"
+                       $HasPBILicense = $true
+                   }
+
+                   if (-not $HasPBILicense) {
+                       Write-Verbose "Power BI license not found in tenant — flagging for removal."
+                       $PBILicenseFound = $false
                    }
                    else {
-                       # Resolve tenant name if not already cached from a previous product
-                       if ([string]::IsNullOrEmpty($TenantName)) {
-                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                           $TenantName = $InitialDomain.Name
-                           $InitialDomainPrefix = $TenantName.split(".")[0]
+                       $PBILicenseFound = $true
+                       # Acquire Power BI access token
+                       $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+                       $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                           $TokenData.PBIAccessToken = Get-MsalAccessToken `
+                               -Scope $PBIScope `
+                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                               -M365Environment $M365Environment
                        }
-                       # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
-                       # if PowerPlatform already signed in interactively this session.
-                       $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                       $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                           -Scope $PBIScope `
-                           -ClientId $PBIClientId `
-                           -Tenant $TenantName `
-                           -M365Environment $M365Environment `
-                           -LoginHint $LoginHint
+                       else {
+                           # Resolve tenant name if not already cached from a previous product
+                           if ([string]::IsNullOrEmpty($TenantName)) {
+                               $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                               $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                               $TenantName = $InitialDomain.Name
+                               $InitialDomainPrefix = $TenantName.split(".")[0]
+                           }
+                           # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
+                           # if PowerPlatform already signed in interactively this session.
+                           $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+                           $TokenData.PBIAccessToken = Get-MsalAccessToken `
+                               -Scope $PBIScope `
+                               -ClientId $PBIClientId `
+                               -Tenant $TenantName `
+                               -M365Environment $M365Environment `
+                               -LoginHint $LoginHint
+                       }
+                       Write-Verbose "Power BI token acquired successfully"
                    }
-                   Write-Verbose "Power BI token acquired successfully"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -298,6 +334,7 @@
    # Return connection result with token data for REST-based products
    @{
        ProdAuthFailed  = $ProdAuthFailed
+       PBILicenseFound = $PBILicenseFound
        SPOAccessToken  = $TokenData.SPOAccessToken
        SPOAdminUrl     = $TokenData.SPOAdminUrl
        PPAccessToken   = $TokenData.PPAccessToken

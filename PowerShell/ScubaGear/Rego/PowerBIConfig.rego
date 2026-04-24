@@ -1,8 +1,8 @@
 package powerbi
 import rego.v1
 import data.utils.key.FilterArray
-import data.utils.powerbi.ApplyLicenseWarning
-import data.utils.powerbi.ApplyLicenseWarningString
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
 
 
 ##################
@@ -19,7 +19,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": PublishToWebSetting.enabled,
-    "ReportDetails": ApplyLicenseWarning(Status),
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some PublishToWebSetting in input.publish_to_web_setting
@@ -55,7 +55,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": GuestAccessSetting.enabled,
-    "ReportDetails": ApplyLicenseWarning(Status),
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some GuestAccessSetting in input.guest_access_setting
@@ -91,7 +91,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": ExternalSharingSetting.enabled,
-    "ReportDetails": ApplyLicenseWarning(Status),
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some ExternalSharingSetting in input.external_sharing_setting
@@ -127,7 +127,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": [ServicePrincipalAPISetting.enabled, ServicePrincipalAPISetting.canSpecifySecurityGroups],
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     some ServicePrincipalAPISetting in input.service_principal_api_setting
@@ -164,7 +164,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": [ServicePrincipalProfileSetting.enabled, ServicePrincipalProfileSetting.canSpecifySecurityGroups],
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
+    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
     some ServicePrincipalProfileSetting in input.service_principal_profile_setting
@@ -206,7 +206,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": ResourceKeySetting.enabled,
-    "ReportDetails": ApplyLicenseWarning(Status),
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some ResourceKeySetting in input.resource_key_setting
@@ -242,7 +242,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": RScriptSetting.enabled,
-    "ReportDetails": ApplyLicenseWarning(Status),
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some RScriptSetting in input.rscript_setting
@@ -278,7 +278,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": SensitivityLabelSetting.enabled,
-    "ReportDetails": ApplyLicenseWarning(Status),
+    "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     some SensitivityLabelSetting in input.sensitivity_label_setting

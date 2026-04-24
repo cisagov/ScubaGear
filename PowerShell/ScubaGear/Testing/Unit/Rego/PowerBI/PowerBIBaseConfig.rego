@@ -48,5 +48,3 @@ SensitivityLabel := {
     "enabled": true,
     "canSpecifySecurityGroups": false
 }
-
-PowerBILicense := true

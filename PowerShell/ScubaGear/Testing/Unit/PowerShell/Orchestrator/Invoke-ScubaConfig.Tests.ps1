@@ -83,6 +83,7 @@ InModuleScope Orchestrator {
         Mock -ModuleName Orchestrator Import-Resources {}
         Mock -ModuleName Orchestrator Invoke-Connection {
             if ($ScubaConfig) { $script:TestSplat['LogIn'] = $ScubaConfig.LogIn }
+            return @{ PBILicenseFound = $true }
         }
         Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
         Mock -ModuleName Orchestrator Invoke-ProviderList {

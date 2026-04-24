@@ -18,11 +18,7 @@ function Export-PowerBIProvider {
 
         [Parameter(Mandatory = $true)]
         [string]
-        $BaseUrl,
-
-        [Parameter(Mandatory = $false)]
-        [bool]
-        $HasPowerBILicense = $true
+        $BaseUrl
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -30,10 +26,6 @@ function Export-PowerBIProvider {
     $Tracker = Get-CommandTracker
 
     $EnvironmentUrl = $BaseUrl
-
-    if (-not $HasPowerBILicense) {
-        Write-Warning "Power BI license not detected in tenant. Audit results will show a license warning."
-    }
 
     $headers = @{
         Authorization  = "Bearer $AccessToken"
@@ -89,7 +81,6 @@ function Export-PowerBIProvider {
 
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
-    $PowerBILicense = ConvertTo-Json $HasPowerBILicense
 
     # Note the spacing and the last comma in the json is important
     $json = @"
@@ -102,7 +93,6 @@ function Export-PowerBIProvider {
     "rscript_setting": $RScriptJson,
     "sensitivity_label_setting": $SensitivityLabelJson,
     "tenant_settings": $TenantSettingsJson,
-    "powerbi_license": $PowerBILicense,
     "powerbi_successful_commands": $PowerBISuccessfulCommands,
     "powerbi_unsuccessful_commands": $PowerBIUnSuccessfulCommands,
 "@
