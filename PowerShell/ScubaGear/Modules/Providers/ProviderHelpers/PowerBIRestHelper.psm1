@@ -34,9 +34,10 @@ function Get-PowerBIScope {
         [string]$M365Environment
     )
     switch ($M365Environment) {
-        { $_ -in @("commercial", "gcc") } { return "https://analysis.windows.net/powerbi/api/.default" }
-        "gcchigh"                         { return "https://high.analysis.usgovcloudapi.net/powerbi/api/.default" }
-        "dod"                             { return "https://mil.analysis.usgovcloudapi.net/powerbi/api/.default" }
+        "commercial" { return "https://analysis.windows.net/powerbi/api/.default" }
+        "gcc"        { return "https://analysis.usgovcloudapi.net/powerbi/api/.default" }
+        "gcchigh"    { return "https://high.analysis.usgovcloudapi.net/powerbi/api/.default" }
+        "dod"        { return "https://mil.analysis.usgovcloudapi.net/powerbi/api/.default" }
     }
 }
 
