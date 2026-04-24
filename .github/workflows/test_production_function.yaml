@@ -29,6 +29,7 @@ on:
   #     - ".github/workflows/function_test_entra.yaml"
   #     - ".github/workflows/function_test_exchange.yaml"
   #     - ".github/workflows/function_test_powerplatform.yaml"
+  #     - ".github/workflows/function_test_powerbi.yaml"
   #     - ".github/workflows/function_test_sharepoint.yaml"
   #     - ".github/workflows/function_test_teams.yaml"
   #     - ".github/actions/extract-email/action.yaml"
@@ -120,6 +121,27 @@ jobs:
   test_power_platform:
     name: Test Power Platform
     uses: ./.github/workflows/function_test_powerplatform.yaml
+    permissions:
+      contents: write
+      id-token: write
+    with:
+      # Default to true when running on a schedule and the input is missing
+      EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
+
+  test_powerbi:
+    name: Test Power BI
+    uses: ./.github/workflows/function_test_powerbi.yaml
     permissions:
       contents: write
       id-token: write

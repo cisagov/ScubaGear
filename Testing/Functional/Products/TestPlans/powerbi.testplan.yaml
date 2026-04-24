@@ -1,0 +1,161 @@
+ProductName: powerbi
+TestPlan:
+  - PolicyId: MS.POWERBI.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.1.1v1 Non-compliant - Publish to web is enabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: PublishToWeb
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.1.1v1 Compliant - Publish to web is disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: PublishToWeb
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.2.1v1 Non-compliant - Guest access to shared content is enabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: AllowGuestUserToAccessSharedContent
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.2.1v1 Compliant - Guest access to shared content is disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: AllowGuestUserToAccessSharedContent
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.3.1v1 Non-compliant - External sharing is enabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: ExternalSharingV2
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.3.1v1 Compliant - External sharing is disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: ExternalSharingV2
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.4.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.4.1v1 Non-compliant - Service principal API access is disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: ServicePrincipalAccessPermissionAPIs
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.4.1v1 Non-compliant - Service principal API access is enabled org-wide (not restricted to security groups)
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: ServicePrincipalAccessPermissionAPIs
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.4.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.4.2v1 Non-compliant - Service principal profile creation is disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: AllowServicePrincipalsCreateAndUseProfiles
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.4.2v1 Non-compliant - Service principal profile creation is enabled org-wide (not restricted to security groups)
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: AllowServicePrincipalsCreateAndUseProfiles
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.5.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.5.1v1 Non-compliant - ResourceKey authentication is not blocked
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: BlockResourceKeyAuthentication
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.5.1v1 Compliant - ResourceKey authentication is blocked
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: BlockResourceKeyAuthentication
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.6.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.6.1v1 Non-compliant - R and Python visuals are enabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: RScriptVisual
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.6.1v1 Compliant - R and Python visuals are disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: RScriptVisual
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.7.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.POWERBI.7.1v1 Non-compliant - Sensitivity labels are disabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: EimInformationProtectionEdit
+              Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.7.1v1 Compliant - Sensitivity labels are enabled
+        Preconditions:
+          - Command: Set-PowerBITenantSetting
+            Splat:
+              SettingName: EimInformationProtectionEdit
+              Enabled: true
+        Postconditions: []
+        ExpectedResult: true

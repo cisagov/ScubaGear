@@ -481,7 +481,7 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
                             '$filter' = "appId eq '$ResourceId'"
                         }
                     ).Value
-                
+
                 $ServicePrincipalId = $ServicePrincipal.id
 
                 $RiskyDelegatedPermissions = $RiskyPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties

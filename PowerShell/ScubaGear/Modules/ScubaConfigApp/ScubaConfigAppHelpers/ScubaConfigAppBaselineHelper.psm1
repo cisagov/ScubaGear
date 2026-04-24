@@ -340,17 +340,17 @@ function Update-ScubaConfigBaselineWithMarkdown {
     # Fix common UTF-8 encoding issues BEFORE converting to JSON
     # This ensures proper JSON escaping of the replaced characters
     $configJson = $configContent | ConvertTo-Json -Depth 10 -Compress | ConvertFrom-Json
-    
+
     # Recursively clean smart quotes and encoding issues from all string properties
     function Set-JsonStrings {
         param($obj)
-        
+
         if ($null -eq $obj) { return $obj }
-        
+
         if ($obj -is [string]) {
             # Replace smart quotes and malformed characters
             $cleaned = $obj -replace ([char]0x2019), "'"        # Right single quotation mark
-            $cleaned = $cleaned -replace ([char]0x201C), '"'    # Left double quotation mark  
+            $cleaned = $cleaned -replace ([char]0x201C), '"'    # Left double quotation mark
             $cleaned = $cleaned -replace ([char]0x201D), '"'    # Right double quotation mark
             $cleaned = $cleaned -replace 'â€"', "—"           # Fix malformed double dash
             $cleaned = $cleaned -replace 'â€™', "'"           # Fix malformed apostrophe
@@ -370,13 +370,13 @@ function Update-ScubaConfigBaselineWithMarkdown {
             }
             return $obj
         }
-        
+
         return $obj
     }
-    
+
     # Clean all strings in the configuration
     $cleanedConfig = Set-JsonStrings $configJson
-    
+
     # Now convert to JSON with cleaned strings
     $jsonOutput = $cleanedConfig | ConvertTo-Json -Depth 10
 

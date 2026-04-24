@@ -35,7 +35,7 @@ InModuleScope ScubaConfig {
         AfterAll {
             # Reset instance after all tests in this file
             [ScubaConfig]::ResetInstance()
-            
+
             # Clean up dummy OPA executable
             if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
                 Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
