@@ -771,6 +771,7 @@ PasswordAdditionBlockedApps := true if {
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordAddition"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
 }
 
 # Helper function to check if symmetric key addition is blocked for applications
@@ -781,6 +782,7 @@ SymmetricKeyAdditionBlockedApps := true if {
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "symmetricKeyAddition"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
 }
 
 # Helper function to check if password addition is blocked for service principals
@@ -791,6 +793,7 @@ PasswordAdditionBlockedSPs := true if {
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordAddition"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
 }
 
 # Helper function to check if symmetric key addition is blocked for service principals
@@ -801,6 +804,7 @@ SymmetricKeyAdditionBlockedSPs := true if {
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "symmetricKeyAddition"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
 }
 
 # Check if MS.AAD.5.5v1 passes (password addition fully blocked)
@@ -842,6 +846,7 @@ PasswordLifetimeRestrictedApps(MaxDays) := true if {
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordLifetime"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
     # maxLifetime format: "P181D" (ISO 8601 duration) - set to 181 to enforce "180 days or less" due to Microsoft's "less than" evaluation
     # Extract number of days from format PnD
     MaxLifetimeStr := Restriction.MaxLifetime
@@ -857,6 +862,7 @@ SymmetricKeyLifetimeRestrictedApps(MaxDays) := true if {
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "symmetricKeyLifetime"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
     MaxLifetimeStr := Restriction.MaxLifetime
     DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
     Days := to_number(DaysStr)
@@ -869,6 +875,7 @@ PasswordLifetimeRestrictedSPs(MaxDays) := true if {
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordLifetime"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
     MaxLifetimeStr := Restriction.MaxLifetime
     DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
     Days := to_number(DaysStr)
@@ -881,6 +888,7 @@ SymmetricKeyLifetimeRestrictedSPs(MaxDays) := true if {
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "symmetricKeyLifetime"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
     MaxLifetimeStr := Restriction.MaxLifetime
     DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
     Days := to_number(DaysStr)
@@ -942,6 +950,7 @@ CertificateLifetimeRestrictedApps(MaxDays) := true if {
     some Restriction in Policy.ApplicationRestrictions.KeyCredentials
     Restriction.RestrictionType == "asymmetricKeyLifetime"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
     # maxLifetime format: "P366D" (ISO 8601 duration) - set to 366 to enforce "365 days or less" due to Microsoft's "less than" evaluation
     # Extract number of days from format PnD
     MaxLifetimeStr := Restriction.MaxLifetime
@@ -957,6 +966,7 @@ CertificateLifetimeRestrictedSPs(MaxDays) := true if {
     some Restriction in Policy.ServicePrincipalRestrictions.KeyCredentials
     Restriction.RestrictionType == "asymmetricKeyLifetime"
     Restriction.State == "enabled"
+    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
     MaxLifetimeStr := Restriction.MaxLifetime
     DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
     Days := to_number(DaysStr)
