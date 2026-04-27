@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "ActualValue":  "",
         "Commandlet":  [
@@ -1983,7 +1983,7 @@
 
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant"
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.3.1v1",
@@ -1995,8 +1995,8 @@
 
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.1.3v1",
@@ -2008,8 +2008,8 @@
 
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.3.2v1",
@@ -2021,8 +2021,8 @@
 
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall/Not-Implemented",
         "PolicyId":  "MS.SHAREPOINT.3.3v1",
@@ -2034,8 +2034,8 @@
                             0
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.1.1v1",
@@ -2047,8 +2047,8 @@
                             0
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.1.2v1",
@@ -2060,8 +2060,8 @@
                             1
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.2.1v1",
@@ -2073,8 +2073,8 @@
                             1
                         ],
         "Commandlet":  [
-                           "Get-SPOTenant",
-                           "Get-PnPTenant"
+                           "SharePoint REST API",
+                           "SharePoint REST API"
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SHAREPOINT.2.2v1",
@@ -2339,3 +2339,4 @@
         "RequirementMet":  true
     }
 ]
+
