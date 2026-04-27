@@ -132,7 +132,7 @@ InModuleScope AADHybridExchangeHelper {
             }
 
             It "throws an exception" {
-                { Get-LegacyExchangeServicePrincipal -M365Environment "gcc" } | Should -Throw "Graph API error"
+                { Get-LegacyExchangeServicePrincipal -M365Environment "gcc" 3>$null } | Should -Throw "Graph API error"
             }
         }
     }
