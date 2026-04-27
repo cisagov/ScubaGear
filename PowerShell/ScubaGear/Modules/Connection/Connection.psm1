@@ -187,7 +187,7 @@
                            $AllPlans = $SubscribedSkus | ForEach-Object { $_.servicePlans } |
                                Where-Object { $_.provisioningStatus -eq "Success" }
                            $PBIPlans = $AllPlans |
-                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P[0-9]|PBI_PREMIUM)" }
+                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM)" }
                            $HasPBILicense = ($null -ne $PBIPlans -and @($PBIPlans).Count -gt 0)
                            if ($HasPBILicense) {
                                $PlanNames = ($PBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
