@@ -640,7 +640,9 @@ Application Password Addition SHOULD be blocked.
 
 <!--Policy: MS.AAD.5.5v1; Criticality: SHOULD -->
 - _Rationale:_ Applications that use client secrets might store them in configuration files, hardcode them in scripts, or risk exposure in other ways. The complexities of secret management make client secrets susceptible to leaks and attractive to attackers. Blocking password addition forces the use of more secure certificate-based authentication.
-- _Last modified:_ November 2025
+- _Last modified:_ April 2026
+- _Note:_ Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **181 days** to enforce the requirement of "180 days or less."
+- _Note:_ If MS.AAD.5.5v1 is implemented (blocking password addition entirely), this policy may be redundant but provides defense-in-depth.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
@@ -655,7 +657,7 @@ Application password lifetime SHOULD be restricted to 180 days or less.
 
 <!--Policy: MS.AAD.5.6v1; Criticality: SHOULD -->
 - _Rationale:_ Long-lived credentials increase the window of opportunity for attackers to exploit compromised secrets. Enforcing a maximum password lifetime of 180 days ensures regular credential rotation, reducing the impact of credential theft and improving overall security hygiene.
-- _Last modified:_ November 2025
+- _Last modified:_ April 2026
 - _Note:_ This policy applies only if password credentials are permitted. Microsoft and CISA recommend blocking password addition entirely (MS.AAD.5.5v1) as the preferred approach.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5, SC-12
 - _MITRE ATT&CK TTP Mapping:_
@@ -670,7 +672,8 @@ Application certificate lifetime SHOULD be restricted to 365 days or less.
 
 <!--Policy: MS.AAD.5.7v1; Criticality: SHOULD -->
 - _Rationale:_ While certificates provide more secure authentication than passwords, long-lived certificates can still be compromised. Limiting certificate lifetime to 365 days reduces the risk of exploitation while balancing operational overhead. Regular certificate rotation is a security best practice that minimizes exposure from compromised keys.
-- _Last modified:_ November 2025
+- _Note:_ Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **366 days** to enforce the requirement of "365 days or less."
+- _Last modified:_ April 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-12, IA-5
 - _MITRE ATT&CK TTP Mapping:_
   - [T1649: Steal or Forge Authentication Certificates](https://attack.mitre.org/techniques/T1649/)
@@ -757,7 +760,9 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 4. Set status to **On**. Ensure **Applies to** is set to **All applications**.
 
-5. Click **Save**.
+5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
+
+6. Click **Save**.
 
 #### MS.AAD.5.6v1 Instructions
 
@@ -769,11 +774,9 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 4. Set status to **On**. Set maximum lifetime to **181 days**. Ensure **Applies to** is set to **All applications**.
 
-5. Click **Save**.
+5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
-**Note:** Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **181 days** to enforce the requirement of "180 days or less."
-
-**Note:** If MS.AAD.5.5v1 is implemented (blocking password addition entirely), this policy may be redundant but provides defense-in-depth.
+6. Click **Save**.
 
 #### MS.AAD.5.7v1 Instructions
 
@@ -785,9 +788,9 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 4. Set status to **On**. Set maximum lifetime to **366 days**. Ensure **Applies to** is set to **All applications**.
 
-5. Click **Save**.
+5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
-**Note:** Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **366 days** to enforce the requirement of "365 days or less."
+6. Click **Save**.
 
 ## 6. Passwords
 
