@@ -27,6 +27,9 @@ InModuleScope Orchestrator {
 
             Mock -CommandName Write-Debug {}
             Mock -CommandName New-Item {}
+            Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
+            Mock -ModuleName Orchestrator Write-ScubaLog {}
+            Mock -ModuleName Orchestrator Get-ScubaRunDetails {}
             Mock -CommandName Get-Content { "" }
             Mock -CommandName Get-Member { $true }
             Mock -CommandName New-Guid { "00000000-0000-0000-0000-000000000000" }

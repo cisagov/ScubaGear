@@ -42,6 +42,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -94,6 +95,7 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
