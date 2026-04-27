@@ -641,8 +641,6 @@ Application Password Addition SHOULD be blocked.
 <!--Policy: MS.AAD.5.5v1; Criticality: SHOULD -->
 - _Rationale:_ Applications that use client secrets might store them in configuration files, hardcode them in scripts, or risk exposure in other ways. The complexities of secret management make client secrets susceptible to leaks and attractive to attackers. Blocking password addition forces the use of more secure certificate-based authentication.
 - _Last modified:_ April 2026
-- _Note:_ Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **181 days** to enforce the requirement of "180 days or less."
-- _Note:_ If MS.AAD.5.5v1 is implemented (blocking password addition entirely), this policy may be redundant but provides defense-in-depth.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5
 - _MITRE ATT&CK TTP Mapping:_
   - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
@@ -658,6 +656,7 @@ Application password lifetime SHOULD be restricted to 180 days or less.
 <!--Policy: MS.AAD.5.6v1; Criticality: SHOULD -->
 - _Rationale:_ Long-lived credentials increase the window of opportunity for attackers to exploit compromised secrets. Enforcing a maximum password lifetime of 180 days ensures regular credential rotation, reducing the impact of credential theft and improving overall security hygiene.
 - _Last modified:_ April 2026
+- _Note:_ Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **181 days** to enforce the requirement of "180 days or less."
 - _Note:_ This policy applies only if password credentials are permitted. Microsoft and CISA recommend blocking password addition entirely (MS.AAD.5.5v1) as the preferred approach.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5, SC-12
 - _MITRE ATT&CK TTP Mapping:_
