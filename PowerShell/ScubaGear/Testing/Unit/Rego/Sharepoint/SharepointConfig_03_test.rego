@@ -444,6 +444,7 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
         "This policy is only applicable if the external sharing slider",
         "in the SharePoint admin center is not set to Only People In Your Organization.",
         "See %v for more info"
+    ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 
