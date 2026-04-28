@@ -246,7 +246,7 @@ The allowable file and folder permissions for links SHALL be set to view only.
   - [T1565: Data Manipulation](https://attack.mitre.org/techniques/T1565/)
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
-#### MS.SHAREPOINT.3.3v1
+#### MS.SHAREPOINT.3.3v2
 Reauthentication days for people who use a verification code SHALL be set to 30 days or less.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
@@ -254,8 +254,8 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 <!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
 - _Rationale:_ By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
-- _Last modified:_ March 2025
-- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone** or **New and existing guests**.
+- _Last modified:_ April 2026
+- _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**, **New and existing guests**, or **Existing guests.**
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1080: Taint Shared Content](https://attack.mitre.org/techniques/T1080/)
@@ -303,7 +303,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 7.  Select **Save**.
 
-#### MS.SHAREPOINT.3.3v1 Instructions
+#### MS.SHAREPOINT.3.3v2 Instructions
 
 1.  Sign in to the **SharePoint admin center**.
 
