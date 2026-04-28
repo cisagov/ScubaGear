@@ -439,11 +439,27 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
                 {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-                                with input.module_version as "main"
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if the external sharing slider",
-        "in the SharePoint admin center is not set to Only People In Your Organization. See %v for more info"
+        "in the SharePoint admin center is not set to Only People In Your Organization.",
+        "See %v for more info"
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable if {
+    PolicyId := "MS.SHAREPOINT.3.3v1"
+
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 0},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 31}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if the external sharing slider",
+        "in the SharePoint admin center is not set to Only People In Your Organization.",
+        "See %v for more info"
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
