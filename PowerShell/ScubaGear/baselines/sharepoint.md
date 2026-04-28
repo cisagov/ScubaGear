@@ -252,7 +252,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SHAREPOINT.3.3v1; Criticality: SHALL -->
+<!--Policy: MS.SHAREPOINT.3.3v2; Criticality: SHALL -->
 - _Rationale:_ By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.
 - _Last modified:_ April 2026
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**, **New and existing guests**, or **Existing guests.**

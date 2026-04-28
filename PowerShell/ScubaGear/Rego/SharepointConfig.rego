@@ -320,7 +320,7 @@ tests contains {
 
 
 #
-# MS.SHAREPOINT.3.3v1
+# MS.SHAREPOINT.3.3v2
 #--
 
 VERIFICATION_STRING := "Expiration time for 'People who use a verification code' NOT"
@@ -346,9 +346,9 @@ VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
 } else := [FAIL, false]
 
 # This policy is only applicable if external sharing is set to "Anyone",
-# or "New and existing guests"
+# "New and existing guests", or "Exisiting Guests"
 tests contains {
-    "PolicyId": "MS.SHAREPOINT.3.3v1",
+    "PolicyId": "MS.SHAREPOINT.3.3v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [
@@ -359,22 +359,22 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMsg),
     "RequirementMet": Status
 } if {
-    SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
+    SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS, EXISTINGGUESTS]
 
     [ErrMsg, Status] := VerificationCodeReAuthExpiration(Tenant)
 }
 
-# Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
+# Test for N/A case where sharing is set to Only people in your organization.
 tests contains {
-    "PolicyId": "MS.SHAREPOINT.3.3v1",
+    "PolicyId": "MS.SHAREPOINT.3.3v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
 } if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-    not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS]
+    PolicyId := "MS.SHAREPOINT.3.3v2"
+    not SharingCapability in [ANYONE, NEWANDEXISTINGGUESTS, EXISTINGGUESTS]
     Reason := NAString(
         concat(" ", [
             SliderSettings(2), 
