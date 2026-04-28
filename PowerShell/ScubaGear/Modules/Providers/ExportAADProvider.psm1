@@ -223,14 +223,14 @@ function Export-AADProvider {
     $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
     ##### End block
 
-    # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1
+    # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
     $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
     $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
 
     # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
     Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
-    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
+    if ($null -eq $AppPolicies -or @($AppPolicies.Value).Count -eq 0) {
         $AppManagementPolicies = ConvertTo-Json @()
     }
     else {
