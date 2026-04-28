@@ -439,6 +439,7 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
                 {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+                                with input.module_version as "main"
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if the external sharing slider",
