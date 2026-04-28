@@ -881,7 +881,6 @@ NotGlobalAdmins contains User.DisplayName if {
 }
 # Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error 
 default GetScoreDescription := "All privileged users are Global Admin"
-# GetScoreDescription := concat("", ["Least Privilege Score Test = ", Score, " (should be 1 or less)"]) if {
 GetScoreDescription := concat("", [
     "Least Privilege Score = ", Score, " (should be 1 or less)",
     sprintf("\nCalculated by %d global admins / %d privileged users without global admin role",
