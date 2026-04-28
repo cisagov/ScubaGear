@@ -18,6 +18,16 @@ on:
         description: "The name of a GitHub event"
         required: true
         type: string
+      SelectedProduct:
+        description: "The product selected for testing"
+        required: false
+        type: string
+        default: "all"
+      RefName:
+        description: "The branch or tag that triggered the workflow"
+        required: false
+        type: string
+        default: ""
     secrets:
       PfxBase64:
         required: true
@@ -31,8 +41,6 @@ on:
         required: true
       NotifierPassword:
         required: true
-  workflow_dispatch:
-
 permissions:
   id-token: write
   contents: write
@@ -48,6 +56,11 @@ jobs:
     concurrency:
       group: Teams_Tenant1
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -79,6 +92,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -97,6 +111,11 @@ jobs:
     concurrency:
       group: Teams_Tenant1
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -128,6 +147,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -143,6 +163,11 @@ jobs:
     concurrency:
       group: Teams_Tenant2
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -174,6 +199,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -192,6 +218,11 @@ jobs:
     concurrency:
       group: Teams_Tenant2
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -223,6 +254,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -238,6 +270,11 @@ jobs:
     concurrency:
       group: Teams_Tenant6
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -269,6 +306,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -287,6 +325,11 @@ jobs:
     concurrency:
       group: Teams_Tenant6
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -318,6 +361,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -333,6 +377,11 @@ jobs:
     concurrency:
       group: Teams_Tenant7
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -364,6 +413,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -382,6 +432,11 @@ jobs:
     concurrency:
       group: Teams_Tenant7
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -413,6 +468,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -448,7 +504,22 @@ jobs:
           server_port: 465
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
-          subject: ScubaGear Functional Test Failure
+          subject: "ScubaGear Functional Test Failure - Teams - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
           from: ScubaGear Notifier
-          body: This workflow failed ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          body: |
+            ScubaGear Functional Test Failure
+
+            Product: Teams
+            Branch: ${{ inputs.RefName || github.ref_name }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Tenant Job Results:
+              Tms_Tenant1: ${{ needs.Tms_Tenant1.result }} (${{ needs.Tms_Tenant1.outputs.passed }}/${{ needs.Tms_Tenant1.outputs.total }} passing, ${{ needs.Tms_Tenant1.outputs.failed }} failed)
+              Tms_Tenant1_GCC: ${{ needs.Tms_Tenant1_GCC.result }} (${{ needs.Tms_Tenant1_GCC.outputs.passed }}/${{ needs.Tms_Tenant1_GCC.outputs.total }} passing, ${{ needs.Tms_Tenant1_GCC.outputs.failed }} failed)
+              Tms_Tenant2: ${{ needs.Tms_Tenant2.result }} (${{ needs.Tms_Tenant2.outputs.passed }}/${{ needs.Tms_Tenant2.outputs.total }} passing, ${{ needs.Tms_Tenant2.outputs.failed }} failed)
+              Tms_Tenant2_GCC: ${{ needs.Tms_Tenant2_GCC.result }} (${{ needs.Tms_Tenant2_GCC.outputs.passed }}/${{ needs.Tms_Tenant2_GCC.outputs.total }} passing, ${{ needs.Tms_Tenant2_GCC.outputs.failed }} failed)
+              Tms_Tenant6: ${{ needs.Tms_Tenant6.result }} (${{ needs.Tms_Tenant6.outputs.passed }}/${{ needs.Tms_Tenant6.outputs.total }} passing, ${{ needs.Tms_Tenant6.outputs.failed }} failed)
+              Tms_Tenant6_GCC: ${{ needs.Tms_Tenant6_GCC.result }} (${{ needs.Tms_Tenant6_GCC.outputs.passed }}/${{ needs.Tms_Tenant6_GCC.outputs.total }} passing, ${{ needs.Tms_Tenant6_GCC.outputs.failed }} failed)
+              Tms_Tenant7: ${{ needs.Tms_Tenant7.result }} (${{ needs.Tms_Tenant7.outputs.passed }}/${{ needs.Tms_Tenant7.outputs.total }} passing, ${{ needs.Tms_Tenant7.outputs.failed }} failed)
+              Tms_Tenant7_EX: ${{ needs.Tms_Tenant7_EX.result }} (${{ needs.Tms_Tenant7_EX.outputs.passed }}/${{ needs.Tms_Tenant7_EX.outputs.total }} passing, ${{ needs.Tms_Tenant7_EX.outputs.failed }} failed)
