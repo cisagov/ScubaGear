@@ -11,6 +11,9 @@ ScubaGear allows users to specify most of the `Invoke-SCuBA` cmdlet [parameters]
 > [!IMPORTANT]
 > When a parameter is specified on both the command line and the configuration file, the parameter value provided on the command line has precedence and the configuration file value will be disregarded.
 
+> [!TIP]
+> It is highly recommended to use the **[Configuration UI](scubaconfigapp.md)** to create and manage ScubaGear configuration files. The UI provides an interactive experience that reduces the risk of errors and makes it easy to configure exclusions, annotations, and omissions without manually editing YAML.
+
 ## Sample Configuration Files
 
 [Sample config files](../../PowerShell/ScubaGear/Sample-Config-Files) are available in the repo. Several of these sample config files are explained in more detail in the sections below.
@@ -188,7 +191,7 @@ Under a product key, there can be policy keys that provide configuration values 
 
 ### Entra ID Configuration
 
-The ScubaGear configuration file provides the capability to exclude specific users or groups from some of the Entra ID policy checks. For example, a user could exclude emergency access accounts from some of the policy checks. Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce grave risks to your system and must be managed carefully**.
+The ScubaGear configuration file provides the capability to exclude specific users, groups, applications, or guest user types from some of the Entra ID policy checks. For example, a user could exclude emergency access accounts from some of the policy checks. Exclusions must only be used if they are approved within an organization's security risk acceptance process. **Exclusions can introduce grave risks to your system and must be managed carefully**.
 
 Example Entra ID configuration:
 
@@ -201,6 +204,28 @@ Aad:
         - "87654321-4321-4321-4321-210987654321"  # Emergency access account 2
       Groups:
         - "11111111-1111-1111-1111-111111111111"  # Break glass admin group
+      Applications:
+        - "49b4dcdf-1f90-41a7c3-9b42-5cfe9dd7e3b4"  # Example Cloud App 1
+      GuestUserTypes:
+        - b2bCollaborationGuest
+        - b2bCollaborationMember
+  MS.AAD.2.1v1:
+    CapExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account 1
+        - "87654321-4321-4321-4321-210987654321"  # Emergency access account 2
+      Groups:
+        - "11111111-1111-1111-1111-111111111111"  # Break glass admin group
+      Applications:
+        - "49b4dcdf-1f90-41a7c3-9b42-5cfe9dd7e3b4"  # Example Application 1
+        -  Office365 # Example Application 2
+      GuestUserTypes:
+        - internalGuest
+        - b2bCollaborationGuest
+        - b2bCollaborationMember
+        - b2bDirectConnectUser
+        - otherExternalUser
+        - serviceProvider
   MS.AAD.7.4v1:
     RoleExclusions:
       Users:
@@ -211,7 +236,33 @@ Aad:
 
 #### Conditional Access Policy Exclusions
 
-The `Aad` top level key allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where the excluded users or groups are defined. The `CapExclusions` key supports both a `Users` or `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.
+The `Aad` top level key allows the user to specify configurations specific to the Entra Id baseline. Under the `Aad` key is the policy identifier such as `MS.AAD.1.1v1` and under that is the `CapExclusions` key where exclusions are defined. `CapExclusions` supports four fields:
+
+- **`Applications`**: A list of Applications to exclude. The value to use depends on how the application appears in the Entra portal under the CAP's **Exclude > Select specific resources** section:
+
+  - **Display name only** (no GUID shown beneath the name, e.g., *Microsoft Admin Portals*, *Office 365*): Remove all spaces from the display name.
+    ```yaml
+    Applications:
+      - "MicrosoftAdminPortals"
+      - "Office365"
+    ```
+
+  - **Display name with a GUID beneath it** (e.g., *Azure Cosmos DB* with `a232010e-820c-4083-83bb-3ace5fc29d0b`): Use the GUID.
+    ```yaml
+    Applications:
+      - "a232010e-820c-4083-83bb-3ace5fc29d0b"
+    ```
+
+  > **Note:** `Applications` is not supported for `MS.AAD.3.8v1`.
+- **`Groups`**: A list of group Object IDs (GUIDs) to exclude from the policy check.
+- **`GuestUserTypes`**: A list of guest/external user types to exclude. Valid values are:
+  - `b2bCollaborationGuest`
+  - `b2bCollaborationMember`
+  - `b2bDirectConnectUser`
+  - `internalGuest`
+  - `otherExternalUser`
+  - `serviceProvider`
+- **`Users`**: A list of user Object IDs (GUIDs) to exclude from the policy check.
 
 CapExclusions are supported for the following policies:
 

@@ -1,5 +1,5 @@
 {
-  "Version": "2.1.23 (build 955)",
+  "Version": "2.4.13 (build 1205)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
@@ -558,9 +558,9 @@
   },
   "inputTypes": {
     "CapExclusions": {
-      "name": "Conditional Access Policy Excluded Groups and Users",
+      "name": "Conditional Access Policy Excluded Groups, Users, Applications, and Guest User Types",
       "value": "CapExclusions",
-      "description": "Exclude specific groups or users from conditional access policies",
+      "description": "Exclude specific groups, users, applications, and guest user types from conditional access policies",
       "fields": [
         {
           "type": "array",
@@ -576,6 +576,53 @@
           "value": "Users",
           "description": "User IDs to exclude from this policy",
           "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Cloud Applications",
+          "value": "Applications",
+          "description": "Cloud Applications, GUIDS and names, to exclude from this policy",
+          "valueType": "guidOrName",
+          "required": false
+        },
+        {
+          "type": "multiselect",
+          "name": "Guest User Types",
+          "value": "GuestUserTypes",
+          "description": "Guest user types to exclude from this policy",
+          "valueType": "guestTypes",
+          "required": false
+        }
+      ]
+    },
+    "CapExclusionsWithoutApps": {
+      "name": "Conditional Access Policy Excluded Groups, Users, and Guest User Types Without Applications",
+      "value": "CapExclusions",
+      "description": "Exclude specific groups, users, and guest user types from conditional access policies without specifying applications",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Group Object Id's",
+          "value": "Groups",
+          "description": "Group IDs to exclude from this policy",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "User Object Id's",
+          "value": "Users",
+          "description": "User IDs to exclude from this policy",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "multiselect",
+          "name": "Guest User Types",
+          "value": "GuestUserTypes",
+          "description": "Guest user types to exclude from this policy",
+          "valueType": "guestTypes",
           "required": false
         }
       ]
@@ -841,6 +888,27 @@
       "invalidScriptMessage": "",
       "invalidScriptChecks": [],
       "sensitive": true
+    },
+    "guidOrName": {
+      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$|^[a-zA-Z0-9]+$",
+      "sample": "123e4567-e89b-12d3-a456-426614174000 or Office365",
+      "format": "123e4567-e89b-12d3-a456-426614174000 or Office365",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "guestTypes": {
+      "itemType": "string",
+      "format": "multiselect",
+      "allowedValues": {
+        "b2bCollaborationGuest":  "B2B collaboration guest users",
+        "b2bCollaborationMember": "B2B collaboration member users",
+        "b2bDirectConnectUser":   "B2B direct connect users",
+        "internalGuest":          "Local guest users",
+        "serviceProvider":        "Service provider users",
+        "otherExternalUser":      "Other external users"
+      },
+      "sensitive": false
     },
     "yearmonthday": {
       "pattern": "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",

@@ -13,6 +13,8 @@ import data.utils.aad.ReportDetailsArrayLicenseWarningCap
 import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
+import data.utils.aad.AppExclusionsFullyExempt
+import data.utils.aad.GuestUserExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.IsPhishingResistantMFA
 import data.utils.aad.IsGeneralMFA
@@ -50,7 +52,6 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -63,6 +64,8 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -96,7 +99,6 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -108,6 +110,8 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
@@ -157,7 +161,6 @@ SignInBlocked contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -169,6 +172,8 @@ SignInBlocked contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
@@ -208,7 +213,6 @@ PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -219,6 +223,8 @@ PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -248,7 +254,6 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -259,6 +264,8 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -426,7 +433,6 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     ### We don't check IncludeUsers All because this is a role based policy
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -440,6 +446,8 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -469,7 +477,6 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -483,6 +490,8 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -527,6 +536,7 @@ RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -555,7 +565,6 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -567,6 +576,8 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -677,7 +688,10 @@ BadPolicies := BadDefaultGrantPolicies if {
 default DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
     count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
-} else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
+} else := concat(" ", [
+    "authorization policies found that allow non-admin users to consent to", 
+    "third-party applications with risky delegated permission classifications"
+ ]) if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
 }
 
@@ -865,9 +879,13 @@ NotGlobalAdmins contains User.DisplayName if {
     some User in input.privileged_users
     not "Global Administrator" in User.roles
 }
-
+# Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error 
 default GetScoreDescription := "All privileged users are Global Admin"
-GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should be 1 or less)"]) if {
+GetScoreDescription := concat("", [
+    "Least Privilege Score = ", Score, " (should be 1 or less)",
+    sprintf("\nCalculated by %d global admins / %d privileged users without global admin role",
+        [Count(GlobalAdmins), Count(NotGlobalAdmins)])
+]) if {
     Count(NotGlobalAdmins) > 0
     RawRatio := sprintf("%v", [Count(GlobalAdmins)/Count(NotGlobalAdmins)])
     CutOff := min([4, Count(RawRatio)])
