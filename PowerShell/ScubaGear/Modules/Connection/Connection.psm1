@@ -187,7 +187,7 @@
                            $AllPlans = $SubscribedSkus | ForEach-Object { $_.servicePlans } |
                                Where-Object { $_.provisioningStatus -eq "Success" }
                            $PBIPlans = $AllPlans |
-                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM)" }
+                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" }
                            $HasPBILicense = ($null -ne $PBIPlans -and @($PBIPlans).Count -gt 0)
                            if ($HasPBILicense) {
                                $PlanNames = ($PBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
@@ -206,6 +206,32 @@
                    }
                    else {
                        $PBILicenseFound = $true
+                       # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
+                       # The Power BI Admin API requires the calling user to have a license.
+                       # Skip this check for service principal auth (SPs use tenant setting + security group).
+                       if (-not $ServicePrincipalParams.CertThumbprintParams) {
+                           try {
+                               $UserLicenseResponse = Invoke-MgGraphRequest -Method GET `
+                                   -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                               $UserPlans = $UserLicenseResponse.value | ForEach-Object { $_.servicePlans } |
+                                   Where-Object { $_.provisioningStatus -eq "Success" }
+                               $UserPBIPlans = $UserPlans |
+                                   Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" }
+                               if (-not $UserPBIPlans -or @($UserPBIPlans).Count -eq 0) {
+                                   Write-Verbose "Current user does not have a Power BI or Fabric license assigned — flagging for removal."
+                                   $PBILicenseFound = $false
+                               }
+                               else {
+                                   $UserPlanNames = ($UserPBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
+                                   Write-Verbose "User Power BI/Fabric license found: $UserPlanNames"
+                               }
+                           }
+                           catch {
+                               Write-Warning "Unable to check user Power BI license. Proceeding with token acquisition. Error: $($_.Exception.Message)"
+                           }
+                       }
+
+                       if ($PBILicenseFound) {
                        # Acquire Power BI access token
                        $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
                        $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
@@ -236,6 +262,7 @@
                                -LoginHint $LoginHint
                        }
                        Write-Verbose "Power BI token acquired successfully"
+                       }
                    }
                }
                "sharepoint" {
