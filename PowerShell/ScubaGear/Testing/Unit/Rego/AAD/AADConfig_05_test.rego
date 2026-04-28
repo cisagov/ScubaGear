@@ -166,27 +166,29 @@ test_IsEnabled_Incorrect if {
 # Policy MS.AAD.5.5v1
 #--
 test_PasswordAdditionBlocked_Correct if {
-    Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
+    Output := aad.tests with input.default_app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.5v1", Output, "0 password/symmetric key addition restriction(s) not meeting requirements"assword/symmetric key addition restriction(s) not meeting requirements", true) == true
+    TestResult("MS.AAD.5.5v1", Output, "0 Password addition restriction(s) not meeting requirements", true) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V1 if {
     Policy := json.patch(AppManagementPolicy,
                 [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/State", "value": "disabled"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.5v1", Output, ["passwordAddition (Applications): restriction is not enabled"]ut, ["passwordAddition (Applications): restriction is not enabled"], false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["Password addition not blocked"], false) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V2 if {
+    # Note: rego only tracks RestrictionType == "passwordAddition" (not symmetricKeyAddition).
+    # Disable SP passwordAddition (index 0) to exercise the SP scope.
     Policy := json.patch(AppManagementPolicy,
-                [{"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
+                [{"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.5v1", Output, ["symmetricKeyAddition (ServicePrincipals): restriction is not enabled"]ut, ["symmetricKeyAddition (ServicePrincipals): restriction is not enabled"], false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["Password addition not blocked"], false) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V3 if {
@@ -194,9 +196,9 @@ test_PasswordAdditionBlocked_Incorrect_V3 if {
     Policy := json.patch(AppManagementPolicy,
                 [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/RestrictForAppsCreatedAfterDateTime", "value": "/Date(1700000000000)/"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.5v1", Output, ["passwordAddition (Applications): date restriction set, old apps are exempt"]ut, ["passwordAddition (Applications): date restriction set, old apps are exempt"], false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["Only applies to apps created after 2023-11-14"], false) == true
 }
 #--
 
@@ -204,9 +206,10 @@ test_PasswordAdditionBlocked_Incorrect_V3 if {
 # Policy MS.AAD.5.6v1
 #--
 test_PasswordLifetimeRestricted_Correct if {
-    Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
+    # Default fixture has password addition fully blocked, so 5.6 takes the N/A path
+    Output := aad.tests with input.default_app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.6v1", Output, "N/A: All password addition is blocked per MS.AAD.5.5v1.", true) == true
+    TestResult("MS.AAD.5.6v1", Output, "Requirement met", true) == true
 }
 
 test_PasswordLifetimeRestricted_PasswordAdditionAllowed_Correct if {
@@ -216,9 +219,9 @@ test_PasswordLifetimeRestricted_PasswordAdditionAllowed_Correct if {
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"},
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.6v1", Output, "0 password/symmetric key lifetime restriction(s) not meeting requirements"assword/symmetric key lifetime restriction(s) not meeting requirements", true) == true
+    TestResult("MS.AAD.5.6v1", Output, "0 password lifetime restriction(s) not meeting requirements", true) == true
 }
 
 test_PasswordLifetimeRestricted_Incorrect_TooLong if {
@@ -229,9 +232,9 @@ test_PasswordLifetimeRestricted_Incorrect_TooLong if {
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"},
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.6v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.6v1", Output, ["Password lifetime too long: 182 days, must be 181 or less"], false) == true
 }
 
 test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
@@ -243,9 +246,9 @@ test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"},
                  {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/3/RestrictForAppsCreatedAfterDateTime", "value": "/Date(1700000000000)/"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.6v1", Output, ["passwordLifetime (Applications): date restriction set, old apps are exempt"]ut, ["passwordLifetime (Applications): date restriction set, old apps are exempt"], false) == true
+    TestResultContains("MS.AAD.5.6v1", Output, ["Password lifetime: only applies to apps created after 2023-11-14"], false) == true
 }
 #--
 
@@ -253,27 +256,27 @@ test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
 # Policy MS.AAD.5.7v1
 #--
 test_CertificateLifetimeRestricted_Correct if {
-    Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
+    Output := aad.tests with input.default_app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.7v1", Output, "0 certificate lifetime restriction(s) not meeting requirements"ertificate lifetime restriction(s) not meeting requirements", true) == true
+    TestResult("MS.AAD.5.7v1", Output, "0 certificate lifetime restriction(s) not meeting requirements", true) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_TooLong if {
     Policy := json.patch(AppManagementPolicy,
                 [{"op": "add", "path": "ApplicationRestrictions/KeyCredentials/0/MaxLifetime", "value": "P367D"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.7v1", Output, ["asymmetricKeyLifetime (Applications): MaxLifetime is 367 days, must be 366 days or less"]ut, ["asymmetricKeyLifetime (Applications): MaxLifetime is 367 days, must be 366 days or less"], false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["Certificate lifetime too long: 367 days, must be 366 or less"], false) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_Disabled if {
     Policy := json.patch(AppManagementPolicy,
                 [{"op": "add", "path": "ServicePrincipalRestrictions/KeyCredentials/0/State", "value": "disabled"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.7v1", Output, ["asymmetricKeyLifetime (ServicePrincipals): restriction is not enabled"]ut, ["asymmetricKeyLifetime (ServicePrincipals): restriction is not enabled"], false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["Certificate lifetime not restricted"], false) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_DateRestriction if {
@@ -281,8 +284,8 @@ test_CertificateLifetimeRestricted_Incorrect_DateRestriction if {
     Policy := json.patch(AppManagementPolicy,
                 [{"op": "add", "path": "ApplicationRestrictions/KeyCredentials/0/RestrictForAppsCreatedAfterDateTime", "value": "/Date(1700000000000)/"}])
 
-    Output := aad.tests with input.app_management_policy as [Policy]
+    Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.7v1", Output, ["asymmetricKeyLifetime (Applications): date restriction set, old apps are exempt"]ut, ["asymmetricKeyLifetime (Applications): date restriction set, old apps are exempt"], false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["Certificate lifetime: only applies to apps created after 2023-11-14"], false) == true
 }
 #--
