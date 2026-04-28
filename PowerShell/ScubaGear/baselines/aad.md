@@ -366,7 +366,7 @@ Managed Devices SHOULD be required to register MFA.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
-<!--ExclusionType: CapExclusions-->
+<!--ExclusionType: CapExclusionsWithoutApps-->
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-20b, IA-3

@@ -23,6 +23,12 @@ test_isDisabled_Incorrect if {
 
     TestResult("MS.POWERPLATFORM.3.1v1", Output, FAIL, false) == true
 }
+
+test_isDisabled_NullIsolationPolicy if {
+    Output := powerplatform.tests with input.tenant_isolation as [null]
+
+    TestResult("MS.POWERPLATFORM.3.1v1", Output, FAIL, false) == true
+}
 #--
 
 #

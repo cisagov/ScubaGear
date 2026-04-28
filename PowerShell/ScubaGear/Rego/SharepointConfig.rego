@@ -68,7 +68,7 @@ else := concat("", [
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [SharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -85,21 +85,21 @@ tests contains {
 # MS.SHAREPOINT.1.2v1
 #--
 
-# If OneDriveSharingCapability is set to Only People In Organization
+# If ODBSharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
-    "ActualValue": [OneDriveSharingCapability],
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": [ODBSharingCapability],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
     input.OneDrive_PnP_Flag == false
-    OneDriveSharingCapability := Tenant.OneDriveSharingCapability
+    ODBSharingCapability := Tenant.ODBSharingCapability
     Conditions := [
-        OneDriveSharingCapability == ONLYPEOPLEINORG,
-        OneDriveSharingCapability == EXISTINGGUESTS
+        ODBSharingCapability == ONLYPEOPLEINORG,
+        ODBSharingCapability == EXISTINGGUESTS
     ]
     Status := count(FilterArray(Conditions, true)) == 1
 }
@@ -138,7 +138,7 @@ NOTESTRING := concat(" ", NoteArray)
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [
         Tenant.SharingDomainRestrictionMode,
         SharingCapability
@@ -154,7 +154,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -179,7 +179,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [Tenant.DefaultSharingLinkType],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -199,7 +199,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.2.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [Tenant.DefaultLinkPermission],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -226,7 +226,7 @@ ErrStr := concat(" ", [
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [
         SharingCapability,
         Tenant.RequireAnonymousLinksExpireInDays
@@ -246,7 +246,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -287,7 +287,7 @@ FileAndFolderLinkPermission(2, 1) := concat(": ", [
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [FileLinkType, FolderLinkType],
     "ReportDetails": FileAndFolderLinkPermission(FileLinkType, FolderLinkType),
     "RequirementMet": Status
@@ -307,7 +307,7 @@ tests contains {
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
@@ -350,7 +350,7 @@ VerificationCodeReAuthExpiration(tenant) := [PASS, true] if {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [
         SharingCapability,
         Tenant.EmailAttestationRequired,
@@ -368,7 +368,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SHAREPOINT.3.3v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-SPOTenant", "Get-PnPTenant"],
+    "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [],
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
