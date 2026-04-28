@@ -169,6 +169,23 @@ InModuleScope -ModuleName ExportAADProvider {
                     $this.AddMockCommand("Get-DedicatedExchangeHybridApplications", {
                         return [pscustomobject]@{}
                     })
+
+                    $this.AddMockCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", {
+                        return [pscustomobject]@{
+                            ApplicationRestrictions = @{
+                                PasswordCredentials = @()
+                                KeyCredentials = @()
+                            }
+                            ServicePrincipalRestrictions = @{
+                                PasswordCredentials = @()
+                                KeyCredentials = @()
+                            }
+                        }
+                    })
+
+                    $this.AddMockCommand("Get-MgBetaPolicyAppManagementPolicy", {
+                        return @()
+                    })
                 }
             }
 
@@ -247,7 +264,8 @@ InModuleScope -ModuleName ExportAADProvider {
 
         It "includes app_management_policy in the JSON output" {
             $Json = Export-AADProvider
-            $Json | Should -Match '"app_management_policy":'
+            $Json | Should -Match '"default_app_management_policy":'
+            $Json | Should -Match '"app_management_policies":'
         }
     }
 }
