@@ -20,7 +20,7 @@ import data.utils.key.Count
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-TenantSettings"],
+    "Commandlet": ["Get-PowerPlatformTenantSettingsRest"],
     "ActualValue": EnvironmentCreation.disableEnvironmentCreationByNonAdminUsers,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -33,7 +33,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-TenantSettings"],
+    "Commandlet": ["Get-PowerPlatformTenantSettingsRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -49,7 +49,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-TenantSettings"],
+    "Commandlet": ["Get-PowerPlatformTenantSettingsRest"],
     "ActualValue": EnvironmentCreation.disableTrialEnvironmentCreationByNonAdminUsers,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -62,7 +62,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.1.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-TenantSettings"],
+    "Commandlet": ["Get-PowerPlatformTenantSettingsRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -126,7 +126,7 @@ PoliciesApplyingToDefaultViaExcept contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": {
         "PoliciesSetToAllEnvironments": PoliciesSetToAllEnvironments
     },
@@ -145,7 +145,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": {
         "DefaultEnvPolicies": DefaultEnvPolicies,
         "PoliciesApplyingToDefaultViaExcept": PoliciesApplyingToDefaultViaExcept
@@ -224,7 +224,7 @@ NonDefaultEnvWithPolicies contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": PoliciesSetToAllEnvironments,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -240,7 +240,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": {
         "AllEnvironments": AllEnvironments,
         "NonDefaultEnvWithPolicies": NonDefaultEnvWithPolicies,
@@ -265,7 +265,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": "No non-default environments and no DLP policies found",
     "ReportDetails": "No non-default environments and no DLP policies found",
     "RequirementMet": true
@@ -281,7 +281,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": "No DLP policies found",
     "ReportDetails": "No DLP policies found",
     "RequirementMet": false
@@ -297,7 +297,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -362,7 +362,7 @@ AllowedInBaseline := {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": RogueConnectors,
     "ReportDetails": ReportDetailsArray(Status, RogueConnectors, ErrorMessage),
     "RequirementMet": Status
@@ -378,7 +378,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": "No DLP Policies found",
     "ReportDetails": "No DLP Policies found",
     "RequirementMet": false
@@ -391,7 +391,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DlpPolicy"],
+    "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -414,7 +414,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-PowerAppTenantIsolationPolicy"],
+    "Commandlet": ["Get-PowerPlatformTenantIsolationRest"],
     "ActualValue": TenantIsolation.properties.isDisabled,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -427,13 +427,27 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-PowerAppTenantIsolationPolicy"],
+    "Commandlet": ["Get-PowerPlatformTenantIsolationRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
 } if {
     count(input.tenant_isolation) <= 0
 }
+
+# Edge case where tenant isolation has never been configured (returns null)
+tests contains {
+    "PolicyId": "MS.POWERPLATFORM.3.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-PowerPlatformTenantIsolationRest"],
+    "ActualValue": "Tenant isolation policy has never been configured",
+    "ReportDetails": ReportDetailsBoolean(false),
+    "RequirementMet": false
+} if {
+    some TenantIsolation in input.tenant_isolation
+    TenantIsolation == null
+}
+
 #--
 
 #
@@ -484,7 +498,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-TenantSettings"],
+    "Commandlet": ["Get-PowerPlatformTenantSettingsRest"],
     "ActualValue": EnvironmentCreation.disablePortalsCreationByNonAdminUsers,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -502,7 +516,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-TenantSettings"],
+    "Commandlet": ["Get-PowerPlatformTenantSettingsRest"],
     "ActualValue": EnvironmentCreation.powerPlatform.powerApps.disableShareWithEveryone,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status

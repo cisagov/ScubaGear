@@ -1,4 +1,9 @@
 :  # SCUBACONFIGAPPUI CHANGELOG
+## 2.4.13 [4/13/2026] - Extended CAPExclusions Support and UI Enhancements
+
+### Enhancements
+- Extended `CapExclusions` support to `Applications` and `GuestUserTypes`.
+- Added multi select list boxes in the UI for easier management of guest user type exclusions.
 
 ## 1.9.22 [09/15/2025] - UI & Usability Improvements
 

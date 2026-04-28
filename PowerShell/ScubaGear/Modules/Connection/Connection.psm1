@@ -34,6 +34,8 @@ function Connect-Tenant {
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -41,6 +43,14 @@ function Connect-Tenant {
    $AADAuthRequired = $true
 
    $ProdAuthFailed = @()
+
+   # Token data for REST-based products (populated during connection)
+   $TokenData = @{
+       SPOAccessToken  = $null
+       SPOAdminUrl     = $null
+       PPAccessToken   = $null
+       PPBaseUrl       = $null
+   }
 
    $N = 0
    $Len = $ProductNames.Length
@@ -83,43 +93,45 @@ function Connect-Tenant {
                    }
                }
                "powerplatform" {
-                   $AddPowerAppsParams = @{
-                       'ErrorAction' = 'Stop';
-                   }
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $AddPowerAppsParams += @{
-                           CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                           ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                           TenantID  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
-                       }
-                   }
-                   switch ($M365Environment) {
-                       "commercial" {
-                           $AddPowerAppsParams += @{'Endpoint'='prod';}
-                       }
-                       "gcc" {
-                           $AddPowerAppsParams += @{'Endpoint'='usgov';}
-                       }
-                       "gcchigh" {
-                           $AddPowerAppsParams += @{'Endpoint'='usgovhigh';}
-                       }
-                       "dod" {
-                           $AddPowerAppsParams += @{'Endpoint'='dod';}
-                       }
-                   }
-                   Add-PowerAppsAccount @AddPowerAppsParams | Out-Null
-
                    if ($AADAuthRequired) {
-                        $LimitedGraphParams = @{
-                            'M365Environment' = $M365Environment;
-                            'ErrorAction' = 'Stop';
-                        }
-                        if ($ServicePrincipalParams) {
-                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
-                        }
-                        Connect-GraphHelper @LimitedGraphParams
-                        $AADAuthRequired = $false
-                    }
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
+
+                   # Acquire Power Platform access token
+                   $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
+                   $TokenData.PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+
+                   if ($ServicePrincipalParams.CertThumbprintParams) {
+                       $TokenData.PPAccessToken = Get-MsalAccessToken `
+                           -Scope $PPScope `
+                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                           -M365Environment $M365Environment
+                   }
+                   else {
+                       # Interactive - resolve tenant name for authority
+                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                       $TenantName = $InitialDomain.Name
+
+                       # Azure PowerShell well-known client ID
+                       $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+                       $TokenData.PPAccessToken = Get-MsalAccessToken `
+                           -Scope $PPScope `
+                           -ClientId $PPClientId `
+                           -Tenant $TenantName `
+                           -M365Environment $M365Environment
+                   }
+                   Write-Verbose "Power Platform token acquired successfully"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -134,48 +146,33 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       $InitialDomain = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value.VerifiedDomains | Where-Object {$_.isInitial}
+                       # Resolve tenant info needed for SharePoint URLs
+                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
                        $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-                       $SPOParams = @{
-                           'ErrorAction' = 'Stop';
-                       }
-                       $PnPParams = @{
-                           'ErrorAction' = 'Stop';
-                       }
+                       $TenantName = $InitialDomain.Name
 
-                       #pull api endpoint from json
-                       $Url = Get-ScubaGearPermissions -Product "sharepoint" -Environment $M365Environment -Domain $InitialDomainPrefix -OutAs endpoint
-                       $SPOParams += @{
-                            'Url'= $Url;
-                       }
-                       $PnPParams += @{
-                            'Url'= $Url;
-                       }
+                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
+                       $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
 
-                       #populate the rest of the parameters for splatting
-                       switch ($M365Environment) {
-                            "gcchigh" {
-                                 $SPOParams += @{'Region' = "ITAR"; }
-                                 $PnPParams += @{'AzureEnvironment' = 'USGovernmentHigh';}
-                            }
-                            "dod" {
-                                 $SPOParams += @{'Region' = "ITAR"; }
-                                 $PnPParams += @{'AzureEnvironment' = 'USGovernmentDoD';}
-                            }
-
-                       }
                        if ($ServicePrincipalParams.CertThumbprintParams) {
-                           $PnPParams += @{
-                               Thumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                               ClientId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                               Tenant  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
-                           }
-                           $env:PNPPOWERSHELL_UPDATECHECK = "false"  # disable PnP update banner
-                           Connect-PnPOnline @PnPParams | Out-Null
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
+                               -Scope $SPOScope `
+                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                               -M365Environment $M365Environment
                        }
                        else {
-                           Connect-SPOService @SPOParams | Out-Null
+                           # SharePoint Online Management Shell app ID
+                           $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
+                               -Scope $SPOScope `
+                               -ClientId $SPOClientId `
+                               -Tenant $TenantName `
+                               -M365Environment $M365Environment
                        }
+                       Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false
                    }
                }
@@ -222,7 +219,15 @@ function Connect-Tenant {
        }
    }
    Write-Progress -Activity "Authenticating to each service" -Status "Ready" -Completed
-   $ProdAuthFailed
+
+   # Return connection result with token data for REST-based products
+   @{
+       ProdAuthFailed  = $ProdAuthFailed
+       SPOAccessToken  = $TokenData.SPOAccessToken
+       SPOAdminUrl     = $TokenData.SPOAdminUrl
+       PPAccessToken   = $TokenData.PPAccessToken
+       PPBaseUrl       = $TokenData.PPBaseUrl
+   }
 }
 
 function Disconnect-SCuBATenant {
@@ -265,17 +270,14 @@ function Disconnect-SCuBATenant {
            Write-Verbose "Disconnecting from $Product."
            if (($Product -eq "aad") -or ($Product -eq "sharepoint")) {
                Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
-
-               if($Product -eq "sharepoint") {
-                   Disconnect-SPOService -ErrorAction SilentlyContinue
-                   Disconnect-PnPOnline -ErrorAction SilentlyContinue
-               }
+               # SharePoint uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif ($Product -eq "teams") {
                Disconnect-MicrosoftTeams -Confirm:$false -ErrorAction SilentlyContinue
            }
            elseif ($Product -eq "powerplatform") {
-               Remove-PowerAppsAccount -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               # Power Platform uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
                if($Product -eq "defender") {

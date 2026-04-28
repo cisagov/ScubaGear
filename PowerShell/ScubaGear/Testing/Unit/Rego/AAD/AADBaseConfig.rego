@@ -20,12 +20,7 @@ ConditionalAccessPolicies := {
             "ExcludeUsers": [],
             "ExcludeGroups": [],
             "ExcludeRoles": [],
-            "ExcludeGuestsOrExternalUsers":  {
-                "ExternalTenants":  {
-                    "MembershipKind":  null
-                },
-                "GuestOrExternalUserTypes":  null
-            },
+            "ExcludeGuestsOrExternalUsers":  null,
         },
         "UserRiskLevels": [
             "high"
@@ -60,7 +55,9 @@ ConditionalAccessPolicies := {
 ScubaConfig := {
             "CapExclusions": {
                 "Users": [],
-                "Groups": []
+                "Groups": [],
+                "Applications": [],
+                "GuestUserTypes": []
             },
             "RoleExclusions": {
                 "Users": [],

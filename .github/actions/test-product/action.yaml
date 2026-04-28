@@ -10,10 +10,24 @@ inputs:
   TestParams:
     required: true
     description: "The set of parameters used to defined the test"
+outputs:
+  passed:
+    description: "Count of tests that passed"
+    value: ${{ steps.run-test.outputs.passed }}
+  failed:
+    description: "Count of tests that failed"
+    value: ${{ steps.run-test.outputs.failed }}
+  skipped:
+    description: "Count of tests that were skipped"
+    value: ${{ steps.run-test.outputs.skipped }}
+  total:
+    description: "Total count of executed tests"
+    value: ${{ steps.run-test.outputs.total }}
 runs:
   using: "composite"
   steps:
-    - run: |
+    - id: run-test
+      run: |
         Import-Module -Name Selenium
         cd repo
 

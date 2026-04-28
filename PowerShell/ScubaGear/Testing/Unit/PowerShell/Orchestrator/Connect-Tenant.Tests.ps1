@@ -59,7 +59,8 @@ InModuleScope Orchestrator {
                 Mock -ModuleName Orchestrator Connect-Tenant { @() }
             }
             It 'does not attempt authentication' {
-                Invoke-Connection -ScubaConfig $ScubaConfig | Should -BeNullOrEmpty
+                $result = Invoke-Connection -ScubaConfig $ScubaConfig
+                $result.ProdAuthFailed | Should -BeNullOrEmpty
                 Should -Invoke -CommandName Connect-Tenant -Times 0 -Exactly
             }
         }
