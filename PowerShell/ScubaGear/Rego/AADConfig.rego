@@ -762,232 +762,312 @@ tests contains {
 #
 # MS.AAD.5.5v1 - Block Password Addition
 #--
+#
+# Background:
+#   The default app management policy contains two parallel restriction sets:
+#     - ApplicationRestrictions.PasswordCredentials       (App registrations)
+#     - ServicePrincipalRestrictions.PasswordCredentials  (Service principals / Enterprise apps)
+#   Each set has a "passwordAddition" entry. To pass, BOTH must be:
+#     1. State == "enabled"
+#     2. RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
+#        (.NET DateTime.MinValue, meaning "applies to ALL apps - no date restriction")
+#
+#   Custom app management policies in input.app_management_policies can disable
+#   the restriction for specific apps via Restrictions.PasswordCredentials. Those
+#   apps are exempt from the global block and must be reported.
+#
+#   ALL_APPS_DATES holds both representations of .NET DateTime.MinValue
+#   that have been observed in provider output:
+#     - "/Date(-62135596800000)/" (legacy .NET serialization)
+#     - "0001-01-01T00:00:00Z"   (ISO 8601)
+#--
 
-# Helper function to check if password addition is blocked for applications
-default PasswordAdditionBlockedApps := false
+ALL_APPS_DATES := {"/Date(-62135596800000)/", "0001-01-01T00:00:00Z"}
 
-PasswordAdditionBlockedApps := true if {
-    Policy := input.app_management_policy[0]
+# True when the given date string represents "all apps" (no date restriction).
+IsAllAppsDate(DateStr) if DateStr in ALL_APPS_DATES
+
+# Convert a RestrictForAppsCreatedAfterDateTime string to YYYY-MM-DD.
+# Handles both "/Date(<ms>)/" and ISO 8601 ("YYYY-MM-DDThh:mm:ssZ") formats.
+FormatRestrictionDate(DateStr) := substring(DateStr, 0, 10) if {
+    not startswith(DateStr, "/Date(")
+}
+
+FormatRestrictionDate(DateStr) := substring(time.format(to_number(MsStr) * 1000000), 0, 10) if {
+    startswith(DateStr, "/Date(")
+    MsStr := trim_prefix(trim_suffix(DateStr, ")/"), "/Date(")
+}
+
+# Collect every passwordAddition restriction from both Application and Service Principal scopes.
+# Treating them uniformly removes Apps/SPs duplication in the issue rules below.
+PasswordAdditionRestrictions contains Restriction if {
+    Policy := input.default_app_management_policy[0]
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordAddition"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
 }
 
-# Helper function to check if symmetric key addition is blocked for applications
-default SymmetricKeyAdditionBlockedApps := false
-
-SymmetricKeyAdditionBlockedApps := true if {
-    Policy := input.app_management_policy[0]
-    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "symmetricKeyAddition"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-}
-
-# Helper function to check if password addition is blocked for service principals
-default PasswordAdditionBlockedSPs := false
-
-PasswordAdditionBlockedSPs := true if {
-    Policy := input.app_management_policy[0]
+PasswordAdditionRestrictions contains Restriction if {
+    Policy := input.default_app_management_policy[0]
     some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordAddition"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
 }
 
-# Helper function to check if symmetric key addition is blocked for service principals
-default SymmetricKeyAdditionBlockedSPs := false
-
-SymmetricKeyAdditionBlockedSPs := true if {
-    Policy := input.app_management_policy[0]
-    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "symmetricKeyAddition"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-}
-
-# Check if MS.AAD.5.5v1 passes (password addition fully blocked)
+# True only when EVERY passwordAddition restriction (Apps + SPs) is fully blocking.
+# Used by MS.AAD.5.6v1 to mark itself N/A (lifetime is moot if addition is blocked).
 default PasswordAdditionFullyBlocked := false
-
 PasswordAdditionFullyBlocked := true if {
-    PasswordAdditionBlockedApps == true
-    SymmetricKeyAdditionBlockedApps == true
-    PasswordAdditionBlockedSPs == true
-    SymmetricKeyAdditionBlockedSPs == true
+    Count(PasswordAdditionIssues) == 0
+    Count(PasswordAdditionRestrictions) > 0
+    every Restriction in PasswordAdditionRestrictions {
+        Restriction.State == "enabled"
+        IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    }
 }
 
-# Policy passes if all four restrictions are enabled
+# Issue: a passwordAddition restriction is not enabled at all.
+PasswordAdditionIssues contains "Password addition not blocked" if {
+    some Restriction in PasswordAdditionRestrictions
+    Restriction.State != "enabled"
+}
+
+# Issue: a passwordAddition restriction is enabled, but only applies to apps
+# created after a specific date - existing apps are exempt.
+PasswordAdditionIssues contains Issue if {
+    some Restriction in PasswordAdditionRestrictions
+    Restriction.State == "enabled"
+    not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    Issue := sprintf("Only applies to apps created after %v", [DateOnly])
+}
+
+# Issue: a custom app management policy disables passwordAddition for specific apps,
+# exempting them from the global restriction.
+PasswordAdditionIssues contains Issue if {
+    some Policy in input.app_management_policies
+    Policy.IsEnabled == true
+    some Restriction in Policy.Restrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordAddition"
+    Restriction.State != "enabled"
+    count(Restriction.AppliesTo) > 0
+    AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
+    Issue := sprintf("Exempted apps: %v", [AppNames])
+}
+
+# Pass when no issues were collected.
 tests contains {
     "PolicyId": "MS.AAD.5.5v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
-    "ActualValue": [PasswordAdditionBlockedApps, SymmetricKeyAdditionBlockedApps, PasswordAdditionBlockedSPs, SymmetricKeyAdditionBlockedSPs],
-    "ReportDetails": ReportDetailsBoolean(Status),
+    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
+    "ActualValue": PasswordAdditionIssues,
+    "ReportDetails": ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString),
     "RequirementMet": Status
 } if {
-    Conditions := [
-        PasswordAdditionBlockedApps,
-        SymmetricKeyAdditionBlockedApps,
-        PasswordAdditionBlockedSPs,
-        SymmetricKeyAdditionBlockedSPs
-    ]
-    Status := Count(FilterArray(Conditions, false)) == 0
+    DescriptionString := "Password addition restriction(s) not meeting requirements"
+    Status := Count(PasswordAdditionIssues) == 0
 }
 #--
 
 #
 # MS.AAD.5.6v1 - Restrict Password Lifetime
 #--
+#
+# Background:
+#   Same data shape as 5.5, but the relevant restriction is "passwordLifetime".
+#   Each restriction also has a MaxLifetime field in ISO 8601 duration format
+#   (e.g. "P181D" = 181 days). To pass, every passwordLifetime restriction must:
+#     1. State == "enabled"
+#     2. RestrictForAppsCreatedAfterDateTime == ALL_APPS_DATE
+#     3. MaxLifetime <= 181 days (181 enforces "180 or less" due to MS's
+#        "less than" evaluation in the portal)
+#
+#   This policy is N/A when 5.5 passes - if password addition is fully blocked,
+#   lifetime is moot.
+#--
 
-# Helper function to check password lifetime restriction for applications
-PasswordLifetimeRestrictedApps(MaxDays) := true if {
-    Policy := input.app_management_policy[0]
+PASSWORD_MAX_DAYS := 181
+
+# Collect every passwordLifetime restriction from both scopes.
+PasswordLifetimeRestrictions contains Restriction if {
+    Policy := input.default_app_management_policy[0]
     some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
     Restriction.RestrictionType == "passwordLifetime"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-    # maxLifetime format: "P181D" (ISO 8601 duration) - set to 181 to enforce "180 days or less" due to Microsoft's "less than" evaluation
-    # Extract number of days from format PnD
-    MaxLifetimeStr := Restriction.MaxLifetime
-    # Remove 'P' prefix and 'D' suffix to get days
-    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
-    Days := to_number(DaysStr)
-    Days <= MaxDays
-} else := false
-
-# Helper function to check symmetric key lifetime restriction for applications
-SymmetricKeyLifetimeRestrictedApps(MaxDays) := true if {
-    Policy := input.app_management_policy[0]
-    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "symmetricKeyLifetime"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-    MaxLifetimeStr := Restriction.MaxLifetime
-    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
-    Days := to_number(DaysStr)
-    Days <= MaxDays
-} else := false
-
-# Helper function to check password lifetime restriction for service principals
-PasswordLifetimeRestrictedSPs(MaxDays) := true if {
-    Policy := input.app_management_policy[0]
-    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordLifetime"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-    MaxLifetimeStr := Restriction.MaxLifetime
-    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
-    Days := to_number(DaysStr)
-    Days <= MaxDays
-} else := false
-
-# Helper function to check symmetric key lifetime restriction for service principals
-SymmetricKeyLifetimeRestrictedSPs(MaxDays) := true if {
-    Policy := input.app_management_policy[0]
-    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "symmetricKeyLifetime"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-    MaxLifetimeStr := Restriction.MaxLifetime
-    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
-    Days := to_number(DaysStr)
-    Days <= MaxDays
-} else := false
-
-# Policy is N/A if password addition is fully blocked (MS.AAD.5.5v1 passes)
-# Otherwise, passes if all four restrictions are set to 181 days (which enforces 180 days or less due to Microsoft's "less than" evaluation)
-tests contains {
-    "PolicyId": "MS.AAD.5.6v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
-    "ActualValue": [
-        PasswordLifetimeRestrictedApps(181),
-        SymmetricKeyLifetimeRestrictedApps(181),
-        PasswordLifetimeRestrictedSPs(181),
-        SymmetricKeyLifetimeRestrictedSPs(181),
-    ],
-    "ReportDetails": ReportDetails,
-    "RequirementMet": Status
-} if {
-    PasswordAdditionFullyBlocked == true
-    ReportDetails := "N/A: All password addition is blocked per MS.AAD.5.5v1."
-    Status := true
 }
 
+PasswordLifetimeRestrictions contains Restriction if {
+    Policy := input.default_app_management_policy[0]
+    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordLifetime"
+}
+
+# Issue: a passwordLifetime restriction is not enabled.
+PasswordLifetimeIssues contains "Password lifetime not restricted" if {
+    some Restriction in PasswordLifetimeRestrictions
+    Restriction.State != "enabled"
+}
+
+# Issue: enabled but only applies to apps created after a specific date.
+PasswordLifetimeIssues contains Issue if {
+    some Restriction in PasswordLifetimeRestrictions
+    Restriction.State == "enabled"
+    not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    Issue := sprintf("Password lifetime: only applies to apps created after %v", [DateOnly])
+}
+
+# Issue: passwordLifetime restriction is missing entirely from one or both scopes.
+# When the portal toggle is OFF, the entry is omitted rather than present-but-disabled.
+PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
+    Policy := input.default_app_management_policy[0]
+    not PasswordLifetimeInScope(Policy.ApplicationRestrictions.PasswordCredentials)
+}
+
+PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
+    Policy := input.default_app_management_policy[0]
+    not PasswordLifetimeInScope(Policy.ServicePrincipalRestrictions.PasswordCredentials)
+}
+
+PasswordLifetimeInScope(Restrictions) if {
+    some R in Restrictions
+    R.RestrictionType == "passwordLifetime"
+}
+
+# Issue: enabled but MaxLifetime exceeds the threshold.
+# MaxLifetime is "PnD" (ISO 8601 duration); strip 'P' prefix and 'D' suffix to get days.
+PasswordLifetimeIssues contains Issue if {
+    some Restriction in PasswordLifetimeRestrictions
+    Restriction.State == "enabled"
+    Days := to_number(trim_prefix(trim_suffix(Restriction.MaxLifetime, "D"), "P"))
+    Days > PASSWORD_MAX_DAYS
+    Issue := sprintf("Password lifetime too long: %v days, must be %v or less", [Days, PASSWORD_MAX_DAYS])
+}
+
+# Issue: a custom app management policy disables passwordLifetime for specific apps.
+PasswordLifetimeIssues contains Issue if {
+    some Policy in input.app_management_policies
+    Policy.IsEnabled == true
+    some Restriction in Policy.Restrictions.PasswordCredentials
+    Restriction.RestrictionType == "passwordLifetime"
+    Restriction.State != "enabled"
+    count(Restriction.AppliesTo) > 0
+    AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
+    Issue := sprintf("Password lifetime: exempted apps: %v", [AppNames])
+}
+
+# N/A path: password addition is fully blocked (5.5 passes), so lifetime doesn't matter.
 tests contains {
     "PolicyId": "MS.AAD.5.6v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
-    "ActualValue": [
-        PasswordLifetimeRestrictedApps(181),
-        SymmetricKeyLifetimeRestrictedApps(181),
-        PasswordLifetimeRestrictedSPs(181),
-        SymmetricKeyLifetimeRestrictedSPs(181),
-    ],
-    "ReportDetails": ReportDetailsBoolean(Status),
+    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
+    "ActualValue": PasswordLifetimeRestrictions,
+    "ReportDetails": "Requirement met",
+    "RequirementMet": true
+} if {
+    PasswordAdditionFullyBlocked == true
+}
+
+# Standard path: pass when no issues collected.
+tests contains {
+    "PolicyId": "MS.AAD.5.6v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
+    "ActualValue": PasswordLifetimeIssues,
+    "ReportDetails": ReportFullDetailsArray(PasswordLifetimeIssues, DescriptionString),
     "RequirementMet": Status
 } if {
     PasswordAdditionFullyBlocked == false
-    MaxDays := 181
-    Conditions := [
-        PasswordLifetimeRestrictedApps(MaxDays),
-        SymmetricKeyLifetimeRestrictedApps(MaxDays),
-        PasswordLifetimeRestrictedSPs(MaxDays),
-        SymmetricKeyLifetimeRestrictedSPs(MaxDays)
-    ]
-    Status := Count(FilterArray(Conditions, false)) == 0
+    DescriptionString := "password lifetime restriction(s) not meeting requirements"
+    Status := Count(PasswordLifetimeIssues) == 0
 }
 #--
 
 #
 # MS.AAD.5.7v1 - Restrict Certificate Lifetime
 #--
+#
+# Background:
+#   Same shape as 5.6, but operates on KeyCredentials instead of PasswordCredentials,
+#   with RestrictionType "asymmetricKeyLifetime". Threshold is 366 days
+#   (enforces "365 or less" due to MS's "less than" evaluation).
+#--
 
-# Helper function to check certificate lifetime restriction for applications
-CertificateLifetimeRestrictedApps(MaxDays) := true if {
-    Policy := input.app_management_policy[0]
+CERTIFICATE_MAX_DAYS := 366
+
+# Collect every asymmetricKeyLifetime restriction from both scopes.
+CertificateLifetimeRestrictions contains Restriction if {
+    Policy := input.default_app_management_policy[0]
     some Restriction in Policy.ApplicationRestrictions.KeyCredentials
     Restriction.RestrictionType == "asymmetricKeyLifetime"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-    # maxLifetime format: "P366D" (ISO 8601 duration) - set to 366 to enforce "365 days or less" due to Microsoft's "less than" evaluation
-    # Extract number of days from format PnD
-    MaxLifetimeStr := Restriction.MaxLifetime
-    # Remove 'P' prefix and 'D' suffix to get days
-    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
-    Days := to_number(DaysStr)
-    Days <= MaxDays
-} else := false
+}
 
-# Helper function to check certificate lifetime restriction for service principals
-CertificateLifetimeRestrictedSPs(MaxDays) := true if {
-    Policy := input.app_management_policy[0]
+CertificateLifetimeRestrictions contains Restriction if {
+    Policy := input.default_app_management_policy[0]
     some Restriction in Policy.ServicePrincipalRestrictions.KeyCredentials
     Restriction.RestrictionType == "asymmetricKeyLifetime"
-    Restriction.State == "enabled"
-    Restriction.RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-    MaxLifetimeStr := Restriction.MaxLifetime
-    DaysStr := trim_prefix(trim_suffix(MaxLifetimeStr, "D"), "P")
-    Days := to_number(DaysStr)
-    Days <= MaxDays
-} else := false
+}
 
-# Policy passes if both certificate restrictions are set to 366 days (which enforces 365 days or less due to Microsoft's "less than" evaluation)
+# Issue: an asymmetricKeyLifetime restriction is not enabled.
+CertificateLifetimeIssues contains "Certificate lifetime not restricted" if {
+    some Restriction in CertificateLifetimeRestrictions
+    Restriction.State != "enabled"
+}
+
+# Issue: enabled but only applies to apps created after a specific date.
+CertificateLifetimeIssues contains Issue if {
+    some Restriction in CertificateLifetimeRestrictions
+    Restriction.State == "enabled"
+    not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
+    Issue := sprintf("Certificate lifetime: only applies to apps created after %v", [DateOnly])
+}
+
+# Issue: asymmetricKeyLifetime restriction is missing entirely from one or both scopes.
+CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
+    Policy := input.default_app_management_policy[0]
+    not CertificateLifetimeInScope(Policy.ApplicationRestrictions.KeyCredentials)
+}
+
+CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
+    Policy := input.default_app_management_policy[0]
+    not CertificateLifetimeInScope(Policy.ServicePrincipalRestrictions.KeyCredentials)
+}
+
+CertificateLifetimeInScope(Restrictions) if {
+    some R in Restrictions
+    R.RestrictionType == "asymmetricKeyLifetime"
+}
+
+# Issue: enabled but MaxLifetime exceeds the threshold.
+CertificateLifetimeIssues contains Issue if {
+    some Restriction in CertificateLifetimeRestrictions
+    Restriction.State == "enabled"
+    Days := to_number(trim_prefix(trim_suffix(Restriction.MaxLifetime, "D"), "P"))
+    Days > CERTIFICATE_MAX_DAYS
+    Issue := sprintf("Certificate lifetime too long: %v days, must be %v or less", [Days, CERTIFICATE_MAX_DAYS])
+}
+
+# Issue: a custom app management policy disables asymmetricKeyLifetime for specific apps.
+CertificateLifetimeIssues contains Issue if {
+    some Policy in input.app_management_policies
+    Policy.IsEnabled == true
+    some Restriction in Policy.Restrictions.KeyCredentials
+    Restriction.RestrictionType == "asymmetricKeyLifetime"
+    Restriction.State != "enabled"
+    count(Restriction.AppliesTo) > 0
+    AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
+    Issue := sprintf("Exempted apps: %v", [AppNames])
+}
+
+# Pass when no issues collected.
 tests contains {
     "PolicyId": "MS.AAD.5.7v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-MgPolicyDefaultAppManagementPolicy"],
-    "ActualValue": [CertificateLifetimeRestrictedApps(366), CertificateLifetimeRestrictedSPs(366)],
-    "ReportDetails": ReportDetailsBoolean(Status),
+    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
+    "ActualValue": CertificateLifetimeIssues,
+    "ReportDetails": ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString),
     "RequirementMet": Status
 } if {
-    MaxDays := 366
-    Conditions := [
-        CertificateLifetimeRestrictedApps(MaxDays),
-        CertificateLifetimeRestrictedSPs(MaxDays)
-    ]
-    Status := Count(FilterArray(Conditions, false)) == 0
+    DescriptionString := "certificate lifetime restriction(s) not meeting requirements"
+    Status := Count(CertificateLifetimeIssues) == 0
 }
 #--
 

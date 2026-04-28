@@ -226,7 +226,17 @@ function Export-AADProvider {
 
     # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
-    $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+    $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+
+    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
+    Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
+    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
+        $AppManagementPolicies = ConvertTo-Json @()
+    }
+    else {
+        $AppManagementPolicies = ConvertTo-Json -Depth 10 @(Get-AppManagementPolicies -AppPolicies @($AppPolicies) -M365Environment $M365Environment)
+    }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
@@ -252,6 +262,7 @@ function Export-AADProvider {
     "legacy_exchange_service_principal": $LegacyExchangeSP,
     "dedicated_exchange_hybrid_applications": $DedicatedExchangeHybridApps,
     "default_app_management_policy": $DefaultAppManagementPolicy,
+    "app_management_policies": $AppManagementPolicies,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@

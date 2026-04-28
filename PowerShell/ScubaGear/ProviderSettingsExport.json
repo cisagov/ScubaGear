@@ -1,0 +1,117 @@
+        {
+                "baseline_version": "1",
+                "module_version": "1.7.1",
+                "date": "04/27/2026 20:53:45 Eastern Daylight Time",
+                "timestamp_zulu": "2026-04-28T00:53:45.175Z",
+                "report_uuid": "792bcbb8-395c-42e9-a552-c726ee365a83",
+                "tenant_details": [
+    {
+        "AADAdditionalData":  "Error retrieving additional data",
+        "TenantId":  "Error retrieving Tenant ID",
+        "DisplayName":  "Error retrieving Display name",
+        "DomainName":  "Error retrieving Domain name"
+    }
+],
+                "scuba_config": {
+    "M365Environment":  "commercial",
+    "Organization":  "",
+    "OutJsonFileName":  "C:\\ActiveDevelopment\\Github\\cisagov\\1960-new-application-entra-baseline-policies\\PowerShell\\ScubaGear\\M365BaselineConformance_2026_04_27_20_37_01\\ScubaResults_832c7ada-6c02-4d36.json",
+    "CertificateThumbprint":  "",
+    "OutRegoFileName":  "TestResults",
+    "OPAPath":  "C:\\Users\\ritracyi\\.scubagear\\Tools",
+    "KeepIndividualJSON":  {
+                               "IsPresent":  false
+                           },
+    "LogIn":  false,
+    "OutCsvFileName":  "ScubaResults",
+    "OutActionPlanFileName":  "ActionPlan",
+    "OutProviderFileName":  "ProviderSettingsExport",
+    "ProductNames":  [
+                         "aad"
+                     ],
+    "AppID":  "",
+    "OutReportName":  "BaselineReports",
+    "NumberOfUUIDCharactersToTruncate":  18
+},
+                    "conditional_access_policies": [
+
+],
+    "cap_table_data": [],
+    "authorization_policies": [
+
+],
+    "privileged_users": [
+
+],
+    "privileged_service_principals": ,
+    "privileged_roles": [
+
+],
+    "service_plans": [
+
+],
+    "directory_settings": [
+
+],
+    "authentication_method": [
+    {
+        "authentication_method_feature_settings":  [
+
+                                                   ],
+        "authentication_method_policy":  {
+
+                                         }
+    }
+],
+    "domain_settings": [
+
+],
+    "license_information": ,
+    "license_state": [
+    {
+        "is_expiring_soon":  false,
+        "is_expired":  false,
+        "state":  "NoLicense",
+        "has_active_plans":  false,
+        "state_reason":  "No subscribed SKUs were found for the tenant.",
+        "days_until_expiration":  null,
+        "has_any_sku":  false,
+        "warning_days_threshold":  30
+    }
+],
+    "total_user_count": ,
+    "risky_applications": [
+
+],
+    "risky_third_party_service_principals": [
+
+],
+    "risky_delegated_permission_classifications": [
+
+],
+    "default_app_management_policy": [
+
+],
+    "app_management_policies": [
+
+],
+    "aad_successful_commands": [
+
+],
+    "aad_unsuccessful_commands": [
+    "Get-MgBetaIdentityConditionalAccessPolicy",
+    "Get-MgBetaSubscribedSku",
+    "Get-PrivilegedRole",
+    "Get-PrivilegedUser",
+    "Get-MgBetaUserCount",
+    "Get-MgBetaPolicyAuthorizationPolicy",
+    "Get-MgBetaDirectorySetting",
+    "Get-MgBetaPolicyAuthenticationMethodPolicy",
+    "Get-MgBetaDomain",
+    "Get-ApplicationsWithRiskyPermissions",
+    "Get-ServicePrincipalsWithRiskyPermissions",
+    "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications",
+    "Get-MgBetaPolicyDefaultAppManagementPolicy",
+    "Get-MgBetaPolicyAppManagementPolicy"
+]
+        }
