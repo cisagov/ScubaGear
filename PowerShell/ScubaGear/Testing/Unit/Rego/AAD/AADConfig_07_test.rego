@@ -53,20 +53,22 @@ test_SecureScore_Correct_V1 if {
                         with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["User Administrator"]}
                         with input.privileged_users.User5 as {"DisplayName": "Test Name 5", "roles": ["Privileged Role Administrator"]}
 
-    ReportDetailStr := "Requirement met: Least Privilege Score = 0.66 (should be 1 or less)"
+    ReportDetailStr := concat("", ["Requirement met: Least Privilege Score = 0.66 (should be 1 or less)",
+    "\nCalculated by 2 global admins / 3 privileged users without global admin role"])
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
 
 # Correct because the ratio of global admins to non global admins is equal to 1
-test_SecureScore_Incorrect_V1 if {
+test_SecureScore_Correct_V2 if {
     Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "User Administrator"}])
 
     Output := aad.tests with input.privileged_users as Users
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Application Administrator"]}
                         with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["Privileged Role Administrator"]}
 
-    ReportDetailStr := "Requirement met: Least Privilege Score = 1 (should be 1 or less)"
+    ReportDetailStr := concat("",["Requirement met: Least Privilege Score = 1 (should be 1 or less)",
+    "\nCalculated by 2 global admins / 2 privileged users without global admin role"])
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
 }
@@ -80,7 +82,8 @@ test_SecureScore_Incorrect_V2 if {
     Output := aad.tests with input.privileged_users as Users
                         with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Privileged Role Administrator"]}
 
-    ReportDetailStr := "Requirement not met: Least Privilege Score = 2 (should be 1 or less)"
+    ReportDetailStr := concat("",["Requirement not met: Least Privilege Score = 2 (should be 1 or less)",
+    "\nCalculated by 2 global admins / 1 privileged users without global admin role"])
 
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
@@ -100,7 +103,7 @@ test_SecureScore_Incorrect_V3 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
-# Incorrect because the total number of global admins is greater than eight
+# Incorrect because the total number of global admins is greater than eight, which makes policy 7.1 fail and thus the score is not computed 
 test_SecureScore_Incorrect_V4 if {
     Users := json.patch(PrivilegedUsers, [{"op": "add", "path": "User2/roles/0", "value": "Exchange Administrator"}])
 
