@@ -1,0 +1,17 @@
+{
+    "Id": "f724f499-b1fc-4915-b3c1-f0a219aa18ab",
+    "AppId": "00000002-0000-0ff1-ce00-000000000000",
+    "DisplayName": "Office 365 Exchange Online",
+    "SignInAudience": "AzureADMultipleOrgs",
+    "KeyCredentials": [
+        {
+            "KeyId": "f724f499-b1fc-4915-b3c1-f0a219aa18ab",
+            "DisplayName": "Test Legacy Cert",
+            "StartDateTime": "\\/Date(1733343742000)\\/",
+            "EndDateTime": "\\/Date(4102444800000)\\/"
+        }
+    ],
+    "PasswordCredentials": null,
+    "FederatedIdentityCredentials": null,
+    "AppOwnerOrganizationId": "f8cdef31-a31e-4b4a-93e4-5f571e91255a"
+}

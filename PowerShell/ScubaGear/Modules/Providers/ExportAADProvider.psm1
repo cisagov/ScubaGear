@@ -178,7 +178,7 @@ function Export-AADProvider {
     # "Format-RiskyApplications" will match app registrations with and without a corresponding service principal object.
     # If an app registration does not have a service principal object, only app registration data will be displayed.
     # If an app registration has a matching service principal object, app registration and service principal data will be aggregated together.
-    $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
+    $AggregateRiskyAppsRaw = @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{
                 "RiskyApps"=$RiskyApps;
@@ -189,7 +189,7 @@ function Export-AADProvider {
 
     # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
     # It only returns risky service principals owned by external tenants.
-    $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
+    $RiskyThirdPartySPs = ConvertTo-Json -Depth 4 @(
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
@@ -199,6 +199,29 @@ function Export-AADProvider {
     )
     ##### End block
     $RiskyDelegatedPermissionClassifications =  ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+
+    ##### This block gathers information on Exchange hybrid application configurations
+    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+
+    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
+    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
+    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
+    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
+    $LegacyExchangeSP = ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
+            "M365Environment"=$M365Environment
+        })
+    )
+
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
+            "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
+        })
+    )
+
+    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
+    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
+    ##### End block
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
@@ -221,6 +244,8 @@ function Export-AADProvider {
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
+    "legacy_exchange_service_principal": $LegacyExchangeSP,
+    "dedicated_exchange_hybrid_applications": $DedicatedExchangeHybridApps,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
