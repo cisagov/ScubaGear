@@ -550,7 +550,7 @@ function Invoke-SCuBA {
         # This check runs after Connect-Tenant because the Graph connection (needed to query
         # subscribed SKUs) is established during that step.
         if (-not $ConnectionResult.PBILicenseFound -and $ScubaConfig.ProductNames -contains "powerbi") {
-            Write-Warning "Power BI license not found in tenant. Removing Power BI from assessment."
+            Write-Warning "Removing Power BI from assessment."
             Write-ScubaLog -Message "Power BI license not found - removing from product list" -Level "Info" -Source "InvokeScuba"
             $ScubaConfig.ProductNames = @($ScubaConfig.ProductNames | Where-Object { $_ -ne "powerbi" })
             if ($ScubaConfig.ProductNames.Count -eq 0) {
@@ -1783,6 +1783,7 @@ function Invoke-Connection {
         @{
             ProdAuthFailed  = @()
             PBILicenseFound = $true
+            PBILicenseReason = ""
             SPOAccessToken  = $null
             SPOAdminUrl     = $null
             PPAccessToken   = $null
@@ -2346,7 +2347,7 @@ function Invoke-SCuBACached {
 
                 # If Power BI license was not found, remove powerbi from the product list
                 if (-not $ConnectionResult.PBILicenseFound -and $ProductNames -contains "powerbi") {
-                    Write-Warning "Power BI license not found in tenant. Removing Power BI from assessment."
+                    Write-Warning "Removing Power BI from assessment."
                     Write-ScubaLog -Message "Power BI license not found - removing from product list" -Level "Info" -Source "ScubaCached"
                     $ProductNames = @($ProductNames | Where-Object { $_ -ne "powerbi" })
                     if ($ProductNames.Count -eq 0) {

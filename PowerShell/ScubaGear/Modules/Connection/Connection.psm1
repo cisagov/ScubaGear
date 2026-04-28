@@ -47,6 +47,7 @@
 
    # Track whether Power BI license was found (defaults to true; set to false if SKU check fails)
    $PBILicenseFound = $true
+   $PBILicenseReason = ""
 
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
@@ -201,8 +202,9 @@
                    }
 
                    if (-not $HasPBILicense) {
-                       Write-Verbose "Power BI license not found in tenant — flagging for removal."
+                       Write-Warning "No Power BI or Fabric license found in the tenant."
                        $PBILicenseFound = $false
+                       $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
                    }
                    else {
                        $PBILicenseFound = $true
@@ -218,8 +220,9 @@
                                $UserPBIPlans = $UserPlans |
                                    Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" }
                                if (-not $UserPBIPlans -or @($UserPBIPlans).Count -eq 0) {
-                                   Write-Verbose "Current user does not have a Power BI or Fabric license assigned — flagging for removal."
+                                   Write-Warning "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
                                    $PBILicenseFound = $false
+                                   $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
                                }
                                else {
                                    $UserPlanNames = ($UserPBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
@@ -362,6 +365,7 @@
    @{
        ProdAuthFailed  = $ProdAuthFailed
        PBILicenseFound = $PBILicenseFound
+       PBILicenseReason = $PBILicenseReason
        SPOAccessToken  = $TokenData.SPOAccessToken
        SPOAdminUrl     = $TokenData.SPOAdminUrl
        PPAccessToken   = $TokenData.PPAccessToken
