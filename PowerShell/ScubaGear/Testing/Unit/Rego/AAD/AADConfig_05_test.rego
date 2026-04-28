@@ -2,6 +2,7 @@ package aad_test
 import rego.v1
 import data.aad
 import data.utils.key.TestResult
+import data.utils.key.TestResultContains
 import data.utils.key.FAIL
 import data.utils.key.PASS
 
@@ -167,7 +168,7 @@ test_IsEnabled_Incorrect if {
 test_PasswordAdditionBlocked_Correct if {
     Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.5v1", Output, PASS, true) == true
+    TestResult("MS.AAD.5.5v1", Output, "0 password/symmetric key addition restriction(s) not meeting requirements"assword/symmetric key addition restriction(s) not meeting requirements", true) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V1 if {
@@ -176,7 +177,7 @@ test_PasswordAdditionBlocked_Incorrect_V1 if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.5v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["passwordAddition (Applications): restriction is not enabled"]ut, ["passwordAddition (Applications): restriction is not enabled"], false) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V2 if {
@@ -185,7 +186,7 @@ test_PasswordAdditionBlocked_Incorrect_V2 if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.5v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["symmetricKeyAddition (ServicePrincipals): restriction is not enabled"]ut, ["symmetricKeyAddition (ServicePrincipals): restriction is not enabled"], false) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V3 if {
@@ -195,7 +196,7 @@ test_PasswordAdditionBlocked_Incorrect_V3 if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.5v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["passwordAddition (Applications): date restriction set, old apps are exempt"]ut, ["passwordAddition (Applications): date restriction set, old apps are exempt"], false) == true
 }
 #--
 
@@ -217,7 +218,7 @@ test_PasswordLifetimeRestricted_PasswordAdditionAllowed_Correct if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.6v1", Output, PASS, true) == true
+    TestResult("MS.AAD.5.6v1", Output, "0 password/symmetric key lifetime restriction(s) not meeting requirements"assword/symmetric key lifetime restriction(s) not meeting requirements", true) == true
 }
 
 test_PasswordLifetimeRestricted_Incorrect_TooLong if {
@@ -244,7 +245,7 @@ test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.6v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.6v1", Output, ["passwordLifetime (Applications): date restriction set, old apps are exempt"]ut, ["passwordLifetime (Applications): date restriction set, old apps are exempt"], false) == true
 }
 #--
 
@@ -254,7 +255,7 @@ test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
 test_CertificateLifetimeRestricted_Correct if {
     Output := aad.tests with input.app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.7v1", Output, PASS, true) == true
+    TestResult("MS.AAD.5.7v1", Output, "0 certificate lifetime restriction(s) not meeting requirements"ertificate lifetime restriction(s) not meeting requirements", true) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_TooLong if {
@@ -263,7 +264,7 @@ test_CertificateLifetimeRestricted_Incorrect_TooLong if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.7v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["asymmetricKeyLifetime (Applications): MaxLifetime is 367 days, must be 366 days or less"]ut, ["asymmetricKeyLifetime (Applications): MaxLifetime is 367 days, must be 366 days or less"], false) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_Disabled if {
@@ -272,7 +273,7 @@ test_CertificateLifetimeRestricted_Incorrect_Disabled if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.7v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["asymmetricKeyLifetime (ServicePrincipals): restriction is not enabled"]ut, ["asymmetricKeyLifetime (ServicePrincipals): restriction is not enabled"], false) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_DateRestriction if {
@@ -282,6 +283,6 @@ test_CertificateLifetimeRestricted_Incorrect_DateRestriction if {
 
     Output := aad.tests with input.app_management_policy as [Policy]
 
-    TestResult("MS.AAD.5.7v1", Output, FAIL, false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["asymmetricKeyLifetime (Applications): date restriction set, old apps are exempt"]ut, ["asymmetricKeyLifetime (Applications): date restriction set, old apps are exempt"], false) == true
 }
 #--
