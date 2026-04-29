@@ -52,15 +52,15 @@ function Get-AppManagementPolicies {
         # Embed the AppliesTo list into each restriction entry so Rego can correlate
         # excluded apps by restrictionType (e.g. passwordLifetime, passwordAddition,
         # asymmetricKeyLifetime) without needing to join at the policy level.
-        $PasswordCredentials = @($Policy.Restrictions.PasswordCredentials | ForEach-Object {
+        $PasswordCredentials = @($Policy.Restrictions.PasswordCredentials | Where-Object { $null -ne $_ } | ForEach-Object {
             $entry = [ordered]@{}
-            $_.PSObject.Properties | ForEach-Object { $entry[$_.Name] = $_.Value }
+            $_.PSObject.Properties | Where-Object { $null -ne $_.Name } | ForEach-Object { $entry[$_.Name] = $_.Value }
             $entry["AppliesTo"] = $AppliesTo
             $entry
         })
-        $KeyCredentials = @($Policy.Restrictions.KeyCredentials | ForEach-Object {
+        $KeyCredentials = @($Policy.Restrictions.KeyCredentials | Where-Object { $null -ne $_ } | ForEach-Object {
             $entry = [ordered]@{}
-            $_.PSObject.Properties | ForEach-Object { $entry[$_.Name] = $_.Value }
+            $_.PSObject.Properties | Where-Object { $null -ne $_.Name } | ForEach-Object { $entry[$_.Name] = $_.Value }
             $entry["AppliesTo"] = $AppliesTo
             $entry
         })

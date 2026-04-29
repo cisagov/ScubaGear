@@ -231,7 +231,7 @@ function Export-AADProvider {
 
     # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
     Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
-    if ($null -eq $AppPolicies -or @($AppPolicies.Value).Count -eq 0) {
+    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
         $AppManagementPolicies = ConvertTo-Json @()
     }
     else {
