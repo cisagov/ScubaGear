@@ -380,6 +380,8 @@ tests contains {
             SliderSettings(2), 
             "or", 
             SliderSettings(1)
+            "or",
+            SliderSettings(3)
         ]),
         false
     )

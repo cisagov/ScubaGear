@@ -441,9 +441,8 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailsString := concat(" ", [
-        "This policy is only applicable if the external sharing slider",
-        "in the SharePoint admin center is not set to Only People In Your Organization.",
-        "See %v for more info"
+        "This policy is only applicable if the external sharing slider in the SharePoint admin center",
+        "is set to Anyone or New and Existing Guests or Existing Guests. See %v for more info"
         ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
