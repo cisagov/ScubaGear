@@ -14,6 +14,19 @@ on:
   workflow_dispatch:
     inputs:
       # checkov:skip=CKV_GHA_7:Manual inputs are desired.
+      product:
+        description: Product to test (defaults to all)
+        type: choice
+        required: true
+        default: all
+        options:
+          - all
+          - defender
+          - entra
+          - exchange
+          - powerplatform
+          - sharepoint
+          - teams
       EmailOnFailure:
         description: Check to send an email on failure
         type: boolean
@@ -57,6 +70,7 @@ jobs:
 
   test_defender:
     name: Test Defender
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'defender' }}
     uses: ./.github/workflows/function_test_defender.yaml
     permissions:
       contents: write
@@ -66,6 +80,8 @@ jobs:
       EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -78,6 +94,7 @@ jobs:
 
   test_entra:
     name: Test Entra
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'entra' }}
     uses: ./.github/workflows/function_test_entra.yaml
     permissions:
       contents: write
@@ -87,6 +104,8 @@ jobs:
       EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -99,6 +118,7 @@ jobs:
 
   test_exchange:
     name: Test Exchange
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'exchange' }}
     uses: ./.github/workflows/function_test_exchange.yaml
     permissions:
       contents: write
@@ -108,6 +128,8 @@ jobs:
       EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -120,6 +142,7 @@ jobs:
 
   test_power_platform:
     name: Test Power Platform
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'powerplatform' }}
     uses: ./.github/workflows/function_test_powerplatform.yaml
     permissions:
       contents: write
@@ -129,6 +152,8 @@ jobs:
       EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -162,6 +187,7 @@ jobs:
 
   test_sharepoint:
     name: Test Sharepoint
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'sharepoint' }}
     uses: ./.github/workflows/function_test_sharepoint.yaml
     permissions:
       contents: write
@@ -171,6 +197,8 @@ jobs:
       EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
@@ -183,6 +211,7 @@ jobs:
 
   test_teams:
     name: Test Teams
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'teams' }}
     uses: ./.github/workflows/function_test_teams.yaml
     permissions:
       contents: write
@@ -192,6 +221,8 @@ jobs:
       EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
       GitHubEventSchedule: ${{ github.event.schedule }}
       GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
     secrets:
       PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
       PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
