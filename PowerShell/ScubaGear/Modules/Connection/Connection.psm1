@@ -185,13 +185,15 @@
                            -Uri "/beta/subscribedSkus" -ErrorAction Stop
                        $SubscribedSkus = $SkuResponse.value
                        if ($SubscribedSkus) {
-                           $AllPlans = $SubscribedSkus | ForEach-Object { $_.servicePlans } |
+                           $AllPlans = $SubscribedSkus |
+                               Where-Object { $null -ne $_.servicePlans } |
+                               ForEach-Object { $_.servicePlans } |
                                Where-Object { $_.provisioningStatus -eq "Success" }
-                           $PBIPlans = $AllPlans |
-                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" }
-                           $HasPBILicense = ($null -ne $PBIPlans -and @($PBIPlans).Count -gt 0)
+                           $PBIPlans = @($AllPlans |
+                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
+                           $HasPBILicense = ($PBIPlans.Count -gt 0)
                            if ($HasPBILicense) {
-                               $PlanNames = ($PBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
+                               $PlanNames = ($PBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
                                Write-Verbose "Power BI license found: $PlanNames"
                            }
                        }
@@ -215,17 +217,19 @@
                            try {
                                $UserLicenseResponse = Invoke-MgGraphRequest -Method GET `
                                    -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
-                               $UserPlans = $UserLicenseResponse.value | ForEach-Object { $_.servicePlans } |
+                               $UserPlans = $UserLicenseResponse.value |
+                                   Where-Object { $null -ne $_.servicePlans } |
+                                   ForEach-Object { $_.servicePlans } |
                                    Where-Object { $_.provisioningStatus -eq "Success" }
-                               $UserPBIPlans = $UserPlans |
-                                   Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" }
-                               if (-not $UserPBIPlans -or @($UserPBIPlans).Count -eq 0) {
+                               $UserPBIPlans = @($UserPlans |
+                                   Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
+                               if ($UserPBIPlans.Count -eq 0) {
                                    Write-Warning "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
                                    $PBILicenseFound = $false
                                    $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
                                }
                                else {
-                                   $UserPlanNames = ($UserPBIPlans | Select-Object -ExpandProperty servicePlanName -Unique) -join ", "
+                                   $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
                                    Write-Verbose "User Power BI/Fabric license found: $UserPlanNames"
                                }
                            }

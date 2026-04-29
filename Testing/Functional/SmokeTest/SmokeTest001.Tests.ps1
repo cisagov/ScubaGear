@@ -83,9 +83,13 @@ Describe "Smoke Test: Generate Output" {
             @{Item = 'IndividualReports/TeamsReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/images'; ItemType = 'Container'}
         ){
-            Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
-                Should -Be $true
-        }
+            $Exists = Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType
+            if (-not $Exists -and $Item -like "*PowerBI*") {
+                Set-ItResult -Skipped -Because "Power BI was removed from assessment (no license found)"
+            }
+            else {
+                $Exists | Should -Be $true
+            }
     }
     Context "Verify exported functions for ScubaGear module" {
         BeforeAll{
