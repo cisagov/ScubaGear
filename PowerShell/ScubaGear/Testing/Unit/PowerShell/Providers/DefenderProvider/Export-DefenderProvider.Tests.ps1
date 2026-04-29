@@ -137,10 +137,14 @@ InModuleScope -ModuleName ExportDefenderProvider {
                 } }
             function Get-SafeAttachmentPolicy {}
             Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy {}
-            function Get-AtpPolicyForO365 {throw 'this will be mocked'}
+            function Get-AtpPolicyForO365 {}
             Mock -ModuleName ExportDefenderProvider Get-AtpPolicyForO365 {}
             function Get-MgBetaUser {}
             Mock -ModuleName ExportDefenderProvider Get-MgBetaUser {}
+            # Reference ExportDefenderProvider.psm1 line 104 and 120  
+            # for the need to mock Get-DlpCompliancePolicy
+            function Get-DlpCompliancePolicy {} 
+            Mock -ModuleName ExportDefenderProvider Get-DlpCompliancePolicy {}
 
             function Test-SCuBAValidProviderJson {
                 param (
