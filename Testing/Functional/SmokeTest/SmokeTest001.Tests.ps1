@@ -90,6 +90,7 @@ Describe "Smoke Test: Generate Output" {
             else {
                 $Exists | Should -Be $true
             }
+        }
     }
     Context "Verify exported functions for ScubaGear module" {
         BeforeAll{
