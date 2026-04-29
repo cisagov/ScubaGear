@@ -19,7 +19,7 @@ The following PowerShell modules are required for ScubaGear to function properly
 
 | Module Name                                   | Minimum Version | Maximum Version  | Purpose                                      |
 |:---------------------------------------------:|:---------------:|:----------------:|:---------------------------------------------|
-| MicrosoftTeams |           4.9.3 |            7.6.0 | Microsoft Teams configuration management |
+| MicrosoftTeams |           4.9.3 |            7.7.0 | Microsoft Teams configuration management |
 | ExchangeOnlineManagement |           3.2.0 |            3.9.2 | Exchange Online and Microsoft Defender management |
 | Microsoft.Graph.Authentication |           2.0.0 |           2.25.0 | Microsoft Graph API authentication |
 | powershell-yaml |           0.4.2 |           0.4.12 | YAML file processing and configuration management |
