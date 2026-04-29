@@ -134,6 +134,18 @@ InModuleScope -ModuleName ExportAADProvider {
                     $this.AddMockCommand("Format-RiskyThirdPartyServicePrincipals", {
                         return [pscustomobject]@{}
                     })
+
+                    $this.AddMockCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-LegacyExchangeServicePrincipal", {
+                        return [pscustomobject]@{}
+                    })
+
+                    $this.AddMockCommand("Get-DedicatedExchangeHybridApplications", {
+                        return [pscustomobject]@{}
+                    })
                 }
             }
 
