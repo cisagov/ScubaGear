@@ -379,7 +379,7 @@ tests contains {
         concat(" ", [
             SliderSettings(2), 
             "or", 
-            SliderSettings(1)
+            SliderSettings(1),
             "or",
             SliderSettings(3)
         ]),
