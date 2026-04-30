@@ -1,5 +1,5 @@
 {
-  "Version": "2.4.8 [updated 4/8/2026]",
+  "Version": "2.4.30 [updated 4/30/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -196,6 +196,10 @@
           {
             "Name": "T1078.004: Cloud Accounts",
             "Url": "https://attack.mitre.org/techniques/T1078/004/"
+          },
+          {
+            "Name": "T1078.004: test new MITRE mapping",
+            "Url": "https://attack.mitre.org/techniques/T1078/005/"
           }
         ],
         "resources": [
@@ -839,7 +843,7 @@
         "name": "Managed Devices SHOULD be required to register MFA.",
         "policySection": "Strong Authentication and a Secure Registration Process",
         "sectionDescription": "This section provides policies that help reduce security risks related to user authentication and registration. Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf). <img src=\"/images/aad-mfa.png\" alt=\"Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Microsoft Entra certificate-based authentication (preferred) and federated PIV card.\" /> Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Microsoft Page](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)_",
-        "exclusionField": "CapExclusions",
+        "exclusionField": "CapExclusionsWithoutApps",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
         "rationale": "Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.",
