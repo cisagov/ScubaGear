@@ -422,7 +422,7 @@ For GCC high tenants:
 
 4.  Select the policy named **Global (Org-wide Default)**.
 
-5. Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **On**.
+5.  Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **On**.
 
 6. Clear the check next to **People in my org can join external meetings and receive new chats from users who have unmanaged Microsoft accounts.**
 
