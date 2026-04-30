@@ -179,6 +179,23 @@ Sign-ins detected as high risk SHALL be blocked.
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
+#### MS.AAD.2.4v1
+Test policy SHALL display in ScubaBaselines.json.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
+<!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
+- _Rationale:_ This prevents compromised accounts from accessing the tenant.
+- _Last modified:_ June 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+    - [T1078.004: Cloud Accounts 123](https://attack.mitre.org/techniques/T1078/004/)
+
 ### Resources
 
 - [What are risk detections?](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks)
