@@ -825,7 +825,7 @@ function Get-ScubaPolicyContent {
         Import markdown content
     #>
     param([string]$Content)
-    $result = @{
+    $result = [ordered]@{
         Criticality = $null
         LastModified = $null
         Rationale = $null
@@ -848,7 +848,7 @@ function Get-ScubaPolicyContent {
         $mitreList = @()
         foreach ($line in $mitreBlock -split "`n") {
             if ($line -match '\[([^\]]+)\]\(([^)]+)\)') {
-                $mitreList += @{ Name = $matches[1]; Url = $matches[2] }
+                $mitreList += [ordered]@{ Name = $matches[1]; Url = $matches[2] }
             }
         }
         $result.MITRE_Mapping = $mitreList
