@@ -1,9 +1,10 @@
 {
-  "Version": "2.4.13 (build 1205)",
+  "Version": "2.4.30 (build 1405)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
   "EnableScubaRun": true,
+  "AllowScubaRunInteractive": false,
   "EnableResultReader": true,
   "MinimumProductsRequired": 1,
   "MaximumResults": 10,
@@ -101,6 +102,7 @@
     "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid.",
     "ScubRunIncomplete": "Configuration incomplete - check Main tab",
     "ScubRunConfigFailed": "Failed to generate temporary configuration",
+    "ScubRunInteractiveNotAllowed": "ScubaGear cannot run interactively. Enable Application Settings in the Advanced tab and provide an App ID and Certificate Thumbprint.",
     "GraphConnectionError": "Microsoft Graph is not connected. Please check your connection and try again.",
     "PleaseSelectItem": "Please select an item.",
     "ConfigurationFileNotFound": "Configuration file not found: {0}",
@@ -259,7 +261,7 @@
       "name": "Power BI",
       "displayName": "Power BI (powerbi)",
       "supportsExclusions": false,
-      "showInApp": false,
+      "showInApp": true,
       "showInViewer": true
     },
     {
@@ -283,6 +285,14 @@
       "name": "Microsoft Teams",
       "displayName": "Microsoft Teams (teams)",
       "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "SecuritySuite",
+      "name": "SecuritySuite",
+      "displayName": "Defender Security Suite (securitysuite)",
+      "supportsExclusions": true,
       "showInApp": true,
       "showInViewer": true
     }
@@ -707,7 +717,7 @@
     },
     "SensitiveUsers": {
       "name": "Defender's Sensitive Users",
-      "value": "SensitiveUsers",
+      "value": "",
       "description": "Defines sensitive user accounts by display name and email address",
       "fields": [
         {
@@ -722,7 +732,7 @@
     },
     "PartnerDomains": {
       "name": "Partner Domains",
-      "value": "PartnerDomains",
+      "value": "",
       "description": "Defines a list of frequent partner domain names",
       "fields": [
         {
@@ -752,7 +762,7 @@
     },
     "AgencyDomains": {
       "name": "Agency Domains",
-      "value": "AgencyDomains",
+      "value": "",
       "description": "Defines a list of agency domain names that should be specified",
       "fields": [
         {

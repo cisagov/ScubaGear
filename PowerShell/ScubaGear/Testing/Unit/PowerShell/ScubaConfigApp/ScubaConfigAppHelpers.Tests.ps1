@@ -24,7 +24,8 @@
                 'ScubaConfigAppToolTipHelper.psm1',
                 'ScubaConfigAppCommonUIHelper.psm1',
                 'ScubaConfigAppUpdateUIHelper.psm1',
-                'ScubaConfigAppYamlPreviewHelper.psm1'
+                'ScubaConfigAppYamlPreviewHelper.psm1',
+                'ScubaConfigAppSubTabHelper.psm1'
             )
 
             foreach ($helper in $expectedHelpers) {
@@ -288,6 +289,9 @@
                     'Format-YamlMultilineString',
                     'New-YamlPreviewConvert',
                     'New-YamlPreview'
+                )
+                'ScubaConfigAppSubTabHelper.psm1' = @(
+                    'Initialize-ProductSubTabs'
                 )
             }
 
