@@ -106,7 +106,7 @@ Use the **search box** at the top to filter by policy name or ID, or use the **c
    - If connected with `-Online`, click the **browse** icon next to a field to search users or groups from your tenant via Microsoft Graph.
 4. Click **Save Exclusion**.
 
-### 3d. Look for the Green Dot ✅
+### 3d. Look for the Green Dot 🟢
 
 After saving, a **green dot** appears on the policy card header. This confirms the exclusion was saved to the in-memory configuration.
 
@@ -138,7 +138,7 @@ All products you selected appear as sub-tabs. Click the product sub-tab, then us
 4. Optionally set a **Remediation Date** (the date you expect the issue to be resolved).
 5. Click **Save Annotate**.
 
-### 4c. Look for the Green Dot ✅
+### 4c. Look for the Green Dot 🟢
 
 A **green dot** confirms the annotation is saved. A **yellow dot** means you have unsaved changes — click **Save Annotate** before leaving.
 
@@ -164,7 +164,7 @@ Click the product sub-tab, then use search/filter.
 3. Optionally set an **Expiration Date** — after this date, the omission will no longer apply and the policy re-enters the assessment.
 4. Click **Save Omit**.
 
-### 5c. Look for the Green Dot ✅
+### 5c. Look for the Green Dot 🟢
 
 Same indicator as Exclusions and Annotations — green dot = saved, yellow dot = unsaved pending changes.
 
