@@ -3166,7 +3166,7 @@
                            "SharePoint REST API"
                        ],
         "Criticality":  "Should",
-        "PolicyId":  "MS.SHAREPOINT.3.3v1",
+        "PolicyId":  "MS.SHAREPOINT.3.3v2",
         "ReportDetails":  "Requirement not met: Expiration timer for \u0027People who use a verification code\u0027 NOT set to 30 days",
         "RequirementMet":  false
     },

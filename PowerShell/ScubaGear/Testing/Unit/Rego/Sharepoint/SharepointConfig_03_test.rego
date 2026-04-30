@@ -366,14 +366,14 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
 }
 
 #
-# Policy MS.SHAREPOINT.3.3v1
+# Policy MS.SHAREPOINT.3.3v2
 #--
 test_EmailAttestationReAuthDays_SharingCapability_NewExistingGuests_Correct if {
     Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 1}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
+    TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
 }
 
 test_EmailAttestationReAuthDays_SharingCapability_Anyone_Correct if {
@@ -381,7 +381,7 @@ test_EmailAttestationReAuthDays_SharingCapability_Anyone_Correct if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
+    TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
 }
 
 test_EmailAttestationReAuthDays_Correct if {
@@ -391,7 +391,7 @@ test_EmailAttestationReAuthDays_Correct if {
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    TestResult("MS.SHAREPOINT.3.3v1", Output, PASS, true) == true
+    TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
 }
 
 test_EmailAttestationReAuthDays_Incorrect_V1 if {
@@ -404,7 +404,7 @@ test_EmailAttestationReAuthDays_Incorrect_V1 if {
 
     ReportDetailsString :=
         "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled and set to 30 days or more"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
 
 test_EmailAttestationReAuthDays_Incorrect_V2 if {
@@ -416,7 +416,7 @@ test_EmailAttestationReAuthDays_Incorrect_V2 if {
 
     ReportDetailsString :=
         "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
 
 test_EmailAttestationRequired_Incorrect if {
@@ -428,11 +428,11 @@ test_EmailAttestationRequired_Incorrect if {
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailsString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
-    TestResult("MS.SHAREPOINT.3.3v1", Output, ReportDetailsString, false) == true
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
 
 test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
+    PolicyId := "MS.SHAREPOINT.3.3v2"
 
     Tenant := json.patch(SPOTenant,
                 [{"op": "add", "path": "SharingCapability", "value": 0},
@@ -442,24 +442,8 @@ test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable 
 
     ReportDetailsString := concat(" ", [
         "This policy is only applicable if the external sharing slider in the SharePoint admin center",
-        "is set to Anyone or New and Existing Guests. See %v for more info"
-    ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
-}
-
-test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_NotApplicable if {
-    PolicyId := "MS.SHAREPOINT.3.3v1"
-
-    Tenant := json.patch(SPOTenant,
-                [{"op": "add", "path": "SharingCapability", "value": 3},
-                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
-
-    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-
-    ReportDetailsString := concat(" ", [
-        "This policy is only applicable if the external sharing slider in the SharePoint admin center",
-        "is set to Anyone or New and Existing Guests. See %v for more info"
-    ])
+        "is set to Anyone or New and Existing Guests or Existing Guests. See %v for more info"
+        ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
 #--
