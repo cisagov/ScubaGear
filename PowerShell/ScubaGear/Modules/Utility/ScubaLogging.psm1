@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
 ScubaLogging PowerShell Module - Detailed Logging Module for ScubaGear
 
@@ -251,7 +251,7 @@ function Write-ScubaLog {
                 # ScubaGear output in logging noise.  Only high-level phase milestones (e.g. "Starting",
                 # "completed") are shown to the user; every Info message still appears in the log file
                 # regardless of this filter, so nothing is lost for troubleshooting.
-                if ($Message -match "Creating output folder|Starting|completed|authenticated|retrieved") {
+                if ($Message -match "Creating output folder|Starting|completed|authenticated|retrieved|EXIT") {
                     Write-Output "INFO: $Message"
                 }
             }
@@ -363,6 +363,7 @@ function Trace-ScubaFunction {
             }
         }
 
+        # Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Info" -Source "FunctionTrace" -Data $exitData
         Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Debug" -Source "FunctionTrace" -Data $exitData
         return $result
     }
@@ -731,81 +732,81 @@ function Get-ScubaRunDetails {
             Write-ScubaLog -Message "Failed to retrieve ScubaGear version: $($_.Exception.Message)" -Level "Warning" -Source "RunDetails"
         }
 
-        # 4. Dependency Modules (Program Files and User Profile, excluding System32)
-        Write-ScubaLog -Message "Collecting PowerShell module information..." -Level "Debug" -Source "RunDetails"
-        try {
-            $programFilesPath = [Environment]::GetFolderPath('ProgramFiles')
-            $userProfilePath = $env:USERPROFILE
+        # # 4. Dependency Modules (Program Files and User Profile, excluding System32)
+        # Write-ScubaLog -Message "Collecting PowerShell module information..." -Level "Debug" -Source "RunDetails"
+        # try {
+        #     $programFilesPath = [Environment]::GetFolderPath('ProgramFiles')
+        #     $userProfilePath = $env:USERPROFILE
 
-            # Get modules from Program Files and User Profile only, excluding System32
-            $dependencies = Get-Module -ListAvailable | Where-Object {
-                $modulePath = $_.ModuleBase
-                ($modulePath -like "$programFilesPath*" -or $modulePath -like "$userProfilePath*") -and
-                $modulePath -notlike "*System32*" -and
-                $modulePath -notlike "*syswow64*"
-            }
+        #     # Get modules from Program Files and User Profile only, excluding System32
+        #     $dependencies = Get-Module -ListAvailable | Where-Object {
+        #         $modulePath = $_.ModuleBase
+        #         ($modulePath -like "$programFilesPath*" -or $modulePath -like "$userProfilePath*") -and
+        #         $modulePath -notlike "*System32*" -and
+        #         $modulePath -notlike "*syswow64*"
+        #     }
 
-            # Group by module name to get unique modules with their versions
-            $uniqueModules = $dependencies | Group-Object Name | ForEach-Object {
-                $module = $_.Group | Sort-Object Version -Descending | Select-Object -First 1
-                "$($module.Name) ($($module.Version))"
-            }
+        #     # Group by module name to get unique modules with their versions
+        #     $uniqueModules = $dependencies | Group-Object Name | ForEach-Object {
+        #         $module = $_.Group | Sort-Object Version -Descending | Select-Object -First 1
+        #         "$($module.Name) ($($module.Version))"
+        #     }
 
-            $depData = @{
-                TotalModulesFound = $dependencies.Count
-                UniqueModules = ($dependencies | Select-Object Name -Unique).Count
-                TopModules = ($uniqueModules | Select-Object -First 20) -join "; "
-            }
-            Write-ScubaLog -Message "PowerShell modules captured (excluding System32)" -Level "Info" -Source "RunDetails" -Data $depData
+        #     $depData = @{
+        #         TotalModulesFound = $dependencies.Count
+        #         UniqueModules = ($dependencies | Select-Object Name -Unique).Count
+        #         TopModules = ($uniqueModules | Select-Object -First 20) -join "; "
+        #     }
+        #     Write-ScubaLog -Message "PowerShell modules captured (excluding System32)" -Level "Info" -Source "RunDetails" -Data $depData
 
-            # Log ScubaGear dependencies by reading from RequiredVersions.ps1
-            $requiredVersionsPath = Join-Path $PSScriptRoot "..\..\RequiredVersions.ps1"
-            $knownDependencyNames = @()
+        #     # Log ScubaGear dependencies by reading from RequiredVersions.ps1
+        #     $requiredVersionsPath = Join-Path $PSScriptRoot "..\..\RequiredVersions.ps1"
+        #     $knownDependencyNames = @()
 
-            if (Test-Path $requiredVersionsPath) {
-                try {
-                    $ModuleList = $null
-                    . $requiredVersionsPath
-                    if ($ModuleList) {
-                        $knownDependencyNames = $ModuleList | ForEach-Object { $_['ModuleName'] }
-                        Write-ScubaLog -Message "Loaded $($knownDependencyNames.Count) required dependencies from RequiredVersions.ps1" -Level "Debug" -Source "RunDetails"
-                    }
-                    else {
-                        Write-ScubaLog -Message "RequiredVersions.ps1 found but `$ModuleList is empty or null" -Level "Error" -Source "RunDetails"
-                    }
-                }
-                catch {
-                    Write-ScubaLog -Message "Failed to read RequiredVersions.ps1: $($_.Exception.Message)" -Level "Error" -Source "RunDetails" -Exception $_.Exception
-                }
-            }
-            else {
-                Write-ScubaLog -Message "RequiredVersions.ps1 not found at: $requiredVersionsPath" -Level "Error" -Source "RunDetails"
-            }
+        #     if (Test-Path $requiredVersionsPath) {
+        #         try {
+        #             $ModuleList = $null
+        #             . $requiredVersionsPath
+        #             if ($ModuleList) {
+        #                 $knownDependencyNames = $ModuleList | ForEach-Object { $_['ModuleName'] }
+        #                 Write-ScubaLog -Message "Loaded $($knownDependencyNames.Count) required dependencies from RequiredVersions.ps1" -Level "Debug" -Source "RunDetails"
+        #             }
+        #             else {
+        #                 Write-ScubaLog -Message "RequiredVersions.ps1 found but `$ModuleList is empty or null" -Level "Error" -Source "RunDetails"
+        #             }
+        #         }
+        #         catch {
+        #             Write-ScubaLog -Message "Failed to read RequiredVersions.ps1: $($_.Exception.Message)" -Level "Error" -Source "RunDetails" -Exception $_.Exception
+        #         }
+        #     }
+        #     else {
+        #         Write-ScubaLog -Message "RequiredVersions.ps1 not found at: $requiredVersionsPath" -Level "Error" -Source "RunDetails"
+        #     }
 
-            # Log each required ScubaGear dependency specifically
-            if ($knownDependencyNames.Count -gt 0) {
-                foreach ($depName in $knownDependencyNames) {
-                    $depModule = $dependencies | Where-Object { $_.Name -eq $depName } | Sort-Object Version -Descending | Select-Object -First 1
-                    if ($depModule) {
-                        $criticalDepData = @{
-                            Module = $depName
-                            Version = $depModule.Version.ToString()
-                            Path = $depModule.ModuleBase
-                        }
-                        Write-ScubaLog -Message "Required dependency: $depName" -Level "Debug" -Source "RunDetails" -Data $criticalDepData
-                    }
-                    else {
-                        Write-ScubaLog -Message "Required dependency NOT FOUND: $depName" -Level "Warning" -Source "RunDetails"
-                    }
-                }
-            }
-            else {
-                Write-ScubaLog -Message "No required dependencies loaded from RequiredVersions.ps1 - cannot verify ScubaGear dependencies" -Level "Error" -Source "RunDetails"
-            }
-        }
-        catch {
-            Write-ScubaLog -Message "Failed to retrieve dependency modules: $($_.Exception.Message)" -Level "Warning" -Source "RunDetails"
-        }
+        #     # Log each required ScubaGear dependency specifically
+        #     if ($knownDependencyNames.Count -gt 0) {
+        #         foreach ($depName in $knownDependencyNames) {
+        #             $depModule = $dependencies | Where-Object { $_.Name -eq $depName } | Sort-Object Version -Descending | Select-Object -First 1
+        #             if ($depModule) {
+        #                 $criticalDepData = @{
+        #                     Module = $depName
+        #                     Version = $depModule.Version.ToString()
+        #                     Path = $depModule.ModuleBase
+        #                 }
+        #                 Write-ScubaLog -Message "Required dependency: $depName" -Level "Debug" -Source "RunDetails" -Data $criticalDepData
+        #             }
+        #             else {
+        #                 Write-ScubaLog -Message "Required dependency NOT FOUND: $depName" -Level "Warning" -Source "RunDetails"
+        #             }
+        #         }
+        #     }
+        #     else {
+        #         Write-ScubaLog -Message "No required dependencies loaded from RequiredVersions.ps1 - cannot verify ScubaGear dependencies" -Level "Error" -Source "RunDetails"
+        #     }
+        # }
+        # catch {
+        #     Write-ScubaLog -Message "Failed to retrieve dependency modules: $($_.Exception.Message)" -Level "Warning" -Source "RunDetails"
+        # }
 
         # 5. OPA Executable Information
         Write-ScubaLog -Message "Collecting OPA executable information..." -Level "Debug" -Source "RunDetails"
