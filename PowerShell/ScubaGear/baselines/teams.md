@@ -336,7 +336,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
+<!--Policy: MS.TEAMS.2.3v3; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ April 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
