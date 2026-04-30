@@ -52,8 +52,8 @@ InModuleScope Orchestrator {
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
-            It 'With -ProductNames "defender", returns valid JSON' {
-                $ProductNames = @('defender')
+            It 'With -ProductNames "securitysuite", returns valid JSON' {
+                $ProductNames = @('securitysuite')
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -77,7 +77,7 @@ InModuleScope Orchestrator {
                 $ValidJson | Should -Be $true
             }
             It 'With all products, returns valid JSON' {
-                $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -100,8 +100,8 @@ InModuleScope Orchestrator {
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
-            It 'With -ProductNames "defender", returns valid JSON' {
-                $ProductNames = @('defender')
+            It 'With -ProductNames "securitysuite", returns valid JSON' {
+                $ProductNames = @('securitysuite')
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -125,7 +125,7 @@ InModuleScope Orchestrator {
                 $ValidJson | Should -Be $true
             }
             It 'With all products, returns valid JSON' {
-                $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -148,8 +148,8 @@ InModuleScope Orchestrator {
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
-            It 'With -ProductNames "defender", returns valid JSON' {
-                $ProductNames = @('defender')
+            It 'With -ProductNames "securitysuite", returns valid JSON' {
+                $ProductNames = @('securitysuite')
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -173,7 +173,7 @@ InModuleScope Orchestrator {
                 $ValidJson | Should -Be $true
             }
             It 'With all products, returns valid JSON' {
-                $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -196,8 +196,8 @@ InModuleScope Orchestrator {
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
-            It 'With -ProductNames "defender", returns valid JSON' {
-                $ProductNames = @('defender')
+            It 'With -ProductNames "securitysuite", returns valid JSON' {
+                $ProductNames = @('securitysuite')
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
@@ -221,7 +221,7 @@ InModuleScope Orchestrator {
                 $ValidJson | Should -Be $true
             }
             It 'With all products, returns valid JSON' {
-                $ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+                $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
                 $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true

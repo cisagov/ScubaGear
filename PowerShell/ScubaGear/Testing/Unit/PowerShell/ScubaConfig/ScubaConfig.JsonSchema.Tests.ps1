@@ -24,7 +24,7 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
             $ProductNames.type | Should -Be "array"
             $ProductNames.items.type | Should -Be "string"
             $ProductNames.items.enum | Should -Contain "aad"
-            $ProductNames.items.enum | Should -Contain "defender"
+            $ProductNames.items.enum | Should -Contain "securitysuite"
             $ProductNames.items.enum | Should -Contain "exo"
             $ProductNames.items.enum | Should -Contain "powerplatform"
             $ProductNames.items.enum | Should -Contain "sharepoint"
@@ -129,7 +129,7 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
 
     Context "Product Configuration Schema" {
         It "Should have product definitions for all supported products" {
-            $SupportedProducts = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
+            $SupportedProducts = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
 
             foreach ($product in $SupportedProducts) {
                 $script:SchemaContent.properties.$product | Should -Not -BeNullOrEmpty -Because "Product $product should be defined in schema"
@@ -143,9 +143,9 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
                 $script:SchemaContent.properties.aad.properties.RoleExclusions | Should -Not -BeNullOrEmpty
             }
 
-            # Defender should have SensitiveAccounts
-            if ($script:SchemaContent.properties.defender -and $script:SchemaContent.properties.defender.properties) {
-                $script:SchemaContent.properties.defender.properties.SensitiveAccounts | Should -Not -BeNullOrEmpty
+            # SecuritySuite should have SensitiveAccounts
+            if ($script:SchemaContent.properties.securitysuite -and $script:SchemaContent.properties.securitysuite.properties) {
+                $script:SchemaContent.properties.securitysuite.properties.SensitiveAccounts | Should -Not -BeNullOrEmpty
             }
         }
     }

@@ -14,7 +14,7 @@ InModuleScope CreateReport {
             $ArgToProd = @{
                 teams         = "Teams";
                 exo           = "EXO";
-                defender      = "Defender";
+                securitysuite = "SecuritySuite";
                 aad           = "AAD";
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
@@ -23,7 +23,7 @@ InModuleScope CreateReport {
             $ProdToFullName = @{
                 Teams         = "Microsoft Teams";
                 EXO           = "Exchange Online";
-                Defender      = "Microsoft 365 Defender";
+                SecuritySuite = "Security Suite";
                 AAD           = "Azure Active Directory";
                 PowerPlatform = "Microsoft Power Platform";
                 SharePoint    = "SharePoint Online";
@@ -42,7 +42,7 @@ InModuleScope CreateReport {
         }
         It 'Creates a report for <Product>' -ForEach @(
             @{Product = 'aad'; WarningCount = 0},
-            @{Product = 'defender'; WarningCount = 9},
+            @{Product = 'securitysuite'; WarningCount = 0},
             @{Product = 'exo'; WarningCount = 0},
             @{Product = 'powerplatform'; WarningCount = 3},
             @{Product = 'sharepoint'; WarningCount = 0},

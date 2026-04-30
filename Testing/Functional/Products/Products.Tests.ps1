@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -98,6 +98,10 @@ param (
 )
 
 BeforeDiscovery {
+    if ($ProductName -eq "defender") {
+        $ProductName = "securitysuite"
+    }
+
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     Import-Module $ScubaModule
@@ -123,7 +127,7 @@ BeforeDiscovery {
         AppId = $AppId
         TenantDomain = $TenantDomain
     }{
-        if ($ProductName -eq "defender"){
+        if ($ProductName -eq "securitysuite"){
             $ProductNames = @($ProductName, "exo")
         }
         else {
@@ -146,6 +150,10 @@ BeforeDiscovery {
 }
 
 BeforeAll {
+    if ($ProductName -eq "defender") {
+        $ProductName = "securitysuite"
+    }
+
     # Shared Data for functional test
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
@@ -157,7 +165,7 @@ BeforeAll {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
         aad = "Azure Active Directory"
-        defender = "Microsoft 365 Defender"
+        securitysuite = "Security Suite"
         exo = "Exchange Online"
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"
