@@ -241,9 +241,9 @@
       "showInViewer": true
     },
     {
-      "id": "Defender",
-      "name": "Defender",
-      "displayName": "Defender (defender)",
+      "id": "SecuritySuite",
+      "name": "SecuritySuite",
+      "displayName": "Security Suite (defender)",
       "supportsExclusions": true,
       "showInApp": true,
       "showInViewer": true
@@ -285,14 +285,6 @@
       "name": "Microsoft Teams",
       "displayName": "Microsoft Teams (teams)",
       "supportsExclusions": false,
-      "showInApp": true,
-      "showInViewer": true
-    },
-    {
-      "id": "SecuritySuite",
-      "name": "SecuritySuite",
-      "displayName": "Defender Security Suite (securitysuite)",
-      "supportsExclusions": true,
       "showInApp": true,
       "showInViewer": true
     }
