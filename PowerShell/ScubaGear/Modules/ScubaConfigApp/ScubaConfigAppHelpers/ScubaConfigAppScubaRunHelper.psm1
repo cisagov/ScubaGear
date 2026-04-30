@@ -404,9 +404,22 @@ Function Test-ScubaRunReadiness {
 
     # Determine run mode based on AppId and CertificateThumbprint
     # If both AppId and CertificateThumbprint have values, it's non-interactive mode
-    if (![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.AppId) -and ![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.CertificateThumbprint)) {
+    $hasNonInteractiveCreds = (![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.AppId) -and
+                               ![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.CertificateThumbprint))
+
+    # Block interactive runs unless the override flag is set (testing only).
+    # WAM-based Graph authentication no longer works interactively inside a runspace.
+    $allowInteractive = $syncHash.UIConfigs.PSObject.Properties['AllowScubaRunInteractive'] -and
+                        $syncHash.UIConfigs.AllowScubaRunInteractive -eq $true
+
+    if (-not $hasNonInteractiveCreds -and -not $allowInteractive) {
+        $hasValidConfig = $false
+        Write-DebugOutput -Message "ScubaRun not allowed. Application authentication (AppId + CertificateThumbprint) is required. Enable Application Settings in the Advanced tab." -Source $MyInvocation.MyCommand -Level "Error"
+    }
+
+    if ($hasNonInteractiveCreds) {
         $runMode = "[non-interactive mode]"
-    }else{
+    } else {
         $runMode = "[interactive mode]"
     }
 
@@ -417,6 +430,8 @@ Function Test-ScubaRunReadiness {
     if (-not $syncHash.JustCompletedExecution) {
         if ($hasValidConfig) {
             Update-ScubaRunStatus -Message ($syncHash.UIConfigs.localeInfoMessages.ScubaRunReady -f $runMode) -Level "Success"
+        } elseif (-not $hasNonInteractiveCreds -and -not $allowInteractive) {
+            Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubRunInteractiveNotAllowed -Level "Error"
         } else {
             Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubaRunIncomplete -Level "Error"
         }

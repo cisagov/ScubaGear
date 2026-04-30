@@ -1188,60 +1188,7 @@
                             <TabControl.Resources>
                                 <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
                             </TabControl.Resources>
-
-                            <!-- AAD Exclusionss Tab -->
-                            <TabItem x:Name="AadExclusionsTab" Header="AAD" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="AadExclusionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- Defender Exclusionss Tab -->
-                            <TabItem x:Name="DefenderExclusionsTab" Header="DEFENDER" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="DefenderExclusionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- EXO Exclusionss Tab -->
-                            <TabItem x:Name="ExoExclusionsTab" Header="EXO" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="ExoExclusionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- PowerPlatform Exclusionss Tab -->
-                            <TabItem x:Name="PowerPlatformExclusionsTab" Header="POWERPLATFORM" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="PowerPlatformExclusionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- SharePoint Exclusionss Tab -->
-                            <TabItem x:Name="SharePointExclusionsTab" Header="SHAREPOINT" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="SharePointExclusionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- Teams Exclusionss Tab -->
-                            <TabItem x:Name="TeamsExclusionsTab" Header="TEAMS" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="TeamsExclusionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
+                            <!-- Sub-tabs are populated dynamically at runtime from UIConfigs.products -->
                         </TabControl>
                     </Grid>
                 </TabItem>
@@ -1322,63 +1269,10 @@
 
                         <!-- Nested Tab Control for Products -->
                         <TabControl x:Name="AnnotationsProductTabControl" Grid.Row="2">
-                             <TabControl.Resources>
+                            <TabControl.Resources>
                                 <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
                             </TabControl.Resources>
-
-                            <!-- AAD Annotations Tab -->
-                            <TabItem x:Name="AadAnnotationsTab" Header="AAD" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="AadAnnotationsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- Defender Annotations Tab -->
-                            <TabItem x:Name="DefenderAnnotationsTab" Header="DEFENDER" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="DefenderAnnotationsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- EXO Annotations Tab -->
-                            <TabItem x:Name="ExoAnnotationsTab" Header="EXO" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="ExoAnnotationsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- PowerPlatform Annotations Tab -->
-                            <TabItem x:Name="PowerPlatformAnnotationsTab" Header="POWERPLATFORM" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="PowerPlatformAnnotationsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- SharePoint Annotations Tab -->
-                            <TabItem x:Name="SharePointAnnotationsTab" Header="SHAREPOINT" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="SharePointAnnotationsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- Teams Annotations Tab -->
-                            <TabItem x:Name="TeamsAnnotationsTab" Header="TEAMS" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="TeamsAnnotationsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
+                            <!-- Sub-tabs are populated dynamically at runtime from UIConfigs.products -->
                         </TabControl>
                     </Grid>
                 </TabItem>
@@ -1459,63 +1353,10 @@
 
                         <!-- Nested Tab Control for Products -->
                         <TabControl x:Name="OmissionsProductTabControl" Grid.Row="2">
-                             <TabControl.Resources>
+                            <TabControl.Resources>
                                 <Style TargetType="TabItem" BasedOn="{StaticResource SubTabItemStyle}"/>
                             </TabControl.Resources>
-
-                            <!-- AAD Omissions Tab -->
-                            <TabItem x:Name="AadOmissionsTab" Header="AAD" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="AadOmissionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- Defender Omissions Tab -->
-                            <TabItem x:Name="DefenderOmissionsTab" Header="DEFENDER" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="DefenderOmissionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- EXO Omissions Tab -->
-                            <TabItem x:Name="ExoOmissionsTab" Header="EXO" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="ExoOmissionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- PowerPlatform Omissions Tab -->
-                            <TabItem x:Name="PowerPlatformOmissionsTab" Header="POWERPLATFORM" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="PowerPlatformOmissionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- SharePoint Omissions Tab -->
-                            <TabItem x:Name="SharePointOmissionsTab" Header="SHAREPOINT" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="SharePointOmissionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
-
-                            <!-- Teams Omissions Tab -->
-                            <TabItem x:Name="TeamsOmissionsTab" Header="TEAMS" IsEnabled="False">
-                                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,16,0,0" Style="{StaticResource ModernScrollViewer}">
-                                    <StackPanel x:Name="TeamsOmissionsContent">
-                                        <!-- Will be populated dynamically -->
-                                    </StackPanel>
-                                </ScrollViewer>
-                            </TabItem>
+                            <!-- Sub-tabs are populated dynamically at runtime from UIConfigs.products -->
                         </TabControl>
                     </Grid>
                 </TabItem>

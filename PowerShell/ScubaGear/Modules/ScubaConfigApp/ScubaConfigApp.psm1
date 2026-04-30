@@ -596,28 +596,7 @@ Function Start-SCuBAConfigApp {
             }.GetNewClosure())
 
         }
-        $ExclusionSupport = $syncHash.UIConfigs.products | Where-Object { $_.supportsExclusions -eq $true } | Select-Object -ExpandProperty id
-        $syncHash.ExclusionsInfo_TextBlock.Text = ($syncHash.UIConfigs.localeContext.ExclusionsInfo_TextBlock -f ($ExclusionSupport -join ', ').ToUpper())
-
-        Foreach($product in $syncHash.UIConfigs.products) {
-            # Initialize the OmissionTab and ExclusionTab for each product
-            $exclusionTabName = "$($product.id)ExclusionsTab"
-            $exclusionTab = $syncHash.$exclusionTabName
-
-            # Only try to set visibility if the exclusion tab actually exists
-            if ($null -ne $exclusionTab) {
-                if ($product.supportsExclusions) {
-                    $exclusionTab.Visibility = "Visible"
-                    Write-DebugOutput -Message "Enabled Exclusion sub tab for: $($product.id)" -Source $source -Level "Info"
-                }else{
-                    # Disable the Exclusions tab if the product does not support exclusions
-                    $exclusionTab.Visibility = "Collapsed"
-                    Write-DebugOutput -Message "Disabled Exclusion sub tab for: $($product.id)" -Source $source -Level "Info"
-                }
-            } else {
-                Write-DebugOutput -Message "Exclusion tab not found for product: $($product.id) (looking for: $exclusionTabName)" -Source $source -Level "Warning"
-            }
-        }
+        Initialize-ProductSubTabs
 
 
         # added events to all tab toggles
