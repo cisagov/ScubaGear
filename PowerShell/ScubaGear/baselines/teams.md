@@ -440,7 +440,7 @@ For commercial and GCC tenants:
 
 4.  Select **Global (Org-wide Default).**
 
-5.  Under **Edit policy details**, Toggle **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
+5.  Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
 
 6.  Click **Save.**
 
