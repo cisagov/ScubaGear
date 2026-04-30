@@ -890,10 +890,10 @@ function Get-ScubaPolicyContent {
         $linkUrl = $match.Groups['LinkUrl'].Value
         if (-not $linkUrl) { $linkUrl = "" }  # Handle badges without links
 
-        $badges += @{
+        $badges += [ordered]@{
             label = $label
-            color = $color
             linkUrl = $linkUrl
+            color = $color
         }
     }
     $result.Badges = $badges
