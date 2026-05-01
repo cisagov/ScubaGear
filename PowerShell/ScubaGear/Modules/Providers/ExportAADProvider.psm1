@@ -26,7 +26,6 @@ function Export-AADProvider {
         $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
     }
 
-Write-Warning "AllPolicies: $($AllPolicies.count)"
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
     $CapHelper = Get-CapTracker
     $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # Used in generating the CAP html in the report
