@@ -648,15 +648,15 @@ test_AppExclusionConditions_Correct_V5 if {
                 {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.Applications as ["Office365"]
+                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.Applications as ["Office365"]
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
 }
 
 # tests for guest user type exclusions
@@ -670,8 +670,8 @@ test_GuestUserTypeExclusionConditions_Correct_V5 if {
                 }}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
-                        with input.scuba_config.Aad["MS.AAD.3.2v2"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.2v2"].CapExclusions.GuestUserTypes as [
+                        with input.scuba_config.Aad["MS.AAD.3.2v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.3.2v1"].CapExclusions.GuestUserTypes as [
                             "b2bCollaborationGuest",
                             "internalGuest"
                         ]
@@ -681,7 +681,7 @@ test_GuestUserTypeExclusionConditions_Correct_V5 if {
         "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
     ])
 
-    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, true) == true
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, true) == true
 }
 
 test_GuestUserTypeExclusionNoExempt_Incorrect_V5 if {
@@ -697,7 +697,7 @@ test_GuestUserTypeExclusionNoExempt_Incorrect_V5 if {
     ReportDetailStr :=
         "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
 
-    TestResult("MS.AAD.3.2v2", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.3.2v1", Output, ReportDetailStr, false) == true
 }
 #--
 
