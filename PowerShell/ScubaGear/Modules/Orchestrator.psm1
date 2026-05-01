@@ -803,11 +803,9 @@ function Invoke-ProviderList {
                 'M365Environment' = $ScubaConfig.M365Environment
             }
 
-            $ServicePrincipalAuth = $false
             if ($ScubaConfig.AppID) {
                 $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
-                $ServicePrincipalAuth = $true
             }
 
             foreach ($Product in $ScubaConfig.ProductNames) {
