@@ -9,7 +9,7 @@ Describe "ScubaConfig Additional Properties Validation" {
         # Determine OS-specific executable name
         $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
         $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
-        
+
         if ($IsLinuxOS) {
             $script:DummyOPAName = "opa_linux_amd64"
         }
@@ -92,7 +92,7 @@ Describe "ScubaConfig Additional Properties Validation" {
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
-        
+
         # Remove dummy OPA executable
         if (Test-Path $script:DummyOPAPath) {
             Remove-Item -Path $script:DummyOPAPath -Force -ErrorAction SilentlyContinue

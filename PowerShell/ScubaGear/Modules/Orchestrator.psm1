@@ -140,7 +140,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -317,7 +317,7 @@ function Invoke-SCuBA {
 
         # Transform ProductNames into list of all products if it contains wildcard
         if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams"
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
@@ -546,6 +546,21 @@ function Invoke-SCuBA {
             $ScubaConfig.ProductNames = $Difference
         }
 
+        # If Power BI license was not found, remove powerbi from the product list entirely.
+        # This check runs after Connect-Tenant because the Graph connection (needed to query
+        # subscribed SKUs) is established during that step.
+        if (-not $ConnectionResult.PBILicenseFound -and $ScubaConfig.ProductNames -contains "powerbi") {
+            Write-Warning "Removing Power BI from assessment."
+            Write-ScubaLog -Message "Power BI license not found - removing from product list" -Level "Info" -Source "InvokeScuba"
+            $ScubaConfig.ProductNames = @($ScubaConfig.ProductNames | Where-Object { $_ -ne "powerbi" })
+            if ($ScubaConfig.ProductNames.Count -eq 0) {
+                Write-Warning "No products remaining after Power BI removal. Aborting."
+                Write-ScubaLog -Message "CRITICAL: No products remaining after Power BI license check - aborting execution" -Level "Error" -Source "InvokeScuba"
+                Stop-ScubaLogging
+                return
+            }
+        }
+
         # Capture module snapshot after authentication to log what modules were imported
         if ($Script:ScubaLoggingEnabled) {
             try {
@@ -720,6 +735,7 @@ $ArgToProd = @{
     aad = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
+    powerbi = "PowerBI";
 }
 
 $ProdToFullName = @{
@@ -729,6 +745,7 @@ $ProdToFullName = @{
     AAD = "Azure Active Directory";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
+    PowerBI = "Microsoft Power BI";
 }
 
 $IndividualReportFolderName = "IndividualReports"
@@ -850,6 +867,13 @@ function Invoke-ProviderList {
                                 'AdminUrl'        = $ConnectionResult.SPOAdminUrl
                             }
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
+                        }
+                        "powerbi" {
+                            $PBIProviderParams = @{
+                                'AccessToken'       = $ConnectionResult.PBIAccessToken
+                                'BaseUrl'           = $ConnectionResult.PBIBaseUrl
+                            }
+                            $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
                         "teams" {
                             if ($ServicePrincipalAuth) {
@@ -1173,7 +1197,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1279,7 +1303,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1676,7 +1700,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1700,6 +1724,9 @@ function Get-TenantDetail {
     }
     elseif ($ProductNames.Contains("powerplatform")) {
         Get-PowerPlatformTenantDetail -M365Environment $M365Environment
+    }
+    elseif ($ProductNames.Contains("powerbi")) {
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("exo")) {
         Get-EXOTenantDetail -M365Environment $M365Environment
@@ -1755,10 +1782,14 @@ function Invoke-Connection {
         # Return empty result when not logging in
         @{
             ProdAuthFailed  = @()
+            PBILicenseFound = $true
+            PBILicenseReason = ""
             SPOAccessToken  = $null
             SPOAdminUrl     = $null
             PPAccessToken   = $null
             PPBaseUrl       = $null
+            PBIAccessToken  = $null
+            PBIBaseUrl      = $null
         }
     }
 }
@@ -1775,13 +1806,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1900,7 +1931,7 @@ function Remove-Resources {
     #>
     [CmdletBinding()]
     $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider")
+    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
@@ -2037,7 +2068,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -2312,6 +2343,19 @@ function Invoke-SCuBACached {
                 }
                 else {
                     Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "ScubaCached"
+                }
+
+                # If Power BI license was not found, remove powerbi from the product list
+                if (-not $ConnectionResult.PBILicenseFound -and $ProductNames -contains "powerbi") {
+                    Write-Warning "Removing Power BI from assessment."
+                    Write-ScubaLog -Message "Power BI license not found - removing from product list" -Level "Info" -Source "ScubaCached"
+                    $ProductNames = @($ProductNames | Where-Object { $_ -ne "powerbi" })
+                    if ($ProductNames.Count -eq 0) {
+                        Write-Warning "No products remaining after Power BI removal. Aborting."
+                        Write-ScubaLog -Message "CRITICAL: No products remaining after Power BI license check - aborting execution" -Level "Error" -Source "ScubaCached"
+                        Stop-ScubaLogging
+                        return
+                    }
                 }
 
                 # Capture module snapshot after authentication to see what modules were imported

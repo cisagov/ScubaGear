@@ -1,3 +1,9 @@
+﻿# Module-scoped MSAL PublicClientApplication cache.
+# Keyed by ClientId — enables silent token acquisition for a different scope after an initial
+# interactive login (e.g., PowerBI reuses the PowerPlatform sign-in, same ClientId 1950a258...).
+$script:MsalPublicClientApps = @{}
+$script:MsalPublicClientAccounts = @{}
+
 function Connect-GraphHelper {
     <#
     .Description
@@ -237,6 +243,12 @@ function Get-MsalAccessToken {
         [Parameter(Mandatory = $true, ParameterSetName = 'Interactive')]
         [string]$ClientId,
 
+        # UPN of the already-authenticated user (e.g., from Get-MgContext.Account).
+        # When provided, enables silent SSO for PP/PBI/SPO by reusing the AAD browser session
+        # established during Connect-MgGraph, avoiding additional sign-in prompts.
+        [Parameter(Mandatory = $false)]
+        [string]$LoginHint = "",
+
         [Parameter(Mandatory = $true)]
         [string]$Tenant,
 
@@ -278,14 +290,58 @@ function Get-MsalAccessToken {
             }
             else {
                 $RedirectUri = "http://localhost"
-                $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-                    WithAuthority($Authority).
-                    WithRedirectUri($RedirectUri).
-                    Build()
 
+                # Step 1: MSAL token cache (silent, no browser — uses stored refresh token).
+                # PowerPlatform and PowerBI share ClientId 1950a258..., so PBI can reuse PP's cached token.
+                if ($script:MsalPublicClientApps.ContainsKey($ClientId) -and
+                    $script:MsalPublicClientAccounts.ContainsKey($ClientId)) {
+                    try {
+                        $CachedApp = $script:MsalPublicClientApps[$ClientId]
+                        $CachedAccount = $script:MsalPublicClientAccounts[$ClientId]
+                        $SilentResult = $CachedApp.AcquireTokenSilent([string[]]@($Scope), $CachedAccount).ExecuteAsync().GetAwaiter().GetResult()
+                        return $SilentResult.AccessToken
+                    }
+                    catch {
+                        Write-Verbose "Silent acquisition failed for '$ClientId' scope '$Scope': $($_.Exception.Message). Trying SSO."
+                    }
+                }
+
+                # Reuse cached app instance if available (preserves internal token cache for future silent reuse)
+                if ($script:MsalPublicClientApps.ContainsKey($ClientId)) {
+                    $MsalApp = $script:MsalPublicClientApps[$ClientId]
+                }
+                else {
+                    $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                        WithAuthority($Authority).
+                        WithRedirectUri($RedirectUri).
+                        Build()
+                }
+
+                # Step 2: SSO via existing AAD browser session (prompt=none).
+                # Reuses the session from Connect-MgGraph — browser opens/closes instantly, no user input.
+                if (-not [string]::IsNullOrEmpty($LoginHint)) {
+                    try {
+                        $SsoResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
+                            WithLoginHint($LoginHint).
+                            WithPrompt([Microsoft.Identity.Client.Prompt]::NoPrompt).
+                            WithUseEmbeddedWebView($false).
+                            ExecuteAsync().GetAwaiter().GetResult()
+                        $script:MsalPublicClientApps[$ClientId] = $MsalApp
+                        $script:MsalPublicClientAccounts[$ClientId] = $SsoResult.Account
+                        return $SsoResult.AccessToken
+                    }
+                    catch {
+                        Write-Verbose "SSO (prompt=none) failed for '$ClientId' scope '$Scope': $($_.Exception.Message). Falling back to interactive."
+                    }
+                }
+
+                # Step 3: Full interactive login (opens browser with account picker)
                 $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                     WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+                    WithUseEmbeddedWebView($false).
                     ExecuteAsync().GetAwaiter().GetResult()
+                $script:MsalPublicClientApps[$ClientId] = $MsalApp
+                $script:MsalPublicClientAccounts[$ClientId] = $TokenResult.Account
             }
             return $TokenResult.AccessToken
         }
