@@ -285,6 +285,10 @@ function Get-ApplicationsWithRiskyPermissions {
                 $IsMultiTenantEnabled = $false
                 if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
 
+                # Count total permissions across all resource APIs; used later in severity score calculation
+                $TotalPermissionCount = ($App.RequiredResourceAccess | ForEach-Object { @($_.ResourceAccess).Count } | Measure-Object -Sum).Sum
+                if ($null -eq $TotalPermissionCount) { $TotalPermissionCount = 0 }
+
                 # Map application permissions against RiskyPermissions.json
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
@@ -374,6 +378,7 @@ function Get-ApplicationsWithRiskyPermissions {
                         PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = Format-Credentials -AccessKeys $FederatedCredentialsResults -IsFromApplication $true -IsFederated
                         Permissions          = $MappedPermissions
+                        TotalPermissionCount = $TotalPermissionCount
                     }
                 }
             }
@@ -514,6 +519,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                             Write-Warning "Error for service principal $($Result.id): $($Result.status)"
                         }
 
+                        # Total appRoleAssignments count (across all APIs, not just risky ones); used later in severity score calculation
+
                         $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
 
                         # Exclude service principals without risky permissions
@@ -529,6 +536,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
                                 FederatedCredentials    = Format-Credentials -AccessKeys $ServicePrincipal.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
                                 Permissions             = $MappedPermissions
+                                TotalPermissionCount    = $TotalPermissionCount
                                 AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
                         }
@@ -605,6 +613,7 @@ function Format-RiskyApplications {
                         PasswordCredentials      = $MergedPasswordCredentials
                         FederatedCredentials     = $MergedFederatedCredentials
                         Permissions              = $App.Permissions
+                        TotalPermissionCount     = $App.TotalPermissionCount
                     }
                 }
                 else {
@@ -791,34 +800,6 @@ function Get-SeverityWeights {
             PointsPerCredentialAfterFirst = 5
             Description = "Multiple active credentials increase the authentication attack surface. Each active credential beyond the first adds bonus points."
         }
-
-        #PasswordCredentials = @{
-        #    PointsPerCredential = 2
-        #    PointsPerLongLivedCredential = 3
-        #    # SP credentials can only be set via API, which makes them inherently more risky than application credentials
-        #    PointsPerServicePrincipalCredential = 4
-        #    MaxPoints = 10
-        #    ThresholdInDays = 180 # Credentials valid for more than 6 months are considered long-lived
-        #    Description = "Credentials can be used to authenticate as the application/service principal."
-        #}
-
-        #KeyCredentials = @{
-        #    PointsPerCredential = 1
-        #    PointsPerLongLivedCredential = 2
-        #    # SP credentials can only be set via API, which makes them inherently more risky than application credentials
-        #    PointsPerServicePrincipalCredential = 3
-        #    MaxPoints = 7
-        #    ThresholdInDays = 365 # Key credentials valid for more than 1 year are considered long-lived
-        #    Description = "Key, or certificate credentials, can be used to authenticate as the application/service principal, but are generally more secure than password credentials."
-        #}
-
-        #FederatedCredentials = @{
-        #    PointsPerCredential = 1
-        #    # SP credentials can only be set via API, which makes them inherently more risky than application credentials
-        #    PointsPerServicePrincipalCredential = 2
-        #    MaxPoints = 3
-        #    Description = "Federated credentials allow an application/service principal to authenticate using an external identity provider."
-        #}
     }
 }
 
@@ -827,6 +808,10 @@ function ConvertFrom-DotNetDate {
         [string]
         $DateString
     )
+
+    if ([string]::IsNullOrEmpty($DateString)) {
+        return $null
+    }
     
     # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
     if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
@@ -1085,6 +1070,21 @@ function Set-SeverityScore {
         $ScoreBreakdown.CredentialVolume = [PSCustomObject]@{
             TotalActiveCredentials = $TotalActiveCredentials
             TotalPoints = $CredentialVolumePoints
+        }
+
+        # 10. Permission volume factor
+        $TotalPermissionCount = if ($null -ne $Object.TotalPermissionCount -and $Object.TotalPermissionCount -gt 0) {
+            $Object.TotalPermissionCount
+        }
+        else {
+            @($Object.Permissions).Count
+        }
+
+        $PermissionVolumePoints = [Math]::Ceiling($TotalPermissionCount / 10) * $Weights.PermissionVolume.PointsPer10Permissions
+        $Score += $PermissionVolumePoints
+        $ScoreBreakdown.PermissionVolume = [PSCustomObject]@{
+            TotalPermissions = $TotalPermissionCount
+            TotalPoints = $PermissionVolumePoints
         }
 
         $ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
