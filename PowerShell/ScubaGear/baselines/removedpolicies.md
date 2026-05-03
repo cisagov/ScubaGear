@@ -63,15 +63,81 @@ Sensitive accounts SHALL be added to Defender for Office 365 protection in the s
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy group 1 (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1).
 
+#### MS.DEFENDER.2.1v1
+User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.2.1v1.
+
+#### MS.DEFENDER.2.2v1
+Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.2.2v1.
+
+#### MS.DEFENDER.2.3v1
+Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.2.3v1.
+
+#### MS.DEFENDER.3.1v1
+Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.4v1.
+
+#### MS.DEFENDER.4.1v2
+A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
+
+#### MS.DEFENDER.4.2v1
+The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.2v1.
+
+#### MS.DEFENDER.4.3v1
+The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.3v1.
+
+#### MS.DEFENDER.4.4v1
+Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.4v1.
+
 #### MS.DEFENDER.4.5v1
 A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Removed the policy because it could not be automatically evaluated by the ScubaGear tool. It defined a best practice requiring agencies to create a list of applications restricted from accessing files protected by the DLP policy, but this is open to interpretation and varies by agency, making it difficult for the Scuba team to enforce.
 
+#### MS.DEFENDER.4.6v1
+Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.5v1.
+
+#### MS.DEFENDER.5.1v1
+At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.1v1.
+
+#### MS.DEFENDER.5.2v1
+The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.2v1.
+
+#### MS.DEFENDER.6.1v1
+Unified Audit logging SHALL be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.5.1v1.
+
 #### MS.DEFENDER.6.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Removal date:_ March 2025
 - _Removal rationale:_ MS.DEFENDER.6.2v1 was originally included in order to enable auditing of additional user actions not captured under Purview Audit (Standard). In October 2023, Microsoft announced changes to its Purview Audit service that included making audit events in Purview Audit (Premium) available to Purview Audit (Standard) subscribers. Now that the rollout of changes is completed, Purview (Standard) includes the necessary auditing that is addressed by MS.DEFENDER.6.1v1.
+
+#### MS.DEFENDER.6.3v1
+Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.5.2v1.
+
 </details>
 
 <details>
@@ -288,6 +354,8 @@ Users SHALL be prevented from running custom scripts on self-service created sit
 Contact with Skype users SHALL be blocked.
 - _Removal date:_ August 2025
 - _Removal rationale:_ The option to restrict contact with Skype users found in policy MS.TEAMS.3.1v1 has been deprecated by Microsoft. All references, including the policy and its implementation steps, have been removed since the setting is no longer present.
+
+
 
 </details>
 
