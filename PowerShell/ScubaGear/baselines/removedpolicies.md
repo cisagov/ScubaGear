@@ -355,7 +355,34 @@ Contact with Skype users SHALL be blocked.
 - _Removal date:_ August 2025
 - _Removal rationale:_ The option to restrict contact with Skype users found in policy MS.TEAMS.3.1v1 has been deprecated by Microsoft. All references, including the policy and its implementation steps, have been removed since the setting is no longer present.
 
+#### MS.EXO.6.1v1
+A DLP solution SHALL be enabled and SHOULD offer services comparable to the native DLP solution offered by Microsoft.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.2v1.
 
+#### MS.EXO.6.2v1
+The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, taxpayer identification numbers (TINs), and Social Security numbers (SSNs) via email SHALL be restricted.- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
+
+#### MS.EXO.7.1v1
+Attachments included with Teams messages SHOULD be scanned for malware.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.4v1.
+
+#### MS.EXO.7.2v1
+Users SHOULD be prevented from opening or downloading files detected as malware.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.4v1.
+
+#### MS.EXO.8.1v1
+Attachments included with Teams messages SHOULD be scanned for malware.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.1v1.
+
+#### MS.EXO.8.2v1
+Users SHOULD be prevented from opening or downloading files detected as malware.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.3v1.
 
 </details>
 
