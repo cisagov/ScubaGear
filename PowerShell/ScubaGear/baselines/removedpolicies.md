@@ -109,7 +109,12 @@ Emails SHALL be filtered by attachment file types.
 #### MS.EXO.9.2v1
 The attachment filter SHOULD attempt to determine the true file type and assess the file extension.
 - _Removal date:_ April 2026
-- _Removal rationale:_ 
+- _Removal rationale:_ Removed the policy because it could not be configured via Microsoft Defender and assessed by ScubaGear.
+
+#### MS.EXO.9.3v1
+Disallowed file types SHALL be determined and enforced.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.1v1.
 
 #### MS.EXO.9.4v1
 If a third-party filtering solution is used, it SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
@@ -131,28 +136,105 @@ Emails identified as containing malware SHALL be quarantined or dropped.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.3v1.
 
+#### MS.EXO.10.3v1
+Email scanning SHALL be capable of reviewing emails after delivery.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.2v1.
+
 #### MS.EXO.11.1v1
 Impersonation protection checks SHOULD be used.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.2.1v1.
 
-MS.EXO.10.3v1
-Email scanning SHALL be capable of reviewing emails after delivery.
-
 #### MS.EXO.11.2v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
 - _Removal date:_ April 2026
-- _Removal rationale:_ 
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.2.4v1.
 
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
 - _Removal date:_ April 2026
-- _Removal rationale:_ 
+- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Secuirty Suite Baseline consolidation efforts.
+
+#### MS.EXO.12.1v1
+IP allow lists SHOULD NOT be created.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.8.1v1
+
+#### MS.EXO.12.2v1
+Safe lists SHOULD NOT be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.8.2v1
+
+#### MS.EXO.14.1v2
+A spam filter SHALL be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.6.1v1.
+
+#### MS.EXO.14.2v1
+Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.6.1v1.
+
+#### MS.EXO.14.3v2
+Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.6.2v1.
+
+#### MS.EXO.15.1v1
+URL comparison with a block-list SHOULD be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.1v1.
+
+#### MS.EXO.15.2v1
+Direct download links SHOULD be scanned for malware.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.1v1.
+
+#### MS.EXO.15.3v1
+User click tracking SHOULD be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.3v1.
+
+#### MS.EXO.16.1v1
+At a minimum, the following alerts SHALL be enabled:
+
+  a. **Suspicious email sending patterns detected.**
+
+  b. **Suspicious Connector Activity.**
+
+  c. **Suspicious Email Forwarding Activity.**
+
+  d. **Messages have been delayed.**
+
+  e. **Tenant restricted from sending unprovisioned email.**
+
+  f. **Tenant restricted from sending email.**
+
+  g. **A potentially malicious URL click was detected.**
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.1v1.
+
+#### MS.EXO.16.2v1
+Unified Audit logging SHALL be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.2v1.
+
+#### MS.EXO.17.1v1
+URL comparison with a block-list SHOULD be enabled.
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.5.1v1.
 
 #### MS.EXO.17.2v1
 Microsoft Purview Audit (Premium) logging SHALL be enabled for ALL users.
 - _Removal date:_ March 2025
 - _Removal rationale:_ MS.EXO.17.2v1 was originally included in order to enable auditing of additional user actions not captured under Purview Audit (Standard). In October 2023, Microsoft announced changes to its Purview Audit service that included making audit events in Purview Audit (Premium) available to Purview Audit (Standard) subscribers. Now that the rollout of changes has been completed, Purview (Standard) includes the necessary auditing which is addressed by MS.EXO.17.2v1
+
+#### MS.EXO.17.3v1
+Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).
+- _Removal date:_ April 2026
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.5.2v1.
+
 </details>
 
 <details>
