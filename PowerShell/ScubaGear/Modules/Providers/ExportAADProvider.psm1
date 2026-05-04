@@ -21,10 +21,8 @@ function Export-AADProvider {
     Import-Module $PSScriptRoot/ProviderHelpers/LicenseHelper.psm1
     $Tracker = Get-CommandTracker
 
-    # The below cmdlet covers ~ 9 policy checks that inspect conditional access policies, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AllPolicies = Trace-ScubaFunction -FunctionName "Get-MgBetaIdentityConditionalAccessPolicy" -ScriptBlock {
-        $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    }
+    # The below cmdlet covers numerous policy checks that inspect conditional access policies, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
+    $AllPolicies = $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
 
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
     $CapHelper = Get-CapTracker
@@ -47,9 +45,7 @@ function Export-AADProvider {
 
     $AllPolicies = ConvertTo-Json -Depth 10 @($AllPolicies)
 
-    $SubscribedSku = Trace-ScubaFunction -FunctionName "Get-MgBetaSubscribedSku" -ScriptBlock {
-        $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    }
+    $SubscribedSku = $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
 
     # Determine tenant license state based on subscribed SKUs/service plans
     $LicenseStateObj = Get-AADLicenseState -SubscribedSku $SubscribedSku
@@ -68,9 +64,7 @@ function Export-AADProvider {
         $TenantHasPremiumLicense = if ($RequiredServicePlan) { $true } else { $false }
 
         # Retrieve an array of privileged users and service principals
-        $PrivilegedObjects = Trace-ScubaFunction -FunctionName "Get-PrivilegedUser" -ScriptBlock {
-            $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
-        }
+        $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
 
         # # Split the objects into users and service principals
         $PrivilegedUsers = @{}
@@ -99,9 +93,7 @@ function Export-AADProvider {
         $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
-        $PrivilegedRoles = Trace-ScubaFunction -FunctionName "Get-PrivilegedRole" -ScriptBlock {
-            $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
-        }
+        $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
         $PrivilegedRoles = ConvertTo-Json -Depth 10 @($PrivilegedRoles) # Depth required to get policy rule object details
     }
     else {
@@ -110,6 +102,7 @@ function Export-AADProvider {
         $PrivilegedRoles = ConvertTo-Json @()
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedRole")
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
+        $PrivilegedServicePrincipals = ConvertTo-Json @()
     }
 
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
@@ -123,19 +116,13 @@ function Export-AADProvider {
     }
 
     # Provides data for policies such as user consent and guest user access, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AuthZPolicies = Trace-ScubaFunction -FunctionName "Get-MgBetaPolicyAuthorizationPolicy" -ScriptBlock {
-        ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-    }
+    $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
     # Provides data for admin consent workflow
-    $DirectorySettings = Trace-ScubaFunction -FunctionName "Get-MgBetaDirectorySetting" -ScriptBlock {
-        ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-    }
+    $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
     # This block supports policies that need data on the tenant's authentication methods, GraphDirect specifies that this will retrieve information from the Graph API (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AuthenticationMethodPolicyRootObject = Trace-ScubaFunction -FunctionName "Get-MgBetaPolicyAuthenticationMethodPolicy" -ScriptBlock {
-        $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    }
+    $AuthenticationMethodPolicyRootObject =$Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
     $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
 
     # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
@@ -152,9 +139,7 @@ function Export-AADProvider {
     ##### End block
 
     # Provides data on the password expiration policy
-    $DomainSettings = Trace-ScubaFunction -FunctionName "Get-MgBetaDomain" -ScriptBlock {
-        ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-    }
+    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
@@ -164,18 +149,14 @@ function Export-AADProvider {
     # This cache is used to store the scopes for each resource application to avoid redundant calls to the Graph API for the same resource application.
     $ResourcePermissionCache = @{}
 
-    $RiskyApps = Trace-ScubaFunction -FunctionName "Get-ApplicationsWithRiskyPermissions" -ScriptBlock {
-        $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
-            "M365Environment"=$M365Environment;
-            "ResourcePermissionCache"=$ResourcePermissionCache
-        })
-    }
-    $RiskySPs = Trace-ScubaFunction -FunctionName "Get-ServicePrincipalsWithRiskyPermissions" -ScriptBlock {
-        $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
-            "M365Environment"=$M365Environment;
-            "ResourcePermissionCache"=$ResourcePermissionCache
-        })
-    }
+    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
+        "M365Environment"=$M365Environment;
+        "ResourcePermissionCache"=$ResourcePermissionCache
+    })
+    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
+        "M365Environment"=$M365Environment;
+        "ResourcePermissionCache"=$ResourcePermissionCache
+    })
 
     $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or @($RiskySPs).Count -eq 0) { @() } else { $RiskySPs }
@@ -209,9 +190,7 @@ function Export-AADProvider {
         }
     )
     ##### End block
-    $RiskyDelegatedPermissionClassifications = Trace-ScubaFunction -FunctionName "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications" -ScriptBlock {
-        ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
-    }
+    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
 
     ##### This block gathers information on Exchange hybrid application configurations
     Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
@@ -220,21 +199,17 @@ function Export-AADProvider {
     # This is an indicator of compromise if keyCredentials are present. The organization has not completed
     # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
     # dedicated hybrid application, or they are still in the legacy hybrid configuration.
-    $LegacyExchangeSP = Trace-ScubaFunction -FunctionName "Get-LegacyExchangeServicePrincipal" -ScriptBlock {
-        ConvertTo-Json -Depth 4 @(
+    $LegacyExchangeSP =  ConvertTo-Json -Depth 4 @(
             $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
                 "M365Environment"=$M365Environment
             })
         )
-    }
 
-    $DedicatedExchangeHybridApps = Trace-ScubaFunction -FunctionName "Get-DedicatedExchangeHybridApplications" -ScriptBlock {
-        ConvertTo-Json -Depth 4 @(
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
             $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
                 "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
             })
         )
-    }
 
     # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
     $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)

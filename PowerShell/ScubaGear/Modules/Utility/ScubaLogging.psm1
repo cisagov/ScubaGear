@@ -252,7 +252,10 @@ function Write-ScubaLog {
                 # "completed") are shown to the user; every Info message still appears in the log file
                 # regardless of this filter, so nothing is lost for troubleshooting.
                 if ($Message -match "Creating output folder|Starting|completed|authenticated|retrieved|EXIT") {
-                    Write-Output "INFO: $Message"
+                    # Write-Information "INFO: $Message" -InformationAction Continue
+                    Write-Information "INFO: $Message $($Data | ConvertTo-Json -Compress -Depth 3)" -InformationAction Continue
+                    # Write-Information $logLine -InformationAction Continue
+
                 }
             }
             "Warning" {
@@ -363,8 +366,7 @@ function Trace-ScubaFunction {
             }
         }
 
-        # Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Info" -Source "FunctionTrace" -Data $exitData
-        Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Debug" -Source "FunctionTrace" -Data $exitData
+        Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Info" -Source "FunctionTrace" -Data $exitData
         return $result
     }
     catch {
