@@ -139,7 +139,7 @@ function Add-Annotation {
 function New-Report {
      <#
     .Description
-    This function creates the individual HTML/json reports using the TestResults.json.
+    This function creates the individual HTML/json reports using the RegoOutput.json.
     Output will be stored as HTML/json files in the InvidualReports folder in the OutPath Folder.
     The report Home page and link tree will be named BaselineReports.html
     .Functionality

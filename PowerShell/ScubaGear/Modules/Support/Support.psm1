@@ -716,7 +716,7 @@ function New-SCuBAConfig {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "TestResults".
+    Defaults to "RegoOutput".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -805,7 +805,7 @@ function New-SCuBAConfig {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutRegoFileName = "TestResults",
+        $OutRegoFileName = "RegoOutput",
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]

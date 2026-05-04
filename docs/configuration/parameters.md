@@ -367,7 +367,7 @@ Invoke-SCuBA -ProductNames teams `
 |-------------|---------------|
 | Optional    | Yes           |
 | Datatype    | String        |
-| Default     | `TestResults` |
+| Default     | `RegoOutput` |
 | Config File | Yes           |
 
 ```powershell

@@ -36,7 +36,7 @@ InModuleScope Support {
                 Organization = '0';
                 OutFolderName = "M365BaselineConformance";
                 OutProviderFileName = "ProviderSettingsExport";
-                OutRegoFileName = "TestResults";
+                OutRegoFileName = "RegoOutput";
                 OutReportName = "BaselineReports";
                 ConfigLocation = $TestPath;
             }

@@ -570,7 +570,7 @@ function LoadTestResults() {
       [string]
       $OutputFolder
   )
-  $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
+  $IntermediateTestResults = Get-Content "$OutputFolder/RegoOutput.json" -Raw | ConvertFrom-Json
   $IntermediateTestResults
 }
 

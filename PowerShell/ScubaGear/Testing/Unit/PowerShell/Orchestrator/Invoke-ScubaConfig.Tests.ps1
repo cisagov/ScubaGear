@@ -138,7 +138,7 @@ InModuleScope Orchestrator {
                         OutPath=$PSScriptRoot
                         OutFolderName='ScubaReports'
                         OutProviderFileName='ProviderSettingsExport'
-                        OutRegoFileName='TestResults'
+                        OutRegoFileName='RegoOutput'
                         OutReportName='BaselineReports'
                         OutJsonFileName='ScubaResults'
                         Organization='sub.domain.com'
@@ -155,7 +155,7 @@ InModuleScope Orchestrator {
                 @{ Parameter = "LogIn";                 Value = $true                  },
                 @{ Parameter = "OutFolderName";         Value = "ScubaReports"         },
                 @{ Parameter = "OutProviderFileName";   Value = "ProviderSettingsExport" },
-                @{ Parameter = "OutRegoFileName";       Value = "TestResults"          },
+                @{ Parameter = "OutRegoFileName";       Value = "RegoOutput"           },
                 @{ Parameter = "OutReportName";         Value = "BaselineReports"      },
                 @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
@@ -180,7 +180,7 @@ InModuleScope Orchestrator {
                         OutPath=$PSScriptRoot
                         OutFolderName='ScubaReports'
                         OutProviderFileName='ProviderSettingsExport'
-                        OutRegoFileName='TestResults'
+                        OutRegoFileName='RegoOutput'
                         OutReportName='BaselineReports'
                         OutJsonFileName='ScubaResults'
                         Organization='sub.domain.com'
