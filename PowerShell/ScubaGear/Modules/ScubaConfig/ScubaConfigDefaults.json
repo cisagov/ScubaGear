@@ -12,8 +12,8 @@
       "MacOS": "opa_darwin_amd64",
       "Linux": "opa_linux_amd64_static"
     },
-    "ProductNames": ["aad", "defender", "exo", "sharepoint", "teams"],
-    "AllProductNames": ["aad", "defender", "exo", "powerplatform", "sharepoint", "teams"],
+    "ProductNames": ["aad", "securitysuite", "exo", "sharepoint", "teams"],
+    "AllProductNames": ["aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"],
     "M365Environment": "commercial",
     "LogIn": true,
     "DisconnectOnExit": false,
@@ -84,7 +84,7 @@
     "errorCategories": [
       {
         "name": "Property errors",
-        "pattern": "^Required\\s+property\\s+|^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
+        "pattern": "^Required\\s+property\\s+|^Property\\s+'(?!Aad|SecuritySuite|Exo|AnnotatePolicy|OmitPolicy)",
         "actionMessageRef": "default"
       },
       {
@@ -93,8 +93,8 @@
         "actionMessageRef": "default"
       },
       {
-        "name": "Defender exclusion errors",
-        "pattern": "^(Defender|DEFENDER)\\s+exclusion\\s+error:|^Property\\s+'Defender'",
+        "name": "Security Suite exclusion errors",
+        "pattern": "^(SecuritySuite|SECURITYSUITE)\\s+exclusion\\s+error:|^Property\\s+'SecuritySuite'",
         "actionMessageRef": "default"
       },
       {
@@ -126,7 +126,7 @@
     "warningCategories": [
       {
         "name": "Property warnings",
-        "pattern": "^Unknown\\s+property\\s+|^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
+        "pattern": "^Unknown\\s+property\\s+|^Property\\s+'(?!Aad|SecuritySuite|Exo|AnnotatePolicy|OmitPolicy)",
         "actionMessageRef": "default"
       },
       {
@@ -135,8 +135,8 @@
         "actionMessageRef": "default"
       },
       {
-        "name": "Defender exclusion warnings",
-        "pattern": "^(Defender|DEFENDER)\\s+exclusion\\s+(warning|info):|^Property\\s+'Defender'",
+        "name": "Security Suite exclusion warnings",
+        "pattern": "^(SecuritySuite|SECURITYSUITE)\\s+exclusion\\s+(warning|info):|^Property\\s+'SecuritySuite'",
         "actionMessageRef": "default"
       },
       {

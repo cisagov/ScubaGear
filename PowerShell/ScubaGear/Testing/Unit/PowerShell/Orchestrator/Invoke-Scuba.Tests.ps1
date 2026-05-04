@@ -56,9 +56,9 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
-            It 'Given -ProductNames defender should not throw' {
+            It 'Given -ProductNames securitysuite should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("defender")
+                    ProductNames = @("securitysuite")
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
