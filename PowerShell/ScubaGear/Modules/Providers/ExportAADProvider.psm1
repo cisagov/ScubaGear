@@ -58,8 +58,73 @@ function Export-AADProvider {
     #Obtains license information for tenant and total number of active users
     $LicenseInfo = $SubscribedSku | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
 
+    # Retrieve tenant user count for both enabled/disabled accounts.
+    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    # Ensure we successfully got a count of users; command failures return empty arrays.
+    # Use -1 as numeric fallback so generated JSON remains valid.
+    if ($UserCount -isnot [int]) {
+        $UserCount = -1
+    }
+
+    # Provides data for policies such as user consent and guest user access.
+    $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
+    # Provides data for admin consent workflow
+    $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
+    #####  This block gets data on the tenant's authentication methods
+    $AuthenticationMethodPolicyRootObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
+
+    # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
+    $AuthenticationMethodPolicy = $AuthenticationMethodPolicyRootObject | ForEach-Object {
+        $_ | Select-Object * -ExcludeProperty AuthenticationMethodConfigurations
+    }
+
+    $AuthenticationMethodObjects = @{
+        authentication_method_policy = $AuthenticationMethodPolicy
+        authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
+    }
+
+    $AuthenticationMethod = ConvertTo-Json -Depth 10 @($AuthenticationMethodObjects)
+    ##### End authentication methods block
+
+    # Provides data on the password expiration policy
+    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
+    # The RiskyDelegatedPermissionClassifications is for user consent policy 5.2 to determine if any delegated permission classifications considered risky by Scuba are classified as low risk in the tenant
+    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+
+    ##### This block gathers information on Exchange hybrid application configurations
+    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+
+    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
+    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
+    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
+    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
+    $LegacyExchangeSP =  ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
+            "M365Environment"=$M365Environment
+        })
+    )
+
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
+            "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
+        })
+    )
+
+    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
+    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
+    ##### End Exchange hybrid application block
+
+    ##### This block contains the slowest functions so that they execute last in the order of operations.
+    #####
+    Write-Information "INFO: Starting execution of functions that typically take longer" -InformationAction Continue
+
+    # Check of there are service plans with a ProvisioningStatus of Success
     if ($ServicePlans) {
-        # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
+        # The $TenantHasPremiumLicense variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
         $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
         $TenantHasPremiumLicense = if ($RequiredServicePlan) { $true } else { $false }
 
@@ -104,42 +169,6 @@ function Export-AADProvider {
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
         $PrivilegedServicePrincipals = ConvertTo-Json @()
     }
-
-    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
-
-    # Retrieve tenant user count for both enabled/disabled accounts utilizing (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    # Ensure we successfully got a count of users; command failures return empty arrays.
-    # Use -1 as numeric fallback so generated JSON remains valid.
-    if ($UserCount -isnot [int]) {
-        $UserCount = -1
-    }
-
-    # Provides data for policies such as user consent and guest user access, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-
-    # Provides data for admin consent workflow
-    $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-
-    # This block supports policies that need data on the tenant's authentication methods, GraphDirect specifies that this will retrieve information from the Graph API (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AuthenticationMethodPolicyRootObject =$Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
-
-    # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
-    $AuthenticationMethodPolicy = $AuthenticationMethodPolicyRootObject | ForEach-Object {
-        $_ | Select-Object * -ExcludeProperty AuthenticationMethodConfigurations
-    }
-
-    $AuthenticationMethodObjects = @{
-        authentication_method_policy = $AuthenticationMethodPolicy
-        authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
-    }
-
-    $AuthenticationMethod = ConvertTo-Json -Depth 10 @($AuthenticationMethodObjects)
-    ##### End block
-
-    # Provides data on the password expiration policy
-    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
@@ -189,31 +218,13 @@ function Export-AADProvider {
             })
         }
     )
-    ##### End block
-    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+    ##### End Risky Apps and Service Principals block
 
-    ##### This block gathers information on Exchange hybrid application configurations
-    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+    #####
+    ##### End slowest functions block
 
-    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
-    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
-    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
-    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
-    $LegacyExchangeSP =  ConvertTo-Json -Depth 4 @(
-            $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
-                "M365Environment"=$M365Environment
-            })
-        )
-
-    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
-            $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
-                "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
-            })
-        )
-
-    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
-    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
-    ##### End block
+    # This conversion to JSON needs to be last because other blocks above here rely on the $ServicePlans object in its PowerShell form.
+    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())

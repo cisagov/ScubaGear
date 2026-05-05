@@ -44,7 +44,6 @@ class CommandTracker {
             if ($isGraphDirect) {
                 # This will pull the Graph API vice the PowerShell module
                 Write-Verbose "Running $($Command) API Call"
-                # $ModCommand = Invoke-GraphDirectly -Commandlet $Command @CommandArgs
                 $ModCommand = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
                     Invoke-GraphDirectly -Commandlet $Command @CommandArgs
                 }
@@ -57,7 +56,6 @@ class CommandTracker {
             }
             else {
                 Write-Verbose "Running $($Command) with arguments: $($CommandArgs)"
-                $Result = & $Command @CommandArgs
                 $Result = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
                     & $Command @CommandArgs
                 }
