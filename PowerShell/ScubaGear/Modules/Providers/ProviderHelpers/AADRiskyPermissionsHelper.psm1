@@ -1010,16 +1010,20 @@ function Set-SeverityScore {
 
         # 6. Determine the credential base points by the highest risk level permission on the app/SP
         $AllRiskyPermissions = @($Object.Permissions | Where-Object { $_.IsRisky -eq $true })
+        $RiskLevelPriority = @{ Critical = 4; High = 3; Medium = 2; Low = 1 }
+        $HighestRiskLevel = "None"
+        $HighestPriority = 0
+
         foreach ($Permission in $AllRiskyPermissions) {
-            switch ($Permission.RiskLevel) {
-                "Critical" { $HighestRiskLevel = $Weights.CredentialContextWeights.Critical; break }
-                "High" { $HighestRiskLevel = $Weights.CredentialContextWeights.High; break }
-                "Medium" { $HighestRiskLevel = $Weights.CredentialContextWeights.Medium; break }
-                "Low" { $HighestRiskLevel = $Weights.CredentialContextWeights.Low; break }
-                default { $HighestRiskLevel = 0 }
+            $Priority = $RiskLevelPriority[$Permission.RiskLevel]
+            if ($null -ne $Priority -and $Priority -gt $HighestPriority) {
+                $HighestPriority = $Priority
+                $HighestRiskLevel = $Permission.RiskLevel
             }
         }
-        $CredentialBasePoints = $HighestRiskLevel
+
+        $CredentialBasePoints = if ($HighestRiskLevel -ne "None") { $Weights.CredentialContextWeights[$HighestRiskLevel] } else { 0 }
+        $ScoreBreakdown.HighestRiskLevel = $HighestRiskLevel
 
         # 7. Calculate password credential weight factor
         $PasswordBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Password)
@@ -1095,8 +1099,9 @@ function Set-SeverityScore {
         }
 
         return [PSCustomObject]@{
-            SeverityScore = $Score
+            SeverityScore  = $Score
             ScoreBreakdown = $ScoreBreakdown
+            Weights        = $Weights
         }
     }
     catch {

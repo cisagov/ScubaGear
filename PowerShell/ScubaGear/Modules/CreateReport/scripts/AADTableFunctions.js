@@ -274,40 +274,6 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
 };
 
 /**
- * Colors a row in the risk apps/SPs table based on its severity level.
- * 
- * Critical = red
- * High = orange
- * Medium = yellow
- * Low/None = no color
- * 
- * @param {Array} data - The table content.
- * @param {string} tableType - The type of table (e.g., "riskyApps", "riskySPs").
- */
-/*const colorRiskyRows = (data, tableType) => {
-    document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
-        const severityLevel = data[rowIndex]?.SeverityLevel;
-        switch (severityLevel) {
-            case "Critical":
-                row.style.background = "var(--severity-critical)";
-                break;
-            case "High":
-                row.style.background = "var(--severity-high)";
-                break;
-            case "Medium":
-                row.style.background = "var(--severity-medium)";
-                break;
-            case "Low":
-                row.style.background = "var(--severity-low)";
-                break;
-            default: 
-                row.style.background = "transparent";
-                break;
-        }
-    });
-};*/
-
-/**
  * Shared function to build a table with expand/collapse chevrons and truncation.
  * 
  * @param {Array} data - The data array.
@@ -469,19 +435,6 @@ const buildExpandableTable = (data, tableType) => {
         console.error(`Error building expandable table for ${tableType}:`, error);
     }
 }
-
-/**
- * Creates a severity badge element for the given severity level.
- * 
- * @param {string} level - "Critical", "High", "Medium", or "Low".
- * @returns {HTMLElement} - A styled <span> badge element.
- */
-/*const createSeverityBadge = (level) => {
-    const span = document.createElement("span");
-    span.classList.add("severity-badge", level);
-    span.textContent = level ?? "Unknown";
-    return span;
-};*/
 
 /**
  * Fills a cell with truncated content and three-dots button (for expanding) if needed.
@@ -936,3 +889,30 @@ const renderSummaryList = (colName, items) => {
 
     return null;
 }
+
+const RISK_INDICATORS_CONFIG = [
+    {
+        key: "AdminConsentedRiskyPermissions",
+        label: (bd) => `${bd.AdminConsentedRiskyPermissions.PermissionCount} Admin-Consented Risky Permission(s)`,
+        colorTier: (bd) => {
+            const pts = bd.AdminConsentedRiskyPermissions?.TotalPoints ?? 0;
+            if (pts >= 50) return "critical";
+            if (pts >= 15) return "high";
+            if (pts >= 5)  return "medium";
+            if (pts > 0)   return "low";
+            return null;
+        }
+    },
+    {
+        key: "NonAdminConsentedRiskyPermissions",
+        label: (bd) => `${bd.NonAdminConsentedRiskyPermissions.PermissionCount} Non-Admin-Consented Risky Permission(s)`,
+        colorTier: (bd) => {
+            const pts = bd.NonAdminConsentedRiskyPermissions?.TotalPoints ?? 0;
+            if (pts >= 50) return "critical";
+            if (pts >= 15) return "high";
+            if (pts >= 5)  return "medium";
+            if (pts > 0)   return "low";
+            return null;
+        }
+    },
+];
