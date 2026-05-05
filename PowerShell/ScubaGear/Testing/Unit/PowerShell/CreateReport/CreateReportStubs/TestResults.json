@@ -298,7 +298,7 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.7.1v1",
-        "ReportDetails":  "15 global admin(s) found:\u003cbr/\u003eAddam Schroll, Alden Hilton - CTR, David Bui - CTR, David Evensky - CTR, Elijah Agbayani - CTR, Grant Brown - CTR, Grant Dasher - GOV - AZ, Jacob Davis - CTR, Nanda Katikaneni - CTR, Richard Mangual, Roger Mamika, Shanti Satyapal, Theodore Kolovos - CTR - AZ, Troy Stevens - CTR - AZ, Victor Echeverria - CTR",
+        "ReportDetails":  "15 global admin(s) found",
         "RequirementMet":  false
     },
     {
@@ -1961,7 +1961,7 @@
                                     "AdminDisplayName":  "",
                                     "Algorithm":  "RsaSHA256",
                                     "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "DistinguishedName":  "CN=agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "agency.org",
                                     "Enabled":  true,
                                     "ExchangeObjectId":  "7218f0b3-d9ad-4964-be49-b7b1c0b635e4",
@@ -1978,15 +1978,15 @@
                                     "LastChecked":  "/Date(1626472130517)/",
                                     "Name":  "agency.org",
                                     "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
                                     "ObjectClass":  [
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
                                     "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                    "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                    "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1626817730517)/",
                                     "Selector1CNAME":  "selector1-agency._domainkey.agency.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -2006,7 +2006,7 @@
                                     "AdminDisplayName":  "",
                                     "Algorithm":  "RsaSHA256",
                                     "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=associates.agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "DistinguishedName":  "CN=associates.agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "associates.agency.org",
                                     "Enabled":  true,
                                     "ExchangeObjectId":  "5c088a4c-3ef4-4413-8095-c8e15d2e9e48",
@@ -2023,15 +2023,15 @@
                                     "LastChecked":  "/Date(1651609815797)/",
                                     "Name":  "associates.agency.org",
                                     "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
                                     "ObjectClass":  [
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
                                     "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                    "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                    "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1651955415797)/",
                                     "Selector1CNAME":  "selector1-associates-agency._domainkey.agency.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -2051,7 +2051,7 @@
                                     "AdminDisplayName":  "",
                                     "Algorithm":  "RsaSHA256",
                                     "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=test365.agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "DistinguishedName":  "CN=test365.agency.org,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "test365.agency.org",
                                     "Enabled":  true,
                                     "ExchangeObjectId":  "e64ef9c1-9920-474d-aad3-b3d1b7cd606e",
@@ -2068,15 +2068,15 @@
                                     "LastChecked":  "/Date(1653603314013)/",
                                     "Name":  "test365.agency.org",
                                     "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
                                     "ObjectClass":  [
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
                                     "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                    "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                    "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1653948914013)/",
                                     "Selector1CNAME":  "selector1-test365-agency._domainkey.agency.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -2096,7 +2096,7 @@
                                     "AdminDisplayName":  "",
                                     "Algorithm":  "RsaSHA256",
                                     "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=agency.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "DistinguishedName":  "CN=agency.onmicrosoft.com,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "agency.onmicrosoft.com",
                                     "Enabled":  true,
                                     "ExchangeObjectId":  "ea1866b3-b7fa-4dbe-b9c9-48087391a536",
@@ -2113,15 +2113,15 @@
                                     "LastChecked":  "/Date(1653603718610)/",
                                     "Name":  "agency.onmicrosoft.com",
                                     "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
                                     "ObjectClass":  [
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
                                     "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                    "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                    "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1653949318610)/",
                                     "Selector1CNAME":  "selector1-agency-onmicrosoft-com._domainkey.agency.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -2141,7 +2141,7 @@
                                     "AdminDisplayName":  "",
                                     "Algorithm":  "RsaSHA256",
                                     "BodyCanonicalization":  "Relaxed",
-                                    "DistinguishedName":  "CN=agency.net,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                    "DistinguishedName":  "CN=agency.net,CN=Dkim Signing config,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                     "Domain":  "agency.net",
                                     "Enabled":  true,
                                     "ExchangeObjectId":  "28c37edc-ac62-41ce-933e-0f02f1af767c",
@@ -2158,15 +2158,15 @@
                                     "LastChecked":  "/Date(1618339026879)/",
                                     "Name":  "agency.net",
                                     "NumberOfBytesToSign":  "All",
-                                    "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
+                                    "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Content-Filter-Config",
                                     "ObjectClass":  [
                                                         "top",
                                                         "msExchHostedContentFilterConfig"
                                                     ],
                                     "ObjectState":  "Unchanged",
-                                    "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                    "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                     "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                    "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                    "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                     "RotateOnDate":  "/Date(1618337906904)/",
                                     "Selector1CNAME":  "selector1-agency-net._domainkey.agency.onmicrosoft.com",
                                     "Selector1KeySize":  2048,
@@ -2211,7 +2211,7 @@
                                 "CurrentTransportSystemState":  "Green",
                                 "DSNConversionMode":  "PreserveDSNBody",
                                 "DiagnosticsAggregationServicePort":  9710,
-                                "DistinguishedName":  "CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "EnableExternalHTTPMailDelivery":  false,
                                 "ExchangeObjectId":  "7ef195bd-4f88-46bc-97e6-db6c7665321b",
                                 "ExchangeVersion":  "0.1 (8.0.535.0)",
@@ -2257,7 +2257,7 @@
                                 "MessageExpiration":  "1.00:00:00",
                                 "MigrationEnabled":  true,
                                 "Name":  "Transport Settings",
-                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Transport-Settings",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Transport-Settings",
                                 "ObjectClass":  [
                                                     "top",
                                                     "container",
@@ -2266,9 +2266,9 @@
                                 "ObjectState":  "Unchanged",
                                 "OpenDomainRoutingEnabled":  false,
                                 "OrganizationFederatedMailbox":  "FederatedEmail.4c1f4d8b-8179-4148-93bf-00a95fa1e042@agency.onmicrosoft.com",
-                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                 "OtherWellKnownObjects":  [
 
                                                           ],
@@ -2339,7 +2339,7 @@
                             {
                                 "AdminDisplayName":  "",
                                 "Default":  true,
-                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "Domains":  [
                                                 "Anonymous:0"
                                             ],
@@ -2351,15 +2351,15 @@
                                 "Identity":  "Default Sharing Policy",
                                 "IsValid":  true,
                                 "Name":  "Default Sharing Policy",
-                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchSharingPolicy"
                                                 ],
                                 "ObjectState":  "Changed",
-                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                 "WhenChanged":  "/Date(1691164284000)/",
                                 "WhenChangedUTC":  "/Date(1691164284000)/",
                                 "WhenCreated":  "/Date(1619484547000)/",
@@ -2379,7 +2379,7 @@
                             {
                                 "AdminDisplayName":  "",
                                 "Default":  true,
-                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default Sharing Policy,CN=Federation,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "Domains":  [
                                                 "Anonymous:0"
                                             ],
@@ -2391,15 +2391,15 @@
                                 "Identity":  "Default Sharing Policy",
                                 "IsValid":  true,
                                 "Name":  "Default Sharing Policy",
-                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Sharing-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchSharingPolicy"
                                                 ],
                                 "ObjectState":  "Changed",
-                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                 "WhenChanged":  "/Date(1691164284000)/",
                                 "WhenChangedUTC":  "/Date(1691164284000)/",
                                 "WhenCreated":  "/Date(1619484547000)/",
@@ -2419,7 +2419,7 @@
                             {
                                 "AdminDisplayName":  "",
                                 "DirectoryBasedEdgeBlockMode":  "Default",
-                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "EnableSafeList":  false,
                                 "ExchangeObjectId":  "7021b7cf-b9fa-4280-94ff-fba468dbb0ab",
                                 "ExchangeVersion":  "0.20 (15.0.0.0)",
@@ -2435,15 +2435,15 @@
                                 "IsDefault":  true,
                                 "IsValid":  true,
                                 "Name":  "Default",
-                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchHostedConnectionFilterPolicy"
                                                 ],
                                 "ObjectState":  "Unchanged",
-                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                 "WhenChanged":  "/Date(1619484593000)/",
                                 "WhenChangedUTC":  "/Date(1619484593000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
@@ -2463,7 +2463,7 @@
                             {
                                 "AdminDisplayName":  "",
                                 "DirectoryBasedEdgeBlockMode":  "Default",
-                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=NAMPR09A006,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=agency.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
                                 "EnableSafeList":  false,
                                 "ExchangeObjectId":  "7021b7cf-b9fa-4280-94ff-fba468dbb0ab",
                                 "ExchangeVersion":  "0.20 (15.0.0.0)",
@@ -2479,15 +2479,15 @@
                                 "IsDefault":  true,
                                 "IsValid":  true,
                                 "Name":  "Default",
-                                "ObjectCategory":  "NAMPR09A006.PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
                                 "ObjectClass":  [
                                                     "top",
                                                     "msExchHostedConnectionFilterPolicy"
                                                 ],
                                 "ObjectState":  "Unchanged",
-                                "OrganizationId":  "NAMPR09A006.PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - NAMPR09A006.PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/agency.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/agency.onmicrosoft.com/Configuration",
                                 "OrganizationalUnitRoot":  "agency.onmicrosoft.com",
-                                "OriginatingServer":  "MWHPR09A006DC07.NAMPR09A006.PROD.OUTLOOK.COM",
+                                "OriginatingServer":  "MWHPR09A006DC07..PROD.OUTLOOK.COM",
                                 "WhenChanged":  "/Date(1619484593000)/",
                                 "WhenChangedUTC":  "/Date(1619484593000)/",
                                 "WhenCreated":  "/Date(1619484586000)/",
@@ -3522,6 +3522,349 @@
         "PolicyId":  "MS.TEAMS.9.3v1",
         "ReportDetails":  "1 meeting policy(ies) found that allow cloud recording and storage outside of the tenant\u0027s region: Tag:Custom Policy 1",
         "RequirementMet":  false
+    },
+   {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.1.1v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite11v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.1.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite12v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.1.3v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite13v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.3.1v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite31v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.5.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite52v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.6.1v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Shall/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.6.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite62v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.1.4v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite14v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.2.1v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite21v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.2.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite22v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.2.3v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite23v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.3.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.3.3v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite33v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.3.4v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite34v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.3.5v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite35v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.4.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite42v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.7.1v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite71v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.7.2v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite72v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.7.3v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite73v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AdminDisplayName":  "",
+                                "DirectoryBasedEdgeBlockMode":  "Default",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=example.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "EnableSafeList":  false,
+                                "ExchangeObjectId":  "c148b105-2d39-449d-a1c6-569380ed2f42",
+                                "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                "Guid":  "c148b105-2d39-449d-a1c6-569380ed2f42",
+                                "IPAllowList":  [
+
+                                                ],
+                                "IPBlockList":  [
+
+                                                ],
+                                "Id":  "Default",
+                                "Identity":  "Default",
+                                "IsDefault":  true,
+                                "IsValid":  true,
+                                "Name":  "Default",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "msExchHostedConnectionFilterPolicy"
+                                                ],
+                                "ObjectState":  "Unchanged",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/example.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/example.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "example.onmicrosoft.com",
+                                "OriginatingServer":  "..PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1776704856000)/",
+                                "WhenChangedUTC":  "/Date(1776704856000)/",
+                                "WhenCreated":  "/Date(1619484586000)/",
+                                "WhenCreatedUTC":  "/Date(1619484586000)/"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-HostedConnectionFilterPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.SECURITYSUITE.8.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "AdminDisplayName":  "",
+                                "DirectoryBasedEdgeBlockMode":  "Default",
+                                "DistinguishedName":  "CN=Default,CN=Hosted Connection Filter,CN=Transport Settings,CN=Configuration,CN=example.onmicrosoft.com,CN=ConfigurationUnits,DC=,DC=PROD,DC=OUTLOOK,DC=COM",
+                                "EnableSafeList":  false,
+                                "ExchangeObjectId":  "c148b105-2d39-449d-a1c6-569380ed2f42",
+                                "ExchangeVersion":  "0.20 (15.0.0.0)",
+                                "Guid":  "c148b105-2d39-449d-a1c6-569380ed2f42",
+                                "IPAllowList":  [
+
+                                                ],
+                                "IPBlockList":  [
+
+                                                ],
+                                "Id":  "Default",
+                                "Identity":  "Default",
+                                "IsDefault":  true,
+                                "IsValid":  true,
+                                "Name":  "Default",
+                                "ObjectCategory":  ".PROD.OUTLOOK.COM/Configuration/Schema/ms-Exch-Hosted-Connection-Filter-Policy",
+                                "ObjectClass":  [
+                                                    "top",
+                                                    "msExchHostedConnectionFilterPolicy"
+                                                ],
+                                "ObjectState":  "Unchanged",
+                                "OrganizationId":  ".PROD.OUTLOOK.COM/Microsoft Exchange Hosted Organizations/example.onmicrosoft.com - .PROD.OUTLOOK.COM/ConfigurationUnits/example.onmicrosoft.com/Configuration",
+                                "OrganizationalUnitRoot":  "example.onmicrosoft.com",
+                                "OriginatingServer":  "..PROD.OUTLOOK.COM",
+                                "WhenChanged":  "/Date(1776704856000)/",
+                                "WhenChangedUTC":  "/Date(1776704856000)/",
+                                "WhenCreated":  "/Date(1619484586000)/",
+                                "WhenCreatedUTC":  "/Date(1619484586000)/"
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-HostedConnectionFilterPolicy"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.SECURITYSUITE.8.2v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-ProtectionAlert"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.SECURITYSUITE.4.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+                            {
+                                "Identity":  "Admin Audit Log Settings",
+                                "UnifiedAuditLogIngestionEnabled":  true
+                            }
+                        ],
+        "Commandlet":  [
+                           "Get-AdminAuditLogConfig"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.SECURITYSUITE.5.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
     }
 ]
 
