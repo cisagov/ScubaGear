@@ -54,9 +54,9 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
-            It 'Given -ProductNames defender should not throw' {
+            It 'Given -ProductNames securitysuite should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("defender")
+                    ProductNames = @("securitysuite")
                 }
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
@@ -99,9 +99,9 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }
-            It 'Given -ProductNames defender should not throw' {
+            It 'Given -ProductNames securitysuite should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("defender")
+                    ProductNames = @("securitysuite")
                 }
                 {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
             }

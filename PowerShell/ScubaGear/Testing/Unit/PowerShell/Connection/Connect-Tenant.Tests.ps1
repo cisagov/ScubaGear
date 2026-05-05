@@ -38,13 +38,13 @@ InModuleScope Connection {
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
-            @{ProductNames = "defender"; Services = @('Connect-EXOHelper')}
+            @{ProductNames = "securitysuite"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "exo"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper')}
             @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper')}  # SharePoint uses REST API, only needs Graph for tenant info
             @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
             @{
-                ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
+                ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
                     'Connect-GraphHelper',
                     'Connect-EXOHelper',
