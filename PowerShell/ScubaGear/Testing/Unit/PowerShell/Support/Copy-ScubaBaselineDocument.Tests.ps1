@@ -5,7 +5,7 @@ InModuleScope Support {
         $Products = @(
             "teams",
             "exo",
-            "defender",
+            "securitysuite",
             "aad",
             "powerplatform",
             "sharepoint"
