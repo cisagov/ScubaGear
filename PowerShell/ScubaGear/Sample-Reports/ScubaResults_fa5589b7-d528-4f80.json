@@ -3468,7 +3468,7 @@
                                           "754baa5d-03d8-401a-a3d4-c2178ca11111":  {
                                                                                        "AppId":  "29730b8b-e222-41af-a94f-905bcde11111",
                                                                                        "ServicePrincipalId":  "754baa5d-03d8-401a-a3d4-c2178ca11111",
-                                                                                       "DisplayName":  "Scuba Functional Test Orchestrator",
+                                                                                       "DisplayName":  "Test Application",
                                                                                        "roles":  [
                                                                                                      "Exchange Administrator"
                                                                                                  ]
@@ -6899,7 +6899,7 @@
                                                               },
                                                    "MaximumDuration":  "P365D",
                                                    "IsExpirationRequired":  false,
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -6926,7 +6926,7 @@
                                                                                   "johndoe@example.org",
                                                                                   "janedoe@example.org"
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -6952,7 +6952,7 @@
                                                    "NotificationRecipients":  [
 
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -6978,7 +6978,7 @@
                                                    "NotificationRecipients":  [
 
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7000,7 +7000,7 @@
                                                    "EnabledRules":  [
 
                                                                     ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7021,7 +7021,7 @@
                                                               },
                                                    "MaximumDuration":  "P15D",
                                                    "IsExpirationRequired":  true,
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7044,7 +7044,7 @@
                                                                         "MultiFactorAuthentication",
                                                                         "Justification"
                                                                     ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7071,7 +7071,7 @@
                                                                                   "johndoe@example.org",
                                                                                   "janedoe@example.org"
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7097,7 +7097,7 @@
                                                    "NotificationRecipients":  [
 
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7123,7 +7123,7 @@
                                                    "NotificationRecipients":  [
 
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7144,7 +7144,7 @@
                                                               },
                                                    "MaximumDuration":  "PT8H",
                                                    "IsExpirationRequired":  false,
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7167,7 +7167,7 @@
                                                                         "MultiFactorAuthentication",
                                                                         "Justification"
                                                                     ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7206,7 +7206,7 @@
                                                                    "IsRequestorJustificationRequired":  true,
                                                                    "ApprovalMode":  "SingleStage"
                                                                },
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7227,7 +7227,7 @@
 
                                                                                        ]
                                                               },
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7254,7 +7254,7 @@
                                                                                   "johndoe@example.org",
                                                                                   "janedoe@example.org"
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7280,7 +7280,7 @@
                                                    "NotificationRecipients":  [
 
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                },
                                                {
@@ -7306,7 +7306,7 @@
                                                    "NotificationRecipients":  [
 
                                                                               ],
-                                                   "RuleSource":  "Scuba Entra Developers",
+                                                   "RuleSource":  "Entra Developers",
                                                    "RuleSourceType":  "PIM Group"
                                                }
                                            ]
