@@ -990,20 +990,31 @@ const credentialPointsToTier = (points, highestRiskLevel, weights) => {
 const RISK_INDICATORS_CONFIG = [
     {
         key: "AdminConsentedRiskyPermissions",
-        label: (scoreBreakdown) => `${scoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount} Admin-Consented Risky Permission(s)`,
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount;
+            const points = scoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints;
+            return `${count} Admin-Consented Risky Permission(s) (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown, weights) => permissionPointsToTier(scoreBreakdown.AdminConsentedRiskyPermissions?.TotalPoints ?? 0, weights)
     },
     {
         key: "NonAdminConsentedRiskyPermissions",
-        label: (scoreBreakdown) => `${scoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount} Non-Admin-Consented Risky Permission(s)`,
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount;
+            const points = scoreBreakdown.NonAdminConsentedRiskyPermissions.TotalPoints;
+            return `${count} Non Admin-Consented Risky Permission(s) (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown, weights) => permissionPointsToTier(scoreBreakdown.NonAdminConsentedRiskyPermissions?.TotalPoints ?? 0, weights)
     },
     {
         key: "PasswordCredentials",
         label: (scoreBreakdown) => {
+            const count = scoreBreakdown.PasswordCredentials.CredentialCount;
             const longLived = scoreBreakdown.PasswordCredentials.LongLivedCredentialCount;
-            const base = `${scoreBreakdown.PasswordCredentials.CredentialCount} Password Credential(s)`;
-            return (longLived > 0) ? `${base} (${longLived} long-lived)` : base;
+            const points = scoreBreakdown.PasswordCredentials.TotalPoints;
+            const base = `${count} Password Credential(s)`;
+            const longLivedText = longLived > 0 ? ` (${longLived} long-lived)` : "";
+            return `${base}${longLivedText} (+${points} pts)`;
         },
         colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
             scoreBreakdown.PasswordCredentials?.TotalPoints ?? 0,
@@ -1014,9 +1025,12 @@ const RISK_INDICATORS_CONFIG = [
     {
         key: "KeyCredentials",
         label: (scoreBreakdown) => {
+            const count = scoreBreakdown.KeyCredentials.CredentialCount;
             const longLived = scoreBreakdown.KeyCredentials.LongLivedCredentialCount;
-            const base = `${scoreBreakdown.KeyCredentials.CredentialCount} Key/Certificate Credential(s)`;
-            return (longLived > 0) ? `${base} (${longLived} long-lived)` : base;
+            const points = scoreBreakdown.KeyCredentials.TotalPoints;
+            const base = `${count} Key/Certificate Credential(s)`;
+            const longLivedText = longLived > 0 ? ` (${longLived} long-lived)` : "";
+            return `${base}${longLivedText} (+${points} pts)`;
         },
         colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
             scoreBreakdown.KeyCredentials?.TotalPoints ?? 0,
@@ -1026,7 +1040,11 @@ const RISK_INDICATORS_CONFIG = [
     },
     {
         key: "FederatedCredentials",
-        label: (scoreBreakdown) => `${scoreBreakdown.FederatedCredentials.CredentialCount} Federated Credential(s)`,
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.FederatedCredentials.CredentialCount;
+            const points = scoreBreakdown.FederatedCredentials.TotalPoints;
+            return `${count} Federated Credential(s) (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
             scoreBreakdown.FederatedCredentials?.TotalPoints ?? 0,
             scoreBreakdown.HighestRiskLevel ?? "None",
@@ -1035,7 +1053,11 @@ const RISK_INDICATORS_CONFIG = [
     },
     {
         key: "CredentialVolume",
-        label: (scoreBreakdown) => `${scoreBreakdown.CredentialVolume.TotalActiveCredentials} Total Active Credential(s)`,
+        label: (scoreBreakdown) => {
+            const total = scoreBreakdown.CredentialVolume.TotalActiveCredentials;
+            const points = scoreBreakdown.CredentialVolume.TotalPoints;
+            return `${total} Total Active Credential(s) (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown, weights) => {
             const points = scoreBreakdown.CredentialVolume?.TotalPoints ?? 0;
             const pointsPerCredentialAfterFirst = weights.CredentialVolume.PointsPerCredentialAfterFirst;
@@ -1048,7 +1070,11 @@ const RISK_INDICATORS_CONFIG = [
     },
     {
         key: "PermissionVolume",
-        label: (scoreBreakdown) => `${scoreBreakdown.PermissionVolume.TotalPermissions} Total Permission(s)`,
+        label: (scoreBreakdown) => {
+            const total = scoreBreakdown.PermissionVolume.TotalPermissions;
+            const points = scoreBreakdown.PermissionVolume.TotalPoints;
+            return `${total} Total Permission(s) (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown, weights) => {
             const points = scoreBreakdown.PermissionVolume?.TotalPoints ?? 0;
             const pointsPer10Permissions = weights.PermissionVolume.PointsPer10Permissions;
@@ -1061,21 +1087,31 @@ const RISK_INDICATORS_CONFIG = [
     },
     {
         key: "MultiTenant",
-        label: () => "Multi-Tenant Application",
+        label: (scoreBreakdown) => {
+            const points = scoreBreakdown.MultiTenant.TotalPoints;
+            return `Multi-Tenant Application (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown) => {
             return scoreBreakdown.MultiTenant?.IsMultiTenantEnabled ? "medium" : null;
         }
     },
     {
         key: "ThirdPartyServicePrincipal",
-        label: () => "Third-Party Service Principal",
+        label: (scoreBreakdown) => {
+            const points = scoreBreakdown.ThirdPartyServicePrincipal.TotalPoints;
+            return `Third-Party Service Principal (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown) => {
             return scoreBreakdown.ThirdPartyServicePrincipal?.IsThirdPartyServicePrincipal ? "high" : null;
         }
     },
     {
         key: "PrivilegedRoles",
-        label: (scoreBreakdown) => `${scoreBreakdown.PrivilegedRoles.RoleCount} Privileged Role(s)`,
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.PrivilegedRoles.RoleCount;
+            const points = scoreBreakdown.PrivilegedRoles.TotalPoints;
+            return `${count} Privileged Role(s) (+${points} pts)`;
+        },
         colorTier: (scoreBreakdown, weights) => {
             const points = scoreBreakdown.PrivilegedRoles?.TotalPoints ?? 0;
             const pointsPerRole = weights.PrivilegedRoles.PointsPerRole;

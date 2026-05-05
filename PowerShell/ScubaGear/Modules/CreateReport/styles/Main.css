@@ -363,6 +363,17 @@ th[data-column] .sort-btn {
     box-sizing: border-box;
 }
 
+th.severity_score {
+    width: 18%;
+}
+
+td.severity_score,
+.riskyApps_table td:nth-child(3),
+.riskyThirdPartySPs_table td:nth-child(3) {
+    width: 18%;
+    overflow-wrap: break-word;
+}
+
 #toggle-container {
     width: 100%;
     display: flex;
@@ -643,6 +654,14 @@ a.control_group:active {
     margin-right: 2px;
 }
 
+.risk-chip,
+.severity-score-value,
+.sort-btn {
+    text-decoration: none;
+    color: inherit;
+    cursor: default;
+}
+
 .sort-btn {
     background: none;
     border: none;
@@ -692,17 +711,18 @@ th:hover .sort-indicator:not(.sort-indicator--active),
 .risk-indicators {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 4px;
+    margin-top: 6px;
 }
 
 .risk-chip {
     display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 0.78rem;
-    font-weight: 600;
-    white-space: nowrap;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 0.8125em;
+    font-weight: normal;
+    white-space: normal;
+    word-break: break-word;
     border: 1px solid transparent;
 }
 
@@ -758,31 +778,30 @@ html[data-theme='dark'] .risk-chip--low {
 }
 
 .severity-score-value {
-    font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 0.8125em;
 }
 
 /* Summary list */
 .summary-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 0.5rem 0;
-    font-size: 0.875rem;
+    margin: 0 0 0.25em 0;
+    font-size: 0.8125em;
 }
 
 .summary-list li {
-    padding: 2px 0;
+    padding: 1px 0;
     line-height: 1.4;
 }
 
 .summary-list-divider {
     border-top: 1px solid var(--border-color);
-    margin: 4px 0;
+    margin: 3px 0;
     opacity: 0.4;
 }
 
 .risk-level-item {
-    padding-left: 1rem;
+    padding-left: 1em;
 }
 
 /* Policy Indicator Badges */
