@@ -33,7 +33,7 @@ const TABLE_METADATA = {
         ]
     },
     riskyApps: {
-        title: "Risky Applications",
+        title: "Applications with Risky Permissions",
         wrapperClass: "expandable_wrapper",
         useModal: true,
         columns: [
@@ -48,7 +48,7 @@ const TABLE_METADATA = {
         ]
     },
     riskyThirdPartySPs: {
-        title: "Risky Third Party Service Principals",
+        title: "Third Party Service Principals with Risky Permissions",
         wrapperClass: "expandable_wrapper",
         useModal: true,
         columns: [
@@ -64,23 +64,15 @@ const TABLE_METADATA = {
     }
 };
 
-// Sort tables in descending order, starting with "Critical" first
-const SEVERITY_SORT_ORDER = {
-    Critical: 4,
-    High: 3,
-    Medium: 2,
-    Low: 1,
-};
-
 /* Associate the table type with the sorting column and direction (asc/desc)
  *
- * { [tableType]: { column: "SeverityLevel", ascending: "asc"/"desc" } }
+ * { [tableType]: { column: "SeverityScore", ascending: "asc"/"desc" } }
  */
 const tableSortState = {};
 
 /**
  * Sorts a data array by a given column and direction.
- * SeverityLevel uses SEVERITY_SORT_ORDER for ordering rather than alphabetical.
+ * SeverityScore uses SEVERITY_SORT_ORDER for ordering rather than alphabetical.
  *
  * @param {Array} data - The data array to sort.
  * @param {string} column - The column name to sort by.
@@ -92,17 +84,19 @@ const sortData = (data, column, direction) => {
         let valueA = a[column];
         let valueB = b[column];
 
-        if (column === "SeverityLevel") {
-            valueA = SEVERITY_SORT_ORDER[valueA];
-            valueB = SEVERITY_SORT_ORDER[valueB];
+        // Numbers
+        if (typeof valueA === "number" && typeof valueB === "number") {
+            valueA = valueA ?? 0;
+            valueB = valueB ?? 0;
         }
         // Arrays/objects (e.g. Permissions, Credentials) sort by count
-        else if (Array.isArray(valueA) || typeof valueA === "object") {
+        else if ((Array.isArray(valueA) || (typeof valueA === "object" && valueA !== null)) &&
+                 (Array.isArray(valueB) || (typeof valueB === "object" && valueB !== null))) {
             valueA = normalizeToArray(valueA).length;
             valueB = normalizeToArray(valueB).length;
         }
         // Booleans
-        else if (typeof valueA === "boolean") {
+        else if (typeof valueA === "boolean" && typeof valueB === "boolean") {
             valueA = valueA ? 0 : 1;
             valueB = valueB ? 0 : 1;
         }
@@ -214,7 +208,6 @@ const handleSortClick = (data, tableType, column) => {
         });
     });
 
-    colorRiskyRows(data, tableType);
     updateSortIndicators(tableType, column, direction);
 };
 
@@ -291,7 +284,7 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "riskyApps", "riskySPs").
  */
-const colorRiskyRows = (data, tableType) => {
+/*const colorRiskyRows = (data, tableType) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
         const severityLevel = data[rowIndex]?.SeverityLevel;
         switch (severityLevel) {
@@ -312,7 +305,7 @@ const colorRiskyRows = (data, tableType) => {
                 break;
         }
     });
-};
+};*/
 
 /**
  * Shared function to build a table with expand/collapse chevrons and truncation.
@@ -379,11 +372,11 @@ const buildExpandableTable = (data, tableType) => {
         collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
         buttons.appendChild(collapseAll);
 
-        // Sort risky tables by SeverityLevel in descending order by default
+        // Sort risky tables by SeverityScore in descending order by default
         if (isSortable) {
-            const sorted = sortData(data, "SeverityLevel", "desc");
+            const sorted = sortData(data, "SeverityScore", "desc");
             data.splice(0, data.length, ...sorted);
-            tableSortState[tableType] = { column: "SeverityLevel", direction: "desc" };
+            tableSortState[tableType] = { column: "SeverityScore", direction: "desc" };
         }
 
         const table = document.createElement("table");
@@ -395,13 +388,12 @@ const buildExpandableTable = (data, tableType) => {
 
         colNames.forEach(col => {
             const th = document.createElement("th");
-            //th.textContent = normalizeColumnNames(col.name);
             if (col.className) th.classList.add(col.className);
             
             // Exclude 0th column since it's set to "" for the expand/collapse arrows.
             if (isSortable && col.name !== "") {
                 th.dataset.column = col.name;
-                th.setAttribute("aria-sort", col.name === "SeverityLevel" ? "descending" : "none");
+                th.setAttribute("aria-sort", col.name === "SeverityScore" ? "descending" : "none");
 
                 const btn = document.createElement("button");
                 btn.classList.add("sort-btn");
@@ -415,7 +407,7 @@ const buildExpandableTable = (data, tableType) => {
                 indicator.classList.add("sort-indicator");
                 indicator.setAttribute("aria-hidden", "true");
                 
-                if (col.name === "SeverityLevel") {
+                if (col.name === "SeverityScore") {
                     // Default sorted column - show desc icon immediately
                     indicator.appendChild(createSortIcon("desc"));
                     indicator.classList.add("sort-indicator--active");
@@ -469,9 +461,9 @@ const buildExpandableTable = (data, tableType) => {
             tbody.appendChild(tr);
         });
 
-        if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
-            colorRiskyRows(data, tableType);
-        }
+        //if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+        //    colorRiskyRows(data, tableType);
+        //}
     }
     catch (error) {
         console.error(`Error building expandable table for ${tableType}:`, error);
@@ -484,12 +476,12 @@ const buildExpandableTable = (data, tableType) => {
  * @param {string} level - "Critical", "High", "Medium", or "Low".
  * @returns {HTMLElement} - A styled <span> badge element.
  */
-const createSeverityBadge = (level) => {
+/*const createSeverityBadge = (level) => {
     const span = document.createElement("span");
     span.classList.add("severity-badge", level);
     span.textContent = level ?? "Unknown";
     return span;
-};
+};*/
 
 /**
  * Fills a cell with truncated content and three-dots button (for expanding) if needed.
@@ -509,6 +501,11 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
 
     if (cellData === null || cellData === undefined) {
         td.textContent = "None";
+        return;
+    }
+
+    if (col.name === "SeverityScore") {
+        td.textContent = cellData;
         return;
     }
 
@@ -562,13 +559,6 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
             })
         );
     }
-
-    if (col.name === "SeverityScore") {
-        td.textContent = "";
-        td.appendChild(createSeverityBadge(cellData));
-        
-        return;
-    }
 }
 
 /**
@@ -601,7 +591,12 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                     contentBuilder: () => createChevronIcon("down", 14)
                 })
             );
+            return;
+        }
 
+        // SeverityScore - display numeric value directly
+        if (col.name === "SeverityScore") {
+            td.textContent = cellData ?? "None";
             return;
         }
         
@@ -650,13 +645,6 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
         }
 
         td.textContent = cellData ?? "None";
-
-        if (col.name === "SeverityScore") {
-            td.textContent = "";
-            td.appendChild(createSeverityBadge(cellData));
-
-            return;
-        }
     });
 }
 
@@ -715,9 +703,9 @@ const expandAllRows = (data, tableType) => {
         fillExpandedRow(data, tableType, row, rowIndex);
     });
 
-    if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
-        colorRiskyRows(data, tableType);
-    }
+    //if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+    //    colorRiskyRows(data, tableType);
+    //}
 }
 
 /**
@@ -744,9 +732,9 @@ const collapseAllRows = (data, tableType) => {
         fillCollapsedRow(data, tableType, row, rowIndex);
     });
 
-    if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
-        colorRiskyRows(data, tableType);
-    }
+    //if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
+    //    colorRiskyRows(data, tableType);
+    //}
 }
 
 /**

@@ -722,6 +722,28 @@ function Get-SeverityScoreWeights {
     .Description
     Returns the weight factors used in severity score calculation.
     The priority score is determined by the sum of all weight factors. A higher value indicates higher risk.
+
+    Weight Factor                   Notes
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Permission risk level weights | Each risky permission adds its RiskLevel weight: critical = 50, high = 15, medium = 5, low = 2
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Permission volume             | +1 per 10 total permissions (both risky and non-risky)
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Multi-tenant                  | +10 for applications with multi-tenant enabled
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Third-party service principal | +20 for externally-owned service principals
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Privileged roles              | +8 per privileged role assigned to a service principal
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Credential context weights    | Base points are added to a credential based on the highest level permission assigned to the application. 
+                                  | +50/cred for critical, +35/cred for high, +15/cred for medium, +5/cred for low
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Credential type discounts     | Key credentials are discounted by 50% and federated credentials are discounted by 75%
+    -------------------------------------------------------------------------------------------------------------------------------------------
+    Credential lifetime tiers     | Bonus points for credentials with long lifetimes (excludes federated credentials):
+                                  | +5 points for password creds valid for 2+ years, +3 points for 1-2 years, +2 points for 6 months - 1 year
+                                  | +5 points for key creds valid for 3+ years, +3 points for 2-3 years, +2 points for 1-2 years
+    -------------------------------------------------------------------------------------------------------------------------------------------
     .Functionality
     #Internal
     #>
