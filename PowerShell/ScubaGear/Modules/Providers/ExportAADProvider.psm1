@@ -60,9 +60,12 @@ function Export-AADProvider {
 
     # Retrieve tenant user count for both enabled/disabled accounts.
     $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    # Ensure we successfully got a count of users; command failures return empty arrays.
-    # Use -1 as numeric fallback so generated JSON remains valid.
-    if ($UserCount -isnot [int]) {
+    # Return value is an array of objects and the first item in the array is a string containing the user count.
+    if ($UserCount -is [array] -and $UserCount.Count -gt 0 -and [int]::TryParse($UserCount[0], [ref]$null)) {
+        $UserCount = $UserCount[0]
+    }
+    else {
+        Write-Warning "Error retrieving user count, invalid data received: $($UserCount | ConvertTo-Json)"
         $UserCount = -1
     }
 
@@ -113,9 +116,6 @@ function Export-AADProvider {
             "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
         })
     )
-
-    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
-    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
     ##### End Exchange hybrid application block
 
     ##### This block contains the slowest functions so that they execute last in the order of operations.
@@ -207,6 +207,8 @@ function Export-AADProvider {
             })
         }
     )
+    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
+    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
 
     # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
     # It only returns risky service principals owned by external tenants.
@@ -725,10 +727,10 @@ function Get-PrivilegedRole {
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
         # Get ALL the roles and users actively assigned to them, API information is contained within the Permissions JSON file.
-        $AllEligibleRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -ScriptBlock {
+        $AllRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -ScriptBlock {
             (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -M365Environment $M365Environment).Value
         }
-        $AllRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -ScriptBlock {
+        $AllEligibleRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -ScriptBlock {
             (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
         }
 
