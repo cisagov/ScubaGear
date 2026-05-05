@@ -582,8 +582,9 @@ const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) =
                 // Assumes column name "DisplayName" or "Name" exist, will need to adjust if adding new table types
                 const rowLabel = data[rowIndex].DisplayName || data[rowIndex].Name;
                 const colLabel = normalizeColumnNames(col.name);
+                const scoreBreakdown = data[rowIndex]["ScoreBreakdown"] ?? null;
 
-                const ul = renderSummaryList(col.name, items);
+                const ul = renderSummaryList(col.name, items, scoreBreakdown);
                 if (ul) td.appendChild(ul);
 
                 const btn = document.createElement("button");
@@ -805,9 +806,10 @@ const renderKeyValueList = (items, options = {}) => {
  * 
  * @param {string} colName - The column name from TABLE_METADATA.columns (e.g., "KeyCredentials", "Permissions").
  * @param {Array} items - The normalized array of items to summarize.
+ * @param {Object} scoreBreakdown - The ScoreBreakdown object from Set-SeverityScore.
  * @returns {HTMLElement|null} - An unordered list element containing the summary.
  */
-const renderSummaryList = (colName, items) => {
+const renderSummaryList = (colName, items, scoreBreakdown = null) => {
     const count = items.length;
 
     const makeUl = () => {
@@ -816,8 +818,9 @@ const renderSummaryList = (colName, items) => {
         return ul;
     };
 
-    const addItem = (ul, label, value) => {
+    const addItem = (ul, label, value, className = null) => {
         const li = document.createElement("li");
+        if (className) li.classList.add(className);
         const strong = document.createElement("strong");
         strong.textContent = `${label}:`;
         li.appendChild(strong);
@@ -825,10 +828,17 @@ const renderSummaryList = (colName, items) => {
         ul.appendChild(li);
     };
 
+    const addDivider = (ul) => {
+        const li = document.createElement("li");
+        li.setAttribute("aria-hidden", "true");
+        li.className = "summary-list-divider";
+        ul.appendChild(li);
+    };
+
     // Only display active/expired counts for key/password credentials
     if (colName === "KeyCredentials" || colName === "PasswordCredentials") {
         const now = new Date();
-        let active = 0, expired = 0;
+        let active = 0, expired = 0, future = 0;
 
         items.forEach(credential => {
             if (!credential || typeof credential !== "object") return;
@@ -837,40 +847,64 @@ const renderSummaryList = (colName, items) => {
             const end = parseDotNetDate(credential.EndDateTime);
 
             if (start && end) {
-                if (start <= now && end >= now) {
-                    active++;
-                    return;
-                }
-                
-                if (end < now) {
-                    expired++;
-                    return;
-                }
+                if (end < now) { expired++; return; }
+                if (start > now) { future++; return; }
+                active++;
             }
+        });
+
+        const breakdownKey = colName === "KeyCredentials" ? "KeyCredentials" : "PasswordCredentials";
+        const longLived = scoreBreakdown?.[breakdownKey]?.LongLivedCredentialCount ?? null;
+
+        const ul = makeUl();
+        addItem(ul, "Total", count);
+
+        addDivider(ul);
+        addItem(ul, "Active", active);
+        addItem(ul, "Expired", expired);
+
+        if (future > 0) addItem(ul, "Not Yet Valid", future);
+        if (longLived !== null) {
+            addDivider(ul);
+            addItem(ul, "Long-Lived (exceeds lifetime threshold)", longLived);
+        }
+        return ul;
+    }
+
+    if (colName === "FederatedCredentials") {
+        // Federated credentials do not expire, summarize by unique issuers
+        const issuers = new Set();
+        items.forEach(credential => {
+            if (credential?.Issuer) issuers.add(credential.Issuer);
         });
 
         const ul = makeUl();
         addItem(ul, "Total", count);
-        addItem(ul, "Active", active);
-        addItem(ul, "Expired", expired);
-        return ul;
-    }
 
-    // Federated credentials do not expire so only display the total count
-    if (colName === "FederatedCredentials") {
-        const ul = makeUl();
-        addItem(ul, "Total", count);
+        addDivider(ul);
+        addItem(ul, "Unique Issuers", issuers.size);
         return ul;
     }
 
     if (colName === "PrivilegedRoles") {
         const ul = makeUl();
         addItem(ul, "Total", count);
+
+        if (items.length > 0 && typeof items[0] === "string") {
+            // List out privileged role names
+            addDivider(ul);
+            items.forEach(role => addItem(ul, "Role", role));
+        }
         return ul;
     }
 
     if (colName === "Permissions") {
-        let applicationPermissions = 0, delegatedPermissions = 0, adminConsented = 0, notAdminConsented = 0, risky = 0;
+        let applicationPermissions = 0;
+        let delegatedPermissions = 0;
+        let adminConsented = 0;
+        let notAdminConsented = 0;
+        let risky = 0;
+        const riskyByLevel = { Critical: 0, High: 0, Medium: 0, Low: 0 };
 
         items.forEach(permission => {
             if (!permission || typeof permission !== "object") return;
@@ -884,16 +918,33 @@ const renderSummaryList = (colName, items) => {
             else notAdminConsented++;
 
             // Handle risky permissions
-            if (permission.IsRisky === true) risky++;
+            if (permission.IsRisky === true) {
+                risky++;
+                if (permission.RiskLevel && riskyByLevel.hasOwnProperty(permission.RiskLevel)) {
+                    riskyByLevel[permission.RiskLevel]++;
+                }
+            }
         });
 
         const ul = makeUl();
         addItem(ul, "Total", count);
+
+        addDivider(ul);
         addItem(ul, "Application Permissions", applicationPermissions);
         addItem(ul, "Delegated Permissions", delegatedPermissions);
+
+        addDivider(ul);
         addItem(ul, "Admin Consented", adminConsented);
         addItem(ul, "Not Admin Consented", notAdminConsented);
+
+        addDivider(ul);
         addItem(ul, "Risky", risky);
+        if (risky > 0) {
+            if (riskyByLevel.Critical > 0) addItem(ul, "Critical", riskyByLevel.Critical, "risk-level-item");
+            if (riskyByLevel.High > 0) addItem(ul, "High", riskyByLevel.High, "risk-level-item");
+            if (riskyByLevel.Medium > 0) addItem(ul, "Medium", riskyByLevel.Medium, "risk-level-item");
+            if (riskyByLevel.Low > 0) addItem(ul, "Low", riskyByLevel.Low, "risk-level-item");
+        }
         return ul;
     }
 
