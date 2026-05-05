@@ -234,10 +234,6 @@ function Get-ApplicationsWithRiskyPermissions {
                 $IsMultiTenantEnabled = $false
                 if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
 
-                # Count total permissions across all resource APIs; used later in severity score calculation
-                $TotalPermissionCount = ($App.RequiredResourceAccess | ForEach-Object { @($_.ResourceAccess).Count } | Measure-Object -Sum).Sum
-                if ($null -eq $TotalPermissionCount) { $TotalPermissionCount = 0 }
-
                 # Map application permissions against RiskyPermissions.json
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
@@ -327,7 +323,6 @@ function Get-ApplicationsWithRiskyPermissions {
                         PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = Format-Credentials -AccessKeys $FederatedCredentialsResults -IsFromApplication $true -IsFederated
                         Permissions          = $MappedPermissions
-                        TotalPermissionCount = $TotalPermissionCount
                     }
                 }
             }
@@ -468,8 +463,6 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                             Write-Warning "Error for service principal $($Result.id): $($Result.status)"
                         }
 
-                        # Total appRoleAssignments count (across all APIs, not just risky ones); used later in severity score calculation
-
                         $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
 
                         # Exclude service principals without risky permissions
@@ -485,7 +478,6 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                 PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
                                 FederatedCredentials    = Format-Credentials -AccessKeys $ServicePrincipal.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
                                 Permissions             = $MappedPermissions
-                                TotalPermissionCount    = $TotalPermissionCount
                                 AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
                             }
                         }
@@ -631,7 +623,6 @@ function Format-RiskyApplications {
                         PasswordCredentials      = $MergedPasswordCredentials
                         FederatedCredentials     = $MergedFederatedCredentials
                         Permissions              = $App.Permissions
-                        TotalPermissionCount     = $App.TotalPermissionCount
                     }
                 }
                 else {
@@ -639,13 +630,10 @@ function Format-RiskyApplications {
                 }
 
                 # Calculate severity score after admin consent for permissions has been determined
-                $SeverityInfo = Set-SeverityScore -Object $MergedObject -ObjectType "Application"
+                $SeverityInfo = Set-SeverityScore -Object $MergedObject
 
                 # Add severity info to the merged object
-                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
-                $MergedObject | Add-Member -MemberType NoteProperty -Name "MaxScore" -Value $SeverityInfo.MaxScore
-                $MergedObject | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
-                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
+                $MergedObject | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.SeverityScore
                 $MergedObject | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
 
                 $Applications += $MergedObject
@@ -707,15 +695,11 @@ function Format-RiskyThirdPartyServicePrincipals {
                     # Calculate severity score after admin consent for permissions has been determined
                     $SeverityInfo = Set-SeverityScore `
                         -Object $ServicePrincipal `
-                        -ObjectType "ServicePrincipal" `
                         -IsThirdPartyServicePrincipal `
                         -PrivilegedRoles $PrivilegedRoles
 
                     # Add severity info to the merged object
-                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.TotalScore
-                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "MaxScore" -Value $SeverityInfo.MaxScore
-                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScorePercentage" -Value $SeverityInfo.ScorePercentage
-                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityLevel" -Value $SeverityInfo.SeverityLevel
+                    $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "SeverityScore" -Value $SeverityInfo.SeverityScore
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "ScoreBreakdown" -Value $SeverityInfo.ScoreBreakdown
                     $ServicePrincipal | Add-Member -MemberType NoteProperty -Name "PrivilegedRoles" -Value $PrivilegedRoles
 
@@ -937,11 +921,6 @@ function Set-SeverityScore {
         [Object[]]
         $Object,
 
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet("Application","ServicePrincipal")]
-        [string]
-        $ObjectType,
-
         [switch]
         $IsThirdPartyServicePrincipal,
 
@@ -1032,7 +1011,7 @@ function Set-SeverityScore {
         }
         $CredentialBasePoints = $HighestRiskLevel
 
-        # 6. Calculate password credential weight factor
+        # 7. Calculate password credential weight factor
         $PasswordBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Password)
         $AllPasswordCredentials = @($Object.PasswordCredentials | Where-Object { $null -ne $_ })
         $PasswordScore = Set-CredentialScore `
@@ -1048,6 +1027,7 @@ function Set-SeverityScore {
             TotalPoints = $PasswordScore.TotalPoints
         }
 
+        # 8. Calculate key credential weight factor
         $KeyBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Key)
         $AllKeyCredentials = @($Object.KeyCredentials | Where-Object { $null -ne $_})
         $KeyScore = Set-CredentialScore `
@@ -1063,7 +1043,7 @@ function Set-SeverityScore {
             TotalPoints = $KeyScore.TotalPoints
         }
 
-        # 8. Calculate federated credential weight factor
+        # 9. Calculate federated credential weight factor
         $FederatedBasePoints = [Math]::Ceiling($CredentialBasePoints * $Weights.CredentialTypeDiscounts.Federated)
         $AllFederatedCredentials = @($Object.FederatedCredentials | Where-Object { $null -ne $_})
         $FederatedScore = Set-CredentialScore `
@@ -1076,11 +1056,12 @@ function Set-SeverityScore {
             TotalPoints = $FederatedScore.TotalPoints
         }
 
-        # 9. Credential volume factor
+        # 10. Credential volume factor
         $TotalActiveCredentials = $PasswordScore.CredentialCount + $KeyScore.CredentialCount + $FederatedScore.CredentialCount
         $CredentialVolumePoints = 0
 
         if ($TotalActiveCredentials -gt 1) {
+            # Subtract 1 because we're already taking into account the first credential.
             $CredentialVolumePoints = ($TotalActiveCredentials - 1) * $Weights.CredentialVolume.PointsPerCredentialAfterFirst
             $Score += $CredentialVolumePoints
         }
@@ -1090,35 +1071,21 @@ function Set-SeverityScore {
             TotalPoints = $CredentialVolumePoints
         }
 
-        # 10. Permission volume factor
-        $TotalPermissionCount = if ($null -ne $Object.TotalPermissionCount -and $Object.TotalPermissionCount -gt 0) {
-            $Object.TotalPermissionCount
-        }
-        else {
-            @($Object.Permissions).Count
-        }
-
-        $PermissionVolumePoints = [Math]::Ceiling($TotalPermissionCount / 10) * $Weights.PermissionVolume.PointsPer10Permissions
+        # 11. Permission volume factor
+        $TotalPermissionCount = @($Object.Permissions).Count
+        # Use Math.floor() so the integer division truncates rounds down.
+        # For example:
+        # - 5 permissions / 10 = 0.5 x 1 (0 points)
+        # - 15 permissions / 10 = 1.5 x 1 (1 point)
+        $PermissionVolumePoints = [Math]::Floor($TotalPermissionCount / 10) * $Weights.PermissionVolume.PointsPer10Permissions
         $Score += $PermissionVolumePoints
         $ScoreBreakdown.PermissionVolume = [PSCustomObject]@{
             TotalPermissions = $TotalPermissionCount
             TotalPoints = $PermissionVolumePoints
         }
 
-        $ScorePercentage = [Math]::Round(($Score / $Weights.MaxScore.$ObjectType) * 100, 1)
-
-        $SeverityLevel = switch ($ScorePercentage) {
-            { $_ -ge $Weights.Thresholds.Critical } { "Critical"; break }
-            { $_ -ge $Weights.Thresholds.High } { "High"; break }
-            { $_ -ge $Weights.Thresholds.Medium } { "Medium"; break }
-            default { "Low" }
-        }
-
         return [PSCustomObject]@{
-            TotalScore = $Score
-            MaxScore = $Weights.MaxScore.$ObjectType
-            ScorePercentage = $ScorePercentage
-            SeverityLevel = $SeverityLevel
+            SeverityScore = $Score
             ScoreBreakdown = $ScoreBreakdown
         }
     }
