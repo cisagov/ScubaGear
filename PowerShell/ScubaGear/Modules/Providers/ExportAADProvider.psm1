@@ -213,10 +213,13 @@ function Export-AADProvider {
             "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
         })
     )
+    ##### End block
 
     # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
     $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
-    ##### End block
+
+    # Export severity score weights at the provider level so the data can be used for processing in the Entra ID HTML report.
+    $SeverityScoreWeights = ConvertTo-Json -Depth 5 (Get-SeverityScoreWeights)
     
     # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function,
     # convert privileged users/service principals to JSON after the calls above.
@@ -262,6 +265,7 @@ function Export-AADProvider {
     "total_user_count": $UserCount,
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
+    "severity_score_weights": $SeverityScoreWeights,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
     "legacy_exchange_service_principal": $LegacyExchangeSP,
     "dedicated_exchange_hybrid_applications": $DedicatedExchangeHybridApps,

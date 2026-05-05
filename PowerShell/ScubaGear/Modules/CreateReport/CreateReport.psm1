@@ -518,9 +518,10 @@ function New-Report {
         # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
 
-        # Same for risky applications and third-party service principals
+        # Same for risky applications, third-party service principals, and severity score weights
         $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
         $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
+        $SeverityScoreWeightsJson = ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -582,6 +583,7 @@ function New-Report {
         $CapJson = "null"
         $RiskyAppsJson = "null"
         $RiskyThirdPartySPJson = "null"
+        $SeverityScoreWeightsJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -639,6 +641,7 @@ function New-Report {
         "<script type='application/json' id='cap-json'> $($CapJson) </script>"
         "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
         "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
+        "<script type='application/json' id='severity-score-weights-json'> $($SeverityScoreWeightsJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 

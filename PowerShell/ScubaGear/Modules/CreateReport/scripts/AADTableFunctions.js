@@ -169,8 +169,9 @@ const updateSortIndicators = (tableType, activeColumn, direction) => {
  * @param {Array} data - The original data array.
  * @param {string} tableType - The type of table.
  * @param {string} column - The column name to sort by.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const handleSortClick = (data, tableType, column) => {
+const handleSortClick = (data, tableType, column, severityScoreWeights) => {
     const currentState = tableSortState[tableType] || {};
     const direction = (currentState.column === column && currentState.direction === "desc")
         ? "asc"
@@ -197,13 +198,13 @@ const handleSortClick = (data, tableType, column) => {
                         title: `Show more info for row ${rowIndex + 1}`,
                         className: "chevron",
                         rowIndex,
-                        onClick: (event) => expandRow(data, tableType, event),
+                        onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                         contentBuilder: () => createChevronIcon("right", 10)
                     })
                 );
             }
             else {
-                fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+                fillTruncatedCell(data, tableType, td, rowIndex, colIndex, severityScoreWeights);
             }
         });
     });
@@ -220,7 +221,7 @@ const handleSortClick = (data, tableType, column) => {
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
-        case "SeverityScore": return "Risk Score";
+        case "SeverityScore": return "Severity Score";
         case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
@@ -278,8 +279,9 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
  * 
  * @param {Array} data - The data array.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const buildExpandableTable = (data, tableType) => {
+const buildExpandableTable = (data, tableType, severityScoreWeights) => {
     try {
         if (data === undefined || data === null) {
             /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but this js file 
@@ -328,14 +330,14 @@ const buildExpandableTable = (data, tableType) => {
         expandAll.classList.add("btn-primary");
         expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
         expandAll.title = "Expands all rows in the table below";
-        expandAll.addEventListener("click", () => expandAllRows(data, tableType));
+        expandAll.addEventListener("click", () => expandAllRows(data, tableType, severityScoreWeights));
         buttons.appendChild(expandAll);
 
         const collapseAll = document.createElement("button");
         collapseAll.classList.add("btn-primary");
         collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
         collapseAll.title = "Collapses all rows in the table below";
-        collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
+        collapseAll.addEventListener("click", () => collapseAllRows(data, tableType, severityScoreWeights));
         buttons.appendChild(collapseAll);
 
         // Sort risky tables by SeverityScore in descending order by default
@@ -364,7 +366,7 @@ const buildExpandableTable = (data, tableType) => {
                 const btn = document.createElement("button");
                 btn.classList.add("sort-btn");
                 btn.title = `Sort by ${normalizeColumnNames(col.name)}`;
-                btn.addEventListener("click", () => handleSortClick(data, tableType, col.name));
+                btn.addEventListener("click", () => handleSortClick(data, tableType, col.name, severityScoreWeights));
 
                 const label = document.createElement("span");
                 label.textContent = normalizeColumnNames(col.name);
@@ -412,13 +414,13 @@ const buildExpandableTable = (data, tableType) => {
                             title: `Show more info for row ${rowIndex + 1}`,
                             className: "chevron",
                             rowIndex,
-                            onClick: (event) => expandRow(data, tableType, event),
+                            onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                             contentBuilder: () => createChevronIcon("right", 10)
                         })
                     );
                 } 
                 else {
-                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex, severityScoreWeights);
                 }
 
                 tr.appendChild(td);
@@ -426,10 +428,6 @@ const buildExpandableTable = (data, tableType) => {
 
             tbody.appendChild(tr);
         });
-
-        //if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
-        //    colorRiskyRows(data, tableType);
-        //}
     }
     catch (error) {
         console.error(`Error building expandable table for ${tableType}:`, error);
@@ -444,8 +442,9 @@ const buildExpandableTable = (data, tableType) => {
  * @param {HTMLElement} td - The table cell to fill.
  * @param {number} rowIndex - The row index (0-indexed, not counting the header row).
  * @param {number} colIndex - The column index (0-indexed).
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
+const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex, severityScoreWeights) => {
     const colNames = TABLE_METADATA[tableType].columns;
     const col = colNames[colIndex];
     const cellData = data[rowIndex][col.name];
@@ -503,7 +502,7 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
                 title: `Expand row ${rowIndex + 1}`,
                 className: "truncated-dots",
                 rowIndex,
-                onClick: (event) => expandRow(data, tableType, event),
+                onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                 contentBuilder: () => {
                     const span = document.createElement("span");
                     span.appendChild(document.createTextNode("..."));
@@ -521,8 +520,9 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {HTMLTableRowElement} row - The table row element.
  * @param {number} rowIndex - The row index.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const fillExpandedRow = (data, tableType, row, rowIndex) => {
+const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) => {
     const metadata = TABLE_METADATA[tableType];
     const colNames = metadata.columns;
 
@@ -540,7 +540,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                     title: `Show less info for row ${rowIndex + 1}`,
                     className: "chevron",
                     rowIndex,
-                    onClick: (event) => collapseRow(data, tableType, event),
+                    onClick: (event) => collapseRow(data, tableType, event, severityScoreWeights),
                     contentBuilder: () => createChevronIcon("down", 14)
                 })
             );
@@ -549,7 +549,20 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
 
         // SeverityScore - display numeric value directly
         if (col.name === "SeverityScore") {
-            td.textContent = cellData ?? "None";
+            const scoreWrapper = document.createElement("div");
+            scoreWrapper.className = "severity-score-wrapper";
+
+            const scoreValue = document.createElement("span");
+            scoreValue.className = "severity-score-value";
+            scoreValue.textContent = cellData ?? "None";
+            scoreWrapper.appendChild(scoreValue);
+
+            const scoreBreakdown = data[rowIndex]["ScoreBreakdown"];
+            if (scoreBreakdown && severityScoreWeights) {
+                scoreWrapper.appendChild(renderRiskIndicators(scoreBreakdown, severityScoreWeights));
+            }
+
+            td.appendChild(scoreWrapper);
             return;
         }
         
@@ -608,13 +621,14 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {HTMLTableRowElement} row - The table row element.
  * @param {number} rowIndex - The row index.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const fillCollapsedRow = (data, tableType, row, rowIndex) => {
+const fillCollapsedRow = (data, tableType, row, rowIndex, severityScoreWeights) => {
     const colNames = TABLE_METADATA[tableType].columns;
 
     colNames.forEach((_, colIndex) => {
         let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
-        fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+        fillTruncatedCell(data, tableType, td, rowIndex, colIndex, severityScoreWeights);
     });
 
     // We have to manually "reset" the content of the first column to an empty value,
@@ -626,7 +640,7 @@ const fillCollapsedRow = (data, tableType, row, rowIndex) => {
             title: `Show more info for row ${rowIndex + 1}`,
             className: "chevron",
             rowIndex,
-            onClick: (event) => expandRow(data, tableType, event),
+            onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
             contentBuilder: () => createChevronIcon("right", 10)
         })
     );
@@ -638,11 +652,12 @@ const fillCollapsedRow = (data, tableType, row, rowIndex) => {
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {Event} event - The event that triggered the expansion.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const expandRow = (data, tableType, event) => {
+const expandRow = (data, tableType, event, severityScoreWeights) => {
     let row = event.currentTarget.closest("tr");
     let rowIndex = event.currentTarget.rowNumber;
-    fillExpandedRow(data, tableType, row, rowIndex);
+    fillExpandedRow(data, tableType, row, rowIndex, severityScoreWeights);
 }
 
 /**
@@ -650,15 +665,12 @@ const expandRow = (data, tableType, event) => {
  * 
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const expandAllRows = (data, tableType) => {
+const expandAllRows = (data, tableType, severityScoreWeights) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
-        fillExpandedRow(data, tableType, row, rowIndex);
+        fillExpandedRow(data, tableType, row, rowIndex, severityScoreWeights);
     });
-
-    //if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
-    //    colorRiskyRows(data, tableType);
-    //}
 }
 
 /**
@@ -667,11 +679,12 @@ const expandAllRows = (data, tableType) => {
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {Event} event - The event that triggered the expansion.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const collapseRow = (data, tableType, event) => {
+const collapseRow = (data, tableType, event, severityScoreWeights) => {
     let row = event.currentTarget.closest("tr");
     let rowIndex = event.currentTarget.rowNumber;
-    fillCollapsedRow(data, tableType, row, rowIndex);
+    fillCollapsedRow(data, tableType, row, rowIndex, severityScoreWeights);
 }
 
 /**
@@ -679,15 +692,12 @@ const collapseRow = (data, tableType, event) => {
  * 
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const collapseAllRows = (data, tableType) => {
+const collapseAllRows = (data, tableType, severityScoreWeights) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
-        fillCollapsedRow(data, tableType, row, rowIndex);
+        fillCollapsedRow(data, tableType, row, rowIndex, severityScoreWeights);
     });
-
-    //if (tableType === "riskyApps" || tableType === "riskyThirdPartySPs") {
-    //    colorRiskyRows(data, tableType);
-    //}
 }
 
 /**
@@ -890,29 +900,174 @@ const renderSummaryList = (colName, items) => {
     return null;
 }
 
+/**
+ * Points-based color tier for admin/non-admin consented permissions.
+ *
+ * @param {number} pts
+ * @param {Object} weights
+ * @returns {"critical" | "high" | "medium" | "low" | null}
+ */
+const permissionPointsToTier = (pts, weights) => {
+    const w = weights.PermissionRiskLevelWeights;
+    if (pts >= w.Critical) return "critical";
+    if (pts >= w.High)     return "high";
+    if (pts >= w.Medium)   return "medium";
+    if (pts > 0)           return "low";
+    return null;
+};
+
+/**
+ * Points-based color tier for credential indicators.
+ * Thresholds are 75%/50%/25% of the CredentialContextWeights base for the app/SP's HighestRiskLevel.
+ *
+ * @param {number} points
+ * @param {string} highestRiskLevel - "Critical" | "High" | "Medium" | "Low" | "None"
+ * @param {Object} weights
+ * @returns {"critical" | "high" | "medium" | "low" | null}
+ */
+const credentialPointsToTier = (points, highestRiskLevel, weights) => {
+    if (points <= 0) return null;
+    const base = weights.CredentialContextWeights[highestRiskLevel] ?? 0;
+    if (base === 0) return "low";
+    const tiers = weights.CredentialRiskIndicatorTiers;
+    if (points >= base * tiers.Critical) return "critical";
+    if (points >= base * tiers.High)     return "high";
+    if (points >= base * tiers.Medium)   return "medium";
+    return "low";
+};
+
 const RISK_INDICATORS_CONFIG = [
     {
         key: "AdminConsentedRiskyPermissions",
-        label: (bd) => `${bd.AdminConsentedRiskyPermissions.PermissionCount} Admin-Consented Risky Permission(s)`,
-        colorTier: (bd) => {
-            const pts = bd.AdminConsentedRiskyPermissions?.TotalPoints ?? 0;
-            if (pts >= 50) return "critical";
-            if (pts >= 15) return "high";
-            if (pts >= 5)  return "medium";
-            if (pts > 0)   return "low";
+        label: (scoreBreakdown) => `${scoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount} Admin-Consented Risky Permission(s)`,
+        colorTier: (scoreBreakdown, weights) => permissionPointsToTier(scoreBreakdown.AdminConsentedRiskyPermissions?.TotalPoints ?? 0, weights)
+    },
+    {
+        key: "NonAdminConsentedRiskyPermissions",
+        label: (scoreBreakdown) => `${scoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount} Non-Admin-Consented Risky Permission(s)`,
+        colorTier: (scoreBreakdown, weights) => permissionPointsToTier(scoreBreakdown.NonAdminConsentedRiskyPermissions?.TotalPoints ?? 0, weights)
+    },
+    {
+        key: "PasswordCredentials",
+        label: (scoreBreakdown) => {
+            const longLived = scoreBreakdown.PasswordCredentials.LongLivedCredentialCount;
+            const base = `${scoreBreakdown.PasswordCredentials.CredentialCount} Password Credential(s)`;
+            return (longLived > 0) ? `${base} (${longLived} long-lived)` : base;
+        },
+        colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
+            scoreBreakdown.PasswordCredentials?.TotalPoints ?? 0,
+            scoreBreakdown.HighestRiskLevel ?? "None",
+            weights
+        )
+    },
+    {
+        key: "KeyCredentials",
+        label: (scoreBreakdown) => {
+            const longLived = scoreBreakdown.KeyCredentials.LongLivedCredentialCount;
+            const base = `${scoreBreakdown.KeyCredentials.CredentialCount} Key/Certificate Credential(s)`;
+            return (longLived > 0) ? `${base} (${longLived} long-lived)` : base;
+        },
+        colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
+            scoreBreakdown.KeyCredentials?.TotalPoints ?? 0,
+            scoreBreakdown.HighestRiskLevel ?? "None",
+            weights
+        )
+    },
+    {
+        key: "FederatedCredentials",
+        label: (scoreBreakdown) => `${scoreBreakdown.FederatedCredentials.CredentialCount} Federated Credential(s)`,
+        colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
+            scoreBreakdown.FederatedCredentials?.TotalPoints ?? 0,
+            scoreBreakdown.HighestRiskLevel ?? "None",
+            weights
+        )
+    },
+    {
+        key: "CredentialVolume",
+        label: (scoreBreakdown) => `${scoreBreakdown.CredentialVolume.TotalActiveCredentials} Total Active Credential(s)`,
+        colorTier: (scoreBreakdown, weights) => {
+            const points = scoreBreakdown.CredentialVolume?.TotalPoints ?? 0;
+            const pointsPerCredentialAfterFirst = weights.CredentialVolume.PointsPerCredentialAfterFirst;
+            if (points >= pointsPerCredentialAfterFirst * 3) return "critical";
+            if (points >= pointsPerCredentialAfterFirst * 2) return "high";
+            if (points >= pointsPerCredentialAfterFirst) return "medium";
+            if (scoreBreakdown.CredentialVolume?.TotalActiveCredentials > 1) return "low";
             return null;
         }
     },
     {
-        key: "NonAdminConsentedRiskyPermissions",
-        label: (bd) => `${bd.NonAdminConsentedRiskyPermissions.PermissionCount} Non-Admin-Consented Risky Permission(s)`,
-        colorTier: (bd) => {
-            const pts = bd.NonAdminConsentedRiskyPermissions?.TotalPoints ?? 0;
-            if (pts >= 50) return "critical";
-            if (pts >= 15) return "high";
-            if (pts >= 5)  return "medium";
-            if (pts > 0)   return "low";
+        key: "PermissionVolume",
+        label: (scoreBreakdown) => `${scoreBreakdown.PermissionVolume.TotalPermissions} Total Permission(s)`,
+        colorTier: (scoreBreakdown, weights) => {
+            const points = scoreBreakdown.PermissionVolume?.TotalPoints ?? 0;
+            const pointsPer10Permissions = weights.PermissionVolume.PointsPer10Permissions;
+            if (points >= pointsPer10Permissions * 4) return "critical";
+            if (points >= pointsPer10Permissions * 3) return "high";
+            if (points >= pointsPer10Permissions * 2) return "medium";
+            if (points >= pointsPer10Permissions) return "low";
             return null;
         }
     },
+    {
+        key: "MultiTenant",
+        label: () => "Multi-Tenant Application",
+        colorTier: (scoreBreakdown) => {
+            return scoreBreakdown.MultiTenant?.IsMultiTenantEnabled ? "medium" : null;
+        }
+    },
+    {
+        key: "ThirdPartyServicePrincipal",
+        label: () => "Third-Party Service Principal",
+        colorTier: (scoreBreakdown) => {
+            return scoreBreakdown.ThirdPartyServicePrincipal?.IsThirdPartyServicePrincipal ? "high" : null;
+        }
+    },
+    {
+        key: "PrivilegedRoles",
+        label: (scoreBreakdown) => `${scoreBreakdown.PrivilegedRoles.RoleCount} Privileged Role(s)`,
+        colorTier: (scoreBreakdown, weights) => {
+            const points = scoreBreakdown.PrivilegedRoles?.TotalPoints ?? 0;
+            const pointsPerRole = weights.PrivilegedRoles.PointsPerRole;
+            if (points >= pointsPerRole * 4) return "critical";
+            if (points >= pointsPerRole * 3) return "high";
+            if (points >= pointsPerRole * 2) return "medium";
+            if (points >= pointsPerRole) return "low";
+            return null;
+        }
+    }
 ];
+
+/**
+ * Builds a container of risk indicator chip badges from an object's severity score breakdown.
+ *
+ * @param {Object} scoreBreakdown - The ScoreBreakdown object from Set-SeverityScore.
+ * @param {Object} severityScoreWeights - The Weights object from Get-SeverityScoreWeights.
+ * @returns {HTMLElement}
+ */
+const renderRiskIndicators = (scoreBreakdown, severityScoreWeights) => {
+    const container = document.createElement("div");
+    container.className = "risk-indicators";
+
+    if (!scoreBreakdown || !severityScoreWeights) {
+        container.textContent = "No breakdown available.";
+        return container;
+    }
+
+    RISK_INDICATORS_CONFIG.forEach(indicator => {
+        if (!scoreBreakdown[indicator.key]) return;
+
+        const tier = indicator.colorTier(scoreBreakdown, severityScoreWeights);
+        if (!tier) return;
+
+        const chip = document.createElement("span");
+        chip.className = `risk-chip risk-chip--${tier}`;
+        chip.textContent = indicator.label(scoreBreakdown);
+        container.appendChild(chip);
+    });
+
+    if (container.children.length === 0) {
+        container.textContent = "No active risk indicators.";
+    }
+
+    return container;
+};

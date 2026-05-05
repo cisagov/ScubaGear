@@ -761,7 +761,6 @@ function Get-SeverityScoreWeights {
             Description = "Over-permissioned applications/service principals represent an increased attack surface regardless of individual permission risk level."
         }
 
-        # Context factors (25 points max)
         MultiTenant = @{
             Points = 10
             Description = "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
@@ -811,6 +810,14 @@ function Get-SeverityScoreWeights {
         CredentialVolume = @{
             PointsPerCredentialAfterFirst = 5
             Description = "Multiple active credentials increase the authentication attack surface. Each active credential beyond the first adds bonus points."
+        }
+
+        # Used in Entra ID HTML report to generate risk indicators.
+        CredentialRiskIndicatorTiers = @{
+            Critical = 0.75
+            High = 0.50
+            Medium = 0.25
+            # Below 0.25 is considered low risk
         }
     }
 }
@@ -948,7 +955,7 @@ function Set-SeverityScore {
             $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $true
         })
         $AdminConsentedPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
-            $Weights.RiskLevelWeights[$_.RiskLevel]
+            $Weights.PermissionRiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
         
         $Score += $AdminConsentedPoints
@@ -962,7 +969,7 @@ function Set-SeverityScore {
             $_.IsRisky -eq $true -and $_.IsAdminConsented -eq $false
         })
         $NonAdminConsentedPoints = ($NonAdminConsentedRiskyPermissions | ForEach-Object {
-            $Weights.RiskLevelWeights[$_.RiskLevel]
+            $Weights.PermissionRiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
 
         $Score += $NonAdminConsentedPoints
@@ -1101,7 +1108,6 @@ function Set-SeverityScore {
         return [PSCustomObject]@{
             SeverityScore  = $Score
             ScoreBreakdown = $ScoreBreakdown
-            Weights        = $Weights
         }
     }
     catch {
@@ -1118,5 +1124,6 @@ Export-ModuleMember -Function @(
     "Get-ServicePrincipalsWithRiskyPermissions",
     "Format-RiskyApplications",
     "Format-RiskyThirdPartyServicePrincipals",
+    "Get-SeverityScoreWeights",
     "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications"
 )
