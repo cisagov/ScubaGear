@@ -39,7 +39,7 @@ const TABLE_METADATA = {
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
-            { name: "SeverityLevel", className: "severity_level" },
+            { name: "SeverityScore", className: "severity_score" },
             { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -54,7 +54,7 @@ const TABLE_METADATA = {
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
-            { name: "SeverityLevel", className: "severity_level" },
+            { name: "SeverityScore", className: "severity_score" },
             { name: "PrivilegedRoles", className: "privileged_roles" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -227,7 +227,7 @@ const handleSortClick = (data, tableType, column) => {
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
-        case "SeverityLevel": return "Risk Level";
+        case "SeverityScore": return "Risk Score";
         case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
@@ -563,7 +563,7 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
         );
     }
 
-    if (col.name === "SeverityLevel") {
+    if (col.name === "SeverityScore") {
         td.textContent = "";
         td.appendChild(createSeverityBadge(cellData));
         
@@ -651,7 +651,7 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
 
         td.textContent = cellData ?? "None";
 
-        if (col.name === "SeverityLevel") {
+        if (col.name === "SeverityScore") {
             td.textContent = "";
             td.appendChild(createSeverityBadge(cellData));
 

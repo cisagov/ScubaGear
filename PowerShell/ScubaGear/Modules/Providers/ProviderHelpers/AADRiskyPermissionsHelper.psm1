@@ -717,36 +717,16 @@ function Format-RiskyThirdPartyServicePrincipals {
     }
 }
 
-function Get-SeverityWeights {
+function Get-SeverityScoreWeights {
     <#
     .Description
     Returns the weight factors used in severity score calculation.
-
     The priority score is determined by the sum of all weight factors. A higher value indicates higher risk.
-
-    The score is composed of the following factors:
-
-    Factor                        App     SP      Notes
-    ---------------------------------------------------------------------------------------
-    Admin consented perms         50      50      Weighted by RiskLevel per permission
-    Non-admin consented perms     10      10      Weighted by RiskLevel per permission
-    Multi-tenant                  10      -       Applications only
-    Third-party SP                -       20      SP only
-    Privileged roles              -       20      SP only
-    Password credentials          10      10      App: 2pts/credential + 3pts if >180 days
-                                                  SP:  4pts/credential + 3pts if >180 days
-    Key credentials               7       7       App: 1pt/cred        + 2pts if >365 days
-                                                  SP:  3pts/cred       + 2pts if >365 days
-    Federated credentials         3       3       App: 1pt/cred
-                                                  SP:  2pts/cred
-    ---------------------------------------------------------------------------------------
-    Total                         90      120
-
     .Functionality
     #Internal
     #>
     return [PSCustomObject]@{
-        RiskLevelWeights = @{
+        PermissionRiskLevelWeights = @{
             Critical = 50
             High = 15
             Medium = 5
@@ -780,7 +760,7 @@ function Get-SeverityWeights {
             High = 35
             Medium = 15
             Low = 5
-            Description = "Credential base points scale by the highest risk level permission on the app/SP."
+            Description = "Credential base points dynamically scale by the highest risk level permission on the app/SP."
         }
 
         # Discount applied to credential base points.
@@ -792,10 +772,18 @@ function Get-SeverityWeights {
             Description = "Multiplier applied to credential and base points by credential type. Passwords hold the highest risk, then certificates, and federated creds with the least."
         }
 
-        CredentialLifetimeTiers = @(
+        PasswordCredentialLifetimeTiers = @(
             @{ MinDays = 730; Points = 5 }  # 2+ years
             @{ MinDays = 365; Points = 3 }  # 1 - 2 years
             @{ MinDays = 180; Points = 2 }  # 6 months - 1 year
+                                            # <= 180 days is valid, no bonus points
+        )
+
+        KeyCredentialLifetimeTiers = @(
+            @{ MinDays = 1095; Points = 5 } # 3+ years
+            @{ MinDays = 730;  Points = 3 } # 2 - 3 years
+            @{ MinDays = 365;  Points = 2 } # 1 - 2 years
+                                            # <= 365 days is valid, no bonus points
         )
 
         CredentialVolume = @{
@@ -928,7 +916,7 @@ function Set-SeverityScore {
         $PrivilegedRoles = @()
     )
     try {
-        $Weights = Get-SeverityWeights
+        $Weights = Get-SeverityScoreWeights
 
         $Score = 0
         $ScoreBreakdown = @{}
@@ -993,7 +981,7 @@ function Set-SeverityScore {
             $Score += $ThirdPartyServicePrincipalPoints
 
             $ScoreBreakdown.ThirdPartyServicePrincipal = [PSCustomObject]@{
-                IsThirdPartyServicePrincipal = $IsThirdPartyServicePrincipal
+                IsThirdPartyServicePrincipal = $true
                 TotalPoints = $ThirdPartyServicePrincipalPoints
             }
         }
@@ -1017,7 +1005,7 @@ function Set-SeverityScore {
         $PasswordScore = Set-CredentialScore `
             -AccessKeys $AllPasswordCredentials `
             -BasePointsPerCredential $PasswordBasePoints `
-            -LifetimeTiers $Weights.CredentialLifetimeTiers `
+            -LifetimeTiers $Weights.PasswordCredentialLifetimeTiers `
             -CheckLifetime
 
         $Score += $PasswordScore.TotalPoints
@@ -1033,7 +1021,7 @@ function Set-SeverityScore {
         $KeyScore = Set-CredentialScore `
             -AccessKeys $AllKeyCredentials `
             -BasePointsPerCredential $KeyBasePoints `
-            -LifetimeTiers $Weights.CredentialLifetimeTiers `
+            -LifetimeTiers $Weights.KeyCredentialLifetimeTiers `
             -CheckLifetime
 
         $Score += $KeyScore.TotalPoints
