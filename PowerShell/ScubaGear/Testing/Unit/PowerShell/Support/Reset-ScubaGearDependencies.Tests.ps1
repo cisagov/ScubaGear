@@ -27,8 +27,8 @@ InModuleScope 'Support' {
             Mock Get-InstalledModule { return $null }
 
             # Mock OPA functions to prevent actual download/installation
-            Mock Install-OPAforSCuBA { }
-            Mock Get-ExeHash { return "AABBCCDD" }
+            Mock Install-OPAforSCuBA -ModuleName Support { }
+            Mock Get-ExeHash -ModuleName Support { return "AABBCCDD" }
         }
 
         Context "WhatIf mode testing (safe execution)" {
@@ -175,7 +175,7 @@ InModuleScope 'Support' {
                     return $true
                 }
                 # Hash matches the expected hash
-                Mock Get-ExeHash { return "AABBCCDD" }
+                Mock Get-ExeHash -ModuleName Support { return "AABBCCDD" }
                 Mock Get-FileHash { return [PSCustomObject]@{ Hash = "AABBCCDD" } }
 
                 $result = Reset-ScubaGearDependencies -Scope CurrentUser -WhatIf
@@ -203,7 +203,7 @@ InModuleScope 'Support' {
                     return $true
                 }
                 # Hash does NOT match
-                Mock Get-ExeHash { return "AABBCCDD" }
+                Mock Get-ExeHash -ModuleName Support { return "AABBCCDD" }
                 Mock Get-FileHash { return [PSCustomObject]@{ Hash = "DIFFERENTHASH" } }
 
                 $result = Reset-ScubaGearDependencies -Scope CurrentUser -WhatIf
@@ -257,7 +257,7 @@ InModuleScope 'Support' {
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $true
                 }
-                Mock Get-ExeHash { return "AABBCCDD" }
+                Mock Get-ExeHash -ModuleName Support { return "AABBCCDD" }
                 Mock Get-FileHash { return [PSCustomObject]@{ Hash = "AABBCCDD" } }
 
                 $result = Reset-ScubaGearDependencies -Scope CurrentUser -WhatIf
