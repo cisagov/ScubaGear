@@ -35,7 +35,7 @@ InModuleScope 'Support' {
             It "Should analyze missing modules without installing them" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -57,7 +57,7 @@ InModuleScope 'Support' {
                 # This test verifies the function loads and checks version properly
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -68,7 +68,7 @@ InModuleScope 'Support' {
             It "Should return proper object structure" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -91,7 +91,7 @@ InModuleScope 'Support' {
             It "Should identify all required modules for installation" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -110,7 +110,7 @@ InModuleScope 'Support' {
             It "Should accept valid Scope values" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -122,7 +122,7 @@ InModuleScope 'Support' {
             It "Should work with WhatIf parameter" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -135,7 +135,7 @@ InModuleScope 'Support' {
         Context "OPA checks" {
             It "Should identify missing OPA for installation" {
                 Mock Get-Module {
-                    param($Name, $ListAvailable, $ErrorAction)
+                    param($Name)
                     $module = [PSCustomObject]@{
                         Name        = $Name
                         Version     = [version]'9.9.9'
@@ -145,7 +145,7 @@ InModuleScope 'Support' {
                 }
                 # OPA executable does not exist
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -160,7 +160,7 @@ InModuleScope 'Support' {
 
             It "Should mark OPA as up to date when executable exists and hash matches" {
                 Mock Get-Module {
-                    param($Name, $ListAvailable, $ErrorAction)
+                    param($Name)
                     $module = [PSCustomObject]@{
                         Name       = $Name
                         Version    = [version]'9.9.9'
@@ -170,7 +170,7 @@ InModuleScope 'Support' {
                 }
                 # OPA executable exists
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $true
                 }
@@ -188,7 +188,7 @@ InModuleScope 'Support' {
 
             It "Should mark OPA for update when executable exists but hash does not match" {
                 Mock Get-Module {
-                    param($Name, $ListAvailable, $ErrorAction)
+                    param($Name)
                     $module = [PSCustomObject]@{
                         Name       = $Name
                         Version    = [version]'9.9.9'
@@ -198,7 +198,7 @@ InModuleScope 'Support' {
                 }
                 # OPA executable exists
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $true
                 }
@@ -217,7 +217,7 @@ InModuleScope 'Support' {
             It "Should count OPA as an action needed when OPA is missing" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
@@ -245,7 +245,7 @@ InModuleScope 'Support' {
 
             It "Should not call Install-OPAforSCuBA when OPA is up to date" {
                 Mock Get-Module {
-                    param($Name, $ListAvailable, $ErrorAction)
+                    param($Name)
                     return [PSCustomObject]@{
                         Name       = $Name
                         Version    = [version]'9.9.9'
@@ -253,7 +253,7 @@ InModuleScope 'Support' {
                     }
                 }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $true
                 }
@@ -269,7 +269,7 @@ InModuleScope 'Support' {
             It "Should include OPA expected version and executable name in result info" {
                 Mock Get-Module { return $null }
                 Mock Test-Path {
-                    param($Path, $PathType)
+                    param($Path)
                     if ($Path -like '*RequiredVersions.ps1') { return $true }
                     return $false
                 }
