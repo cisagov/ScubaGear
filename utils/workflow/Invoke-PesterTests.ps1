@@ -52,5 +52,4 @@ function Invoke-PesterTests {
     if ($null -eq $result) {
         throw "The Pester tests failed to run."
     }
-
 }
