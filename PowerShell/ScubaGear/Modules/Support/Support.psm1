@@ -2066,6 +2066,7 @@ function Update-ScubaGearFromGitHub {
 
 Export-ModuleMember -Function @(
     'Copy-SCuBABaselineDocument',
+    'Get-ExeHash',
     'Install-OPAforSCuBA',
     'Initialize-SCuBA',
     'Copy-SCuBASampleReport',
