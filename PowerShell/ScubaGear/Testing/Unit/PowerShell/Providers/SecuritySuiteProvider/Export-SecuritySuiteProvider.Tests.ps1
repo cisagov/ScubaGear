@@ -38,7 +38,7 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-HostedContentFilterPolicy" {
+                            "Get-HostedConnectionFilterPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -141,6 +141,9 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             Mock -ModuleName ExportSecuritySuiteProvider Get-AtpPolicyForO365 {}
             function Get-MgBetaUser {}
             Mock -ModuleName ExportSecuritySuiteProvider Get-MgBetaUser {}
+
+            function Write-ScubaLog {}
+            Mock -ModuleName ExportSecuritySuiteProvider Write-ScubaLog {}
 
             function Test-SCuBAValidProviderJson {
                 param (
