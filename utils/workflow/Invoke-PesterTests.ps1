@@ -52,4 +52,22 @@ function Invoke-PesterTests {
     if ($null -eq $result) {
         throw "The Pester tests failed to run."
     }
+
+    # Temporary CI diagnostics: print each failing test's location and assertion message.
+    # This block can be removed once root cause is identified.
+    if ($result.FailedCount -gt 0) {
+        foreach ($failedTest in $result.Failed) {
+            Write-Error "FAILED TEST: $($failedTest.ExpandedPath)"
+            if ($null -ne $failedTest.ErrorRecord -and $null -ne $failedTest.ErrorRecord.Exception) {
+                Write-Error "ASSERTION: $($failedTest.ErrorRecord.Exception.Message)"
+            }
+            elseif ($null -ne $failedTest.ErrorRecord) {
+                Write-Error "ASSERTION: $($failedTest.ErrorRecord)"
+            }
+            else {
+                Write-Error "ASSERTION: <No error details provided by Pester object>"
+            }
+        }
+        exit 1
+    }
 }
