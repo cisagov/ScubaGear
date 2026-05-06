@@ -139,6 +139,8 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             Mock -ModuleName ExportSecuritySuiteProvider Get-SafeAttachmentPolicy {}
             function Get-AtpPolicyForO365 {throw 'this will be mocked'}
             Mock -ModuleName ExportSecuritySuiteProvider Get-AtpPolicyForO365 {}
+            function Get-DlpCompliancePolicy {}
+            Mock -ModuleName ExportSecuritySuiteProvider Get-DlpCompliancePolicy {}
             function Get-MgBetaUser {}
             Mock -ModuleName ExportSecuritySuiteProvider Get-MgBetaUser {}
 
