@@ -305,10 +305,18 @@ img {
     border-left: none;
 }
 
-.expandable_wrapper span {
+.expandable_wrapper .sort-btn span {
     cursor: pointer;
     color: var(--header-color);
     text-decoration:underline;
+}
+
+.cell-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5em;
+    height: 100%;
 }
 
 .caps_table, .riskyApps_table, .riskyThirdPartySPs_table {
@@ -545,7 +553,8 @@ a.control_group:active {
 }
 
 .view-details-button {
-    margin: 1rem;
+    margin: 0;
+    align-self: flex-start;
 }
 
 .kv-advanced {
@@ -652,14 +661,6 @@ a.control_group:active {
     font-weight: 600;
     color: var(--header-color);
     margin-right: 2px;
-}
-
-.risk-chip,
-.severity-score-value,
-.sort-btn {
-    text-decoration: none;
-    color: inherit;
-    cursor: default;
 }
 
 .sort-btn {

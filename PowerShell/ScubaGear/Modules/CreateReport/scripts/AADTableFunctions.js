@@ -585,7 +585,11 @@ const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) =
                 const scoreBreakdown = data[rowIndex]["ScoreBreakdown"] ?? null;
 
                 const ul = renderSummaryList(col.name, items, scoreBreakdown);
-                if (ul) td.appendChild(ul);
+
+                const cellWrapper = document.createElement("div");
+                cellWrapper.className = "cell-content-wrapper";
+
+                if (ul) cellWrapper.appendChild(ul);
 
                 const btn = document.createElement("button");
                 btn.type = "button";
@@ -594,6 +598,9 @@ const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) =
                 btn.addEventListener("click", () => {
                     let dataType = "";
                     if (col.name === "Permissions") dataType = "Permissions";
+                    // Exclude "FederatedCredentials" column because it doesn't have active/expired credentials
+                    // like key/password credentials. Since "FederatedCredentials" isn't assigned dataType,
+                    // it's treated as a generic list in the modal popup.
                     if (col.name === "KeyCredentials" || col.name === "PasswordCredentials") dataType = "Credentials";
                     if (col.name === "PrivilegedRoles") dataType = "PrivilegedRoles";
 
@@ -602,7 +609,8 @@ const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) =
                     openDetailsModal(title, node);
                 });
 
-                td.appendChild(btn);
+                cellWrapper.appendChild(btn);
+                td.appendChild(cellWrapper);
             }
             else {
                 td.appendChild(renderKeyValueList(items));
