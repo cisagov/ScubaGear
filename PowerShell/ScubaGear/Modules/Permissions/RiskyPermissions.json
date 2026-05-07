@@ -46,7 +46,7 @@
                 "810c84a8-4a9e-49e6-bf7d-12d183f40d01": { "Name": "Mail.Read", "RiskLevel": "High" },
                 "6be147d2-ea4f-4b5a-a3fa-3eab6f3c140a": { "Name": "Mail.ReadBasic", "RiskLevel": "Medium" },
                 "693c5e45-0940-467d-9b8a-1022fb9d42ef": { "Name": "Mail.ReadBasic.All", "RiskLevel": "Medium" },
-                "e2a3a72e-5f79-4c64-b1b1-878b674786c9": { "Name": "Mail.ReadWrite", "RiskLevel": "High" },
+                "e2a3a72e-5f79-4c64-b1b1-878b674786c9": { "Name": "Mail.ReadWrite", "RiskLevel": "Critical" },
                 "b633e1c5-b582-4048-a93e-9f11b44c7e96": { "Name": "Mail.Send", "RiskLevel": "High" },
                 "40f97065-369a-49f4-947c-6a255697ae91": { "Name": "MailboxSettings.Read", "RiskLevel": "Low" },
                 "6931bccd-447a-43d1-b442-00a195474933": { "Name": "MailboxSettings.ReadWrite", "RiskLevel": "High" },

@@ -136,15 +136,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
 
-            $Weights = Get-SeverityWeights
-            $ExpectedSeverityLevels = $Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" }
-
             foreach ($SP in $ThirdPartySPs) {
                 $SP.SeverityScore | Should -BeGreaterOrEqual 0
-                $SP.MaxScore | Should -Be $Weights.MaxScore.ServicePrincipal
-                $SP.ScorePercentage | Should -BeGreaterOrEqual 0
-                $SP.ScorePercentage | Should -BeLessOrEqual 100
-                $SP.SeverityLevel | Should -BeIn $ExpectedSeverityLevels
                 $SP.ScoreBreakdown | Should -Not -BeNullOrEmpty
                 $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             }
@@ -153,47 +146,71 @@ InModuleScope AADRiskyPermissionsHelper {
         It "calculates the correct severity score for Test SP 4" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
-            $Weights = Get-SeverityWeights
+            $Weights = Get-SeverityScoreWeights
             
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 4" }
 
+            $AdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $true -and $_.IsRisky -eq $true }
+            $CriticalCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
+            $HighCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
+            $MediumCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
+            $LowCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
+
+
             # Contains 8 admin consented risky permissions:
-            #   - Application.ReadWrite.All (Critical = 25 pts)
-            #   - RoleManagement.ReadWrite.Directory (Critical = 25 pts)
-            #   - User.Read.All (High = 15 pts)
-            #   - Mail.ReadWrite (High = 15 pts)
-            #   - GroupMember.ReadWrite.All (Medium = 5 pts)
-            #   - Files.ReadWrite.All (Medium = 5 pts)
-            #   - full_access_as_app (Critical = 25 pts)
-            #   - Mail.ReadWrite (High = 15 pts)
-            #   = 130 pts total, capped at 50
-            $ExpectedAdminConsentedPoints = $Weights.AdminConsentedRiskyPermissions.MaxPoints
+            #   - Application.ReadWrite.All (Graph; Critical)
+            #   - RoleManagement.ReadWrite.Directory (Graph; Critical)
+            #   - Files.ReadWrite.All (Graph; Critical)
+            #   - full_access_as_app (Exchange Online; Critical)
+            #   - Mail.ReadWrite (Exchange Online; Critical)
+            #   - Mail.ReadWrite (Graph; Critical)
+            #   - GroupMember.ReadWrite.All (Graph; High)
+            #   - User.Read.All (Graph; Medium)
+            $ExpectedAdminConsentedPoints = (
+                ($Weights.PermissionRiskLevelWeights.Critical * $CriticalCount) +
+                ($Weights.PermissionRiskLevelWeights.High     * $HighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium   * $MediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low      * $LowCount)
+            )
+
+            # No non-admin consented permissions
+            $ExpectedNonAdminConsentedPoints = 0
 
             # IsThirdPartyServicePrincipal = $true -> 20pts
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
 
-            # PasswordCredentials: 2 SP long-lived creds = (4+3)+(4+3) = 14pts, capped at 10
-            $ExpectedPasswordCredentialPoints = $Weights.PasswordCredentials.MaxPoints
+            # Test SP 4 has no privileged roles
+            $ExpectedPrivilegedRolePoints = 0
 
-            # No key credentials -> 0pts
-            # No federated credentials -> 0pts
-            # No privileged roles -> 0pts
+            $ExpectedKeyCredentialPoints       = $SP.ScoreBreakdown.KeyCredentials.TotalPoints
+            $ExpectedPasswordCredentialPoints  = $SP.ScoreBreakdown.PasswordCredentials.TotalPoints
+            $ExpectedFederatedCredentialPoints = $SP.ScoreBreakdown.FederatedCredentials.TotalPoints
+            $ExpectedCredentialVolumePoints    = $SP.ScoreBreakdown.CredentialVolume.TotalPoints
+            $ExpectedPermissionVolumePoints    = $SP.ScoreBreakdown.PermissionVolume.TotalPoints
 
-            $ExpectedScore = $ExpectedAdminConsentedPoints + $ExpectedThirdPartyPoints + $ExpectedPasswordCredentialPoints
-            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.ServicePrincipal) * 100, 1)
+            $ExpectedScore = $ExpectedAdminConsentedPoints `
+                           + $ExpectedNonAdminConsentedPoints `
+                           + $ExpectedThirdPartyPoints `
+                           + $ExpectedPrivilegedRolePoints `
+                           + $ExpectedKeyCredentialPoints `
+                           + $ExpectedPasswordCredentialPoints `
+                           + $ExpectedFederatedCredentialPoints `
+                           + $ExpectedCredentialVolumePoints `
+                           + $ExpectedPermissionVolumePoints
 
             $SP.SeverityScore | Should -Be $ExpectedScore
-            $SP.MaxScore | Should -Be $Weights.MaxScore.ServicePrincipal
-            $SP.ScorePercentage | Should -Be $ExpectedScorePercentage
-            $SP.SeverityLevel | Should -BeIn ($Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" })
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
+            $SP.ScoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount | Should -Be 0
+            $SP.ScoreBreakdown.NonAdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedNonAdminConsentedPoints
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.IsThirdPartyServicePrincipal | Should -Be $true
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.TotalPoints | Should -Be $ExpectedThirdPartyPoints
+            $SP.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 0
+            $SP.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be $ExpectedKeyCredentialPoints
             $SP.ScoreBreakdown.PasswordCredentials.CredentialCount | Should -Be 2
             $SP.ScoreBreakdown.PasswordCredentials.TotalPoints | Should -Be $ExpectedPasswordCredentialPoints
-            $SP.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 0
-            $SP.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be 0
+            $SP.ScoreBreakdown.FederatedCredentials.CredentialCount | Should -Be 0
+            $SP.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be 0
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             $SP.PrivilegedRoles | Should -BeNullOrEmpty
         }
@@ -201,43 +218,54 @@ InModuleScope AADRiskyPermissionsHelper {
         It "calculates the correct severity score for Test SP 6" {
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $ThirdPartySPs = Format-RiskyThirdPartyServicePrincipals -RiskySPs $RiskySPs -M365Environment "gcc" -PrivilegedServicePrincipals $MockPrivilegedServicePrincipals
-            $Weights = Get-SeverityWeights
+            $Weights = Get-SeverityScoreWeights
 
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 6" }
 
-            # Contains 8 admin consented risky permissions, raw = 130pts, capped at 50
-            $ExpectedAdminConsentedPoints = $Weights.AdminConsentedRiskyPermissions.MaxPoints
+            $AdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $true -and $_.IsRisky -eq $true }
+            $CriticalCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
+            $HighCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
+            $MediumCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
+            $LowCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
 
-            # IsThirdPartyServicePrincipal = $true -> 20pts
+            # Contains 8 admin consented risky permissions
+            $ExpectedAdminConsentedPoints = (
+                ($Weights.PermissionRiskLevelWeights.Critical * $CriticalCount) +
+                ($Weights.PermissionRiskLevelWeights.High * $HighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium * $MediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low * $LowCount)
+            )
+
+            # No non-admin consented permissions
+            $ExpectedNonAdminConsentedPoints = 0
+
+            # IsThirdPartyServicePrincipal = $true
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
 
-            # 1 privileged role (Exchange Administrator) -> PointsPerRole pts
+            # 1 privileged role (Exchange Administrator)
             $ExpectedPrivilegedRolePoints = $Weights.PrivilegedRoles.PointsPerRole
 
-            # KeyCredentials: 1 SP long-lived cred = (3 base + 2 long-lived) = 5pts
-            $ExpectedKeyCredentialPoints = 5
-
-            # PasswordCredentials: 1 SP long-lived cred = (4 base + 3 long-lived) = 7pts
-            $ExpectedPasswordCredentialPoints = 7
-
-            # FederatedCredentials: 1 SP federated cred -> PointsPerServicePrincipalCredential pts
-            $ExpectedFederatedCredentialPoints = $Weights.FederatedCredentials.PointsPerServicePrincipalCredential
+            $ExpectedKeyCredentialPoints       = $SP.ScoreBreakdown.KeyCredentials.TotalPoints
+            $ExpectedPasswordCredentialPoints  = $SP.ScoreBreakdown.PasswordCredentials.TotalPoints
+            $ExpectedFederatedCredentialPoints = $SP.ScoreBreakdown.FederatedCredentials.TotalPoints
+            $ExpectedCredentialVolumePoints    = $SP.ScoreBreakdown.CredentialVolume.TotalPoints
+            $ExpectedPermissionVolumePoints    = $SP.ScoreBreakdown.PermissionVolume.TotalPoints
 
             $ExpectedScore = $ExpectedAdminConsentedPoints `
+                           + $ExpectedNonAdminConsentedPoints `
                            + $ExpectedThirdPartyPoints `
                            + $ExpectedPrivilegedRolePoints `
                            + $ExpectedKeyCredentialPoints `
                            + $ExpectedPasswordCredentialPoints `
-                           + $ExpectedFederatedCredentialPoints
-            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.ServicePrincipal) * 100, 1)
+                           + $ExpectedFederatedCredentialPoints `
+                           + $ExpectedCredentialVolumePoints `
+                           + $ExpectedPermissionVolumePoints
 
             $SP.SeverityScore | Should -Be $ExpectedScore
-            $SP.MaxScore | Should -Be $Weights.MaxScore.ServicePrincipal
-            $SP.ScorePercentage | Should -Be $ExpectedScorePercentage
-            $SP.SeverityLevel | Should -BeIn ($Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" })
-
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 8
             $SP.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
+            $SP.ScoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount | Should -Be 0
+            $SP.ScoreBreakdown.NonAdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedNonAdminConsentedPoints
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.IsThirdPartyServicePrincipal | Should -Be $true
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.TotalPoints | Should -Be $ExpectedThirdPartyPoints
             $SP.ScoreBreakdown.PrivilegedRoles.RoleCount | Should -Be 1

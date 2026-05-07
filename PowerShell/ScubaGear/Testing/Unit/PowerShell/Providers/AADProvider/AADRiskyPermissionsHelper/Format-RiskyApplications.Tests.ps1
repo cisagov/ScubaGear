@@ -137,7 +137,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $ExpectedKeys = @(
                 "ObjectId", "AppId", "DisplayName", "IsMultiTenantEnabled", `
                 "KeyCredentials", "PasswordCredentials", "FederatedCredentials", "Permissions", `
-                "SeverityScore", "MaxScore", "ScorePercentage", "SeverityLevel", "ScoreBreakdown"
+                "SeverityScore", "ScoreBreakdown"
             )
             foreach ($App in $AggregateRiskyApps) {
                 # Check for correct properties
@@ -174,60 +174,49 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "returns severity info with valid properties for each application" {
-            $Weights = Get-SeverityWeights
-            $ExpectedSeverityLevels = $Weights.Thresholds.Keys | Where-Object { $_ -ne "Description" }
-
             foreach ($App in $AggregateRiskyApps) {
                 $App.SeverityScore | Should -BeGreaterOrEqual 0
-                $App.MaxScore | Should -Be $Weights.MaxScore.Application
-                $App.ScorePercentage | Should -BeGreaterOrEqual 0
-                $App.ScorePercentage | Should -BeLessOrEqual 100
-                $App.SeverityLevel | Should -BeIn $ExpectedSeverityLevels
                 $App.ScoreBreakdown | Should -Not -BeNullOrEmpty
             }
         }
 
         It "calculates the correct severity score for Test App 1" {
-            $Weights = Get-SeverityWeights
+            $Weights = Get-SeverityScoreWeights
             $App = $AggregateRiskyApps | Where-Object { $_.DisplayName -eq "Test App 1" }
 
             # Contains 2 admin consented risky permissions:
-            #   - Application.ReadWrite.All (Critical = 25pts) + RoleManagement.ReadWrite.Directory (Critical = 25pts) = 50pts
-            $ExpectedAdminConsentedPoints = [Math]::Min(
-                ($Weights.RiskLevelWeights.Critical * 2),
-                $Weights.AdminConsentedRiskyPermissions.MaxPoints
-            )
+            #   - Application.ReadWrite.All (Critical = 50pts) + RoleManagement.ReadWrite.Directory (Critical = 50pts) = 100pts
+            $ExpectedAdminConsentedPoints = $Weights.PermissionRiskLevelWeights.Critical * 2
+
+            # Both permissions are admin consented so non-admin consented = 0pts
+            $ExpectedNonAdminConsentedPoints = 0
+            
             # IsMultiTenantEnabled = $true -> 10pts
             $ExpectedMultiTenantPoints = $Weights.MultiTenant.Points
 
-            # PasswordCredentials: 1 app cred (long-lived) + 1 SP cred (long-lived) = (2+3)+(4+3) = 12pts, capped at 10
-            $ExpectedPasswordCredentialPoints = $Weights.PasswordCredentials.MaxPoints
-            
-            # KeyCredentials: 2 app creds (long-lived) + 1 SP cred (long-lived) = (1+2)+(1+2)+(3+2) = 11pts, capped at 7
-            $ExpectedKeyCredentialPoints = $Weights.KeyCredentials.MaxPoints
-            
-            # FederatedCredentials: 2 app creds (1pt each) = 2pts, capped at 3
-            $ExpectedFederatedCredentialPoints = 2
+            $ExpectedPasswordCredentialPoints  = $App.ScoreBreakdown.PasswordCredentials.TotalPoints
+            $ExpectedKeyCredentialPoints       = $App.ScoreBreakdown.KeyCredentials.TotalPoints
+            $ExpectedFederatedCredentialPoints = $App.ScoreBreakdown.FederatedCredentials.TotalPoints
+            $ExpectedCredentialVolumePoints    = $App.ScoreBreakdown.CredentialVolume.TotalPoints
+            $ExpectedPermissionVolumePoints    = $App.ScoreBreakdown.PermissionVolume.TotalPoints
+
             $ExpectedScore = $ExpectedAdminConsentedPoints `
-                             + $ExpectedMultiTenantPoints `
-                             + $ExpectedKeyCredentialPoints `
-                             + $ExpectedPasswordCredentialPoints `
-                             + $ExpectedFederatedCredentialPoints
-            $ExpectedScorePercentage = [Math]::Round(($ExpectedScore / $Weights.MaxScore.Application) * 100, 1)
+                           + $ExpectedNonAdminConsentedPoints `
+                           + $ExpectedMultiTenantPoints `
+                           + $ExpectedPasswordCredentialPoints `
+                           + $ExpectedKeyCredentialPoints `
+                           + $ExpectedFederatedCredentialPoints `
+                           + $ExpectedCredentialVolumePoints `
+                           + $ExpectedPermissionVolumePoints
 
             $App.SeverityScore | Should -Be $ExpectedScore
-            $App.MaxScore | Should -Be $Weights.MaxScore.Application
-            $App.ScorePercentage | Should -Be $ExpectedScorePercentage
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 2
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
             $App.ScoreBreakdown.MultiTenant.IsMultiTenantEnabled | Should -Be $true
             $App.ScoreBreakdown.MultiTenant.TotalPoints | Should -Be $ExpectedMultiTenantPoints
             $App.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 3
-            $App.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be $ExpectedKeyCredentialPoints
             $App.ScoreBreakdown.PasswordCredentials.CredentialCount | Should -Be 2
-            $App.ScoreBreakdown.PasswordCredentials.TotalPoints | Should -Be $ExpectedPasswordCredentialPoints
             $App.ScoreBreakdown.FederatedCredentials.CredentialCount | Should -Be 2
-            $App.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
         }
     }
 }

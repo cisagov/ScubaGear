@@ -907,9 +907,9 @@ function Set-CredentialScore {
                 }
             }
         }
-    }
 
-    $CredentialPoints += $CurrentCredentialPoints
+        $CredentialPoints += $CurrentCredentialPoints
+    }
 
     return @{
         CredentialCount = $CredentialCount
