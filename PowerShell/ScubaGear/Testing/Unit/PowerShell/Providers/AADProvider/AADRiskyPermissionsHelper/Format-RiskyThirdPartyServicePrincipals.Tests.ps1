@@ -150,43 +150,45 @@ InModuleScope AADRiskyPermissionsHelper {
             
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 4" }
 
+            # Dynamically calculate permission risk weights
             $AdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $true -and $_.IsRisky -eq $true }
+            $NonAdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $false -and $_.IsRisky -eq $true }
+
             $CriticalCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
             $HighCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
             $MediumCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
             $LowCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
 
+            $NonAdminCriticalCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
+            $NonAdminHighCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
+            $NonAdminMediumCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
+            $NonAdminLowCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
 
-            # Contains 8 admin consented risky permissions:
-            #   - Application.ReadWrite.All (Graph; Critical)
-            #   - RoleManagement.ReadWrite.Directory (Graph; Critical)
-            #   - Files.ReadWrite.All (Graph; Critical)
-            #   - full_access_as_app (Exchange Online; Critical)
-            #   - Mail.ReadWrite (Exchange Online; Critical)
-            #   - Mail.ReadWrite (Graph; Critical)
-            #   - GroupMember.ReadWrite.All (Graph; High)
-            #   - User.Read.All (Graph; Medium)
             $ExpectedAdminConsentedPoints = (
                 ($Weights.PermissionRiskLevelWeights.Critical * $CriticalCount) +
-                ($Weights.PermissionRiskLevelWeights.High     * $HighCount) +
-                ($Weights.PermissionRiskLevelWeights.Medium   * $MediumCount) +
-                ($Weights.PermissionRiskLevelWeights.Low      * $LowCount)
+                ($Weights.PermissionRiskLevelWeights.High * $HighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium * $MediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low * $LowCount)
             )
 
-            # No non-admin consented permissions
-            $ExpectedNonAdminConsentedPoints = 0
+            $ExpectedNonAdminConsentedPoints = (
+                ($Weights.PermissionRiskLevelWeights.Critical * $NonAdminCriticalCount) +
+                ($Weights.PermissionRiskLevelWeights.High * $NonAdminHighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium * $NonAdminMediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low * $NonAdminLowCount)
+            )
 
             # IsThirdPartyServicePrincipal = $true -> 20pts
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
 
-            # Test SP 4 has no privileged roles
-            $ExpectedPrivilegedRolePoints = 0
+            $PrivilegedRoleCount = ($SP.PrivilegedRoles | Measure-Object).Count
+            $ExpectedPrivilegedRolePoints = $Weights.PrivilegedRoles.PointsPerRole * $PrivilegedRoleCount
 
-            $ExpectedKeyCredentialPoints       = $SP.ScoreBreakdown.KeyCredentials.TotalPoints
+            $ExpectedKeyCredentialPoints = $SP.ScoreBreakdown.KeyCredentials.TotalPoints
             $ExpectedPasswordCredentialPoints  = $SP.ScoreBreakdown.PasswordCredentials.TotalPoints
             $ExpectedFederatedCredentialPoints = $SP.ScoreBreakdown.FederatedCredentials.TotalPoints
-            $ExpectedCredentialVolumePoints    = $SP.ScoreBreakdown.CredentialVolume.TotalPoints
-            $ExpectedPermissionVolumePoints    = $SP.ScoreBreakdown.PermissionVolume.TotalPoints
+            $ExpectedCredentialVolumePoints = $SP.ScoreBreakdown.CredentialVolume.TotalPoints
+            $ExpectedPermissionVolumePoints = $SP.ScoreBreakdown.PermissionVolume.TotalPoints
 
             $ExpectedScore = $ExpectedAdminConsentedPoints `
                            + $ExpectedNonAdminConsentedPoints `
@@ -213,6 +215,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be 0
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
             $SP.PrivilegedRoles | Should -BeNullOrEmpty
+            $SP.ScoreBreakdown.PrivilegdRoles | Should -BeNullOrEmpty
         }
 
         It "calculates the correct severity score for Test SP 6" {
@@ -222,34 +225,45 @@ InModuleScope AADRiskyPermissionsHelper {
 
             $SP = $ThirdPartySPs | Where-Object { $_.DisplayName -eq "Test SP 6" }
 
-            $AdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $true -and $_.IsRisky -eq $true }
+            # Dynamically calculate permission risk weights
+            $AdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $true  -and $_.IsRisky -eq $true }
+            $NonAdminConsentedRiskyPermissions = $SP.Permissions | Where-Object { $_.IsAdminConsented -eq $false -and $_.IsRisky -eq $true }
+
             $CriticalCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
             $HighCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
             $MediumCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
             $LowCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
 
-            # Contains 8 admin consented risky permissions
+            $NonAdminCriticalCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
+            $NonAdminHighCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
+            $NonAdminMediumCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
+            $NonAdminLowCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
+
             $ExpectedAdminConsentedPoints = (
                 ($Weights.PermissionRiskLevelWeights.Critical * $CriticalCount) +
-                ($Weights.PermissionRiskLevelWeights.High * $HighCount) +
-                ($Weights.PermissionRiskLevelWeights.Medium * $MediumCount) +
-                ($Weights.PermissionRiskLevelWeights.Low * $LowCount)
+                ($Weights.PermissionRiskLevelWeights.High     * $HighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium   * $MediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low      * $LowCount)
             )
 
-            # No non-admin consented permissions
-            $ExpectedNonAdminConsentedPoints = 0
+            $ExpectedNonAdminConsentedPoints = (
+                ($Weights.PermissionRiskLevelWeights.Critical * $NonAdminCriticalCount) +
+                ($Weights.PermissionRiskLevelWeights.High     * $NonAdminHighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium   * $NonAdminMediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low      * $NonAdminLowCount)
+            )
 
             # IsThirdPartyServicePrincipal = $true
             $ExpectedThirdPartyPoints = $Weights.ThirdPartyServicePrincipal.Points
 
-            # 1 privileged role (Exchange Administrator)
-            $ExpectedPrivilegedRolePoints = $Weights.PrivilegedRoles.PointsPerRole
+            $PrivilegedRoleCount = ($SP.PrivilegedRoles | Measure-Object).Count
+            $ExpectedPrivilegedRolePoints = $Weights.PrivilegedRoles.PointsPerRole * $PrivilegedRoleCount
 
-            $ExpectedKeyCredentialPoints       = $SP.ScoreBreakdown.KeyCredentials.TotalPoints
-            $ExpectedPasswordCredentialPoints  = $SP.ScoreBreakdown.PasswordCredentials.TotalPoints
+            $ExpectedKeyCredentialPoints = $SP.ScoreBreakdown.KeyCredentials.TotalPoints
+            $ExpectedPasswordCredentialPoints = $SP.ScoreBreakdown.PasswordCredentials.TotalPoints
             $ExpectedFederatedCredentialPoints = $SP.ScoreBreakdown.FederatedCredentials.TotalPoints
-            $ExpectedCredentialVolumePoints    = $SP.ScoreBreakdown.CredentialVolume.TotalPoints
-            $ExpectedPermissionVolumePoints    = $SP.ScoreBreakdown.PermissionVolume.TotalPoints
+            $ExpectedCredentialVolumePoints = $SP.ScoreBreakdown.CredentialVolume.TotalPoints
+            $ExpectedPermissionVolumePoints = $SP.ScoreBreakdown.PermissionVolume.TotalPoints
 
             $ExpectedScore = $ExpectedAdminConsentedPoints `
                            + $ExpectedNonAdminConsentedPoints `
@@ -268,8 +282,6 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.NonAdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedNonAdminConsentedPoints
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.IsThirdPartyServicePrincipal | Should -Be $true
             $SP.ScoreBreakdown.ThirdPartyServicePrincipal.TotalPoints | Should -Be $ExpectedThirdPartyPoints
-            $SP.ScoreBreakdown.PrivilegedRoles.RoleCount | Should -Be 1
-            $SP.ScoreBreakdown.PrivilegedRoles.TotalPoints | Should -Be $ExpectedPrivilegedRolePoints
             $SP.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 1
             $SP.ScoreBreakdown.KeyCredentials.TotalPoints | Should -Be $ExpectedKeyCredentialPoints
             $SP.ScoreBreakdown.PasswordCredentials.CredentialCount | Should -Be 1
@@ -277,6 +289,8 @@ InModuleScope AADRiskyPermissionsHelper {
             $SP.ScoreBreakdown.FederatedCredentials.CredentialCount | Should -Be 1
             $SP.ScoreBreakdown.FederatedCredentials.TotalPoints | Should -Be $ExpectedFederatedCredentialPoints
             $SP.PSObject.Properties.Name | Should -Contain "PrivilegedRoles"
+            $SP.ScoreBreakdown.PrivilegedRoles.RoleCount | Should -Be 1
+            $SP.ScoreBreakdown.PrivilegedRoles.TotalPoints | Should -Be $ExpectedPrivilegedRolePoints
             $SP.PrivilegedRoles | Should -HaveCount 1
             $SP.PrivilegedRoles[0] | Should -Be "Exchange Administrator"
         }

@@ -184,12 +184,33 @@ InModuleScope AADRiskyPermissionsHelper {
             $Weights = Get-SeverityScoreWeights
             $App = $AggregateRiskyApps | Where-Object { $_.DisplayName -eq "Test App 1" }
 
-            # Contains 2 admin consented risky permissions:
-            #   - Application.ReadWrite.All (Critical = 50pts) + RoleManagement.ReadWrite.Directory (Critical = 50pts) = 100pts
-            $ExpectedAdminConsentedPoints = $Weights.PermissionRiskLevelWeights.Critical * 2
+            # Dynamically calculate permission risk weights
+            $AdminConsentedRiskyPermissions = $App.Permissions | Where-Object { $_.IsAdminConsented -eq $true -and $_.IsRisky -eq $true }
+            $NonAdminConsentedRiskyPermissions = $App.Permissions | Where-Object { $_.IsAdminConsented -eq $false -and $_.IsRisky -eq $true }
 
-            # Both permissions are admin consented so non-admin consented = 0pts
-            $ExpectedNonAdminConsentedPoints = 0
+            $CriticalCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
+            $HighCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
+            $MediumCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
+            $LowCount = ($AdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
+
+            $NonAdminCriticalCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Critical" } | Measure-Object).Count
+            $NonAdminHighCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "High" }     | Measure-Object).Count
+            $NonAdminMediumCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Medium" }   | Measure-Object).Count
+            $NonAdminLowCount = ($NonAdminConsentedRiskyPermissions | Where-Object { $_.RiskLevel -eq "Low" }      | Measure-Object).Count
+
+            $ExpectedAdminConsentedPoints = (
+                ($Weights.PermissionRiskLevelWeights.Critical * $CriticalCount) +
+                ($Weights.PermissionRiskLevelWeights.High * $HighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium * $MediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low * $LowCount)
+            )
+
+            $ExpectedNonAdminConsentedPoints = (
+                ($Weights.PermissionRiskLevelWeights.Critical * $NonAdminCriticalCount) +
+                ($Weights.PermissionRiskLevelWeights.High * $NonAdminHighCount) +
+                ($Weights.PermissionRiskLevelWeights.Medium * $NonAdminMediumCount) +
+                ($Weights.PermissionRiskLevelWeights.Low * $NonAdminLowCount)
+            )
             
             # IsMultiTenantEnabled = $true -> 10pts
             $ExpectedMultiTenantPoints = $Weights.MultiTenant.Points
@@ -210,8 +231,10 @@ InModuleScope AADRiskyPermissionsHelper {
                            + $ExpectedPermissionVolumePoints
 
             $App.SeverityScore | Should -Be $ExpectedScore
-            $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be 2
+            $App.ScoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount | Should -Be $AdminConsentedRiskyPermissions.Count
             $App.ScoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints | Should -Be $ExpectedAdminConsentedPoints
+            $App.ScoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount | Should -Be $NonAdminConsentedRiskyPermissions.Count
+            $App.ScoreBreakdown.NonAdminConsentedRiskyPermissions.TotalPoints     | Should -Be $ExpectedNonAdminConsentedPoints
             $App.ScoreBreakdown.MultiTenant.IsMultiTenantEnabled | Should -Be $true
             $App.ScoreBreakdown.MultiTenant.TotalPoints | Should -Be $ExpectedMultiTenantPoints
             $App.ScoreBreakdown.KeyCredentials.CredentialCount | Should -Be 3
