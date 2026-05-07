@@ -34,8 +34,6 @@ jobs:
     name: Build and Draft Release
     runs-on: windows-latest
     environment: Development
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       id-token: write
       contents: write
