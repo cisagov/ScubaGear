@@ -119,15 +119,26 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.5.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.5.1v1 Non-Compliant case - Unified Audit logging is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: false
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.1v1 Compliant case - Unified Audit logging is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: true
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked (manual policy)
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
