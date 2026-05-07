@@ -64,6 +64,7 @@ This section provides policies that reduce security risks related to legacy auth
 Legacy authentication SHALL be blocked.
 
 <!--Policy: MS.AAD.1.1v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ The security risk of allowing legacy authentication protocols is they do not support MFA. Blocking legacy protocols reduces the impact of user credential theft.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
@@ -116,6 +117,7 @@ This section provides policies that reduce security risks related to potentially
 Users detected as high risk SHALL be blocked.
 
 <!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 - _Note:_ Users identified as high risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
@@ -139,6 +141,7 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
 Sign-ins detected as high risk SHALL be blocked.
 
 <!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ This prevents compromised accounts from accessing the tenant.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
@@ -212,6 +215,7 @@ The phishing-resistant methods **Microsoft Entra ID certificate-based authentica
 If on-premises PIV authentication and federation to Microsoft Entra ID is used, [enforce PIV logon via Microsoft Active Directory group policy](https://www.idmanagement.gov/implement/scl-windows/).
 
 <!--Policy: MS.AAD.3.1v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ Weaker forms of MFA do not protect against sophisticated phishing attacks. By enforcing methods resistant to phishing, those risks are minimized.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-2(1), IA-2(2), IA-5c, IA-5g, IA-2(8)
@@ -224,6 +228,7 @@ If on-premises PIV authentication and federation to Microsoft Entra ID is used, 
 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.
 
 <!--Policy: MS.AAD.3.2v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ This is a stopgap security policy to help protect the tenant if phishing-resistant MFA has not been enforced. This policy requires MFA enforcement, thus reducing single-form authentication risk.
 - _Last modified:_ June 2023
 - _Note:_ If a conditional access policy enforces phishing-resistant MFA, then this policy is not necessary. This policy does not dictate the specific MFA method.
@@ -275,6 +280,7 @@ The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SH
 Phishing-resistant MFA SHALL be required for highly privileged roles.
 
 <!--Policy: MS.AAD.3.6v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
 - _Last modified:_ June 2023
 - _Note:_ Refer to the Highly Privileged Roles section at the top of this document for a reference list of roles considered highly privileged.
@@ -290,6 +296,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 Managed devices SHOULD be required for authentication.
 
 <!--Policy: MS.AAD.3.7v1; Criticality: SHOULD -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ The security risk of an adversary authenticating to the tenant from their own device is reduced by requiring a managed device to authenticate. Managed devices are under the provisioning and control of the agency. [OMB-22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf) states, "When authorizing users to access resources, agencies must consider at least one device-level signal alongside identity information about the authenticated user."
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-20b, IA-3
@@ -315,6 +322,7 @@ Managed Devices SHOULD be required to register MFA.
 Device code authentication SHOULD be blocked.
 
 <!--Policy: MS.AAD.3.9v1; Criticality: SHOULD -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ The device code authentication flow has been abused to compromise user accounts via phishing. Since most organizations using M365 don't need device code authentication, blocking it mitigates the risk.
 - _Last modified:_ February 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
@@ -649,6 +657,7 @@ Privileged users SHALL be provisioned cloud-only accounts separate from an on-pr
 Permanent active role assignments SHALL NOT be allowed for highly privileged roles.
 
 <!--Policy: MS.AAD.7.4v1; Criticality: SHALL -->
+<!--ExclusionType: RoleExclusions-->
 - _Rationale:_ Instead of giving users permanent assignments to privileged roles, provisioning access just in time lessens exposure if those accounts become compromised. In Microsoft Entra ID PIM or an alternative PAM system, just in time access can be provisioned by assigning users to roles as eligible instead of perpetually active.
 - _Last modified:_ June 2023
 - _Note:_ Exceptions to this policy are:
