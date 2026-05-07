@@ -138,7 +138,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked (manual policy)
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
