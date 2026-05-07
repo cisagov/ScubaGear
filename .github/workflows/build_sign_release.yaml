@@ -34,6 +34,8 @@ jobs:
     name: Build and Draft Release
     runs-on: windows-latest
     environment: Development
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     permissions:
       id-token: write
       contents: write
@@ -44,7 +46,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Install Azure Signing Tool
@@ -54,7 +56,7 @@ jobs:
           Install-AzureSignTool
       # OpenID Connect (OIDC) login to Azure Public Cloud with AzPowershell
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -77,7 +79,7 @@ jobs:
             -ReleaseVersion ${{ inputs.version }} `
             -RootFolderName "repo"
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         id: create-release
         with:
           draft: true
@@ -88,7 +90,7 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release
-        uses: dsaltares/fetch-gh-release-asset@1.1.1
+        uses: step-security/fetch-gh-release-asset@v1.1.2
         if: ${{ inputs.runQuickCheck }}
         with:
           version: ${{ steps.create-release.outputs.id}}
