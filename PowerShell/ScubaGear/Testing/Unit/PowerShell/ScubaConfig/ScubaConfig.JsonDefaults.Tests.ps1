@@ -76,7 +76,7 @@ Describe "JSON-based Configuration System" {
         It "Should read ProductNames default from JSON" {
             $productNames = [ScubaConfig]::ScubaDefault('DefaultProductNames')
             $productNames | Should -Contain "aad"
-            $productNames | Should -Contain "defender"
+            $productNames | Should -Contain "securitysuite"
             $productNames | Should -Contain "exo"
         }
 
@@ -122,7 +122,7 @@ Describe "JSON-based Configuration System" {
         It "Should return supported products list" {
             $supportedProducts = [ScubaConfig]::GetSupportedProducts()
             $supportedProducts | Should -Contain "aad"
-            $supportedProducts | Should -Contain "defender"
+            $supportedProducts | Should -Contain "securitysuite"
         }
 
         It "Should return supported environments list" {

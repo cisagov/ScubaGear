@@ -3,7 +3,7 @@
     "version": "1.7.0",
     "_comment": "ScubaGear default configuration values",
     "lastUpdated": "2026-01-12",
-    "compatibleOpaVersions": ["1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0","1.7.1","1.8.0","1.9.0","1.10.1","1.11.1","1.12.2","1.13.2","1.14.1"]
+    "compatibleOpaVersions": ["1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0","1.7.1","1.8.0","1.9.0","1.10.1","1.11.1","1.12.2","1.13.2","1.14.1","1.15.2"]
   },
   "defaults": {
     "OPAPath": "~/.scubagear/Tools",
@@ -12,8 +12,8 @@
       "MacOS": "opa_darwin_amd64",
       "Linux": "opa_linux_amd64_static"
     },
-    "ProductNames": ["aad", "defender", "exo", "sharepoint", "teams"],
-    "AllProductNames": ["aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams"],
+    "ProductNames": ["aad", "securitysuite", "exo", "sharepoint", "teams"],
+    "AllProductNames": ["aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"],
     "M365Environment": "commercial",
     "LogIn": true,
     "DisconnectOnExit": false,
@@ -26,7 +26,7 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-    "OPAVersion": "1.15.2",
+    "OPAVersion": "1.16.1",
     "PreferredDnsResolvers": [],
     "SkipDoH": false
   },
@@ -84,7 +84,7 @@
     "errorCategories": [
       {
         "name": "Property errors",
-        "pattern": "^Required\\s+property\\s+|^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
+        "pattern": "^Required\\s+property\\s+|^Property\\s+'(?!Aad|SecuritySuite|Exo|AnnotatePolicy|OmitPolicy)",
         "actionMessageRef": "default"
       },
       {
@@ -93,8 +93,8 @@
         "actionMessageRef": "default"
       },
       {
-        "name": "Defender exclusion errors",
-        "pattern": "^(Defender|DEFENDER)\\s+exclusion\\s+error:|^Property\\s+'Defender'",
+        "name": "Security Suite exclusion errors",
+        "pattern": "^(SecuritySuite|SECURITYSUITE)\\s+exclusion\\s+error:|^Property\\s+'SecuritySuite'",
         "actionMessageRef": "default"
       },
       {
@@ -126,7 +126,7 @@
     "warningCategories": [
       {
         "name": "Property warnings",
-        "pattern": "^Unknown\\s+property\\s+|^Property\\s+'(?!Aad|Defender|Exo|AnnotatePolicy|OmitPolicy)",
+        "pattern": "^Unknown\\s+property\\s+|^Property\\s+'(?!Aad|SecuritySuite|Exo|AnnotatePolicy|OmitPolicy)",
         "actionMessageRef": "default"
       },
       {
@@ -135,8 +135,8 @@
         "actionMessageRef": "default"
       },
       {
-        "name": "Defender exclusion warnings",
-        "pattern": "^(Defender|DEFENDER)\\s+exclusion\\s+(warning|info):|^Property\\s+'Defender'",
+        "name": "Security Suite exclusion warnings",
+        "pattern": "^(SecuritySuite|SECURITYSUITE)\\s+exclusion\\s+(warning|info):|^Property\\s+'SecuritySuite'",
         "actionMessageRef": "default"
       },
       {

@@ -195,7 +195,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, with wildcard CLI override"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
 
@@ -206,7 +206,7 @@ InModuleScope Orchestrator {
 
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams')
+                        ProductNames=@('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi')
                         M365Environment='commercial'
                         Login=$true
                         OutPath=$PSScriptRoot
@@ -224,7 +224,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, reflects all products"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerplatform', 'securitysuite', 'sharepoint', 'teams', 'powerbi') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
     }

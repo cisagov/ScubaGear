@@ -585,6 +585,38 @@ function UpdateCachedConditionalAccessPolicyByName{
   }
 }
 
+function UpdateCachedHighRiskBlockPoliciesToLowRisk {
+  <#
+    .SYNOPSIS
+      For cached CA policy test scenarios, force high-risk block policies to low-risk.
+    .PARAMETER OutputFolder
+      The folder containing the original and updated provider settings exports.
+  #>
+  [CmdletBinding()]
+  param (
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
+
+  foreach ($Policy in $ConditionalAccessPolicies) {
+      if (
+          $Policy.Conditions.Users.IncludeUsers -contains "All" -and
+          $Policy.Conditions.Applications.IncludeApplications -contains "All" -and
+          $Policy.GrantControls.BuiltInControls -contains "block" -and
+          $Policy.Conditions.UserRiskLevels -contains "high"
+      ) {
+          $Policy.Conditions.UserRiskLevels = @("low")
+      }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
 function LoadTestResults() {
   <#
     .SYNOPSIS
