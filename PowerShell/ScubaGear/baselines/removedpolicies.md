@@ -283,7 +283,7 @@ At a minimum, the following alerts SHALL be enabled:
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.1v1.
 
 #### MS.EXO.16.2v1
-Unified Audit logging SHALL be enabled.
+The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.2v1.
 
