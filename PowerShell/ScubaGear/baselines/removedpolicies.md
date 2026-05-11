@@ -361,7 +361,7 @@ A DLP solution SHALL be enabled and SHOULD offer services comparable to the nati
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.2v1.
 
-#### MS.EXO.6.2v1
+#### MS.TEAMS.6.2v1
 The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency. At a minimum, sharing credit card numbers, taxpayer identification numbers (TINs), and Social Security numbers (SSNs) via email SHALL be restricted.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
