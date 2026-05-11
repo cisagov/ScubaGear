@@ -186,7 +186,7 @@ Disallowed file types SHALL be determined and enforced.
 #### MS.EXO.9.4v1
 If a third-party filtering solution is used, it SHOULD offer services comparable to Microsoft Defender's Common Attachment Filter.
 - _Removal date:_ April 2026
-- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Secuirty Suite Baseline consolidation efforts. 
+- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Security Suite Baseline consolidation efforts. 
 
 #### MS.EXO.9.5v1
 At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).
