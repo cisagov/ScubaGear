@@ -161,7 +161,7 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 #### MS.EXO.8.3v1
 The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 - _Removal date:_ April 2026
-- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Secuirty Suite Baseline consolidation efforts. 
+- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Security Suite Baseline consolidation efforts. 
 
 #### MS.EXO.8.4v1
 At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.- _Removal date:_ April 2026
