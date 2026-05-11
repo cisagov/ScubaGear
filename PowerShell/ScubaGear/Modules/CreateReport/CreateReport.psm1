@@ -569,7 +569,7 @@ function New-Report {
             $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
 
             # Create a section header for the service principal information
-            $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
+            $privilegedServicePrincipalsTableHTML = "<h2>Service Principals with Privileged Roles</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
         }
         else {
