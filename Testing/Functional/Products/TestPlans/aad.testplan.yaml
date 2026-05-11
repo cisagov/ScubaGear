@@ -1057,7 +1057,7 @@ TestPlan:
                     IsRoot: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.6.1v1 Compliant case - root domains with null PasswordValidityPeriodInDays (Post-Oct 2021 behavior) 
+      - TestDescription: MS.AAD.6.1v1 Compliant case - root domains with null PasswordValidityPeriodInDays (Post-Oct 2021 behavior)
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
