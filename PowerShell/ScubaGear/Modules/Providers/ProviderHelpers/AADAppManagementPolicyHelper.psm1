@@ -33,32 +33,32 @@ function Get-AppManagementPolicies {
             $AppliesToResponse = (Invoke-GraphDirectly `
                 -Commandlet "Get-MgBetaPolicyAppManagementPolicyApplyTo" `
                 -M365Environment $M365Environment `
-                -Id $Policy.Id).Value
+                -Id $Policy.id).Value
 
             if ($AppliesToResponse) {
                 $AppliesTo = @($AppliesToResponse | ForEach-Object {
                     [ordered]@{
-                        "Id"          = $_.Id
-                        "AppId"       = $_.AppId
-                        "DisplayName" = $_.DisplayName
+                        "Id"          = $_.id
+                        "AppId"       = $_.appId
+                        "DisplayName" = $_.displayName
                     }
                 })
             }
         }
         catch {
-            Write-Warning "Failed to retrieve appliesTo for app management policy '$($Policy.DisplayName)' ($($Policy.Id)): $($_.Exception.Message)"
+            Write-Warning "Failed to retrieve appliesTo for app management policy '$($Policy.displayName)' ($($Policy.id)): $($_.Exception.Message)"
         }
 
         # Embed the AppliesTo list into each restriction entry so Rego can correlate
         # excluded apps by restrictionType (e.g. passwordLifetime, passwordAddition,
         # asymmetricKeyLifetime) without needing to join at the policy level.
-        $PasswordCredentials = @($Policy.Restrictions.PasswordCredentials | Where-Object { $null -ne $_ } | ForEach-Object {
+        $PasswordCredentials = @($Policy.restrictions.passwordCredentials | Where-Object { $null -ne $_ } | ForEach-Object {
             $entry = [ordered]@{}
             $_.PSObject.Properties | Where-Object { $null -ne $_.Name } | ForEach-Object { $entry[$_.Name] = $_.Value }
             $entry["AppliesTo"] = $AppliesTo
             $entry
         })
-        $KeyCredentials = @($Policy.Restrictions.KeyCredentials | Where-Object { $null -ne $_ } | ForEach-Object {
+        $KeyCredentials = @($Policy.restrictions.keyCredentials | Where-Object { $null -ne $_ } | ForEach-Object {
             $entry = [ordered]@{}
             $_.PSObject.Properties | Where-Object { $null -ne $_.Name } | ForEach-Object { $entry[$_.Name] = $_.Value }
             $entry["AppliesTo"] = $AppliesTo
@@ -66,9 +66,9 @@ function Get-AppManagementPolicies {
         })
 
         $RestrictedApps.Add([ordered]@{
-            "Id"          = $Policy.Id
-            "DisplayName" = $Policy.DisplayName
-            "IsEnabled"   = $Policy.IsEnabled
+            "Id"          = $Policy.id
+            "DisplayName" = $Policy.displayName
+            "IsEnabled"   = $Policy.isEnabled
             "Restrictions" = [ordered]@{
                 "PasswordCredentials" = $PasswordCredentials
                 "KeyCredentials"      = $KeyCredentials
