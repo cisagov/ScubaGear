@@ -168,7 +168,7 @@ At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. 
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
 
-#### MS.EXO.9.1v1
+#### MS.EXO.9.1v2
 Emails SHALL be filtered by attachment file types.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.1v1.
