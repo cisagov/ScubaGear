@@ -852,13 +852,19 @@ function Set-CredentialScore {
         [Object[]]
         $AccessKeys,
 
+        # Base points per credential are derived by:
+        # - multiplying the credential context weight (determined by the app/SP's highest risk level permission)
+        # - credential type discount (password credentials have no discount, key credentials have a 50% discount,
+        #   and federated credentials have a 75% discount)
         [ValidateNotNullOrEmpty()]
         [int]
         $BasePointsPerCredential,
 
+        # Bonus poinst are added to a credential's score if the credential's duration exceeds a certain time-bound threshold.
         [array]
         $LifetimeTiers,
 
+        # Only check lifetime for password/key credentials, not required for federated credentials.
         [switch]
         $CheckLifetime
     )
