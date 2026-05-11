@@ -989,6 +989,11 @@ function Test-ScubaGearVersion {
     )
 
     try {
+        if ($env:DEV_SKIP_DEPENDENCY_CHECK) {
+            Write-Warning "Skipping dependency checks due to DEV_SKIP_DEPENDENCY_CHECK environment variable."
+            return
+        }
+
         $modules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
         $latest = Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction SilentlyContinue
 

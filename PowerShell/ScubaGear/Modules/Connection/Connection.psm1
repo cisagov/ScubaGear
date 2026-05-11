@@ -45,8 +45,8 @@
 
    $ProdAuthFailed = @()
 
-   # Track whether Power BI license was found (defaults to true; set to false if SKU check fails)
-   $PBILicenseFound = $true
+   # Track whether Power BI license was found
+   $PBILicenseFound = $false
    $PBILicenseReason = ""
 
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
@@ -180,98 +180,80 @@
                    # Check for Power BI license before attempting token acquisition.
                    # This prevents triggering a second consent/browser window for the
                    # Power BI API scope when the tenant has no PBI license at all.
-                   # Uses Invoke-MgGraphRequest instead of Get-MgBetaSubscribedSku to
-                   # avoid requiring the Beta Graph module to be loaded.
-                   $HasPBILicense = $true
-                   try {
-                       $SkuResponse = Invoke-MgGraphRequest -Method GET `
-                           -Uri "/beta/subscribedSkus" -ErrorAction Stop
-                       $SubscribedSkus = $SkuResponse.value
-                       if ($SubscribedSkus) {
-                           $AllPlans = $SubscribedSkus |
-                               Where-Object { $null -ne $_.servicePlans } |
-                               ForEach-Object { $_.servicePlans } |
-                               Where-Object { $_.provisioningStatus -eq "Success" }
-                           $PBIPlans = @($AllPlans |
-                               Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
-                           $HasPBILicense = ($PBIPlans.Count -gt 0)
-                           if ($HasPBILicense) {
-                               $PlanNames = ($PBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
-                               Write-Verbose "Power BI license found: $PlanNames"
-                           }
-                       }
-                   }
-                   catch {
-                       Write-Warning "Unable to check Power BI license via Graph. Proceeding with token acquisition. Error: $($_.Exception.Message)"
-                       $HasPBILicense = $true
-                   }
+                   $TenantHasPBILicense = $false
+                   $SubscribedSku = (Invoke-GraphDirectly -Commandlet Get-MgBetaSubscribedSku -M365Environment $M365Environment).Value
+                   $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+                   if ($ServicePlans) {
+                        $PBIServicePlans = $ServicePlans | Where-Object -Property ServicePlanName -Match -Value "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)"
+                        if ($PBIServicePlans) {
+                            $TenantHasPBILicense = $true
+                            $PlanNames = ($PBIServicePlans | ForEach-Object { $_.ServicePlanName } | Select-Object -Unique) -join ", "
+                            Write-Information "Power BI license found: $PlanNames" -InformationAction Continue
+                        }
+                  }
 
-                   if (-not $HasPBILicense) {
+                   if (-not $TenantHasPBILicense) {
                        Write-Warning "No Power BI or Fabric license found in the tenant."
                        $PBILicenseFound = $false
                        $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
                    }
                    else {
-                       $PBILicenseFound = $true
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
-                       # The Power BI Admin API requires the calling user to have a license.
-                       # Skip this check for service principal auth (SPs use tenant setting + security group).
+                       # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                           try {
-                               $UserLicenseResponse = Invoke-MgGraphRequest -Method GET `
-                                   -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
-                               $UserPlans = $UserLicenseResponse.value |
-                                   Where-Object { $null -ne $_.servicePlans } |
-                                   ForEach-Object { $_.servicePlans } |
-                                   Where-Object { $_.provisioningStatus -eq "Success" }
-                               $UserPBIPlans = @($UserPlans |
-                                   Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
-                               if ($UserPBIPlans.Count -eq 0) {
-                                   Write-Warning "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
-                                   $PBILicenseFound = $false
-                                   $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
-                               }
-                               else {
-                                   $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
-                                   Write-Verbose "User Power BI/Fabric license found: $UserPlanNames"
-                               }
-                           }
-                           catch {
-                               Write-Warning "Unable to check user Power BI license. Proceeding with token acquisition. Error: $($_.Exception.Message)"
-                           }
+                            $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                            $UserPlans = $UserLicenseResponse.value |
+                                Where-Object { $null -ne $_.servicePlans } |
+                                ForEach-Object { $_.servicePlans } |
+                                Where-Object { $_.provisioningStatus -eq "Success" }
+                            $UserPBIPlans = @($UserPlans |Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
+                            if ($UserPBIPlans.Count -eq 0) {
+                                Write-Warning "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+                                $PBILicenseFound = $false
+                                $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+                            }
+                            else {
+                                $PBILicenseFound = $true
+                                $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
+                                Write-Information "User Power BI/Fabric license found: $UserPlanNames" -InformationAction Continue
+                            }
+                       }
+                       # Skip this check for service principal auth (SPs use tenant setting + security group).
+                       else {
+                            $PBILicenseFound = $true
                        }
 
                        if ($PBILicenseFound) {
-                       # Acquire Power BI access token
-                       $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
-                       $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
-                           $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                               -Scope $PBIScope `
-                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                               -M365Environment $M365Environment
-                       }
-                       else {
-                           # Resolve tenant name if not already cached from a previous product
-                           if ([string]::IsNullOrEmpty($TenantName)) {
-                               $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                               $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                               $TenantName = $InitialDomain.Name
-                               $InitialDomainPrefix = $TenantName.split(".")[0]
-                           }
-                           # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
-                           # if PowerPlatform already signed in interactively this session.
-                           $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                           $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                               -Scope $PBIScope `
-                               -ClientId $PBIClientId `
-                               -Tenant $TenantName `
-                               -M365Environment $M365Environment `
-                               -LoginHint $LoginHint
-                       }
-                       Write-Verbose "Power BI token acquired successfully"
+                            # Acquire Power BI access token
+                            $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+                            $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+                            if ($ServicePrincipalParams.CertThumbprintParams) {
+                                $TokenData.PBIAccessToken = Get-MsalAccessToken `
+                                    -Scope $PBIScope `
+                                    -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                                    -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                                    -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                                    -M365Environment $M365Environment
+                            }
+                            else {
+                                # Resolve tenant name if not already cached from a previous product
+                                if ([string]::IsNullOrEmpty($TenantName)) {
+                                    $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                                    $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                                    $TenantName = $InitialDomain.Name
+                                    $InitialDomainPrefix = $TenantName.split(".")[0]
+                                }
+                                # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
+                                # if PowerPlatform already signed in interactively this session.
+                                $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+                                $TokenData.PBIAccessToken = Get-MsalAccessToken `
+                                    -Scope $PBIScope `
+                                    -ClientId $PBIClientId `
+                                    -Tenant $TenantName `
+                                    -M365Environment $M365Environment `
+                                    -LoginHint $LoginHint
+                            }
+                            Write-Verbose "Power BI token acquired successfully"
                        }
                    }
                }

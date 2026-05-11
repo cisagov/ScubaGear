@@ -557,21 +557,6 @@ function Invoke-SCuBA {
             $ScubaConfig.ProductNames = $Difference
         }
 
-        # If Power BI license was not found, remove powerbi from the product list entirely.
-        # This check runs after Connect-Tenant because the Graph connection (needed to query
-        # subscribed SKUs) is established during that step.
-        if (-not $ConnectionResult.PBILicenseFound -and $ScubaConfig.ProductNames -contains "powerbi") {
-            Write-Warning "Removing Power BI from assessment."
-            Write-ScubaLog -Message "Power BI license not found - removing from product list" -Level "Info" -Source "InvokeScuba"
-            $ScubaConfig.ProductNames = @($ScubaConfig.ProductNames | Where-Object { $_ -ne "powerbi" })
-            if ($ScubaConfig.ProductNames.Count -eq 0) {
-                Write-Warning "No products remaining after Power BI removal. Aborting."
-                Write-ScubaLog -Message "CRITICAL: No products remaining after Power BI license check - aborting execution" -Level "Error" -Source "InvokeScuba"
-                Stop-ScubaLogging
-                return
-            }
-        }
-
         # Capture module snapshot after authentication to log what modules were imported
         if ($Script:ScubaLoggingEnabled) {
             try {
@@ -883,6 +868,7 @@ function Invoke-ProviderList {
                             $PBIProviderParams = @{
                                 'AccessToken'       = $ConnectionResult.PBIAccessToken
                                 'BaseUrl'           = $ConnectionResult.PBIBaseUrl
+                                'LicenseFound'      = $ConnectionResult.PBILicenseFound
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
