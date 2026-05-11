@@ -221,7 +221,7 @@ User warnings, comparable to the user safety tips included with EOP, SHOULD be d
 #### MS.EXO.11.3v1
 The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.
 - _Removal date:_ April 2026
-- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Secuirty Suite Baseline consolidation efforts.
+- _Removal rationale:_ Removed "offer services comparable solution offered by Microsoft" policies in Security Suite Baseline consolidation efforts.
 
 #### MS.EXO.12.1v1
 IP allow lists SHOULD NOT be created.
