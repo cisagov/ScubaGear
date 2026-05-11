@@ -288,7 +288,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a security
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.4.2v1.
 
 #### MS.EXO.17.1v1
-URL comparison with a block-list SHOULD be enabled.
+Unified Audit logging SHALL be enabled.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.5.1v1.
 
