@@ -256,7 +256,7 @@ URL comparison with a block-list SHOULD be enabled.
 #### MS.EXO.15.2v1
 Direct download links SHOULD be scanned for malware.
 - _Removal date:_ April 2026
-- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.1v1.
+- _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.7.2v1.
 
 #### MS.EXO.15.3v1
 User click tracking SHOULD be enabled.
