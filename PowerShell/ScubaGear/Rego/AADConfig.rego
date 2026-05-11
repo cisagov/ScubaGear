@@ -1089,6 +1089,11 @@ RootDomains contains Domain if {
 RootDomainFor(Domain) := Root.Id if {
     some Root in RootDomains
     endswith(Domain.Id, Root.Id)
+    # When multiple root domains match (e.g., "sub.example.com" and "example.com" both match
+    # "sub.sub.example.com"), select the most specific one (longest Id). 
+    # Otherwise, an eval_conflict_error error will occur due to multiple matching root domains.
+    MaxLength := max({count(R.Id) | some R in RootDomains; endswith(Domain.Id, R.Id)})
+    count(Root.Id) == MaxLength
 }
 
 IsValid(Domain) := true if {
