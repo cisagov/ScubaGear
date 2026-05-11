@@ -366,7 +366,7 @@ The DLP solution SHALL protect personally identifiable information (PII) and sen
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.1v1.
 
-#### MS.EXO.7.1v1
+#### MS.TEAMS.7.1v1
 Attachments included with Teams messages SHOULD be scanned for malware.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.1.4v1.
