@@ -22,7 +22,7 @@ InModuleScope Orchestrator {
                     ProductNames = @('aad')
                     OPAPath = "./"
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName = "TestResults"
+                    OutRegoFileName = "RegoOutput"
                     OutReportName = "BaselineReports"
                     LogIn = $false
                 }

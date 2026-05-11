@@ -29,7 +29,7 @@ InModuleScope Orchestrator {
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName = "TestResults"
+                    OutRegoFileName = "RegoOutput"
                     OutReportName = "BaselineReports"
                     OPAPath = "."
                     LogIn = $false
@@ -90,7 +90,7 @@ InModuleScope Orchestrator {
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName = "TestResults"
+                    OutRegoFileName = "RegoOutput"
                     OutReportName = "BaselineReports"
                     OPAPath = "."
                     LogIn = $false

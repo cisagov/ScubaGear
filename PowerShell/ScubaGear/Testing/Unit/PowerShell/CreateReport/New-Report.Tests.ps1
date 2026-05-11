@@ -36,7 +36,7 @@ InModuleScope CreateReport {
                 'IndividualReportPath' = $IndividualReportPath
                 'OutPath'              = $TestOutPath
                 'OutProviderFileName'  = "ProviderSettingsExport"
-                'OutRegoFileName'      = "TestResults"
+                'OutRegoFileName'      = "RegoOutput"
                 'DarkMode'             = $false
             }
         }

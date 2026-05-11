@@ -972,7 +972,7 @@ function Invoke-RunRego {
     process {
         try {
             $ProdRegoFailed = @()
-            $TestResults = @()
+            $RegoOutput = @()
             $N = 0
             $Len = $ScubaConfig.ProductNames.Length
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -1009,7 +1009,7 @@ function Invoke-RunRego {
                 }
                 try {
                     $RetVal = Invoke-Rego @params
-                    $TestResults += $RetVal
+                    $RegoOutput += $RetVal
                     Write-ScubaLog -Message "Rego evaluation succeeded: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{ Product = $Product }
                 }
                 catch {
@@ -1027,9 +1027,9 @@ function Invoke-RunRego {
                 }
             }
 
-            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
-            $TestResultsJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
+            $RegoOutputJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
             $ProdRegoFailed
         }

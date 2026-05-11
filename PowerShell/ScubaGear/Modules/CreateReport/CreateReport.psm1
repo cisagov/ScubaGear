@@ -202,7 +202,7 @@ function New-Report {
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
-    $TestResults =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
+    $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
 
@@ -243,7 +243,7 @@ function New-Report {
 
         foreach ($Control in $BaselineGroup.Controls){
 
-            $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
+            $Test = $RegoOutput | Where-Object -Property PolicyId -eq $Control.Id
 
             # Generate indicator HTML for this control and track which types are used
             $IndicatorHtml = Get-IndicatorHtml -Indicators $Control.Indicators -BaselineName $BaselineName -ModuleVersion $SettingsExport.module_version
