@@ -1167,7 +1167,7 @@
             "https://learn.microsoft.com/en-us/graph/api/tenantappmanagementpolicy-get",
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicydefaultappmanagementpolicy?view=graph-powershell-beta"
         ],
-        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1 - Application Management Policy checks"
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
 
     {
@@ -1201,7 +1201,7 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAppManagementPolicy?view=graph-powershell-beta"
         ],
-        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1 - Application Management Policy checks"
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
 
     {
@@ -1235,7 +1235,7 @@
         "supportLinks": [
             "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.signins/get-mgbetapolicyappmanagementpolicyapplyto?view=graph-powershell-beta"
         ],
-        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1, MS.AAD.5.8v1 - Application Management Policy checks"
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
 
     {

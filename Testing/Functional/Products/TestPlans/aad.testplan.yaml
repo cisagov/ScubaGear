@@ -874,7 +874,7 @@ TestPlan:
                           MaxLifetime: P365D
                       KeyCredentials: []
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
       - TestDescription: MS.AAD.5.6v1 Non-Compliant case - Password lifetime too long (180 days)
         Preconditions:
           - Command: UpdateProviderExport
