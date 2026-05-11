@@ -356,7 +356,7 @@ Contact with Skype users SHALL be blocked.
 - _Removal date:_ August 2025
 - _Removal rationale:_ The option to restrict contact with Skype users found in policy MS.TEAMS.3.1v1 has been deprecated by Microsoft. All references, including the policy and its implementation steps, have been removed since the setting is no longer present.
 
-#### MS.EXO.6.1v1
+#### MS.TEAMS.6.1v1
 A DLP solution SHALL be enabled and SHOULD offer services comparable to the native DLP solution offered by Microsoft.
 - _Removal date:_ April 2026
 - _Removal rationale:_ Reworked into the new security suite baseline policy MS.SECURITYSUITE.3.2v1.
