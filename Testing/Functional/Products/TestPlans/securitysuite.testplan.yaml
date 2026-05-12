@@ -1,0 +1,193 @@
+ProductName: securitysuite
+TestPlan:
+  - PolicyId: MS.SECURITYSUITE.1.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.1.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.1.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.1.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.4v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.2.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.2.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.2.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.3.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.5v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.4.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.4.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.4.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.5.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.5.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.5.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.6.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.6.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.7.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.7.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.7.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.8.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.8.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.8.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.8.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false

@@ -351,6 +351,43 @@
     },
 
     {
+        "moduleCmdlet": "Get-MgBetaServicePrincipalAppRoleAssignedTo",
+        "apiResource": "/beta/servicePrincipals/{id}/appRoleAssignedTo",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Applications"
+        ],
+        "leastPermissions": [
+            "Application.Read.All"
+        ],
+        "higherPermissions": [
+            "Directory.Read.All",
+            "Directory.ReadWrite.All",
+            "AppRoleAssignment.ReadWrite.All",
+            "Application.ReadWrite.All",
+            "Application.ReadWrite.OwnedBy"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignedto?view=graph-rest-beta&tabs=http"
+        ],
+        "notes": "Used by AADHybridExchangeHelper to find tenant-owned service principals granted full_access_as_app on the Office 365 Exchange Online service principal."
+    },
+
+    {
         "moduleCmdlet": "Get-MgBetaApplication",
         "apiResource": "/beta/applications",
         "apiFilter": "",
@@ -1096,6 +1133,109 @@
         ],
         "notes": "",
         "oauthScope": ""
+    },
+
+    {
+        "moduleCmdlet": "Get-MgBetaPolicyDefaultAppManagementPolicy",
+        "apiResource": "/beta/policies/defaultAppManagementPolicy",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "Policy.Read.All"
+        ],
+        "higherPermissions": [
+            "Policy.Read.ApplicationConfiguration",
+            "Policy.ReadWrite.ApplicationConfiguration"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/graph/api/tenantappmanagementpolicy-get",
+            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicydefaultappmanagementpolicy?view=graph-powershell-beta"
+        ],
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
+    },
+
+    {
+        "moduleCmdlet": "Get-MgBetaPolicyAppManagementPolicy",
+        "apiResource": "/beta/policies/appManagementPolicies",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "Policy.Read.All"
+        ],
+        "higherPermissions": [
+            "Policy.Read.ApplicationConfiguration",
+            "Policy.ReadWrite.ApplicationConfiguration"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAppManagementPolicy?view=graph-powershell-beta"
+        ],
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
+    },
+
+    {
+        "moduleCmdlet": "Get-MgBetaPolicyAppManagementPolicyApplyTo",
+        "apiResource": "/beta/policies/appManagementPolicies/{id}/appliesTo",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "Microsoft.Graph.Identity.SignIns"
+        ],
+        "leastPermissions": [
+            "Policy.Read.All"
+        ],
+        "higherPermissions": [
+            "Policy.Read.ApplicationConfiguration",
+            "Policy.ReadWrite.ApplicationConfiguration"
+        ],
+        "spRolePermissions": [],
+        "scubaGearProduct": [
+            "aad"
+        ],
+        "supportedEnv": [
+            "commercial",
+            "gcc",
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.signins/get-mgbetapolicyappmanagementpolicyapplyto?view=graph-powershell-beta"
+        ],
+        "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
 
     {

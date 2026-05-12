@@ -149,13 +149,13 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "Defender", "AAD", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
+        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -268,7 +268,7 @@ function New-Report {
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
 
-                # Declare annotation fields at the top level. If they exist, these fields need to be included 
+                # Declare annotation fields at the top level. If they exist, these fields need to be included
                 # in the control object regardless if the control is omitted, incorrect, or normal
                 $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
                 $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
@@ -478,7 +478,7 @@ function New-Report {
     $IndicatorLegendItems = ""
     if ($UsedIndicatorTypes.Count -gt 0) {
         # Sort: BOD first (order 0), then rest alphabetically by name
-        $SortedTypes = $UsedIndicatorTypes.Keys | Sort-Object { 
+        $SortedTypes = $UsedIndicatorTypes.Keys | Sort-Object {
             $def = $IndicatorDefinitions[$_]
             if ($def.Order -eq 0) { "0" } else { $def.Name }
         }
@@ -642,7 +642,7 @@ function New-Report {
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
-    # Load JS files 
+    # Load JS files
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
     $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
     $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
@@ -776,7 +776,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
@@ -881,17 +881,17 @@ function Import-SecureBaseline{
                         # Look for badge lines between policy ID and criticality comment
                         for ($i = 1; $i -lt $MaxBadgeSearch; $i++) {
                             $BadgeLine = ([string]$MdLines[$LineNumber + $i]).Trim()
-                            
+
                             # Stop if we hit a comment line (criticality marker)
                             if ($BadgeLine -match "^<!--") {
                                 break
                             }
-                            
+
                             # Match badge pattern: [![Badge Name](image_url)](link_url)
                             if ($BadgeLine -match '\[!\[([^\]]+)\]\([^\)]+\)\]\(([^\)]+)\)') {
                                 $BadgeName = $Matches[1]
                                 $BadgeLink = $Matches[2]
-                                
+
                                 # Determine badge type based on name
                                 $BadgeType = switch -Regex ($BadgeName) {
                                     "BOD.25-01" { "bod" }
@@ -901,7 +901,7 @@ function Import-SecureBaseline{
                                     "Requires.Configuration" { "requires-config" }
                                     default { "other" }
                                 }
-                                
+
                                 $Indicators += @{
                                     "Name" = $BadgeName
                                     "Link" = $BadgeLink
