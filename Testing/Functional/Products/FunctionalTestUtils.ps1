@@ -619,7 +619,7 @@ function Get-ExpectedHeaderNames {
           return @("","Display Name","SeverityScore","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         "riskyThirdPartySPs_table" {
-          return @("","Display Name","SeverityScore","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","SeverityScore","PrivilegedRoles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
           return $null 
