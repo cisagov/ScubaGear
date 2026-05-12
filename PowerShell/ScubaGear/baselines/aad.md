@@ -843,14 +843,20 @@ User passwords SHALL NOT expire.
     $_.passwordValidityPeriodInDays -ne [int32]::MaxValue
   }
 
-  # Remediate a single specific domain
+  Write-Host $NonCompliantDomains | Format-List
+
+  # Remediate each non-compliant domain
   Invoke-MgGraphRequest -Method PATCH -Uri "https://graph.microsoft.com/v1.0/domains/example.com" `
     -Body @{ passwordValidityPeriodInDays = [int32]::MaxValue }
 
-  # Or remediate all domains
-  $NonCompliantDomains | ForEach-Object {
-    Invoke-MgGraphRequest -Method PATCH -Uri "https://graph.microsoft.com/v1.0/domains/$($_.id)" `
-      -Body @{ passwordValidityPeriodInDays = [int32]::MaxValue }
+  # Verify domain configurations
+  $AllDomains = (Invoke-MgGraphRequest -Method GET -Uri "https://graph.microsoft.com/v1.0/domains").value | Where-Object {
+    $_.isRoot -and $_.isVerified
+  }
+
+  Write-Host "All current domain password expiration policies"
+  foreach ($Domain in $AllDomains) {
+    Write-Host "Domain passwordValidityPeriodInDays: $($Domain.id) $($Domain.passwordValidityPeriodInDays)"
   }
   ```
 
