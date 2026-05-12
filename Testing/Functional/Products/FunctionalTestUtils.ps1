@@ -588,10 +588,10 @@ function UpdateCachedHighRiskBlockPoliciesToLowRisk {
   PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
 }
 
-function LoadTestResults() {
+function LoadRegoOutput() {
   <#
     .SYNOPSIS
-      Wrapper function to load the test results within the given folder.
+      Wrapper function to load the Rego output within the given folder.
     .PARAMETER OutputFolder
       The folder containing the outputs of a ScubaGear run.
   #>
@@ -602,8 +602,8 @@ function LoadTestResults() {
       [string]
       $OutputFolder
   )
-  $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
-  $IntermediateTestResults
+  $IntermediateRegoOutput = Get-Content "$OutputFolder/RegoOutput.json" -Raw | ConvertFrom-Json
+  $IntermediateRegoOutput
 }
 
 function Get-ExpectedHeaderNames {

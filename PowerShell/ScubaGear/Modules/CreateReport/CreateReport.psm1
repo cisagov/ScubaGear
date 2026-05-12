@@ -139,7 +139,7 @@ function Add-Annotation {
 function New-Report {
      <#
     .Description
-    This function creates the individual HTML/json reports using the TestResults.json.
+    This function creates the individual HTML/json reports using the RegoOutput.json.
     Output will be stored as HTML/json files in the InvidualReports folder in the OutPath Folder.
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
@@ -202,7 +202,7 @@ function New-Report {
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
-    $TestResults =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
+    $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
 
@@ -243,7 +243,7 @@ function New-Report {
 
         foreach ($Control in $BaselineGroup.Controls){
 
-            $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
+            $Test = $RegoOutput | Where-Object -Property PolicyId -eq $Control.Id
 
             # Generate indicator HTML for this control and track which types are used
             $IndicatorHtml = Get-IndicatorHtml -Indicators $Control.Indicators -BaselineName $BaselineName -ModuleVersion $SettingsExport.module_version

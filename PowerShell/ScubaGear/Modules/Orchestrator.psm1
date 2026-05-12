@@ -64,7 +64,7 @@ function Invoke-SCuBA {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "TestResults".
+    Defaults to "RegoOutput".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -948,7 +948,7 @@ function Invoke-RunRego {
     This function runs the RunRego module.
     Which runs the various rego files against the
     ProviderSettings.json using the specified OPA executable
-    Output will be stored as a TestResults.json in the OutPath Folder
+    Output will be stored as a RegoOutput.json in the OutPath Folder
     .Functionality
     Internal
     #>
@@ -972,7 +972,7 @@ function Invoke-RunRego {
     process {
         try {
             $ProdRegoFailed = @()
-            $TestResults = @()
+            $RegoOutput = @()
             $N = 0
             $Len = $ScubaConfig.ProductNames.Length
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -1009,7 +1009,7 @@ function Invoke-RunRego {
                 }
                 try {
                     $RetVal = Invoke-Rego @params
-                    $TestResults += $RetVal
+                    $RegoOutput += $RetVal
                     Write-ScubaLog -Message "Rego evaluation succeeded: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{ Product = $Product }
                 }
                 catch {
@@ -1027,9 +1027,9 @@ function Invoke-RunRego {
                 }
             }
 
-            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
-            $TestResultsJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
+            $RegoOutputJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
             $ProdRegoFailed
         }
@@ -1472,7 +1472,7 @@ function Invoke-ReportCreation {
     <#
     .Description
     This function runs the CreateReport Module
-    which creates an HTML report using the TestResults.json.
+    which creates an HTML report using the RegoOutput.json.
     Output will be stored as various HTML files in the OutPath Folder.
     The report Home page will be named BaselineReports.html
     .Functionality
@@ -1993,7 +1993,7 @@ function Invoke-SCuBACached {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "TestResults".
+    Defaults to "RegoOutput".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
