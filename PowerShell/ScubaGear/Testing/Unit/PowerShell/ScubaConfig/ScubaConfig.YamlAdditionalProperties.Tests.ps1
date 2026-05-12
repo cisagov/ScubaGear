@@ -112,7 +112,7 @@ M365Environment: commercial
 OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
-OutRegoFileName: TestResults
+OutRegoFileName: RegoOutput
 OutReportName: BaselineReports
 DisconnectOnExit: false
 SkipDoH: false
@@ -341,7 +341,7 @@ OPAPath: .
 OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
-OutRegoFileName: TestResults
+OutRegoFileName: RegoOutput
 OutReportName: BaselineReports
 DisconnectOnExit: false
 AppId: 12345678-1234-1234-1234-123456789012
