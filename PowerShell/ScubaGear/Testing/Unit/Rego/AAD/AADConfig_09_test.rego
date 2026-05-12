@@ -24,8 +24,9 @@ test_BlockRiskyAgentsCAP_Correct_V1 if {
                 [{"op": "add", "path": "M365Environment", "value": "commercial"},])
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/AgentIdRiskLevels", "value": "high"},
+                {"op": "add", "path": "Conditions/ClientApplications", "value": {} },
                 {"op": "add", "path": "Conditions/ClientApplications/IncludeAgentIdServicePrincipals", "value": ["All"] },
-                {"op": "replace", "path": "Conditions/ClientAppTypes", "value": ["all"] }])
+                {"op": "add", "path": "Conditions/ClientAppTypes", "value": ["all"] },])
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config as ScubaConf
