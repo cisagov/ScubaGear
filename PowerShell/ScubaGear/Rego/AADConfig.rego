@@ -1634,16 +1634,43 @@ AIAgents contains CAPolicy.DisplayName if {
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
 }
 
-# Pass if at least 1 policy meets all conditions
+default AAD_9_1_Not_Applicable := false
+
+# Returns true if the M365 Environment used by the tenant does not support AI Agents
+AAD_9_1_Not_Applicable := true if {
+    input.scuba_config.M365Environment in {"gcchigh", "dod"}
+}
+
+# First test is for N/A case
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": true
+} if {
+    PolicyId := "MS.AAD.9.1v1"
+    Reason := "This policy is not applicable to GCC High or DOD environments. See %v for more info"
+    AAD_9_1_Not_Applicable == true
+}
+
+# Pass if at least 1 policy meets all conditions & has correct
+# license.
 tests contains {
     "PolicyId": "MS.AAD.9.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": AIAgents,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(AIAgents, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetailsArrayLicenseWarningCap(AIAgents, DescriptionString),
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    Status := Count(AIAgents) > 0
+    Conditions := [
+        Count(Aad2P2Licenses) > 0,
+        Count(AIAgents) > 0
+    ]
+    AAD_9_1_Not_Applicable == false
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--

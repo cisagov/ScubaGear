@@ -1204,13 +1204,14 @@ This section provides policies that help reduce security risks related to the us
 
 ### Policies
 #### MS.AAD.9.1v1
-High risk AI agents SHALL be blocked.
+Risky AI agents SHALL be blocked.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.AAD.9.1v1; Criticality: SHALL -->
 - _Rationale:_ AI agents may access tenant resources using application permissiona and can perform actions autonomously. Blocking high-risk AI agents reduces the risk of unauthorized access and automated misuse of resources.
 - _Last modified:_ March 2026
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC) High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, AC-6, CM-7(4)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
@@ -1222,7 +1223,7 @@ High risk AI agents SHALL be blocked.
 
 ### License Requirements
 
-- N/A
+- Requires a Microsoft Entra ID P2 license
 
 ### Implementation
 
