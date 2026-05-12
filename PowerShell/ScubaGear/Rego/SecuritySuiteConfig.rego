@@ -1,6 +1,8 @@
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsArray
+import data.utils.report.ReportDetailsString
 
 
 ######################
@@ -181,13 +183,31 @@ tests contains {
 #
 # MS.SECURITYSUITE.4.1v1
 #--
+RequiredAlerts := {
+    "Suspicious email sending patterns detected",
+    "Suspicious connector activity",
+    "Suspicious Email Forwarding Activity",
+    "Messages have been delayed",
+    "Tenant restricted from sending unprovisioned email",
+    "Tenant restricted from sending email",
+    "A potentially malicious URL click was detected",
+}
+EnabledAlerts contains alert.Name if {
+    some alert in input.protection_alerts
+    alert.Name in RequiredAlerts
+    alert.Disabled == false
+}
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.4.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-ProtectionAlert"],
+    "ActualValue": MissingAlerts,
+    "ReportDetails": ReportDetailsString(Status, ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
+    "RequirementMet": Status
+} if {
+    MissingAlerts := RequiredAlerts - EnabledAlerts
+    ErrorMessage := "disabled alert(s):"
+    Status := count(MissingAlerts) == 0
 }
 #--
 
