@@ -10,6 +10,14 @@ import data.utils.report.NotCheckedDetails
 #
 # MS.SECURITYSUITE.1.1v1
 #--
+
+PoliciesBlockingClickToRun contains Policy.Name if {
+    some Policy in input.anti_malware_policies
+    Policy.EnableFileFilter == true
+    RequiredTypes := {"exe", "cmd", "vbe"}
+    count(intersection([RequiredTypes, Policy.FileTypes])) == count(RequiredTypes)
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.1v1",
     "Criticality": "Shall/Not-Implemented",
