@@ -2343,19 +2343,6 @@ function Invoke-SCuBACached {
                     Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "ScubaCached"
                 }
 
-                # If Power BI license was not found, remove powerbi from the product list
-                if (-not $ConnectionResult.PBILicenseFound -and $ProductNames -contains "powerbi") {
-                    Write-Warning "Removing Power BI from assessment."
-                    Write-ScubaLog -Message "Power BI license not found - removing from product list" -Level "Info" -Source "ScubaCached"
-                    $ProductNames = @($ProductNames | Where-Object { $_ -ne "powerbi" })
-                    if ($ProductNames.Count -eq 0) {
-                        Write-Warning "No products remaining after Power BI removal. Aborting."
-                        Write-ScubaLog -Message "CRITICAL: No products remaining after Power BI license check - aborting execution" -Level "Error" -Source "ScubaCached"
-                        Stop-ScubaLogging
-                        return
-                    }
-                }
-
                 # Capture module snapshot after authentication to see what modules were imported
                 if ($Script:ScubaLoggingEnabled) {
                     try {
