@@ -26,10 +26,6 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-MalwareFilterPolicy" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
                             "Get-AdminAuditLogConfig" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
