@@ -58,6 +58,8 @@ function Export-SecuritySuiteProvider {
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
     $HostedContentFilterPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
     $HostedContentFilterRules = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterRule"))
+    $AntiMalwarePolicy = ConvertTo-Json @$Tracker.TryCommand("Get-MalwareFilterPolicy")
+    $AntiMalwareRule = ConvertTo-Json @$Tracker.TryCommand("Get-MalwareFilterRule")
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
@@ -171,6 +173,8 @@ function Export-SecuritySuiteProvider {
     "defender_dlp_license": $DLPLicense,
     "hosted_content_filter_policies": $HostedContentFilterPolicies,
     "hosted_content_filter_rules": $HostedContentFilterRules,
+    "anti_malware_policies": $AntiMalwarePolicy,
+    "anti_malware_rules": $AntiMalwareRule,
     "securitysuite_successful_commands": $SuccessfulCommands,
     "securitysuite_unsuccessful_commands": $UnSuccessfulCommands,
 "@
