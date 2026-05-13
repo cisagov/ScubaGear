@@ -22,6 +22,14 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
+                            "Get-MalwareFilterRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-MalwareFilterPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             "Get-AdminAuditLogConfig" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
@@ -137,6 +145,10 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                 } }
             function Get-SafeAttachmentPolicy {}
             Mock -ModuleName ExportSecuritySuiteProvider Get-SafeAttachmentPolicy {}
+            function Get-MalwareFilterPolicy {}
+            Mock -ModuleName ExportSecuritySuiteProvider Get-MalwareFilterPolicy {}
+            function Get-MalwareFilterRule {}
+            Mock -ModuleName ExportSecuritySuiteProvider Get-MalwareFilterRule {}
             function Get-AtpPolicyForO365 {throw 'this will be mocked'}
             Mock -ModuleName ExportSecuritySuiteProvider Get-AtpPolicyForO365 {}
             function Get-MgBetaUser {}

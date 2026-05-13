@@ -15,7 +15,7 @@ PoliciesBlockingClickToRun contains Policy.Name if {
     some Policy in input.anti_malware_policies
     Policy.EnableFileFilter == true
     RequiredTypes := {"exe", "cmd", "vbe"}
-    count(intersection([RequiredTypes, Policy.FileTypes])) == count(RequiredTypes)
+    count(intersection({RequiredTypes, Policy.FileTypes})) == count(RequiredTypes)
 }
 
 tests contains {
