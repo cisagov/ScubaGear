@@ -465,6 +465,18 @@
         "RequirementMet":  true
     },
     {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.9.1v1",
+        "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  false
+    },
+    {
         "ActualValue":  true,
         "Commandlet":  [
                            "Get-AntiPhishPolicy"
