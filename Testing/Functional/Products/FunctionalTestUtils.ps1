@@ -616,10 +616,10 @@ function Get-ExpectedHeaderNames {
           return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
         }
         "riskyApps_table" {
-          return @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","SeverityScore","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         "riskyThirdPartySPs_table" {
-          return @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","SeverityScore","PrivilegedRoles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
           return $null 
