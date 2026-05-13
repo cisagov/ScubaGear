@@ -194,19 +194,20 @@ RequiredAlerts := {
 }
 EnabledAlerts contains alert.Name if {
     some alert in input.protection_alerts
-    alert.Name in RequiredAlerts
     alert.Disabled == false
 }
+# if there are any missing required alerts, the test fails 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.4.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-ProtectionAlert"],
     "ActualValue": MissingAlerts,
-    "ReportDetails": ReportDetailsString(Status, ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
+    "ReportDetails": ReportDetailsString(Status, 
+        ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
     "RequirementMet": Status
 } if {
     MissingAlerts := RequiredAlerts - EnabledAlerts
-    ErrorMessage := "disabled alert(s):"
+    ErrorMessage := "disabled required alert(s) found:"
     Status := count(MissingAlerts) == 0
 }
 #--
