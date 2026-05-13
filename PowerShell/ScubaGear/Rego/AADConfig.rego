@@ -1630,8 +1630,7 @@ AIAgents contains CAPolicy.DisplayName if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
 }
 
 default AAD_9_1_Not_Applicable := false
