@@ -99,7 +99,16 @@ InModuleScope AADRiskyPermissionsHelper {
                 -Id $MockApplicationPermissions[0].RoleId `
                 -IsAdminConsented $false
 
-            $ExpectedKeys = @("RoleId", "RoleType", "RoleDisplayName", "ApplicationDisplayName", "IsAdminConsented", "IsRisky")
+            $ExpectedKeys = @(
+                "RoleId",
+                "RoleType",
+                "RoleDisplayName",
+                "ApplicationDisplayName",
+                "IsAdminConsented",
+                "RequiresAdminConsent",
+                "IsRisky",
+                "RiskLevel"
+            )
             $Output.PSObject.Properties.Name | Should -Be $ExpectedKeys
         }
 

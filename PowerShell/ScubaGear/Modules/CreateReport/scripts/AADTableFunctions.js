@@ -33,12 +33,13 @@ const TABLE_METADATA = {
         ]
     },
     riskyApps: {
-        title: "Risky Applications",
+        title: "Applications with Risky Permissions",
         wrapperClass: "expandable_wrapper",
         useModal: true,
         columns: [
             { name: "" },
-            { name: "DisplayName" },
+            { name: "DisplayName", className: "display_name" },
+            { name: "SeverityScore", className: "severity_score" },
             { name: "IsMultiTenantEnabled", className: "multi_tenant_enabled" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
@@ -47,18 +48,168 @@ const TABLE_METADATA = {
         ]
     },
     riskyThirdPartySPs: {
-        title: "Risky Third Party Service Principals",
+        title: "Third Party Service Principals with Risky Permissions",
         wrapperClass: "expandable_wrapper",
         useModal: true,
         columns: [
             { name: "" },
             { name: "DisplayName", className: "display_name" },
+            { name: "SeverityScore", className: "severity_score" },
+            { name: "PrivilegedRoles", className: "privileged_roles" },
             { name: "KeyCredentials", className: "key_credentials" },
             { name: "PasswordCredentials", className: "password_credentials" },
             { name: "FederatedCredentials", className: "federated_credentials" },
             { name: "Permissions", className: "permissions" }
         ]
     }
+};
+
+/* Associate the table type with the sorting column and direction (asc/desc)
+ *
+ * { [tableType]: { column: "SeverityScore", ascending: "asc"/"desc" } }
+ */
+const tableSortState = {};
+
+/**
+ * Sorts a data array by a given column and direction.
+ * SeverityScore uses SEVERITY_SORT_ORDER for ordering rather than alphabetical.
+ *
+ * @param {Array} data - The data array to sort.
+ * @param {string} column - The column name to sort by.
+ * @param {string} direction - "asc" or "desc".
+ * @returns {Array} - Sorted copy of the data array.
+ */
+const sortData = (data, column, direction) => {
+    return [...data].sort((a, b) => {
+        let valueA = a[column];
+        let valueB = b[column];
+
+        // Numbers
+        if (typeof valueA === "number" && typeof valueB === "number") {
+            valueA = valueA ?? 0;
+            valueB = valueB ?? 0;
+        }
+        // Arrays/objects (e.g. Permissions, Credentials) sort by count
+        else if ((Array.isArray(valueA) || (typeof valueA === "object" && valueA !== null)) &&
+                 (Array.isArray(valueB) || (typeof valueB === "object" && valueB !== null))) {
+            valueA = normalizeToArray(valueA).length;
+            valueB = normalizeToArray(valueB).length;
+        }
+        // Booleans
+        else if (typeof valueA === "boolean" && typeof valueB === "boolean") {
+            valueA = valueA ? 0 : 1;
+            valueB = valueB ? 0 : 1;
+        }
+        // Strings
+        else {
+            valueA = String(valueA ?? "").toLowerCase();
+            valueB = String(valueB ?? "").toLowerCase();
+        }
+
+        if (valueA < valueB) return direction === "asc" ? -1 : 1;
+        if (valueA > valueB) return direction === "asc" ? 1 : -1;
+        return 0;
+    })
+};
+
+/**
+ * Creates a sort indicator <img> icon for the given state.
+ * 
+ * @param {"asc" | "desc" | "none"} state - The sort state.
+ * @returns {HTMLImageElement} - An <img> element.
+ */
+const createSortIcon = (state) => {
+    const img = document.createElement("img");
+    const map = {
+        asc:  { src: "images/arrow-up.svg", alt: "Sorted ascending" },
+        desc: { src: "images/arrow-down.svg", alt: "Sorted descending" },
+        none: { src: "images/arrow-down-up.svg", alt: "Sort" }
+    };
+
+    const metadata = map[state] || map.none;
+    img.setAttribute("src", metadata.src);
+    img.setAttribute("alt", metadata.alt);
+    img.classList.add("sort-icon");
+    return img;
+};
+
+/**
+ * Updates the sort indicator icons on all column headers for the given table.
+ *
+ * @param {string} tableType - The type of table (e.g., "riskyApps", "riskyThirdPartySPs").
+ * @param {string} activeColumn - The currently sorted column name.
+ * @param {string} direction - "asc" or "desc".
+ */
+const updateSortIndicators = (tableType, activeColumn, direction) => {
+    document.querySelectorAll(`.${tableType}_table thead th`).forEach(th => {
+        const indicator = th.querySelector(".sort-indicator");
+        if (!indicator) return;
+
+        const col = th.dataset.column;
+        indicator.textContent = "";
+        if (col === activeColumn) {
+            indicator.appendChild(createSortIcon(direction));
+            indicator.setAttribute("aria-label", direction === "asc" ? "sorted ascending" : "sorted descending");
+            indicator.classList.add("sort-indicator--active");
+            th.setAttribute("aria-sort", direction === "asc" ? "ascending" : "descending");
+        }
+        else {
+            indicator.appendChild(createSortIcon("none"));
+            indicator.removeAttribute("aria-label");
+            indicator.classList.remove("sort-indicator--active");
+            th.setAttribute("aria-sort", "none");
+        }
+    });
+};
+
+/**
+ * Handles a column header click to sort the table by that column.
+ * Toggles between ascending and descending; defaults to descending on first click.
+ *
+ * @param {Array} data - The original data array.
+ * @param {string} tableType - The type of table.
+ * @param {string} column - The column name to sort by.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
+ */
+const handleSortClick = (data, tableType, column, severityScoreWeights) => {
+    const currentState = tableSortState[tableType] || {};
+    const direction = (currentState.column === column && currentState.direction === "desc")
+        ? "asc"
+        : "desc";
+
+    tableSortState[tableType] = { column, direction };
+
+    const sorted = sortData(data, column, direction);
+
+    // Replace data in-place so all existing references (expand/collapse) stay in sync
+    data.splice(0, data.length, ...sorted);
+
+    const tbody = document.querySelector(`.${tableType}_table tbody`);
+    const colNames = TABLE_METADATA[tableType].columns;
+
+    tbody.querySelectorAll("tr").forEach((row, rowIndex) => {
+        colNames.forEach((_, colIndex) => {
+            const td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
+            td.textContent = "";
+
+            if (colIndex === 0) {
+                td.appendChild(
+                    createRowActionButton({
+                        title: `Show more info for row ${rowIndex + 1}`,
+                        className: "chevron",
+                        rowIndex,
+                        onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
+                        contentBuilder: () => createChevronIcon("right", 10)
+                    })
+                );
+            }
+            else {
+                fillTruncatedCell(data, tableType, td, rowIndex, colIndex, severityScoreWeights);
+            }
+        });
+    });
+
+    updateSortIndicators(tableType, column, direction);
 };
 
 /**
@@ -70,6 +221,8 @@ const TABLE_METADATA = {
 const normalizeColumnNames = (name) => {
     switch (name) {
         case "DisplayName": return "Display Name";
+        case "SeverityScore": return "Severity Score";
+        case "PrivilegedRoles": return "Privileged Roles";
         case "IsMultiTenantEnabled": return "Multi-Tenant Enabled";
         case "KeyCredentials": return "Key Credentials";
         case "PasswordCredentials": return "Password Credentials";
@@ -126,8 +279,9 @@ const createRowActionButton = ({ title, className, rowIndex, onClick, contentBui
  * 
  * @param {Array} data - The data array.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const buildExpandableTable = (data, tableType) => {
+const buildExpandableTable = (data, tableType, severityScoreWeights) => {
     try {
         if (data === undefined || data === null) {
             /*  CAP, risky app, and risky SP tables are only displayed for the AAD baseline, but this js file 
@@ -148,6 +302,7 @@ const buildExpandableTable = (data, tableType) => {
             return;
         }
 
+        const isSortable = tableType === "riskyApps" || tableType === "riskyThirdPartySPs";
         const colNames = metadata.columns;
         const section = document.createElement("section");
         section.className = metadata.wrapperClass;
@@ -175,15 +330,22 @@ const buildExpandableTable = (data, tableType) => {
         expandAll.classList.add("btn-primary");
         expandAll.appendChild(document.createTextNode("&#x2b; Expand all"));
         expandAll.title = "Expands all rows in the table below";
-        expandAll.addEventListener("click", () => expandAllRows(data, tableType));
+        expandAll.addEventListener("click", () => expandAllRows(data, tableType, severityScoreWeights));
         buttons.appendChild(expandAll);
 
         const collapseAll = document.createElement("button");
         collapseAll.classList.add("btn-primary");
         collapseAll.appendChild(document.createTextNode("&minus; Collapse all"));
         collapseAll.title = "Collapses all rows in the table below";
-        collapseAll.addEventListener("click", () => collapseAllRows(data, tableType));
+        collapseAll.addEventListener("click", () => collapseAllRows(data, tableType, severityScoreWeights));
         buttons.appendChild(collapseAll);
+
+        // Sort risky tables by SeverityScore in descending order by default
+        if (isSortable) {
+            const sorted = sortData(data, "SeverityScore", "desc");
+            data.splice(0, data.length, ...sorted);
+            tableSortState[tableType] = { column: "SeverityScore", direction: "desc" };
+        }
 
         const table = document.createElement("table");
         table.className = `${tableType}_table`;
@@ -194,9 +356,43 @@ const buildExpandableTable = (data, tableType) => {
 
         colNames.forEach(col => {
             const th = document.createElement("th");
-            th.textContent = normalizeColumnNames(col.name);
-
             if (col.className) th.classList.add(col.className);
+            
+            // Exclude 0th column since it's set to "" for the expand/collapse arrows.
+            if (isSortable && col.name !== "") {
+                th.dataset.column = col.name;
+                th.setAttribute("aria-sort", col.name === "SeverityScore" ? "descending" : "none");
+
+                const btn = document.createElement("button");
+                btn.classList.add("sort-btn");
+                btn.title = `Sort by ${normalizeColumnNames(col.name)}`;
+                btn.addEventListener("click", () => handleSortClick(data, tableType, col.name, severityScoreWeights));
+
+                const label = document.createElement("span");
+                label.textContent = normalizeColumnNames(col.name);
+
+                const indicator = document.createElement("span");
+                indicator.classList.add("sort-indicator");
+                indicator.setAttribute("aria-hidden", "true");
+                
+                if (col.name === "SeverityScore") {
+                    // Default sorted column - show desc icon immediately
+                    indicator.appendChild(createSortIcon("desc"));
+                    indicator.classList.add("sort-indicator--active");
+                }
+                else {
+                    // All other columns - show neutral icon only on hover
+                    indicator.appendChild(createSortIcon("none"));
+                }
+
+                btn.appendChild(label);
+                btn.appendChild(indicator);
+                th.appendChild(btn);
+            }
+            else {
+                th.textContent = normalizeColumnNames(col.name);
+            }
+
             header.appendChild(th);
         });
 
@@ -218,13 +414,13 @@ const buildExpandableTable = (data, tableType) => {
                             title: `Show more info for row ${rowIndex + 1}`,
                             className: "chevron",
                             rowIndex,
-                            onClick: (event) => expandRow(data, tableType, event),
+                            onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                             contentBuilder: () => createChevronIcon("right", 10)
                         })
                     );
                 } 
                 else {
-                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+                    fillTruncatedCell(data, tableType, td, rowIndex, colIndex, severityScoreWeights);
                 }
 
                 tr.appendChild(td);
@@ -246,8 +442,9 @@ const buildExpandableTable = (data, tableType) => {
  * @param {HTMLElement} td - The table cell to fill.
  * @param {number} rowIndex - The row index (0-indexed, not counting the header row).
  * @param {number} colIndex - The column index (0-indexed).
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
+const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex, severityScoreWeights) => {
     const colNames = TABLE_METADATA[tableType].columns;
     const col = colNames[colIndex];
     const cellData = data[rowIndex][col.name];
@@ -256,6 +453,11 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
 
     if (cellData === null || cellData === undefined) {
         td.textContent = "None";
+        return;
+    }
+
+    if (col.name === "SeverityScore") {
+        td.textContent = cellData;
         return;
     }
 
@@ -300,7 +502,7 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
                 title: `Expand row ${rowIndex + 1}`,
                 className: "truncated-dots",
                 rowIndex,
-                onClick: (event) => expandRow(data, tableType, event),
+                onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                 contentBuilder: () => {
                     const span = document.createElement("span");
                     span.appendChild(document.createTextNode("..."));
@@ -318,8 +520,9 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex) => {
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {HTMLTableRowElement} row - The table row element.
  * @param {number} rowIndex - The row index.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const fillExpandedRow = (data, tableType, row, rowIndex) => {
+const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) => {
     const metadata = TABLE_METADATA[tableType];
     const colNames = metadata.columns;
 
@@ -337,11 +540,29 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                     title: `Show less info for row ${rowIndex + 1}`,
                     className: "chevron",
                     rowIndex,
-                    onClick: (event) => collapseRow(data, tableType, event),
+                    onClick: (event) => collapseRow(data, tableType, event, severityScoreWeights),
                     contentBuilder: () => createChevronIcon("down", 14)
                 })
             );
+            return;
+        }
 
+        // SeverityScore - display numeric value directly
+        if (col.name === "SeverityScore") {
+            const scoreWrapper = document.createElement("div");
+            scoreWrapper.className = "severity-score-wrapper";
+
+            const scoreValue = document.createElement("span");
+            scoreValue.className = "severity-score-value";
+            scoreValue.textContent = cellData ?? "None";
+            scoreWrapper.appendChild(scoreValue);
+
+            const scoreBreakdown = data[rowIndex]["ScoreBreakdown"];
+            if (scoreBreakdown && severityScoreWeights) {
+                scoreWrapper.appendChild(renderRiskIndicators(scoreBreakdown, severityScoreWeights));
+            }
+
+            td.appendChild(scoreWrapper);
             return;
         }
         
@@ -361,9 +582,14 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                 // Assumes column name "DisplayName" or "Name" exist, will need to adjust if adding new table types
                 const rowLabel = data[rowIndex].DisplayName || data[rowIndex].Name;
                 const colLabel = normalizeColumnNames(col.name);
+                const scoreBreakdown = data[rowIndex]["ScoreBreakdown"] ?? null;
 
-                const ul = renderSummaryList(col.name, items);
-                if (ul) td.appendChild(ul);
+                const ul = renderSummaryList(col.name, items, scoreBreakdown);
+
+                const cellWrapper = document.createElement("div");
+                cellWrapper.className = "cell-content-wrapper";
+
+                if (ul) cellWrapper.appendChild(ul);
 
                 const btn = document.createElement("button");
                 btn.type = "button";
@@ -372,14 +598,19 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
                 btn.addEventListener("click", () => {
                     let dataType = "";
                     if (col.name === "Permissions") dataType = "Permissions";
+                    // Exclude "FederatedCredentials" column because it doesn't have active/expired credentials
+                    // like key/password credentials. Since "FederatedCredentials" isn't assigned dataType,
+                    // it's treated as a generic list in the modal popup.
                     if (col.name === "KeyCredentials" || col.name === "PasswordCredentials") dataType = "Credentials";
+                    if (col.name === "PrivilegedRoles") dataType = "PrivilegedRoles";
 
                     let node = renderKeyValueList(items, { advanced: true, dataType });
                     const title = `${rowLabel} - ${colLabel}`;
                     openDetailsModal(title, node);
                 });
 
-                td.appendChild(btn);
+                cellWrapper.appendChild(btn);
+                td.appendChild(cellWrapper);
             }
             else {
                 td.appendChild(renderKeyValueList(items));
@@ -399,13 +630,14 @@ const fillExpandedRow = (data, tableType, row, rowIndex) => {
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {HTMLTableRowElement} row - The table row element.
  * @param {number} rowIndex - The row index.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const fillCollapsedRow = (data, tableType, row, rowIndex) => {
+const fillCollapsedRow = (data, tableType, row, rowIndex, severityScoreWeights) => {
     const colNames = TABLE_METADATA[tableType].columns;
 
     colNames.forEach((_, colIndex) => {
         let td = row.querySelector(`td:nth-of-type(${colIndex + 1})`);
-        fillTruncatedCell(data, tableType, td, rowIndex, colIndex);
+        fillTruncatedCell(data, tableType, td, rowIndex, colIndex, severityScoreWeights);
     });
 
     // We have to manually "reset" the content of the first column to an empty value,
@@ -417,7 +649,7 @@ const fillCollapsedRow = (data, tableType, row, rowIndex) => {
             title: `Show more info for row ${rowIndex + 1}`,
             className: "chevron",
             rowIndex,
-            onClick: (event) => expandRow(data, tableType, event),
+            onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
             contentBuilder: () => createChevronIcon("right", 10)
         })
     );
@@ -429,11 +661,12 @@ const fillCollapsedRow = (data, tableType, row, rowIndex) => {
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {Event} event - The event that triggered the expansion.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const expandRow = (data, tableType, event) => {
+const expandRow = (data, tableType, event, severityScoreWeights) => {
     let row = event.currentTarget.closest("tr");
     let rowIndex = event.currentTarget.rowNumber;
-    fillExpandedRow(data, tableType, row, rowIndex);
+    fillExpandedRow(data, tableType, row, rowIndex, severityScoreWeights);
 }
 
 /**
@@ -441,10 +674,11 @@ const expandRow = (data, tableType, event) => {
  * 
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const expandAllRows = (data, tableType) => {
+const expandAllRows = (data, tableType, severityScoreWeights) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
-        fillExpandedRow(data, tableType, row, rowIndex);
+        fillExpandedRow(data, tableType, row, rowIndex, severityScoreWeights);
     });
 }
 
@@ -454,11 +688,12 @@ const expandAllRows = (data, tableType) => {
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
  * @param {Event} event - The event that triggered the expansion.
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const collapseRow = (data, tableType, event) => {
+const collapseRow = (data, tableType, event, severityScoreWeights) => {
     let row = event.currentTarget.closest("tr");
     let rowIndex = event.currentTarget.rowNumber;
-    fillCollapsedRow(data, tableType, row, rowIndex);
+    fillCollapsedRow(data, tableType, row, rowIndex, severityScoreWeights);
 }
 
 /**
@@ -466,10 +701,11 @@ const collapseRow = (data, tableType, event) => {
  * 
  * @param {Array} data - The table content.
  * @param {string} tableType - The type of table (e.g., "caps", "riskyApps", "riskySPs").
+ * @param {Object} severityScoreWeights - The severity score weights object used for calculating risk scores.
  */
-const collapseAllRows = (data, tableType) => {
+const collapseAllRows = (data, tableType, severityScoreWeights) => {
     document.querySelectorAll(`.${tableType}_table tbody tr`).forEach((row, rowIndex) => {
-        fillCollapsedRow(data, tableType, row, rowIndex);
+        fillCollapsedRow(data, tableType, row, rowIndex, severityScoreWeights);
     });
 }
 
@@ -578,9 +814,10 @@ const renderKeyValueList = (items, options = {}) => {
  * 
  * @param {string} colName - The column name from TABLE_METADATA.columns (e.g., "KeyCredentials", "Permissions").
  * @param {Array} items - The normalized array of items to summarize.
+ * @param {Object} scoreBreakdown - The ScoreBreakdown object from Set-SeverityScore.
  * @returns {HTMLElement|null} - An unordered list element containing the summary.
  */
-const renderSummaryList = (colName, items) => {
+const renderSummaryList = (colName, items, scoreBreakdown = null) => {
     const count = items.length;
 
     const makeUl = () => {
@@ -589,8 +826,9 @@ const renderSummaryList = (colName, items) => {
         return ul;
     };
 
-    const addItem = (ul, label, value) => {
+    const addItem = (ul, label, value, className = null) => {
         const li = document.createElement("li");
+        if (className) li.classList.add(className);
         const strong = document.createElement("strong");
         strong.textContent = `${label}:`;
         li.appendChild(strong);
@@ -598,10 +836,17 @@ const renderSummaryList = (colName, items) => {
         ul.appendChild(li);
     };
 
+    const addDivider = (ul) => {
+        const li = document.createElement("li");
+        li.setAttribute("aria-hidden", "true");
+        li.className = "summary-list-divider";
+        ul.appendChild(li);
+    };
+
     // Only display active/expired counts for key/password credentials
     if (colName === "KeyCredentials" || colName === "PasswordCredentials") {
         const now = new Date();
-        let active = 0, expired = 0;
+        let active = 0, expired = 0, future = 0;
 
         items.forEach(credential => {
             if (!credential || typeof credential !== "object") return;
@@ -610,34 +855,64 @@ const renderSummaryList = (colName, items) => {
             const end = parseDotNetDate(credential.EndDateTime);
 
             if (start && end) {
-                if (start <= now && end >= now) {
-                    active++;
-                    return;
-                }
-                
-                if (end < now) {
-                    expired++;
-                    return;
-                }
+                if (end < now) { expired++; return; }
+                if (start > now) { future++; return; }
+                active++;
             }
+        });
+
+        const breakdownKey = colName === "KeyCredentials" ? "KeyCredentials" : "PasswordCredentials";
+        const longLived = scoreBreakdown?.[breakdownKey]?.LongLivedCredentialCount ?? null;
+
+        const ul = makeUl();
+        addItem(ul, "Total", count);
+
+        addDivider(ul);
+        addItem(ul, "Active", active);
+        addItem(ul, "Expired", expired);
+
+        if (future > 0) addItem(ul, "Not Yet Valid", future);
+        if (longLived !== null) {
+            addDivider(ul);
+            addItem(ul, "Long-Lived (exceeds lifetime threshold)", longLived);
+        }
+        return ul;
+    }
+
+    if (colName === "FederatedCredentials") {
+        // Federated credentials do not expire, summarize by unique issuers
+        const issuers = new Set();
+        items.forEach(credential => {
+            if (credential?.Issuer) issuers.add(credential.Issuer);
         });
 
         const ul = makeUl();
         addItem(ul, "Total", count);
-        addItem(ul, "Active", active);
-        addItem(ul, "Expired", expired);
+
+        addDivider(ul);
+        addItem(ul, "Unique Issuers", issuers.size);
         return ul;
     }
 
-    // Federated credentials do not expire so only display the total count
-    if (colName === "FederatedCredentials") {
+    if (colName === "PrivilegedRoles") {
         const ul = makeUl();
         addItem(ul, "Total", count);
+
+        if (items.length > 0 && typeof items[0] === "string") {
+            // List out privileged role names
+            addDivider(ul);
+            items.forEach(role => addItem(ul, "Role", role));
+        }
         return ul;
     }
 
     if (colName === "Permissions") {
-        let applicationPermissions = 0, delegatedPermissions = 0, adminConsented = 0, notAdminConsented = 0, risky = 0;
+        let applicationPermissions = 0;
+        let delegatedPermissions = 0;
+        let adminConsented = 0;
+        let notAdminConsented = 0;
+        let risky = 0;
+        const riskyByLevel = { Critical: 0, High: 0, Medium: 0, Low: 0 };
 
         items.forEach(permission => {
             if (!permission || typeof permission !== "object") return;
@@ -651,18 +926,243 @@ const renderSummaryList = (colName, items) => {
             else notAdminConsented++;
 
             // Handle risky permissions
-            if (permission.IsRisky === true) risky++;
+            if (permission.IsRisky === true) {
+                risky++;
+                if (permission.RiskLevel && riskyByLevel.hasOwnProperty(permission.RiskLevel)) {
+                    riskyByLevel[permission.RiskLevel]++;
+                }
+            }
         });
 
         const ul = makeUl();
         addItem(ul, "Total", count);
+
+        addDivider(ul);
         addItem(ul, "Application Permissions", applicationPermissions);
         addItem(ul, "Delegated Permissions", delegatedPermissions);
+
+        addDivider(ul);
         addItem(ul, "Admin Consented", adminConsented);
         addItem(ul, "Not Admin Consented", notAdminConsented);
+
+        addDivider(ul);
         addItem(ul, "Risky", risky);
+        if (risky > 0) {
+            if (riskyByLevel.Critical > 0) addItem(ul, "Critical", riskyByLevel.Critical, "risk-level-item");
+            if (riskyByLevel.High > 0) addItem(ul, "High", riskyByLevel.High, "risk-level-item");
+            if (riskyByLevel.Medium > 0) addItem(ul, "Medium", riskyByLevel.Medium, "risk-level-item");
+            if (riskyByLevel.Low > 0) addItem(ul, "Low", riskyByLevel.Low, "risk-level-item");
+        }
         return ul;
     }
 
     return null;
 }
+
+/**
+ * Points-based color tier for admin/non-admin consented permissions.
+ *
+ * @param {number} pts
+ * @param {Object} weights
+ * @returns {"critical" | "high" | "medium" | "low" | null}
+ */
+const permissionPointsToTier = (pts, weights) => {
+    const w = weights.PermissionRiskLevelWeights;
+    if (pts >= w.Critical) return "critical";
+    if (pts >= w.High)     return "high";
+    if (pts >= w.Medium)   return "medium";
+    if (pts > 0)           return "low";
+    return null;
+};
+
+/**
+ * Points-based color tier for credential indicators.
+ * Thresholds are 75%/50%/25% of the CredentialContextWeights base for the app/SP's HighestRiskLevel.
+ *
+ * @param {number} points
+ * @param {string} highestRiskLevel - "Critical" | "High" | "Medium" | "Low" | "None"
+ * @param {Object} weights
+ * @returns {"critical" | "high" | "medium" | "low" | null}
+ */
+const credentialPointsToTier = (points, highestRiskLevel, weights) => {
+    if (points <= 0) return null;
+    const base = weights.CredentialContextWeights[highestRiskLevel] ?? 0;
+    if (base === 0) return "low";
+    const tiers = weights.CredentialRiskIndicatorTiers;
+    if (points >= base * tiers.Critical) return "critical";
+    if (points >= base * tiers.High)     return "high";
+    if (points >= base * tiers.Medium)   return "medium";
+    return "low";
+};
+
+const RISK_INDICATORS_CONFIG = [
+    {
+        key: "AdminConsentedRiskyPermissions",
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.AdminConsentedRiskyPermissions.PermissionCount;
+            const points = scoreBreakdown.AdminConsentedRiskyPermissions.TotalPoints;
+            return `${count} Admin-Consented Risky Permission(s) (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => permissionPointsToTier(scoreBreakdown.AdminConsentedRiskyPermissions?.TotalPoints ?? 0, weights)
+    },
+    {
+        key: "NonAdminConsentedRiskyPermissions",
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.NonAdminConsentedRiskyPermissions.PermissionCount;
+            const points = scoreBreakdown.NonAdminConsentedRiskyPermissions.TotalPoints;
+            return `${count} Non Admin-Consented Risky Permission(s) (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => permissionPointsToTier(scoreBreakdown.NonAdminConsentedRiskyPermissions?.TotalPoints ?? 0, weights)
+    },
+    {
+        key: "PasswordCredentials",
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.PasswordCredentials.CredentialCount;
+            const longLived = scoreBreakdown.PasswordCredentials.LongLivedCredentialCount;
+            const points = scoreBreakdown.PasswordCredentials.TotalPoints;
+            const base = `${count} Password Credential(s)`;
+            const longLivedText = longLived > 0 ? ` (${longLived} long-lived)` : "";
+            return `${base}${longLivedText} (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
+            scoreBreakdown.PasswordCredentials?.TotalPoints ?? 0,
+            scoreBreakdown.HighestRiskLevel ?? "None",
+            weights
+        )
+    },
+    {
+        key: "KeyCredentials",
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.KeyCredentials.CredentialCount;
+            const longLived = scoreBreakdown.KeyCredentials.LongLivedCredentialCount;
+            const points = scoreBreakdown.KeyCredentials.TotalPoints;
+            const base = `${count} Key/Certificate Credential(s)`;
+            const longLivedText = longLived > 0 ? ` (${longLived} long-lived)` : "";
+            return `${base}${longLivedText} (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
+            scoreBreakdown.KeyCredentials?.TotalPoints ?? 0,
+            scoreBreakdown.HighestRiskLevel ?? "None",
+            weights
+        )
+    },
+    {
+        key: "FederatedCredentials",
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.FederatedCredentials.CredentialCount;
+            const points = scoreBreakdown.FederatedCredentials.TotalPoints;
+            return `${count} Federated Credential(s) (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => credentialPointsToTier(
+            scoreBreakdown.FederatedCredentials?.TotalPoints ?? 0,
+            scoreBreakdown.HighestRiskLevel ?? "None",
+            weights
+        )
+    },
+    {
+        key: "CredentialVolume",
+        label: (scoreBreakdown) => {
+            const total = scoreBreakdown.CredentialVolume.TotalActiveCredentials;
+            const points = scoreBreakdown.CredentialVolume.TotalPoints;
+            return `${total} Total Active Credential(s) (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => {
+            const points = scoreBreakdown.CredentialVolume?.TotalPoints ?? 0;
+            const pointsPerCredentialAfterFirst = weights.CredentialVolume.PointsPerCredentialAfterFirst;
+            if (points >= pointsPerCredentialAfterFirst * 3) return "critical";
+            if (points >= pointsPerCredentialAfterFirst * 2) return "high";
+            if (points >= pointsPerCredentialAfterFirst) return "medium";
+            if (scoreBreakdown.CredentialVolume?.TotalActiveCredentials > 1) return "low";
+            return null;
+        }
+    },
+    {
+        key: "PermissionVolume",
+        label: (scoreBreakdown) => {
+            const total = scoreBreakdown.PermissionVolume.TotalPermissions;
+            const points = scoreBreakdown.PermissionVolume.TotalPoints;
+            return `${total} Total Permission(s) (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => {
+            const points = scoreBreakdown.PermissionVolume?.TotalPoints ?? 0;
+            const pointsPer10Permissions = weights.PermissionVolume.PointsPer10Permissions;
+            if (points >= pointsPer10Permissions * 4) return "critical";
+            if (points >= pointsPer10Permissions * 3) return "high";
+            if (points >= pointsPer10Permissions * 2) return "medium";
+            if (points >= pointsPer10Permissions) return "low";
+            return null;
+        }
+    },
+    {
+        key: "MultiTenant",
+        label: (scoreBreakdown) => {
+            const points = scoreBreakdown.MultiTenant.TotalPoints;
+            return `Multi-Tenant Application (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown) => {
+            return scoreBreakdown.MultiTenant?.IsMultiTenantEnabled ? "medium" : null;
+        }
+    },
+    {
+        key: "ThirdPartyServicePrincipal",
+        label: (scoreBreakdown) => {
+            const points = scoreBreakdown.ThirdPartyServicePrincipal.TotalPoints;
+            return `Third-Party Service Principal (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown) => {
+            return scoreBreakdown.ThirdPartyServicePrincipal?.IsThirdPartyServicePrincipal ? "high" : null;
+        }
+    },
+    {
+        key: "PrivilegedRoles",
+        label: (scoreBreakdown) => {
+            const count = scoreBreakdown.PrivilegedRoles.RoleCount;
+            const points = scoreBreakdown.PrivilegedRoles.TotalPoints;
+            return `${count} Privileged Role(s) (+${points} pts)`;
+        },
+        colorTier: (scoreBreakdown, weights) => {
+            const points = scoreBreakdown.PrivilegedRoles?.TotalPoints ?? 0;
+            const pointsPerRole = weights.PrivilegedRoles.PointsPerRole;
+            if (points >= pointsPerRole * 4) return "critical";
+            if (points >= pointsPerRole * 3) return "high";
+            if (points >= pointsPerRole * 2) return "medium";
+            if (points >= pointsPerRole) return "low";
+            return null;
+        }
+    }
+];
+
+/**
+ * Builds a container of risk indicator chip badges from an object's severity score breakdown.
+ *
+ * @param {Object} scoreBreakdown - The ScoreBreakdown object from Set-SeverityScore.
+ * @param {Object} severityScoreWeights - The Weights object from Get-SeverityScoreWeights.
+ * @returns {HTMLElement}
+ */
+const renderRiskIndicators = (scoreBreakdown, severityScoreWeights) => {
+    const container = document.createElement("div");
+    container.className = "risk-indicators";
+
+    if (!scoreBreakdown || !severityScoreWeights) {
+        container.textContent = "No breakdown available.";
+        return container;
+    }
+
+    RISK_INDICATORS_CONFIG.forEach(indicator => {
+        if (!scoreBreakdown[indicator.key]) return;
+
+        const tier = indicator.colorTier(scoreBreakdown, severityScoreWeights);
+        if (!tier) return;
+
+        const chip = document.createElement("span");
+        chip.className = `risk-chip risk-chip--${tier}`;
+        chip.textContent = indicator.label(scoreBreakdown);
+        container.appendChild(chip);
+    });
+
+    if (container.children.length === 0) {
+        container.textContent = "No active risk indicators.";
+    }
+
+    return container;
+};

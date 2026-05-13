@@ -1648,10 +1648,12 @@ function Invoke-ReportCreation {
             $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
             $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
             $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
+            $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
 
             $JSFiles = @(
                 $ParentReportJS
                 $UtilsJS
+                $TableFunctionsJS
             ) -join "`n"
 
             $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
