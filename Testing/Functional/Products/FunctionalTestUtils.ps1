@@ -588,10 +588,10 @@ function UpdateCachedHighRiskBlockPoliciesToLowRisk {
   PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
 }
 
-function LoadTestResults() {
+function LoadRegoOutput() {
   <#
     .SYNOPSIS
-      Wrapper function to load the test results within the given folder.
+      Wrapper function to load the Rego output within the given folder.
     .PARAMETER OutputFolder
       The folder containing the outputs of a ScubaGear run.
   #>
@@ -602,8 +602,8 @@ function LoadTestResults() {
       [string]
       $OutputFolder
   )
-  $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
-  $IntermediateTestResults
+  $IntermediateRegoOutput = Get-Content "$OutputFolder/RegoOutput.json" -Raw | ConvertFrom-Json
+  $IntermediateRegoOutput
 }
 
 function Get-ExpectedHeaderNames {
@@ -616,10 +616,10 @@ function Get-ExpectedHeaderNames {
           return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
         }
         "riskyApps_table" {
-          return @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","SeverityScore","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         "riskyThirdPartySPs_table" {
-          return @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","SeverityScore","PrivilegedRoles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
           return $null 

@@ -361,19 +361,19 @@ Invoke-SCuBA -ProductNames teams `
 
 ## OutRegoFileName
 
-**OutRegoFileName** is the name of the JSON test results file that is created in the output folder, containing the raw Rego output.
+**OutRegoFileName** is the name of the JSON Rego output file that is created in the output folder, containing the raw policy evaluation output.
 
 | Parameter   | Value         |
 |-------------|---------------|
 | Optional    | Yes           |
 | Datatype    | String        |
-| Default     | `TestResults` |
+| Default     | `RegoOutput` |
 | Config File | Yes           |
 
 ```powershell
 # Change the rego file
 Invoke-SCuBA -ProductNames teams `
-  -OutRegoFileName mytestresults
+  -OutRegoFileName myregooutput
 ```
 
 > **Note**: ScubaGear will automatically add the the `.json` to this filename.
