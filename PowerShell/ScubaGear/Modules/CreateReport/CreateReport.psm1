@@ -139,7 +139,7 @@ function Add-Annotation {
 function New-Report {
      <#
     .Description
-    This function creates the individual HTML/json reports using the TestResults.json.
+    This function creates the individual HTML/json reports using the RegoOutput.json.
     Output will be stored as HTML/json files in the InvidualReports folder in the OutPath Folder.
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
@@ -202,7 +202,7 @@ function New-Report {
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
-    $TestResults =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
+    $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
 
@@ -243,7 +243,7 @@ function New-Report {
 
         foreach ($Control in $BaselineGroup.Controls){
 
-            $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
+            $Test = $RegoOutput | Where-Object -Property PolicyId -eq $Control.Id
 
             # Generate indicator HTML for this control and track which types are used
             $IndicatorHtml = Get-IndicatorHtml -Indicators $Control.Indicators -BaselineName $BaselineName -ModuleVersion $SettingsExport.module_version
@@ -518,9 +518,10 @@ function New-Report {
         # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
 
-        # Same for risky applications and third-party service principals
+        # Same for risky applications, third-party service principals, and severity score weights
         $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
         $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
+        $SeverityScoreWeightsJson = ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -568,7 +569,7 @@ function New-Report {
             $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
 
             # Create a section header for the service principal information
-            $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
+            $privilegedServicePrincipalsTableHTML = "<h2>Service Principals with Privileged Roles</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
         }
         else {
@@ -582,6 +583,7 @@ function New-Report {
         $CapJson = "null"
         $RiskyAppsJson = "null"
         $RiskyThirdPartySPJson = "null"
+        $SeverityScoreWeightsJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -639,6 +641,7 @@ function New-Report {
         "<script type='application/json' id='cap-json'> $($CapJson) </script>"
         "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
         "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
+        "<script type='application/json' id='severity-score-weights-json'> $($SeverityScoreWeightsJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
