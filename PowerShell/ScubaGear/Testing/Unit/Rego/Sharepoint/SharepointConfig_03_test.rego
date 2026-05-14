@@ -368,6 +368,32 @@ test_File_Folder_AnonymousLinkType_SharingCapability_NewExistingGuests_NotApplic
 #
 # Policy MS.SHAREPOINT.3.3v2
 #--
+
+###########################################
+# Not Applicable - SharingCapability = 0  #
+###########################################
+
+test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
+    PolicyId := "MS.SHAREPOINT.3.3v2"
+
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 0},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := concat(" ", [
+        "This policy is only applicable if the external sharing slider in the SharePoint admin center",
+        "is set to Anyone or New and Existing Guests or Existing Guests. See %v for more info"
+        ])
+    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
+}
+
+###########################################
+# EmailAttestationReAuthDays = 30         #
+# Expected: PASS                          #
+###########################################
+
 test_EmailAttestationReAuthDays_SharingCapability_NewExistingGuests_Correct if {
     Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 1}])
 
@@ -384,6 +410,19 @@ test_EmailAttestationReAuthDays_SharingCapability_Anyone_Correct if {
     TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
 }
 
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_Correct if {
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 3}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
+}
+
+###########################################
+# EmailAttestationReAuthDays = 29         #
+# Expected: PASS                          #
+###########################################
+
 test_EmailAttestationReAuthDays_Correct if {
     Tenant := json.patch(SPOTenant,
                 [{"op": "add", "path": "SharingCapability", "value": 1},
@@ -393,6 +432,74 @@ test_EmailAttestationReAuthDays_Correct if {
 
     TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
 }
+
+test_EmailAttestationReAuthDays_SharingCapability_Anyone_29_Correct if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_29_Correct if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 3},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    TestResult("MS.SHAREPOINT.3.3v2", Output, PASS, true) == true
+}
+
+###############################################
+# EmailAttestationReAuthDays = 31             #
+# EmailAttestationRequired = true (default)   #
+# Expected: FAIL - days over limit            #
+###############################################
+
+test_EmailAttestationReAuthDays_Incorrect_V2 if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 1},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 31}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString :=
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_Anyone_31_Incorrect if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 31}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString :=
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
+}
+
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_31_Incorrect if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 3},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 31}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString :=
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
+}
+
+###############################################
+# EmailAttestationReAuthDays = 31             #
+# EmailAttestationRequired = false            #
+# Expected: FAIL - both disabled and over     #
+###############################################
 
 test_EmailAttestationReAuthDays_Incorrect_V1 if {
     Tenant := json.patch(SPOTenant,
@@ -407,17 +514,37 @@ test_EmailAttestationReAuthDays_Incorrect_V1 if {
     TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
 
-test_EmailAttestationReAuthDays_Incorrect_V2 if {
+test_EmailAttestationReAuthDays_SharingCapability_Anyone_31_Required_False_Incorrect if {
     Tenant := json.patch(SPOTenant,
-                [{"op": "add", "path": "SharingCapability", "value": 1},
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "EmailAttestationRequired", "value": false},
                 {"op": "add", "path": "EmailAttestationReAuthDays", "value": 31}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
     ReportDetailsString :=
-        "Requirement not met: Expiration time for 'People who use a verification code' NOT set to 30 days or less"
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled and set to 30 days or more"
     TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
+
+test_EmailAttestationReAuthDays_SharingCapability_ExistingGuests_31_Required_False_Incorrect if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 3},
+                {"op": "add", "path": "EmailAttestationRequired", "value": false},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 31}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString :=
+        "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled and set to 30 days or more"
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
+}
+
+###############################################
+# EmailAttestationReAuthDays = 29             #
+# EmailAttestationRequired = false            #
+# Expected: FAIL - disabled despite good days #
+###############################################
 
 test_EmailAttestationRequired_Incorrect if {
     Tenant := json.patch(SPOTenant,
@@ -431,19 +558,27 @@ test_EmailAttestationRequired_Incorrect if {
     TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
 
-test_EmailAttestationReAuthDays_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
-    PolicyId := "MS.SHAREPOINT.3.3v2"
-
+test_EmailAttestationRequired_SharingCapability_Anyone_Incorrect if {
     Tenant := json.patch(SPOTenant,
-                [{"op": "add", "path": "SharingCapability", "value": 0},
+                [{"op": "add", "path": "SharingCapability", "value": 2},
+                {"op": "add", "path": "EmailAttestationRequired", "value": false},
                 {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
 
-    ReportDetailsString := concat(" ", [
-        "This policy is only applicable if the external sharing slider in the SharePoint admin center",
-        "is set to Anyone or New and Existing Guests or Existing Guests. See %v for more info"
-        ])
-    TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
+    ReportDetailsString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
+}
+
+test_EmailAttestationRequired_SharingCapability_ExistingGuests_Incorrect if {
+    Tenant := json.patch(SPOTenant,
+                [{"op": "add", "path": "SharingCapability", "value": 3},
+                {"op": "add", "path": "EmailAttestationRequired", "value": false},
+                {"op": "add", "path": "EmailAttestationReAuthDays", "value": 29}])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := "Requirement not met: Expiration time for 'People who use a verification code' NOT enabled"
+    TestResult("MS.SHAREPOINT.3.3v2", Output, ReportDetailsString, false) == true
 }
 #--
