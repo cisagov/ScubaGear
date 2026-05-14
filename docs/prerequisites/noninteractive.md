@@ -103,7 +103,7 @@ Create a plain security group in Entra ID (without role assignment) and add the 
 
 ### Step 2: Enable Read-Only Admin API Access
 
-In the [Power BI Admin portal](https://app.powerbi.com/admin-portal/tenantSettings):
+In the **Power BI Admin portal**:
 1. Navigate to **Tenant settings** → **Admin API settings**
 2. Enable **"Service principals can access read-only admin APIs"**
 3. Under **Apply to**, select **Specific security groups** and add the security group from Step 1
