@@ -54,8 +54,8 @@ function Export-SecuritySuiteProvider {
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
-    $AntiMalwarePolicy = ConvertTo-Json @$Tracker.TryCommand("Get-MalwareFilterPolicy")
-    $AntiMalwareRule = ConvertTo-Json @$Tracker.TryCommand("Get-MalwareFilterRule")
+    $AntiMalwarePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterPolicy"))
+    $AntiMalwareRule = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterRule"))
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
