@@ -132,6 +132,9 @@ function Export-AADProvider {
                 }
             }
         }
+
+        # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function,
+        # convert privileged users/service principals to JSON after the calls above.
         $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
         $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
 
@@ -155,6 +158,9 @@ function Export-AADProvider {
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
+
+    # Export severity score weights at the provider level so the data can be used for processing in the Entra ID HTML report.
+    $SeverityScoreWeights = ConvertTo-Json -Depth 5 (Get-SeverityScoreWeights)
 
     # Microsoft does not provide a commandlet to retrieve the display name of delegated permissions out of the box.
     # Each resource application, e.g. Microsoft Graph, Exchange Online, etc., can be queried to retrieve its application/delegated API scopes
@@ -199,7 +205,8 @@ function Export-AADProvider {
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
-                "M365Environment"=$M365Environment
+                "M365Environment"=$M365Environment;
+                "PrivilegedServicePrincipals"=$PrivilegedServicePrincipals
             })
         }
     )
@@ -222,6 +229,20 @@ function Export-AADProvider {
         })
     )
     ##### End Exchange hybrid application block
+
+    # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
+    # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
+    $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+
+    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
+    Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
+    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
+        $AppManagementPolicies = ConvertTo-Json @()
+    }
+    else {
+        $AppManagementPolicies = ConvertTo-Json -Depth 10 @(Get-AppManagementPolicies -AppPolicies @($AppPolicies) -M365Environment $M365Environment)
+    }
 
     #####
     ##### End slowest functions block
@@ -249,9 +270,12 @@ function Export-AADProvider {
     "total_user_count": $UserCount,
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
+    "severity_score_weights": $SeverityScoreWeights,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
     "legacy_exchange_service_principal": $LegacyExchangeSP,
     "dedicated_exchange_hybrid_applications": $DedicatedExchangeHybridApps,
+    "default_app_management_policy": $DefaultAppManagementPolicy,
+    "app_management_policies": $AppManagementPolicies,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@

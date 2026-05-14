@@ -59,7 +59,7 @@ AtpPolicyRules := [
 
 ScubaConfig := {
     "OutPath": ".",
-    "OutRegoFileName": "TestResults",
+    "OutRegoFileName": "RegoOutput",
     "Defender": {
         "MS.DEFENDER.1.4v1": {
             "SensitiveAccounts": {

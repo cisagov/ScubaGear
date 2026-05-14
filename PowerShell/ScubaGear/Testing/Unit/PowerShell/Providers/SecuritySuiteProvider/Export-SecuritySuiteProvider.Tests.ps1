@@ -141,6 +141,15 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             Mock -ModuleName ExportSecuritySuiteProvider Get-AtpPolicyForO365 {}
             function Get-MgBetaUser {}
             Mock -ModuleName ExportSecuritySuiteProvider Get-MgBetaUser {}
+            # Added to silence tenant warning on O365 and DLP 
+            Mock -ModuleName ExportSecuritySuiteProvider Get-Command {
+                [pscustomobject]@{ Name = @($Name)[0] }
+            } -ParameterFilter {
+                @($Name)[0] -in @(
+                    "Get-AtpPolicyForO365",
+                    "Get-DlpCompliancePolicy"
+                )
+            }
 
             function Write-ScubaLog {}
             Mock -ModuleName ExportSecuritySuiteProvider Write-ScubaLog {}

@@ -35,7 +35,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                  ProductNames = @('aad')
                  OutProviderFileName = "ProviderSettingsExport"
                  M365Environment = "commercial"
-                 OutRegoFileName = "TestResults"
+                 OutRegoFileName = "RegoOutput"
                  OutReportName = "BaselineReports"
                  OPAPath = "."
                  LogIn = $false

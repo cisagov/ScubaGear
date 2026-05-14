@@ -9,6 +9,7 @@ InModuleScope CreateReport {
             New-Item -Path (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ItemType Directory
             $TestOutPath = (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs")
             Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "CreateReportStubs/*") -Destination $TestOutPath -Recurse
+            Copy-Item -Path (Join-Path -Path $TestOutPath -ChildPath "TestResults.json") -Destination (Join-Path -Path $TestOutPath -ChildPath "RegoOutput.json")
 
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ArgToProd')]
             $ArgToProd = @{
@@ -36,7 +37,7 @@ InModuleScope CreateReport {
                 'IndividualReportPath' = $IndividualReportPath
                 'OutPath'              = $TestOutPath
                 'OutProviderFileName'  = "ProviderSettingsExport"
-                'OutRegoFileName'      = "TestResults"
+                'OutRegoFileName'      = "RegoOutput"
                 'DarkMode'             = $false
             }
         }

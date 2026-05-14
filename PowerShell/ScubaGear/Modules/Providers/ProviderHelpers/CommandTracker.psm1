@@ -50,7 +50,7 @@ class CommandTracker {
                 $Result = $ModCommand
 
                 # Check if $Result.value exists, if it does, return it if not return just $Result
-                if ($Result.value) {
+                if ($null -ne $Result.value) {
                     $Result = $Result.value
                 }
             }
