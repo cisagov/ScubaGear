@@ -111,7 +111,9 @@ jobs:
           name: ${{ inputs.releaseName }}
           tag_name: v${{ inputs.version }}
           previous_tag: ${{ steps.previous-release.outputs.tag }}
-          files: ScubaGear-${{ inputs.version }}.zip
+          files: |
+            ScubaGear-${{ inputs.version }}.zip
+            ScubaGear-${{ inputs.version }}/PowerShell/ScubaGear/schemas/ScubaBaselines.json
           generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release
