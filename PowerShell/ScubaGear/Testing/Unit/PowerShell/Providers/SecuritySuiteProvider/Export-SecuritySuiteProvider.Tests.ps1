@@ -29,6 +29,7 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                             "Get-HostedConnectionFilterPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
+                            }
                             "Get-AdminAuditLogConfig" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
