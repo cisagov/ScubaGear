@@ -989,8 +989,14 @@ function Test-ScubaGearVersion {
     )
 
     try {
-        if ($env:DEV_SKIP_DEPENDENCY_CHECK) {
+        # This flag is used strictly by developers to speed up module import by skipping dependency checks.
+        if (-not [string]::IsNullOrWhiteSpace($env:DEV_SKIP_DEPENDENCY_CHECK)) {
             Write-Warning "Skipping dependency checks due to DEV_SKIP_DEPENDENCY_CHECK environment variable."
+            return
+        }
+
+        # This flag is for end users to bypass version checks during module import.
+        if (-not [string]::IsNullOrWhiteSpace($env:SCUBAGEAR_SKIP_VERSION_CHECK)) {
             return
         }
 

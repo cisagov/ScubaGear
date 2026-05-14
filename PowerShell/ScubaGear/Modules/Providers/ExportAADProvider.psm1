@@ -101,23 +101,6 @@ function Export-AADProvider {
     ##### This block gathers information on Exchange hybrid application configurations
     Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
 
-    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
-    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
-    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
-    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
-    $LegacyExchangeSP =  ConvertTo-Json -Depth 4 @(
-        $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
-            "M365Environment"=$M365Environment
-        })
-    )
-
-    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
-        $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
-            "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
-        })
-    )
-    ##### End Exchange hybrid application block
-
     ##### This block contains the slowest functions so that they execute last in the order of operations.
     #####
     Write-Information "INFO: Starting execution of functions that typically take longer" -InformationAction Continue
@@ -221,6 +204,24 @@ function Export-AADProvider {
         }
     )
     ##### End Risky Apps and Service Principals block
+
+    ##### This block gathers information for reporting on risks related to Exchange hybrid application
+    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
+    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
+    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
+    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
+    $LegacyExchangeSP =  ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
+            "M365Environment"=$M365Environment
+        })
+    )
+
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
+            "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
+        })
+    )
+    ##### End Exchange hybrid application block
 
     #####
     ##### End slowest functions block
