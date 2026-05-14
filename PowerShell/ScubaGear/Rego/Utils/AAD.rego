@@ -233,6 +233,22 @@ IsGeneralMFA(Policy) := true if {
     Count(Strengths - PRMFA) > 0
 } else := false
 
+# Returns a json object as a list. This is used to future proof against changes microsoft 
+# may make to the input where a field may change from a string to an array of strings. 
+# The function ensures that the output is always an array of strings, whether the input 
+# is null, a string, or an array of strings.
+# Case 1: Input is null -> output is empty array
+# Case 2: Input is an array -> output is the same array
+# Case 3: Input is a string -> output is an array of trimmed items split by commas
+EnsureTrimmedArray(JsonObject) := [] if {
+    JsonObject == null
+} else := arr if {
+    is_array(JsonObject)
+    arr := JsonObject
+} else := arr if {
+    is_string(JsonObject)
+    arr = [trim(y, " ") | y := split(JsonObject, ",")[_]]
+}
 
 ############################################################################
 # Report formatting functions for MS.AAD.6.1v1                             #

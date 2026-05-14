@@ -1605,3 +1605,46 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
+  - PolicyId: MS.AAD.9.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.AAD.9.1v1 Noncompliant case
+        ### This test deletes the conditional access policies from the provider export which should result in a non-compliant result
+        ### The reason we have to delete the CAPs from the export is because the test tenants have an MFA policy enabled which would cause this scenario to pass
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                conditional_access_policies: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.9.1v1 Compliant case
+        ### This test sets the conditional access policies in the provider export which should result in a compliant result
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: Automated Test 1 - DO NOT MODIFY
+              updates:
+                State: enabled
+                GrantControls.BuiltInControls:
+                  - "block"
+                Conditions:
+                  Users:
+                    IncludeUsers: ["None"]
+                    ExcludeUsers: []
+                    IncludeRoles: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  ClientAppTypes: ["all"]
+                ClientApplications:
+                  "IncludeAgentIdServicePrincipals": ["All"]
+                AgentIdRiskLevels:
+                  - "high"
+        Postconditions: []
+        ExpectedResult: true

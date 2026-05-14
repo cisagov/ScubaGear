@@ -22,6 +22,7 @@ import data.utils.aad.CAPLINK
 import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
 import data.utils.key.Count
+import data.utils.aad.EnsureTrimmedArray
 
 
 #############
@@ -1595,5 +1596,80 @@ tests contains {
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails("MS.AAD.8.3v1"),
     "RequirementMet": false
+}
+#--
+
+############
+# MS.AAD.9 #
+############
+
+#
+# MS.AAD.9.1v1
+#--
+
+# If policy matches basic conditions, special conditions,
+# & all exclusions are intentional, save the policy name
+AIAgents contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+
+    ### Common checks for conditional access policies
+    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
+    CAPolicy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
+    "all" in CAPolicy.Conditions.ClientAppTypes
+    # CAPolicy.Conditions.AgentIdRiskLevels is a string, which can contain multiple values
+    # The helper function EnsureTrimmedArray turns the string into acomma delimited list
+    # with leading and trailing spaces removed
+    "high" in EnsureTrimmedArray(CAPolicy.Conditions.AgentIdRiskLevels)
+    "block" in CAPolicy.GrantControls.BuiltInControls
+    "All" in CAPolicy.Conditions.ClientApplications.IncludeAgentIdServicePrincipals
+    ###
+
+    # Only match policies with user and group exclusions per the confile file
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
+}
+
+default AAD_9_1_Not_Applicable := false
+
+# Returns true if the M365 Environment used by the tenant does not support AI Agents
+AAD_9_1_Not_Applicable := true if {
+    input.scuba_config.M365Environment in {"gcchigh", "dod"}
+}
+
+# First test is for N/A case
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": true
+} if {
+    PolicyId := "MS.AAD.9.1v1"
+    Reason := "This policy is not applicable to GCC High or DOD environments. See %v for more info"
+    AAD_9_1_Not_Applicable == true
+}
+
+# Pass if at least 1 policy meets all conditions & has correct
+# license.
+tests contains {
+    "PolicyId": "MS.AAD.9.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": AIAgents,
+    "ReportDetails": ReportDetailsArrayLicenseWarningCap(AIAgents, DescriptionString),
+    "RequirementMet": Status
+} if {
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    Conditions := [
+        Count(Aad2P2Licenses) > 0,
+        Count(AIAgents) > 0
+    ]
+    AAD_9_1_Not_Applicable == false
+    Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
