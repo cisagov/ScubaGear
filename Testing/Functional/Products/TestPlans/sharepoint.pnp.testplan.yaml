@@ -321,96 +321,99 @@ TestPlan:
   #       IsNotChecked: true
   #       ExpectedResult: false
 
-  - PolicyId: MS.SHAREPOINT.3.3v1
+  - PolicyId: MS.SHAREPOINT.3.3v2
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
-              EmailAttestationRequired: false
-              EmailAttestationReAuthDays: 30
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserSharingOnly
-              EmailAttestationRequired: false
-              EmailAttestationReAuthDays: 30
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserAndGuestSharing
-              EmailAttestationRequired: false
-              EmailAttestationReAuthDays: 30
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 31
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserSharingOnly
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 31
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserAndGuestSharing
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 31
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExistingExternalUserSharingOnly
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 30
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserSharingOnly
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 30
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserAndGuestSharing
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 30
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization)
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: Disabled
-              EmailAttestationRequired: true
-              EmailAttestationReAuthDays: 29
-        Postconditions: []
-        ExpectedResult: true
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-Applicable - SharingCapability = Disabled (Only people in organization)
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: Disabled
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 29
+      Postconditions: []
+      ExpectedResult: true
+
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExistingExternalUserSharingOnly
+            EmailAttestationRequired: false
+            EmailAttestationReAuthDays: 30
+      Postconditions: []
+      ExpectedResult: false
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExternalUserSharingOnly
+            EmailAttestationRequired: false
+            EmailAttestationReAuthDays: 30
+      Postconditions: []
+      ExpectedResult: false
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = false; EmailAttestationReAuthDays = 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExternalUserAndGuestSharing
+            EmailAttestationRequired: false
+            EmailAttestationReAuthDays: 30
+      Postconditions: []
+      ExpectedResult: false
+
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExistingExternalUserSharingOnly
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 31
+      Postconditions: []
+      ExpectedResult: false
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExternalUserSharingOnly
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 31
+      Postconditions: []
+      ExpectedResult: false
+    - TestDescription: MS.SHAREPOINT.3.3v2 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays > 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExternalUserAndGuestSharing
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 31
+      Postconditions: []
+      ExpectedResult: false
+
+    - TestDescription: MS.SHAREPOINT.3.3v2 Compliant - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExistingExternalUserSharingOnly
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 30
+      Postconditions: []
+      ExpectedResult: true
+    - TestDescription: MS.SHAREPOINT.3.3v2 Compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExternalUserSharingOnly
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 30
+      Postconditions: []
+      ExpectedResult: true
+    - TestDescription: MS.SHAREPOINT.3.3v2 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); EmailAttestationRequired = true; EmailAttestationReAuthDays = 30
+      Preconditions:
+        - Command: Set-SPOTenant
+          Splat:
+            SharingCapability: ExternalUserAndGuestSharing
+            EmailAttestationRequired: true
+            EmailAttestationReAuthDays: 30
+      Postconditions: []
+      ExpectedResult: true
