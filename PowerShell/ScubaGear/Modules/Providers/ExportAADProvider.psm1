@@ -98,8 +98,27 @@ function Export-AADProvider {
     # The RiskyDelegatedPermissionClassifications is for user consent policy 5.2 to determine if any delegated permission classifications considered risky by Scuba are classified as low risk in the tenant
     $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
 
-    ##### This block gathers information on Exchange hybrid application configurations
-    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+    ##### Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
+    # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
+    $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+
+    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
+    Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
+    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
+        $AppManagementPolicies = ConvertTo-Json @()
+    }
+    else {
+        # $AppManagementPolicies = ConvertTo-Json -Depth 10 @(Get-AppManagementPolicies -AppPolicies @($AppPolicies) -M365Environment $M365Environment)
+        $AppManagementPolicies = $Tracker.TryCommand("Get-AppManagementPolicies", @{"M365Environment"=$M365Environment; "AppPolicies"=@($AppPolicies)})
+        if ($AppManagementPolicies.count -gt 0) {
+            $AppManagementPolicies = ConvertTo-Json -Depth 10 @($AppManagementPolicies[0])
+        }
+        else {
+            $AppManagementPolicies = ConvertTo-Json @()
+        }
+    }
+    ##### End application management policies
 
     ##### This block contains the slowest functions so that they execute last in the order of operations.
     #####
@@ -133,15 +152,8 @@ function Export-AADProvider {
             }
         }
 
-        # $PrivilegedServicePrincipals is used in the Format-RiskyThirdPartyServicePrincipals function,
-        # convert privileged users/service principals to JSON after the calls above.
         $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-
-        # While ConvertTo-Json won't mess up a dict as described in the above comment,
-        # on error, $TryCommand returns an empty list, not a dictionary.
         $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
@@ -213,6 +225,8 @@ function Export-AADProvider {
     ##### End Risky Apps and Service Principals block
 
     ##### This block gathers information for reporting on risks related to Exchange hybrid application
+    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+
     # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
     # This is an indicator of compromise if keyCredentials are present. The organization has not completed
     # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
@@ -230,22 +244,12 @@ function Export-AADProvider {
     )
     ##### End Exchange hybrid application block
 
-    # Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
-    # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
-    $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-
-    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
-    Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
-    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
-        $AppManagementPolicies = ConvertTo-Json @()
-    }
-    else {
-        $AppManagementPolicies = ConvertTo-Json -Depth 10 @(Get-AppManagementPolicies -AppPolicies @($AppPolicies) -M365Environment $M365Environment)
-    }
-
     #####
     ##### End slowest functions block
+
+    # PrivilegedServicePrincipals is converted to JSON here because earlier it is used as a PowerShell object.
+    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
     # This conversion to JSON needs to be last because other blocks above here rely on the $ServicePlans object in its PowerShell form.
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
