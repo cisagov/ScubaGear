@@ -16,7 +16,7 @@ InModuleScope 'RunRego' {
                 'InputFile' = Join-Path -Path $PSScriptRoot -ChildPath "./RunRegoStubs/ProviderSettingsExport.json";
             }
         }
-        It 'Runs the <Arg> Rego on a Provider JSON and returns a TestResults object' {
+        It 'Runs the <Arg> Rego on a Provider JSON and returns a Rego output object' {
             $RegoParams += @{
                 'RegoFile'    = Join-Path -Path $PSScriptRoot -ChildPath "../../../../Rego/$($Arg)Config.rego";
                 'PackageName' = $Product;

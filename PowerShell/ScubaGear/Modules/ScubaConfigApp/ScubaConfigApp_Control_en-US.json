@@ -219,7 +219,7 @@
     "OutPath_TextBox": ".",
     "OutFolderName_TextBox": "M365BaselineConformance",
     "OutProviderFileName_TextBox": "ProviderSettingsExport",
-    "OutRegoFileName_TextBox": "TestResults",
+    "OutRegoFileName_TextBox": "RegoOutput",
     "OutReportName_TextBox": "BaselineReports",
     "OutJsonFileName_TextBox": "ScubaResults",
     "OutCsvFileName_TextBox": "ScubaResults",

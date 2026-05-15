@@ -7,14 +7,14 @@ This module provides a robust, configurable logging framework specifically desig
 It offers multiple levels of logging from basic information capture to deep function tracing and debugging.
 
 KEY FEATURES:
-• Structured logging with timestamps, levels, sources, and optional data payloads
-• Configurable log levels (Debug, Info, Warning, Error) with filtering
-• File-based logging with automatic timestamped filenames to prevent conflicts
-• PowerShell transcript recording for complete console output capture
-• Function tracing with entry/exit logging, parameter capture, and timing
-• Automatic sensitive data redaction (passwords, secrets, tokens, keys)
-• Enhanced debugging features using PowerShell's built-in debugging capabilities
-• Minimal performance impact with optional features that can be enabled as needed
+- Structured logging with timestamps, levels, sources, and optional data payloads
+- Configurable log levels (Debug, Info, Warning, Error) with filtering
+- File-based logging with automatic timestamped filenames to prevent conflicts
+- PowerShell transcript recording for complete console output capture
+- Function tracing with entry/exit logging, parameter capture, and timing
+- Automatic sensitive data redaction (passwords, secrets, tokens, keys)
+- Enhanced debugging features using PowerShell's built-in debugging capabilities
+- Minimal performance impact with optional features that can be enabled as needed
 
 CORE FUNCTIONALITY:
 1. INITIALIZATION: Initialize-ScubaLogging sets up the logging system with configurable paths,
@@ -251,8 +251,9 @@ function Write-ScubaLog {
                 # ScubaGear output in logging noise.  Only high-level phase milestones (e.g. "Starting",
                 # "completed") are shown to the user; every Info message still appears in the log file
                 # regardless of this filter, so nothing is lost for troubleshooting.
-                if ($Message -match "Creating output folder|Starting|completed|authenticated|retrieved") {
-                    Write-Output "INFO: $Message"
+                if ($Message -match "Creating output folder|Starting|completed|authenticated|retrieved|EXIT") {
+                    Write-Information "INFO: $Message $($Data | ConvertTo-Json -Compress -Depth 3)" -InformationAction Continue
+
                 }
             }
             "Warning" {
@@ -363,7 +364,7 @@ function Trace-ScubaFunction {
             }
         }
 
-        Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Debug" -Source "FunctionTrace" -Data $exitData
+        Write-ScubaLog -Message "EXIT: $FunctionName" -Level "Info" -Source "FunctionTrace" -Data $exitData
         return $result
     }
     catch {
@@ -1294,8 +1295,8 @@ function Get-ScubaDebugLogReport {
     # Small helper: safely convert a Data object to compact JSON for inline display
     function Get-InlineData ([object]$data) {
         if ($null -eq $data) { return '' }
-        try   { return " — ``$($data | ConvertTo-Json -Compress -Depth 3)``" }
-        catch { return " — ``$data``" }
+        try { return " - ``$($data | ConvertTo-Json -Compress -Depth 3)``" }
+        catch { return " - ``$data``" }
     }
 
     # -------------------------------------------------------------------------
@@ -1365,7 +1366,7 @@ function Get-ScubaDebugLogReport {
     $netEntry    = Find-Entry 'RunDetails' 'Network connectivity status captured'
     $netInternet = if ($netEntry.Data.InternetConnected) { 'Connected' }     else { ':x: NOT connected' }
     $netDns      = if ($netEntry.Data.DNSResolution)     { 'OK' }            else { ':x: FAILED' }
-    $netProxy    = if ($netEntry.Data.ProxyDetected)     { "Detected — $($netEntry.Data.ProxyAddress)" } else { 'Not detected' }
+    $netProxy    = if ($netEntry.Data.ProxyDetected) { "Detected - $($netEntry.Data.ProxyAddress)" } else { 'Not detected' }
 
     # --- Phase timing ---
     # Provider and Rego timing come from FunctionTrace EXIT entries which log ExecutionTimeMs
