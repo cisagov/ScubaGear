@@ -9,7 +9,7 @@ Describe "ScubaConfig Additional Properties Validation" {
         # Determine OS-specific executable name
         $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
         $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
-        
+
         if ($IsLinuxOS) {
             $script:DummyOPAName = "opa_linux_amd64"
         }
@@ -20,9 +20,11 @@ Describe "ScubaConfig Additional Properties Validation" {
             $script:DummyOPAName = "opa_windows_amd64.exe"
         }
         $script:DummyOPAPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\..\..\$script:DummyOPAName"
+        $script:DummyOPACreatedByTests = $false
         # Create empty file to satisfy OPA validation
         if (-not (Test-Path $script:DummyOPAPath)) {
             New-Item -Path $script:DummyOPAPath -ItemType File -Force | Out-Null
+            $script:DummyOPACreatedByTests = $true
         }
 
         # Mock ConvertFrom-Yaml to avoid dependency on powershell-yaml module in CI
@@ -92,9 +94,9 @@ Describe "ScubaConfig Additional Properties Validation" {
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
-        
+
         # Remove dummy OPA executable
-        if (Test-Path $script:DummyOPAPath) {
+        if ($script:DummyOPACreatedByTests -and (Test-Path $script:DummyOPAPath)) {
             Remove-Item -Path $script:DummyOPAPath -Force -ErrorAction SilentlyContinue
         }
     }
@@ -110,7 +112,7 @@ M365Environment: commercial
 OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
-OutRegoFileName: TestResults
+OutRegoFileName: RegoOutput
 OutReportName: BaselineReports
 DisconnectOnExit: false
 SkipDoH: false
@@ -339,7 +341,7 @@ OPAPath: .
 OutPath: .
 OutFolderName: M365BaselineConformance
 OutProviderFileName: ProviderSettingsExport
-OutRegoFileName: TestResults
+OutRegoFileName: RegoOutput
 OutReportName: BaselineReports
 DisconnectOnExit: false
 AppId: 12345678-1234-1234-1234-123456789012

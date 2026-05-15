@@ -21,7 +21,7 @@ function Export-AADProvider {
     Import-Module $PSScriptRoot/ProviderHelpers/LicenseHelper.psm1
     $Tracker = Get-CommandTracker
 
-    # The below cmdlet covers ~ 9 policy checks that inspect conditional access policies, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
+    # The below cmdlet covers numerous policy checks that inspect conditional access policies, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
     $AllPolicies = $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
 
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
@@ -58,17 +58,80 @@ function Export-AADProvider {
     #Obtains license information for tenant and total number of active users
     $LicenseInfo = $SubscribedSku | Select-Object -Property Sku*, ConsumedUnits, PrepaidUnits | ConvertTo-Json -Depth 3
 
-    if ($ServicePlans) {
-        # The RequiredServicePlan variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
-        $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
+    # Retrieve tenant user count for both enabled/disabled accounts.
+    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    # Return value is an array of objects and the first item in the array is a string containing the user count.
+    if ($UserCount -is [array] -and $UserCount.Count -gt 0 -and [int]::TryParse($UserCount[0], [ref]$null)) {
+        $UserCount = $UserCount[0]
+    }
+    else {
+        Write-Warning "Error retrieving user count, invalid data received: $($UserCount | ConvertTo-Json)"
+        $UserCount = -1
+    }
 
-        if ($RequiredServicePlan) {
-            # If the tenant has the premium license then we also include calls to PIM APIs
-            $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
+    # Provides data for policies such as user consent and guest user access.
+    $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
+    # Provides data for admin consent workflow
+    $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
+    #####  This block gets data on the tenant's authentication methods
+    $AuthenticationMethodPolicyRootObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
+
+    # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
+    $AuthenticationMethodPolicy = $AuthenticationMethodPolicyRootObject | ForEach-Object {
+        $_ | Select-Object * -ExcludeProperty AuthenticationMethodConfigurations
+    }
+
+    $AuthenticationMethodObjects = @{
+        authentication_method_policy = $AuthenticationMethodPolicy
+        authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
+    }
+
+    $AuthenticationMethod = ConvertTo-Json -Depth 10 @($AuthenticationMethodObjects)
+    ##### End authentication methods block
+
+    # Provides data on the password expiration policy
+    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+
+    # The RiskyDelegatedPermissionClassifications is for user consent policy 5.2 to determine if any delegated permission classifications considered risky by Scuba are classified as low risk in the tenant
+    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+
+    ##### Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
+    # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
+    $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
+    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+
+    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
+    Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
+    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
+        $AppManagementPolicies = ConvertTo-Json @()
+    }
+    else {
+        # $AppManagementPolicies = ConvertTo-Json -Depth 10 @(Get-AppManagementPolicies -AppPolicies @($AppPolicies) -M365Environment $M365Environment)
+        $AppManagementPolicies = $Tracker.TryCommand("Get-AppManagementPolicies", @{"M365Environment"=$M365Environment; "AppPolicies"=@($AppPolicies)})
+        if ($AppManagementPolicies.count -gt 0) {
+            $AppManagementPolicies = ConvertTo-Json -Depth 10 @($AppManagementPolicies[0])
         }
         else {
-            $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
+            $AppManagementPolicies = ConvertTo-Json @()
         }
+    }
+    ##### End application management policies
+
+    ##### This block contains the slowest functions so that they execute last in the order of operations.
+    #####
+    Write-Information "INFO: Starting execution of functions that typically take longer" -InformationAction Continue
+
+    # Check of there are service plans with a ProvisioningStatus of Success
+    if ($ServicePlans) {
+        # The $TenantHasPremiumLicense variable is used so that PIM Cmdlets are only executed if the tenant has the premium license
+        $RequiredServicePlan = $ServicePlans | Where-Object -Property ServicePlanName -eq -Value "AAD_PREMIUM_P2"
+        $TenantHasPremiumLicense = if ($RequiredServicePlan) { $true } else { $false }
+
+        # Retrieve an array of privileged users and service principals
+        $PrivilegedObjects = $Tracker.TryCommand("Get-PrivilegedUser", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
 
         # # Split the objects into users and service principals
         $PrivilegedUsers = @{}
@@ -88,22 +151,12 @@ function Export-AADProvider {
                 }
             }
         }
-        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-        $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
 
-        # While ConvertTo-Json won't mess up a dict as described in the above comment,
-        # on error, $TryCommand returns an empty list, not a dictionary.
+        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
         $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
-        $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
-        if ($RequiredServicePlan){
-            # If the tenant has the premium license then we also include calls to PIM APIs
-            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$true; "M365Environment"=$M365Environment})
-        }
-        else {
-            $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$false; "M365Environment"=$M365Environment})
-        }
+        $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
         $PrivilegedRoles = ConvertTo-Json -Depth 10 @($PrivilegedRoles) # Depth required to get policy rule object details
     }
     else {
@@ -112,45 +165,14 @@ function Export-AADProvider {
         $PrivilegedRoles = ConvertTo-Json @()
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedRole")
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
+        $PrivilegedServicePrincipals = ConvertTo-Json @()
     }
-    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
-
-    # Retrieve tenant user count for both enabled/disabled accounts utilizing (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $UserCount = $Tracker.TryCommand("Get-MgBetaUserCount", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    # Ensure we successfully got a count of users
-    if(-Not $UserCount -is [int]) {
-        $UserCount = "NaN"
-    }
-
-    # Provides data for policies such as user consent and guest user access, GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-
-    # Provides data for admin consent workflow
-    $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-
-    # This block supports policies that need data on the tenant's authentication methods, GraphDirect specifies that this will retrieve information from the Graph API (Invoke-GraphDirectly) and not use the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-    $AuthenticationMethodPolicyRootObject = $Tracker.TryCommand("Get-MgBetaPolicyAuthenticationMethodPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-
-    $AuthenticationMethodFeatureSettings = @($AuthenticationMethodPolicyRootObject.AuthenticationMethodConfigurations | Where-Object { $_.Id})
-
-    # Exclude the AuthenticationMethodConfigurations so we do not duplicate it in the JSON
-    $AuthenticationMethodPolicy = $AuthenticationMethodPolicyRootObject | ForEach-Object {
-        $_ | Select-Object * -ExcludeProperty AuthenticationMethodConfigurations
-    }
-
-    $AuthenticationMethodObjects = @{
-        authentication_method_policy = $AuthenticationMethodPolicy
-        authentication_method_feature_settings = $AuthenticationMethodFeatureSettings
-    }
-
-    $AuthenticationMethod = ConvertTo-Json -Depth 10 @($AuthenticationMethodObjects)
-    ##### End block
-
-    # Provides data on the password expiration policy
-    $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
+
+    # Export severity score weights at the provider level so the data can be used for processing in the Entra ID HTML report.
+    $SeverityScoreWeights = ConvertTo-Json -Depth 5 (Get-SeverityScoreWeights)
 
     # Microsoft does not provide a commandlet to retrieve the display name of delegated permissions out of the box.
     # Each resource application, e.g. Microsoft Graph, Exchange Online, etc., can be queried to retrieve its application/delegated API scopes
@@ -178,7 +200,7 @@ function Export-AADProvider {
     # "Format-RiskyApplications" will match app registrations with and without a corresponding service principal object.
     # If an app registration does not have a service principal object, only app registration data will be displayed.
     # If an app registration has a matching service principal object, app registration and service principal data will be aggregated together.
-    $AggregateRiskyApps = ConvertTo-Json -Depth 3 @(
+    $AggregateRiskyAppsRaw = @(
         if (@($RiskyApps).Count -gt 0 -and @($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyApplications", @{
                 "RiskyApps"=$RiskyApps;
@@ -186,19 +208,51 @@ function Export-AADProvider {
             })
         }
     )
+    # We need the raw data from "Format-RiskyApplications", convert $AggregateRiskyAppsRaw to JSON format after this operation is complete.
+    $AggregateRiskyApps = ConvertTo-Json -Depth 4 @($AggregateRiskyAppsRaw)
 
     # "Format-RiskyThirdPartyServicePrincipals" does NOT return service principals created in its home tenant.
     # It only returns risky service principals owned by external tenants.
-    $RiskyThirdPartySPs = ConvertTo-Json -Depth 3 @(
+    $RiskyThirdPartySPs = ConvertTo-Json -Depth 4 @(
         if (@($RiskySPs).Count -gt 0) {
             $Tracker.TryCommand("Format-RiskyThirdPartyServicePrincipals", @{
                 "RiskySPs"=$RiskySPs;
-                "M365Environment"=$M365Environment
+                "M365Environment"=$M365Environment;
+                "PrivilegedServicePrincipals"=$PrivilegedServicePrincipals
             })
         }
     )
-    ##### End block
-    $RiskyDelegatedPermissionClassifications =  ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+    ##### End Risky Apps and Service Principals block
+
+    ##### This block gathers information for reporting on risks related to Exchange hybrid application
+    Import-Module $PSScriptRoot/ProviderHelpers/AADHybridExchangeHelper.psm1
+
+    # Check if the first-party Office 365 Exchange Online service principal is configured with credentials.
+    # This is an indicator of compromise if keyCredentials are present. The organization has not completed
+    # remediation per Microsoft's guidance to remove remaining key credentials after migrating to the new
+    # dedicated hybrid application, or they are still in the legacy hybrid configuration.
+    $LegacyExchangeSP =  ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-LegacyExchangeServicePrincipal", @{
+            "M365Environment"=$M365Environment
+        })
+    )
+
+    $DedicatedExchangeHybridApps = ConvertTo-Json -Depth 4 @(
+        $Tracker.TryCommand("Get-DedicatedExchangeHybridApplications", @{
+            "AggregateRiskyAppsRaw"=$AggregateRiskyAppsRaw
+        })
+    )
+    ##### End Exchange hybrid application block
+
+    #####
+    ##### End slowest functions block
+
+    # PrivilegedServicePrincipals is converted to JSON here because earlier it is used as a PowerShell object.
+    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
+    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+
+    # This conversion to JSON needs to be last because other blocks above here rely on the $ServicePlans object in its PowerShell form.
+    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
@@ -220,7 +274,12 @@ function Export-AADProvider {
     "total_user_count": $UserCount,
     "risky_applications": $AggregateRiskyApps,
     "risky_third_party_service_principals": $RiskyThirdPartySPs,
+    "severity_score_weights": $SeverityScoreWeights,
     "risky_delegated_permission_classifications": $RiskyDelegatedPermissionClassifications,
+    "legacy_exchange_service_principal": $LegacyExchangeSP,
+    "dedicated_exchange_hybrid_applications": $DedicatedExchangeHybridApps,
+    "default_app_management_policy": $DefaultAppManagementPolicy,
+    "app_management_policies": $AppManagementPolicies,
     "aad_successful_commands": $SuccessfulCommands,
     "aad_unsuccessful_commands": $UnSuccessfulCommands,
 "@
@@ -294,44 +353,48 @@ function Get-PrivilegedUser {
     $AADRoles = (Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryRole" -M365Environment $M365Environment).Value | Where-Object { $_.DisplayName -in $PrivilegedRoles }
 
     # Construct a list of privileged users based on the Active role assignments
-    foreach ($Role in $AADRoles) {
+    Trace-ScubaFunction -FunctionName "Get-PrivilegedUser Active assignments" -ScriptBlock {
+        foreach ($Role in $AADRoles) {
 
-        # Get a list of all the users and groups Actively assigned to this role
-        $UsersAssignedRole = (Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryRoleMember" -M365Environment $M365Environment -Id $Role.Id).Value
+            # Get a list of all the users and groups Actively assigned to this role
+            $UsersAssignedRole = (Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryRoleMember" -M365Environment $M365Environment -Id $Role.Id).Value
 
-        foreach ($User in $UsersAssignedRole) {
-            $Objecttype = $User."@odata.type" -replace "#microsoft.graph."
+            foreach ($User in $UsersAssignedRole) {
+                $Objecttype = $User."@odata.type" -replace "#microsoft.graph."
 
-                if ($Objecttype -eq "user") {
-                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
+                    if ($Objecttype -eq "user") {
+                        LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "user"
+                    }
+                    elseif ($Objecttype -eq "servicePrincipal") {
+                        LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "serviceprincipal"
+                    }
+                    elseif ($Objecttype -eq "group") {
+                        # In this context $User.Id is a group identifier
+                        $GroupId = $User.Id
+
+                    # Process all of the group members that are transitively assigned to the current role as Active via group membership
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "group"
                 }
-                elseif ($Objecttype -eq "servicePrincipal") {
-                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $User.Id -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "serviceprincipal"
-                }
-                elseif ($Objecttype -eq "group") {
-                    # In this context $User.Id is a group identifier
-                    $GroupId = $User.Id
-
-                # Process all of the group members that are transitively assigned to the current role as Active via group membership
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $GroupId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment -Objecttype "group"
             }
         }
     }
 
     # Process the Eligible role assignments if the premium license for PIM is there
     if ($TenantHasPremiumLicense) {
-        # Get a list of all the users and groups that have Eligible assignments, this will retrieve information from the Graph API directly and not use the cmdlet.
-        $AllPIMRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
+        Trace-ScubaFunction -FunctionName "Get-PrivilegedUser Eligible assignments" -ScriptBlock {
+            # Get a list of all the users and groups that have Eligible assignments, this will retrieve information from the Graph API directly and not use the cmdlet.
+            $AllPIMRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
 
-        # Add to the list of privileged users based on Eligible assignments
-        foreach ($Role in $AADRoles) {
-            $PrivRoleId = $Role.RoleTemplateId
-            # Get a list of all the users and groups Eligible assigned to this role
-            $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $PrivRoleId }
+            # Add to the list of privileged users based on Eligible assignments
+            foreach ($Role in $AADRoles) {
+                $PrivRoleId = $Role.RoleTemplateId
+                # Get a list of all the users and groups Eligible assigned to this role
+                $PIMRoleAssignments = $AllPIMRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $PrivRoleId }
 
-            foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
-                $UserObjectId = $PIMRoleAssignment.PrincipalId
-                LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $UserObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+                foreach ($PIMRoleAssignment in $PIMRoleAssignments) {
+                    $UserObjectId = $PIMRoleAssignment.PrincipalId
+                    LoadObjectDataIntoPrivilegedUserHashtable -RoleName $Role.DisplayName -PrivilegedUsers $PrivilegedUsers -ObjectId $UserObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
+                }
             }
         }
     }
@@ -693,15 +756,23 @@ function Get-PrivilegedRole {
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
         # Get ALL the roles and users actively assigned to them, API information is contained within the Permissions JSON file.
-        $AllRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -M365Environment $M365Environment).Value
-        $AllEligibleRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
+        $AllRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -ScriptBlock {
+            (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -M365Environment $M365Environment).Value
+        }
+        $AllEligibleRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -ScriptBlock {
+            (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
+        }
 
         # Each of the helper functions below add configuration settings (aka rules) to the role array.
         # Get the PIM configurations for the roles
-        GetConfigurationsForRoles -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments
+        Trace-ScubaFunction -FunctionName "GetConfigurationsForRoles" -ScriptBlock {
+            GetConfigurationsForRoles -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments
+        }
         # Get the PIM configurations for the groups
         $AllRoleAssignments += $AllEligibleRoleAssignments # Add eligible only for PIM groups
-        GetConfigurationsForPimGroups -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
+        Trace-ScubaFunction -FunctionName "GetConfigurationsForPimGroups" -ScriptBlock {
+            GetConfigurationsForPimGroups -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
+        }
     }
 
     # Return the array

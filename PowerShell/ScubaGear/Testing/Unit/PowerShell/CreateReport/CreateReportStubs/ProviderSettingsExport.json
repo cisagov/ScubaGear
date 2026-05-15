@@ -15886,7 +15886,7 @@
     }
   ],
   "defender_license": true,
-  "defender_successful_commands": [
+  "securitysuite_successful_commands": [
     "Get-AdminAuditLogConfig",
     "Get-EOPProtectionPolicyRule",
     "Get-MalwareFilterPolicy",
@@ -15902,7 +15902,7 @@
     "Get-ProtectionAlert",
     "Get-DlpComplianceRule"
   ],
-  "defender_unsuccessful_commands": [],
+  "securitysuite_unsuccessful_commands": [],
   "remote_domains": [
     {
       "DomainName": "*",
@@ -18024,7 +18024,7 @@
       "OneDriveLoopDefaultSharingLinkRole": 0,
       "OneDriveRequestFilesLinkEnabled": true,
       "OneDriveRequestFilesLinkExpirationInDays": 1,
-      "OneDriveSharingCapability": 2,
+      "ODBSharingCapability": 2,
       "OneDriveDefaultShareLinkScope": -1,
       "OneDriveDefaultShareLinkRole": 0,
       "OneDriveDefaultLinkToExistingAccess": false,

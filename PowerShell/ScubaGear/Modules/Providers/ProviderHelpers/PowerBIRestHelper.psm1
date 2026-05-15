@@ -1,5 +1,3 @@
-. (Join-Path -Path $PSScriptRoot -ChildPath "MsalHelper.ps1")
-
 function Get-PowerBIBaseUrl {
     <#
     .SYNOPSIS
@@ -174,7 +172,5 @@ function Get-PowerBIAccessTokenInteractive {
 
 Export-ModuleMember -Function @(
     'Get-PowerBIBaseUrl',
-    'Get-PowerBIScope',
-    'Get-PowerBIAccessToken',
-    'Get-PowerBIAccessTokenInteractive'
+    'Get-PowerBIScope'
 )

@@ -56,6 +56,14 @@
                     $hasValue = $true
                 }
 
+            } elseif ($field.type -eq "multiselect") {
+                # For multiselect, check if any CheckBox in the panel is checked
+                $checkBoxPanelName = ($controlFieldName + "_CheckBoxPanel")
+                $checkBoxPanel = Find-UIControlByName -parent $detailsPanel -targetName $checkBoxPanelName
+                if ($checkBoxPanel) {
+                    $hasValue = $checkBoxPanel.Children | Where-Object { $_ -is [System.Windows.Controls.CheckBox] -and $_.IsChecked -eq $true } | Select-Object -First 1
+                }
+
             } elseif ($field.type -eq "boolean") {
                 # Boolean fields always have a value (true or false)
                 $hasValue = $true
@@ -101,7 +109,7 @@ Function Test-FieldValidation {
     .SYNOPSIS
     Validates both required fields and regex patterns for all fields in a policy card.
     .DESCRIPTION
-    This function performs comprehensive validation including:
+    This function performs validation including:
     - Required field validation (fields marked as required must have values)
     - Regex pattern validation (any field with a value must match its pattern if defined)
     Returns both missing required fields and format validation errors.
@@ -159,6 +167,18 @@ Function Test-FieldValidation {
                                     $fieldValue += $textBlock.Text
                                 }
                             }
+                        }
+                    }
+                }
+                "multiselect" {
+                    $checkBoxPanelControl = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_CheckBoxPanel")
+                    if ($checkBoxPanelControl) {
+                        $checkedItems = $checkBoxPanelControl.Children | Where-Object { $_ -is [System.Windows.Controls.CheckBox] -and $_.IsChecked -eq $true }
+                        if ($checkedItems) {
+                            $hasValue = $true
+                            $fieldValue = @($checkedItems | ForEach-Object {
+                                if ($_.Tag) { $_.Tag.ToString() } else { $_.Content.ToString() }
+                            })
                         }
                     }
                 }
@@ -502,6 +522,42 @@ Function New-FieldListControl {
         # Add input row and list container to field panel
         [void]$fieldPanel.Children.Add($arrayContainer)
 
+    } elseif ($Field.type -eq "multiselect") {
+        # Create a compact scrollable checkbox panel sourced from JSON field items
+        $checkBoxPanel = New-Object System.Windows.Controls.StackPanel
+        $checkBoxPanel.Name = $fieldName + "_CheckBoxPanel"
+        $checkBoxPanel.Margin = "2,2,2,2"
+
+        # Source options from valueValidations.allowedValues (key=config value, value=display label)
+        $allowedValues = $syncHash.UIConfigs.valueValidations.($Field.valueType).allowedValues
+        if ($allowedValues) {
+            foreach ($configValue in $allowedValues.PSObject.Properties.Name) {
+                $cb = New-Object System.Windows.Controls.CheckBox
+                $cb.Content = $allowedValues.$configValue
+                $cb.Tag     = $configValue
+                $cb.Margin  = "0,3,0,3"
+                Add-UIControlEventHandler -Control $cb
+                [void]$checkBoxPanel.Children.Add($cb)
+            }
+        }
+
+        $scrollViewer = New-Object System.Windows.Controls.ScrollViewer
+        $scrollViewer.MaxHeight = 160
+        $scrollViewer.VerticalScrollBarVisibility = "Auto"
+        $scrollViewer.HorizontalScrollBarVisibility = "Disabled"
+        $scrollViewer.Content = $checkBoxPanel
+
+        $checkBorder = New-Object System.Windows.Controls.Border
+        $checkBorder.BorderThickness = "1"
+        $checkBorder.BorderBrush = $syncHash.Window.FindResource("BorderBrush")
+        $checkBorder.CornerRadius = "3"
+        $checkBorder.Padding = "6,4,6,4"
+        $checkBorder.Width = 260
+        $checkBorder.HorizontalAlignment = "Left"
+        $checkBorder.Child = $scrollViewer
+
+        [void]$fieldPanel.Children.Add($checkBorder)
+
     } elseif ($Field.type -eq "boolean") {
         # Create boolean checkbox control
         $booleanCheckBox = New-Object System.Windows.Controls.CheckBox
@@ -810,7 +866,7 @@ function Add-FieldListControl {
 Function New-FieldListCard {
     <#
     .SYNOPSIS
-    Creates a comprehensive field card UI element for policy configuration.
+    Creates a field card UI element for policy configuration.
     .DESCRIPTION
     This Function generates a complete card interface with checkboxes, input fields, tabs, and buttons for configuring multiple field types within policy settings including baselineControl tabs.
     When using -OutPolicyOnly, specify -SettingsTypeName to indicate which settings type to save for AutoSave functionality.
@@ -1158,6 +1214,34 @@ Function New-FieldListCard {
                             Add-FieldListControl -FieldPanel $listContainer -ExistingValues $existingData
                         }
                     }
+                    elseif ($field.type -eq "multiselect") {
+                        # Pre-check checkboxes that match the existing data
+                        $checkBoxPanelName = ($fieldName + "_CheckBoxPanel")
+                        $checkBoxPanel = $null
+
+                        if ($validInputFields.Count -gt 1) {
+                            $tabControl = $detailsPanel.Children | Where-Object { $_ -is [System.Windows.Controls.TabControl] }
+                            foreach ($tabItem in $tabControl.Items) {
+                                if ($tabItem.Header -eq $FieldListDef.name) {
+                                    $tabContent = $tabItem.Content
+                                    $checkBoxPanel = Find-UIControlByName -parent $tabContent -targetName $checkBoxPanelName
+                                    if ($checkBoxPanel) { break }
+                                }
+                            }
+                        } else {
+                            $checkBoxPanel = Find-UIControlByName -parent $detailsPanel -targetName $checkBoxPanelName
+                        }
+
+                        if ($checkBoxPanel) {
+                            foreach ($cb in $checkBoxPanel.Children) {
+                                if ($cb -is [System.Windows.Controls.CheckBox]) {
+                                    # Match against Tag (config value) if present, else Content
+                                    $cbValue = if ($cb.Tag) { $cb.Tag.ToString() } else { $cb.Content.ToString() }
+                                    $cb.IsChecked = $existingData -contains $cbValue
+                                }
+                            }
+                        }
+                    }
                     elseif ($field.type -eq "boolean") {
                         # Pre-populate boolean field
                         $booleanFieldName = ($fieldName + "_CheckBox")
@@ -1293,7 +1377,7 @@ Function New-FieldListCard {
         # Get the details panel (parent of button panel)
         $detailsPanel = $this.Parent.Parent
 
-        # Perform comprehensive validation (required fields + regex patterns)
+        # Perform validation (required fields + regex patterns)
         $validationResults = Test-FieldValidation -detailsPanel $detailsPanel -validInputFields $validInputFields -policyId $policyId -CardName $CardName
 
         # Check for validation errors
@@ -1404,6 +1488,24 @@ Function New-FieldListCard {
                         }
                     } else {
                         Write-DebugOutput -Message ("List container not found or empty for: {0}" -f $listContainerName) -Source $this.Name -Level "Error"
+                    }
+
+                } elseif ($field.type -eq "multiselect") {
+                    # Collect checked items from the checkbox panel
+                    $checkBoxPanelName = ($controlFieldName + "_CheckBoxPanel")
+                    $checkBoxPanel = Find-UIControlByName -parent $detailsPanel -targetName $checkBoxPanelName
+
+                    if ($checkBoxPanel) {
+                        $items = @($checkBoxPanel.Children | Where-Object { $_ -is [System.Windows.Controls.CheckBox] -and $_.IsChecked -eq $true } | ForEach-Object {
+                            # Use Tag (config value) if present, else fall back to Content
+                            if ($_.Tag) { $_.Tag.ToString() } else { $_.Content.ToString() }
+                        })
+                        if ($items.Count -gt 0) {
+                            $fieldCardData[$field.value] = $items
+                            Write-DebugOutput -Message ($syncHash.UIConfigs.LocaleInfoMessages.CollectedArrayField -f $inputData, $field.value, ($items -join ', ')) -Source $this.Name -Level "Info"
+                        }
+                    } else {
+                        Write-DebugOutput -Message ("CheckBox panel not found for: {0}" -f $checkBoxPanelName) -Source $this.Name -Level "Error"
                     }
 
                 } elseif ($field.type -eq "boolean") {

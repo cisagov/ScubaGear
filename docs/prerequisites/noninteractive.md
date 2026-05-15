@@ -23,7 +23,7 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 |                         | User.Read.All                                   |               |                                       |                                       |
 | Defender for Office 365 |                                                 | Global Reader |                                       |                                       |
 | Exchange Online         | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
-| Power BI                | Tenant.Read.All                                 |               | Power BI Service                      | 00000009-0000-0000-c000-000000000000  |
+| Power BI                | Tenant setting required <sup>3</sup>            |               |                                       |                                       |
 | Power Platform          | Registration required <sup>2</sup>                                     |               |                                       |                                       |
 | SharePoint Online       | Sites.FullControl.All                           |               | SharePoint<sup>1</sup>                            | 00000003-0000-0ff1-ce00-000000000000  |
 | Microsoft Teams         |                                                 | Global Reader |                                       |                                       |
@@ -31,7 +31,7 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 > [!NOTE]
 > Additional details necessary for GCC High non-interactive authentication are detailed in [this section](#additional-gcc-high-details).<sup>1</sup><br>
 > Power Platform service principals require an additional one-time registration step via interactive login, detailed in [this section](#power-platform-registration).<sup>2</sup><br>
-> Power BI requires a Power BI Admin portal tenant setting to be enabled before service principal access works, detailed in [this section](#power-bi-tenant-setting).<sup>3</sup>
+> Power BI does **not** require any API permissions on the App Registration. Instead, it requires a Power BI Admin portal tenant setting, detailed in [this section](#power-bi-tenant-setting). Adding `Tenant.Read.All` to the App Registration will cause errors (500 in commercial, 401 in GCC).<sup>3</sup>
 
 ## Service Principal Setup
 
@@ -91,6 +91,9 @@ Continue to the [Power Platform Registration](#power-platform-registration) sect
 
 The Power BI Admin portal must be configured to allow service principal access before ScubaGear can retrieve Power BI settings.
 
+> [!WARNING]
+> Do **not** add the `Tenant.Read.All` permission from the Power BI Service API to the App Registration. This permission conflicts with the tenant setting approach and will result in HTTP 500 errors (commercial) or HTTP 401 errors (GCC). The security group and tenant setting described below is the only required configuration.
+
 > [!IMPORTANT]
 > Power BI does not allow adding service principals directly to this setting — the SP must be a member of a security group, and that group must be added to the setting.
 
@@ -100,7 +103,7 @@ Create a plain security group in Entra ID (without role assignment) and add the 
 
 ### Step 2: Enable Read-Only Admin API Access
 
-In the [Power BI Admin portal](https://app.powerbi.com/admin-portal/tenantSettings):
+In the **Power BI Admin portal**:
 1. Navigate to **Tenant settings** → **Admin API settings**
 2. Enable **"Service principals can access read-only admin APIs"**
 3. Under **Apply to**, select **Specific security groups** and add the security group from Step 1
@@ -175,4 +178,4 @@ When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Si
 
 ### Power BI in GCC High
 
-When running ScubaGear to assess Power BI in a GCC High tenant, the `Tenant.Read.All` application permission must be added from the `Power BI Service` API (App ID `00000009-0000-0000-c000-000000000000`) rather than the commercial API.
+When running ScubaGear to assess Power BI in a GCC High tenant, the same [Power BI Tenant Setting](#power-bi-tenant-setting) configuration applies — create an Entra security group containing the service principal and add it to the "Service principals can access read-only admin APIs" setting in the Power BI Admin portal. No API permissions need to be added to the App Registration. Use `-M365Environment gcchigh` when invoking ScubaGear.

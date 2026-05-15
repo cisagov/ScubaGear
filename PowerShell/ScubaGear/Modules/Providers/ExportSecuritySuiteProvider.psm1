@@ -1,8 +1,8 @@
-function Export-DefenderProvider {
+function Export-SecuritySuiteProvider {
     <#
     .Description
     Gets the Microsoft 365 Defender settings that are relevant
-    to the SCuBA Microsoft 365 Defender baselines using the Graph and EXO PowerShell Modules
+    to the SCuBA Microsoft 365 Security Suite using the Graph and EXO PowerShell Modules
     .Functionality
     Internal
     #>
@@ -53,6 +53,7 @@ function Export-DefenderProvider {
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
+    $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
@@ -90,6 +91,8 @@ function Export-DefenderProvider {
         if ($ServicePrincipalParams) {
             $DefenderHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
         }
+        Write-Information "INFO: Authenticating to Security & Compliance..." -InformationAction Continue
+        Write-ScubaLog -Message "Authenticating to Security & Compliance" -Level "Info" -Source "Export-SecuritySuiteProvider"
         Connect-DefenderHelper @DefenderHelperParams
         $IPPSConnected = $true
     }
@@ -157,10 +160,11 @@ function Export-DefenderProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "conn_filter": $ConnectionFilter,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
-    "defender_successful_commands": $SuccessfulCommands,
-    "defender_unsuccessful_commands": $UnSuccessfulCommands,
+    "securitysuite_successful_commands": $SuccessfulCommands,
+    "securitysuite_unsuccessful_commands": $UnSuccessfulCommands,
 "@
 
     $json

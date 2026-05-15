@@ -70,17 +70,23 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
     Context "Navigation to detailed reports" {
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
-            @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
+            @{Product = "securitysuite"; LinkText = "Security Suite"}
             @{Product = "exo"; LinkText = "Exchange Online"}
+            @{Product = "powerbi"; LinkText = "Microsoft Power BI"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
         ){
-            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
-            $DetailLink | Should -Not -BeNullOrEmpty
-            Invoke-SeClick -Element $DetailLink
+            if ($Product -eq "powerbi" -and -not (Test-Path "./$OutputFolder/IndividualReports/PowerBIReport.html")) {
+                Set-ItResult -Skipped -Because "Power BI was removed from assessment (no license found)"
+            }
+            else {
+                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+                $DetailLink | Should -Not -BeNullOrEmpty
+                Invoke-SeClick -Element $DetailLink
 
-            Open-SeUrl -Back -Driver $Driver
+                Open-SeUrl -Back -Driver $Driver
+            }
         }
     }
 
@@ -90,15 +96,20 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
         }
         It "Check <Product> (<LinkText>) tables" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
-            @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
+            @{Product = "securitysuite"; LinkText = "Security Suite"}
             @{Product = "exo"; LinkText = "Exchange Online"}
+            @{Product = "powerbi"; LinkText = "Microsoft Power BI"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
         ){
-            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
-            $DetailLink | Should -Not -BeNullOrEmpty
-            Invoke-SeClick -Element $DetailLink
+            if ($Product -eq "powerbi" -and -not (Test-Path "./$OutputFolder/IndividualReports/PowerBIReport.html")) {
+                Set-ItResult -Skipped -Because "Power BI was removed from assessment (no license found)"
+            }
+            else {
+                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+                $DetailLink | Should -Not -BeNullOrEmpty
+                Invoke-SeClick -Element $DetailLink
 
             # For better performance turn off implict wait
             $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 0
@@ -271,6 +282,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
             # Turn implict wait back on
             $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
+            }
         }
     }
 

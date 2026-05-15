@@ -39,7 +39,7 @@ class ScubaConfig {
     # Cached JSON schema used for validation
     hidden static [object]$_ConfigSchema = $null
 
-    # Initializes validator subsystem once per session - loads schema/defaults from JSON files,
+    # Initializes validator subsystem once per session - loads schemas/defaults from JSON files,
     # caches resources in static properties for performance.
     # This is called automatically when needed and uses lazy loading pattern
     static [void] InitializeValidator() {
@@ -526,7 +526,7 @@ class ScubaConfig {
         foreach ($Policy in $PolicyConfig.Keys) {
             # Validate policy ID format against the regex pattern from configuration
             # Pattern ensures proper format: MS.{PRODUCT}.{GROUP}.{NUMBER}v{VERSION}
-            # Example valid IDs: MS.AAD.1.1v1, MS.DEFENDER.2.3v2, MS.EXO.1.4v1
+            # Example valid IDs: MS.AAD.1.1v1, MS.SECURITYSUITE.2.3v1, MS.EXO.1.4v1
             if (-not ($Policy -match $Defaults.validation.policyIdPattern)) {
                 # Try to extract product from malformed policy ID to provide helpful error message
                 # Split on periods to get potential product name for better error guidance

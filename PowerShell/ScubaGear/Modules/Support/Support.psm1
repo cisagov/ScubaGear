@@ -30,7 +30,7 @@ function Copy-SCuBABaselineDocument {
         New-Item -ItemType Directory -Path $Destination | Out-Null
     }
 
-    @("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint") | ForEach-Object {
+    @("teams", "exo", "securitysuite", "aad", "powerbi", "powerplatform", "sharepoint") | ForEach-Object {
         $SourceFileName = Join-Path -Path $PSScriptRoot -ChildPath "..\..\baselines\$_.md"
         $TargetFileName = Join-Path -Path $Destination -ChildPath "$_.md"
         Copy-Item -Path $SourceFileName -Destination $Destination -Force:$Force -ErrorAction Stop  2> $null
@@ -716,7 +716,7 @@ function New-SCuBAConfig {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "TestResults".
+    Defaults to "RegoOutput".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -805,7 +805,7 @@ function New-SCuBAConfig {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $OutRegoFileName = "TestResults",
+        $OutRegoFileName = "RegoOutput",
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
@@ -989,6 +989,17 @@ function Test-ScubaGearVersion {
     )
 
     try {
+        # This flag is used strictly by developers to speed up module import by skipping dependency checks.
+        if (-not [string]::IsNullOrWhiteSpace($env:DEV_SKIP_DEPENDENCY_CHECK)) {
+            Write-Warning "Skipping dependency checks due to DEV_SKIP_DEPENDENCY_CHECK environment variable."
+            return
+        }
+
+        # This flag is for end users to bypass version checks during module import.
+        if (-not [string]::IsNullOrWhiteSpace($env:SCUBAGEAR_SKIP_VERSION_CHECK)) {
+            return
+        }
+
         $modules = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue
         $latest = Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction SilentlyContinue
 
@@ -1068,7 +1079,6 @@ function Test-ScubaGearVersion {
 
         # Add dependency status objects
         $dependencyStatus = Get-DependencyStatus
-
         # Create dependency component with enhanced properties (always include detailed information)
         $dependencyComponent = [PSCustomObject]@{
             Component = "Dependencies"
@@ -1481,7 +1491,8 @@ function Update-ScubaGear {
 function Reset-ScubaGearDependencies {
     <#
     .SYNOPSIS
-        Manages ScubaGear dependencies based on version requirements defined in the RequiredVersions.ps1 file.
+        Manages ScubaGear dependencies based on version requirements defined in the RequiredVersions.ps1 file
+        and verifies the OPA (Open Policy Agent) executable is installed and up to date.
 
     .DESCRIPTION
         Checks each dependency against RequiredVersions.ps1 and only removes/updates when necessary:
@@ -1489,6 +1500,9 @@ function Reset-ScubaGearDependencies {
         - Updates outdated modules (outside acceptable range)
         - Cleans up multiple versions (keeps best version in range)
         - Preserves modules that are already in acceptable range
+        Also checks the OPA executable against the version configured in ScubaConfigDefaults.json:
+        - Installs OPA if the executable is missing
+        - Updates OPA if the executable hash does not match the expected version
         Returns a comprehensive analysis and execution result.
 
     .PARAMETER Scope
@@ -1524,6 +1538,11 @@ function Reset-ScubaGearDependencies {
         ModulesToInstall = @()
         ModulesToUpdate = @()
         ModulesToCleanup = @()
+
+        # OPA executable status
+        OpaUpToDate = $null
+        OpaToInstall = $null
+        OpaToUpdate = $null
 
         # Execution tracking
         ActionsPerformed = @()
@@ -1622,8 +1641,56 @@ function Reset-ScubaGearDependencies {
             }
         }
 
+        # Analyze OPA executable
+        Write-Information -MessageData "Checking OPA..." -InformationAction Continue
+        $OperatingSystem = "Windows"
+        if ($PSVersionTable.PSEdition -eq "Core") {
+            if ($IsMacOS)  { $OperatingSystem = "MacOS" }
+            elseif ($IsLinux) { $OperatingSystem = "Linux" }
+        }
+        $OpaExpectedVersion = [ScubaConfig]::GetOpaVersion()
+        $OpaExeName         = [ScubaConfig]::GetOpaExecutable($OperatingSystem)
+        $OpaDirectory       = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
+        $OpaFullPath        = Join-Path -Path $OpaDirectory -ChildPath $OpaExeName
+
+        $opaInfo = [PSCustomObject]@{
+            Name            = "OPA"
+            ExpectedVersion = $OpaExpectedVersion
+            ExecutableName  = $OpaExeName
+            InstallPath     = $OpaDirectory
+            Action          = $null
+        }
+
+        if (-not (Test-Path -Path $OpaFullPath -PathType Leaf)) {
+            $opaInfo.Action      = "Install OPA v$OpaExpectedVersion"
+            $result.OpaToInstall = $opaInfo
+        }
+        else {
+            $hashVerified = $false
+            $hashCorrect  = $false
+            try {
+                $ExpectedHash = Get-ExeHash -name $OpaExeName -version $OpaExpectedVersion
+                $ActualHash   = (Get-FileHash -Path $OpaFullPath -Algorithm SHA256).Hash
+                $hashVerified = $true
+                $hashCorrect  = ($ActualHash -ieq $ExpectedHash)
+            }
+            catch {
+                $result.Warnings += "Could not verify OPA hash: $($_.Exception.Message)"
+            }
+
+            if ($hashVerified -and -not $hashCorrect) {
+                $opaInfo.Action     = "Update to v$OpaExpectedVersion (hash mismatch)"
+                $result.OpaToUpdate = $opaInfo
+            }
+            else {
+                $opaInfo.Action     = if ($hashVerified) { "Already up to date" } else { "Present (hash unverifiable)" }
+                $result.OpaUpToDate = $opaInfo
+            }
+        }
+
         # Calculate totals
-        $result.ActionsNeeded = $result.ModulesToInstall.Count + $result.ModulesToUpdate.Count + $result.ModulesToCleanup.Count
+        $opaActionNeeded  = ($null -ne $result.OpaToInstall) -or ($null -ne $result.OpaToUpdate)
+        $result.ActionsNeeded = $result.ModulesToInstall.Count + $result.ModulesToUpdate.Count + $result.ModulesToCleanup.Count + [int]$opaActionNeeded
 
         # Admin check
         if ($result.AdminRequired -and -not $result.AdminAvailable) {
@@ -1748,6 +1815,22 @@ function Reset-ScubaGearDependencies {
                 }
                 else {
                     $result.Errors += "[FAIL] Failed to clean $($module.Name): could not remove any versions"
+                    $result.ActionsFailed++
+                }
+            }
+        }
+
+        # Install or update OPA executable
+        if ($null -ne $result.OpaToInstall -or $null -ne $result.OpaToUpdate) {
+            $opaActionLabel = if ($null -ne $result.OpaToInstall) { "Install" } else { "Update" }
+            if ($PSCmdlet.ShouldProcess("OPA v$OpaExpectedVersion", "$opaActionLabel OPA executable")) {
+                try {
+                    Install-OPAforSCuBA -ExpectedVersion $OpaExpectedVersion -OperatingSystem $OperatingSystem
+                    $result.ActionsPerformed += "[OK] $opaActionLabel OPA to v$OpaExpectedVersion"
+                    $result.ActionsCompleted++
+                }
+                catch {
+                    $result.Errors += "[FAIL] Failed to $opaActionLabel OPA: $($_.Exception.Message)"
                     $result.ActionsFailed++
                 }
             }
@@ -1993,6 +2076,7 @@ function Update-ScubaGearFromGitHub {
 
 Export-ModuleMember -Function @(
     'Copy-SCuBABaselineDocument',
+    'Get-ExeHash',
     'Install-OPAforSCuBA',
     'Initialize-SCuBA',
     'Copy-SCuBASampleReport',

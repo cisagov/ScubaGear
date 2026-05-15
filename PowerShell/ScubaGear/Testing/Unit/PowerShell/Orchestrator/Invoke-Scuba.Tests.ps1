@@ -30,6 +30,9 @@ InModuleScope Orchestrator {
 
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}
+            Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
+            Mock -ModuleName Orchestrator Write-ScubaLog {}
+            Mock -ModuleName Orchestrator Get-ScubaRunDetails {}
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
@@ -53,9 +56,9 @@ InModuleScope Orchestrator {
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
-            It 'Given -ProductNames defender should not throw' {
+            It 'Given -ProductNames securitysuite should not throw' {
                 $SplatParams += @{
-                    ProductNames = @("defender")
+                    ProductNames = @("securitysuite")
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
