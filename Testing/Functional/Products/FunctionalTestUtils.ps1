@@ -408,40 +408,6 @@ function UpdateProviderExport{
 
 }
 
-function UpdateDirectorySettingByName{
-  <#
-    .SYNOPSIS
-      Wrapper function for the MS Graph commandlet, Update-MgBetaDirectorySetting, to lookup by name for update.
-    .PARAMETER DisplayName
-      The DisplayName of the Directory Setting to be updated.
-    .PARAMETER Updates
-      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
-    .NOTES
-      If more than one directory setting has the same DisplayName then only the first is updated.
-  #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
-  [CmdletBinding()]
-  param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $DisplayName,
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [hashtable]
-      $Updates
-  )
-
-  $Ids = Get-MgBetaDirectorySetting | Where-Object { $_.DisplayName -eq $DisplayName } | Select-Object -Property Id
-
-  foreach($Id in $Ids){
-      if (-not ([string]::IsNullOrEmpty($Id.Id))){
-          Update-MgBetaDirectorySetting -DirectorySettingId $($Id.Id) @Updates
-          break
-      }
-  }
-}
-
 function RemoveConditionalAccessPolicyByName{
     <#
     .SYNOPSIS
