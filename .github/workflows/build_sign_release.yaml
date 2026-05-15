@@ -44,7 +44,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Install Azure Signing Tool
@@ -54,7 +54,7 @@ jobs:
           Install-AzureSignTool
       # OpenID Connect (OIDC) login to Azure Public Cloud with AzPowershell
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -76,25 +76,52 @@ jobs:
             -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
             -ReleaseVersion ${{ inputs.version }} `
             -RootFolderName "repo"
+      - name: Get previous release tag
+        id: previous-release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              }
+            );
+
+            const currentTag = `v${{ inputs.version }}`;
+            const previousRelease = releases.find(
+              (release) => !release.draft && !release.prerelease && release.tag_name !== currentTag
+            );
+
+            if (!previousRelease) {
+              core.setFailed("Unable to determine previous published release tag.");
+              return;
+            }
+
+            core.info(`Using previous tag ${previousRelease.tag_name} for release notes.`);
+            core.setOutput("tag", previousRelease.tag_name);
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         id: create-release
         with:
           draft: true
           prerelease: false
           name: ${{ inputs.releaseName }}
           tag_name: v${{ inputs.version }}
+          previous_tag: ${{ steps.previous-release.outputs.tag }}
           files: |
             ScubaGear-${{ inputs.version }}.zip
             ScubaGear-${{ inputs.version }}/PowerShell/ScubaGear/schemas/ScubaBaselines.json
           generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release
-        uses: dsaltares/fetch-gh-release-asset@1.1.1
         if: ${{ inputs.runQuickCheck }}
-        with:
-          version: ${{ steps.create-release.outputs.id}}
-          file: "ScubaGear-${{ inputs.version }}.zip"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "ScubaGear-${{ inputs.version }}.zip" --clobber
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
