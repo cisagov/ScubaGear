@@ -408,40 +408,6 @@ function UpdateProviderExport{
 
 }
 
-function UpdateDirectorySettingByName{
-  <#
-    .SYNOPSIS
-      Wrapper function for the MS Graph commandlet, Update-MgBetaDirectorySetting, to lookup by name for update.
-    .PARAMETER DisplayName
-      The DisplayName of the Directory Setting to be updated.
-    .PARAMETER Updates
-      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
-    .NOTES
-      If more than one directory setting has the same DisplayName then only the first is updated.
-  #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
-  [CmdletBinding()]
-  param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $DisplayName,
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [hashtable]
-      $Updates
-  )
-
-  $Ids = Get-MgBetaDirectorySetting | Where-Object { $_.DisplayName -eq $DisplayName } | Select-Object -Property Id
-
-  foreach($Id in $Ids){
-      if (-not ([string]::IsNullOrEmpty($Id.Id))){
-          Update-MgBetaDirectorySetting -DirectorySettingId $($Id.Id) @Updates
-          break
-      }
-  }
-}
-
 function RemoveConditionalAccessPolicyByName{
     <#
     .SYNOPSIS
@@ -616,10 +582,10 @@ function Get-ExpectedHeaderNames {
           return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
         }
         "riskyApps_table" {
-          return @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","Severity Score","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         "riskyThirdPartySPs_table" {
-          return @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","Severity Score","Privileged Roles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
           return $null 
@@ -634,8 +600,8 @@ function Get-ExpectedColumnSize {
     )
     switch ($TableClass) {
         "caps_table" { return 8 }
-        "riskyApps_table" { return 7 }
-        "riskyThirdPartySPs_table" { return 6 }
+        "riskyApps_table" { return 8 }
+        "riskyThirdPartySPs_table" { return 8 }
         default { return 0 }
     }
 }

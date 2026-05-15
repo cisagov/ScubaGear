@@ -26,7 +26,7 @@ function Get-ExchangeHybridIds {
         # $FullAccessAsAppRoleId.Name represents the role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
         # $FullAccessAsAppRoleId.Value represents the role name ("full_access_as_app")
         $FullAccessAsAppRoleId = $RiskyPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
-            $_.Value -eq "full_access_as_app"
+            $_.Value.Name -eq "full_access_as_app"
         } | Select-Object -First 1
 
         if ($null -eq $FullAccessAsAppRoleId) {
@@ -84,7 +84,7 @@ function Get-LegacyExchangeServicePrincipal {
                 HasKeyCredentials       = ($null -ne $ExchangeOnlineSP.KeyCredentials) -and @($ExchangeOnlineSP.KeyCredentials).Count -gt 0
                 KeyCredentials          = Format-Credentials -AccessKeys $ExchangeOnlineSP.KeyCredentials -IsFromApplication $false
                 PasswordCredentials     = Format-Credentials -AccessKeys $ExchangeOnlineSP.PasswordCredentials -IsFromApplication $false
-                FederatedCredentials    = $ExchangeOnlineSP.FederatedIdentityCredentials
+                FederatedCredentials    = Format-Credentials -AccessKeys $ExchangeOnlineSP.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
                 AppOwnerOrganizationId  = $ExchangeOnlineSP.AppOwnerOrganizationId
             }
         }

@@ -91,6 +91,8 @@ function Export-SecuritySuiteProvider {
         if ($ServicePrincipalParams) {
             $DefenderHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
         }
+        Write-Information "INFO: Authenticating to Security & Compliance..." -InformationAction Continue
+        Write-ScubaLog -Message "Authenticating to Security & Compliance" -Level "Info" -Source "Export-SecuritySuiteProvider"
         Connect-DefenderHelper @DefenderHelperParams
         $IPPSConnected = $true
     }
