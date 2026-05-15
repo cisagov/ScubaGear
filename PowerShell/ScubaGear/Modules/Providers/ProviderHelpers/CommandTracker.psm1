@@ -1,12 +1,8 @@
 Import-Module -Name $PSScriptRoot/../ExportEXOProvider.psm1 -Function Get-ScubaSpfRecord, Get-ScubaDkimRecord, Get-ScubaDmarcRecord
 Import-Module -Name $PSScriptRoot/../ExportAADProvider.psm1 -Function Get-PrivilegedRole, Get-PrivilegedUser
 Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-ApplicationsWithRiskyPermissions, Get-ServicePrincipalsWithRiskyPermissions, Format-RiskyApplications, Format-RiskyThirdPartyServicePrincipals, Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications
-Import-Module -Name $PSScriptRoot/AADHybridExchangeHelper.psm1 -Function Get-LegacyExchangeServicePrincipal, Get-DedicatedExchangeHybridApplications
-Import-Module -Name $PSScriptRoot/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformTenantSettingsRest, Get-PowerPlatformEnvironmentsRest, Get-PowerPlatformDlpPoliciesRest, Get-PowerPlatformTenantIsolationRest
-Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 Import-Module -Name $PSScriptRoot/../../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
-Import-Module -Name $PSScriptRoot/AADAppManagementPolicyHelper.psm1 -Function Get-AppManagementPolicies
 
 class CommandTracker {
     [string[]]$SuccessfulCommands = @()
@@ -45,21 +41,17 @@ class CommandTracker {
             if ($isGraphDirect) {
                 # This will pull the Graph API vice the PowerShell module
                 Write-Verbose "Running $($Command) API Call"
-                $ModCommand = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
-                    Invoke-GraphDirectly -Commandlet $Command @CommandArgs
-                }
+                $ModCommand = Invoke-GraphDirectly -Commandlet $Command @CommandArgs
                 $Result = $ModCommand
 
                 # Check if $Result.value exists, if it does, return it if not return just $Result
-                if ($null -ne $Result.value) {
+                if ($Result.value) {
                     $Result = $Result.value
                 }
             }
             else {
                 Write-Verbose "Running $($Command) with arguments: $($CommandArgs)"
-                $Result = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
-                    & $Command @CommandArgs
-                }
+                $Result = & $Command @CommandArgs
             }
 
             $this.SuccessfulCommands += $Command

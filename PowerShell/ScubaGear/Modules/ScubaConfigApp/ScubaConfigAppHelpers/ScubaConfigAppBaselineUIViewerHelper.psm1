@@ -24,10 +24,7 @@ Function Show-ScubaBaselinePolicyHelper {
         [string]$NavigateToPolicyId,
 
         [Parameter(Mandatory = $false)]
-        [string]$ControlConfigPath,
-
-        [Parameter(Mandatory = $false)]
-        [switch]$PassThru
+        [string]$ControlConfigPath
     )
 
     try {
@@ -54,28 +51,8 @@ Function Show-ScubaBaselinePolicyHelper {
             IsClosing = $false
             Error = $null
             NavigationQueue = [System.Collections.Queue]::Synchronized([System.Collections.Queue]::new())
-            ViewerLogs = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
-            LoggingEnabled = $PassThru.IsPresent
         })
         $viewerRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
-
-        # Import debug helper module into viewer runspace if PassThru is enabled
-        if ($PassThru) {
-            try {
-                # Find the debug helper module relative to this module
-                $debugHelperPath = Join-Path $PSScriptRoot "ScubaConfigAppDebugHelper.psm1"
-                if (Test-Path $debugHelperPath) {
-                    $viewerRunspace.SessionStateProxy.Path.SetLocation($PSScriptRoot)
-                    $importScript = "Import-Module '$debugHelperPath' -Force -ErrorAction SilentlyContinue"
-                    $viewerRunspace.SessionStateProxy.InvokeCommand.InvokeScript($importScript)
-                    Write-Verbose "Debug helper module imported into viewer runspace"
-                } else {
-                    Write-Warning "Debug helper module not found at: $debugHelperPath. Logging will not be available."
-                }
-            } catch {
-                Write-Warning "Failed to import debug helper into viewer runspace: $($_.Exception.Message)"
-            }
-        }
 
         # Define the main UI script block
         $uiScriptBlock = {
@@ -84,24 +61,6 @@ Function Show-ScubaBaselinePolicyHelper {
                 Add-Type -AssemblyName PresentationFramework
                 Add-Type -AssemblyName PresentationCore
                 Add-Type -AssemblyName WindowsBase
-
-                # Create a simple logging function if logging is enabled
-                if ($syncHash.LoggingEnabled) {
-                    # Create wrapper for Write-DebugOutput that works with synchronized collection
-                    function Write-ViewerLog {
-                        param([string]$Message, [string]$Source = "BaselineViewer", [string]$Level = "Info")
-                        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss.fff"
-                        $logEntry = "[$timestamp] [$Level] [$Source] $Message"
-                        [void]$syncHash.ViewerLogs.Add($logEntry)
-
-                        # Also try to use Write-DebugOutput if it exists (from imported module)
-                        if (Get-Command Write-DebugOutput -ErrorAction SilentlyContinue) {
-                            Write-DebugOutput -Message $Message -Source $Source -Level $Level
-                        }
-                    }
-
-                    Write-ViewerLog "Baseline Policy Viewer started" -Level "Info"
-                }
 
                 # Load baseline data
                 $jsonData = Get-Content $BaselineFilePath -Raw | ConvertFrom-Json
@@ -951,13 +910,19 @@ Function Show-ScubaBaselinePolicyHelper {
                         $lastIndex = $match.Index + $match.Length
                     }
 
-                    # Add any remaining text after the last match (or all text if no matches)
+                    # Add any remaining text after the last match
                     if ($lastIndex -lt $text.Length) {
                         $remainingText = $text.Substring($lastIndex)
                         if ($remainingText) {
                             $run = New-Object System.Windows.Documents.Run($remainingText)
                             [void]$textBlock.Inlines.Add($run)
                         }
+                    }
+
+                    # If no matches were found, add the entire text
+                    if ($formatMatches.Count -eq 0) {
+                        $run = New-Object System.Windows.Documents.Run($text)
+                        [void]$textBlock.Inlines.Add($run)
                     }
                 }
 
@@ -1014,22 +979,11 @@ Function Show-ScubaBaselinePolicyHelper {
                                         @($sectionConfig.jsonProperty)
                                     }
 
-                                    # Log processing
-                                    if ($syncHash.LoggingEnabled) {
-                                        Write-ViewerLog "Processing section: $sectionKey, jsonProperties count: $($jsonProperties.Count), Panel has $($contentPanel.Children.Count) children before processing" -Level "Debug"
-                                    }
-
                                     foreach ($jsonProp in $jsonProperties) {
                                         # Completely dynamic content handling - no hardcoded property names
                                         $propertyData = $selectedPolicy.$jsonProp
 
                                         if ($propertyData) {
-                                            # Log property processing
-                                            if ($syncHash.LoggingEnabled) {
-                                                $dataType = if ($propertyData -is [array]) { "Array[$($propertyData.Count)]" } else { "String" }
-                                                Write-ViewerLog "  Property '$jsonProp' in section '$sectionKey' -> Type: $dataType" -Level "Debug"
-                                            }
-
                                             # Handle different data types dynamically
                                             if ($propertyData -is [array] -and $propertyData.Count -gt 0) {
                                                 # Handle all arrays the same way - check each item
@@ -1060,9 +1014,6 @@ Function Show-ScubaBaselinePolicyHelper {
                                                         [void]$contentPanel.Children.Add($linkBlock)
                                                     } elseif ($item -is [string] -and -not [string]::IsNullOrWhiteSpace($item)) {
                                                         # Handle string items (licenseRequirements, etc.) - display each as separate bullet with markdown support
-                                                        if ($syncHash.LoggingEnabled) {
-                                                            Write-ViewerLog "    Adding bullet item to '$sectionKey': $item" -Level "Debug"
-                                                        }
                                                         $bulletContent = "• $item"
                                                         $bulletText = & $createTextBlockWithFormatting $bulletContent "0,2,0,2"
                                                         [void]$contentPanel.Children.Add($bulletText)
@@ -1075,11 +1026,6 @@ Function Show-ScubaBaselinePolicyHelper {
                                                 [void]$contentPanel.Children.Add($contentText)
                                             }
                                         }
-                                    }
-
-                                    # Log final child count
-                                    if ($syncHash.LoggingEnabled) {
-                                        Write-ViewerLog "  Final: section '$sectionKey' panel has $($contentPanel.Children.Count) children after processing" -Level "Debug"
                                     }
 
                                     # Add "no content" message if panel is still empty
@@ -1371,9 +1317,6 @@ Function Show-ScubaBaselinePolicyHelper {
 
                 # Add window closing event to properly clean up
                 $window.Add_Closing({
-                    if ($syncHash.LoggingEnabled) {
-                        Write-ViewerLog "Baseline Policy Viewer closing. Total log entries: $($syncHash.ViewerLogs.Count)" -Level "Info"
-                    }
                     $syncHash.IsClosing = $true
                     $navigationTimer.Stop()
                 }.GetNewClosure())
@@ -1394,7 +1337,6 @@ Function Show-ScubaBaselinePolicyHelper {
         $viewerHandle = $viewerPowerShell.BeginInvoke()
 
         # Return the runspace information for management
-        # (Always returned for internal tracking regardless of PassThru parameter)
         return @{
             PowerShell = $viewerPowerShell
             Runspace = $viewerRunspace

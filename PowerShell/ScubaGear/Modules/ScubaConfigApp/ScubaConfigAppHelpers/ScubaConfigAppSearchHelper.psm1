@@ -222,7 +222,7 @@ Function Add-SearchAndFilterCapability {
 
             # Get labels from the baseline control configuration
             $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.controlType -eq $tabType }
-
+            
             # Use configured labels or fall back to defaults
             $allLabel = if ($baselineControl.filterAllLabel) { $baselineControl.filterAllLabel } else { "All Policies" }
             $configuredLabel = if ($baselineControl.filterConfiguredLabel) { $baselineControl.filterConfiguredLabel } else { "Configured Policies" }

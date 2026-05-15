@@ -196,7 +196,7 @@ test_Locations_Incorrect_V1 if {
     ReportDetailString := concat("", [
         "DLP custom policy applied to the following locations: Devices, OneDrive, SharePoint, Teams",
         ". Custom policy protecting sensitive info types NOT applied to: Exchange",
-        ".  For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ".  For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
@@ -216,7 +216,7 @@ test_Locations_Incorrect_V2 if {
     ReportDetailString := concat("", [
         "DLP custom policy applied to the following locations: Devices, Exchange, OneDrive, Teams",
         ". Custom policy protecting sensitive info types NOT applied to: SharePoint",
-        ".  For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ".  For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
@@ -236,7 +236,7 @@ test_Locations_Incorrect_V3 if {
     ReportDetailString := concat("", [
         "DLP custom policy applied to the following locations: Devices, Exchange, SharePoint, Teams",
         ". Custom policy protecting sensitive info types NOT applied to: OneDrive",
-        ".  For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ".  For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
@@ -257,7 +257,7 @@ test_Locations_Incorrect_V4 if {
         "DLP custom policy applied to the following locations: Devices, Exchange, OneDrive, SharePoint",
         ". Custom policy protecting sensitive info types NOT applied to: Teams",
         ". Teams location requires DLP for Teams included in E5/G5 licenses",
-        ". For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ". For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
@@ -278,7 +278,7 @@ test_Locations_Incorrect_V5 if {
         "DLP custom policy applied to the following locations: Exchange, OneDrive, SharePoint, Teams",
         ". Custom policy protecting sensitive info types NOT applied to: Devices",
         ". Devices location requires DLP for Endpoint licensing and at least one registered device",
-        ". For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ". For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
@@ -299,7 +299,7 @@ test_Locations_Incorrect_V6 if {
         "Custom policy protecting sensitive info types NOT applied to: Devices, Exchange, OneDrive, SharePoint, Teams",
         ". Devices location requires DLP for Endpoint licensing and at least one registered device",
         ". Teams location requires DLP for Teams included in E5/G5 licenses",
-        ". For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ". For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
 }
@@ -319,7 +319,7 @@ test_Locations_Incorrect_V7 if {
         "Custom policy protecting sensitive info types NOT applied to: Devices, Exchange, OneDrive, SharePoint, Teams",
         ". Devices location requires DLP for Endpoint licensing and at least one registered device",
         ". Teams location requires DLP for Teams included in E5/G5 licenses",
-        ". For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ". For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true
@@ -340,7 +340,7 @@ test_Locations_Incorrect_V8 if {
         "Custom policy protecting sensitive info types NOT applied to: Devices, Exchange, OneDrive, SharePoint, Teams",
         ". Devices location requires DLP for Endpoint licensing and at least one registered device",
         ". Teams location requires DLP for Teams included in E5/G5 licenses",
-        ". For full policy details, see the ActualValue field in the results file: ./RegoOutput.json"
+        ". For full policy details, see the ActualValue field in the results file: ./TestResults.json"
     ])
 
     TestResult("MS.DEFENDER.4.2v1", Output, ReportDetailString, false) == true

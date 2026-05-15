@@ -38,8 +38,11 @@
       "MS.AAD.3.8v1": ["CapExclusions"],
       "MS.AAD.3.9v1": ["CapExclusions"],
       "MS.AAD.7.4v1": ["RoleExclusions"],
-      "MS.SECURITYSUITE.2.1v1": ["SensitiveUsers"],
-      "MS.SECURITYSUITE.2.3v1": ["PartnerDomains"],
+      "MS.DEFENDER.1.4v1": ["SensitiveAccounts"],
+      "MS.DEFENDER.1.5v1": ["SensitiveAccounts"],
+      "MS.DEFENDER.2.1v1": ["SensitiveUsers"],
+      "MS.DEFENDER.2.2v1": ["AgencyDomains"],
+      "MS.DEFENDER.2.3v1": ["PartnerDomains"],
       "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
     },
 
@@ -48,9 +51,9 @@
         "supportsExclusions": true,
         "supportedExclusionTypes": ["CapExclusions", "RoleExclusions"]
       },
-      "SecuritySuite": {
+      "Defender": {
         "supportsExclusions": true,
-        "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers", "PartnerDomains"]
+        "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers", "AgencyDomains", "PartnerDomains"]
       },
       "Exo": {
         "supportsExclusions": true,
@@ -101,7 +104,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["aad", "defender", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi", "*"]
+        "enum": ["aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams", "*"]
       },
       "minItems": 1,
       "uniqueItems": true,
@@ -257,15 +260,21 @@
       "caseSensitive": true
     },
 
-    "SecuritySuite": {
-      "_comment": "Security Suite exclusion configurations",
+    "Defender": {
+      "_comment": "Microsoft Defender exclusion configurations",
       "type": "object",
       "patternProperties": {
-        "^MS\\.SECURITYSUITE\\.[0-9]+\\.[0-9]+v[0-9]+$": {
+        "^MS\\.DEFENDER\\.[0-9]+\\.[0-9]+v[0-9]+$": {
           "type": "object",
           "properties": {
+            "SensitiveAccounts": {
+              "$ref": "#/definitions/exclusionTypes/SensitiveAccounts"
+            },
             "SensitiveUsers": {
               "$ref": "#/definitions/exclusionTypes/SensitiveUsers"
+            },
+            "AgencyDomains": {
+              "$ref": "#/definitions/exclusionTypes/DomainList"
             },
             "PartnerDomains": {
               "$ref": "#/definitions/exclusionTypes/DomainList"
@@ -463,12 +472,6 @@
         "type": "string",
         "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
         "friendlyName": "User Principal Name (email format)"
-      },
-      "guestUserType": {
-        "_comment": "Valid guest user types for Conditional Access exclusions",
-        "pattern": "^(internalGuest|b2bCollaborationGuest|b2bCollaborationMember|b2bDirectConnectUser|otherExternalUser|serviceProvider)$",
-        "type": "string",
-        "friendlyName": "Guest user type"
       }
     },
 
@@ -490,33 +493,6 @@
             "type": "array",
             "items": {
               "$ref": "#/definitions/patterns/guid"
-            },
-            "uniqueItems": true
-          },
-          "Applications": {
-            "_comment": "Cloud app IDs to exclude from Conditional Access policies. Each entry must be either a valid GUID (e.g. '00000004-0000-0ff1-ce00-000000000000') or an alphanumeric named app string (e.g. 'Office365'). Malformed GUIDs will fail validation.",
-            "type": "array",
-            "items": {
-              "oneOf": [
-                {
-                  "_comment": "Valid GUID format",
-                  "$ref": "#/definitions/patterns/guid"
-                },
-                {
-                  "_comment": "Named app string (alphanumeric only, e.g. 'Office365', 'MicrosoftAdminPortals')",
-                  "type": "string",
-                  "pattern": "^[a-zA-Z0-9]+$",
-                  "minLength": 1
-                }
-              ]
-            },
-            "uniqueItems": true
-          },
-          "GuestUserTypes": {
-            "_comment": "Guest/external user types to exclude from Conditional Access policies. Values correspond to GuestOrExternalUserTypes in the MS Graph CAP schema.",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/patterns/guestUserType"
             },
             "uniqueItems": true
           }
@@ -541,6 +517,64 @@
             "type": "array",
             "items": {
               "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      },
+
+      "SensitiveAccounts": {
+        "_comment": "Sensitive account configuration for Defender policies",
+        "type": "object",
+        "properties": {
+          "IncludedUsers": {
+            "_comment": "User Principal Names (UPNs) to include as sensitive",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/upn"
+            },
+            "uniqueItems": true
+          },
+          "IncludedGroups": {
+            "_comment": "Group display names with FQDN (displayname@fqdn) to include",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/fqdn"
+            },
+            "uniqueItems": true
+          },
+          "IncludedDomains": {
+            "_comment": "Domain names to include as sensitive",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true
+          },
+          "ExcludedUsers": {
+            "_comment": "User Principal Names (UPNs) to exclude from sensitive accounts",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/upn"
+            },
+            "uniqueItems": true
+          },
+          "ExcludedGroups": {
+            "_comment": "Group display names with FQDN (displayname@fqdn) to exclude",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/fqdn"
+            },
+            "uniqueItems": true
+          },
+          "ExcludedDomains": {
+            "_comment": "Domain names to exclude from sensitive accounts",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
             },
             "uniqueItems": true
           }

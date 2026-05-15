@@ -71,25 +71,19 @@ Describe "Smoke Test: Generate Output" {
         }
         It "Item, <Item>, exists" -ForEach @(
             @{Item = 'BaselineReports.html'; ItemType = 'Leaf'},
-            @{Item = 'RegoOutput.json'; ItemType = 'Leaf'},
+            @{Item = 'TestResults.json'; ItemType = 'Leaf'},
             @{Item = 'ProviderSettingsExport.json'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports'; ItemType = 'Container'},
             @{Item = 'IndividualReports/AADReport.html'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/SecuritySuiteReport.html'; ItemType = 'Leaf'},
+            @{Item = 'IndividualReports/DefenderReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/EXOReport.html'; ItemType = 'Leaf'},
-            @{Item = 'IndividualReports/PowerBIReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/PowerPlatformReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/SharePointReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/TeamsReport.html'; ItemType = 'Leaf'},
             @{Item = 'IndividualReports/images'; ItemType = 'Container'}
         ){
-            $Exists = Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType
-            if (-not $Exists -and $Item -like "*PowerBI*") {
-                Set-ItResult -Skipped -Because "Power BI was removed from assessment (no license found)"
-            }
-            else {
-                $Exists | Should -Be $true
-            }
+            Test-Path -Path "./$OutputFolder/$Item" -PathType $ItemType |
+                Should -Be $true
         }
     }
     Context "Verify exported functions for ScubaGear module" {
@@ -115,7 +109,7 @@ Describe "Smoke Test: Generate Output" {
     Context "Verify Copy* exported commands" -ForEach @(
         @{Command='Copy-SCuBABaselineDocument'; CopiedFiles=@(
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/aad.md"),
-            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/securitysuite.md"),
+            (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/defender.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/exo.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerbi.md"),
             (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/powerplatform.md"),

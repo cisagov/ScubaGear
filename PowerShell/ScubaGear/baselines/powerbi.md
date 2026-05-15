@@ -301,22 +301,14 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 
 ### Implementation
 #### MS.POWERBI.4.1v1 Instructions
-If your organization has service principals that need to access Power BI APIs, then you configure the setting per the instructions below.
-If you don't have service principals that need access then for step 4, configure the setting to Disabled.
-
 1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
 3. Scroll to **Developer settings**
 
-4. Click on **Service Principals can call Fabric public APIs**
-
-5. If don't have service principals that need access to Power BI APIs, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.
-
-6. If you have service principals that need to access Power BI APIs, then configure the setting to **Enabled**.
-
-7. Select the specific security groups that contain the service principals authorized to call the APIs.
+4. Click on **Service Principals can call Fabric public APIs** set to **Enabled**.
+Choose a specific security group allowed to use service principles for the APIs.
 
 
 #### MS.POWERBI.4.2v1 Instructions
@@ -326,13 +318,8 @@ If you don't have service principals that need access then for step 4, configure
 
 3. Scroll to **Developer settings**
 
-4. Then, click on **Allow service principals to create and use profiles**
-
-5. If don't have service principals that need to create and use profiles, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.
-
-6. If you have service principals that need to create and use profiles, then configure the setting to **Enabled**.
-
-7. Select the specific security groups that contain the service principals authorized to to create and use profiles.
+4. Then, click on **Allow service principals to create and use profiles** and set to **Enabled**.
+Choose a specific security group allowed to use service principles to create and use profiles
 
 
 ## 5. Power BI ResourceKey Authentication

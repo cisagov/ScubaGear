@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -98,10 +98,6 @@ param (
 )
 
 BeforeDiscovery {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
-
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     Import-Module $ScubaModule
@@ -127,7 +123,7 @@ BeforeDiscovery {
         AppId = $AppId
         TenantDomain = $TenantDomain
     }{
-        if ($ProductName -eq "securitysuite"){
+        if ($ProductName -eq "defender"){
             $ProductNames = @($ProductName, "exo")
         }
         else {
@@ -150,10 +146,6 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
-
     # Shared Data for functional test
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
@@ -165,9 +157,8 @@ BeforeAll {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
         aad = "Azure Active Directory"
-        securitysuite = "Security Suite"
+        defender = "Microsoft 365 Defender"
         exo = "Exchange Online"
-        powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"
         teams = "Microsoft Teams"
@@ -182,8 +173,6 @@ BeforeAll {
     if ($ProductName -eq "sharepoint") {
         $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
         Import-Module $SPOHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
         $DomainPrefix = $TenantDomain.Split(".")[0]
         $script:SPOAdminUrl = switch ($M365Environment) {
             "gcchigh" { "https://$DomainPrefix-admin.sharepoint.us" }
@@ -191,19 +180,18 @@ BeforeAll {
             default   { "https://$DomainPrefix-admin.sharepoint.com" }
         }
         if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:SPOAccessToken = Get-MsalAccessToken `
+            $script:SPOAccessToken = Get-SPOAccessToken `
                 -CertificateThumbprint $Thumbprint `
                 -AppID $AppId `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -Scope "$($script:SPOAdminUrl)/.default"
+                -AdminUrl $script:SPOAdminUrl
         }
         else {
-            $script:SPOAccessToken = Get-MsalAccessToken `
+            $script:SPOAccessToken = Get-SPOAccessTokenInteractive `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "9bc3ab49-b65d-410a-85ad-de819febfddc" `
-                -Scope "$($script:SPOAdminUrl)/.default"
+                -AdminUrl $script:SPOAdminUrl
         }
     }
 
@@ -213,24 +201,18 @@ BeforeAll {
     if ($ProductName -eq "powerplatform") {
         $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
         Import-Module $PPHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
         $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
-        $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
         if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:PPAccessToken = Get-MsalAccessToken `
+            $script:PPAccessToken = Get-PowerPlatformAccessToken `
                 -CertificateThumbprint $Thumbprint `
                 -AppID $AppId `
                 -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -Scope $PPScope
+                -M365Environment $M365Environment
         }
         else {
-            $script:PPAccessToken = Get-MsalAccessToken `
+            $script:PPAccessToken = Get-PowerPlatformAccessTokenInteractive `
                 -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
-                -Scope $PPScope
+                -M365Environment $M365Environment
         }
     }
 
@@ -240,24 +222,18 @@ BeforeAll {
     if ($ProductName -eq "powerbi") {
         $PBIHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerBIRestHelper.psm1"
         Import-Module $PBIHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
         $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
-        $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
         if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:PBIAccessToken = Get-MsalAccessToken `
+            $script:PBIAccessToken = Get-PowerBIAccessToken `
                 -CertificateThumbprint $Thumbprint `
                 -AppID $AppId `
                 -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -Scope $PBIScope
+                -M365Environment $M365Environment
         }
         else {
-            $script:PBIAccessToken = Get-MsalAccessToken `
+            $script:PBIAccessToken = Get-PowerBIAccessTokenInteractive `
                 -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
-                -Scope $PBIScope
+                -M365Environment $M365Environment
         }
     }
 
@@ -386,10 +362,10 @@ Describe "Policy Checks for <ProductName>" {
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending
             $OutputFolder = $ReportFolders[0]
             Write-Debug "OutputFolder: $OutputFolder"
-            $IntermediateRegoOutput = LoadRegoOutput($OutputFolder)
+            $IntermediateTestResults = LoadTestResults($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
-            $PolicyResultObj = $IntermediateRegoOutput | Where-Object { $_.PolicyId -eq $PolicyId }
+            $PolicyResultObj = $IntermediateTestResults | Where-Object { $_.PolicyId -eq $PolicyId }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
             try {
@@ -410,6 +386,9 @@ Describe "Policy Checks for <ProductName>" {
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
                 $Details = $PolicyResultObj.ReportDetails
                 $Details | Should -Not -BeNullOrEmpty -Because "expect details, $Details"
+                if ($IsCustomImplementation){
+                    $Details | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
+                }
 
                 # Check final HTML output
                 $FoundPolicy = $false
@@ -511,7 +490,11 @@ Describe "Policy Checks for <ProductName>" {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
-                                    if ($IsNotChecked){
+                                    if ($IsCustomImplementation) {
+                                        $RowData[2].text | Should -BeLikeExactly "N/A" -Because "custom policies should not have results. [$Msg]"
+                                        $RowData[4].text | Should -Match 'A custom product can be used to fulfill this policy requirement.+'
+                                    }
+                                    elseif ($IsNotChecked){
                                         $RowData[2].text | Should -BeLikeExactly "N/A" -Because "policies that are not checked should be N/A. [$Msg]"
                                     }
                                     elseif ($true -eq $ExpectedResult) {

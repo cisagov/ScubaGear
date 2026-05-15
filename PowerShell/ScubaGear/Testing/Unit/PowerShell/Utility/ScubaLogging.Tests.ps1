@@ -884,21 +884,21 @@ InModuleScope ScubaLogging {
 
                 # Mock Test-Path so ValidateScript passes
                 Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
-
+                
                 # Mock Get-Content to return test log content
                 Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
-
+                
                 # Override Get-Content for the redaction schema to return the real file as-is
                 Mock Get-Content {
                     # Find module file location to locate redaction JSON
                     $moduleFile = Get-Command Get-ScubaDebugLogReport | Select-Object -ExpandProperty ScriptBlock | Select-Object -ExpandProperty File
                     $modulePath = Split-Path $moduleFile -Parent
                     $actualPath = Join-Path $modulePath 'ScubaLoggingRedactions.json'
-
+                    
                     if (-not (Test-Path $actualPath)) {
                         throw "Redaction file not found at: $actualPath"
                     }
-
+                    
                     # Return actual file content without modification
                     return [System.IO.File]::ReadAllText($actualPath)
                 } -ParameterFilter { $Path -like '*ScubaLoggingRedactions.json' }
@@ -1022,7 +1022,7 @@ InModuleScope ScubaLogging {
 
                 # Should preserve non-AppID GUIDs (not in sensitive contexts)
                 $report | Should -Match 'd38604c0-5c0b-4997-b268-c632af060bd3'
-
+                
                 # Should preserve system paths without usernames
                 $report | Should -Match 'C:\\Modules'
             }
@@ -1082,21 +1082,21 @@ InModuleScope ScubaLogging {
                         $moduleFile = Get-Command Get-ScubaDebugLogReport | Select-Object -ExpandProperty ScriptBlock | Select-Object -ExpandProperty File
                         $modulePath = Split-Path $moduleFile -Parent
                         $actualPath = Join-Path $modulePath 'ScubaLoggingRedactions.json'
-
+                        
                         if (-not (Test-Path $actualPath)) {
                             throw "Redaction file not found at: $actualPath"
                         }
-
+                        
                         # Read and modify to enable GUID_Blanket
                         $content = [System.IO.File]::ReadAllText($actualPath)
                         $schema = $content | ConvertFrom-Json
-
+                        
                         # Enable GUID_Blanket pattern specifically for these tests
                         $guidPattern = $schema.patterns | Where-Object { $_.name -eq 'GUID_Blanket' }
                         if ($guidPattern) {
                             $guidPattern.enabled = $true
                         }
-
+                        
                         return ($schema | ConvertTo-Json -Depth 10)
                     } -ParameterFilter { $Path -like '*ScubaLoggingRedactions.json' }
                 }

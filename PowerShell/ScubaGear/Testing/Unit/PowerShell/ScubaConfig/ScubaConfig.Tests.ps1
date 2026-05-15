@@ -21,20 +21,18 @@ Describe "ScubaConfig Module Unit Tests" {
             $script:OPAExeName = "opa_windows_amd64.exe"
         }
         $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
-        $script:OPAExeCreatedByTests = $false
         if (-not (Test-Path $script:OPAExePath)) {
             New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
-            $script:OPAExeCreatedByTests = $true
         }
 
         # Create a global mock for ConvertFrom-Yaml to avoid needing powershell-yaml module in CI/CD
         function global:ConvertFrom-Yaml {
             param($Yaml)
-
+            
             # Simple mock that returns a hashtable (not PSCustomObject)
             # Handle both array and string inputs
             $Content = if ($Yaml -is [array]) { $Yaml -join "`n" } else { $Yaml }
-
+            
             # Parse basic YAML syntax like "ProductNames: [aad]" or "ProductNames: [aad, exo]"
             if ($Content -match 'ProductNames:\s*\[([^\]]+)\]') {
                 $ProductsString = $matches[1]
@@ -43,32 +41,32 @@ Describe "ScubaConfig Module Unit Tests" {
                     ProductNames = $Products
                 }
             }
-
+            
             # Return hashtable with ProductNames if found on separate line
             if ($Content -match 'ProductNames:') {
                 return @{
                     ProductNames = @('aad')
                 }
             }
-
+            
             # Return hashtable with at least ProductNames to satisfy validation
             return @{
                 ProductNames = @('aad')
             }
         }
     }
-
+    
     AfterAll {
         # Clean up the global mock
         Remove-Item -Path Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
-
+        
         # Clean up dummy OPA executable and directory if created by tests
-        if ($script:OPAExeCreatedByTests -and $script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+        if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
             Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
         }
         # Note: We don't remove the .scubagear\Tools directory as it might be needed by other tests
     }
-
+    
     BeforeEach {
         # Reset the instance before each test to prevent state bleed
         [ScubaConfig]::ResetInstance()
@@ -273,7 +271,7 @@ ProductNames: [aad]
 
             # Load some configuration first
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-
+            
             # Create the default OPAPath directory so validation passes
             $DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
             $OPAPathCreated = $false
@@ -281,7 +279,7 @@ ProductNames: [aad]
                 New-Item -Path $DefaultOPAPath -ItemType Directory -Force | Out-Null
                 $OPAPathCreated = $true
             }
-
+            
             @"
 OrgName: TestOrg
 ProductNames: [aad]

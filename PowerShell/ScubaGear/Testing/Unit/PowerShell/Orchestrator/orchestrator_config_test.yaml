@@ -8,7 +8,7 @@ DisconnectOnExit: false
 OutPath: .
 OutFolderName: ScubaReports
 OutProviderFileName: ProviderSettingsExport
-OutRegoFileName: RegoOutput
+OutRegoFileName: TestResults
 OutReportName: BaselineReports
 OutJsonFileName: ScubaResults
 

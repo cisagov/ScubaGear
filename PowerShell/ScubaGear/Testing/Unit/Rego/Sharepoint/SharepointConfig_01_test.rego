@@ -45,15 +45,15 @@ test_SharingCapability_Incorrect_V2 if {
 #
 # Policy MS.SHAREPOINT.1.2v1
 #--
-test_ODBSharingCapability_Correct_V1 if {
+test_OneDriveSharingCapability_Correct_V1 if {
     Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
                                 with input.OneDrive_PnP_Flag as false
 
     TestResult("MS.SHAREPOINT.1.2v1", Output, PASS, true) == true
 }
 
-test_ODBSharingCapability_Correct_V2 if {
-    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "ODBSharingCapability", "value": 3}])
+test_OneDriveSharingCapability_Correct_V2 if {
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 3}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
                                 with input.OneDrive_PnP_Flag as false
@@ -64,7 +64,7 @@ test_ODBSharingCapability_Correct_V2 if {
 test_UsingServicePrincipal if {
     PolicyId := "MS.SHAREPOINT.1.2v1"
 
-    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "ODBSharingCapability", "value": 3}])
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 3}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
                                 with input.OneDrive_PnP_Flag as true
@@ -72,8 +72,8 @@ test_UsingServicePrincipal if {
     TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 
-test_ODBSharingCapability_Incorrect_V1 if {
-    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "ODBSharingCapability", "value": 1}])
+test_OneDriveSharingCapability_Incorrect_V1 if {
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 1}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
                                 with input.OneDrive_PnP_Flag as false
@@ -81,8 +81,8 @@ test_ODBSharingCapability_Incorrect_V1 if {
     TestResult("MS.SHAREPOINT.1.2v1", Output, FAIL, false) == true
 }
 
-test_ODBSharingCapability_Incorrect_V2 if {
-    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "ODBSharingCapability", "value": 2}])
+test_OneDriveSharingCapability_Incorrect_V2 if {
+    Tenant := json.patch(SPOTenant, [{"op": "add", "path": "OneDriveSharingCapability", "value": 2}])
 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
                                 with input.OneDrive_PnP_Flag as false

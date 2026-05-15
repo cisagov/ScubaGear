@@ -31,20 +31,18 @@ InModuleScope Connection {
                     }
                 }
             }
-            function Get-MsalAccessToken {throw 'this will be mocked'}
-            Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
             }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
-            @{ProductNames = "securitysuite"; Services = @('Connect-EXOHelper')}
+            @{ProductNames = "defender"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "exo"; Services = @('Connect-EXOHelper')}
             @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper')}
             @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper')}  # SharePoint uses REST API, only needs Graph for tenant info
             @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
             @{
-                ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
+                ProductNames = "aad", "defender", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
                     'Connect-GraphHelper',
                     'Connect-EXOHelper',
@@ -55,8 +53,8 @@ InModuleScope Connection {
         ){
 
             It "No Service Principal" {
-                $ConnectionResult = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint
-                $ConnectionResult.ProdAuthFailed.Count | Should -Be 0
+                $FailedAuthList = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint
+                $FailedAuthList.Length | Should -Be 0
             }
             It "With Service Principal" {
                 $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint

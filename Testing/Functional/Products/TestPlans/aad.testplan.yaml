@@ -71,7 +71,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   ClientAppTypes:
                     - other
                     - exchangeActiveSync
@@ -108,7 +107,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -137,7 +135,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -179,7 +176,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -204,7 +200,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -246,7 +241,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -269,7 +263,8 @@ TestPlan:
                   Id: MicrosoftAuthenticator
                   State: disabled
         Postconditions: []
-        ExpectedResult: true
+        IsNotChecked: true
+        ExpectedResult: false
       - TestDescription: MS.AAD.3.3v2 Non-Compliant case - MS Auth App name and Geolocation disabled
         Preconditions:
           - Command: UpdateProviderExport
@@ -433,7 +428,6 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -470,7 +464,6 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -529,7 +522,6 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -583,7 +575,6 @@ TestPlan:
                     IncludeGroups: []
                     ExcludeGroups: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: []
                     ExcludeApplications: []
@@ -612,7 +603,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:
@@ -638,7 +628,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   AuthenticationFlows:
                     TransferMethods: "deviceCodeFlow"
                 GrantControls:
@@ -781,238 +770,6 @@ TestPlan:
                     Values:
                       - Name: EnableAdminConsentRequests
                         Value: "true"
-        Postconditions: []
-        ExpectedResult: true
-
-  - PolicyId: MS.AAD.5.5v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.AAD.5.5v1 Non-Compliant case - Password addition not blocked for applications
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: enabled
-                          MaxLifetime: null
-                      KeyCredentials: []
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: enabled
-                          MaxLifetime: null
-                      KeyCredentials: []
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.5.5v1 Compliant case - All password addition is blocked
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: enabled
-                          MaxLifetime: null
-                      KeyCredentials: []
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: enabled
-                          MaxLifetime: null
-                      KeyCredentials: []
-        Postconditions: []
-        ExpectedResult: true
-
-  - PolicyId: MS.AAD.5.6v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.AAD.5.6v1 N/A case - All password addition blocked
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: passwordLifetime
-                          State: disabled
-                          MaxLifetime: P365D
-                      KeyCredentials: []
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: enabled
-                          MaxLifetime: null
-                        - RestrictionType: passwordLifetime
-                          State: disabled
-                          MaxLifetime: P365D
-                      KeyCredentials: []
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.5.6v1 Non-Compliant case - Password lifetime too long (180 days)
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: passwordLifetime
-                          State: enabled
-                          MaxLifetime: P181D
-                        - RestrictionType: symmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                      KeyCredentials: []
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: passwordLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                        - RestrictionType: symmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                      KeyCredentials: []
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.AAD.5.6v1 Compliant case - Password lifetime restricted to 90 days
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: passwordLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                        - RestrictionType: symmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                      KeyCredentials: []
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials:
-                        - RestrictionType: passwordAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: symmetricKeyAddition
-                          State: disabled
-                          MaxLifetime: null
-                        - RestrictionType: passwordLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                        - RestrictionType: symmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P90D
-                      KeyCredentials: []
-        Postconditions: []
-        ExpectedResult: true
-
-  - PolicyId: MS.AAD.5.7v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.AAD.5.7v1 Non-Compliant case - Certificate lifetime too long (367 days)
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials: []
-                      KeyCredentials:
-                        - RestrictionType: asymmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P367D
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials: []
-                      KeyCredentials:
-                        - RestrictionType: asymmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P367D
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.5.7v1 Non-Compliant case - Certificate lifetime not restricted for service principals
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials: []
-                      KeyCredentials:
-                        - RestrictionType: asymmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P180D
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials: []
-                      KeyCredentials:
-                        - RestrictionType: asymmetricKeyLifetime
-                          State: disabled
-                          MaxLifetime: P180D
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.5.7v1 Compliant case - Certificate lifetime restricted to 180 days
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              updates:
-                default_app_management_policy:
-                  - ApplicationRestrictions:
-                      PasswordCredentials: []
-                      KeyCredentials:
-                        - RestrictionType: asymmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P180D
-                    ServicePrincipalRestrictions:
-                      PasswordCredentials: []
-                      KeyCredentials:
-                        - RestrictionType: asymmetricKeyLifetime
-                          State: enabled
-                          MaxLifetime: P180D
         Postconditions: []
         ExpectedResult: true
 

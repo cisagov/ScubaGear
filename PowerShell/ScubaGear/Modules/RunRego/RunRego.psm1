@@ -3,7 +3,7 @@ function Invoke-Rego {
     .Description
     This function runs the specifed BaselineName rego file against the
     ProviderSettings.json using the specified OPA executable
-    Returns an OPA Rego output PSObject array
+    Returns a OPA TestResults PSObject Array
     .Functionality
     Internal
     #>
@@ -47,8 +47,8 @@ function Invoke-Rego {
     $RegoFileObject = Get-Item $RegoFile
     $ScubaUtils = Join-Path -Path $RegoFileObject.DirectoryName -ChildPath "Utils"
     $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $InputFile, "-d", $RegoFile, "-d", $ScubaUtils, "-f", "values")
-    $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
-    $RegoOutput
+    $TestResults = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
+    $TestResults
 }
 
 function Invoke-ExternalCmd{

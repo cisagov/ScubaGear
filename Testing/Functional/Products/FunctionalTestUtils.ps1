@@ -437,6 +437,40 @@ function UpdateProviderExport{
 
 }
 
+function UpdateDirectorySettingByName{
+  <#
+    .SYNOPSIS
+      Wrapper function for the MS Graph commandlet, Update-MgBetaDirectorySetting, to lookup by name for update.
+    .PARAMETER DisplayName
+      The DisplayName of the Directory Setting to be updated.
+    .PARAMETER Updates
+      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
+    .NOTES
+      If more than one directory setting has the same DisplayName then only the first is updated.
+  #>
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
+  [CmdletBinding()]
+  param (
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $DisplayName,
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [hashtable]
+      $Updates
+  )
+
+  $Ids = Get-MgBetaDirectorySetting | Where-Object { $_.DisplayName -eq $DisplayName } | Select-Object -Property Id
+
+  foreach($Id in $Ids){
+      if (-not ([string]::IsNullOrEmpty($Id.Id))){
+          Update-MgBetaDirectorySetting -DirectorySettingId $($Id.Id) @Updates
+          break
+      }
+  }
+}
+
 function RemoveConditionalAccessPolicyByName{
     <#
     .SYNOPSIS
@@ -551,42 +585,10 @@ function UpdateCachedConditionalAccessPolicyByName{
   }
 }
 
-function UpdateCachedHighRiskBlockPoliciesToLowRisk {
+function LoadTestResults() {
   <#
     .SYNOPSIS
-      For cached CA policy test scenarios, force high-risk block policies to low-risk.
-    .PARAMETER OutputFolder
-      The folder containing the original and updated provider settings exports.
-  #>
-  [CmdletBinding()]
-  param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $OutputFolder
-  )
-
-  $ProviderExport = LoadProviderExport($OutputFolder)
-  $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
-
-  foreach ($Policy in $ConditionalAccessPolicies) {
-      if (
-          $Policy.Conditions.Users.IncludeUsers -contains "All" -and
-          $Policy.Conditions.Applications.IncludeApplications -contains "All" -and
-          $Policy.GrantControls.BuiltInControls -contains "block" -and
-          $Policy.Conditions.UserRiskLevels -contains "high"
-      ) {
-          $Policy.Conditions.UserRiskLevels = @("low")
-      }
-  }
-
-  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
-}
-
-function LoadRegoOutput() {
-  <#
-    .SYNOPSIS
-      Wrapper function to load the Rego output within the given folder.
+      Wrapper function to load the test results within the given folder.
     .PARAMETER OutputFolder
       The folder containing the outputs of a ScubaGear run.
   #>
@@ -597,8 +599,8 @@ function LoadRegoOutput() {
       [string]
       $OutputFolder
   )
-  $IntermediateRegoOutput = Get-Content "$OutputFolder/RegoOutput.json" -Raw | ConvertFrom-Json
-  $IntermediateRegoOutput
+  $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
+  $IntermediateTestResults
 }
 
 function Get-ExpectedHeaderNames {
@@ -611,10 +613,10 @@ function Get-ExpectedHeaderNames {
           return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
         }
         "riskyApps_table" {
-          return @("","Display Name","Severity Score","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         "riskyThirdPartySPs_table" {
-          return @("","Display Name","Severity Score","Privileged Roles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
           return $null
@@ -629,8 +631,8 @@ function Get-ExpectedColumnSize {
     )
     switch ($TableClass) {
         "caps_table" { return 8 }
-        "riskyApps_table" { return 8 }
-        "riskyThirdPartySPs_table" { return 8 }
+        "riskyApps_table" { return 7 }
+        "riskyThirdPartySPs_table" { return 6 }
         default { return 0 }
     }
 }

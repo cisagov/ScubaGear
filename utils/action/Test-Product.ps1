@@ -7,7 +7,7 @@ function Test-Product {
         .PARAMETER ProductAlias
             The alias used in the parameters secret to denote a given tenant, product, variant combo.
         .PARAMETER TestParams
-            The set of parameters (stored as a secret) containing a given environment's alias, tenant domain, etc.
+            The set of parameters (stored as a secret) containing a given environment's alias, tenant domain, etc.            
     #>
     [CmdletBinding()]
     param(

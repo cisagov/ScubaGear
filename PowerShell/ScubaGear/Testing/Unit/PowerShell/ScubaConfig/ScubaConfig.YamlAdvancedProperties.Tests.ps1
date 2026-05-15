@@ -83,10 +83,8 @@ Describe "ScubaConfigValidator Basic Validation" {
             $script:OPAExeName = "opa_windows_amd64.exe"
         }
         $script:OPAExePath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:OPAExeName
-        $script:OPAExeCreatedByTests = $false
         if (-not (Test-Path $script:OPAExePath)) {
             New-Item -Path $script:OPAExePath -ItemType File -Force | Out-Null
-            $script:OPAExeCreatedByTests = $true
         }
 
         # Initialize the validator
@@ -266,9 +264,9 @@ Defender:
         if (Get-Command ConvertFrom-Yaml -ErrorAction SilentlyContinue) {
             Remove-Item Function:\ConvertFrom-Yaml -ErrorAction SilentlyContinue
         }
-
+        
         # Clean up dummy OPA executable
-        if ($script:OPAExeCreatedByTests -and $script:OPAExePath -and (Test-Path $script:OPAExePath)) {
+        if ($script:OPAExePath -and (Test-Path $script:OPAExePath)) {
             Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue
         }
     }

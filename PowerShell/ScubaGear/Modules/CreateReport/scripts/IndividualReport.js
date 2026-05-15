@@ -5,11 +5,10 @@ window.addEventListener('DOMContentLoaded', () => {
     const caps = getJsonData('cap-json');
     const riskyApps = getJsonData('risky-apps-json');
     const riskyThirdPartySPs = getJsonData('risky-third-party-sp-json');
-    const severityScoreWeights = getJsonData('severity-score-weights-json');
 
     buildExpandableTable(caps, "caps");
-    buildExpandableTable(riskyApps, "riskyApps", severityScoreWeights);
-    buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs", severityScoreWeights);
+    buildExpandableTable(riskyApps, "riskyApps");
+    buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs");
 
     colorRows();
     applyScopeAttributes();

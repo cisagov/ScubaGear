@@ -4,10 +4,10 @@
 #>
 
 $ProviderPath = "../../../../../Modules/Providers"
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportSecuritySuiteProvider.psm1") -Function Export-SecuritySuiteProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportDefenderProvider.psm1") -Function Export-DefenderProvider -Force
 
-InModuleScope -ModuleName ExportSecuritySuiteProvider {
-    Describe -Tag 'ExportSecuritySuiteProvider' -Name "Export-SecuritySuiteProvider" -ForEach @(
+InModuleScope -ModuleName ExportDefenderProvider {
+    Describe -Tag 'ExportDefenderProvider' -Name "Export-DefenderProvider" -ForEach @(
         "commercial",
         "gcc",
         "gcchigh",
@@ -38,7 +38,7 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-HostedConnectionFilterPolicy" {
+                            "Get-HostedContentFilterPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -122,37 +122,25 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                     return $this.SuccessfulCommands
                 }
             }
-            Mock -ModuleName ExportSecuritySuiteProvider Import-Module {}
+            Mock -ModuleName ExportDefenderProvider Import-Module {}
             function Get-CommandTracker {}
-            Mock -ModuleName ExportSecuritySuiteProvider Get-CommandTracker {
+            Mock -ModuleName ExportDefenderProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
             function Connect-EXOHelper {}
-            Mock -ModuleName ExportSecuritySuiteProvider Connect-EXOHelper {}
+            Mock -ModuleName ExportDefenderProvider Connect-EXOHelper {}
             function Connect-DefenderHelper {}
-            Mock -ModuleName ExportSecuritySuiteProvider Connect-DefenderHelper {}
+            Mock -ModuleName ExportDefenderProvider Connect-DefenderHelper {}
             function Get-OrganizationConfig {}
-            Mock -ModuleName ExportSecuritySuiteProvider Get-OrganizationConfig { [pscustomobject]@{
+            Mock -ModuleName ExportDefenderProvider Get-OrganizationConfig { [pscustomobject]@{
                     "mockkey" = "mockvalue";
                 } }
             function Get-SafeAttachmentPolicy {}
-            Mock -ModuleName ExportSecuritySuiteProvider Get-SafeAttachmentPolicy {}
+            Mock -ModuleName ExportDefenderProvider Get-SafeAttachmentPolicy {}
             function Get-AtpPolicyForO365 {throw 'this will be mocked'}
-            Mock -ModuleName ExportSecuritySuiteProvider Get-AtpPolicyForO365 {}
+            Mock -ModuleName ExportDefenderProvider Get-AtpPolicyForO365 {}
             function Get-MgBetaUser {}
-            Mock -ModuleName ExportSecuritySuiteProvider Get-MgBetaUser {}
-            # Added to silence tenant warning on O365 and DLP 
-            Mock -ModuleName ExportSecuritySuiteProvider Get-Command {
-                [pscustomobject]@{ Name = @($Name)[0] }
-            } -ParameterFilter {
-                @($Name)[0] -in @(
-                    "Get-AtpPolicyForO365",
-                    "Get-DlpCompliancePolicy"
-                )
-            }
-
-            function Write-ScubaLog {}
-            Mock -ModuleName ExportSecuritySuiteProvider Write-ScubaLog {}
+            Mock -ModuleName ExportDefenderProvider Get-MgBetaUser {}
 
             function Test-SCuBAValidProviderJson {
                 param (
@@ -172,13 +160,13 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             }
         }
         It "When called with -M365Environment '<_>', returns valid JSON" {
-            $Json = Export-SecuritySuiteProvider -M365Environment $_
+            $Json = Export-DefenderProvider -M365Environment $_
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
     }
 }
 AfterAll {
-    Remove-Module ExportSecuritySuiteProvider -Force -ErrorAction SilentlyContinue
+    Remove-Module ExportDefenderProvider -Force -ErrorAction SilentlyContinue
     Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
 }

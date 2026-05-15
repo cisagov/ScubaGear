@@ -1,0 +1,19 @@
+Description: Test Config for MS.DEFENDER.1.4v1 Compliant Matching Domain
+ProductNames:
+  - defender
+LogIn: false
+Defender:
+  MS.DEFENDER.1.4v1:
+    SensitiveAccounts:
+      IncludedUsers:
+        -
+      IncludedGroups:
+        -
+      IncludedDomains:
+        - badpeople.r.us
+      ExcludedUsers:
+        -
+      ExcludedGroups:
+        -
+      ExcludedDomains:
+        -

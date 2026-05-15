@@ -1575,7 +1575,7 @@
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                                     <TextBlock Text="Rego FileName:" Width="120" VerticalAlignment="Center"/>
-                                                    <TextBox x:Name="OutRegoFileName_TextBox" Width="300" Text="RegoOutput"/>
+                                                    <TextBox x:Name="OutRegoFileName_TextBox" Width="300" Text="TestResults"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                                                     <TextBlock Text="Report Name:" Width="120" VerticalAlignment="Center"/>

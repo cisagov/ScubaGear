@@ -28,7 +28,7 @@ Interactive mode simply means that the user will be prompted for their credentia
 
 ### SharePoint Authentication
 
-When assessing SharePoint, a browser window will automatically open to the Microsoft sign-in page. Sign in with an account that has **Global Reader or SharePoint Administrator** permissions. After successful sign-in, the token is acquired automatically and the assessment continues without any additional steps required.
+When assessing SharePoint, a browser window will automatically open to the Microsoft sign-in page. Sign in with an account that has **SharePoint Administrator** permissions. After successful sign-in, the token is acquired automatically and the assessment continues without any additional steps required.
 
 ### All Products
 

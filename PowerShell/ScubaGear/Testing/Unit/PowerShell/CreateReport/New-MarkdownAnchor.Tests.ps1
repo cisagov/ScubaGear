@@ -36,7 +36,7 @@ InModuleScope CreateReport {
             $GroupName.Split(' ').ForEach{
                 $Anchor -Like "*$($_.ToLower())*" | Should -BeTrue -Because "$Anchor contains $($_.ToLower())"}
         }
-
+        
         It "Test DMARC anchor generation with special characters" {
             $GroupNumber = "4"
             $GroupName = "Domain-Based Message Authentication, Reporting, and Conformance (DMARC)"

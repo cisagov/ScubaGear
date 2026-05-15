@@ -366,7 +366,7 @@ Managed Devices SHOULD be required to register MFA.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.3.8v1; Criticality: SHOULD -->
-<!--ExclusionType: CapExclusionsWithoutApps-->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-20b, IA-3
@@ -622,7 +622,6 @@ An admin consent workflow SHALL be configured for applications.
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-
 <!--Policy: MS.AAD.5.3v1; Criticality: SHALL -->
 - _Rationale:_ Configuring an admin consent workflow reduces the risk of the previous policy by setting up a process for users to securely request access to applications necessary for business purposes. Administrators have the opportunity to review the permissions requested by new applications and approve or deny access based on a risk assessment.
 - _Last modified:_ June 2023
@@ -632,59 +631,11 @@ An admin consent workflow SHALL be configured for applications.
     - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
     - [T1098.003: Additional Cloud Roles](https://attack.mitre.org/techniques/T1098/003/)
 
-#### MS.AAD.5.5v1
-Application Password Addition SHOULD be blocked.
-
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-
-
-<!--Policy: MS.AAD.5.5v1; Criticality: SHOULD -->
-- _Rationale:_ Applications that use client secrets might store them in configuration files, hardcode them in scripts, or risk exposure in other ways. The complexities of secret management make client secrets susceptible to leaks and attractive to attackers. Blocking password addition forces the use of more secure certificate-based authentication.
-- _Last modified:_ April 2026
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
-    - [T1098.001: Additional Cloud Credentials](https://attack.mitre.org/techniques/T1098/001/)
-  - [T1528: Steal Application Access Token](https://attack.mitre.org/techniques/T1528/)
-
-#### MS.AAD.5.6v1
-Application password lifetime SHOULD be restricted to 180 days or less.
-
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-
-
-<!--Policy: MS.AAD.5.6v1; Criticality: SHOULD -->
-- _Rationale:_ Long-lived credentials increase the window of opportunity for attackers to exploit compromised secrets. Enforcing a maximum password lifetime of 180 days ensures regular credential rotation, reducing the impact of credential theft and improving overall security hygiene.
-- _Last modified:_ April 2026
-- _Note:_ Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **181 days** to enforce the requirement of "180 days or less."
-- _Note:_ This policy applies only if password credentials are permitted. Microsoft and CISA recommend blocking password addition entirely (MS.AAD.5.5v1) as the preferred approach.
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-5, SC-12
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1552: Unsecured Credentials](https://attack.mitre.org/techniques/T1552/)
-    - [T1552.001: Credentials In Files](https://attack.mitre.org/techniques/T1552/001/)
-
-#### MS.AAD.5.7v1
-Application certificate lifetime SHOULD be restricted to 365 days or less.
-
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-
-
-<!--Policy: MS.AAD.5.7v1; Criticality: SHOULD -->
-- _Rationale:_ While certificates provide more secure authentication than passwords, long-lived certificates can still be compromised. Limiting certificate lifetime to 365 days reduces the risk of exploitation while balancing operational overhead. Regular certificate rotation is a security best practice that minimizes exposure from compromised keys.
-- _Note:_ Due to how Microsoft Entra ID evaluates the MaxLifetime restriction using "less than" (not "less than or equal to"), the portal setting must be configured to **366 days** to enforce the requirement of "365 days or less."
-- _Last modified:_ April 2026
-- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-12, IA-5
-- _MITRE ATT&CK TTP Mapping:_
-  - [T1649: Steal or Forge Authentication Certificates](https://attack.mitre.org/techniques/T1649/)
-
 ### Resources
 
 - [Restrict Application Registration for Non-Privileged Users](https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html)
 
 - [Configure the admin consent workflow](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow)
-- [Configure restrictions on how applications can be configured](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies)
-- [Tutorial: Enforce secret and certificate standards using application management policies](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards)
-- [Application Management Policies API Overview](https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy)
 
 ### License Requirements
 
@@ -746,48 +697,6 @@ There are a couple of configuration options to restrict user consent. Each optio
 4. Under **Admin consent requests** navigate to **Users can request admin consent to apps they are unable to consent to** and select **Yes**.
 
 5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating app requests (created in step one above).
-
-6. Click **Save**.
-
-#### MS.AAD.5.5v1 Instructions
-
-1. In **Microsoft Entra admin center**, select **Enterprise apps**.
-
-2. Under **Security**, select **Application policies**.
-
-3. Select **Block password addition**.
-
-4. Set status to **On**. Ensure **Applies to** is set to **All applications**.
-
-5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
-
-6. Click **Save**.
-
-#### MS.AAD.5.6v1 Instructions
-
-1. In **Microsoft Entra admin center**, select **Enterprise apps**.
-
-2. Under **Security**, select **Application policies**.
-
-3. Select **Restrict max password lifetime**.
-
-4. Set status to **On**. Set maximum lifetime to **181 days**. Ensure **Applies to** is set to **All applications**.
-
-5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
-
-6. Click **Save**.
-
-#### MS.AAD.5.7v1 Instructions
-
-1. In **Microsoft Entra admin center**, select **Enterprise apps**.
-
-2. Under **Security**, select **Application policies**.
-
-3. Select **Restrict max certificate lifetime**.
-
-4. Set status to **On**. Set maximum lifetime to **366 days**. Ensure **Applies to** is set to **All applications**.
-
-5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
 6. Click **Save**.
 

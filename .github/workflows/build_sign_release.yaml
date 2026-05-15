@@ -84,9 +84,7 @@ jobs:
           prerelease: false
           name: ${{ inputs.releaseName }}
           tag_name: v${{ inputs.version }}
-          files: |
-            ScubaGear-${{ inputs.version }}.zip
-            ScubaGear-${{ inputs.version }}/PowerShell/ScubaGear/schemas/ScubaBaselines.json
+          files: ScubaGear-${{ inputs.version }}.zip
           generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release

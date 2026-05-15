@@ -1,0 +1,573 @@
+ProductName: defender
+TestPlan:
+  - PolicyId: MS.DEFENDER.1.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- EOP Disabled, ATP Disabled for both STd & Strict
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Disabled; Strict EOP Disabled, ATP Enabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Disabled; Strict EOP Enabled, ATP Disabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Disabled; Strict EOP Enabled, ATP Enabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Disabled, ATP Disabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Disabled, ATP Enabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Enabled, ATP Disabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Disabled, ATP Enabled; Strict EOP Enabled, ATP Enabled
+        Preconditions:
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Disabled, ATP Disabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Disabled, ATP Enabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Enabled, ATP Disabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Disabled; Strict EOP Enabled, ATP Enabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Non-compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Disabled, ATP Disabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Disabled, ATP Enabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enable, ATP Enable; Strict EOP Enable, ATP Disabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.1.1v1 Compliant -- Std EOP Enabled, ATP Enabled; Strict EOP Enable, ATP Enabled
+        Preconditions:
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-EOPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.1.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.3v1 Non-compliant -- std&strict SentTo Non-null, SentToMemberOf Non-null, RecipientDomainIs Non-null
+        Preconditions:
+          # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
+          - Command: |
+                      $User = (Get-EXOMailbox)[0].UserPrincipalName
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-ATPProtectionPolicyRule -Identity "Standard Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+                      Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.3v1 Compliant -- std&strict SentTo Null, SentToMemberOf Null, RecipientDomainIs Null
+        Preconditions:
+          - Command: Set-ATPProtectionPolicyRule
+            Splat:
+              Identity: Standard Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
+              Confirm: false
+          - Command: Set-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              SentTo: null
+              SentToMemberOf: null
+              RecipientDomainIs: null
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.1.5v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant Strict Preset Security Policy Disabled
+        Preconditions:
+          - Command: Disable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.5v1 Non-compliant Mismatched Recipient Domains
+        ConfigFileName: MismatchedRecipientDomain.yaml
+        Preconditions:
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          # Pull first tenant user that is part of the default tenant domain and add that user to the preset policies
+          - Command: |
+                      $User = (Get-EXOMailbox)[0].UserPrincipalName
+                      $Group = (Get-UnifiedGroup)[0].alias
+                      Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo "$User" -SentToMemberOf $Group -RecipientDomainIs badpeople.r.us -Confirm:$false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.1.5v1 Compliant Matched Recipient Domains
+        ConfigFileName: MatchedRecipientDomain.yaml
+        Preconditions:
+          - Command: Enable-ATPProtectionPolicyRule
+            Splat:
+              Identity: Strict Preset Security Policy
+              Confirm: false
+              ErrorAction: Continue
+          - Command: 'Set-ATPProtectionPolicyRule -Identity "Strict Preset Security Policy" -SentTo $null -SentToMemberOf $null -RecipientDomainIs badpeople.r.us -Confirm:$false'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user not listed
+        ConfigFileName: MismatchedUser.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Non-compliant - Sensitive user partial coverage
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users (mix-cased) are protected
+        ConfigFileName: MatchedWithMixedCase.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - All Listed sensitive users are protected
+        ConfigFileName: MatchedUser.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect "AgencyUserGlobalReader;AgencyUserGlobalReader@y2zj1.onmicrosoft.com"}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.1v1 Compliant - No sensitive users identified but all users covered
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedUsersToProtect $null}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain not listed
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Non-compliant - All domains No list
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.2v1 Compliant - All Listed are protected
+        ConfigFileName: AgencyDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodguys.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain not listed
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Non-compliant - Agency domain partial coverage
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect $null}'
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.2.3v1 Compliant - All domains No list of domains in config
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect @{}}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect @{}}'
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.DEFENDER.2.3v1 Compliant - All Listed are protected
+        ConfigFileName: PartnerDomainList.yaml
+        Preconditions:
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Strict Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+          # yamllint disable-line rule:line-length
+          - Command: 'Get-AntiPhishPolicy | Where-Object {$_.Identity -like "Standard Preset Security Policy*"} | % {Set-AntiPhishPolicy -Identity $($_.Identity) -TargetedDomainsToProtect "goodparnter.com"}'
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.DEFENDER.3.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.DEFENDER.3.1v1 Protection disabled
+        Preconditions:
+          - Command: Set-AtpPolicyForO365
+            Splat:
+              Identity: Default
+              EnableATPForSPOTeamsODB: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.DEFENDER.3.1v1 Protection enabled
+        Preconditions:
+          - Command: Set-AtpPolicyForO365
+            Splat:
+              Identity: Default
+              EnableATPForSPOTeamsODB: true
+        Postconditions: []
+        ExpectedResult: true
