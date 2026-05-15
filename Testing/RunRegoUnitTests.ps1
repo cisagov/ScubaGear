@@ -5,7 +5,7 @@
     .DESCRIPTION
         This script executes the files with the format *ControlGroupName*Config_##_test.rego
         that are found within each products folder in the Testing\Unit\Rego directory. You can run
-        this script focusing only on one product or multiple such as aad, securitysuite, exo, powerplatform, sharepoint, and teams.
+        this script focusing only on one product or multiple such as aad, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
         .\RunRegoUnitTests.ps1
@@ -14,7 +14,7 @@
     .EXAMPLE
         .\RunRegoUnitTests.ps1 -p teams,sharepoint
         Runs all tests for the specified products. Products must be specified with the -p parameter.
-        Valid product names are: aad, securitysuite, exo, powerplatform, sharepoint, and teams.
+        Valid product names are: aad, defender, exo, powerplatform, sharepoint, and teams.
 
     .EXAMPLE
         .\RunRegoUnitTests.ps1 -p aad -c 1
@@ -31,7 +31,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
-    [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', '*')]
+    [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', '*')]
     [Alias('p')]
     [string[]]$Products = '*',
 
@@ -136,7 +136,7 @@ function Invoke-Products {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
+        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
         [string[]]$Products
     )
 
@@ -180,7 +180,7 @@ function Invoke-ControlGroups {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
+        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
         [string]$Product,
 
         [Parameter(Mandatory = $true)]
@@ -228,7 +228,7 @@ function Invoke-SpecificTests {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
+        [ValidateSet('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')]
         [string]$Product,
 
         [Parameter(Mandatory = $true)]
@@ -281,7 +281,7 @@ if ($Verbosity.IsPresent) {
     $Flag = "-v"
 }
 if ($pEmpty) {
-    Invoke-Products -Flag $Flag -Products @('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')
+    Invoke-Products -Flag $Flag -Products @('AAD', 'Defender', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams')
 }
 elseif ((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
     if (($Products.Count -gt 1) -or ($ControlGroups.Count -gt 1)) {

@@ -33,10 +33,6 @@
     --btn-primary-border: #005288;
     --btn-primary-hover-bg: #f2f6f8;
     --btn-primary-active-bg: #e3eaee;
-    --severity-critical: #f8d7da;
-    --severity-high: #fde8d8;
-    --severity-medium: #fff3cd;
-    --severity-low: #dce8f8;
 }
 
 html[data-theme='dark'] {
@@ -68,10 +64,6 @@ html[data-theme='dark'] {
     --btn-primary-border: #4aa3d6;
     --btn-primary-hover-bg: #16212a;
     --btn-primary-active-bg: #1c2731;
-    --severity-critical: #5c1a1a;
-    --severity-high: #5c3a1a;
-    --severity-medium: #4a3c00;
-    --severity-low: #1a2e4a;
 }
 
 body {
@@ -305,18 +297,10 @@ img {
     border-left: none;
 }
 
-.expandable_wrapper .sort-btn span {
+.expandable_wrapper span {
     cursor: pointer;
     color: var(--header-color);
     text-decoration:underline;
-}
-
-.cell-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 0.5em;
-    height: 100%;
 }
 
 .caps_table, .riskyApps_table, .riskyThirdPartySPs_table {
@@ -360,26 +344,6 @@ th.key_credentials, th.password_credentials, th.federated_credentials {
 
 th.permissions {
     width: 25%;
-}
-
-th[data-column] {
-    padding: 0.25em;
-}
-
-th[data-column] .sort-btn {
-    width: 100%;
-    box-sizing: border-box;
-}
-
-th.severity_score {
-    width: 18%;
-}
-
-td.severity_score,
-.riskyApps_table td:nth-child(3),
-.riskyThirdPartySPs_table td:nth-child(3) {
-    width: 18%;
-    overflow-wrap: break-word;
 }
 
 #toggle-container {
@@ -553,8 +517,7 @@ a.control_group:active {
 }
 
 .view-details-button {
-    margin: 0;
-    align-self: flex-start;
+    margin: 1rem;
 }
 
 .kv-advanced {
@@ -661,148 +624,6 @@ a.control_group:active {
     font-weight: 600;
     color: var(--header-color);
     margin-right: 2px;
-}
-
-.sort-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font: inherit;
-    font-weight: bold;
-    color: var(--text-color);
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 4px;
-    width: 100%;
-}
-
-.sort-btn:focus-visible {
-    outline: 2px solid var(--input-border-focus);
-    outline-offset: 2px;
-    border-radius: 2px;
-}
-
-.sort-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-}
-
-.sort-indicator:not(.sort-indicator--active) {
-    opacity: 0;
-    transition: opacity 0.15s ease;
-}
-
-th:hover .sort-indicator:not(.sort-indicator--active),
-.sort-btn:focus-visible + .sort-indicator:not(.sort-indicator--active) {
-    opacity: 1;
-}
-
-.sort-indicator--active {
-    opacity: 1;
-}
-
-[data-dark-mode="true"] .sort-icon {
-    filter: invert(1);
-}
-
-/* Risk indicator chips */
-.risk-indicators {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 6px;
-}
-
-.risk-chip {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 3px;
-    font-size: 0.8125em;
-    font-weight: normal;
-    white-space: normal;
-    word-break: break-word;
-    border: 1px solid transparent;
-}
-
-.risk-chip--critical {
-    background-color: var(--severity-critical);
-    color: #7f1d1d;
-    border-color: #f87171;
-}
-
-.risk-chip--high {
-    background-color: var(--severity-high);
-    color: #7c3000;
-    border-color: #fb923c;
-}
-
-.risk-chip--medium {
-    background-color: var(--severity-medium);
-    color: #713f12;
-    border-color: #fbbf24;
-}
-
-.risk-chip--low {
-    background-color: var(--severity-low);
-    color: #1e3a5f;
-    border-color: #60a5fa;
-}
-
-html[data-theme='dark'] .risk-chip--critical {
-    color: #fca5a5;
-    border-color: #b91c1c;
-}
-
-html[data-theme='dark'] .risk-chip--high {
-    color: #fdba74;
-    border-color: #c2410c;
-}
-
-html[data-theme='dark'] .risk-chip--medium {
-    color: #fde68a;
-    border-color: #b45309;
-}
-
-html[data-theme='dark'] .risk-chip--low {
-    color: #93c5fd;
-    border-color: #1d4ed8;
-}
-
-/* Severity score cell */
-.severity-score-wrapper {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.severity-score-value {
-    font-size: 0.8125em;
-}
-
-/* Summary list */
-.summary-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 0.25em 0;
-    font-size: 0.8125em;
-}
-
-.summary-list li {
-    padding: 1px 0;
-    line-height: 1.4;
-}
-
-.summary-list-divider {
-    border-top: 1px solid var(--border-color);
-    margin: 3px 0;
-    opacity: 0.4;
-}
-
-.risk-level-item {
-    padding-left: 1em;
 }
 
 /* Policy Indicator Badges */

@@ -5,7 +5,7 @@ BeforeDiscovery {
     if (-not (Test-Path $DefaultOPAPath)) {
         New-Item -Path $DefaultOPAPath -ItemType Directory -Force | Out-Null
     }
-
+    
     # Create dummy OPA executable for default location
     $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
     $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
@@ -19,25 +19,21 @@ BeforeDiscovery {
         $OPAExeName = "opa_windows_amd64.exe"
     }
     $OPAExePath = Join-Path -Path $DefaultOPAPath -ChildPath $OPAExeName
-    $script:DiscoveryDefaultOPACreatedByTests = $false
     if (-not (Test-Path $OPAExePath)) {
         New-Item -Path $OPAExePath -ItemType File -Force | Out-Null
-        $script:DiscoveryDefaultOPACreatedByTests = $true
     }
-
+    
     # Also create OPA in test directory (for OPAPath: . in orchestrator_config_test.yaml)
     $TestOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $OPAExeName
-    $script:DiscoveryTestOPACreatedByTests = $false
     if (-not (Test-Path $TestOPAPath)) {
         New-Item -Path $TestOPAPath -ItemType File -Force | Out-Null
-        $script:DiscoveryTestOPACreatedByTests = $true
     }
-
+    
     $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\..\Modules'
-
+    
     # Import ScubaConfig module (moved from 'using module' to ensure OPA setup happens first)
     Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'ScubaConfig\ScubaConfig.psm1') -Force
-
+    
     # Import the branch version of Orchestrator
     Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Orchestrator.psm1') -Force
 }
@@ -46,18 +42,18 @@ InModuleScope Orchestrator {
     BeforeAll {
         # Set up all mocks ONCE for all tests
         $script:TestSplat = @{}
-
+        
         # Create default OPA directory for tests (needed in CI environments like GitHub Actions)
         $script:DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
         if (-not (Test-Path $script:DefaultOPAPath)) {
             New-Item -Path $script:DefaultOPAPath -ItemType Directory -Force | Out-Null
         }
-
+        
         # Create a dummy OPA executable for testing (required for configuration validation)
         # Determine OS-specific executable name
         $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
         $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
-
+        
         if ($IsLinuxOS) {
             $script:DummyOPAName = "opa_linux_amd64"
         }
@@ -68,25 +64,21 @@ InModuleScope Orchestrator {
             $script:DummyOPAName = "opa_windows_amd64.exe"
         }
         $script:DummyOPAPath = Join-Path -Path $script:DefaultOPAPath -ChildPath $script:DummyOPAName
-        $script:DummyOPACreatedByTests = $false
         # Create empty file to satisfy OPA validation
         if (-not (Test-Path $script:DummyOPAPath)) {
             New-Item -Path $script:DummyOPAPath -ItemType File -Force | Out-Null
-            $script:DummyOPACreatedByTests = $true
         }
-
+        
         # Also create OPA in test directory (for OPAPath: . in orchestrator_config_test.yaml)
         $TestOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $script:DummyOPAName
-        $script:InModuleTestOPACreatedByTests = $false
         if (-not (Test-Path $TestOPAPath)) {
             New-Item -Path $TestOPAPath -ItemType File -Force | Out-Null
-            $script:InModuleTestOPACreatedByTests = $true
         }
-
+        
         # Define stub functions that will be mocked
         function ConvertTo-ResultsCsv {throw 'this will be mocked'}
         function Disconnect-SCuBATenant {throw 'this will be mocked'}
-
+        
         Mock -ModuleName Orchestrator Remove-Resources {}
         Mock -ModuleName Orchestrator Import-Resources {}
         Mock -ModuleName Orchestrator Invoke-Connection {
@@ -125,9 +117,6 @@ InModuleScope Orchestrator {
         }
         Mock -CommandName New-Item {}
         Mock -CommandName Copy-Item {}
-        Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
-        Mock -ModuleName Orchestrator Write-ScubaLog {}
-        Mock -ModuleName Orchestrator Get-ScubaRunDetails {}
     }
 
     Context  "Parameter override test"{
@@ -136,7 +125,7 @@ InModuleScope Orchestrator {
             BeforeAll {
                 # Reset TestSplat for this test
                 $script:TestSplat = @{}
-
+                
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@("teams")
@@ -146,7 +135,7 @@ InModuleScope Orchestrator {
                         OutPath=$PSScriptRoot
                         OutFolderName='ScubaReports'
                         OutProviderFileName='ProviderSettingsExport'
-                        OutRegoFileName='RegoOutput'
+                        OutRegoFileName='TestResults'
                         OutReportName='BaselineReports'
                         OutJsonFileName='ScubaResults'
                         Organization='sub.domain.com'
@@ -163,7 +152,7 @@ InModuleScope Orchestrator {
                 @{ Parameter = "LogIn";                 Value = $true                  },
                 @{ Parameter = "OutFolderName";         Value = "ScubaReports"         },
                 @{ Parameter = "OutProviderFileName";   Value = "ProviderSettingsExport" },
-                @{ Parameter = "OutRegoFileName";       Value = "RegoOutput"           },
+                @{ Parameter = "OutRegoFileName";       Value = "TestResults"          },
                 @{ Parameter = "OutReportName";         Value = "BaselineReports"      },
                 @{ Parameter = "OutJsonFileName";       Value = "ScubaResults"         },
                 @{ Parameter = "Organization";          Value = "sub.domain.com"       },
@@ -173,12 +162,12 @@ InModuleScope Orchestrator {
                     $script:TestSplat[$Parameter] | Should -BeExactly $Value -Because "got $($script:TestSplat[$Parameter])"
             }
         }
-
+        
         Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba with command line ProductNames wild card override' {
             BeforeAll {
                 # Reset TestSplat for this test
                 $script:TestSplat = @{}
-
+                
                 function global:ConvertFrom-Yaml {
                     @{
                         ProductNames=@("teams")
@@ -188,7 +177,7 @@ InModuleScope Orchestrator {
                         OutPath=$PSScriptRoot
                         OutFolderName='ScubaReports'
                         OutProviderFileName='ProviderSettingsExport'
-                        OutRegoFileName='RegoOutput'
+                        OutRegoFileName='TestResults'
                         OutReportName='BaselineReports'
                         OutJsonFileName='ScubaResults'
                         Organization='sub.domain.com'
@@ -202,7 +191,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, with wildcard CLI override"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
 
@@ -210,10 +199,10 @@ InModuleScope Orchestrator {
             BeforeAll {
                 # Reset TestSplat for this test
                 $script:TestSplat = @{}
-
+                
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams')
+                        ProductNames=@('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams')
                         M365Environment='commercial'
                         Login=$true
                         OutPath=$PSScriptRoot
@@ -231,28 +220,28 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, reflects all products"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerplatform', 'securitysuite', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'defender', 'exo', 'powerbi', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
     }
-
+    
     # Cleanup - remove dummy OPA executables
     AfterAll {
         # Clean up default location OPA
-        if ($script:DummyOPACreatedByTests -and (Test-Path $script:DummyOPAPath)) {
+        if (Test-Path $script:DummyOPAPath) {
             Remove-Item -Path $script:DummyOPAPath -Force -ErrorAction SilentlyContinue
         }
-
+        
         # Clean up test directory OPA (for OPAPath: . in orchestrator_config_test.yaml)
         $TestOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $script:DummyOPAName
-        if ($script:InModuleTestOPACreatedByTests -and (Test-Path $TestOPAPath)) {
+        if (Test-Path $TestOPAPath) {
             Remove-Item -Path $TestOPAPath -Force -ErrorAction SilentlyContinue
         }
     }
 }
 AfterAll {
     Remove-Module Orchestrator -ErrorAction SilentlyContinue
-
+    
     # Clean up dummy OPA executables created in BeforeDiscovery
     # Default location
     $DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
@@ -267,15 +256,15 @@ AfterAll {
     else {
         $OPAExeName = "opa_windows_amd64.exe"
     }
-
+    
     $OPAExePath = Join-Path -Path $DefaultOPAPath -ChildPath $OPAExeName
-    if ($script:DiscoveryDefaultOPACreatedByTests -and (Test-Path $OPAExePath)) {
+    if (Test-Path $OPAExePath) {
         Remove-Item -Path $OPAExePath -Force -ErrorAction SilentlyContinue
     }
-
+    
     # Test directory OPA (for OPAPath: . in orchestrator_config_test.yaml)
     $TestOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $OPAExeName
-    if ($script:DiscoveryTestOPACreatedByTests -and (Test-Path $TestOPAPath)) {
+    if (Test-Path $TestOPAPath) {
         Remove-Item -Path $TestOPAPath -Force -ErrorAction SilentlyContinue
     }
 }

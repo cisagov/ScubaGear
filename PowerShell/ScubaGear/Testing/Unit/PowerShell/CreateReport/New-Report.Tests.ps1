@@ -9,13 +9,12 @@ InModuleScope CreateReport {
             New-Item -Path (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs/CreateReportUnitFolder") -Name "IndividualReports" -ItemType Directory
             $TestOutPath = (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs")
             Copy-Item -Path (Join-Path -Path $PSScriptRoot -ChildPath "CreateReportStubs/*") -Destination $TestOutPath -Recurse
-            Copy-Item -Path (Join-Path -Path $TestOutPath -ChildPath "TestResults.json") -Destination (Join-Path -Path $TestOutPath -ChildPath "RegoOutput.json")
 
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ArgToProd')]
             $ArgToProd = @{
                 teams         = "Teams";
                 exo           = "EXO";
-                securitysuite = "SecuritySuite";
+                defender      = "Defender";
                 aad           = "AAD";
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
@@ -24,7 +23,7 @@ InModuleScope CreateReport {
             $ProdToFullName = @{
                 Teams         = "Microsoft Teams";
                 EXO           = "Exchange Online";
-                SecuritySuite = "Security Suite";
+                Defender      = "Microsoft 365 Defender";
                 AAD           = "Azure Active Directory";
                 PowerPlatform = "Microsoft Power Platform";
                 SharePoint    = "SharePoint Online";
@@ -37,13 +36,13 @@ InModuleScope CreateReport {
                 'IndividualReportPath' = $IndividualReportPath
                 'OutPath'              = $TestOutPath
                 'OutProviderFileName'  = "ProviderSettingsExport"
-                'OutRegoFileName'      = "RegoOutput"
+                'OutRegoFileName'      = "TestResults"
                 'DarkMode'             = $false
             }
         }
         It 'Creates a report for <Product>' -ForEach @(
             @{Product = 'aad'; WarningCount = 0},
-            @{Product = 'securitysuite'; WarningCount = 0},
+            @{Product = 'defender'; WarningCount = 9},
             @{Product = 'exo'; WarningCount = 0},
             @{Product = 'powerplatform'; WarningCount = 3},
             @{Product = 'sharepoint'; WarningCount = 0},

@@ -299,23 +299,20 @@ Function Find-UIControlByName {
         }
     }
 
-    # Recurse into Content directly (handles ContentControl subclasses: ScrollViewer, etc.)
-    if ($parent.Content -and $parent.Content -isnot [string]) {
-        $result = Find-UIControlByName -parent $parent.Content -targetName $targetName
-        if ($result) { return $result }
-    }
-
-    # Recurse into Child directly (handles Border, Decorator subclasses)
-    if ($parent.Child -and $parent.Child -isnot [string]) {
-        $result = Find-UIControlByName -parent $parent.Child -targetName $targetName
-        if ($result) { return $result }
+    if ($parent.Content -and $parent.Content.Children) {
+        foreach ($child in $parent.Content.Children) {
+            $result = Find-UIControlByName -parent $child -targetName $targetName
+            if ($result) { return $result }
+        }
     }
 
     if ($parent.Items) {
         foreach ($item in $parent.Items) {
-            if ($item.Content -and $item.Content -isnot [string]) {
-                $result = Find-UIControlByName -parent $item.Content -targetName $targetName
-                if ($result) { return $result }
+            if ($item.Content -and $item.Content.Children) {
+                foreach ($child in $item.Content.Children) {
+                    $result = Find-UIControlByName -parent $child -targetName $targetName
+                    if ($result) { return $result }
+                }
             }
         }
     }

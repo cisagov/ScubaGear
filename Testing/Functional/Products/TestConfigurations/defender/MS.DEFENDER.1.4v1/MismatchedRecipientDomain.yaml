@@ -1,0 +1,19 @@
+Description: Test Config for MS.DEFENDER.1.4v1 Non-compliant Mismatch Domain
+ProductNames:
+  - defender
+LogIn: false
+Defender:
+  MS.DEFENDER.1.4v1:
+    SensitiveAccounts:
+      IncludedUsers:
+        -
+      IncludedGroups:
+        -
+      IncludedDomains:
+        - nefarious.org
+      ExcludedUsers:
+        -
+      ExcludedGroups:
+        -
+      ExcludedDomains:
+        -

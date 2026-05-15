@@ -70,7 +70,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
     Context "Navigation to detailed reports" {
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
-            @{Product = "securitysuite"; LinkText = "Security Suite"}
+            @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
@@ -90,7 +90,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
         }
         It "Check <Product> (<LinkText>) tables" -ForEach @(
             @{Product = "aad"; LinkText = "Azure Active Directory"}
-            @{Product = "securitysuite"; LinkText = "Security Suite"}
+            @{Product = "defender"; LinkText = "Microsoft 365 Defender"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}

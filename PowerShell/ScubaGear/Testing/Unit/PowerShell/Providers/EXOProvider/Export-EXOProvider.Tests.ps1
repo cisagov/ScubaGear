@@ -63,22 +63,6 @@ InModuleScope -ModuleName ExportEXOProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
-                            "Get-InboundConnector" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-OutboundConnector" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-IntraOrganizationConnector" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
-                            "Get-OrganizationRelationship" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{}
-                            }
                             default {
                                 throw "ERROR you forgot to create a mock method for this cmdlet: $($Command)"
                             }

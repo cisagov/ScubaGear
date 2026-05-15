@@ -128,6 +128,35 @@ function Set-PowerAppTenantIsolationPolicy {
 }
 
 # -----------------------------------------------------------------------
+# Power BI REST wrapper for functional test preconditions.
+# Uses the Fabric/Power BI Admin API to toggle individual tenant settings.
+# $script:PBIBaseUrl and $script:PBIAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before this function is called.
+# Endpoint: POST {base}/v1/admin/tenantsettings/{settingName}/update
+# -----------------------------------------------------------------------
+function Set-PowerBITenantSetting {
+    param(
+        [Parameter(Mandatory = $true)] [string]$SettingName,
+        [Parameter(Mandatory = $true)] [bool]$Enabled
+    )
+    $Body = @{ enabled = $Enabled } | ConvertTo-Json
+    $MaxAttempts = 3
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            Invoke-RestMethod -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
+                -Method POST -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
+                -Body $Body -ContentType "application/json" | Out-Null
+            return
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) { throw }
+            Write-Warning "Set-PowerBITenantSetting attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
+    }
+}
+
+# -----------------------------------------------------------------------
 # SharePoint Online REST wrapper for functional test preconditions.
 # Replaces the removed Microsoft.Online.SharePoint.PowerShell Set-SPOTenant
 # cmdlet. $script:SPOAdminUrl and $script:SPOAccessToken must be set by
@@ -408,6 +437,40 @@ function UpdateProviderExport{
 
 }
 
+function UpdateDirectorySettingByName{
+  <#
+    .SYNOPSIS
+      Wrapper function for the MS Graph commandlet, Update-MgBetaDirectorySetting, to lookup by name for update.
+    .PARAMETER DisplayName
+      The DisplayName of the Directory Setting to be updated.
+    .PARAMETER Updates
+      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
+    .NOTES
+      If more than one directory setting has the same DisplayName then only the first is updated.
+  #>
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
+  [CmdletBinding()]
+  param (
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [string]
+      $DisplayName,
+      [Parameter(Mandatory = $true)]
+      [ValidateNotNullOrEmpty()]
+      [hashtable]
+      $Updates
+  )
+
+  $Ids = Get-MgBetaDirectorySetting | Where-Object { $_.DisplayName -eq $DisplayName } | Select-Object -Property Id
+
+  foreach($Id in $Ids){
+      if (-not ([string]::IsNullOrEmpty($Id.Id))){
+          Update-MgBetaDirectorySetting -DirectorySettingId $($Id.Id) @Updates
+          break
+      }
+  }
+}
+
 function RemoveConditionalAccessPolicyByName{
     <#
     .SYNOPSIS
@@ -522,42 +585,10 @@ function UpdateCachedConditionalAccessPolicyByName{
   }
 }
 
-function UpdateCachedHighRiskBlockPoliciesToLowRisk {
+function LoadTestResults() {
   <#
     .SYNOPSIS
-      For cached CA policy test scenarios, force high-risk block policies to low-risk.
-    .PARAMETER OutputFolder
-      The folder containing the original and updated provider settings exports.
-  #>
-  [CmdletBinding()]
-  param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $OutputFolder
-  )
-
-  $ProviderExport = LoadProviderExport($OutputFolder)
-  $ConditionalAccessPolicies = $ProviderExport.conditional_access_policies
-
-  foreach ($Policy in $ConditionalAccessPolicies) {
-      if (
-          $Policy.Conditions.Users.IncludeUsers -contains "All" -and
-          $Policy.Conditions.Applications.IncludeApplications -contains "All" -and
-          $Policy.GrantControls.BuiltInControls -contains "block" -and
-          $Policy.Conditions.UserRiskLevels -contains "high"
-      ) {
-          $Policy.Conditions.UserRiskLevels = @("low")
-      }
-  }
-
-  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
-}
-
-function LoadRegoOutput() {
-  <#
-    .SYNOPSIS
-      Wrapper function to load the Rego output within the given folder.
+      Wrapper function to load the test results within the given folder.
     .PARAMETER OutputFolder
       The folder containing the outputs of a ScubaGear run.
   #>
@@ -568,8 +599,8 @@ function LoadRegoOutput() {
       [string]
       $OutputFolder
   )
-  $IntermediateRegoOutput = Get-Content "$OutputFolder/RegoOutput.json" -Raw | ConvertFrom-Json
-  $IntermediateRegoOutput
+  $IntermediateTestResults = Get-Content "$OutputFolder/TestResults.json" -Raw | ConvertFrom-Json
+  $IntermediateTestResults
 }
 
 function Get-ExpectedHeaderNames {
@@ -578,17 +609,17 @@ function Get-ExpectedHeaderNames {
       $TableClass
     )
     switch ($TableClass) {
-        "caps_table" { 
+        "caps_table" {
           return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
         }
         "riskyApps_table" {
-          return @("","Display Name","Severity Score","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","Multi-Tenant Enabled","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         "riskyThirdPartySPs_table" {
-          return @("","Display Name","Severity Score","Privileged Roles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
+          return @("","Display Name","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
-          return $null 
+          return $null
         }
     }
 }
@@ -600,8 +631,8 @@ function Get-ExpectedColumnSize {
     )
     switch ($TableClass) {
         "caps_table" { return 8 }
-        "riskyApps_table" { return 8 }
-        "riskyThirdPartySPs_table" { return 8 }
+        "riskyApps_table" { return 7 }
+        "riskyThirdPartySPs_table" { return 6 }
         default { return 0 }
     }
 }

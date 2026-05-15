@@ -22,7 +22,7 @@ InModuleScope Orchestrator {
                     ProductNames = @('aad')
                     OPAPath = "./"
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName = "RegoOutput"
+                    OutRegoFileName = "TestResults"
                     OutReportName = "BaselineReports"
                     LogIn = $false
                 }
@@ -35,8 +35,8 @@ InModuleScope Orchestrator {
                 $ScubaConfig.ProductNames = @("aad")
                 { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
-            It 'With -ProductNames "securitysuite", should not throw' {
-                $ScubaConfig.ProductNames = @("securitysuite")
+            It 'With -ProductNames "defender", should not throw' {
+                $ScubaConfig.ProductNames = @("defender")
                 { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With -ProductNames "exo", should not throw' {
@@ -56,7 +56,7 @@ InModuleScope Orchestrator {
                 { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
             It 'With all products, should not throw' {
-                $ScubaConfig.ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
+                $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
             }
         }

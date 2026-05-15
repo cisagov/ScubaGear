@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+   [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -34,8 +34,6 @@ function Connect-Tenant {
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
-   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
-   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -44,26 +42,15 @@ function Connect-Tenant {
 
    $ProdAuthFailed = @()
 
-   # Token data for REST-based products (populated during connection)
-   $TokenData = @{
-       SPOAccessToken  = $null
-       SPOAdminUrl     = $null
-       PPAccessToken   = $null
-       PPBaseUrl       = $null
-   }
-
    $N = 0
    $Len = $ProductNames.Length
 
    foreach ($Product in $ProductNames) {
        $N += 1
        $Percent = $N*100/$Len
-       # securitysuite technically isn't a "product" so say "Authenticating to defender" for it
-       # rather than "Authenticating to securitysuite"
-       $ProductName = if ($Product -ne "securitysuite") { $Product } else { "defender" }
        $ProgressParams = @{
            'Activity' = "Authenticating to each Product";
-           'Status' = "Authenticating to $($ProductName); $($N) of $($Len) Products authenticated to.";
+           'Status' = "Authenticating to $($Product); $($N) of $($Len) Products authenticated to.";
            'PercentComplete' = $Percent;
        }
        Write-Progress @ProgressParams
@@ -82,7 +69,7 @@ function Connect-Tenant {
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
-               {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
+               {($_ -eq "exo") -or ($_ -eq "defender")} {
                    if ($EXOAuthRequired) {
                        $EXOHelperParams = @{
                            M365Environment = $M365Environment;
@@ -90,7 +77,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Write-Verbose "For the Security Suite baseline, Defender will require a sign in every single run regardless of what the LogIn parameter is set"
+                       Write-Verbose "Defender will require a sign in every single run regardless of what the LogIn parameter is set"
                        Connect-EXOHelper @EXOHelperParams
                        $EXOAuthRequired = $false
                    }
@@ -107,34 +94,21 @@ function Connect-Tenant {
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
                    }
-
-                   # Acquire Power Platform access token
-                   $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
-                   $TokenData.PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
-
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $TokenData.PPAccessToken = Get-MsalAccessToken `
-                           -Scope $PPScope `
-                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                           -M365Environment $M365Environment
+                   Write-Verbose "Power Platform uses REST API with on-demand MSAL token - no persistent PowerApps connection needed"
+               }
+               "powerbi" {
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
                    }
-                   else {
-                       # Interactive - resolve tenant name for authority
-                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                       $TenantName = $InitialDomain.Name
-
-                       # Azure PowerShell well-known client ID
-                       $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                       $TokenData.PPAccessToken = Get-MsalAccessToken `
-                           -Scope $PPScope `
-                           -ClientId $PPClientId `
-                           -Tenant $TenantName `
-                           -M365Environment $M365Environment
-                   }
-                   Write-Verbose "Power Platform token acquired successfully"
+                   Write-Verbose "Power BI uses REST API with on-demand MSAL token - no persistent connection needed"
                }
                "sharepoint" {
                    if ($AADAuthRequired) {
@@ -149,33 +123,9 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
-                       # Resolve tenant info needed for SharePoint URLs
-                       $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                       $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                       $InitialDomainPrefix = $InitialDomain.Name.split(".")[0]
-                       $TenantName = $InitialDomain.Name
-
-                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
-                       $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
-
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
-                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                               -Scope $SPOScope `
-                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                               -M365Environment $M365Environment
-                       }
-                       else {
-                           # SharePoint Online Management Shell app ID
-                           $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
-                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                               -Scope $SPOScope `
-                               -ClientId $SPOClientId `
-                               -Tenant $TenantName `
-                               -M365Environment $M365Environment
-                       }
-                       Write-Verbose "SharePoint token acquired successfully"
+                       # SharePoint authentication is now handled via REST API in ExportSharePointProvider
+                       # Token is acquired on-demand using browser auth (interactive) or certificate (service principal)
+                       Write-Verbose "SharePoint will use REST API authentication (no SPO/PnP module required)"
                        $SPOAuthRequired = $false
                    }
                }
@@ -222,15 +172,7 @@ function Connect-Tenant {
        }
    }
    Write-Progress -Activity "Authenticating to each service" -Status "Ready" -Completed
-
-   # Return connection result with token data for REST-based products
-   @{
-       ProdAuthFailed  = $ProdAuthFailed
-       SPOAccessToken  = $TokenData.SPOAccessToken
-       SPOAdminUrl     = $TokenData.SPOAdminUrl
-       PPAccessToken   = $TokenData.PPAccessToken
-       PPBaseUrl       = $TokenData.PPBaseUrl
-   }
+   $ProdAuthFailed
 }
 
 function Disconnect-SCuBATenant {
@@ -255,10 +197,10 @@ function Disconnect-SCuBATenant {
    #>
    [CmdletBinding()]
    param(
-       [ValidateSet("aad", "securitysuite", "exo","powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
+       [ValidateSet("aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams", IgnoreCase = $false)]
        [ValidateNotNullOrEmpty()]
        [string[]]
-       $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
+       $ProductNames = @("aad", "defender", "exo", "powerbi", "powerplatform", "sharepoint", "teams")
    )
    $ErrorActionPreference = "SilentlyContinue"
 
@@ -282,8 +224,12 @@ function Disconnect-SCuBATenant {
                Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
                # Power Platform uses REST API with on-demand token - no persistent connection to disconnect
            }
-           elseif (($Product -eq "exo") -or ($Product -eq "securitysuite")) {
-               if($Product -eq "securitysuite") {
+           elseif ($Product -eq "powerbi") {
+               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               # Power BI uses REST API with on-demand token - no persistent connection to disconnect
+           }
+           elseif (($Product -eq "exo") -or ($Product -eq "defender")) {
+               if($Product -eq "defender") {
                    Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
                }
                Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue -InformationAction SilentlyContinue | Out-Null

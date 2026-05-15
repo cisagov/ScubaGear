@@ -13,8 +13,6 @@ import data.utils.aad.ReportDetailsArrayLicenseWarningCap
 import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
-import data.utils.aad.AppExclusionsFullyExempt
-import data.utils.aad.GuestUserExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
 import data.utils.aad.IsPhishingResistantMFA
 import data.utils.aad.IsGeneralMFA
@@ -52,6 +50,7 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -64,8 +63,6 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -99,6 +96,7 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -110,8 +108,6 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
@@ -161,6 +157,7 @@ SignInBlocked contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -172,8 +169,6 @@ SignInBlocked contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
@@ -213,6 +208,7 @@ PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -223,8 +219,6 @@ PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -254,6 +248,7 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -264,8 +259,6 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -433,6 +426,7 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     ### We don't check IncludeUsers All because this is a role based policy
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -446,8 +440,6 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -477,6 +469,7 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -490,8 +483,6 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -536,7 +527,6 @@ RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -565,6 +555,7 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
+    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -576,8 +567,6 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     # Only match policies with user and group exclusions per the confile file
     UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
     GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -688,10 +677,7 @@ BadPolicies := BadDefaultGrantPolicies if {
 default DescriptionStr := "authorization policies found that allow non-admin users to consent to third-party applications"
 DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
     count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
-} else := concat(" ", [
-    "authorization policies found that allow non-admin users to consent to", 
-    "third-party applications with risky delegated permission classifications"
- ]) if {
+} else := "authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications" if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
 }
 
@@ -756,318 +742,6 @@ tests contains {
         Count(GoodAdminConsentSettings) > 0
     ]
     Status := Count(FilterArray(Conditions, false)) == 0
-}
-#--
-
-#
-# MS.AAD.5.5v1 - Block Password Addition
-#--
-#
-# Background:
-#   The default app management policy contains two parallel restriction sets:
-#     - ApplicationRestrictions.PasswordCredentials       (App registrations)
-#     - ServicePrincipalRestrictions.PasswordCredentials  (Service principals / Enterprise apps)
-#   Each set has a "passwordAddition" entry. To pass, BOTH must be:
-#     1. State == "enabled"
-#     2. RestrictForAppsCreatedAfterDateTime == "/Date(-62135596800000)/"
-#        (.NET DateTime.MinValue, meaning "applies to ALL apps - no date restriction")
-#
-#   Custom app management policies in input.app_management_policies can disable
-#   the restriction for specific apps via Restrictions.PasswordCredentials. Those
-#   apps are exempt from the global block and must be reported.
-#
-#   ALL_APPS_DATES holds both representations of .NET DateTime.MinValue
-#   that have been observed in provider output:
-#     - "/Date(-62135596800000)/" (legacy .NET serialization)
-#     - "0001-01-01T00:00:00Z"   (ISO 8601)
-#--
-
-ALL_APPS_DATES := {"/Date(-62135596800000)/", "0001-01-01T00:00:00Z"}
-
-# True when the given date string represents "all apps" (no date restriction).
-IsAllAppsDate(DateStr) if DateStr in ALL_APPS_DATES
-
-# Convert a RestrictForAppsCreatedAfterDateTime string to YYYY-MM-DD.
-# Handles both "/Date(<ms>)/" and ISO 8601 ("YYYY-MM-DDThh:mm:ssZ") formats.
-FormatRestrictionDate(DateStr) := substring(DateStr, 0, 10) if {
-    not startswith(DateStr, "/Date(")
-}
-
-FormatRestrictionDate(DateStr) := substring(time.format(to_number(MsStr) * 1000000), 0, 10) if {
-    startswith(DateStr, "/Date(")
-    MsStr := trim_prefix(trim_suffix(DateStr, ")/"), "/Date(")
-}
-
-# Collect every passwordAddition restriction from both Application and Service Principal scopes.
-# Treating them uniformly removes Apps/SPs duplication in the issue rules below.
-PasswordAdditionRestrictions contains Restriction if {
-    Policy := input.default_app_management_policy[0]
-    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordAddition"
-}
-
-PasswordAdditionRestrictions contains Restriction if {
-    Policy := input.default_app_management_policy[0]
-    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordAddition"
-}
-
-# True only when EVERY passwordAddition restriction (Apps + SPs) is fully blocking.
-# Used by MS.AAD.5.6v1 to mark itself N/A (lifetime is moot if addition is blocked).
-default PasswordAdditionFullyBlocked := false
-PasswordAdditionFullyBlocked := true if {
-    Count(PasswordAdditionIssues) == 0
-    Count(PasswordAdditionRestrictions) > 0
-    every Restriction in PasswordAdditionRestrictions {
-        Restriction.State == "enabled"
-        IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    }
-}
-
-# Issue: a passwordAddition restriction is not enabled at all.
-PasswordAdditionIssues contains "Password addition not blocked" if {
-    some Restriction in PasswordAdditionRestrictions
-    Restriction.State != "enabled"
-}
-
-# Issue: a passwordAddition restriction is enabled, but only applies to apps
-# created after a specific date - existing apps are exempt.
-PasswordAdditionIssues contains Issue if {
-    some Restriction in PasswordAdditionRestrictions
-    Restriction.State == "enabled"
-    not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    Issue := sprintf("Only applies to apps created after %v", [DateOnly])
-}
-
-# Issue: a custom app management policy disables passwordAddition for specific apps,
-# exempting them from the global restriction.
-PasswordAdditionIssues contains Issue if {
-    some Policy in input.app_management_policies
-    Policy.IsEnabled == true
-    some Restriction in Policy.Restrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordAddition"
-    Restriction.State != "enabled"
-    count(Restriction.AppliesTo) > 0
-    AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
-    Issue := sprintf("Exempted apps: %v", [AppNames])
-}
-
-# Pass when no issues were collected.
-tests contains {
-    "PolicyId": "MS.AAD.5.5v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
-    "ActualValue": PasswordAdditionIssues,
-    "ReportDetails": ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString),
-    "RequirementMet": Status
-} if {
-    DescriptionString := "Password addition restriction(s) not meeting requirements"
-    Status := Count(PasswordAdditionIssues) == 0
-}
-#--
-
-#
-# MS.AAD.5.6v1 - Restrict Password Lifetime
-#--
-#
-# Background:
-#   Same data shape as 5.5, but the relevant restriction is "passwordLifetime".
-#   Each restriction also has a MaxLifetime field in ISO 8601 duration format
-#   (e.g. "P181D" = 181 days). To pass, every passwordLifetime restriction must:
-#     1. State == "enabled"
-#     2. RestrictForAppsCreatedAfterDateTime == ALL_APPS_DATE
-#     3. MaxLifetime <= 181 days (181 enforces "180 or less" due to MS's
-#        "less than" evaluation in the portal)
-#
-#   This policy is N/A when 5.5 passes - if password addition is fully blocked,
-#   lifetime is moot.
-#--
-
-PASSWORD_MAX_DAYS := 181
-
-# Collect every passwordLifetime restriction from both scopes.
-PasswordLifetimeRestrictions contains Restriction if {
-    Policy := input.default_app_management_policy[0]
-    some Restriction in Policy.ApplicationRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordLifetime"
-}
-
-PasswordLifetimeRestrictions contains Restriction if {
-    Policy := input.default_app_management_policy[0]
-    some Restriction in Policy.ServicePrincipalRestrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordLifetime"
-}
-
-# Issue: a passwordLifetime restriction is not enabled.
-PasswordLifetimeIssues contains "Password lifetime not restricted" if {
-    some Restriction in PasswordLifetimeRestrictions
-    Restriction.State != "enabled"
-}
-
-# Issue: enabled but only applies to apps created after a specific date.
-PasswordLifetimeIssues contains Issue if {
-    some Restriction in PasswordLifetimeRestrictions
-    Restriction.State == "enabled"
-    not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    Issue := sprintf("Password lifetime: only applies to apps created after %v", [DateOnly])
-}
-
-# Issue: passwordLifetime restriction is missing entirely from one or both scopes.
-# When the portal toggle is OFF, the entry is omitted rather than present-but-disabled.
-PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
-    Policy := input.default_app_management_policy[0]
-    not PasswordLifetimeInScope(Policy.ApplicationRestrictions.PasswordCredentials)
-}
-
-PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
-    Policy := input.default_app_management_policy[0]
-    not PasswordLifetimeInScope(Policy.ServicePrincipalRestrictions.PasswordCredentials)
-}
-
-PasswordLifetimeInScope(Restrictions) if {
-    some R in Restrictions
-    R.RestrictionType == "passwordLifetime"
-}
-
-# Issue: enabled but MaxLifetime exceeds the threshold.
-# MaxLifetime is "PnD" (ISO 8601 duration); strip 'P' prefix and 'D' suffix to get days.
-PasswordLifetimeIssues contains Issue if {
-    some Restriction in PasswordLifetimeRestrictions
-    Restriction.State == "enabled"
-    Days := to_number(trim_prefix(trim_suffix(Restriction.MaxLifetime, "D"), "P"))
-    Days > PASSWORD_MAX_DAYS
-    Issue := sprintf("Password lifetime too long: %v days, must be %v or less", [Days, PASSWORD_MAX_DAYS])
-}
-
-# Issue: a custom app management policy disables passwordLifetime for specific apps.
-PasswordLifetimeIssues contains Issue if {
-    some Policy in input.app_management_policies
-    Policy.IsEnabled == true
-    some Restriction in Policy.Restrictions.PasswordCredentials
-    Restriction.RestrictionType == "passwordLifetime"
-    Restriction.State != "enabled"
-    count(Restriction.AppliesTo) > 0
-    AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
-    Issue := sprintf("Password lifetime: exempted apps: %v", [AppNames])
-}
-
-# N/A path: password addition is fully blocked (5.5 passes), so lifetime doesn't matter.
-tests contains {
-    "PolicyId": "MS.AAD.5.6v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
-    "ActualValue": PasswordLifetimeRestrictions,
-    "ReportDetails": "Requirement met",
-    "RequirementMet": true
-} if {
-    PasswordAdditionFullyBlocked == true
-}
-
-# Standard path: pass when no issues collected.
-tests contains {
-    "PolicyId": "MS.AAD.5.6v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
-    "ActualValue": PasswordLifetimeIssues,
-    "ReportDetails": ReportFullDetailsArray(PasswordLifetimeIssues, DescriptionString),
-    "RequirementMet": Status
-} if {
-    PasswordAdditionFullyBlocked == false
-    DescriptionString := "password lifetime restriction(s) not meeting requirements"
-    Status := Count(PasswordLifetimeIssues) == 0
-}
-#--
-
-#
-# MS.AAD.5.7v1 - Restrict Certificate Lifetime
-#--
-#
-# Background:
-#   Same shape as 5.6, but operates on KeyCredentials instead of PasswordCredentials,
-#   with RestrictionType "asymmetricKeyLifetime". Threshold is 366 days
-#   (enforces "365 or less" due to MS's "less than" evaluation).
-#--
-
-CERTIFICATE_MAX_DAYS := 366
-
-# Collect every asymmetricKeyLifetime restriction from both scopes.
-CertificateLifetimeRestrictions contains Restriction if {
-    Policy := input.default_app_management_policy[0]
-    some Restriction in Policy.ApplicationRestrictions.KeyCredentials
-    Restriction.RestrictionType == "asymmetricKeyLifetime"
-}
-
-CertificateLifetimeRestrictions contains Restriction if {
-    Policy := input.default_app_management_policy[0]
-    some Restriction in Policy.ServicePrincipalRestrictions.KeyCredentials
-    Restriction.RestrictionType == "asymmetricKeyLifetime"
-}
-
-# Issue: an asymmetricKeyLifetime restriction is not enabled.
-CertificateLifetimeIssues contains "Certificate lifetime not restricted" if {
-    some Restriction in CertificateLifetimeRestrictions
-    Restriction.State != "enabled"
-}
-
-# Issue: enabled but only applies to apps created after a specific date.
-CertificateLifetimeIssues contains Issue if {
-    some Restriction in CertificateLifetimeRestrictions
-    Restriction.State == "enabled"
-    not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    Issue := sprintf("Certificate lifetime: only applies to apps created after %v", [DateOnly])
-}
-
-# Issue: asymmetricKeyLifetime restriction is missing entirely from one or both scopes.
-CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
-    Policy := input.default_app_management_policy[0]
-    not CertificateLifetimeInScope(Policy.ApplicationRestrictions.KeyCredentials)
-}
-
-CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
-    Policy := input.default_app_management_policy[0]
-    not CertificateLifetimeInScope(Policy.ServicePrincipalRestrictions.KeyCredentials)
-}
-
-CertificateLifetimeInScope(Restrictions) if {
-    some R in Restrictions
-    R.RestrictionType == "asymmetricKeyLifetime"
-}
-
-# Issue: enabled but MaxLifetime exceeds the threshold.
-CertificateLifetimeIssues contains Issue if {
-    some Restriction in CertificateLifetimeRestrictions
-    Restriction.State == "enabled"
-    Days := to_number(trim_prefix(trim_suffix(Restriction.MaxLifetime, "D"), "P"))
-    Days > CERTIFICATE_MAX_DAYS
-    Issue := sprintf("Certificate lifetime too long: %v days, must be %v or less", [Days, CERTIFICATE_MAX_DAYS])
-}
-
-# Issue: a custom app management policy disables asymmetricKeyLifetime for specific apps.
-CertificateLifetimeIssues contains Issue if {
-    some Policy in input.app_management_policies
-    Policy.IsEnabled == true
-    some Restriction in Policy.Restrictions.KeyCredentials
-    Restriction.RestrictionType == "asymmetricKeyLifetime"
-    Restriction.State != "enabled"
-    count(Restriction.AppliesTo) > 0
-    AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
-    Issue := sprintf("Exempted apps: %v", [AppNames])
-}
-
-# Pass when no issues collected.
-tests contains {
-    "PolicyId": "MS.AAD.5.7v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
-    "ActualValue": CertificateLifetimeIssues,
-    "ReportDetails": ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString),
-    "RequirementMet": Status
-} if {
-    DescriptionString := "certificate lifetime restriction(s) not meeting requirements"
-    Status := Count(CertificateLifetimeIssues) == 0
 }
 #--
 
@@ -1191,13 +865,9 @@ NotGlobalAdmins contains User.DisplayName if {
     some User in input.privileged_users
     not "Global Administrator" in User.roles
 }
-# Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error 
+
 default GetScoreDescription := "All privileged users are Global Admin"
-GetScoreDescription := concat("", [
-    "Least Privilege Score = ", Score, " (should be 1 or less)",
-    sprintf("\nCalculated by %d global admins / %d privileged users without global admin role",
-        [Count(GlobalAdmins), Count(NotGlobalAdmins)])
-]) if {
+GetScoreDescription := concat("", ["Least Privilege Score = ", Score, " (should be 1 or less)"]) if {
     Count(NotGlobalAdmins) > 0
     RawRatio := sprintf("%v", [Count(GlobalAdmins)/Count(NotGlobalAdmins)])
     CutOff := min([4, Count(RawRatio)])

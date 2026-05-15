@@ -29,7 +29,7 @@ InModuleScope Orchestrator {
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName = "RegoOutput"
+                    OutRegoFileName = "TestResults"
                     OutReportName = "BaselineReports"
                     OPAPath = "."
                     LogIn = $false
@@ -59,8 +59,8 @@ InModuleScope Orchestrator {
                 $ScubaConfig.ProductNames = @("aad")
                 { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
-            It 'With -ProductNames "securitysuite", should not throw' {
-                $ScubaConfig.ProductNames = @("securitysuite")
+            It 'With -ProductNames "defender", should not throw' {
+                $ScubaConfig.ProductNames = @("defender")
                 { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With -ProductNames "exo", should not throw' {
@@ -80,7 +80,7 @@ InModuleScope Orchestrator {
                 { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
             It 'With all products, should not throw' {
-                $ScubaConfig.ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
+                $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
             }
         }
@@ -90,7 +90,7 @@ InModuleScope Orchestrator {
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     OutProviderFileName = "ProviderSettingsExport"
-                    OutRegoFileName = "RegoOutput"
+                    OutRegoFileName = "TestResults"
                     OutReportName = "BaselineReports"
                     OPAPath = "."
                     LogIn = $false
@@ -107,7 +107,7 @@ InModuleScope Orchestrator {
                 $Quiet = $true
             }
             It 'With all products, should not throw' {
-                $ScubaConfig.ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
+                $ScubaConfig.ProductNames = @("aad", "defender", "exo", "powerplatform", "sharepoint", "teams")
                 { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet } | Should -Not -Throw
             }
         }

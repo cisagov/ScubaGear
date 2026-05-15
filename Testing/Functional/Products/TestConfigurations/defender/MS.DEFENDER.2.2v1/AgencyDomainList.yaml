@@ -1,0 +1,8 @@
+Description: Test Config for MS.DEFENDER.2.2v1
+ProductNames:
+  - defender
+LogIn: false
+Defender:
+  MS.DEFENDER.2.2v1:
+    AgencyDomains:
+      - goodguys.com

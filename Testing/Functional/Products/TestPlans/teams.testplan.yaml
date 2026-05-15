@@ -261,3 +261,42 @@ TestPlan:
           - Command: "Get-CsTeamsAppPermissionPolicy | % {Set-CsTeamsAppPermissionPolicy -Identity ($_.Identity) -PrivateCatalogAppsType AllowedAppList -PrivateCatalogApps @()}"
         Postconditions: []
         ExpectedResult: true
+  - PolicyId: MS.TEAMS.6.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.6.1v1 Compliant - Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.6.2v1 Compliant - Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+  - PolicyId: MS.TEAMS.7.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.7.1v1 Compliant - Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.7.2v1 Compliant - Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+  - PolicyId: MS.TEAMS.8.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.8.1v1 Compliant - Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.8.2v1 Compliant - Custom Implementation
+        Preconditions: []
+        Postconditions: []
+        IsCustomImplementation: true
+        ExpectedResult: false

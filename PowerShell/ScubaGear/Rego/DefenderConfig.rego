@@ -573,7 +573,7 @@ DLPLicenseWarning4_2(AbsentLocations) := LicenseWarning if {
 ResultsFilePath := Path if {
     not input.scuba_config.OutputPath
     not input.scuba_config.OutRegoFileName
-    Path := "./RegoOutput.json"
+    Path := "./TestResults.json"
 }
 
 # Return results file path when only file name is defined
@@ -587,7 +587,7 @@ ResultsFilePath := Path if {
 ResultsFilePath := Path if {
     not input.scuba_config.OutRegoFileName
     FilePath := input.scuba_config.OutputPath
-    Path := concat("", [FilePath, "/RegoOutput",".json"])
+    Path := concat("", [FilePath, "/TestResults",".json"])
 }
 
 # Return results file path when custom config defined

@@ -5,7 +5,7 @@ InModuleScope CreateReport {
 
     Describe -tag "Markdown" -name 'Check Secure Baseline Markdown document exists for <Product>' -ForEach @(
         @{Product = "aad"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\aad.md" -Resolve }
-        @{Product = "securitysuite"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\securitysuite.md" -Resolve}
+        @{Product = "defender"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\defender.md" -Resolve}
         @{Product = "exo"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\exo.md" -Resolve}
         @{Product = "powerbi"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\powerbi.md" -Resolve}
         @{Product = "powerplatform"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\powerplatform.md" -Resolve}

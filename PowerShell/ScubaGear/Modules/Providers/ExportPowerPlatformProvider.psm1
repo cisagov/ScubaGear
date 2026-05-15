@@ -1,10 +1,11 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
 function Export-PowerPlatformProvider {
     <#
     .Description
     Gets the Power Platform settings that are relevant
-    to the SCuBA Power Platform baselines using direct REST API calls.
+    to the SCuBA Power Platform baselines using direct REST API calls
+    authenticated via MSAL.
     .Functionality
     Internal
     #>
@@ -16,13 +17,9 @@ function Export-PowerPlatformProvider {
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory = $true)]
-        [string]
-        $AccessToken,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $BaseUrl
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $ServicePrincipalParams = @{}
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -36,22 +33,76 @@ function Export-PowerPlatformProvider {
     $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
     Test-M365EnvironmentConfiguration -TenantDomain $DomainInfo.TenantDomain -TLD $DomainInfo.TLD -M365Environment $M365Environment
 
+    # Acquire Power Platform access token - service principal or interactive
+    $BaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+    $AccessToken = $null
+    try {
+        if ($ServicePrincipalParams.CertThumbprintParams) {
+            $AccessToken = Get-PowerPlatformAccessToken `
+                -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                -M365Environment $M365Environment
+        }
+        else {
+            # Interactive browser authentication - use tenant domain for authority
+            $InitialDomain = $TenantDetails.VerifiedDomains | Where-Object { $_.isInitial }
+            $TenantName = $InitialDomain.Name
+            $AccessToken = Get-PowerPlatformAccessTokenInteractive `
+                -Tenant $TenantName `
+                -M365Environment $M365Environment
+        }
+    }
+    catch {
+        Write-Warning "Failed to acquire Power Platform access token: $($_.Exception.Message)"
+    }
+
     # MS.POWERPLATFORM.1.1v1, MS.POWERPLATFORM.1.2v1, MS.POWERPLATFORM.5.1v1, MS.POWERPLATFORM.6.1v1
-    $TenantSettings = $Tracker.TryCommand("Get-PowerPlatformTenantSettingsRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
-    $EnvironmentCreation = ConvertTo-Json -Depth 10 @($TenantSettings)
+    $EnvironmentCreation = ConvertTo-Json @()
+    try {
+        $TenantSettings = Get-PowerPlatformTenantSettingsRest -BaseUrl $BaseUrl -AccessToken $AccessToken
+        $EnvironmentCreation = ConvertTo-Json -Depth 10 @($TenantSettings)
+        $Tracker.AddSuccessfulCommand("Get-TenantSettings")
+    }
+    catch {
+        Write-Warning "Error running Get-TenantSettings (REST): $($_)"
+        $Tracker.AddUnSuccessfulCommand("Get-TenantSettings")
+    }
 
     # MS.POWERPLATFORM.2.1v1, MS.POWERPLATFORM.2.2v1, MS.POWERPLATFORM.2.3v1
-    $Environments = $Tracker.TryCommand("Get-PowerPlatformEnvironmentsRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
-    $EnvironmentList = ConvertTo-Json -Depth 4 @($Environments)
+    $EnvironmentList = ConvertTo-Json @()
+    try {
+        $Environments = Get-PowerPlatformEnvironmentsRest -BaseUrl $BaseUrl -AccessToken $AccessToken
+        $EnvironmentList = ConvertTo-Json -Depth 4 @($Environments)
+        $Tracker.AddSuccessfulCommand("Get-AdminPowerAppEnvironment")
+    }
+    catch {
+        Write-Warning "Error running Get-AdminPowerAppEnvironment (REST): $($_)"
+        $Tracker.AddUnSuccessfulCommand("Get-AdminPowerAppEnvironment")
+    }
 
     # has to be tested manually because of http 403 errors
-    $DlpResponse = $Tracker.TryCommand("Get-PowerPlatformDlpPoliciesRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
-    $DLPPolicies = ConvertTo-Json -Depth 10 @($DlpResponse)
+    $DLPPolicies = ConvertTo-Json @()
+    try {
+        $DlpResponse = Get-PowerPlatformDlpPoliciesRest -BaseUrl $BaseUrl -AccessToken $AccessToken
+        $DLPPolicies = ConvertTo-Json -Depth 10 @($DlpResponse)
+        $Tracker.AddSuccessfulCommand("Get-DlpPolicy")
+    }
+    catch {
+        Write-Warning "Error running Get-DlpPolicy (REST): $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
+    }
 
     # MS.POWERPLATFORM.3.1v1
     # has to be tested manually because of http 403 errors
-    $TenantIso = $Tracker.TryCommand("Get-PowerPlatformTenantIsolationRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken; TenantId = $TenantId})
-    $TenantIsolation = ConvertTo-Json -Depth 4 @($TenantIso)
+    $TenantIsolation = ConvertTo-Json @()
+    try {
+        $TenantIso = Get-PowerPlatformTenantIsolationRest -BaseUrl $BaseUrl -AccessToken $AccessToken -TenantId $TenantId
+        $TenantIsolation = ConvertTo-Json -Depth 4 @($TenantIso)
+        $Tracker.AddSuccessfulCommand("Get-PowerAppTenantIsolationPolicy")
+    }
+    catch {
+        Write-Warning "Error running Get-PowerAppTenantIsolationPolicy (REST): $($_). <= If a HTTP 403 ERROR is thrown then this is because you do not have the proper permissions. Necessary roles for running ScubaGear with Power Platform: Power Platform Administrator with a Power Apps License or Global Admininstrator"
+    }
 
     # MS.POWERPLATFORM.3.2v1 currently has no corresponding PowerShell Cmdlet
 

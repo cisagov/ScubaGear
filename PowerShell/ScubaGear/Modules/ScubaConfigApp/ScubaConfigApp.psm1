@@ -68,7 +68,7 @@ Function Start-SCuBAConfigApp {
     Start-SCuBAConfigApp
     # Opens the ScubaConfig UI.
 
-    .PARAMETER ConfigFilePath
+    .PARAMETER BaselineFilePath
     Specifies the YAML configuration file to load. If not provided, the default configuration will be used.
 
     .PARAMETER Language
@@ -87,7 +87,7 @@ Function Start-SCuBAConfigApp {
     Start-SCuBAConfigApp
 
     .EXAMPLE
-    $scubaui = Start-SCuBAConfigApp -ConfigFilePath "C:\path\to\config.yaml" -Online -M365Environment "gcc" -Passthru
+    $scubaui = Start-SCuBAConfigApp -BaselineFilePath "C:\path\to\config.yaml" -Online -M365Environment "gcc" -Passthru
 
     # To show configurations run:
     $scubaui.GeneralSettingsData | ConvertTo-Json
@@ -331,30 +331,8 @@ Function Start-SCuBAConfigApp {
         $syncHash.Baselines = $null
         $ModuleBasePath = Split-Path $syncHash.UIConfigPath -Parent
 
-        # Strategy 0: Published schema baseline JSON (highest priority - pre-generated baseline)
-        try {
-            Write-DebugOutput -Message "Attempting to load pre-generated baseline from schemas folder" -Source $source -Level "Verbose"
-
-            # schemas folder is at: ...\PowerShell\ScubaGear\schemas\ScubaBaselines.json
-            # PSScriptRoot is: ...\PowerShell\ScubaGear\Modules\ScubaConfigApp
-            $SchemaBaselinePath = Join-Path $ModuleBasePath "..\..\schemas\ScubaBaselines.json"
-            $SchemaBaselineResolved = Resolve-Path $SchemaBaselinePath -ErrorAction Stop
-
-            if (Test-Path $SchemaBaselineResolved) {
-                Write-DebugOutput -Message "Found published baseline at: $SchemaBaselineResolved" -Source $source -Level "Verbose"
-
-                $JsonConfigData = (Get-Content -Path $SchemaBaselineResolved -Raw | ConvertFrom-Json)
-                $syncHash.Baselines = $JsonConfigData.baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Published Schema JSON" -Source $source -Level "Info"
-            }
-        }
-        catch {
-            Write-DebugOutput -Message "Failed to load baselines from schemas folder: $($_.Exception.Message)" -Source $source -Level "Verbose"
-            $syncHash.Baselines = $null
-        }
-
-        # Strategy 1: Local markdown baselines parsing (fallback for development/testing)
-        if (-not $syncHash.Baselines -and -not $syncHash.UIConfigs.PullOnlineBaselines) {
+        # Strategy 1: Local markdown baselines parsing (primary strategy when PullOnlineBaselines is false)
+        if (-not $syncHash.UIConfigs.PullOnlineBaselines) {
             try {
                 Write-DebugOutput -Message "Attempting to dynamically parse baselines from local markdown files" -Source $source -Level "Verbose"
 
@@ -1363,10 +1341,7 @@ Function Show-SCuBABaselinePolicyViewer {
         [string]$BaselineFilePath = "$env:TEMP\ScubaBaselines.json",
 
         [Parameter(Mandatory=$false)]
-        [string]$NavigateToPolicyId,
-
-        [Parameter(Mandatory=$false)]
-        [switch]$PassThru
+        [string]$NavigateToPolicyId
     )
 
     try {
@@ -1421,120 +1396,99 @@ Function Show-SCuBABaselinePolicyViewer {
     }
 
     try {
-        # Strategy 1: Try to use pre-generated baseline from schemas folder (highest priority)
-        $usePublishedBaseline = $false
-        $SchemaBaselinePath = Join-Path $PSScriptRoot "..\..\schemas\ScubaBaselines.json"
+            # ALWAYS generate baseline file
 
+        # Use the same path resolution as Start-SCuBAConfigApp
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
-            # No custom baseline specified, check for published baseline
-            if (Test-Path $SchemaBaselinePath) {
-                Write-Output "Found published baseline in schemas folder. Using pre-generated baseline."
-                # Copy the published baseline to the target location (if different)
-                $resolvedSchemaPath = (Resolve-Path $SchemaBaselinePath -ErrorAction SilentlyContinue).Path
-                $resolvedTargetPath = if (Test-Path $BaselineFilePath) { (Resolve-Path $BaselineFilePath -ErrorAction SilentlyContinue).Path } else { $BaselineFilePath }
+            # Use the exact same approach as Start-SCuBAConfigApp
+            # PSScriptRoot is: ...\Modules\ScubaConfigApp
+            # We want: ...\ScubaGear\baselines (so go up 2, then down to baselines)
+            $LocalBaselineMarkdownPath = Join-Path $PSScriptRoot "..\\..\\baselines"
+            $BaselineDirectory = (Resolve-Path $LocalBaselineMarkdownPath).Path
+            Write-Output "Using local baselines directory: $BaselineDirectory"
+        }
 
-                if ($resolvedSchemaPath -ne $resolvedTargetPath) {
-                    Copy-Item -Path $SchemaBaselinePath -Destination $BaselineFilePath -Force
-                }
-                $usePublishedBaseline = $true
+        # Import the baseline helper module
+        $helperModulePath = Join-Path $PSScriptRoot "ScubaConfigAppHelpers\ScubaConfigAppBaselineHelper.psm1"
+        if (-not (Test-Path $helperModulePath)) {
+            throw "Baseline helper module not found: $helperModulePath"
+        }
+
+        Import-Module $helperModulePath -Force -ErrorAction Stop
+
+        # Generate the baseline configuration with progress UI
+        $params = @{
+            BaselineFilePath = $BaselineFilePath
+        }
+
+        if ($BaselineDirectory) {
+            $params.BaselineDirectory = $BaselineDirectory
+        }
+        if ($GitHubDirectoryUrl) {
+            $params.GitHubDirectoryUrl = $GitHubDirectoryUrl
+        }
+
+        Write-Output "Generating ScubaBaselines.json with progress dialog..."
+
+        # Synchronized hashtable to communicate between runspaces
+        $progressSync = [hashtable]::Synchronized(@{
+            IsComplete = $false
+            Error = $null
+            Status = "Initializing baseline generation..."
+            Detail = "Please wait while baseline policies are processed..."
+        })
+
+        # Create background runspace for baseline generation
+        $backgroundRunspace = [runspacefactory]::CreateRunspace()
+        $backgroundRunspace.ApartmentState = "MTA"
+        $backgroundRunspace.Open()
+        $backgroundRunspace.SessionStateProxy.SetVariable("progressSync", $progressSync)
+        $backgroundRunspace.SessionStateProxy.SetVariable("params", $params)
+        $backgroundRunspace.SessionStateProxy.SetVariable("helperModulePath", $helperModulePath)
+
+        # Background baseline generation script
+        $backgroundScript = {
+            try {
+                # Import the baseline helper module in the background thread
+                Import-Module $helperModulePath -Force -ErrorAction Stop
+
+                # Update status and generate baseline
+                $progressSync.Status = "Processing baseline markdown files..."
+                $progressSync.Detail = "Parsing policy documents and extracting configurations..."
+
+                # Create empty baseline structure first (same as Start-SCuBAConfigApp)
+                $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
+                $emptyBaseline | Out-File -FilePath $params.BaselineFilePath -Encoding utf8 -Force
+
+                # Use the exact same approach as Start-SCuBAConfigApp
+                Update-ScubaConfigBaselineWithMarkdown @params
+
+                $progressSync.Status = "Baseline generation complete!"
+                $progressSync.Detail = "Ready to launch baseline policy viewer..."
+                Start-Sleep -Milliseconds 750  # Brief pause to show completion
+            }
+            catch {
+                $progressSync.Error = $_.Exception.Message
+                $progressSync.Status = "Error occurred during baseline generation"
+                $progressSync.Detail = "Please check the error details"
+            }
+            finally {
+                $progressSync.IsComplete = $true
             }
         }
 
-        # Strategy 2: Generate baseline from markdown (fallback for custom baselines or if published baseline not found)
-        if (-not $usePublishedBaseline) {
-            Write-Output "Generating baseline from markdown files..."
+        # Start background baseline generation
+        $backgroundPowerShell = [powershell]::Create()
+        $backgroundPowerShell.Runspace = $backgroundRunspace
+        $backgroundPowerShell.AddScript($backgroundScript) | Out-Null
+        $backgroundHandle = $backgroundPowerShell.BeginInvoke()
 
-            # Use the same path resolution as Start-SCuBAConfigApp
-            if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
-                # Use the exact same approach as Start-SCuBAConfigApp
-                # PSScriptRoot is: ...\Modules\ScubaConfigApp
-                # We want: ...\ScubaGear\baselines (so go up 2, then down to baselines)
-                $LocalBaselineMarkdownPath = Join-Path $PSScriptRoot "..\\..\\baselines"
-                $BaselineDirectory = (Resolve-Path $LocalBaselineMarkdownPath).Path
-                Write-Output "Using local baselines directory: $BaselineDirectory"
-            }
-
-            # Import the baseline schema helper module (from Support modules)
-            $helperModulePath = Join-Path $PSScriptRoot "..\Support\ScubaBaselineSchemaHelper.psm1"
-            if (-not (Test-Path $helperModulePath)) {
-                throw "Baseline schema helper module not found: $helperModulePath"
-            }
-
-            Import-Module $helperModulePath -Force -ErrorAction Stop
-
-            # Generate the baseline configuration with progress UI
-            $params = @{
-                BaselineFilePath = $BaselineFilePath
-            }
-
-            if ($BaselineDirectory) {
-                $params.BaselineDirectory = $BaselineDirectory
-            }
-            if ($GitHubDirectoryUrl) {
-                $params.GitHubDirectoryUrl = $GitHubDirectoryUrl
-            }
-
-            Write-Output "Generating ScubaBaselines.json with progress dialog..."
-
-            # Synchronized hashtable to communicate between runspaces
-            $progressSync = [hashtable]::Synchronized(@{
-                IsComplete = $false
-                Error = $null
-                Status = "Initializing baseline generation..."
-                Detail = "Please wait while baseline policies are processed..."
-            })
-
-            # Create background runspace for baseline generation
-            $backgroundRunspace = [runspacefactory]::CreateRunspace()
-            $backgroundRunspace.ApartmentState = "MTA"
-            $backgroundRunspace.Open()
-            $backgroundRunspace.SessionStateProxy.SetVariable("progressSync", $progressSync)
-            $backgroundRunspace.SessionStateProxy.SetVariable("params", $params)
-            $backgroundRunspace.SessionStateProxy.SetVariable("helperModulePath", $helperModulePath)
-
-            # Background baseline generation script
-            $backgroundScript = {
-                try {
-                    # Import the baseline helper module in the background thread
-                    Import-Module $helperModulePath -Force -ErrorAction Stop
-
-                    # Update status and generate baseline
-                    $progressSync.Status = "Processing baseline markdown files..."
-                    $progressSync.Detail = "Parsing policy documents and extracting configurations..."
-
-                    # Create empty baseline structure first (same as Start-SCuBAConfigApp)
-                    $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
-                    $emptyBaseline | Out-File -FilePath $params.BaselineFilePath -Encoding utf8 -Force
-
-                    # Use the exact same approach as Start-SCuBAConfigApp
-                    Update-ScubaConfigBaselineWithMarkdown @params
-
-                    $progressSync.Status = "Baseline generation complete!"
-                    $progressSync.Detail = "Ready to launch baseline policy viewer..."
-                    Start-Sleep -Milliseconds 750  # Brief pause to show completion
-                }
-                catch {
-                    $progressSync.Error = $_.Exception.Message
-                    $progressSync.Status = "Error occurred during baseline generation"
-                    $progressSync.Detail = "Please check the error details"
-                }
-                finally {
-                    $progressSync.IsComplete = $true
-                }
-            }
-
-            # Start background baseline generation
-            $backgroundPowerShell = [powershell]::Create()
-            $backgroundPowerShell.Runspace = $backgroundRunspace
-            $backgroundPowerShell.AddScript($backgroundScript) | Out-Null
-            $backgroundHandle = $backgroundPowerShell.BeginInvoke()
-
-            # Create a runspace for the progress dialog (UI thread)
-            $progressRunspace = [runspacefactory]::CreateRunspace()
-            $progressRunspace.ApartmentState = "STA"
-            $progressRunspace.ThreadOptions = "ReuseThread"
-            $progressRunspace.Open()
-            $progressRunspace.SessionStateProxy.SetVariable("progressSync", $progressSync)
+        # Create a runspace for the progress dialog (UI thread)
+        $progressRunspace = [runspacefactory]::CreateRunspace()
+        $progressRunspace.ApartmentState = "STA"
+        $progressRunspace.ThreadOptions = "ReuseThread"
+        $progressRunspace.Open()
+        $progressRunspace.SessionStateProxy.SetVariable("progressSync", $progressSync)
 
         # Progress dialog script
         $progressScript = {
@@ -1640,7 +1594,6 @@ Function Show-SCuBABaselinePolicyViewer {
             throw "Baseline generation failed: $($progressSync.Error)"
         }
 
-        } # End if (-not $usePublishedBaseline)
 
         Write-Output "Launching baseline policy viewer UI..."
 
@@ -1653,28 +1606,18 @@ Function Show-SCuBABaselinePolicyViewer {
 
         # Call the helper function directly (it handles its own runspace)
         try {
-            # Build parameters hashtable
-            $helperParams = @{
-                BaselineFilePath = $BaselineFilePath
+            if ((Test-Path $controlConfigPath) -and $NavigateToPolicyId) {
+                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath -ControlConfigPath $controlConfigPath -NavigateToPolicyId $NavigateToPolicyId
+            } elseif (Test-Path $controlConfigPath) {
+                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath -ControlConfigPath $controlConfigPath
+            } elseif ($NavigateToPolicyId) {
+                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath -NavigateToPolicyId $NavigateToPolicyId
+            } else {
+                $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper -BaselineFilePath $BaselineFilePath
             }
-            if (Test-Path $controlConfigPath) {
-                $helperParams.ControlConfigPath = $controlConfigPath
-            }
-            if ($NavigateToPolicyId) {
-                $helperParams.NavigateToPolicyId = $NavigateToPolicyId
-            }
-            if ($PassThru) {
-                $helperParams.PassThru = $true
-            }
-
-            $script:BaselineViewerInstance = Show-ScubaBaselinePolicyHelper @helperParams
 
             Write-Output "Baseline Policy Viewer launched successfully!"
-
-            # Return viewer instance if PassThru was specified
-            if ($PassThru) {
-                return $script:BaselineViewerInstance
-            }
+            #return $script:BaselineViewerInstance
         } catch {
             throw "Failed to launch baseline policy viewer: $($_.Exception.Message)"
         }

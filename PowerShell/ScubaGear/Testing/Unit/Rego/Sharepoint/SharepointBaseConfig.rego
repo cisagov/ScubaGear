@@ -3,7 +3,7 @@ import rego.v1
 
 SPOTenant := {
     "SharingCapability": 0,
-    "ODBSharingCapability": 0,
+    "OneDriveSharingCapability": 0,
     "SharingDomainRestrictionMode": 0,
     "DefaultSharingLinkType": 1,
     "DefaultLinkPermission": 1,

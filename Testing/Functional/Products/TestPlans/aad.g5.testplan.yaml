@@ -5,8 +5,6 @@ TestPlan:
     Tests:
       - TestDescription: MS.AAD.2.1v1 Non-Compliant case - low risk users are blocked
         Preconditions:
-          - Command: UpdateCachedHighRiskBlockPoliciesToLowRisk
-            Splat: {}
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
               displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
@@ -44,7 +42,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
@@ -97,7 +94,6 @@ TestPlan:
                     ExcludeGroups: []
                     IncludeRoles: []
                     ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
