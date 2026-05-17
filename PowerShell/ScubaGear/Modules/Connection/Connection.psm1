@@ -52,9 +52,6 @@
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
    $InitialDomainPrefix = $null
-   # UPN captured after first successful Connect-GraphHelper; enables SSO (prompt=none) for PP, PBI, and SPO
-   # by reusing the AAD browser session already established by Connect-MgGraph.
-   $LoginHint = $null
 
    # Token data for REST-based products (populated during connection)
    $TokenData = @{
@@ -95,9 +92,6 @@
                    }
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
-                   if (-not $LoginHint) {
-                       $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
-                   }
                }
                {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
@@ -123,9 +117,6 @@
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
-                       if (-not $LoginHint) {
-                           $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
-                       }
                    }
 
                    # Acquire Power Platform access token
@@ -155,8 +146,7 @@
                            -Scope $PPScope `
                            -ClientId $PPClientId `
                            -Tenant $TenantName `
-                           -M365Environment $M365Environment `
-                           -LoginHint $LoginHint
+                           -M365Environment $M365Environment 
                    }
                    Write-Verbose "Power Platform token acquired successfully"
                }
@@ -172,9 +162,6 @@
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
-                       if (-not $LoginHint) {
-                           $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
-                       }
                    }
 
                    # Check for Power BI license before attempting token acquisition.
@@ -189,13 +176,16 @@
                             $TenantHasPBILicense = $true
                             $PlanNames = ($PBIServicePlans | ForEach-Object { $_.ServicePlanName } | Select-Object -Unique) -join ", "
                             Write-Information "Power BI license found: $PlanNames" -InformationAction Continue
+                            Write-ScubaLog -Message "Power BI license found: $PlanNames" -Level "Info" -Source "Connect-Tenant"
                         }
                   }
 
                    if (-not $TenantHasPBILicense) {
-                       Write-Warning "No Power BI or Fabric license found in the tenant."
-                       $PBILicenseFound = $false
-                       $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
+                        Write-Warning "No Power BI or Fabric license found in the tenant."
+                        Write-ScubaLog -Message "No Power BI or Fabric license found in the tenant." -Level "Info" -Source "Connect-Tenant"
+                        # Mark license as not found to avoid attempting Power BI API calls later, which would trigger consent/sign-in without a license.
+                        $PBILicenseFound = $false
+                        $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
                    }
                    else {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
@@ -209,6 +199,7 @@
                             $UserPBIPlans = @($UserPlans |Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
                             if ($UserPBIPlans.Count -eq 0) {
                                 Write-Warning "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+                                Write-ScubaLog -Message "Current user does not have a Power BI or Fabric license assigned." -Level "Info" -Source "Connect-Tenant"
                                 $PBILicenseFound = $false
                                 $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
                             }
@@ -216,6 +207,7 @@
                                 $PBILicenseFound = $true
                                 $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
                                 Write-Information "User Power BI/Fabric license found: $UserPlanNames" -InformationAction Continue
+                                Write-ScubaLog -Message "User Power BI/Fabric license found: $UserPlanNames" -Level "Info" -Source "Connect-Tenant"
                             }
                        }
                        # Skip this check for service principal auth (SPs use tenant setting + security group).
@@ -250,8 +242,7 @@
                                     -Scope $PBIScope `
                                     -ClientId $PBIClientId `
                                     -Tenant $TenantName `
-                                    -M365Environment $M365Environment `
-                                    -LoginHint $LoginHint
+                                    -M365Environment $M365Environment 
                             }
                             Write-Verbose "Power BI token acquired successfully"
                        }
@@ -268,9 +259,6 @@
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
-                       if (-not $LoginHint) {
-                           $LoginHint = (Get-MgContext -ErrorAction SilentlyContinue).Account
-                       }
                    }
                    if ($SPOAuthRequired) {
                        # Resolve tenant info if not already cached from a previous product
@@ -299,8 +287,7 @@
                                -Scope $SPOScope `
                                -ClientId $SPOClientId `
                                -Tenant $TenantName `
-                               -M365Environment $M365Environment `
-                               -LoginHint $LoginHint
+                               -M365Environment $M365Environment 
                        }
                        Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false

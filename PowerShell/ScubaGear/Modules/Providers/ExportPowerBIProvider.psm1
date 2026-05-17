@@ -75,7 +75,7 @@ function Export-PowerBIProvider {
     "powerbi_tenant_settings": $TenantSettingsJson,
     "powerbi_successful_commands": $PowerBISuccessfulCommands,
     "powerbi_unsuccessful_commands": $PowerBIUnSuccessfulCommands,
-    "powerbi_license_found": $LicenseFoundJson
+    "powerbi_license_found": $LicenseFoundJson,
 "@
 
     $json
