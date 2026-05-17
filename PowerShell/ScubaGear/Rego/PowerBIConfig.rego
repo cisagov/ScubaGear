@@ -3,8 +3,6 @@ import rego.v1
 import data.utils.key.FilterArray
 import data.utils.key.Count
 import data.utils.report.ReportDetailsBoolean
-import data.utils.report.ReportDetailsString
-
 
 # Some global variables
 
