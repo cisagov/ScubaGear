@@ -95,8 +95,12 @@ function Export-AADProvider {
     # Provides data on the password expiration policy
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
+    # Load the risky permissions module and JSON once for reuse by multiple functions below
+    Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
+    $RiskyPermissionsJson = Get-RiskyPermissionsJson
+
     # The RiskyDelegatedPermissionClassifications is for user consent policy 5.2 to determine if any delegated permission classifications considered risky by Scuba are classified as low risk in the tenant
-    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment; "RiskyPermissionsJson"=$RiskyPermissionsJson}))
 
     ##### Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
@@ -169,7 +173,6 @@ function Export-AADProvider {
     }
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
-    Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
 
     # Export severity score weights at the provider level so the data can be used for processing in the Entra ID HTML report.
     $SeverityScoreWeights = ConvertTo-Json -Depth 5 (Get-SeverityScoreWeights)
@@ -181,11 +184,13 @@ function Export-AADProvider {
 
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
-        "ResourcePermissionCache"=$ResourcePermissionCache
+        "ResourcePermissionCache"=$ResourcePermissionCache;
+        "RiskyPermissionsJson"=$RiskyPermissionsJson
     })
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
-        "ResourcePermissionCache"=$ResourcePermissionCache
+        "ResourcePermissionCache"=$ResourcePermissionCache;
+        "RiskyPermissionsJson"=$RiskyPermissionsJson
     })
 
     $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }

@@ -1,5 +1,9 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
+# Module-scoped cache for RiskyPermissions.json - loaded once, reused across all function calls
+$script:CachedRiskyPermissionsJson = $null
+$script:CachedPermissionLookup = $null
+
 function Get-ResourcePermissions {
     param(
         [ValidateNotNullOrEmpty()]
@@ -41,20 +45,89 @@ function Get-ResourcePermissions {
 }
 
 function Get-RiskyPermissionsJson {
+    <#
+    .Description
+    Returns the parsed RiskyPermissions.json data. Uses a module-scoped cache to avoid
+    redundant file reads and JSON parsing on subsequent calls.
+    .Functionality
+    Internal
+    #>
     process {
-        try {
-            $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
-            $PermissionsJson = Get-Content -Path (
-                Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
-            ) | ConvertFrom-Json
+        if ($null -eq $script:CachedRiskyPermissionsJson) {
+            try {
+                $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
+                $script:CachedRiskyPermissionsJson = Get-Content -Path (
+                    Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
+                ) -Raw | ConvertFrom-Json
+                # Build the hashtable lookup on first load
+                $script:CachedPermissionLookup = Build-PermissionLookup -Json $script:CachedRiskyPermissionsJson
+            }
+            catch {
+                Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
+                Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+                throw $_
+            }
         }
-        catch {
-            Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
-            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
-            throw $_
-        }
-        return $PermissionsJson
+        return $script:CachedRiskyPermissionsJson
     }
+}
+
+function Build-PermissionLookup {
+    <#
+    .Description
+    Builds a nested hashtable from the RiskyPermissions.json PSObject for O(1) permission lookups.
+    Structure: $Lookup[$ResourceDisplayName][$RoleType][$Guid] = @{ Name; RiskLevel }
+    .Functionality
+    Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Json
+    )
+
+    $Lookup = @{}
+    foreach ($Resource in $Json.permissions.PSObject.Properties) {
+        $ResourceName = $Resource.Name
+        $Lookup[$ResourceName] = @{}
+        foreach ($RoleType in $Resource.Value.PSObject.Properties) {
+            # Skip internal keys like _excludedDelegated
+            if ($RoleType.Name.StartsWith("_")) { continue }
+            $RoleTypeName = $RoleType.Name
+            $Lookup[$ResourceName][$RoleTypeName] = @{}
+            foreach ($Perm in $RoleType.Value.PSObject.Properties) {
+                $Lookup[$ResourceName][$RoleTypeName][$Perm.Name] = @{
+                    Name = $Perm.Value.Name
+                    RiskLevel = $Perm.Value.RiskLevel
+                }
+            }
+        }
+    }
+    return $Lookup
+}
+
+function Get-PermissionLookup {
+    <#
+    .Description
+    Returns the cached hashtable lookup for risky permissions. Builds it if not yet initialized.
+    .Functionality
+    Internal
+    #>
+    param (
+        [PSCustomObject]
+        $RiskyPermissionsJson
+    )
+
+    if ($null -ne $script:CachedPermissionLookup) {
+        return $script:CachedPermissionLookup
+    }
+
+    if ($null -eq $RiskyPermissionsJson) {
+        $RiskyPermissionsJson = Get-RiskyPermissionsJson
+    }
+
+    $script:CachedPermissionLookup = Build-PermissionLookup -Json $RiskyPermissionsJson
+    return $script:CachedPermissionLookup
 }
 
 function Format-Permission {
@@ -94,9 +167,16 @@ function Format-Permission {
     )
     $Map = @()
     if ($null -ne $RoleType) {
-        $RiskyPermissions = $Json.permissions.$AppDisplayName.$RoleType.PSObject.Properties.Name
-        $IsRisky = $RiskyPermissions -contains $Id
-        $RiskLevel = $Json.permissions.$AppDisplayName.$RoleType.$Id.RiskLevel
+        $Lookup = Get-PermissionLookup -RiskyPermissionsJson $Json
+        $IsRisky = $false
+        $RiskLevel = $null
+
+        if ($Lookup.ContainsKey($AppDisplayName) -and
+            $Lookup[$AppDisplayName].ContainsKey($RoleType) -and
+            $Lookup[$AppDisplayName][$RoleType].ContainsKey($Id)) {
+            $IsRisky = $true
+            $RiskLevel = $Lookup[$AppDisplayName][$RoleType][$Id].RiskLevel
+        }
 
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
@@ -221,11 +301,16 @@ function Get-ApplicationsWithRiskyPermissions {
         $M365Environment,
 
         [hashtable]
-        $ResourcePermissionCache
+        $ResourcePermissionCache,
+
+        [PSCustomObject]
+        $RiskyPermissionsJson
     )
     process {
         try {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            if ($null -eq $RiskyPermissionsJson) {
+                $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            }
             # Get all applications in the tenant
             $Applications = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplication" -M365Environment $M365Environment).Value
             $ApplicationResults = @()
@@ -349,11 +434,16 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         $M365Environment,
 
         [hashtable]
-        $ResourcePermissionCache
+        $ResourcePermissionCache,
+
+        [PSCustomObject]
+        $RiskyPermissionsJson
     )
     process {
         try {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            if ($null -eq $RiskyPermissionsJson) {
+                $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            }
             $ServicePrincipalResults = @()
             # Get all service principals
             $ServicePrincipals = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment $M365Environment).Value
@@ -504,11 +594,16 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
     param (
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [PSCustomObject]
+        $RiskyPermissionsJson
     )
     process {
         try {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            if ($null -eq $RiskyPermissionsJson) {
+                $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            }
             $Resources = $RiskyPermissionsJson.resources.PSObject.Properties
 
 
@@ -1125,6 +1220,8 @@ function Set-SeverityScore {
 
 Export-ModuleMember -Function @(
     "Get-RiskyPermissionsJson",
+    "Build-PermissionLookup",
+    "Get-PermissionLookup",
     "Format-Credentials",
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
