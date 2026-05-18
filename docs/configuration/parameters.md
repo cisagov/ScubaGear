@@ -24,7 +24,8 @@ Here is an example using `-AppID`:
 Invoke-SCuBA -ProductNames teams `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com
+  -Organization contoso.onmicrosoft.com `
+  -M365Environment gcc
 ```
 
 > **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
@@ -47,7 +48,8 @@ Here is an example using `-CertificateThumbprint`:
 Invoke-SCuBA -ProductNames teams `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com
+  -Organization contoso.onmicrosoft.com `
+  -M365Environment gcc
 ```
 
 > **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
@@ -243,7 +245,8 @@ Here is an example using Organization:
 Invoke-SCuBA -ProductNames teams `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com
+  -Organization contoso.onmicrosoft.com `
+  -M365Environment gcc
 ```
 
 > **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.

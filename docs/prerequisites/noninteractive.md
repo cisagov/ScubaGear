@@ -116,7 +116,7 @@ In the **Power BI Admin portal**:
 After enabling the setting, confirm the SP can reach the API:
 
 ```powershell
-Invoke-SCuBA -ProductNames powerbi -AppID <app-id> -CertificateThumbprint <thumbprint> -Organization <tenant>.onmicrosoft.com
+Invoke-SCuBA -ProductNames powerbi -AppID <app-id> -CertificateThumbprint <thumbprint> -Organization <tenant>.onmicrosoft.com -M365Environment gcc
 ```
 
 > [!NOTE]

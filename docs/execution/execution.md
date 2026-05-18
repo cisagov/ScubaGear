@@ -77,10 +77,12 @@ Non-interactive mode means that the credentials that are required by the underly
 
 ```powershell
 # Assess with service principal
+# Must pass M365Environment. Acceptable values are: commercial, gcc, gcchigh
 Invoke-SCuBA -ProductNames * `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com 
+  -Organization contoso.onmicrosoft.com `
+  -M365Environment gcc
 ```
 
 ## Parameters
