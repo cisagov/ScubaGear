@@ -338,7 +338,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     ConnFilterPolicies := ConnFiltersWithIPAllowList
-    ErrString := "Connection filter polic(ies) with an IP allowlist:"
+    ErrString := "connection filter polic(ies) with an IP allowlist:"
     ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
@@ -365,7 +365,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     ConnFilterPolicies := ConnFiltersWithSafeList
-    ErrString := "Connection filter polic(ies) with a safe list:"
+    ErrString := "connection filter polic(ies) with a safe list:"
     ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
