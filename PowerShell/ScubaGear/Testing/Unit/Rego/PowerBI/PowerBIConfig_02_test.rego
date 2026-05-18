@@ -12,7 +12,7 @@ import data.utils.key.PASS
 ### Testing the "PowerBI License found and setting was found in JSON" scenarios
 ###
 test_AllowGuestUserToAccessSharedContent_Compliant_Disabled if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": false},
         {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": []}
@@ -23,7 +23,7 @@ test_AllowGuestUserToAccessSharedContent_Compliant_Disabled if {
 }
 
 test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithSecurityGroup if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": true},
         {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": [
@@ -39,7 +39,7 @@ test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithSecurityGroup if {
 }
 
 test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithTwoSecurityGroups if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": true},
         {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": [
@@ -59,7 +59,7 @@ test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithTwoSecurityGroups 
 }
 
 test_AllowGuestUserToAccessSharedContent_NonCompliant_EnabledWithNoSecurityGroups if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": true},
         {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": []}
@@ -74,31 +74,31 @@ test_AllowGuestUserToAccessSharedContent_NonCompliant_EnabledWithNoSecurityGroup
 ### Testing the "No PowerBI license found" scenarios
 ###
 test_AllowGuestUserToAccessSharedContent_NoLicense if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": false}
     ])
 
     Output := powerbi.tests with input as patched_input
-    TestResult("MS.POWERBI.2.1v1", Output, powerbi_license_error_message, false) == true
+    TestResult("MS.POWERBI.2.1v1", Output, PowerbiLicenseErrorMessage, false) == true
 }
 
 test_AllowGuestUserToAccessSharedContent_LicenseVariableMissing if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "remove", "path": "/powerbi_license_found"}
     ])
 
     Output := powerbi.tests with input as patched_input
-    TestResult("MS.POWERBI.2.1v1", Output, powerbi_license_error_message, false) == true
+    TestResult("MS.POWERBI.2.1v1", Output, PowerbiLicenseErrorMessage, false) == true
 }
 
 test_AllowGuestUserToAccessSharedContent_NoLicense_TakesPrecedence_OverMissingTenantSettings if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": false},
         {"op": "remove", "path": "/powerbi_tenant_settings"}
     ])
 
     Output := powerbi.tests with input as patched_input
-    TestResult("MS.POWERBI.2.1v1", Output, powerbi_license_error_message, false) == true
+    TestResult("MS.POWERBI.2.1v1", Output, PowerbiLicenseErrorMessage, false) == true
 }
 ###
 
@@ -106,7 +106,7 @@ test_AllowGuestUserToAccessSharedContent_NoLicense_TakesPrecedence_OverMissingTe
 ### Testing the "Missing the specific setting that this policy expects" scenarios
 ###
 test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_Missing if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "remove", "path": "/powerbi_tenant_settings"}
     ])
@@ -117,7 +117,7 @@ test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_Missing if {
 }
 
 test_AllowGuestUserToAccessSharedContent_Missing if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")])}
     ])
@@ -128,7 +128,7 @@ test_AllowGuestUserToAccessSharedContent_Missing if {
 }
 
 test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_EmptyArray if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": "/powerbi_tenant_settings", "value": []}
     ])
@@ -139,7 +139,7 @@ test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_EmptyArray if {
 }
 
 test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_NullArrayElement if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": "/powerbi_tenant_settings", "value": [null]}
     ])
@@ -150,7 +150,7 @@ test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_NullArrayElement 
 }
 
 test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_NonObjectArrayElement if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "replace", "path": "/powerbi_tenant_settings", "value": ["bad-data"]}
     ])
@@ -161,7 +161,7 @@ test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_NonObjectArrayEle
 }
 
 test_AllowGuestUserToAccessSharedContent_MissingSettingName if {
-    patched_input := json.patch(powerbi_tenant_settings_json, [
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
         {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")])}
     ])

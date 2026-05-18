@@ -1,7 +1,7 @@
 package powerbi_test
 import rego.v1
 
-powerbi_tenant_settings_json := {
+PowerbiTenantSettingsJson := {
     "powerbi_license_found": true,
 
     "powerbi_tenant_settings": [
@@ -90,7 +90,7 @@ powerbi_tenant_settings_json := {
 
 powerbi_setting_index(setting_name) := idx if {
     some idx
-    powerbi_tenant_settings_json.powerbi_tenant_settings[idx].settingName == setting_name
+    PowerbiTenantSettingsJson.powerbi_tenant_settings[idx].settingName == setting_name
 }
 
-powerbi_license_error_message := "Power BI license was not found. Unable to evaluate tenant setting."
+PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluate tenant setting."

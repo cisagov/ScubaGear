@@ -6,13 +6,13 @@ import data.utils.report.ReportDetailsBoolean
 
 # Some global variables
 
-powerbi_license_error_message := "Power BI license was not found. Unable to evaluate tenant setting."
+PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluate tenant setting."
 
 # object.get returns the actual value from the input if the key exists, otherwise it returns the default value specified (false in this case)
-powerbi_license_found := object.get(input, "powerbi_license_found", false)
+PowerbiLicenseFound := object.get(input, "powerbi_license_found", false)
 
 # Convert tenant settings array into a map keyed by settingName
-powerbi_tenant_settings := {
+PowerbiTenantSettings := {
     setting.settingName: setting |
     some setting in object.get(input, "powerbi_tenant_settings", [])
     is_object(setting)
@@ -23,22 +23,22 @@ powerbi_tenant_settings := {
 # MS.POWERBI.1.1v1
 #--
 
-publish_to_web_setting := object.get(powerbi_tenant_settings, "PublishToWeb", null)
+PublishToWebSetting := object.get(PowerbiTenantSettings, "PublishToWeb", null)
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": publish_to_web_setting.enabled,
+    "ActualValue": PublishToWebSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    publish_to_web_setting != null
+    PublishToWebSetting != null
 
-    status := publish_to_web_setting.enabled == false
+    status := PublishToWebSetting.enabled == false
 }
 
 # Exception case: No PowerBI license found
@@ -47,10 +47,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -62,11 +62,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or PublishToWeb are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        publish_to_web_setting == null
+        count(PowerbiTenantSettings) == 0,
+        PublishToWebSetting == null
     ]
 
     some condition in missing_conditions
@@ -78,12 +78,12 @@ tests contains {
 # MS.POWERBI.2.1v1
 #--
 
-allow_guest_access_shared_content_setting := object.get(powerbi_tenant_settings, "AllowGuestUserToAccessSharedContent", null)
+AllowGuestAccessSharedContentSetting := object.get(PowerbiTenantSettings, "AllowGuestUserToAccessSharedContent", null)
 
-allow_guest_access_disabled := allow_guest_access_shared_content_setting.enabled == false
+AllowGuestAccessDisabled := AllowGuestAccessSharedContentSetting.enabled == false
 
-allow_guest_access_security_groups := Count(
-    object.get(allow_guest_access_shared_content_setting, "enabledSecurityGroups", [])
+AllowGuestAccessSecurityGroups := Count(
+    object.get(AllowGuestAccessSharedContentSetting, "enabledSecurityGroups", [])
 ) > 0
 
 # Core policy: PowerBI License found and setting was found in JSON
@@ -91,17 +91,17 @@ tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": allow_guest_access_shared_content_setting.enabled,
+    "ActualValue": AllowGuestAccessSharedContentSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    allow_guest_access_shared_content_setting != null
+    AllowGuestAccessSharedContentSetting != null
 
     CompliantConditions := [
-        allow_guest_access_disabled,
-        allow_guest_access_security_groups
+        AllowGuestAccessDisabled,
+        AllowGuestAccessSecurityGroups
     ]
 
     # If either of the compliance conditions are true, then pass the policy.
@@ -114,10 +114,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -129,11 +129,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or AllowGuestUserToAccessSharedContent are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        allow_guest_access_shared_content_setting == null
+        count(PowerbiTenantSettings) == 0,
+        AllowGuestAccessSharedContentSetting == null
     ]
 
     some condition in missing_conditions
@@ -146,12 +146,12 @@ tests contains {
 # MS.POWERBI.3.1v1
 #--
 
-external_sharing_v2_setting := object.get(powerbi_tenant_settings, "ExternalSharingV2", null)
+ExternalSharingV2Setting := object.get(PowerbiTenantSettings, "ExternalSharingV2", null)
 
-external_sharing_v2_disabled := external_sharing_v2_setting.enabled == false
+ExternalSharingV2Disabled := ExternalSharingV2Setting.enabled == false
 
-external_sharing_v2_security_groups := Count(
-    object.get(external_sharing_v2_setting, "enabledSecurityGroups", [])
+ExternalSharingV2SecurityGroups := Count(
+    object.get(ExternalSharingV2Setting, "enabledSecurityGroups", [])
 ) > 0
 
 # Core policy: PowerBI License found and setting was found in JSON
@@ -159,17 +159,17 @@ tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": external_sharing_v2_setting.enabled,
+    "ActualValue": ExternalSharingV2Setting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    external_sharing_v2_setting != null
+    ExternalSharingV2Setting != null
 
     conditions := [
-        external_sharing_v2_disabled,
-        external_sharing_v2_security_groups
+        ExternalSharingV2Disabled,
+        ExternalSharingV2SecurityGroups
     ]
 
     status := Count(FilterArray(conditions, true)) > 0
@@ -181,10 +181,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -196,11 +196,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or ExternalSharingV2 are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        external_sharing_v2_setting == null
+        count(PowerbiTenantSettings) == 0,
+        ExternalSharingV2Setting == null
     ]
 
     some condition in missing_conditions
@@ -213,12 +213,12 @@ tests contains {
 # MS.POWERBI.4.1v1
 #--
 
-service_principal_access_permission_apis_setting := object.get(powerbi_tenant_settings, "ServicePrincipalAccessPermissionAPIs", null)
+ServicePrincipalAccessPermissionApisSetting := object.get(PowerbiTenantSettings, "ServicePrincipalAccessPermissionAPIs", null)
 
-service_principal_access_permission_apis_disabled := service_principal_access_permission_apis_setting.enabled == false
+ServicePrincipalAccessPermissionApisDisabled := ServicePrincipalAccessPermissionApisSetting.enabled == false
 
-service_principal_access_permission_apis_security_groups := Count(
-    object.get(service_principal_access_permission_apis_setting, "enabledSecurityGroups", [])
+ServicePrincipalAccessPermissionApisSecurityGroups := Count(
+    object.get(ServicePrincipalAccessPermissionApisSetting, "enabledSecurityGroups", [])
 ) > 0
 
 # Core policy: PowerBI License found and setting was found in JSON
@@ -226,17 +226,17 @@ tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": service_principal_access_permission_apis_setting.enabled,
+    "ActualValue": ServicePrincipalAccessPermissionApisSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    service_principal_access_permission_apis_setting != null
+    ServicePrincipalAccessPermissionApisSetting != null
 
     conditions := [
-        service_principal_access_permission_apis_disabled,
-        service_principal_access_permission_apis_security_groups
+        ServicePrincipalAccessPermissionApisDisabled,
+        ServicePrincipalAccessPermissionApisSecurityGroups
     ]
 
     status := Count(FilterArray(conditions, true)) > 0
@@ -248,10 +248,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -263,11 +263,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or ServicePrincipalAccessPermissionAPIs are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        service_principal_access_permission_apis_setting == null
+        count(PowerbiTenantSettings) == 0,
+        ServicePrincipalAccessPermissionApisSetting == null
     ]
 
     some condition in missing_conditions
@@ -279,12 +279,12 @@ tests contains {
 # MS.POWERBI.4.2v1
 #--
 
-allow_service_principals_create_and_use_profiles_setting := object.get(powerbi_tenant_settings, "AllowServicePrincipalsCreateAndUseProfiles", null)
+AllowServicePrincipalsCreateAndUseProfilesSetting := object.get(PowerbiTenantSettings, "AllowServicePrincipalsCreateAndUseProfiles", null)
 
-allow_service_principals_create_and_use_profiles_disabled := allow_service_principals_create_and_use_profiles_setting.enabled == false
+AllowServicePrincipalsCreateAndUseProfilesDisabled := AllowServicePrincipalsCreateAndUseProfilesSetting.enabled == false
 
-allow_service_principals_create_and_use_profiles_security_groups := Count(
-    object.get(allow_service_principals_create_and_use_profiles_setting, "enabledSecurityGroups", [])
+AllowServicePrincipalsCreateAndUseProfilesSecurityGroups := Count(
+    object.get(AllowServicePrincipalsCreateAndUseProfilesSetting, "enabledSecurityGroups", [])
 ) > 0
 
 # Core policy: PowerBI License found and setting was found in JSON
@@ -292,17 +292,17 @@ tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": allow_service_principals_create_and_use_profiles_setting.enabled,
+    "ActualValue": AllowServicePrincipalsCreateAndUseProfilesSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    allow_service_principals_create_and_use_profiles_setting != null
+    AllowServicePrincipalsCreateAndUseProfilesSetting != null
 
     conditions := [
-        allow_service_principals_create_and_use_profiles_disabled,
-        allow_service_principals_create_and_use_profiles_security_groups
+        AllowServicePrincipalsCreateAndUseProfilesDisabled,
+        AllowServicePrincipalsCreateAndUseProfilesSecurityGroups
     ]
 
     status := Count(FilterArray(conditions, true)) > 0
@@ -314,10 +314,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -329,11 +329,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or AllowServicePrincipalsCreateAndUseProfiles are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        allow_service_principals_create_and_use_profiles_setting == null
+        count(PowerbiTenantSettings) == 0,
+        AllowServicePrincipalsCreateAndUseProfilesSetting == null
     ]
 
     some condition in missing_conditions
@@ -346,7 +346,7 @@ tests contains {
 # MS.POWERBI.5.1v1
 #--
 
-BlockResourceKeyAuthenticationSetting := object.get(powerbi_tenant_settings, "BlockResourceKeyAuthentication", null)
+BlockResourceKeyAuthenticationSetting := object.get(PowerbiTenantSettings, "BlockResourceKeyAuthentication", null)
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -357,7 +357,7 @@ tests contains {
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     BlockResourceKeyAuthenticationSetting != null
 
@@ -370,10 +370,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -385,10 +385,10 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
+        count(PowerbiTenantSettings) == 0,
         BlockResourceKeyAuthenticationSetting == null
     ]
 
@@ -401,22 +401,22 @@ tests contains {
 # MS.POWERBI.6.1v1
 #--
 
-r_script_visual_setting := object.get(powerbi_tenant_settings, "RScriptVisual", null)
+RScriptVisualSetting := object.get(PowerbiTenantSettings, "RScriptVisual", null)
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": r_script_visual_setting.enabled,
+    "ActualValue": RScriptVisualSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    r_script_visual_setting != null
+    RScriptVisualSetting != null
 
-    status := r_script_visual_setting.enabled == false
+    status := RScriptVisualSetting.enabled == false
 }
 
 # Exception case: No PowerBI license found
@@ -425,10 +425,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -440,11 +440,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or RScriptVisual are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        r_script_visual_setting == null
+        count(PowerbiTenantSettings) == 0,
+        RScriptVisualSetting == null
     ]
 
     some condition in missing_conditions
@@ -457,22 +457,22 @@ tests contains {
 # MS.POWERBI.7.1v1
 #--
 
-eim_information_protection_edit_setting := object.get(powerbi_tenant_settings, "EimInformationProtectionEdit", null)
+EimInformationProtectionEditSetting := object.get(PowerbiTenantSettings, "EimInformationProtectionEdit", null)
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": eim_information_protection_edit_setting.enabled,
+    "ActualValue": EimInformationProtectionEditSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
-    eim_information_protection_edit_setting != null
+    EimInformationProtectionEditSetting != null
 
-    status := eim_information_protection_edit_setting.enabled == true
+    status := EimInformationProtectionEditSetting.enabled == true
 }
 
 # Exception case: No PowerBI license found
@@ -481,10 +481,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
     "ActualValue": "No License",
-    "ReportDetails": powerbi_license_error_message,
+    "ReportDetails": PowerbiLicenseErrorMessage,
     "RequirementMet": false
 } if {
-    not powerbi_license_found
+    not PowerbiLicenseFound
 }
 
 # Exception case: Missing the specific setting that this policy expects
@@ -496,11 +496,11 @@ tests contains {
     "ReportDetails": "powerbi_tenant_settings or EimInformationProtectionEdit are missing from input JSON",
     "RequirementMet": false
 } if {
-    powerbi_license_found
+    PowerbiLicenseFound
 
     missing_conditions := [
-        count(powerbi_tenant_settings) == 0,
-        eim_information_protection_edit_setting == null
+        count(PowerbiTenantSettings) == 0,
+        EimInformationProtectionEditSetting == null
     ]
 
     some condition in missing_conditions
