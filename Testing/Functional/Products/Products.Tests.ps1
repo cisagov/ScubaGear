@@ -102,6 +102,10 @@ BeforeDiscovery {
         $ProductName = "securitysuite"
     }
 
+    if ($Variant -and $ProductName -eq "aad" -and $M365Environment -in @("gcchigh", "dod")) {
+        $Variant = "$M365Environment.$Variant".TrimEnd(".")
+    }
+
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     Import-Module $ScubaModule
