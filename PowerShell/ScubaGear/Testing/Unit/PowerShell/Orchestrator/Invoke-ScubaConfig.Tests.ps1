@@ -232,7 +232,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, reflects all products"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerplatform', 'securitysuite', 'sharepoint', 'teams', 'powerbi') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerbi', 'powerplatform', 'securitysuite', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
     }
