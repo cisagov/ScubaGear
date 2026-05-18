@@ -346,22 +346,22 @@ tests contains {
 # MS.POWERBI.5.1v1
 #--
 
-block_resource_key_authentication_setting := object.get(powerbi_tenant_settings, "BlockResourceKeyAuthentication", null)
+BlockResourceKeyAuthenticationSetting := object.get(powerbi_tenant_settings, "BlockResourceKeyAuthentication", null)
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
     "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": block_resource_key_authentication_setting.enabled,
+    "ActualValue": BlockResourceKeyAuthenticationSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     powerbi_license_found
 
-    block_resource_key_authentication_setting != null
+    BlockResourceKeyAuthenticationSetting != null
 
-    status := block_resource_key_authentication_setting.enabled == true
+    status := BlockResourceKeyAuthenticationSetting.enabled == true
 }
 
 # Exception case: No PowerBI license found
@@ -389,7 +389,7 @@ tests contains {
 
     missing_conditions := [
         count(powerbi_tenant_settings) == 0,
-        block_resource_key_authentication_setting == null
+        BlockResourceKeyAuthenticationSetting == null
     ]
 
     some condition in missing_conditions
