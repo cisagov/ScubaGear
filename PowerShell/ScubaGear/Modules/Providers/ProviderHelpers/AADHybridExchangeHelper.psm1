@@ -5,7 +5,7 @@ function Get-ExchangeHybridIds {
     <#
     .Description
     Look up the Office 365 Exchange Online app ID and full_access_as_app role ID
-    from the RiskyPermissions.json reference.
+    from the RiskyAppPermissions.json reference.
 
     .Functionality
     Internal
@@ -26,7 +26,7 @@ function Get-ExchangeHybridIds {
         } | Select-Object -First 1
 
         if ($null -eq $ExchangeOnlineResource) {
-            throw "Could not find 'Office 365 Exchange Online' in RiskyPermissions.json."
+            throw "Could not find 'Office 365 Exchange Online' in RiskyAppPermissions.json."
         }
 
         # $FullAccessAsAppRoleId.Name represents the role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
@@ -36,7 +36,7 @@ function Get-ExchangeHybridIds {
         } | Select-Object -First 1
 
         if ($null -eq $FullAccessAsAppRoleId) {
-            throw "Could not find 'full_access_as_app' in RiskyPermissions.json under permissions.'$($ExchangeOnlineResource.Value)'.Application"
+            throw "Could not find 'full_access_as_app' in RiskyAppPermissions.json under permissions.'$($ExchangeOnlineResource.Value)'.Application"
         }
 
         return @{

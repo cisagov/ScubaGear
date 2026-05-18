@@ -1,6 +1,6 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
-# Module-scoped cache for RiskyPermissions.json - loaded once, reused across all function calls
+# Module-scoped cache for RiskyAppPermissions.json - loaded once, reused across all function calls
 $script:CachedRiskyPermissionsJson = $null
 $script:CachedPermissionLookup = $null
 
@@ -47,7 +47,7 @@ function Get-ResourcePermissions {
 function Get-RiskyPermissionsJson {
     <#
     .Description
-    Returns the parsed RiskyPermissions.json data. Uses a module-scoped cache to avoid
+    Returns the parsed RiskyAppPermissions.json data. Uses a module-scoped cache to avoid
     redundant file reads and JSON parsing on subsequent calls.
     .Functionality
     Internal
@@ -55,9 +55,9 @@ function Get-RiskyPermissionsJson {
     process {
         if ($null -eq $script:CachedRiskyPermissionsJson) {
             try {
-                $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
+                $SchemasPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.Parent.FullName) -ChildPath "schemas"
                 $script:CachedRiskyPermissionsJson = Get-Content -Path (
-                    Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
+                    Join-Path -Path (Get-Item -Path $SchemasPath) -ChildPath "RiskyAppPermissions.json"
                 ) -Raw | ConvertFrom-Json
                 # Build the hashtable lookup on first load
                 $script:CachedPermissionLookup = Build-PermissionLookup -Json $script:CachedRiskyPermissionsJson
@@ -75,7 +75,7 @@ function Get-RiskyPermissionsJson {
 function Build-PermissionLookup {
     <#
     .Description
-    Builds a nested hashtable from the RiskyPermissions.json PSObject for O(1) permission lookups.
+    Builds a nested hashtable from the RiskyAppPermissions.json PSObject for O(1) permission lookups.
     Structure: $Lookup[$ResourceDisplayName][$RoleType][$Guid] = @{ Name; RiskLevel }
     .Functionality
     Internal
@@ -134,7 +134,7 @@ function Format-Permission {
     <#
     .Description
     Returns an API permission from either application/service principal which maps
-    to the list of permissions declared in RiskyPermissions.json
+    to the list of permissions declared in RiskyAppPermissions.json
     .Functionality
     #Internal
     ##>
@@ -319,7 +319,7 @@ function Get-ApplicationsWithRiskyPermissions {
                 $IsMultiTenantEnabled = $false
                 if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
 
-                # Map application permissions against RiskyPermissions.json
+                # Map application permissions against RiskyAppPermissions.json
                 $MappedPermissions = @()
                 foreach ($Resource in $App.RequiredResourceAccess) {
                     # Returns both application and delegated permissions
@@ -341,7 +341,7 @@ function Get-ApplicationsWithRiskyPermissions {
                     # then update the value later when its compared to service principal permissions.
                     $IsAdminConsented = $false
 
-                    # Only map on resources stored in RiskyPermissions.json file
+                    # Only map on resources stored in RiskyAppPermissions.json file
                     if ($RiskyPermissionsJson.resources.PSObject.Properties.Name -contains $ResourceAppId) {
                         foreach ($Role in $Roles) {
                             $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
@@ -498,7 +498,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                     # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
                                     $IsAdminConsented = $true
 
-                                    # Only map on resources stored in RiskyPermissions.json file
+                                    # Only map on resources stored in RiskyAppPermissions.json file
                                     if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
                                         $ResourceAppId = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
                                             $_.Value -eq $ResourceDisplayName

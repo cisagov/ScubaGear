@@ -149,7 +149,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs | Should -BeNullOrEmpty
         }
 
-        It "excludes permissions not included in the RiskyPermissions.json mapping" {
+        It "excludes permissions not included in the RiskyAppPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
