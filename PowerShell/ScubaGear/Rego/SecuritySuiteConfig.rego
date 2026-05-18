@@ -1,6 +1,7 @@
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsString
 
 
 ######################
@@ -323,7 +324,7 @@ tests contains {
 # list, save the filter name to ConnFiltersWithIPAllowList array.
 ConnFiltersWithIPAllowList contains ConnFilter.Name if {
     some ConnFilter in input.conn_filter
-    count(ConnFilter.IPAllowList) > 0s
+    count(ConnFilter.IPAllowList) > 0
 }
 
 tests contains {
@@ -335,7 +336,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     ConnFilterPolicies := ConnFiltersWithIPAllowList
-    ErrString := "connection filter polic(ies) with an IP allowlist:"
+    ErrString := "Connection filter polic(ies) with an IP allowlist:"
     ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
@@ -362,7 +363,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     ConnFilterPolicies := ConnFiltersWithSafeList
-    ErrString := "connection filter polic(ies) with a safe list:"
+    ErrString := "Connection filter polic(ies) with a safe list:"
     ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
     Status := count(ConnFilterPolicies) == 0
 }
