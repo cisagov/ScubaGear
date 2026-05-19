@@ -330,6 +330,22 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
     - [T1566.002: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
 
+#### MS.SECURITYSUITE.2.4v1
+User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite24v1-instructions)
+
+<!--Policy: MS.SECURITYSUITE.2.4v1; Criticality: SHOULD -->
+- _Rationale:_ Many tasks are better suited for automated processes, such as identifying
+unusual characters in the `FROM` address or identifying a first-time sender.
+User warnings can handle these tasks, reducing the burden on end users and the risk of
+successful phishing attempts.
+- _Last modified:_ March 2026
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AT-2b, SI-8
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+  - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
+
 ### Resources
 
 - [Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365)
@@ -399,6 +415,14 @@ then add a name and valid email address for each sensitive account and click **A
 9.  On the **Manage custom domains for impersonation protection** page, click **Add domain**
 then add each partner domain.
 10. Click **Add domains**, **Done**, then **Save**.
+
+#### MS.SECURITYSUITE.2.4v1 Instructions
+
+Any product meeting the requirements outlined in this baseline policy may be
+used. If the agency uses Microsoft Defender, see the following
+implementation steps for
+[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies) which
+include user safety tips to warn users.
 
 ## 3. Data Loss Prevention
 

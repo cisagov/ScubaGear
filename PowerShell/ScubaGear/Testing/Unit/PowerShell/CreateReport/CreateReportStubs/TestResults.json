@@ -3693,6 +3693,18 @@
 
                        ],
         "Criticality":  "Should/Not-Implemented",
+        "PolicyId":  "MS.SECURITYSUITE.2.4v1",
+        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite24v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+
+                       ],
+        "Criticality":  "Should/Not-Implemented",
         "PolicyId":  "MS.SECURITYSUITE.3.2v1",
         "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite32v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
         "RequirementMet":  false

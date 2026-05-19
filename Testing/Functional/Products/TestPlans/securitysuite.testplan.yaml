@@ -57,6 +57,14 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.2.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.4v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.3.1v1
     TestDriver: ScubaCached

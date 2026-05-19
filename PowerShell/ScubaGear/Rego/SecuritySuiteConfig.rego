@@ -104,6 +104,19 @@ tests contains {
 }
 #--
 
+#
+# MS.SECURITYSUITE.2.4v1
+#--
+tests contains {
+    "PolicyId": "MS.SECURITYSUITE.2.4v1",
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
+    "RequirementMet": false
+}
+#--
+
 
 ######################
 # MS.SECURITYSUITE.3 #
