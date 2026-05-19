@@ -26,4 +26,4 @@ jobs:
       - name: Setup Lint File
         run: cp Testing/Linting/MegaLinter/.yamllint.yml .yamllint.yml
       - name: Lint YAML
-        uses: oxsecurity/megalinter/flavors/ci_light@latest
+        uses: oxsecurity/megalinter/flavors/ci_light@v9.5.0

@@ -26,4 +26,4 @@ jobs:
       - name: Setup Checkov File
         run: cp Testing/Linting/MegaLinter/.checkov.yml .checkov.yml
       - name: Check Security
-        uses: oxsecurity/megalinter/flavors/security@latest
+        uses: oxsecurity/megalinter/flavors/security@v9.5.0
