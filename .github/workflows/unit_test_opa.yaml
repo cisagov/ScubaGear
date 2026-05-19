@@ -22,7 +22,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v6
       - name: Setup OPA
-        uses: open-policy-agent/setup-opa@v2
+        uses: open-policy-agent/setup-opa@v2.4.0
         with:
           version: latest
       - name: Run OPA Check
@@ -30,7 +30,7 @@ jobs:
       - name: Run OPA Tests
         run: opa test ${{ env.MODULE_ROOT }}/Rego/*.rego ${{ env.MODULE_ROOT }}/Rego/Utils/*.rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego/**/*.rego -v
       - name: Setup Regal
-        uses: open-policy-agent/setup-regal@v1
+        uses: open-policy-agent/setup-regal@v2.0.0
         with:
           version: v0.23.1
       - name: Run Regal Lint
