@@ -377,10 +377,8 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [AuthenticationPolicyMigrationState],
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    Status := AuthenticationPolicyMigrationIsComplete
+    "ReportDetails": ReportDetailsBoolean(AuthenticationPolicyMigrationIsComplete),
+    "RequirementMet": AuthenticationPolicyMigrationIsComplete
 }
 #--
 
@@ -410,17 +408,18 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthenticationMethodPolicy"],
     "ActualValue": [LowSecurityAuthMethods],
-    "ReportDetails": ReportDetailsString(Status, ErrorMessage),
-    "RequirementMet": Status
-} if {
-    ErrorMessage := "Sms, Voice, and Email authentication must be disabled."
-    Status := LowSecurityAuthMethodsDisabled
+    "ReportDetails": ReportDetailsString(LowSecurityAuthMethodsDisabled, "Sms, Voice, and Email authentication must be disabled."),
+    "RequirementMet": LowSecurityAuthMethodsDisabled
 }
 #--
 
 #
 # MS.AAD.3.6v1
 #--
+
+# Hoisted outside of the iteration in PhishingResistantMFAPrivilegedRoles to
+# avoid recomputing on every CAPolicy iteration (non-loop-expression).
+PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
 
 # First check if policy is enabled, then confirm that all
 # privliged roles are included in policy & not excluded.
@@ -437,7 +436,6 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
     ###
 
     ### Conditional access checks specific to this policy
-    PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
     # Make sure all the necessary roles are included
     Count(PrivRolesSet - ConvertToSet(CAPolicy.Conditions.Users.IncludeRoles)) == 0
     IsPhishingResistantMFA(CAPolicy) == true
@@ -641,12 +639,8 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
-    "ReportDetails": ReportFullDetailsArray(BadPolicies, DescriptionString),
-    "RequirementMet": Status
-} if {
-    BadPolicies := AuthPoliciesAppBad
-    Status := Count(BadPolicies) == 0
-    DescriptionString := "authorization policies found that allow non-admin users to register third-party applications"
+    "ReportDetails": ReportFullDetailsArray(AuthPoliciesAppBad, "authorization policies found that allow non-admin users to register third-party applications"),
+    "RequirementMet": Count(AuthPoliciesAppBad) == 0
 }
 #--
 
@@ -660,7 +654,8 @@ RiskyDelegatedPermissionClassifications contains Policy.Id if {
     some Policy in input.authorization_policies
     "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
     # Checks if any delegated permissions have a classification of low and are found in the RiskyPermissions.json file
-    count([x | some x in input.risky_delegated_permission_classifications; x != null]) > 0
+    some x in input.risky_delegated_permission_classifications
+    x != null
 }
 
 # Return the Id if non-compliant user consent policies
@@ -1092,7 +1087,7 @@ RootDomainFor(Domain) := Root.Id if {
 }
 
 IsValid(Domain) := true if {
-    Domain.IsRoot = true
+    Domain.IsRoot == true
     Domain.PasswordValidityPeriodInDays == INT_MAX
 } else := true if {
     Domain.IsRoot == false
@@ -1175,11 +1170,8 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaSubscribedSku", "Get-PrivilegedUser"],
     "ActualValue": GlobalAdmins,
-    "ReportDetails": ReportFullDetailsArray(GlobalAdmins, DescriptionString),
-    "RequirementMet": Status
-} if {
-    DescriptionString := "global admin(s) found"
-    Status := IsGlobalAdminCountGood
+    "ReportDetails": ReportFullDetailsArray(GlobalAdmins, "global admin(s) found"),
+    "RequirementMet": IsGlobalAdminCountGood
 }
 #--
 
@@ -1263,11 +1255,10 @@ default PrivilegedRoleExclusions(_, _) := false
 # return true if all users + groups are in the config.
 PrivilegedRoleExclusions(PrivilegedRole, PolicyID) := true if {
     PrivilegedRoleAssignedPrincipals := {x.PrincipalId | some x in PrivilegedRole.Assignments; x.EndDateTime == null}
+    Count(PrivilegedRoleAssignedPrincipals) > 0
 
     AllowedPrivilegedRoleUsers := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users; y != null}
     AllowedPrivilegedRoleGroups := {y | some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups; y != null}
-
-    Count(PrivilegedRoleAssignedPrincipals) > 0
     Count(PrivilegedRoleAssignedPrincipals - (AllowedPrivilegedRoleUsers | AllowedPrivilegedRoleGroups)) != 0
 }
 
