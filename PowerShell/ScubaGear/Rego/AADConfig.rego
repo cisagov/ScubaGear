@@ -639,7 +639,10 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaPolicyAuthorizationPolicy"],
     "ActualValue": {"all_allowed_create_values": AllAuthPoliciesAllowedCreate},
-    "ReportDetails": ReportFullDetailsArray(AuthPoliciesAppBad, "authorization policies found that allow non-admin users to register third-party applications"),
+    "ReportDetails": ReportFullDetailsArray(
+        AuthPoliciesAppBad,
+        "authorization policies found that allow non-admin users to register third-party applications"
+    ),
     "RequirementMet": Count(AuthPoliciesAppBad) == 0
 }
 #--

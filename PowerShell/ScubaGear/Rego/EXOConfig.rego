@@ -262,13 +262,12 @@ tests contains {
     ],
     "ActualValue": input.dmarc_records,
     "ReportDetails": concat(". ", [
-        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        ReportDetailsArray(Status, DomainsWithoutDmarc, "agency domain(s) found in violation:"),
         DNSLink
     ]),
     "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutDmarc
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutDmarc) == 0
 }
 #--
 
@@ -516,10 +515,9 @@ tests contains {
 # Loop through email rules, if rule is: enabled, set to enforce,
 # & PrependSubject >= 1, then save rule in EnabledRules
 EnabledRules contains Rule if {
-    Rules := input.transport_rule
-    some Rule in Rules;
-    Rule.State == "Enabled";
-    Rule.Mode == "Enforce";
+    some Rule in input.transport_rule
+    Rule.State == "Enabled"
+    Rule.Mode == "Enforce"
     count(Rule.PrependSubject) >= 1
 }
 
