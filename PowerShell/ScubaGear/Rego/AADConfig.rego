@@ -49,8 +49,8 @@ LegacyAuthentication contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -96,8 +96,8 @@ BlockHighRisk contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -158,8 +158,8 @@ SignInBlocked contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -210,8 +210,8 @@ PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -251,8 +251,8 @@ NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -430,7 +430,7 @@ PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
 
     ### Common checks for conditional access policies
     ### We don't check IncludeUsers All because this is a role based policy
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -472,8 +472,8 @@ ManagedDeviceAuth contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
@@ -516,13 +516,13 @@ RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
 
     ### Common checks for conditional access policies
     ### We don't check IncludeApplications and ExcludeApplications because they are not relevant when you have an IncludeUserActions node
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    Contains(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
 
     Conditions := [
         "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
@@ -560,8 +560,8 @@ RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
     CAPolicy.State == "enabled"
     ###

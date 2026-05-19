@@ -26,9 +26,9 @@ IsEmptyContainer(container) := true if {
 } else := false
 
 # Check if string is in array
-Contains(null, _) := false
+ContainsValue(null, _) := false
 
-Contains(array, item) := true if {
+ContainsValue(array, item) := true if {
     item in array
 } else := false
 

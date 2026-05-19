@@ -93,6 +93,8 @@ PoliciesSetToAllEnvironments contains {
 # MS.POWERPLATFORM.2.1v1
 #--
 
+DefaultEnvName := concat("-", ["Default", input.tenant_id])
+
 # Iterate through all policies. For each, check if the environment the policy applies to
 # is the default environment. If so, save the policy name to the DefaultEnvPolicies list.
 DefaultEnvPolicies contains {
@@ -102,7 +104,7 @@ DefaultEnvPolicies contains {
     some Policy in input.dlp_policies
     some PolicyValue in Policy.value
     some Env in PolicyValue.environments
-    Env.name == concat("-", ["Default", input.tenant_id])
+    Env.name == DefaultEnvName
 }
 
 # Check if a policy with ExceptEnvironments applies to default (default is not in the exception list)
@@ -118,7 +120,6 @@ PoliciesApplyingToDefaultViaExcept contains {
     ExceptedEnvNames := { Env.name | some Env in PolicyValue.environments }
 
     # Check if default is NOT in the exceptions list (meaning policy applies to default)
-    DefaultEnvName := concat("-", ["Default", input.tenant_id])
     not DefaultEnvName in ExceptedEnvNames
 }
 
@@ -130,14 +131,12 @@ tests contains {
     "ActualValue": {
         "PoliciesSetToAllEnvironments": PoliciesSetToAllEnvironments
     },
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
+    "ReportDetails": ReportDetailsBoolean(PolicySetToAllEnvExists),
+    "RequirementMet": PolicySetToAllEnvExists
 } if {
     some DLPPolicies in input.dlp_policies
     Count(DLPPolicies.value) > 0
-    Count(PoliciesSetToAllEnvironments) >= 1
-
-    Status := Count(PoliciesSetToAllEnvironments) >= 1
+    PolicySetToAllEnvExists
 }
 
 # Note: there is only one default environment per tenant and it cannot be deleted or backed up
@@ -197,9 +196,6 @@ EnvsCoveredViaExcept contains EnvName if {
     # Get all environment names in the exceptions list
     ExceptedEnvNames := { Env.name | some Env in PolicyValue.environments }
 
-    # Get all non-default environment names from environment_list
-    AllNonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
-
     # Environments covered are those NOT in the exceptions list
     CoveredEnvs := AllNonDefaultEnvNames - ExceptedEnvNames
     some EnvName in CoveredEnvs
@@ -220,20 +216,38 @@ NonDefaultEnvWithPolicies contains {
     some EnvName in EnvsCoveredViaExcept
 }
 
+AllNonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
+
+NonDefaultEnvWithPoliciesNames := { e.name | some e in NonDefaultEnvWithPolicies }
+
+EnvWithoutPolicies := AllNonDefaultEnvNames - NonDefaultEnvWithPoliciesNames
+
+PolicySetToAllEnvExists if Count(PoliciesSetToAllEnvironments) >= 1
+
+HasNonDefaultEnvironments if some _ in AllNonDefaultEnvNames
+
+default AllEnvsHavePolicies := false
+
+AllEnvsHavePolicies if EnvWithoutPolicies == set()
+
+RogueConnectors := ConnectorSet - AllowedInBaseline
+
+default AllConnectorsAllowed := false
+
+AllConnectorsAllowed if RogueConnectors == set()
+
 # Pass if at least one policy is set to all environments
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.2.2v1",
     "Criticality": "Should",
     "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": PoliciesSetToAllEnvironments,
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
+    "ReportDetails": ReportDetailsBoolean(PolicySetToAllEnvExists),
+    "RequirementMet": PolicySetToAllEnvExists
 } if {
     some DLPPolicies in input.dlp_policies
     Count(DLPPolicies.value) > 0
-    Count(PoliciesSetToAllEnvironments) >= 1
-
-    Status := Count(PoliciesSetToAllEnvironments) >= 1
+    PolicySetToAllEnvExists
 }
 
 # Pass if all environments have a policy applied to them
@@ -246,19 +260,12 @@ tests contains {
         "NonDefaultEnvWithPolicies": NonDefaultEnvWithPolicies,
         "EnvWithoutPolicies": EnvWithoutPolicies
     },
-    "ReportDetails": ReportDetailsArray(Status, EnvWithoutPolicies, ErrorMessage),
-    "RequirementMet": Status
+    "ReportDetails": ReportDetailsArray(AllEnvsHavePolicies, EnvWithoutPolicies, "subsequent environments without DLP policies:"),
+    "RequirementMet": AllEnvsHavePolicies
 } if {
     some DLPPolicies in input.dlp_policies
     Count(DLPPolicies.value) > 0
-    Count(PoliciesSetToAllEnvironments) == 0
-    ErrorMessage := "subsequent environments without DLP policies:"
-
-    # Finds environments with no policies applied to them
-    AllEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
-    NonDefaultEnvNames := { e.name | some e in NonDefaultEnvWithPolicies }
-    EnvWithoutPolicies := AllEnvNames - NonDefaultEnvNames
-    Status := Count(EnvWithoutPolicies) == 0
+    not PolicySetToAllEnvExists
 }
 
 # Edge case where no non-default environments and no DLP policies are found
@@ -272,9 +279,7 @@ tests contains {
 } if {
     some DLPPolicies in input.dlp_policies
     Count(DLPPolicies.value) <= 0
-
-    NonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
-    Count(NonDefaultEnvNames) == 0
+    not HasNonDefaultEnvironments
 }
 
 # Edge case where non-default environments exist but no DLP policies are found
@@ -288,9 +293,7 @@ tests contains {
 } if {
     some DLPPolicies in input.dlp_policies
     Count(DLPPolicies.value) <= 0
-
-    NonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
-    Count(NonDefaultEnvNames) > 0
+    HasNonDefaultEnvironments
 }
 
 # Edge case where pulling configuration from tenant fails
@@ -313,8 +316,8 @@ tests contains {
 # gets the set of connectors that are allowed in the default environment
 # general and confidential groups refer to business and non-business
 ConnectorSet contains Connector.id if {
-    # regal ignore:prefer-some-in-iteration
-    some Policies in input.dlp_policies[_].value
+    some DlpPolicy in input.dlp_policies
+    some Policies in DlpPolicy.value
     some Group in Policies.connectorGroups
     Conditions := [
         Group.classification == "General",
@@ -325,8 +328,7 @@ ConnectorSet contains Connector.id if {
 
     # Filter: only include policies that meet all the requirements
     some Env in Policies.environments
-    TenantId := input.tenant_id
-    Env.name == concat("-", ["Default", TenantId])
+    Env.name == DefaultEnvName
 }
 
 # set of all connectors that cannot be blocked
@@ -364,14 +366,11 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-PowerPlatformDlpPoliciesRest"],
     "ActualValue": RogueConnectors,
-    "ReportDetails": ReportDetailsArray(Status, RogueConnectors, ErrorMessage),
-    "RequirementMet": Status
+    "ReportDetails": ReportDetailsArray(AllConnectorsAllowed, RogueConnectors, "Connectors are allowed that should be blocked:"),
+    "RequirementMet": AllConnectorsAllowed
 } if {
     some DLPPolicies in input.dlp_policies
     count(DLPPolicies.value) > 0
-    ErrorMessage := "Connectors are allowed that should be blocked:"
-    RogueConnectors := ConnectorSet - AllowedInBaseline
-    Status := count(RogueConnectors) == 0
 }
 
 # Edge case where no policies are found
