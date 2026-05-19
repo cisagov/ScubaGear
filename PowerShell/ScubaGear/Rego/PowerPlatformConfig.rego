@@ -216,9 +216,14 @@ NonDefaultEnvWithPolicies contains {
     some EnvName in EnvsCoveredViaExcept
 }
 
-AllNonDefaultEnvNames := { e.EnvironmentName | some e in AllEnvironments; e.IsDefault == false }
+AllNonDefaultEnvNames contains e.EnvironmentName if {
+    some e in AllEnvironments
+    e.IsDefault == false
+}
 
-NonDefaultEnvWithPoliciesNames := { e.name | some e in NonDefaultEnvWithPolicies }
+NonDefaultEnvWithPoliciesNames contains e.name if {
+    some e in NonDefaultEnvWithPolicies
+}
 
 EnvWithoutPolicies := AllNonDefaultEnvNames - NonDefaultEnvWithPoliciesNames
 

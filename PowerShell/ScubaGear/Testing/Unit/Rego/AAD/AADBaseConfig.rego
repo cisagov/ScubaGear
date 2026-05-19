@@ -315,26 +315,38 @@ BuiltinMultifactorAuthenticationAuthStrength := {
 AppManagementPolicy := {
     "ApplicationRestrictions": {
         "PasswordCredentials": [
-            {"RestrictionType": "passwordAddition", "State": "enabled", "MaxLifetime": null, "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "symmetricKeyAddition", "State": "enabled", "MaxLifetime": null, "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "customPasswordAddition", "State": "enabled", "MaxLifetime": null, "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "passwordLifetime", "State": "enabled", "MaxLifetime": "P90D", "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "symmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P90D", "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
+            {"RestrictionType": "passwordAddition", "State": "enabled", "MaxLifetime": null,
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "symmetricKeyAddition", "State": "enabled", "MaxLifetime": null,
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "customPasswordAddition", "State": "enabled", "MaxLifetime": null,
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "passwordLifetime", "State": "enabled", "MaxLifetime": "P90D",
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "symmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P90D",
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
         ],
         "KeyCredentials": [
-            {"RestrictionType": "asymmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P180D", "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
+            {"RestrictionType": "asymmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P180D",
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
         ]
     },
     "ServicePrincipalRestrictions": {
         "PasswordCredentials": [
-            {"RestrictionType": "passwordAddition", "State": "enabled", "MaxLifetime": null, "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "symmetricKeyAddition", "State": "enabled", "MaxLifetime": null, "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "customPasswordAddition", "State": "enabled", "MaxLifetime": null, "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "passwordLifetime", "State": "enabled", "MaxLifetime": "P90D", "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
-            {"RestrictionType": "symmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P90D", "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
+            {"RestrictionType": "passwordAddition", "State": "enabled", "MaxLifetime": null,
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "symmetricKeyAddition", "State": "enabled", "MaxLifetime": null,
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "customPasswordAddition", "State": "enabled", "MaxLifetime": null,
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "passwordLifetime", "State": "enabled", "MaxLifetime": "P90D",
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"},
+            {"RestrictionType": "symmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P90D",
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
         ],
         "KeyCredentials": [
-            {"RestrictionType": "asymmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P180D", "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
+            {"RestrictionType": "asymmetricKeyLifetime", "State": "enabled", "MaxLifetime": "P180D",
+                "RestrictForAppsCreatedAfterDateTime": "/Date(-62135596800000)/"}
         ]
     }
 }

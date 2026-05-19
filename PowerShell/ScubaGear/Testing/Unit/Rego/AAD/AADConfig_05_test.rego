@@ -194,7 +194,9 @@ test_PasswordAdditionBlocked_Incorrect_V2 if {
 test_PasswordAdditionBlocked_Incorrect_V3 if {
     # Setting a specific date means old apps are exempt from the restriction
     Policy := json.patch(AppManagementPolicy,
-                [{"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/0/RestrictForAppsCreatedAfterDateTime", "value": "/Date(1700000000000)/"}])
+                [{"op": "add",
+                    "path": "ApplicationRestrictions/PasswordCredentials/0/RestrictForAppsCreatedAfterDateTime",
+                    "value": "/Date(1700000000000)/"}])
 
     Output := aad.tests with input.default_app_management_policy as [Policy]
 
@@ -244,7 +246,9 @@ test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
                  {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/1/State", "value": "disabled"},
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/0/State", "value": "disabled"},
                  {"op": "add", "path": "ServicePrincipalRestrictions/PasswordCredentials/1/State", "value": "disabled"},
-                 {"op": "add", "path": "ApplicationRestrictions/PasswordCredentials/3/RestrictForAppsCreatedAfterDateTime", "value": "/Date(1700000000000)/"}])
+                 {"op": "add",
+                     "path": "ApplicationRestrictions/PasswordCredentials/3/RestrictForAppsCreatedAfterDateTime",
+                     "value": "/Date(1700000000000)/"}])
 
     Output := aad.tests with input.default_app_management_policy as [Policy]
 
@@ -282,7 +286,9 @@ test_CertificateLifetimeRestricted_Incorrect_Disabled if {
 test_CertificateLifetimeRestricted_Incorrect_DateRestriction if {
     # Setting a specific date means old apps are exempt from the certificate lifetime restriction
     Policy := json.patch(AppManagementPolicy,
-                [{"op": "add", "path": "ApplicationRestrictions/KeyCredentials/0/RestrictForAppsCreatedAfterDateTime", "value": "/Date(1700000000000)/"}])
+                [{"op": "add",
+                    "path": "ApplicationRestrictions/KeyCredentials/0/RestrictForAppsCreatedAfterDateTime",
+                    "value": "/Date(1700000000000)/"}])
 
     Output := aad.tests with input.default_app_management_policy as [Policy]
 
