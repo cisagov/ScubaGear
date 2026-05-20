@@ -1084,14 +1084,17 @@ RootDomains contains Domain if {
     Domain.AuthenticationType == "Managed"
 }
 
+# Longest matching root domain Id length for a domain (used to pick the most specific root).
+MaxMatchingRootIdLength(Domain) := max({count(R.Id) | some R in RootDomains; endswith(Domain.Id, R.Id)})
+
 RootDomainFor(Domain) := Root.Id if {
+    MaxLength := MaxMatchingRootIdLength(Domain)
     some Root in RootDomains
     endswith(Domain.Id, Root.Id)
 
     # When multiple root domains match (e.g., "sub.example.com" and "example.com" both match
-    # "sub.sub.example.com"), select the most specific one (longest Id). 
+    # "sub.sub.example.com"), select the most specific one (longest Id).
     # Otherwise, an eval_conflict_error error will occur due to multiple matching root domains.
-    MaxLength := max({count(R.Id) | some R in RootDomains; endswith(Domain.Id, R.Id)})
     count(Root.Id) == MaxLength
 }
 
@@ -1101,7 +1104,7 @@ PasswordNeverExpires(Domain) if Domain.PasswordValidityPeriodInDays == INT_MAX
 PasswordNeverExpires(Domain) if is_null(Domain.PasswordValidityPeriodInDays)
 
 IsValid(Domain) := true if {
-    Domain.IsRoot = true
+    Domain.IsRoot == true
     PasswordNeverExpires(Domain)
 } else := true if {
     Domain.IsRoot == false
