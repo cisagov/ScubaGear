@@ -102,6 +102,50 @@ jobs:
 
             core.info(`Using previous tag ${previousRelease.tag_name} for release notes.`);
             core.setOutput("tag", previousRelease.tag_name);
+      - name: Generate release notes
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const configPath = path.join(
+              process.cwd(),
+              "repo",
+              ".github",
+              "release.yml"
+            );
+            if (!fs.existsSync(configPath)) {
+              core.setFailed(
+                "Missing repo/.github/release.yml on the branch used for this workflow run. " +
+                  "Merge release.yml into the release branch (and default branch) before drafting a release."
+              );
+              return;
+            }
+
+            const tagName = `v${{ inputs.version }}`;
+            const previousTag = "${{ steps.previous-release.outputs.tag }}";
+
+            const { data: generated } = await github.rest.repos.generateReleaseNotes({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tagName,
+              target_commitish: context.sha,
+              previous_tag_name: previousTag,
+              configuration_file_path: ".github/release.yml"
+            });
+
+            if (!generated.body.includes("## Major Changes")) {
+              core.warning(
+                "Generated release notes are not categorized. Verify PR labels and .github/release.yml categories."
+              );
+            }
+
+            fs.writeFileSync(
+              path.join(process.cwd(), "release-body.md"),
+              generated.body,
+              "utf8"
+            );
       - name: Create Release
         uses: softprops/action-gh-release@v3
         id: create-release
@@ -110,11 +154,10 @@ jobs:
           prerelease: false
           name: ${{ inputs.releaseName }}
           tag_name: v${{ inputs.version }}
-          previous_tag: ${{ steps.previous-release.outputs.tag }}
+          body_path: release-body.md
           files: |
             ScubaGear-${{ inputs.version }}.zip
             ScubaGear-${{ inputs.version }}/PowerShell/ScubaGear/schemas/ScubaBaselines.json
-          generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release
         if: ${{ inputs.runQuickCheck }}
