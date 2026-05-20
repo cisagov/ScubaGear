@@ -158,10 +158,24 @@ jobs:
               "Dependencies"
             ];
 
-            function categorize(labels) {
-              const names = labels.map((label) => label.name);
+            function isDependencyPullRequest(pr) {
+              const dependencyAuthors = new Set([
+                "github-actions[bot]",
+                "dependabot[bot]"
+              ]);
+              return (
+                dependencyAuthors.has(pr.user.login) ||
+                /^Bump /i.test(pr.title)
+              );
+            }
+
+            function categorize(pr) {
+              const names = pr.labels.map((label) => label.name);
               if (names.some((name) => excludedLabels.has(name))) {
                 return null;
+              }
+              if (isDependencyPullRequest(pr)) {
+                return "Dependencies";
               }
               if (names.includes("baseline-document")) {
                 return "Baselines";
@@ -262,6 +276,16 @@ jobs:
               return `${lines.join("\r\n")}\r\n`;
             }
 
+            function formatDependenciesSection(items) {
+              const lines = ["## Dependencies", ""];
+              if (items.length > 0) {
+                lines.push(...items);
+              } else {
+                lines.push("No dependency updates included in this release.");
+              }
+              return `${lines.join("\r\n")}\r\n`;
+            }
+
             async function resolveTagCommitSha(tagName) {
               const { data: ref } = await github.rest.git.getRef({
                 owner: context.repo.owner,
@@ -330,17 +354,25 @@ jobs:
             );
 
             for (const pr of pullRequestsByNumber.values()) {
-              const section = categorize(pr.labels);
+              const section = categorize(pr);
               if (section) {
                 grouped[section].push(formatPullRequest(pr));
               }
             }
 
             const sections = sectionOrder
-              .filter((title) => title === "Baselines" || grouped[title].length > 0)
+              .filter(
+                (title) =>
+                  title === "Baselines" ||
+                  title === "Dependencies" ||
+                  grouped[title].length > 0
+              )
               .map((title) => {
                 if (title === "Baselines") {
                   return formatBaselinesSection(grouped.Baselines);
+                }
+                if (title === "Dependencies") {
+                  return formatDependenciesSection(grouped.Dependencies);
                 }
                 return formatSection(title, grouped[title]);
               });
