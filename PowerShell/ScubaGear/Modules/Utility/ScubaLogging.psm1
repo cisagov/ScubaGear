@@ -301,6 +301,10 @@ function Trace-ScubaFunction {
     .PARAMETER LogReturnValue
     Whether to log the return value (disable for large objects)
 
+    .PARAMETER LogErrors
+    $false suppreses writing to the log and prevents ScubaLogging from thinking that a terminating error occurred if the traced function call fails.
+    The caller will use $false when they want to handle the error themselves.
+
     .EXAMPLE
     $result = Trace-ScubaFunction -FunctionName "Get-MgUser" -Parameters @{UserId="test@domain.com"} -ScriptBlock {
         Get-MgUser -UserId $UserId
@@ -316,7 +320,9 @@ function Trace-ScubaFunction {
         [Parameter(Mandatory = $true)]
         [scriptblock]$ScriptBlock,
 
-        [bool]$LogReturnValue = $false
+        [bool]$LogReturnValue = $false,
+
+        [bool]$LogErrors = $true
     )
 
     if (-not $Script:ScubaLogEnabled) {
@@ -376,8 +382,11 @@ function Trace-ScubaFunction {
             ErrorType = $_.Exception.GetType().Name           # Type of exception that occurred
         }
 
-        # Log the error exit with full exception details
-        Write-ScubaLog -Message "EXIT: $FunctionName (ERROR)" -Level "Error" -Source "FunctionTrace" -Data $exitData -Exception $_.Exception
+        if ($LogErrors) {
+            # Log the error exit with full exception details
+            Write-ScubaLog -Message "EXIT: $FunctionName (ERROR)" -Level "Error" -Source "FunctionTrace" -Data $exitData -Exception $_.Exception
+        }
+
         throw  # Re-throw the exception to maintain original error handling
     }
 }
