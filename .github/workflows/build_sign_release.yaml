@@ -133,6 +133,86 @@ jobs:
               return `* ${pr.title} by @${pr.user.login} in #${pr.number}`;
             }
 
+            function buildIssuesUrl(query) {
+              return (
+                `https://github.com/${context.repo.owner}/${context.repo.repo}/issues?q=` +
+                encodeURIComponent(query)
+              );
+            }
+
+            const sectionFooters = {
+              "Major Changes": {
+                linkLabel: "enhancements",
+                query:
+                  "is:issue is:closed label:enhancement -label:baseline-document -label:documentation -label:Testing -label:hands-on-prototyping -label:epic"
+              },
+              "Bugs Fixed": {
+                linkLabel: "bug fixes",
+                query:
+                  "is:issue is:closed label:bug -label:baseline-document -label:Testing -label:documentation -label:epic"
+              },
+              Documentation: {
+                linkLabel: "documentation updates",
+                query: "state:closed label:documentation"
+              }
+            };
+
+            function formatSection(title, items) {
+              const lines = [`## ${title}`, "", ...items];
+              const footer = sectionFooters[title];
+              if (footer) {
+                lines.push(
+                  `* See full list of ${footer.linkLabel} [here](${buildIssuesUrl(footer.query)})`
+                );
+              }
+              return `${lines.join("\r\n")}\r\n`;
+            }
+
+            const bodConfigurationsUrl =
+              "https://www.cisa.gov/resources-tools/services/bod-25-01-implementing-secure-practices-cloud-services-required-configurations";
+
+            function formatBaselinesSection(baselineItems) {
+              const baselineIssuesUrl = buildIssuesUrl(
+                "is:issue is:closed label:baseline-document -label:Testing -label:documentation -label:epic"
+              );
+
+              const lines = [
+                "## Baselines",
+                "",
+                "### BOD 25-01 required configuration policy changes",
+                "",
+                "This section lists baseline policy changes that affect current " +
+                  `[BOD 25-01 Required Configurations](${bodConfigurationsUrl}).`,
+                "",
+                "#### Additions",
+                "",
+                "No new required configuration policies added in this release.",
+                "",
+                "#### Removals",
+                "",
+                "_Move BOD 25-01 policy removals here before publishing._",
+                "",
+                "#### Updates",
+                "",
+                "_Move BOD 25-01 policy version updates here before publishing._",
+                "",
+                "### Other baseline changes",
+                ""
+              ];
+
+              if (baselineItems.length > 0) {
+                lines.push(...baselineItems);
+              } else {
+                lines.push("No baseline updates included in this release.");
+              }
+
+              lines.push(
+                `* See full list of baseline updates [here](${baselineIssuesUrl})`
+              );
+
+              return `${lines.join("\r\n")}\r\n`;
+            }
+
             async function listMergedPullRequests(previousTag) {
               const { data: comparison } =
                 await github.rest.repos.compareCommitsWithBasehead({
@@ -175,8 +255,13 @@ jobs:
             }
 
             const sections = sectionOrder
-              .filter((title) => grouped[title].length > 0)
-              .map((title) => `## ${title}\r\n${grouped[title].join("\r\n")}\r\n`);
+              .filter((title) => title === "Baselines" || grouped[title].length > 0)
+              .map((title) => {
+                if (title === "Baselines") {
+                  return formatBaselinesSection(grouped.Baselines);
+                }
+                return formatSection(title, grouped[title]);
+              });
 
             const compareUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/compare/${previousTag}...${tagName}`;
             const body = `${sections.join("\r\n")}\r\n**Full Changelog**: ${compareUrl}\r\n`;
