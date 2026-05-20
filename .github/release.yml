@@ -1,0 +1,43 @@
+# Configures automatically generated release notes for ScubaGear releases.
+# See: https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+
+changelog:
+  exclude:
+    labels:
+      - epic
+      - Testing
+      - hands-on-prototyping
+      - blocked
+      - duplicate
+      - wontfix
+  categories:
+    - title: Major Changes
+      labels:
+        - enhancement
+      exclude:
+        labels:
+          - bug
+          - documentation
+          - baseline-document
+    - title: Bugs Fixed
+      labels:
+        - bug
+      exclude:
+        labels:
+          - baseline-document
+          - documentation
+    - title: Baselines
+      labels:
+        - baseline-document
+    - title: Documentation
+      labels:
+        - documentation
+    - title: Dependencies
+      labels:
+        - "*"
+      exclude:
+        labels:
+          - enhancement
+          - bug
+          - documentation
+          - baseline-document
