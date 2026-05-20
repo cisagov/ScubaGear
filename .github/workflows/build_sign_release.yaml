@@ -60,22 +60,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
-      - name: Get Key Vault info
-        id: key-vault-info
-        env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
-        run: |
-          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
-      - name: Sign Module
-        run: |
-          . repo/utils/workflow/Build-SignRelease.ps1
-          New-ModuleSignature `
-            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
-            -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
-            -ReleaseVersion ${{ inputs.version }} `
-            -RootFolderName "repo"
       - name: Get previous release tag
         id: previous-release
         uses: actions/github-script@v9
@@ -109,43 +93,112 @@ jobs:
             const fs = require("fs");
             const path = require("path");
 
-            const configPath = path.join(
-              process.cwd(),
-              "repo",
-              ".github",
-              "release.yml"
-            );
-            if (!fs.existsSync(configPath)) {
-              core.setFailed(
-                "Missing repo/.github/release.yml on the branch used for this workflow run. " +
-                  "Merge release.yml into the release branch (and default branch) before drafting a release."
-              );
-              return;
+            const excludedLabels = new Set([
+              "epic",
+              "Testing",
+              "hands-on-prototyping",
+              "blocked",
+              "duplicate",
+              "wontfix"
+            ]);
+            const sectionOrder = [
+              "Major Changes",
+              "Bugs Fixed",
+              "Baselines",
+              "Documentation",
+              "Dependencies"
+            ];
+
+            function categorize(labels) {
+              const names = labels.map((label) => label.name);
+              if (names.some((name) => excludedLabels.has(name))) {
+                return null;
+              }
+              if (names.includes("baseline-document")) {
+                return "Baselines";
+              }
+              if (names.includes("documentation")) {
+                return "Documentation";
+              }
+              if (names.includes("bug")) {
+                return "Bugs Fixed";
+              }
+              if (names.includes("enhancement")) {
+                return "Major Changes";
+              }
+              return "Dependencies";
+            }
+
+            function formatPullRequest(pr) {
+              return `* ${pr.title} by @${pr.user.login} in #${pr.number}`;
+            }
+
+            async function listMergedPullRequests(previousTag) {
+              const { data: comparison } =
+                await github.rest.repos.compareCommitsWithBasehead({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  basehead: `${previousTag}...${context.sha}`
+                });
+
+              const pullRequestsByNumber = new Map();
+              for (const commit of comparison.commits) {
+                const { data: pulls } =
+                  await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    commit_sha: commit.sha
+                  });
+
+                for (const pr of pulls) {
+                  if (pr.merged_at) {
+                    pullRequestsByNumber.set(pr.number, pr);
+                  }
+                }
+              }
+
+              return pullRequestsByNumber;
             }
 
             const tagName = `v${{ inputs.version }}`;
             const previousTag = "${{ steps.previous-release.outputs.tag }}";
+            const pullRequestsByNumber = await listMergedPullRequests(previousTag);
+            const grouped = Object.fromEntries(
+              sectionOrder.map((title) => [title, []])
+            );
 
-            const { data: generated } = await github.rest.repos.generateReleaseNotes({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag_name: tagName,
-              target_commitish: context.sha,
-              previous_tag_name: previousTag,
-              configuration_file_path: ".github/release.yml"
-            });
-
-            if (!generated.body.includes("## Major Changes")) {
-              core.warning(
-                "Generated release notes are not categorized. Verify PR labels and .github/release.yml categories."
-              );
+            for (const pr of pullRequestsByNumber.values()) {
+              const section = categorize(pr.labels);
+              if (section) {
+                grouped[section].push(formatPullRequest(pr));
+              }
             }
 
-            fs.writeFileSync(
-              path.join(process.cwd(), "release-body.md"),
-              generated.body,
-              "utf8"
-            );
+            const sections = sectionOrder
+              .filter((title) => grouped[title].length > 0)
+              .map((title) => `## ${title}\r\n${grouped[title].join("\r\n")}\r\n`);
+
+            const compareUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/compare/${previousTag}...${tagName}`;
+            const body = `${sections.join("\r\n")}\r\n**Full Changelog**: ${compareUrl}\r\n`;
+
+            fs.writeFileSync(path.join(process.cwd(), "release-body.md"), body, "utf8");
+            core.info(`Release notes include ${pullRequestsByNumber.size} merged pull requests.`);
+      - name: Get Key Vault info
+        id: key-vault-info
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
+        run: |
+          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
+          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
+          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+      - name: Sign Module
+        run: |
+          . repo/utils/workflow/Build-SignRelease.ps1
+          New-ModuleSignature `
+            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
+            -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
+            -ReleaseVersion ${{ inputs.version }} `
+            -RootFolderName "repo"
       - name: Create Release
         uses: softprops/action-gh-release@v3
         id: create-release
