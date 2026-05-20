@@ -65,6 +65,31 @@ jobs:
         uses: actions/github-script@v9
         with:
           script: |
+            function parseVersion(tagName) {
+              const match = tagName.match(/^v?(\d+)\.(\d+)(?:\.(\d+))?$/i);
+              if (!match) {
+                return null;
+              }
+
+              return {
+                tag: tagName,
+                parts: [
+                  Number(match[1]),
+                  Number(match[2]),
+                  Number(match[3] ?? 0)
+                ]
+              };
+            }
+
+            function compareVersions(left, right) {
+              for (let index = 0; index < 3; index++) {
+                if (left.parts[index] !== right.parts[index]) {
+                  return left.parts[index] - right.parts[index];
+                }
+              }
+              return 0;
+            }
+
             const releases = await github.paginate(
               github.rest.repos.listReleases,
               {
@@ -75,17 +100,41 @@ jobs:
             );
 
             const currentTag = `v${{ inputs.version }}`;
-            const previousRelease = releases.find(
-              (release) => !release.draft && !release.prerelease && release.tag_name !== currentTag
-            );
-
-            if (!previousRelease) {
-              core.setFailed("Unable to determine previous published release tag.");
+            const currentVersion = parseVersion(currentTag);
+            if (!currentVersion) {
+              core.setFailed(`Unable to parse release version from tag ${currentTag}.`);
               return;
             }
 
-            core.info(`Using previous tag ${previousRelease.tag_name} for release notes.`);
+            const publishedReleases = releases
+              .filter(
+                (release) =>
+                  !release.draft &&
+                  !release.prerelease &&
+                  release.tag_name.toLowerCase() !== currentTag.toLowerCase()
+              )
+              .map((release) => ({
+                release,
+                version: parseVersion(release.tag_name)
+              }))
+              .filter((entry) => entry.version)
+              .filter((entry) => compareVersions(entry.version, currentVersion) < 0)
+              .sort((left, right) => compareVersions(right.version, left.version));
+
+            const previousEntry = publishedReleases[0];
+            if (!previousEntry) {
+              core.setFailed(
+                `Unable to find a published release older than ${currentTag}.`
+              );
+              return;
+            }
+
+            const previousRelease = previousEntry.release;
+            core.info(
+              `Using previous tag ${previousRelease.tag_name} (published ${previousRelease.published_at}) for release notes.`
+            );
             core.setOutput("tag", previousRelease.tag_name);
+            core.setOutput("published_at", previousRelease.published_at);
       - name: Generate release notes
         uses: actions/github-script@v9
         with:
@@ -213,12 +262,34 @@ jobs:
               return `${lines.join("\r\n")}\r\n`;
             }
 
-            async function listMergedPullRequests(previousTag) {
+            async function resolveTagCommitSha(tagName) {
+              const { data: ref } = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${tagName}`
+              });
+
+              if (ref.object.type === "commit") {
+                return ref.object.sha;
+              }
+
+              const { data: tag } = await github.rest.git.getTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_sha: ref.object.sha
+              });
+
+              return tag.object.sha;
+            }
+
+            async function listMergedPullRequests(previousTag, previousPublishedAt) {
+              const baseSha = await resolveTagCommitSha(previousTag);
+              const mergedAfter = new Date(previousPublishedAt);
               const { data: comparison } =
                 await github.rest.repos.compareCommitsWithBasehead({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  basehead: `${previousTag}...${context.sha}`
+                  basehead: `${baseSha}...${context.sha}`
                 });
 
               const pullRequestsByNumber = new Map();
@@ -231,9 +302,15 @@ jobs:
                   });
 
                 for (const pr of pulls) {
-                  if (pr.merged_at) {
-                    pullRequestsByNumber.set(pr.number, pr);
+                  if (!pr.merged_at) {
+                    continue;
                   }
+
+                  if (new Date(pr.merged_at) <= mergedAfter) {
+                    continue;
+                  }
+
+                  pullRequestsByNumber.set(pr.number, pr);
                 }
               }
 
@@ -242,7 +319,12 @@ jobs:
 
             const tagName = `v${{ inputs.version }}`;
             const previousTag = "${{ steps.previous-release.outputs.tag }}";
-            const pullRequestsByNumber = await listMergedPullRequests(previousTag);
+            const previousPublishedAt =
+              "${{ steps.previous-release.outputs.published_at }}";
+            const pullRequestsByNumber = await listMergedPullRequests(
+              previousTag,
+              previousPublishedAt
+            );
             const grouped = Object.fromEntries(
               sectionOrder.map((title) => [title, []])
             );
@@ -267,7 +349,9 @@ jobs:
             const body = `${sections.join("\r\n")}\r\n**Full Changelog**: ${compareUrl}\r\n`;
 
             fs.writeFileSync(path.join(process.cwd(), "release-body.md"), body, "utf8");
-            core.info(`Release notes include ${pullRequestsByNumber.size} merged pull requests.`);
+            core.info(
+              `Release notes include ${pullRequestsByNumber.size} pull requests merged after ${previousTag} (${previousPublishedAt}).`
+            );
       - name: Get Key Vault info
         id: key-vault-info
         env:
