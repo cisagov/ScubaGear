@@ -34,8 +34,7 @@
     Generates the baseline JSON to a custom location and validates it.
 
 .NOTES
-    This script is called by the GitHub Action workflow 'generate_baseline_json.yaml'
-    when baseline markdown files are modified in a pull request.
+    This script is called by the GitHub Action workflow 'generate_baseline_json.yaml', which is triggered manually.
 #>
 
 [CmdletBinding()]
