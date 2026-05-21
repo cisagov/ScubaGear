@@ -1,8 +1,8 @@
-Description: Test Config for MS.DEFENDER.2.1v1 Non-compliant Mismatching User
+Description: Test Config for MS.SECURITYSUITE.2.1v1 Non-compliant Mismatching User
 ProductNames:
-  - defender
+  - securitysuite
 LogIn: false
-Defender:
-  MS.DEFENDER.2.1v1:
+SecuritySuite:
+  MS.SECURITYSUITE.2.1v1:
     SensitiveUsers:
       - Mismatched User;mmuser@someemail.com
