@@ -26,6 +26,11 @@ on:
         required: false
         type: boolean
         default: true
+      compareHeadRef:
+        description: "Compare head ref (branch or tag) for release notes, e.g. main or release/1.9.0. Defaults to the branch selected when running the workflow."
+        required: false
+        type: string
+        default: ""
 
 permissions: read-all
 
@@ -134,7 +139,6 @@ jobs:
               `Using previous tag ${previousRelease.tag_name} (published ${previousRelease.published_at}) for release notes.`
             );
             core.setOutput("tag", previousRelease.tag_name);
-            core.setOutput("published_at", previousRelease.published_at);
       - name: Generate release notes
         uses: actions/github-script@v9
         with:
@@ -277,12 +281,18 @@ jobs:
             }
 
             function formatDependenciesSection(items) {
+              const dependencyIssuesUrl = buildIssuesUrl(
+                "is:pr is:merged (author:app/github-actions OR author:dependabot) sort:updated-desc"
+              );
               const lines = ["## Dependencies", ""];
               if (items.length > 0) {
                 lines.push(...items);
               } else {
                 lines.push("No dependency updates included in this release.");
               }
+              lines.push(
+                `* See full list of dependency updates [here](${dependencyIssuesUrl})`
+              );
               return `${lines.join("\r\n")}\r\n`;
             }
 
@@ -306,17 +316,49 @@ jobs:
               return tag.object.sha;
             }
 
-            async function listMergedPullRequests(previousTag, previousPublishedAt) {
-              const baseSha = await resolveTagCommitSha(previousTag);
-              const mergedAfter = new Date(previousPublishedAt);
+            async function resolveCompareHeadRef(currentTag, compareHeadRefInput) {
+              if (compareHeadRefInput) {
+                return compareHeadRefInput;
+              }
+
+              try {
+                await resolveTagCommitSha(currentTag);
+                core.info(
+                  `Tag ${currentTag} already exists; using it as the compare head for release notes.`
+                );
+                return currentTag;
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+              }
+
+              core.info(
+                `Tag ${currentTag} does not exist yet (expected before publish). ` +
+                  `Using branch ${context.ref_name} as the compare head.`
+              );
+              return context.ref_name;
+            }
+
+            async function listMergedPullRequests(previousTag, currentTag, compareHeadRefInput) {
+              const headRef = await resolveCompareHeadRef(
+                currentTag,
+                compareHeadRefInput
+              );
+              const basehead = `${previousTag}...${headRef}`;
+              const pullRequestsByNumber = new Map();
+
               const { data: comparison } =
                 await github.rest.repos.compareCommitsWithBasehead({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  basehead: `${baseSha}...${context.sha}`
+                  basehead
                 });
 
-              const pullRequestsByNumber = new Map();
+              core.info(
+                `Comparing ${basehead}: ${comparison.commits.length} commits (status: ${comparison.status}).`
+              );
+
               for (const commit of comparison.commits) {
                 const { data: pulls } =
                   await github.rest.repos.listPullRequestsAssociatedWithCommit({
@@ -326,29 +368,28 @@ jobs:
                   });
 
                 for (const pr of pulls) {
-                  if (!pr.merged_at) {
-                    continue;
+                  if (pr.merged_at) {
+                    pullRequestsByNumber.set(pr.number, pr);
                   }
-
-                  if (new Date(pr.merged_at) <= mergedAfter) {
-                    continue;
-                  }
-
-                  pullRequestsByNumber.set(pr.number, pr);
                 }
               }
 
-              return pullRequestsByNumber;
+              core.info(
+                `Found ${pullRequestsByNumber.size} pull requests associated with commits in ${basehead}.`
+              );
+
+              return { pullRequestsByNumber, headRef, basehead };
             }
 
             const tagName = `v${{ inputs.version }}`;
             const previousTag = "${{ steps.previous-release.outputs.tag }}";
-            const previousPublishedAt =
-              "${{ steps.previous-release.outputs.published_at }}";
-            const pullRequestsByNumber = await listMergedPullRequests(
-              previousTag,
-              previousPublishedAt
-            );
+            const compareHeadRefInput = "${{ inputs.compareHeadRef }}".trim();
+            const { pullRequestsByNumber, headRef, basehead } =
+              await listMergedPullRequests(
+                previousTag,
+                tagName,
+                compareHeadRefInput
+              );
             const grouped = Object.fromEntries(
               sectionOrder.map((title) => [title, []])
             );
@@ -377,13 +418,21 @@ jobs:
                 return formatSection(title, grouped[title]);
               });
 
-            const compareUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/compare/${previousTag}...${tagName}`;
+            const compareUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/compare/${basehead}`;
             const body = `${sections.join("\r\n")}\r\n**Full Changelog**: ${compareUrl}\r\n`;
 
             fs.writeFileSync(path.join(process.cwd(), "release-body.md"), body, "utf8");
+
+            const dependencyCount = grouped.Dependencies.length;
             core.info(
-              `Release notes include ${pullRequestsByNumber.size} pull requests merged after ${previousTag} (${previousPublishedAt}).`
+              `Release notes include ${pullRequestsByNumber.size} pull requests (${dependencyCount} in Dependencies).`
             );
+            if (dependencyCount === 0) {
+              core.warning(
+                `No dependency pull requests were linked to commits in ${basehead}. ` +
+                  "Cherry-picked changes may need to be added manually."
+              );
+            }
       - name: Get Key Vault info
         id: key-vault-info
         env:
