@@ -71,7 +71,7 @@ Test the creation without making changes:
 ```powershell
 New-ScubaGearServicePrincipal `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerplatform' `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerplatform', 'powerbi' `
     -WhatIf
 ```
 
@@ -88,7 +88,7 @@ Create the Service Principal:
 ```powershell
 $NewSP = New-ScubaGearServicePrincipal `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerplatform' `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerplatform', 'powerbi' `
     -ServicePrincipalName "ScubaGear-Production"
 ```
 
@@ -106,6 +106,9 @@ Get-ScubaGearAppPermission `
     -M365Environment $NewSP.M365Environment `
     -ProductNames $NewSP.ProductNames
 ```
+
+> [!NOTE]
+> After setup, if assessing Power BI, also complete the [Power BI Tenant Setting](noninteractive.md#power-bi-tenant-setting) configuration step in the Power BI Admin portal.
 
 **Expected result:** Status should show "No action needed - service principal is correctly configured."
 

@@ -101,7 +101,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["aad", "defender", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "*"]
+        "enum": ["aad", "defender", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi", "*"]
       },
       "minItems": 1,
       "uniqueItems": true,

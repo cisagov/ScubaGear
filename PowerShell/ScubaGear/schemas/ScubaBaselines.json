@@ -1,5 +1,5 @@
 {
-  "Version": "2.5.14 [updated 5/14/2026]",
+  "Version": "2.5.22 [updated 5/22/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -4131,9 +4131,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi11v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4186,9 +4186,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi21v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4249,9 +4249,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi31v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4266,7 +4266,7 @@
         "rationale": "With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.",
         "criticality": "SHOULD",
         "lastModified": "June 2023",
-        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Service Principals can call Fabric public APIs** set to **Enabled**.\nChoose a specific security group allowed to use service principles for the APIs.",
+        "implementation": "If your organization has service principals that need to access Power BI APIs, then you configure the setting per the instructions below.\nIf you don't have service principals that need access then for step 4, configure the setting to Disabled.\n\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Service Principals can call Fabric public APIs**\n\n5. If don't have service principals that need access to Power BI APIs, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.\n\n6. If you have service principals that need to access Power BI APIs, then configure the setting to **Enabled**.\n\n7. Select the specific security groups that contain the service principals authorized to call the APIs.",
         "mitreMapping": [
           {
             "Name": "T1059: Command and Scripting Interpreter",
@@ -4308,9 +4308,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi41v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4325,7 +4325,7 @@
         "rationale": "With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.",
         "criticality": "SHOULD",
         "lastModified": "June 2023",
-        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Then, click on **Allow service principals to create and use profiles** and set to **Enabled**.\nChoose a specific security group allowed to use service principles to create and use profiles",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Then, click on **Allow service principals to create and use profiles**\n\n5. If don't have service principals that need to create and use profiles, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.\n\n6. If you have service principals that need to create and use profiles, then configure the setting to **Enabled**.\n\n7. Select the specific security groups that contain the service principals authorized to to create and use profiles.",
         "mitreMapping": [
           {
             "Name": "T1098: Account Manipulation",
@@ -4367,9 +4367,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi42v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4414,9 +4414,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi51v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4459,9 +4459,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi61v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4525,9 +4525,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi71v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       }

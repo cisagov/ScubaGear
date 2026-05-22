@@ -1,0 +1,252 @@
+# Run functional tests for Power BI
+
+name: Functional Tests Power BI
+
+# This is a reusable workflow called by the pipeline.
+on:
+  workflow_call:
+    inputs:
+      EmailOnFailure:
+        description: "True if an email should be sent when the workflow fails."
+        required: true
+        type: boolean
+      GitHubEventSchedule:
+        description: "A type of GitHub event"
+        required: true
+        type: string
+      GitHubEventName:
+        description: "The name of a GitHub event"
+        required: true
+        type: string
+    secrets:
+      PfxBase64:
+        required: true
+      PfxPassword:
+        required: true
+      TestParams:
+        required: true
+      TestParamsDev:
+        required: true
+      NotifierUsername:
+        required: true
+      NotifierPassword:
+        required: true
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  PBI_Tenant1:
+    name: PBI_Tenant1
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: PowerBI_Tenant1
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: PBI_Tenant1
+          TestParams: ${{ secrets.TestParams }}
+  PBI_Tenant2:
+    name: PBI_Tenant2
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: PowerBI_Tenant2
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: PBI_Tenant2
+          TestParams: ${{ secrets.TestParams }}
+  PBI_Tenant6:
+    name: PBI_Tenant6
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: PowerBI_Tenant6
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: PBI_Tenant6
+          TestParams: ${{ secrets.TestParams }}
+  PBI_Tenant7:
+    name: PBI_Tenant7
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: PowerBI_Tenant7
+      cancel-in-progress: false
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v4
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: PBI_Tenant7
+          TestParams: ${{ secrets.TestParams }}
+  email:
+    name: Email
+    runs-on: windows-latest
+    needs:
+      - PBI_Tenant1
+      - PBI_Tenant2
+      - PBI_Tenant6
+      - PBI_Tenant7
+    if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Extract Email
+        id: extract-email
+        uses: ./.github/actions/extract-email
+        env:
+          # Could use any of previous jobs as the alias
+          Alias: PBI_Tenant1
+          TestParams: ${{ secrets.TestParams }}
+      - name: Notify on Failure
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.NotifierUsername }}
+          password: ${{ secrets.NotifierPassword }}
+          subject: ScubaGear Functional Test Failure
+          to: ${{ steps.extract-email.outputs.emails }}
