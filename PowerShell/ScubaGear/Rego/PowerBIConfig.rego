@@ -12,8 +12,7 @@ PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluat
 PowerbiLicenseFound := object.get(input, "powerbi_license_found", false)
 
 # Convert tenant settings array into a map keyed by settingName
-PowerbiTenantSettings := {
-    setting.settingName: setting |
+PowerbiTenantSettings[setting.settingName] := setting if {
     some setting in object.get(input, "powerbi_tenant_settings", [])
     is_object(setting)
     object.get(setting, "settingName", "") != ""
@@ -80,13 +79,15 @@ tests contains {
 
 AllowGuestAccessSharedContentSetting := object.get(PowerbiTenantSettings, "AllowGuestUserToAccessSharedContent", null)
 
-AllowGuestAccessDisabled := true if {
+default AllowGuestAccessDisabled := false
+AllowGuestAccessDisabled if {
     not AllowGuestAccessSharedContentSetting.enabled
-} else := false
+}
 
-AllowGuestAccessSecurityGroups := true if {
+default AllowGuestAccessSecurityGroups := false
+AllowGuestAccessSecurityGroups if {
     Count( object.get(AllowGuestAccessSharedContentSetting, "enabledSecurityGroups", []) ) > 0
-} else := false
+}
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -150,13 +151,15 @@ tests contains {
 
 ExternalSharingV2Setting := object.get(PowerbiTenantSettings, "ExternalSharingV2", null)
 
-ExternalSharingV2Disabled := true if {
-    ExternalSharingV2Setting.enabled == false
-} else := false
+default ExternalSharingV2Disabled := false
+ExternalSharingV2Disabled if {
+    not ExternalSharingV2Setting.enabled
+}
 
-ExternalSharingV2SecurityGroups := true if {
+default ExternalSharingV2SecurityGroups := false
+ExternalSharingV2SecurityGroups if {
     Count( object.get(ExternalSharingV2Setting, "enabledSecurityGroups", []) ) > 0
-} else := false
+}
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -219,13 +222,15 @@ tests contains {
 
 ServicePrincipalAccessPermissionApisSetting := object.get(PowerbiTenantSettings, "ServicePrincipalAccessPermissionAPIs", null)
 
-ServicePrincipalAccessPermissionApisDisabled := true if {
-    ServicePrincipalAccessPermissionApisSetting.enabled == false
-} else := false
+default ServicePrincipalAccessPermissionApisDisabled := false
+ServicePrincipalAccessPermissionApisDisabled if {
+    not ServicePrincipalAccessPermissionApisSetting.enabled
+}
 
-ServicePrincipalAccessPermissionApisSecurityGroups := true if {
+default ServicePrincipalAccessPermissionApisSecurityGroups := false
+ServicePrincipalAccessPermissionApisSecurityGroups if {
     Count( object.get(ServicePrincipalAccessPermissionApisSetting, "enabledSecurityGroups", []) ) > 0
-} else := false
+}
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -287,13 +292,15 @@ tests contains {
 
 AllowServicePrincipalsCreateAndUseProfilesSetting := object.get(PowerbiTenantSettings, "AllowServicePrincipalsCreateAndUseProfiles", null)
 
-AllowServicePrincipalsCreateAndUseProfilesDisabled := true if {
-    AllowServicePrincipalsCreateAndUseProfilesSetting.enabled == false
-} else := false
+default AllowServicePrincipalsCreateAndUseProfilesDisabled := false
+AllowServicePrincipalsCreateAndUseProfilesDisabled if {
+    not AllowServicePrincipalsCreateAndUseProfilesSetting.enabled
+}
 
-AllowServicePrincipalsCreateAndUseProfilesSecurityGroups := true if {
+default AllowServicePrincipalsCreateAndUseProfilesSecurityGroups := false
+AllowServicePrincipalsCreateAndUseProfilesSecurityGroups if {
     Count( object.get(AllowServicePrincipalsCreateAndUseProfilesSetting, "enabledSecurityGroups", []) ) > 0
-} else := false
+}
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
