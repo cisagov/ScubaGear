@@ -60,9 +60,7 @@ IsPresetAntiPhishPolicy(Identity) if {
     regex.match(`(?i)Strict Preset Security Policy`, Identity)
 }
 
-RuleFieldEmpty(Value) if {
-    Value == null
-}
+RuleFieldEmpty(null)
 
 RuleFieldEmpty(Value) if {
     count(Value) == 0
@@ -140,11 +138,9 @@ NormalizeListEntry(Raw) := Normalized if {
 }
 
 # SensitiveUsers: accept "Display Name;email@domain.com" or email-only.
-SensitiveUserConfigEmails(ConfigUsers) := Emails if {
-    Emails := {Email |
-        some Entry in ConfigUsers
-        Email := SensitiveUserEmail(Entry)
-    }
+SensitiveUserConfigEmails(ConfigUsers) := {Email |
+    some Entry in ConfigUsers
+    Email := SensitiveUserEmail(Entry)
 }
 
 SensitiveUserEmail(Entry) := Email if {
@@ -159,12 +155,10 @@ SensitiveUserEmail(Entry) := Entry if {
     count(Parts) == 1
 }
 
-PolicyProtectedUserEmails(Policy) := Emails if {
-    Emails := {Email |
-        some Raw in Policy.TargetedUsersToProtect
-        Entry := lower(trim_space(Raw))
-        Email := SensitiveUserEmail(Entry)
-    }
+PolicyProtectedUserEmails(Policy) := {Email |
+    some Raw in Policy.TargetedUsersToProtect
+    Entry := lower(trim_space(Raw))
+    Email := SensitiveUserEmail(Entry)
 }
 
 PolicyIncludesAllSensitiveUsers(Policy, ConfigUsers) if {
@@ -231,11 +225,9 @@ UserImpersonationCompliant(ConfigUsers) := Result if {
 
 PartnerDomainConfig(PolicyID) := ListConfigValues(PolicyID, "PartnerDomains")
 
-PolicyProtectedDomains(Policy) := Domains if {
-    Domains := {lower(trim_space(x)) |
-        some x in Policy.TargetedDomainsToProtect
-        x != null
-    }
+PolicyProtectedDomains(Policy) := {lower(trim_space(x)) |
+    some x in Policy.TargetedDomainsToProtect
+    x != null
 }
 
 PolicyIncludesAllPartnerDomains(Policy, ConfigDomains) if {
@@ -262,9 +254,9 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     "Policies": [],
 }
 
+default OrganizationDomainProtectionCompliant := false
+
 OrganizationDomainProtectionCompliant := true if {
     some Policy in EnabledAntiPhishPolicies
     Policy.EnableOrganizationDomainsProtection == true
 }
-
-else := false
