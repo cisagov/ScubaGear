@@ -77,16 +77,11 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
         ){
-            if ($Product -eq "powerbi" -and -not (Test-Path "./$OutputFolder/IndividualReports/PowerBIReport.html")) {
-                Set-ItResult -Skipped -Because "Power BI was removed from assessment (no license found)"
-            }
-            else {
-                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
-                $DetailLink | Should -Not -BeNullOrEmpty
-                Invoke-SeClick -Element $DetailLink
+            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+            $DetailLink | Should -Not -BeNullOrEmpty
+            Invoke-SeClick -Element $DetailLink
 
-                Open-SeUrl -Back -Driver $Driver
-            }
+            Open-SeUrl -Back -Driver $Driver
         }
     }
 
@@ -103,13 +98,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
             @{Product = "sharepoint"; LinkText = "SharePoint Online"}
             @{Product = "teams"; LinkText = "Microsoft Teams"}
         ){
-            if ($Product -eq "powerbi" -and -not (Test-Path "./$OutputFolder/IndividualReports/PowerBIReport.html")) {
-                Set-ItResult -Skipped -Because "Power BI was removed from assessment (no license found)"
-            }
-            else {
-                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
-                $DetailLink | Should -Not -BeNullOrEmpty
-                Invoke-SeClick -Element $DetailLink
+            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+            $DetailLink | Should -Not -BeNullOrEmpty
+            Invoke-SeClick -Element $DetailLink
 
             # For better performance turn off implict wait
             $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 0
@@ -282,7 +273,6 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
             # Turn implict wait back on
             $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
-            }
         }
     }
 
