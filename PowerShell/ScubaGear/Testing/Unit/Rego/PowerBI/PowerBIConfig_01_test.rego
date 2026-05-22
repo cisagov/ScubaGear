@@ -14,7 +14,7 @@ import data.utils.key.PASS
 test_PublishToWeb_Compliant if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("PublishToWeb")]), "value": false}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [GetPowerBISettingIndex("PublishToWeb")]), "value": false}
         ])
 
     # print("patched_input:", patched_input)
@@ -26,7 +26,7 @@ test_PublishToWeb_Compliant if {
 test_PublishToWeb_NonCompliant if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("PublishToWeb")]), "value": true}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [GetPowerBISettingIndex("PublishToWeb")]), "value": true}
         ])
 
     Output := powerbi.tests with input as patched_input
@@ -82,7 +82,7 @@ test_PowerBITenantSettings_Missing if {
 
 test_PublishToWeb_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("PublishToWeb")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [GetPowerBISettingIndex("PublishToWeb")])}
         ])
 
     Output := powerbi.tests with input as patched_input

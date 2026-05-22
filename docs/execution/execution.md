@@ -26,13 +26,11 @@ Initialize-SCuBA
 
 Interactive mode simply means that the user will be prompted for their credentials that are required to authenticate to the tenant. A prompt may popup for the user to select their profile **for each product being tested** but the user should only have to enter their credentials once.
 
-### SharePoint Authentication
-
-When assessing SharePoint, a browser window will automatically open to the Microsoft sign-in page. Sign in with an account that has **Global Reader or SharePoint Administrator** permissions. After successful sign-in, the token is acquired automatically and the assessment continues without any additional steps required.
+>**Note**: Power Platform and Power BI have special licensing and first time setup requirements described in the [user permissions](../prerequisites/interactive.md#user-permissions) section.
 
 ### All Products
 
-To assess all products, use the `-ProductNames` flag with a wildcard:
+To assess all products, use the `-ProductNames` flag with a * value:
 
 ```powershell
 # Assess all products
@@ -57,6 +55,15 @@ To assess multiple products, add them to the `-ProductNames` flag, separated by 
 ```powershell
 # Assess SharePoint and Teams
 Invoke-SCuBA -ProductNames sharepoint, teams
+```
+
+### All Products Except for Power Platform and Power BI
+
+To assess all products except for Power Platform and Power BI, do not pass ProductNames at all:
+
+```powershell
+# Assess all products except for Power Platform and Power BI
+Invoke-SCuBA
 ```
 
 ### Custom Output Location

@@ -14,7 +14,8 @@ import data.utils.key.PASS
 test_BlockResourceKeyAuthentication_Compliant_Enabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("BlockResourceKeyAuthentication")]), "value": true}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")]), "value": true}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -24,7 +25,8 @@ test_BlockResourceKeyAuthentication_Compliant_Enabled if {
 test_BlockResourceKeyAuthentication_NonCompliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("BlockResourceKeyAuthentication")]), "value": false}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")]), "value": false}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -81,7 +83,8 @@ test_BlockResourceKeyAuthentication_PowerBITenantSettings_Missing if {
 test_BlockResourceKeyAuthentication_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("BlockResourceKeyAuthentication")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -125,7 +128,8 @@ test_BlockResourceKeyAuthentication_PowerBITenantSettings_NonObjectArrayElement 
 test_BlockResourceKeyAuthentication_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("BlockResourceKeyAuthentication")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")])}
     ])
 
     Output := powerbi.tests with input as patched_input

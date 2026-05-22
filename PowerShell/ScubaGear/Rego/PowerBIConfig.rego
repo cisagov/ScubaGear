@@ -80,11 +80,13 @@ tests contains {
 
 AllowGuestAccessSharedContentSetting := object.get(PowerbiTenantSettings, "AllowGuestUserToAccessSharedContent", null)
 
-AllowGuestAccessDisabled := AllowGuestAccessSharedContentSetting.enabled == false
+AllowGuestAccessDisabled := true if {
+    not AllowGuestAccessSharedContentSetting.enabled
+} else := false
 
-AllowGuestAccessSecurityGroups := Count(
-    object.get(AllowGuestAccessSharedContentSetting, "enabledSecurityGroups", [])
-) > 0
+AllowGuestAccessSecurityGroups := true if {
+    Count( object.get(AllowGuestAccessSharedContentSetting, "enabledSecurityGroups", []) ) > 0
+} else := false
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -148,11 +150,13 @@ tests contains {
 
 ExternalSharingV2Setting := object.get(PowerbiTenantSettings, "ExternalSharingV2", null)
 
-ExternalSharingV2Disabled := ExternalSharingV2Setting.enabled == false
+ExternalSharingV2Disabled := true if {
+    ExternalSharingV2Setting.enabled == false
+} else := false
 
-ExternalSharingV2SecurityGroups := Count(
-    object.get(ExternalSharingV2Setting, "enabledSecurityGroups", [])
-) > 0
+ExternalSharingV2SecurityGroups := true if {
+    Count( object.get(ExternalSharingV2Setting, "enabledSecurityGroups", []) ) > 0
+} else := false
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -215,11 +219,13 @@ tests contains {
 
 ServicePrincipalAccessPermissionApisSetting := object.get(PowerbiTenantSettings, "ServicePrincipalAccessPermissionAPIs", null)
 
-ServicePrincipalAccessPermissionApisDisabled := ServicePrincipalAccessPermissionApisSetting.enabled == false
+ServicePrincipalAccessPermissionApisDisabled := true if {
+    ServicePrincipalAccessPermissionApisSetting.enabled == false
+} else := false
 
-ServicePrincipalAccessPermissionApisSecurityGroups := Count(
-    object.get(ServicePrincipalAccessPermissionApisSetting, "enabledSecurityGroups", [])
-) > 0
+ServicePrincipalAccessPermissionApisSecurityGroups := true if {
+    Count( object.get(ServicePrincipalAccessPermissionApisSetting, "enabledSecurityGroups", []) ) > 0
+} else := false
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {
@@ -281,11 +287,13 @@ tests contains {
 
 AllowServicePrincipalsCreateAndUseProfilesSetting := object.get(PowerbiTenantSettings, "AllowServicePrincipalsCreateAndUseProfiles", null)
 
-AllowServicePrincipalsCreateAndUseProfilesDisabled := AllowServicePrincipalsCreateAndUseProfilesSetting.enabled == false
+AllowServicePrincipalsCreateAndUseProfilesDisabled := true if {
+    AllowServicePrincipalsCreateAndUseProfilesSetting.enabled == false
+} else := false
 
-AllowServicePrincipalsCreateAndUseProfilesSecurityGroups := Count(
-    object.get(AllowServicePrincipalsCreateAndUseProfilesSetting, "enabledSecurityGroups", [])
-) > 0
+AllowServicePrincipalsCreateAndUseProfilesSecurityGroups := true if {
+    Count( object.get(AllowServicePrincipalsCreateAndUseProfilesSetting, "enabledSecurityGroups", []) ) > 0
+} else := false
 
 # Core policy: PowerBI License found and setting was found in JSON
 tests contains {

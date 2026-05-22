@@ -14,8 +14,10 @@ import data.utils.key.PASS
 test_AllowGuestUserToAccessSharedContent_Compliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": false},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": false},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -25,8 +27,10 @@ test_AllowGuestUserToAccessSharedContent_Compliant_Disabled if {
 test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithSecurityGroup if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": [
             {
                 "graphId": "47122f83-b243-4417-82dc-87ce0d767fa7",
                 "name": "Lumbergs Employees"
@@ -41,8 +45,10 @@ test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithSecurityGroup if {
 test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithTwoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": [
             {
                 "graphId": "47122f83-b243-4417-82dc-87ce0d767fa7",
                 "name": "Lumbergs Employees"
@@ -61,8 +67,10 @@ test_AllowGuestUserToAccessSharedContent_Compliant_EnabledWithTwoSecurityGroups 
 test_AllowGuestUserToAccessSharedContent_NonCompliant_EnabledWithNoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -119,7 +127,8 @@ test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_Missing if {
 test_AllowGuestUserToAccessSharedContent_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -163,7 +172,8 @@ test_AllowGuestUserToAccessSharedContent_PowerBITenantSettings_NonObjectArrayEle
 test_AllowGuestUserToAccessSharedContent_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("AllowGuestUserToAccessSharedContent")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", 
+            [GetPowerBISettingIndex("AllowGuestUserToAccessSharedContent")])}
     ])
 
     Output := powerbi.tests with input as patched_input

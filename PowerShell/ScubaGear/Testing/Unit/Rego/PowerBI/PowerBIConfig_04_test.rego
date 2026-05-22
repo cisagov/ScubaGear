@@ -14,8 +14,10 @@ import data.utils.key.FAIL
 test_ServicePrincipalAccessPermissionAPIs_Compliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": false},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": false},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -25,8 +27,10 @@ test_ServicePrincipalAccessPermissionAPIs_Compliant_Disabled if {
 test_ServicePrincipalAccessPermissionAPIs_Compliant_EnabledWithSecurityGroup if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": [
             {
                 "graphId": "56500b38-aabf-4bb2-8b0f-60ef6a6c4dd3",
                 "name": "PowerBI-Test"
@@ -41,8 +45,10 @@ test_ServicePrincipalAccessPermissionAPIs_Compliant_EnabledWithSecurityGroup if 
 test_ServicePrincipalAccessPermissionAPIs_Compliant_EnabledWithTwoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": [
             {
                 "graphId": "56500b38-aabf-4bb2-8b0f-60ef6a6c4dd3",
                 "name": "PowerBI-Test"
@@ -61,8 +67,10 @@ test_ServicePrincipalAccessPermissionAPIs_Compliant_EnabledWithTwoSecurityGroups
 test_ServicePrincipalAccessPermissionAPIs_NonCompliant_EnabledWithNoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -119,7 +127,8 @@ test_ServicePrincipalAccessPermissionAPIs_PowerBITenantSettings_Missing if {
 test_ServicePrincipalAccessPermissionAPIs_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -163,7 +172,8 @@ test_ServicePrincipalAccessPermissionAPIs_PowerBITenantSettings_NonObjectArrayEl
 test_ServicePrincipalAccessPermissionAPIs_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("ServicePrincipalAccessPermissionAPIs")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", 
+            [GetPowerBISettingIndex("ServicePrincipalAccessPermissionAPIs")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -182,8 +192,10 @@ test_ServicePrincipalAccessPermissionAPIs_MissingSettingName if {
 test_AllowServicePrincipalsCreateAndUseProfiles_Compliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": false},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": false},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -193,8 +205,10 @@ test_AllowServicePrincipalsCreateAndUseProfiles_Compliant_Disabled if {
 test_AllowServicePrincipalsCreateAndUseProfiles_Compliant_EnabledWithSecurityGroup if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": [
             {
                 "graphId": "56500b38-aabf-4bb2-8b0f-60ef6a6c4dd3",
                 "name": "PowerBI-Test"
@@ -209,8 +223,10 @@ test_AllowServicePrincipalsCreateAndUseProfiles_Compliant_EnabledWithSecurityGro
 test_AllowServicePrincipalsCreateAndUseProfiles_Compliant_EnabledWithTwoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": [
             {
                 "graphId": "56500b38-aabf-4bb2-8b0f-60ef6a6c4dd3",
                 "name": "PowerBI-Test"
@@ -229,8 +245,10 @@ test_AllowServicePrincipalsCreateAndUseProfiles_Compliant_EnabledWithTwoSecurity
 test_AllowServicePrincipalsCreateAndUseProfiles_NonCompliant_EnabledWithNoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -287,7 +305,8 @@ test_AllowServicePrincipalsCreateAndUseProfiles_PowerBITenantSettings_Missing if
 test_AllowServicePrincipalsCreateAndUseProfiles_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -331,7 +350,8 @@ test_AllowServicePrincipalsCreateAndUseProfiles_PowerBITenantSettings_NonObjectA
 test_AllowServicePrincipalsCreateAndUseProfiles_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("AllowServicePrincipalsCreateAndUseProfiles")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", 
+            [GetPowerBISettingIndex("AllowServicePrincipalsCreateAndUseProfiles")])}
     ])
 
     Output := powerbi.tests with input as patched_input

@@ -14,8 +14,10 @@ import data.utils.key.PASS
 test_ExternalSharingV2_Compliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ExternalSharingV2")]), "value": false},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ExternalSharingV2")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": false},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -25,8 +27,10 @@ test_ExternalSharingV2_Compliant_Disabled if {
 test_ExternalSharingV2_Compliant_EnabledWithSecurityGroup if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ExternalSharingV2")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ExternalSharingV2")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": [
             {
                 "graphId": "56500b38-aabf-4bb2-8b0f-60ef6a6c4dd3",
                 "name": "PowerBI-Test"
@@ -41,8 +45,10 @@ test_ExternalSharingV2_Compliant_EnabledWithSecurityGroup if {
 test_ExternalSharingV2_Compliant_EnabledWithTwoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ExternalSharingV2")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ExternalSharingV2")]), "value": [
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": [
             {
                 "graphId": "56500b38-aabf-4bb2-8b0f-60ef6a6c4dd3",
                 "name": "PowerBI-Test"
@@ -61,8 +67,10 @@ test_ExternalSharingV2_Compliant_EnabledWithTwoSecurityGroups if {
 test_ExternalSharingV2_NonCompliant_EnabledWithNoSecurityGroups if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("ExternalSharingV2")]), "value": true},
-        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", [powerbi_setting_index("ExternalSharingV2")]), "value": []}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": true},
+        {"op": "add", "path": sprintf("/powerbi_tenant_settings/%v/enabledSecurityGroups", 
+            [GetPowerBISettingIndex("ExternalSharingV2")]), "value": []}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -119,7 +127,7 @@ test_ExternalSharingV2_PowerBITenantSettings_Missing if {
 test_ExternalSharingV2_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("ExternalSharingV2")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [GetPowerBISettingIndex("ExternalSharingV2")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -163,7 +171,7 @@ test_ExternalSharingV2_PowerBITenantSettings_NonObjectArrayElement if {
 test_ExternalSharingV2_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("ExternalSharingV2")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [GetPowerBISettingIndex("ExternalSharingV2")])}
     ])
 
     Output := powerbi.tests with input as patched_input

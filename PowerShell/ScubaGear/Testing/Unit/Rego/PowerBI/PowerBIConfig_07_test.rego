@@ -14,7 +14,8 @@ import data.utils.key.PASS
 test_EimInformationProtectionEdit_Compliant_Enabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("EimInformationProtectionEdit")]), "value": true}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("EimInformationProtectionEdit")]), "value": true}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -24,7 +25,8 @@ test_EimInformationProtectionEdit_Compliant_Enabled if {
 test_EimInformationProtectionEdit_NonCompliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("EimInformationProtectionEdit")]), "value": false}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("EimInformationProtectionEdit")]), "value": false}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -81,7 +83,8 @@ test_EimInformationProtectionEdit_PowerBITenantSettings_Missing if {
 test_EimInformationProtectionEdit_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("EimInformationProtectionEdit")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", 
+            [GetPowerBISettingIndex("EimInformationProtectionEdit")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -125,7 +128,8 @@ test_EimInformationProtectionEdit_PowerBITenantSettings_NonObjectArrayElement if
 test_EimInformationProtectionEdit_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("EimInformationProtectionEdit")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", 
+            [GetPowerBISettingIndex("EimInformationProtectionEdit")])}
     ])
 
     Output := powerbi.tests with input as patched_input

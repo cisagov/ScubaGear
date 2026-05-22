@@ -14,7 +14,7 @@ import data.utils.key.PASS
 test_RScriptVisual_Compliant_Disabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("RScriptVisual")]), "value": false}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [GetPowerBISettingIndex("RScriptVisual")]), "value": false}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -24,7 +24,7 @@ test_RScriptVisual_Compliant_Disabled if {
 test_RScriptVisual_NonCompliant_Enabled if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [powerbi_setting_index("RScriptVisual")]), "value": true}
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", [GetPowerBISettingIndex("RScriptVisual")]), "value": true}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -81,7 +81,7 @@ test_RScriptVisual_PowerBITenantSettings_Missing if {
 test_RScriptVisual_Missing if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [powerbi_setting_index("RScriptVisual")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", [GetPowerBISettingIndex("RScriptVisual")])}
     ])
 
     Output := powerbi.tests with input as patched_input
@@ -125,7 +125,7 @@ test_RScriptVisual_PowerBITenantSettings_NonObjectArrayElement if {
 test_RScriptVisual_MissingSettingName if {
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": true},
-        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [powerbi_setting_index("RScriptVisual")])}
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", [GetPowerBISettingIndex("RScriptVisual")])}
     ])
 
     Output := powerbi.tests with input as patched_input
