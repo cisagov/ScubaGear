@@ -187,17 +187,6 @@ UserImpersonationCompliant(ConfigUsers) := Result if {
         HasAcceptableUserProtectionAction(PhishPolicy)
         AntiPhishPolicyCoversAllRecipients(PhishPolicy)
     }
-    Partial := [Entry |
-        some Policy in EnabledAntiPhishPolicies
-        Policy.EnableTargetedUserProtection == true
-        PolicyIncludesAllSensitiveUsers(Policy, ConfigUsers)
-        HasAcceptableUserProtectionAction(Policy)
-        not AntiPhishPolicyCoversAllRecipients(Policy)
-        Entry := {
-            "Name": Policy.Identity,
-            "MissingRecipients": true,
-        }
-    ]
     count(Compliant) > 0
     Result := {
         "Compliant": true,
