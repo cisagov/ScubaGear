@@ -53,6 +53,15 @@ else := concat("", [
     "See %v for more info"
 ]) if Negation == true
 
+### Fix added by Ted
+SharepointSettings := {
+    key: value |
+    SPOTenantObject := object.get(input, "SPO_tenant", [])[0]
+    some key, value in SPOTenantObject
+}
+
+SharingCapabilitySetting := object.get(SharepointSettings, "SharingCapability", null)
+###
 
 
 ###################
@@ -69,15 +78,35 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.1.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
-    "ActualValue": [SharingCapability],
+    "ActualValue": [SharingCapabilitySetting],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
+    SharingCapabilitySetting != null
+
     Conditions := [
-        SharingCapability == ONLYPEOPLEINORG,
-        SharingCapability == EXISTINGGUESTS
+        SharingCapabilitySetting == ONLYPEOPLEINORG,
+        SharingCapabilitySetting == EXISTINGGUESTS
     ]
+
     Status := count(FilterArray(Conditions, true)) == 1
+}
+
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.1.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": "Setting Not Found in JSON",
+    "ReportDetails": "SPO_tenant or SharingCapability are missing from input JSON",
+    "RequirementMet": false
+} if {
+    MissingConditions := [
+        count(SharepointSettings) == 0,
+        SharingCapabilitySetting == null
+    ]
+
+    some condition in MissingConditions
+    condition
 }
 #--
 
@@ -85,35 +114,43 @@ tests contains {
 # MS.SHAREPOINT.1.2v1
 #--
 
+ODBSharingCapabilitySetting := object.get(SharepointSettings, "ODBSharingCapability", null)
+
 # If ODBSharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
 tests contains {
     "PolicyId": "MS.SHAREPOINT.1.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
-    "ActualValue": [ODBSharingCapability],
+    "ActualValue": [ODBSharingCapabilitySetting],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    input.OneDrive_PnP_Flag == false
-    ODBSharingCapability := Tenant.ODBSharingCapability
+    ODBSharingCapabilitySetting != null
+
     Conditions := [
-        ODBSharingCapability == ONLYPEOPLEINORG,
-        ODBSharingCapability == EXISTINGGUESTS
+        ODBSharingCapabilitySetting == ONLYPEOPLEINORG,
+        ODBSharingCapabilitySetting == EXISTINGGUESTS
     ]
+
     Status := count(FilterArray(Conditions, true)) == 1
 }
 
 tests contains {
-    "PolicyId": PolicyId,
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails(PolicyId),
+    "PolicyId": "MS.SHAREPOINT.1.2v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": "Setting Not Found in JSON",
+    "ReportDetails": "SPO_tenant or ODBSharingCapability are missing from input JSON",
     "RequirementMet": false
 } if {
-    PolicyId := "MS.SHAREPOINT.1.2v1"
-    input.OneDrive_PnP_Flag == true
+    MissingConditions := [
+        count(SharepointSettings) == 0,
+        ODBSharingCapabilitySetting == null
+    ]
+
+    some condition in MissingConditions
+    condition
 }
 #--
 
@@ -124,6 +161,8 @@ tests contains {
 # SharingDomainRestrictionMode == 0 Unchecked
 # SharingDomainRestrictionMode == 1 Checked
 # SharingAllowedDomainList == "domains" Domain list
+
+SharingDomainRestrictionModeSetting := object.get(SharepointSettings, "SharingDomainRestrictionMode", null)
 
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
@@ -140,28 +179,50 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [
-        Tenant.SharingDomainRestrictionMode,
-        SharingCapability
+        SharingDomainRestrictionModeSetting,
+        SharingCapabilitySetting
     ],
     "ReportDetails": ReportDetailsBooleanWarning(Status, NOTESTRING),
     "RequirementMet": Status
 } if {
-    SharingCapability != ONLYPEOPLEINORG
-    Status := Tenant.SharingDomainRestrictionMode == 1
+    SharingDomainRestrictionModeSetting != null
+    SharingCapabilitySetting != null
+
+    SharingCapabilitySetting != ONLYPEOPLEINORG
+    Status := SharingDomainRestrictionModeSetting == 1
 }
 
 # Test for N/A case where sharing is set to Only people in your organization
 tests contains {
-    "PolicyId": PolicyId,
+    "PolicyId": "MS.SHAREPOINT.1.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "ReportDetails": CheckedSkippedDetails("MS.SHAREPOINT.1.3v1", Reason),
     "RequirementMet": true
 } if {
-    SharingCapability == ONLYPEOPLEINORG
-    PolicyId := "MS.SHAREPOINT.1.3v1"
+    SharingDomainRestrictionModeSetting != null
+    SharingCapabilitySetting != null
+    SharingCapabilitySetting == ONLYPEOPLEINORG
     Reason := NAString(SliderSettings(0), true)
+}
+
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.1.3v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": "Setting Not Found in JSON",
+    "ReportDetails": "SPO_tenant or SharingDomainRestrictionMode or SharingCapability are missing from input JSON",
+    "RequirementMet": false
+} if {
+    MissingConditions := [
+        count(SharepointSettings) == 0,
+        SharingCapabilitySetting == null,
+        SharingDomainRestrictionModeSetting == null
+    ]
+
+    some condition in MissingConditions
+    condition
 }
 #--
 
@@ -173,6 +234,8 @@ tests contains {
 # MS.SHAREPOINT.2.1v1
 #--
 
+DefaultSharingLinkTypeSetting := object.get(SharepointSettings, "DefaultSharingLinkType", null)
+
 # DefaultSharingLinkType == 1 for Specific People
 # DefaultSharingLinkType == 2 for Only people in your organization
 # Default Sharing Link should be set to specific people
@@ -180,17 +243,38 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.2.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
-    "ActualValue": [Tenant.DefaultSharingLinkType],
+    "ActualValue": [DefaultSharingLinkTypeSetting],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := Tenant.DefaultSharingLinkType == 1
+    DefaultSharingLinkTypeSetting != null
+
+    Status := DefaultSharingLinkTypeSetting == 1
+}
+
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.2.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": "Setting Not Found in JSON",
+    "ReportDetails": "SPO_tenant or DefaultSharingLinkType are missing from input JSON",
+    "RequirementMet": false
+} if {
+    MissingConditions := [
+        count(SharepointSettings) == 0,
+        DefaultSharingLinkTypeSetting == null
+    ]
+
+    some condition in MissingConditions
+    condition
 }
 #--
 
 #
 # MS.SHAREPOINT.2.2v1
 #--
+
+DefaultLinkPermissionSetting := object.get(SharepointSettings, "DefaultLinkPermission", null)
 
 # DefaultLinkPermission == 1 view
 # DefaultLinkPermission == 2 edit
@@ -200,11 +284,30 @@ tests contains {
     "PolicyId": "MS.SHAREPOINT.2.2v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
-    "ActualValue": [Tenant.DefaultLinkPermission],
+    "ActualValue": [DefaultLinkPermissionSetting],
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := Tenant.DefaultLinkPermission == 1
+    DefaultLinkPermissionSetting != null
+
+    Status := DefaultLinkPermissionSetting == 1
+}
+
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.2.2v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": "Setting Not Found in JSON",
+    "ReportDetails": "SPO_tenant or DefaultLinkPermission are missing from input JSON",
+    "RequirementMet": false
+} if {
+    MissingConditions := [
+        count(SharepointSettings) == 0,
+        DefaultLinkPermissionSetting == null
+    ]
+
+    some condition in MissingConditions
+    condition
 }
 #--
 
@@ -215,6 +318,8 @@ tests contains {
 #
 # MS.SHAREPOINT.3.1v1
 #--
+
+RequireAnonymousLinksExpireInDaysSetting := object.get(SharepointSettings, "RequireAnonymousLinksExpireInDays", null)
 
 ErrStr := concat(" ", [
     "Requirement not met:",
@@ -229,31 +334,53 @@ tests contains {
     "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [
         SharingCapability,
-        Tenant.RequireAnonymousLinksExpireInDays
+        RequireAnonymousLinksExpireInDaysSetting
     ],
     "ReportDetails": ReportDetailsString(Status, ErrStr),
     "RequirementMet": Status
 } if {
-    SharingCapability == ANYONE
+    SharingCapabilitySetting != null
+    SharingCapabilitySetting == ANYONE
+
+    RequireAnonymousLinksExpireInDaysSetting != null
     Conditions := [
-        Tenant.RequireAnonymousLinksExpireInDays >= 1,
-        Tenant.RequireAnonymousLinksExpireInDays <= 30
+        RequireAnonymousLinksExpireInDaysSetting >= 1,
+        RequireAnonymousLinksExpireInDaysSetting <= 30
     ]
     Status := count(FilterArray(Conditions, true)) == 2
 }
 
 # Test for N/A case where sharing is set to New and existing guests, Existing guests, or Only people in your organization.
 tests contains {
-    "PolicyId": PolicyId,
+    "PolicyId": "MS.SHAREPOINT.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-SPOTenantRest"],
     "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "ReportDetails": CheckedSkippedDetails("MS.SHAREPOINT.3.1v1", Reason),
     "RequirementMet": true
 } if {
-    PolicyId := "MS.SHAREPOINT.3.1v1"
-    SharingCapability != ANYONE
+    SharingCapabilitySetting != null
+    SharingCapabilitySetting != ANYONE
+    RequireAnonymousLinksExpireInDaysSetting != null
     Reason := NAString(SliderSettings(2), false)
+}
+
+tests contains {
+    "PolicyId": "MS.SHAREPOINT.3.1v1",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-SPOTenantRest"],
+    "ActualValue": "Setting Not Found in JSON",
+    "ReportDetails": "SPO_tenant or RequireAnonymousLinksExpireInDays or SharingCapability are missing from input JSON",
+    "RequirementMet": false
+} if {
+    MissingConditions := [
+        count(SharepointSettings) == 0,
+        SharingCapabilitySetting == null,
+        RequireAnonymousLinksExpireInDaysSetting == null
+    ]
+
+    some condition in MissingConditions
+    condition
 }
 #--
 

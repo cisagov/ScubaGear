@@ -177,6 +177,47 @@ test_SharingCapability_NewExistingGuests_NotApplicable_V2 if {
     ])
     TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailsString), true) == true
 }
+
+### Testing the "Missing the specific setting that this policy expects" scenarios
+###
+test_RequireAnonymousLinksExpireInDays_SharepointSettings_Missing if {
+    Output := sharepoint.tests with input as []
+
+    MissingError := "SPO_tenant or RequireAnonymousLinksExpireInDays or SharingCapability are missing from input JSON"
+    TestResult("MS.SHAREPOINT.3.1v1", Output, MissingError, false) == true
+}
+
+test_RequireAnonymousLinksExpireInDays_SharepointSettings_EmptyArray if {
+    Output := sharepoint.tests with input.SPO_tenant as []
+
+    MissingError := "SPO_tenant or RequireAnonymousLinksExpireInDays or SharingCapability are missing from input JSON"
+    TestResult("MS.SHAREPOINT.3.1v1", Output, MissingError, false) == true
+}
+
+test_RequireAnonymousLinksExpireInDays_Missing if {
+    Tenant := json.patch(SPOTenant, [{"op": "remove", "path": "RequireAnonymousLinksExpireInDays"}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    MissingError := "SPO_tenant or RequireAnonymousLinksExpireInDays or SharingCapability are missing from input JSON"
+    TestResult("MS.SHAREPOINT.3.1v1", Output, MissingError, false) == true
+}
+
+test_RequireAnonymousLinksExpireInDays_SharingCapability_Missing if {
+    Tenant := json.patch(SPOTenant, [{"op": "remove", "path": "SharingCapability"}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    MissingError := "SPO_tenant or RequireAnonymousLinksExpireInDays or SharingCapability are missing from input JSON"
+    TestResult("MS.SHAREPOINT.3.1v1", Output, MissingError, false) == true
+}
+
+test_RequireAnonymousLinksExpireInDays_SharingDomainRestrictionMode_Both_Missing if {
+    Tenant := json.patch(SPOTenant, [{"op": "remove", "path": "RequireAnonymousLinksExpireInDays"},
+                                    {"op": "remove", "path": "SharingCapability"}])
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    MissingError := "SPO_tenant or RequireAnonymousLinksExpireInDays or SharingCapability are missing from input JSON"
+    TestResult("MS.SHAREPOINT.3.1v1", Output, MissingError, false) == true
+}
 #--
 
 #
@@ -245,7 +286,7 @@ test_File_Folder_AnonymousLinkType_UsingServicePrincipal_Correct if {
 
     # Set PnP flag to true denoting use of service principal
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-        with input.OneDrive_PnP_Flag as true
+
     TestResult("MS.SHAREPOINT.3.2v1", Output, PASS, true) == true
 }
 
@@ -261,7 +302,6 @@ test_File_Folder_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
     
     # Set PnP flag to true denoting use of service principal 
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-        with input.OneDrive_PnP_Flag as true
 
     ReportDetailsString := concat(": ", [
         FAIL,
@@ -282,7 +322,6 @@ test_File_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
     
     # Set PnP flag to true denoting use of service principal
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-        with input.OneDrive_PnP_Flag as true
 
     # FAIL = Requirement not met
     # ReportDetailsString = "Requirement not met: both files and folders are not limited to view for Anyone"
@@ -305,7 +344,6 @@ test_Folder_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
     
     # Set PnP flag to true denoting use of service principal
     Output := sharepoint.tests with input.SPO_tenant as [Tenant]
-        with input.OneDrive_PnP_Flag as true
 
     ReportDetailsString := concat(": ", [
         FAIL,
