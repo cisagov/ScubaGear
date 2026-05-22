@@ -1089,17 +1089,28 @@ RootDomains contains Domain if {
 RootDomainFor(Domain) := Root.Id if {
     some Root in RootDomains
     endswith(Domain.Id, Root.Id)
+
+    # When multiple root domains match (e.g., "sub.example.com" and "example.com" both match
+    # "sub.sub.example.com"), select the most specific one (longest Id). 
+    # Otherwise, an eval_conflict_error error will occur due to multiple matching root domains.
+    MaxLength := max({count(R.Id) | some R in RootDomains; endswith(Domain.Id, R.Id)})
+    count(Root.Id) == MaxLength
 }
+
+# For tenants created before Oct 2021, passwordValidityPeriodInDays is set to INT_MAX (2147483647), indicating passwords never expire.
+# For tenants created after Oct 2021, passwordValidityPeriodInDays is set to null by default, which also indicates passwords never expire. 
+PasswordNeverExpires(Domain) if Domain.PasswordValidityPeriodInDays == INT_MAX
+PasswordNeverExpires(Domain) if is_null(Domain.PasswordValidityPeriodInDays)
 
 IsValid(Domain) := true if {
     Domain.IsRoot = true
-    Domain.PasswordValidityPeriodInDays == INT_MAX
+    PasswordNeverExpires(Domain)
 } else := true if {
     Domain.IsRoot == false
     RootDomainFor(Domain) != null
     some Root in RootDomains
     Root.Id == RootDomainFor(Domain)
-    Root.PasswordValidityPeriodInDays == INT_MAX
+    PasswordNeverExpires(Root)
 } else := false
 
 ValidDomains contains Domain.Id if {

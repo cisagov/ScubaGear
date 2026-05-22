@@ -1,6 +1,7 @@
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.ReportDetailsBoolean
 
 
 ######################
@@ -212,13 +213,25 @@ tests contains {
 #
 # MS.SECURITYSUITE.5.1v1
 #--
+# Save the identity of audit logs that have logging enabled
+CorrectLogConfigs contains {
+    "Identity": AuditLog.Identity,
+    "UnifiedAuditLogIngestionEnabled": AuditLog.UnifiedAuditLogIngestionEnabled
+} if {
+    some AuditLog in input.admin_audit_log_config
+    AuditLog.UnifiedAuditLogIngestionEnabled == true
+}
+
+# The test should pass if at least one log exists
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.5.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-AdminAuditLogConfig"],
+    "ActualValue": CorrectLogConfigs,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    Status := count(CorrectLogConfigs) >= 1
 }
 #--
 
