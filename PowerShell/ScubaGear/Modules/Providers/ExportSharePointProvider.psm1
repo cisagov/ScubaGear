@@ -25,8 +25,7 @@ function Export-SharePointProvider {
     $SPOTenantJson = ConvertTo-Json @()
 
     # Use access token acquired by Connection.psm1
-    # $TenantData = $Tracker.TryCommand("Get-SPOTenantRest", @{AdminUrl = $AdminUrl; AccessToken = $AccessToken})
-    $TenantData = $Tracker.TryCommand("Get-SPOTenantRest", @{AdminUrl = "https://www.github.com"; AccessToken = "NoToken"})
+    $TenantData = $Tracker.TryCommand("Get-SPOTenantRest", @{AdminUrl = $AdminUrl; AccessToken = $AccessToken})
     # If successfully retrieved the tenant settings
     if ($TenantData.count -gt 0) {
         $SPOTenantJson = ConvertTo-Json @($TenantData) -Depth 10

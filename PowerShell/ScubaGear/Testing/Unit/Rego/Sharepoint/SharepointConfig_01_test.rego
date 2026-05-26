@@ -64,32 +64,6 @@ test_SharingCapability_Missing if {
     MissingError := "SPO_tenant or SharingCapability are missing from input JSON"
     TestResult("MS.SHAREPOINT.1.1v1", Output, MissingError, false) == true
 }
-
-### Delete below this
-# test_SharingCapability_Empty if {
-#     # Tenant := json.patch(SPOTenant, [{"op": "add", "path": "SharingCapability", "value": 2}])
-# SPOTenant := {
-#     "SharingCapability": 0,
-#     "ODBSharingCapability": 0,
-#     "SharingDomainRestrictionMode": 0,
-#     "DefaultSharingLinkType": 1,
-#     "DefaultLinkPermission": 1,
-#     "RequireAnonymousLinksExpireInDays": 30,
-#     "FileAnonymousLinkType": 1,
-#     "FolderAnonymousLinkType": 1,
-#     "EmailAttestationRequired": true,
-#     "EmailAttestationReAuthDays": 30
-# }
-
-#     Output := sharepoint.tests with input.SPO_tenant as [SPOTenant]
-#     # Output := sharepoint.tests with input.SPO_tenant as []
-
-#     # count(Output) == 1
-# # sprintf("DEBUG test_SharingCapability_Empty Output: %v", [Output])
-# print("DEBUG test_SharingCapability_Empty Output: ", [Output])
-
-#     TestResult("MS.SHAREPOINT.1.1v1", Output, FAIL, false) == true
-# }
 #--
 
 #
