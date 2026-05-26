@@ -7,14 +7,7 @@ $markdownMappings = Get-ScubaConfigExclusionMappingsFromMarkdown -BaselineDirect
 
 # Update configuration using markdown mappings from GitHub
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
-# Update configuration using markdown mappings from GitHub
-Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
 
-# Update configuration using local markdown files
-Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -BaselineDirectory "..\..\..\baselines"
-
-# Filter specific products -
-Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
 # Update configuration using local markdown files
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -BaselineDirectory "..\..\..\baselines"
 
@@ -22,7 +15,6 @@ Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -ProductFilter @("aad", "defender", "exo")
 
 # Update configuration with additional fields
-Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -AdditionalFields @('criticality')
 Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.tests.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines" -AdditionalFields @('criticality')
 #>
 
@@ -345,9 +337,19 @@ function Update-ScubaConfigBaselineWithMarkdown {
     # Update the configuration
     $configContent.baselines = $newBaselines
 
-    # Save the updated configuration
+    # Save the updated configuration with proper character encoding
     $jsonOutput = $configContent | ConvertTo-Json -Depth 10
-    $jsonOutput | Set-Content $ConfigFilePath -Encoding UTF8
+
+    # Fix common UTF-8 encoding issues in the JSON output using character codes
+    $jsonOutput = $jsonOutput -replace ([char]0x2019), "'"        # Right single quotation mark
+    $jsonOutput = $jsonOutput -replace ([char]0x201C), '"'        # Left double quotation mark
+    $jsonOutput = $jsonOutput -replace ([char]0x201D), '"'        # Right double quotation mark
+    $jsonOutput = $jsonOutput -replace 'â€"', "—"                 # Fix malformed double dash
+    $jsonOutput = $jsonOutput -replace 'â€™', "'"                 # Fix malformed apostrophe
+    $jsonOutput = $jsonOutput -replace 'â€œ', '"'                 # Fix malformed left quote
+    $jsonOutput = $jsonOutput -replace 'â€', '"'                  # Fix malformed right quote
+
+    $jsonOutput | Set-Content $BaselineFilePath -Encoding UTF8
 
     Write-Output "Successfully updated baselines in configuration file: $BaselineFilePath"
     Write-Output "Updated products: $($newBaselines.Keys -join ', ')"
@@ -527,6 +529,18 @@ function Get-ScubaBaselinePolicy {
             $lines = Get-Content -Path $file.FullName -Encoding UTF8
         }
 
+        # Normalize problematic Unicode characters to standard ASCII equivalents
+        for ($j = 0; $j -lt $lines.Count; $j++) {
+            $lines[$j] = $lines[$j] -replace [char]0x2019, "'"    # Right single quotation mark to apostrophe
+            $lines[$j] = $lines[$j] -replace [char]0x201C, '"'    # Left double quotation mark
+            $lines[$j] = $lines[$j] -replace [char]0x201D, '"'    # Right double quotation mark
+            $lines[$j] = $lines[$j] -replace [char]0x2013, '-'    # En dash to hyphen
+            $lines[$j] = $lines[$j] -replace [char]0x2014, '--'   # Em dash to double hyphen
+            $lines[$j] = $lines[$j] -replace 'â€™', "'"           # Fix UTF-8 encoding error
+            $lines[$j] = $lines[$j] -replace 'â€œ', '"'           # Fix UTF-8 encoding error
+            $lines[$j] = $lines[$j] -replace 'â€\x9d', '"'         # Fix UTF-8 encoding error
+        }
+
         # Parse hierarchically by sections
         $fullContent = $lines -join "`n"
         $sections = Get-ScubaBaselineSections -Content $fullContent
@@ -674,30 +688,27 @@ function Get-ScubaBaselineSections {
         $currentContent += $line
     }
 
-    # Save last section
-    if ($currentSection) {
-        # Save last policy if exists
-        if ($currentPolicy -and $currentSubSection -eq "Policies") {
-            $currentPolicy.Content = ($currentContent -join "`n").Trim()
-            $policyDetails = Get-ScubaPolicyContent -Content $currentPolicy.Content
-            $currentPolicy.Criticality = $policyDetails.Criticality
-            $currentPolicy.LastModified = $policyDetails.LastModified
-            $currentPolicy.Rationale = $policyDetails.Rationale
-            $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
-            $currentPolicy.Badges = $policyDetails.Badges
-            # Extract implementation instructions for this policy
-            $currentPolicy.Implementation = Get-ScubaPolicyImplementation -Content $Content -PolicyId $currentPolicy.PolicyId
-            $null = $currentSection.Policies.Add($currentPolicy)
-        }
+    # Save final policy and section
+    if ($currentPolicy -and $currentSection) {
+        $currentPolicy.Content = ($currentContent -join "`n").Trim()
+        $policyDetails = Get-ScubaPolicyContent -Content $currentPolicy.Content
+        $currentPolicy.Criticality = $policyDetails.Criticality
+        $currentPolicy.LastModified = $policyDetails.LastModified
+        $currentPolicy.Rationale = $policyDetails.Rationale
+        $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
+        $currentPolicy.Badges = $policyDetails.Badges
+        $currentPolicy.Implementation = Get-ScubaPolicyImplementation -Content $Content -PolicyId $currentPolicy.PolicyId
+        $null = $currentSection.Policies.Add($currentPolicy)
+    }
 
-        # Process remaining section content
+    # Process final section content
+    if ($currentSection) {
         if ($currentSubSection -eq "Resources") {
             $currentSection.Resources = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources"
         } elseif ($currentSubSection -eq "License Requirements") {
             $sectionLicenseReq = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "LicenseRequirements"
             $currentSection.LicenseRequirements = if ($sectionLicenseReq -and $sectionLicenseReq.Count -gt 0) { $sectionLicenseReq } else { @("N/A") }
         }
-
         $sections += $currentSection
     }
 
@@ -814,7 +825,7 @@ function Get-ScubaPolicyContent {
         Import markdown content
     #>
     param([string]$Content)
-    $result = @{
+    $result = [ordered]@{
         Criticality = $null
         LastModified = $null
         Rationale = $null
@@ -837,7 +848,7 @@ function Get-ScubaPolicyContent {
         $mitreList = @()
         foreach ($line in $mitreBlock -split "`n") {
             if ($line -match '\[([^\]]+)\]\(([^)]+)\)') {
-                $mitreList += @{ Name = $matches[1]; Url = $matches[2] }
+                $mitreList += [ordered]@{ Name = $matches[1]; Url = $matches[2] }
             }
         }
         $result.MITRE_Mapping = $mitreList
@@ -879,10 +890,10 @@ function Get-ScubaPolicyContent {
         $linkUrl = $match.Groups['LinkUrl'].Value
         if (-not $linkUrl) { $linkUrl = "" }  # Handle badges without links
 
-        $badges += @{
+        $badges += [ordered]@{
             label = $label
-            color = $color
             linkUrl = $linkUrl
+            color = $color
         }
     }
     $result.Badges = $badges
