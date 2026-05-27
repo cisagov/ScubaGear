@@ -43,10 +43,12 @@ else := concat("", [
 ]) if Negation == true
 
 # All of the SharePoint settings
-SharepointSettings := {
-    key: value |
-    SPOTenantObject := object.get(input, "SPO_tenant", [])[0]
-    some key, value in SPOTenantObject
+SharepointSettings[settingname] := setting if {
+    tenants := object.get(input, "SPO_tenant", [])
+    count(tenants) > 0
+
+    tenant := tenants[0]
+    some settingname, setting in tenant
 }
 
 # SharingCapability is referenced by many of the policies
