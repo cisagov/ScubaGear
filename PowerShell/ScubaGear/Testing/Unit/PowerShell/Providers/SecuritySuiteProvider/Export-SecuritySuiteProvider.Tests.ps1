@@ -151,6 +151,9 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                 )
             }
 
+            function Write-ScubaLog {}
+            Mock -ModuleName ExportSecuritySuiteProvider Write-ScubaLog {}
+
             function Test-SCuBAValidProviderJson {
                 param (
                     [string]

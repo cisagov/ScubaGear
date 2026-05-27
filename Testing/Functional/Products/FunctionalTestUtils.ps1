@@ -128,6 +128,35 @@ function Set-PowerAppTenantIsolationPolicy {
 }
 
 # -----------------------------------------------------------------------
+# Power BI REST wrapper for functional test preconditions.
+# Uses the Fabric/Power BI Admin API to toggle individual tenant settings.
+# $script:PBIBaseUrl and $script:PBIAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before this function is called.
+# Endpoint: POST {base}/v1/admin/tenantsettings/{settingName}/update
+# -----------------------------------------------------------------------
+function Set-PowerBITenantSetting {
+    param(
+        [Parameter(Mandatory = $true)] [string]$SettingName,
+        [Parameter(Mandatory = $true)] [bool]$Enabled
+    )
+    $Body = @{ enabled = $Enabled } | ConvertTo-Json
+    $MaxAttempts = 3
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            Invoke-RestMethod -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
+                -Method POST -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
+                -Body $Body -ContentType "application/json" | Out-Null
+            return
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) { throw }
+            Write-Warning "Set-PowerBITenantSetting attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
+    }
+}
+
+# -----------------------------------------------------------------------
 # SharePoint Online REST wrapper for functional test preconditions.
 # Replaces the removed Microsoft.Online.SharePoint.PowerShell Set-SPOTenant
 # cmdlet. $script:SPOAdminUrl and $script:SPOAccessToken must be set by
@@ -408,40 +437,6 @@ function UpdateProviderExport{
 
 }
 
-function UpdateDirectorySettingByName{
-  <#
-    .SYNOPSIS
-      Wrapper function for the MS Graph commandlet, Update-MgBetaDirectorySetting, to lookup by name for update.
-    .PARAMETER DisplayName
-      The DisplayName of the Directory Setting to be updated.
-    .PARAMETER Updates
-      A hashtable of key/value pairs used as a splat for the Update-MgBetaDirectorySetting commandlet.
-    .NOTES
-      If more than one directory setting has the same DisplayName then only the first is updated.
-  #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
-  [CmdletBinding()]
-  param (
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [string]
-      $DisplayName,
-      [Parameter(Mandatory = $true)]
-      [ValidateNotNullOrEmpty()]
-      [hashtable]
-      $Updates
-  )
-
-  $Ids = Get-MgBetaDirectorySetting | Where-Object { $_.DisplayName -eq $DisplayName } | Select-Object -Property Id
-
-  foreach($Id in $Ids){
-      if (-not ([string]::IsNullOrEmpty($Id.Id))){
-          Update-MgBetaDirectorySetting -DirectorySettingId $($Id.Id) @Updates
-          break
-      }
-  }
-}
-
 function RemoveConditionalAccessPolicyByName{
     <#
     .SYNOPSIS
@@ -612,7 +607,7 @@ function Get-ExpectedHeaderNames {
       $TableClass
     )
     switch ($TableClass) {
-        "caps_table" { 
+        "caps_table" {
           return @("","Name","State","Users","Apps/Actions","Conditions","Block/Grant Access","Session Controls")
         }
         "riskyApps_table" {
@@ -622,7 +617,7 @@ function Get-ExpectedHeaderNames {
           return @("","Display Name","Severity Score","Privileged Roles","Key Credentials","Password Credentials","Federated Credentials","Permissions")
         }
         default {
-          return $null 
+          return $null
         }
     }
 }
