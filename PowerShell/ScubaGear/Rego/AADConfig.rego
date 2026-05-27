@@ -1638,6 +1638,7 @@ default AAD_9_1_Not_Applicable := false
 # Returns true if the M365 Environment used by the tenant does not support AI Agents
 AAD_9_1_Not_Applicable := true if {
     input.scuba_config.M365Environment in {"gcchigh", "dod"}
+    Count(AIAgents) == 0
 }
 
 # First test is for N/A case

@@ -170,5 +170,25 @@ test_PrioritizeEnvironmentOverLicense_Correct_V1 if {
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
 }
 
+#Future proofing test to ensure that if the policy is applied properly, it will pass based on that 
+#and not pass due to the environment. GCCHigh and DoD tenants may acquire this feature in the future
+test_PrioritizePolicyOverEnvironment_Correct_V1 if {
+    ScubaConf := json.patch(ScubaConfig,
+                [{"op": "add", "path": "M365Environment", "value": "gcchigh"},])
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/AgentIdRiskLevels", "value": "high"},
+                {"op": "add", "path": "Conditions/ClientApplications", "value": {} },
+                {"op": "add", "path": "Conditions/ClientApplications/IncludeAgentIdServicePrincipals", "value": ["All"] },
+                {"op": "add", "path": "Conditions/ClientAppTypes", "value": ["all"] },])
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config as ScubaConf
+
+    ReportDetailString := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
+}
 
 #--
