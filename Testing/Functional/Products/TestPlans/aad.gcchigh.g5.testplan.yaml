@@ -732,10 +732,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.9.1v1 Environment Not Supported
+  - PolicyId: MS.AAD.9.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.9.1v1
+      - TestDescription: MS.AAD.9.1v1 Environment Not Supported
         Preconditions: []
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
