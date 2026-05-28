@@ -758,9 +758,8 @@ TestPlan:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
                   ClientAppTypes: ["all"]
-                ClientApplications:
-                  IncludeAgentIdServicePrincipals: ["All"]
-                AgentIdRiskLevels:
-                  - "high"
+                  ClientApplications:
+                    IncludeAgentIdServicePrincipals: ["All"]
+                  AgentIdRiskLevels: "high"
         Postconditions: []
         ExpectedResult: true
