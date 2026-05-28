@@ -588,7 +588,7 @@ function Stop-ScubaLogging {
     }
 }
 
-function Get-ScubaRunDetails {
+function Write-ScubaRunDetails {
     <#
     .SYNOPSIS
     Capture ScubaGear runtime diagnostic information
@@ -617,12 +617,15 @@ function Get-ScubaRunDetails {
     Include the most recent PowerShell errors from the $Error automatic variable.
     Useful for diagnosing what went wrong during a failed ScubaGear run.
 
+    .PARAMETER TestNetworkConnectivity
+    Passing $false prevents the function from performing a network connectivity test since it is not necessary for Invoke-ScubaCached
+
     .EXAMPLE
-    Get-ScubaRunDetails
+    Write-ScubaRunDetails
     Collect basic diagnostic information about the current ScubaGear environment.
 
     .EXAMPLE
-    Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors
+    Write-ScubaRunDetails -IncludeLoadedModules -IncludeErrors
     Collect diagnostic information including loaded modules and recent errors.
 
     .NOTES
@@ -639,7 +642,9 @@ function Get-ScubaRunDetails {
         [switch]$IncludeErrors,
 
         [Parameter(Mandatory = $false)]
-        [string]$ConfiguredOPAPath
+        [string]$ConfiguredOPAPath,
+
+        [bool]$TestNetworkConnectivity = $true
     )
 
     try {
@@ -843,63 +848,65 @@ function Get-ScubaRunDetails {
         }
 
         # 6. Network Connectivity Status
-        Write-ScubaLog -Message "Checking network connectivity..." -Level "Debug" -Source "RunDetails"
-        try {
-            $connectivityData = @{
-                InternetConnected = $false
-                DNSResolution = $false
-                TestTarget = "www.microsoft.com"
-            }
-
-            # Test internet connectivity via HTTPS (port 443) rather than ICMP ping.
-            # ICMP is blocked in many corporate environments, causing false "not connected" results.
+        if ($TestNetworkConnectivity) {
+            Write-ScubaLog -Message "Checking network connectivity..." -Level "Debug" -Source "RunDetails"
             try {
-                $testConnection = Test-NetConnection -ComputerName $connectivityData.TestTarget -Port 443 -InformationLevel Quiet -ErrorAction Stop -WarningAction SilentlyContinue
-                $connectivityData.InternetConnected = $testConnection
-            }
-            catch {
-                $connectivityData.InternetError = $_.Exception.Message
-            }
+                $connectivityData = @{
+                    InternetConnected = $false
+                    DNSResolution = $false
+                    TestTarget = "www.microsoft.com"
+                }
 
-            # Test DNS resolution
-            try {
-                $dnsTest = Resolve-DnsName $connectivityData.TestTarget -ErrorAction Stop
-                $connectivityData.DNSResolution = $null -ne $dnsTest
-                if ($dnsTest) {
-                    # Resolve-DnsName returns IP4Address for A records and IP6Address for AAAA records;
-                    # find the first A record and fall back to IP6Address if none exists
-                    $aRecord = $dnsTest | Where-Object { $_.QueryType -eq 'A' } | Select-Object -First 1
-                    $connectivityData.DNSResult = if ($aRecord) { $aRecord.IP4Address } else {
-                        ($dnsTest | Where-Object { $_.IP6Address } | Select-Object -First 1).IP6Address
+                # Test internet connectivity via HTTPS (port 443) rather than ICMP ping.
+                # ICMP is blocked in many corporate environments, causing false "not connected" results.
+                try {
+                    $testConnection = Test-NetConnection -ComputerName $connectivityData.TestTarget -Port 443 -InformationLevel Quiet -ErrorAction Stop -WarningAction SilentlyContinue
+                    $connectivityData.InternetConnected = $testConnection
+                }
+                catch {
+                    $connectivityData.InternetError = $_.Exception.Message
+                }
+
+                # Test DNS resolution
+                try {
+                    $dnsTest = Resolve-DnsName $connectivityData.TestTarget -ErrorAction Stop
+                    $connectivityData.DNSResolution = $null -ne $dnsTest
+                    if ($dnsTest) {
+                        # Resolve-DnsName returns IP4Address for A records and IP6Address for AAAA records;
+                        # find the first A record and fall back to IP6Address if none exists
+                        $aRecord = $dnsTest | Where-Object { $_.QueryType -eq 'A' } | Select-Object -First 1
+                        $connectivityData.DNSResult = if ($aRecord) { $aRecord.IP4Address } else {
+                            ($dnsTest | Where-Object { $_.IP6Address } | Select-Object -First 1).IP6Address
+                        }
                     }
                 }
+                catch {
+                    $connectivityData.DNSError = $_.Exception.Message
+                }
+
+                # Check for proxy settings
+                # GetProxy() requires an absolute URI, so prefix the hostname with https://
+                try {
+                    $proxySettings = [System.Net.WebRequest]::GetSystemWebProxy()
+                    $testUri       = [uri]"https://$($connectivityData.TestTarget)"
+                    $proxyUri      = $proxySettings.GetProxy($testUri)
+                    if ($proxyUri.Host -ne $connectivityData.TestTarget) {
+                        $connectivityData.ProxyDetected = $true
+                        $connectivityData.ProxyAddress = $proxyUri.ToString()
+                    }
+                    else {
+                        $connectivityData.ProxyDetected = $false
+                    }
+                }
+                catch {
+                    $connectivityData.ProxyCheckError = $_.Exception.Message
+                }
+
+                Write-ScubaLog -Message "Network connectivity status captured" -Level "Info" -Source "RunDetails" -Data $connectivityData
             }
             catch {
-                $connectivityData.DNSError = $_.Exception.Message
+                Write-ScubaLog -Message "Failed to check network connectivity: $($_.Exception.Message)" -Level "Warning" -Source "RunDetails"
             }
-
-            # Check for proxy settings
-            # GetProxy() requires an absolute URI, so prefix the hostname with https://
-            try {
-                $proxySettings = [System.Net.WebRequest]::GetSystemWebProxy()
-                $testUri       = [uri]"https://$($connectivityData.TestTarget)"
-                $proxyUri      = $proxySettings.GetProxy($testUri)
-                if ($proxyUri.Host -ne $connectivityData.TestTarget) {
-                    $connectivityData.ProxyDetected = $true
-                    $connectivityData.ProxyAddress = $proxyUri.ToString()
-                }
-                else {
-                    $connectivityData.ProxyDetected = $false
-                }
-            }
-            catch {
-                $connectivityData.ProxyCheckError = $_.Exception.Message
-            }
-
-            Write-ScubaLog -Message "Network connectivity status captured" -Level "Info" -Source "RunDetails" -Data $connectivityData
-        }
-        catch {
-            Write-ScubaLog -Message "Failed to check network connectivity: $($_.Exception.Message)" -Level "Warning" -Source "RunDetails"
         }
 
         # 7. Current Command/Invocation Details
@@ -1351,13 +1358,13 @@ function Get-ScubaDebugLogReport {
     $versionMismatch    = ($scubaLoaded -ne 'Unknown' -and $scubaInstalled -ne 'Unknown' -and $scubaLoaded -ne $scubaInstalled)
 
     # --- OPA ---
-    # Default-location discovery: what Get-ScubaRunDetails found in ~/.scubagear/Tools
+    # Default-location discovery: what Write-ScubaRunDetails found in ~/.scubagear/Tools
     $opaEntry   = Find-Entry 'RunDetails' 'OPA Executable found'
     $opaVersion = if ($opaEntry.Data.Version)  { ($opaEntry.Data.Version -replace 'Version:\s*', '').Trim() } else { 'Unknown' }
     $opaPath    = if ($opaEntry.Data.Path)     { $opaEntry.Data.Path }     else { 'Unknown' }
     $opaSize    = if ($opaEntry.Data.SizeMB)   { "$($opaEntry.Data.SizeMB) MB" } else { 'Unknown' }
 
-    # Configured-path check: logged by Get-ScubaRunDetails when called with -ConfiguredOPAPath $ScubaConfig.OPAPath.
+    # Configured-path check: logged by Write-ScubaRunDetails when called with -ConfiguredOPAPath $ScubaConfig.OPAPath.
     # This reflects the path ScubaGear will actually use at runtime (from -OPAPath param or YAML OPAPath key).
     # Regex matches both "OPA Executable at configured path" and "OPA Executable NOT found at configured path"
     $opaConfiguredEntry = Find-Entry 'RunDetails' 'OPA Executable (NOT found )?at configured path'
@@ -1581,7 +1588,7 @@ function Get-ScubaDebugLogReport {
     }
     else {
         # Fallback to old behavior if no snapshots found (legacy logs)
-        $sb.AppendLine('_No module snapshots captured. Use Get-ScubaRunDetails with -IncludeLoadedModules to enable module tracking._') | Out-Null
+        $sb.AppendLine('_No module snapshots captured. Use Write-ScubaRunDetails with -IncludeLoadedModules to enable module tracking._') | Out-Null
     }
     $sb.AppendLine('') | Out-Null
 
@@ -1791,7 +1798,7 @@ function Get-ScubaDebugLogReport {
 # Explicitly export only the public API surface of this module.
 # Internal helpers (e.g. module-level variables, private utility logic) are not exported.
 # Callers in Orchestrator.psm1 use: Initialize-ScubaLogging, Write-ScubaLog, Trace-ScubaFunction,
-# Get-ScubaRunDetails, and Stop-ScubaLogging.  The remaining exports (Enable-ScubaAutoTrace,
+# Write-ScubaRunDetails, and Stop-ScubaLogging.  The remaining exports (Enable-ScubaAutoTrace,
 # Write-ScubaFunctionEntry, Write-ScubaFunctionExit) are available for future instrumentation use.
 Export-ModuleMember -Function @(
     'Initialize-ScubaLogging',
@@ -1801,7 +1808,7 @@ Export-ModuleMember -Function @(
     'Enable-ScubaAutoTrace',
     'Write-ScubaFunctionEntry',
     'Write-ScubaFunctionExit',
-    'Get-ScubaRunDetails',
+    'Write-ScubaRunDetails',
     'Update-ScubaModuleSnapshot',
     'Get-ScubaDebugLogReport'
 )

@@ -32,7 +32,7 @@ InModuleScope Orchestrator {
             Mock -CommandName Copy-Item {}
             Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
             Mock -ModuleName Orchestrator Write-ScubaLog {}
-            Mock -ModuleName Orchestrator Get-ScubaRunDetails {}
+            Mock -ModuleName Orchestrator Write-ScubaRunDetails {}
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {

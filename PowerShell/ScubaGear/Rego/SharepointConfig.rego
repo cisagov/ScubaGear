@@ -92,7 +92,6 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        # count(SharepointSettings) == 0,
         count(SPOTenant) == 0,
         SharingCapabilitySetting == null
     ]
@@ -139,7 +138,6 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        # count(SharepointSettings) == 0,
         count(SPOTenant) == 0,
         ODBSharingCapabilitySetting == null
     ]
@@ -212,7 +210,6 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        # count(SharepointSettings) == 0,
         count(SPOTenant) == 0,
         SharingCapabilitySetting == null,
         SharingDomainRestrictionModeSetting == null
