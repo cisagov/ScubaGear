@@ -10,6 +10,7 @@ const filterBySearch = (arr, term) => {
     const lower = term.toLowerCase();
 
     return arr.filter(o => {
+        if (typeof o === "string") return o.toLowerCase().includes(lower);
         if (!o || typeof o !== "object") return false;
 
         return Object.values(o).some(v => String(v).toLowerCase().includes(lower));
@@ -54,7 +55,7 @@ const groupPermissions = (data, groupKey) => {
 
     data.forEach(obj => {
         let keyVal = obj[groupKey];
-        if (groupKey === "IsAdminConsented" || groupKey === "IsRisky") {
+        if (groupKey === "IsAdminConsented") {
             if (keyVal === true) keyVal = "Admin consented";
             else if (keyVal === false) keyVal = "Not admin consented";
             else keyVal = "Unknown";
@@ -149,6 +150,12 @@ const renderFilteredList = (items, state, resultList) => {
     if (state.dataType === "Permissions") {
         const groups = groupPermissions(filtered, state.groupBy);
         Object.entries(groups).forEach(([name, arr]) => renderGroupSection(name, arr, resultList));
+        return;
+    }
+
+    if (state.dataType === "PrivilegedRoles") {
+        const roles = filtered.map(role => ({ Role: role }));
+        renderGroupSection("All", roles, resultList);
         return;
     }
 

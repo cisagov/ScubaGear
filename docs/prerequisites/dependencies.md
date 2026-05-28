@@ -24,7 +24,7 @@ The following PowerShell modules are required for ScubaGear to function properly
 | Microsoft.Graph.Authentication |           2.0.0 |           2.25.0 | Microsoft Graph API authentication |
 | powershell-yaml |           0.4.2 |           0.4.12 | YAML file processing and configuration management |
 
-> **Note**: SharePoint data is now retrieved via REST API and no longer requires Microsoft.Online.SharePoint.PowerShell or PnP.PowerShell modules.
+> **Note**: SharePoint and PowerPlatform data are now retrieved via REST API and no longer require Microsoft.Online.SharePoint.PowerShell or PnP.PowerShell modules.
 
 > **Note**: The maximum versions are updated to the latest available versions on a scheduled basis.
 
@@ -48,7 +48,7 @@ If that fails, you can manually download the OPA executable.
 ![version](../images/opa_version.png)
 
 [![OPA Latest Version](https://img.shields.io/github/v/release/open-policy-agent/opa?label=OPA%20Latest%20Version&color=blue)](https://github.com/open-policy-agent/opa/releases)
-[![OPA Tested Version](https://img.shields.io/badge/SCuBA%20OPA%20Tested%20Version-v1.16.1-green)](https://github.com/open-policy-agent/opa/releases/tag/v1.16.1)
+[![OPA Tested Version](https://img.shields.io/badge/SCuBA%20OPA%20Tested%20Version-v1.16.2-green)](https://github.com/open-policy-agent/opa/releases/tag/v1.16.2)
 
 > **Note**: You can also find the default supported version in the ScubaGear module: go to the [ScubaConfig](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1) file, look for the variable `$ScubaDefaults`, and find its parameter `DefaultOPAVersion`.
 

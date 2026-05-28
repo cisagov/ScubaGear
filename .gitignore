@@ -35,3 +35,6 @@
 # Debug Logs
 /testing/M365Baseline*
 *DebugLogs*
+
+# Local debug scripts
+Testing/Functional/Products/Debug-*.ps1

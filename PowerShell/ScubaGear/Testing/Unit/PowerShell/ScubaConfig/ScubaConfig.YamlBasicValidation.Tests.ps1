@@ -47,7 +47,7 @@ Describe "ScubaConfig Basic Root Configuration Tests" {
     AfterAll {
         # Clean up after tests
         [ScubaConfig]::ResetInstance()
-        
+
         # Clean up dummy OPA executable
         if ($script:OPAExeCreatedByTests -and $script:OPAExePath -and (Test-Path $script:OPAExePath)) {
             Remove-Item -Path $script:OPAExePath -Force -ErrorAction SilentlyContinue

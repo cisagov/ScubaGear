@@ -92,7 +92,7 @@
       "_comment": "Detailed description of this configuration file, its purpose, and any special considerations",
       "type": "string",
       "minLength": 1,
-      "maxLength": 500,
+      "maxLength": 1000,
       "caseSensitive": false
     },
 
@@ -101,7 +101,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["aad", "defender", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "*"]
+        "enum": ["aad", "defender", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi", "*"]
       },
       "minItems": 1,
       "uniqueItems": true,

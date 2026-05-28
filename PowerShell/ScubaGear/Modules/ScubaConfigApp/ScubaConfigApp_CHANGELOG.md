@@ -5,6 +5,57 @@
 - Extended `CapExclusions` support to `Applications` and `GuestUserTypes`.
 - Added multi select list boxes in the UI for easier management of guest user type exclusions.
 
+## 2.3.16 (03/16/2026) - Baseline Loading Performance Enhancement
+
+### Bug Fixes
+- Fixed baseline policy viewer failure when using pre-generated baseline schema
+
+### Enhancements
+- Added Strategy 0 to Start-SCuBAConfigApp to prioritize loading pre-generated ScubaBaseline.json from schema folder
+- Updated Show-SCuBABaselinePolicyViewer to use published baseline from schema folder instead of regenerating from markdown
+- Significantly improved startup performance by eliminating markdown parsing overhead for standard use cases
+- Maintained backward compatibility for custom baseline directories and GitHub URL scenarios
+
+### Code Improvements
+- Implemented cascading baseline loading strategy with published schema as highest priority
+- Retained markdown generation fallback for development and testing workflows
+- Aligned baseline loading logic with branch design for published baseline schema package
+
+
+## 2.3.16 (03/16/2026) - Baseline Loading Performance Enhancement
+
+### Bug Fixes
+- Fixed baseline policy viewer failure when using pre-generated baseline schema
+
+### Enhancements
+- Added Strategy 0 to Start-SCuBAConfigApp to prioritize loading pre-generated ScubaBaseline.json from schema folder
+- Updated Show-SCuBABaselinePolicyViewer to use published baseline from schema folder instead of regenerating from markdown
+- Significantly improved startup performance by eliminating markdown parsing overhead for standard use cases
+- Maintained backward compatibility for custom baseline directories and GitHub URL scenarios
+
+### Code Improvements
+- Implemented cascading baseline loading strategy with published schema as highest priority
+- Retained markdown generation fallback for development and testing workflows
+- Aligned baseline loading logic with branch design for published baseline schema package
+
+
+## 2.3.16 (03/16/2026) - Baseline Loading Performance Enhancement
+
+### Bug Fixes
+- Fixed baseline policy viewer failure when using pre-generated baseline schema
+
+### Enhancements
+- Added Strategy 0 to Start-SCuBAConfigApp to prioritize loading pre-generated ScubaBaselines.json from schema folder
+- Updated Show-SCuBABaselinePolicyViewer to use published baseline from schema folder instead of regenerating from markdown
+- Significantly improved startup performance by eliminating markdown parsing overhead for standard use cases
+- Maintained backward compatibility for custom baseline directories and GitHub URL scenarios
+
+### Code Improvements
+- Implemented cascading baseline loading strategy with published schema as highest priority
+- Retained markdown generation fallback for development and testing workflows
+- Aligned baseline loading logic with branch design for published baseline schema package
+
+
 ## 1.9.22 [09/15/2025] - UI & Usability Improvements
 
 ### Bug Fixes
@@ -43,7 +94,7 @@
 
 ### Code Improvements
 - Removed deprecated GlobalSettings sync functions and cleaned up legacy calls across helper modules
-- Enhanced debug logging and validation error handling with comprehensive field-level detail and better error messages
+- Enhanced debug logging and validation error handling with field-level detail and better error messages
 - Standardized control naming patterns and data structure handling across save/remove operations
 - Implemented clear-and-rebuild strategy for baseline exclusions to prevent data persistence issues
 
@@ -51,11 +102,11 @@
 - Updated field configuration to align PreferredDnsResolvers naming with ScubaGear YAML format requirements
 - Enhanced exclusion data structure handling for proper field removal and YAML compatibility
 
-## 1.8.14 [08/14/2025] - Comprehensive Test Framework and Module Architecture Enhancement
+## 1.8.14 [08/14/2025] - Test Framework and Module Architecture Enhancement
 -  Implemented changelog display functionality with `Show-ChangelogWindow` function for easy access to version history
 -  Moved functions from main module to 17 specialized helper modules for better organization and maintainability
 -  Resolved product-specific report display issues to properly show ScubaGear execution results
--  Implemented comprehensive Pester test suite for all 17 helper modules with 10 test contexts covering file existence, syntax validation, Unicode character detection, import validation, dependencies, and documentation
+-  Implemented Pester test suite for all 17 helper modules with 10 test contexts covering file existence, syntax validation, Unicode character detection, import validation, dependencies, and documentation
 -  Added validation for 94+ functions across helper modules ensuring all expected functions are present and properly organized
 -  Implemented Unicode character detection tests to prevent PowerShell parsing errors from problematic characters (emojis, special symbols)
 
@@ -94,12 +145,12 @@
 ## 1.7.29 [07/29/2025] - Unit Testing and Code Analysis
 - Added script analyzer suppress for runspace and updated unit test for sample config
 - Fixed YAML import functionality to populate both GeneralSettings and AdvancedSettings with proper data structure
-- Resolved debug queue array index errors and added comprehensive error handling and validation
+- Resolved debug queue array index errors and added error handling and validation
 
 ## 1.7.28 [07/28/2025] - UI Optimization and Debug Enhancement
 - Enhanced debug functionality with Pester testing framework, proper null checking for debug queue operations, and detailed error logging with stack traces
 - Fixed timer event handler array index issues and optimized UI refresh cycles for improved performance
-- Disabled debug mode for production builds and implemented comprehensive UI optimization improvements
+- Disabled debug mode for production builds and implemented UI optimization improvements
 
 ## 1.7.23 [07/23/2025] - Module Architecture Modernization
 - Moved UI to dedicated module with modular architecture for better maintainability and enhanced component separation
@@ -110,7 +161,7 @@
 - Enhanced images and visual assets for clearer project documentation
 
 ## 1.7.21 [07/21/2025] - Core Configuration System Implementation
-- Added comprehensive configuration system with detailed comments, enhanced anchor mention functionality, and removed old configuration files with updated README
+- Added configuration system with detailed comments, enhanced anchor mention functionality, and removed old configuration files with updated README
 - Implemented ScubaConfig UI foundation with online feature functionality, debug capabilities, and enhanced UI responsiveness and error handling
 - Fixed YAML output formatting issues, resolved YAML export functionality, and created robust YAML import/export functionality with proper data management
 - Established configuration data structures with GeneralSettings vs AdvancedSettings separation and implemented advanced settings toggle functionality
