@@ -506,10 +506,10 @@ function Invoke-SCuBA {
                 InvocationLine = $MyInvocation.Line
             }
 
-            # Capture environment diagnostics using Get-ScubaRunDetails
+            # Capture environment diagnostics using Write-ScubaRunDetails
             Write-ScubaLog -Message "Capturing environment diagnostics" -Level "Info" -Source "InvokeScuba"
             try {
-                Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $ScubaConfig.OPAPath -ErrorAction Stop
+                Write-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $ScubaConfig.OPAPath -ErrorAction Stop
             }
             catch {
                 Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "InvokeScuba" -Data @{
@@ -2256,10 +2256,10 @@ function Invoke-SCuBACached {
                     InvocationLine = $MyInvocation.Line
                 }
 
-                # Capture environment diagnostics using Get-ScubaRunDetails
+                # Capture environment diagnostics using Write-ScubaRunDetails
                 Write-ScubaLog -Message "Capturing environment diagnostics (Cached Mode)" -Level "Info" -Source "ScubaCached"
                 try {
-                    Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $OPAPath -ErrorAction Stop
+                    Write-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $OPAPath -ErrorAction Stop
                 }
                 catch {
                     Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "ScubaCached" -Data @{
