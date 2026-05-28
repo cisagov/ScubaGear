@@ -3,7 +3,11 @@
         "00000003-0000-0000-c000-000000000000": "Microsoft Graph",
         "00000002-0000-0ff1-ce00-000000000000": "Office 365 Exchange Online",
         "00000003-0000-0ff1-ce00-000000000000": "Office 365 SharePoint Online",
-        "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs"
+        "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs",
+        "00000009-0000-0000-c000-000000000000": "Power BI Service",
+        "00000007-0000-0000-c000-000000000000": "Dataverse",
+        "475226c6-020e-4fb2-8a90-7a972cbfc1d4": "PowerApps Service",
+        "7df0a125-d3be-4c96-aa54-591f83ff541c": "Microsoft Flow Service"
     },
     "permissions": {
         "Microsoft Graph": {
@@ -133,7 +137,39 @@
                 "c74fd47d-ed3c-45c3-9a9e-b8676de685d2": { "Name": "EntitlementManagement.Read.All", "RiskLevel": "Medium" },
                 "83d4163d-a2d8-4d3b-9695-4ae3ca98f888": { "Name": "SharePointTenantSettings.Read.All", "RiskLevel": "Low" },
                 "498476ce-e0fe-48b0-b801-37ba7e2685c6": { "Name": "Organization.Read.All", "RiskLevel": "Low" },
-                "dbb9058a-0e50-45d7-ae91-66909b5d4664": { "Name": "Domain.Read.All", "RiskLevel": "Low" }
+                "dbb9058a-0e50-45d7-ae91-66909b5d4664": { "Name": "Domain.Read.All", "RiskLevel": "Low" },
+                "a7a681dc-756e-4909-b988-f160edc6655f": { "Name": "Calls.AccessMedia.All", "RiskLevel": "High" },
+                "284383ee-7f6e-4e40-a2a8-e85dcb029101": { "Name": "Calls.Initiate.All", "RiskLevel": "Medium" },
+                "4c277553-8a09-487b-8023-29ee378d8324": { "Name": "Calls.InitiateGroupCall.All", "RiskLevel": "Medium" },
+                "f6b49018-60ab-4f81-83bd-22caeabfed2d": { "Name": "Calls.JoinGroupCall.All", "RiskLevel": "High" },
+                "23fc2474-f741-46ce-8465-674744c5c361": { "Name": "Team.Create", "RiskLevel": "Medium" },
+                "2280dda6-0bfd-44ee-a2f4-cb867cfc4c1e": { "Name": "Team.ReadBasic.All", "RiskLevel": "Low" },
+                "660b7406-55f1-41ca-a0ed-0b035e182f3e": { "Name": "TeamMember.Read.All", "RiskLevel": "Low" },
+                "242607bd-1d2c-432c-82eb-bdb27baa23ab": { "Name": "TeamSettings.Read.All", "RiskLevel": "Low" },
+                "bdd80a03-d9bc-451d-b7c4-ce7c63fe3c8f": { "Name": "TeamSettings.ReadWrite.All", "RiskLevel": "High" },
+                "a3410be2-8e48-4f32-8454-c29a7465209d": { "Name": "ChatMember.Read.All", "RiskLevel": "Medium" },
+                "49981c42-fd7b-4530-be03-e77b21aed25e": { "Name": "TeamsTab.Create", "RiskLevel": "Medium" },
+                "46890524-499a-4bb2-ad64-1476b4f3e1cf": { "Name": "TeamsTab.Read.All", "RiskLevel": "Low" },
+                "a96d855f-016b-47d7-b51c-1218a98d791c": { "Name": "TeamsTab.ReadWrite.All", "RiskLevel": "High" },
+                "9e19bae1-2623-4c4f-ab6e-2664615ff9a0": { "Name": "TeamsAppInstallation.ReadWriteForChat.All", "RiskLevel": "High" },
+                "5dad17ba-f6cc-4954-a5a2-a0dcc95154f0": { "Name": "TeamsAppInstallation.ReadWriteForTeam.All", "RiskLevel": "High" },
+                "74ef0291-ca83-4d02-8c7e-d2391e6a444f": { "Name": "TeamsAppInstallation.ReadWriteForUser.All", "RiskLevel": "High" },
+                "dfb0dd15-61de-45b2-be36-d6a69fba3c79": { "Name": "Teamwork.Migrate.All", "RiskLevel": "Critical" },
+                "79c02f5b-bd4f-4713-bc2c-a8a4a66e127b": { "Name": "TeamworkDevice.ReadWrite.All", "RiskLevel": "High" },
+                "a267235f-af13-44dc-8385-c1dc93023186": { "Name": "TeamsActivity.Send", "RiskLevel": "Medium" },
+                "70dec828-f620-4914-aa83-a29117306807": { "Name": "TeamsActivity.Read.All", "RiskLevel": "Medium" },
+                "a70e0c2d-e793-494c-94c4-118fa0a67f42": { "Name": "Presence.Read.All", "RiskLevel": "Medium" },
+                "ed4fca05-be46-441f-9803-1873825f8fdb": { "Name": "SecurityAlert.ReadWrite.All", "RiskLevel": "High" },
+                "dd98c7f5-2d42-42d3-a0e4-633161547251": { "Name": "ThreatHunting.Read.All", "RiskLevel": "High" },
+                "197ee4e9-b993-4066-898f-d6aecc55125b": { "Name": "ThreatIndicators.Read.All", "RiskLevel": "Medium" },
+                "21792b6c-c986-4ffc-85de-df9da54b52fa": { "Name": "ThreatIndicators.ReadWrite.OwnedBy", "RiskLevel": "High" },
+                "e0b77adb-e790-44a3-b0a0-257d06303687": { "Name": "ThreatIntelligence.Read.All", "RiskLevel": "High" },
+                "d72bdbf4-a59b-405c-8b04-5995895819ac": { "Name": "ThreatSubmission.ReadWrite.All", "RiskLevel": "High" },
+                "86632667-cd15-4845-ad89-48a88e8412e1": { "Name": "ThreatSubmission.Read.All", "RiskLevel": "Medium" },
+                "926a6798-b100-4a20-a22f-a4918f13951d": { "Name": "ThreatSubmissionPolicy.ReadWrite.All", "RiskLevel": "High" },
+                "e0fd9c8d-a12e-4cc9-9827-20c8c3cd6fb8": { "Name": "CustomDetection.ReadWrite.All", "RiskLevel": "High" },
+                "673a007a-9e0f-4c97-b066-3c0164486909": { "Name": "CustomDetection.Read.All", "RiskLevel": "Medium" },
+                "d4dcee6d-0774-412a-b06c-aeabbd99e816": { "Name": "SecurityIdentitiesSensors.ReadWrite.All", "RiskLevel": "High" }
             },
             "Delegated": {
                 "e4aa47b9-9a69-4109-82ed-36ec70d85ff1": { "Name": "AccessReview.ReadWrite.All", "RiskLevel": "High" },
@@ -218,7 +254,18 @@
                 "6aedf524-7e1c-45a7-bd76-ded8cab8d0fc": { "Name": "SecurityEvents.ReadWrite.All", "RiskLevel": "High" },
                 "572fea84-0151-49b2-9301-11cb16974376": { "Name": "Policy.Read.All", "RiskLevel": "Medium" },
                 "e4c9e354-4dc5-45b8-9e7c-e1393b0b1a20": { "Name": "AuditLog.Read.All", "RiskLevel": "Medium" },
-                "0e263e50-5827-48a4-b97c-d940288653c7": { "Name": "Directory.AccessAsUser.All", "RiskLevel": "Critical" }
+                "0e263e50-5827-48a4-b97c-d940288653c7": { "Name": "Directory.AccessAsUser.All", "RiskLevel": "Critical" },
+                "39d65650-9d3e-4223-80db-a335590d027e": { "Name": "TeamSettings.ReadWrite.All", "RiskLevel": "High" },
+                "b98bfd41-87c6-45cc-b104-e2de4f0dafb9": { "Name": "TeamsTab.ReadWrite.All", "RiskLevel": "High" },
+                "2e25a044-2580-450d-8859-42eeb6e996c0": { "Name": "TeamsAppInstallation.ReadWriteForTeam", "RiskLevel": "Medium" },
+                "2497278c-d82d-46a2-b1ce-39d4cdde5570": { "Name": "TeamMember.Read.All", "RiskLevel": "Low" },
+                "7ab1d787-bae7-4d5d-8db6-37ea32df9186": { "Name": "TeamsActivity.Send", "RiskLevel": "Low" },
+                "471f2a7f-2a42-4d45-a2bf-594d0838070d": { "Name": "SecurityAlert.ReadWrite.All", "RiskLevel": "High" },
+                "b152eca8-ea73-4a48-8c98-1a6742673d99": { "Name": "ThreatHunting.Read.All", "RiskLevel": "High" },
+                "91e7d36d-022a-490f-a748-f8e011357b42": { "Name": "ThreatIndicators.ReadWrite.OwnedBy", "RiskLevel": "High" },
+                "f266d9c0-ccb9-4fb8-a228-01ac0d8d6627": { "Name": "ThreatIntelligence.Read.All", "RiskLevel": "High" },
+                "8458e264-4eb9-4922-abe9-768d58f13c7f": { "Name": "ThreatSubmission.ReadWrite.All", "RiskLevel": "High" },
+                "c34088fb-0649-4714-af0b-bcbfec155897": { "Name": "CustomDetection.ReadWrite.All", "RiskLevel": "High" }
             },
             "_excludedDelegated": {
                 "3a1e4806-a744-4c70-80fc-223bf8582c46": { "Name": "Family.Read", "RiskLevel": "Low", "Reason": "Consumer-only feature (Microsoft Family Safety), not relevant to enterprise security" },
@@ -312,6 +359,65 @@
                 "5b625b3d-65b6-4fb0-85d9-8a5aa26bdf36": { "Name": "SharePointCrossTenantMigration.Manage.All", "RiskLevel": "High" },
                 "9aaa3660-6678-4cb8-b4b5-be92b6f4fbf0": { "Name": "SitesMetadataAdmin.ReadWrite.All", "RiskLevel": "Medium" },
                 "1a50df37-8278-4139-9af3-3b60d57dd007": { "Name": "Migration.ReadWrite.All", "RiskLevel": "Medium" }
+            }
+        },
+        "Power BI Service": {
+            "Application": {
+                "654b31ae-d941-4e22-8798-7add8fdf049f": { "Name": "Tenant.Read.All", "RiskLevel": "High" },
+                "28379fa9-8596-4fd9-869e-cb60a93b5d84": { "Name": "Tenant.ReadWrite.All", "RiskLevel": "Critical" }
+            },
+            "Delegated": {
+                "d594897b-76e7-4b2b-984b-b4adff35e109": { "Name": "Tenant.ReadWrite.All", "RiskLevel": "Critical" },
+                "01944dba-21df-426f-bb8c-796488be96ad": { "Name": "Tenant.Read.All", "RiskLevel": "High" },
+                "7a27a256-301d-4359-b77b-c2b759d2e362": { "Name": "Item.ReadWrite.All", "RiskLevel": "High" },
+                "ddb3ca45-a192-477d-acb2-46bf9dc586de": { "Name": "Gateway.ReadWrite.All", "RiskLevel": "High" },
+                "27789c5b-aca8-4cb6-94b8-bcc8964dd8ad": { "Name": "StorageAccount.ReadWrite.All", "RiskLevel": "High" },
+                "3be8fe94-2189-4d8b-89c6-dd35c5cea6ef": { "Name": "Connection.ReadWrite.All", "RiskLevel": "High" },
+                "b43e1ada-25ee-416f-bd5c-512976ddc74b": { "Name": "UserState.ReadWrite.All", "RiskLevel": "High" },
+                "322b68b2-0804-416e-86a5-d772c567b6e6": { "Name": "Dataset.ReadWrite.All", "RiskLevel": "High" },
+                "7504609f-c495-4c64-8542-686125a5a36f": { "Name": "Report.ReadWrite.All", "RiskLevel": "High" },
+                "b271f05e-8329-4b97-baa4-91cf15b99cf1": { "Name": "Dashboard.ReadWrite.All", "RiskLevel": "High" },
+                "ddd37690-e119-40c5-a821-3746ea6125c4": { "Name": "Dataflow.ReadWrite.All", "RiskLevel": "High" },
+                "199f155b-cccd-4be4-bbe6-ca9a867b24b4": { "Name": "Pipeline.ReadWrite.All", "RiskLevel": "High" },
+                "652d7d02-6ff0-4cf7-9516-cf77d33a3ae4": { "Name": "Pipeline.Deploy", "RiskLevel": "High" },
+                "445002fb-a6f2-4dc1-a81e-4254a111cd29": { "Name": "Workspace.ReadWrite.All", "RiskLevel": "High" },
+                "d2bc95fc-440e-4b0e-bafd-97182de7aef5": { "Name": "Item.Read.All", "RiskLevel": "Medium" },
+                "d2e42f6b-2baf-4ff4-83ef-51e66321516e": { "Name": "Gateway.Read.All", "RiskLevel": "Medium" },
+                "e677843f-76d8-44d3-bcdb-ec40dea919e7": { "Name": "StorageAccount.Read.All", "RiskLevel": "Medium" },
+                "9ff18859-b8d5-4a89-9912-448b84dfb097": { "Name": "Connection.Read.All", "RiskLevel": "Medium" },
+                "7f33e027-4039-419b-938e-2f8ca153e68e": { "Name": "Dataset.Read.All", "RiskLevel": "Medium" },
+                "4ae1bf56-f562-4747-b7bc-2fa0874ed46f": { "Name": "Report.Read.All", "RiskLevel": "Medium" },
+                "2448370f-f988-42cd-909c-6528efd67c1a": { "Name": "Dashboard.Read.All", "RiskLevel": "Medium" },
+                "f9759906-80a4-4f4a-b010-24b832bc6a30": { "Name": "Dataflow.Read.All", "RiskLevel": "Medium" },
+                "dbe6434c-63f0-42bb-be8e-122ec1bad4d2": { "Name": "Pipeline.Read.All", "RiskLevel": "Medium" },
+                "b2f1b2fa-f35c-407c-979c-a858a808ba85": { "Name": "Workspace.Read.All", "RiskLevel": "Medium" },
+                "4eabc3d1-b762-40ff-9da5-0e18fdf11230": { "Name": "Capacity.ReadWrite.All", "RiskLevel": "High" },
+                "f3076109-ca66-412a-be10-d4ee1be95d47": { "Name": "Content.Create", "RiskLevel": "High" },
+                "76e2ebd5-0dfb-4a5b-93c7-ed89e0362834": { "Name": "Capacity.Read.All", "RiskLevel": "Low" },
+                "8b01a991-5a5a-47f8-91a2-84d6bfd72c02": { "Name": "App.Read.All", "RiskLevel": "Low" }
+            }
+        },
+        "Dataverse": {
+            "Application": {},
+            "Delegated": {
+                "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4": { "Name": "user_impersonation", "RiskLevel": "Critical" }
+            }
+        },
+        "PowerApps Service": {
+            "Application": {},
+            "Delegated": {
+                "0eb56b90-a7b5-43b5-9402-8137a8083e90": { "Name": "User", "RiskLevel": "Medium" }
+            }
+        },
+        "Microsoft Flow Service": {
+            "Application": {},
+            "Delegated": {
+                "30b2d850-00c3-4802-b7ae-ece9af9de5c6": { "Name": "Flows.Manage.All", "RiskLevel": "High" },
+                "27c61d54-eb42-4315-8793-6e5715a19746": { "Name": "Flows.Write.Plans", "RiskLevel": "Medium" },
+                "0b575251-2c95-46df-bc75-c8c43e6b7116": { "Name": "Flows.Read.Plans", "RiskLevel": "Medium" },
+                "e45c5562-459d-4d1b-8148-83eb1b6dcf83": { "Name": "Flows.Read.All", "RiskLevel": "Medium" },
+                "d05743e4-fb24-4dff-8a33-0f6c73c964bd": { "Name": "Approvals.Manage.All", "RiskLevel": "Medium" },
+                "e9cbd5de-0031-493e-8fb1-60712d03cc8b": { "Name": "Approvals.Read.All", "RiskLevel": "Low" }
             }
         }
     }
