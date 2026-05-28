@@ -350,10 +350,9 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMessage),
     "RequirementMet": Status
 } if {
-    ConnFilterPolicies := ConnFiltersWithIPAllowList
     ErrString := "connection filter polic(ies) with an IP allowlist:"
-    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
-    Status := count(ConnFilterPolicies) == 0
+    ErrMessage := Description([ArraySizeStr(ConnFiltersWithIPAllowList), ErrString , concat(", ", ConnFiltersWithIPAllowList)])
+    Status := count(ConnFiltersWithIPAllowList) == 0
 }
 #--
 
@@ -377,9 +376,8 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMessage),
     "RequirementMet": Status
 } if {
-    ConnFilterPolicies := ConnFiltersWithSafeList
     ErrString := "connection filter polic(ies) with a safe list:"
-    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
-    Status := count(ConnFilterPolicies) == 0
+    ErrMessage := Description([ArraySizeStr(ConnFiltersWithSafeList), ErrString , concat(", ", ConnFiltersWithSafeList)])
+    Status := count(ConnFiltersWithSafeList) == 0
 }
 #--
