@@ -5,7 +5,8 @@ ConnFilter:= {
     "IPAllowList": [],
     "EnableSafeList": false,
     "Name": "A"
-    
+}
+
 AdminAuditLogConfig := {
     "Identity": "Admin Audit Log Settings",
     "UnifiedAuditLogIngestionEnabled": true
