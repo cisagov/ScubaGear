@@ -1,0 +1,139 @@
+package powerbi_test
+import rego.v1
+import data.powerbi
+import data.utils.key.TestResult
+import data.utils.key.FAIL
+import data.utils.key.PASS
+
+#
+# Policy MS.POWERBI.5.1v1
+#--
+
+### Testing the "PowerBI License found and setting was found in JSON" scenarios
+###
+test_BlockResourceKeyAuthentication_Compliant_Enabled if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")]), "value": true}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    TestResult("MS.POWERBI.5.1v1", Output, PASS, true) == true
+}
+
+test_BlockResourceKeyAuthentication_NonCompliant_Disabled if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": sprintf("/powerbi_tenant_settings/%v/enabled", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")]), "value": false}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    TestResult("MS.POWERBI.5.1v1", Output, FAIL, false) == true
+}
+###
+
+
+### Testing the "No PowerBI license found" scenarios
+###
+test_BlockResourceKeyAuthentication_NoLicense if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": false}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    TestResult("MS.POWERBI.5.1v1", Output, PowerbiLicenseErrorMessage, false) == true
+}
+
+test_BlockResourceKeyAuthentication_LicenseVariableMissing if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "remove", "path": "/powerbi_license_found"}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    TestResult("MS.POWERBI.5.1v1", Output, PowerbiLicenseErrorMessage, false) == true
+}
+
+test_BlockResourceKeyAuthentication_NoLicense_TakesPrecedence_OverMissingTenantSettings if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": false},
+        {"op": "remove", "path": "/powerbi_tenant_settings"}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    TestResult("MS.POWERBI.5.1v1", Output, PowerbiLicenseErrorMessage, false) == true
+}
+###
+
+
+### Testing the "Missing the specific setting that this policy expects" scenarios
+###
+test_BlockResourceKeyAuthentication_PowerBITenantSettings_Missing if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "remove", "path": "/powerbi_tenant_settings"}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    MissingError := "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON"
+    TestResult("MS.POWERBI.5.1v1", Output, MissingError, false) == true
+}
+
+test_BlockResourceKeyAuthentication_Missing if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")])}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    MissingError := "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON"
+    TestResult("MS.POWERBI.5.1v1", Output, MissingError, false) == true
+}
+
+test_BlockResourceKeyAuthentication_PowerBITenantSettings_EmptyArray if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": []}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    MissingError := "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON"
+    TestResult("MS.POWERBI.5.1v1", Output, MissingError, false) == true
+}
+
+test_BlockResourceKeyAuthentication_PowerBITenantSettings_NullArrayElement if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": [null]}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    MissingError := "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON"
+    TestResult("MS.POWERBI.5.1v1", Output, MissingError, false) == true
+}
+
+test_BlockResourceKeyAuthentication_PowerBITenantSettings_NonObjectArrayElement if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": ["bad-data"]}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    MissingError := "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON"
+    TestResult("MS.POWERBI.5.1v1", Output, MissingError, false) == true
+}
+
+test_BlockResourceKeyAuthentication_MissingSettingName if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "remove", "path": sprintf("/powerbi_tenant_settings/%v/settingName", 
+            [GetPowerBISettingIndex("BlockResourceKeyAuthentication")])}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    MissingError := "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON"
+    TestResult("MS.POWERBI.5.1v1", Output, MissingError, false) == true
+}
+###

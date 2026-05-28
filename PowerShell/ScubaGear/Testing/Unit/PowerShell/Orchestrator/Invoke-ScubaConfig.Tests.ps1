@@ -91,6 +91,7 @@ InModuleScope Orchestrator {
         Mock -ModuleName Orchestrator Import-Resources {}
         Mock -ModuleName Orchestrator Invoke-Connection {
             if ($ScubaConfig) { $script:TestSplat['LogIn'] = $ScubaConfig.LogIn }
+            return @{ PBILicenseFound = $true }
         }
         Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
         Mock -ModuleName Orchestrator Invoke-ProviderList {
@@ -202,7 +203,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, with wildcard CLI override"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
 
@@ -213,7 +214,7 @@ InModuleScope Orchestrator {
 
                 function global:ConvertFrom-Yaml {
                     @{
-                        ProductNames=@('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams')
+                        ProductNames=@('aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi')
                         M365Environment='commercial'
                         Login=$true
                         OutPath=$PSScriptRoot
@@ -231,7 +232,7 @@ InModuleScope Orchestrator {
             }
 
             It "Verify parameter, ProductNames, reflects all products"{
-                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerplatform', 'securitysuite', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+                $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerbi', 'powerplatform', 'securitysuite', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
             }
         }
     }

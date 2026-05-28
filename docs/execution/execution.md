@@ -26,13 +26,11 @@ Initialize-SCuBA
 
 Interactive mode simply means that the user will be prompted for their credentials that are required to authenticate to the tenant. A prompt may popup for the user to select their profile **for each product being tested** but the user should only have to enter their credentials once.
 
-### SharePoint Authentication
-
-When assessing SharePoint, a browser window will automatically open to the Microsoft sign-in page. Sign in with an account that has **Global Reader or SharePoint Administrator** permissions. After successful sign-in, the token is acquired automatically and the assessment continues without any additional steps required.
+>**Note**: Power Platform and Power BI have special licensing and first time setup requirements described in the [user permissions](../prerequisites/interactive.md#user-permissions) section.
 
 ### All Products
 
-To assess all products, use the `-ProductNames` flag with a wildcard:
+To assess all products, use the `-ProductNames` flag with a * value:
 
 ```powershell
 # Assess all products
@@ -59,6 +57,15 @@ To assess multiple products, add them to the `-ProductNames` flag, separated by 
 Invoke-SCuBA -ProductNames sharepoint, teams
 ```
 
+### All Products Except for Power Platform and Power BI
+
+To assess all products except for Power Platform and Power BI, do not pass ProductNames at all:
+
+```powershell
+# Assess all products except for Power Platform and Power BI
+Invoke-SCuBA
+```
+
 ### Custom Output Location
 
 By default, ScubaGear creates a new directory in the current directory and then adds report files to that new directory. To change the location of the output:
@@ -77,10 +84,12 @@ Non-interactive mode means that the credentials that are required by the underly
 
 ```powershell
 # Assess with service principal
+# Must pass M365Environment. Acceptable values are: commercial, gcc, gcchigh
 Invoke-SCuBA -ProductNames * `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com 
+  -Organization contoso.onmicrosoft.com `
+  -M365Environment gcc
 ```
 
 ## Parameters

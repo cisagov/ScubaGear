@@ -66,7 +66,7 @@ publish data to the web.
 #### MS.POWERBI.1.1v1
 The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi11v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.1.1v1; Criticality: SHOULD -->
 - _Rationale:_ A publicly accessible web URL can be accessed by everyone, including malicious actors. This policy limits information available on the public web that is not specifically allowed to be published.
@@ -107,7 +107,7 @@ This section provides policies helping reduce guest user access risks related to
 #### MS.POWERBI.2.1v1
 Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi21v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.2.1v1; Criticality: SHOULD -->
 - _Rationale:_ Disabling external access to Power BI helps keep guest users from accessing potentially risky data and application programming interfaces (APIs). If an agency needs to allow guest access, this can be limited to users in specific security groups to curb risk.
@@ -173,7 +173,7 @@ pickers throughout the Power BI user experience.
 #### MS.POWERBI.3.1v1
 The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi31v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.3.1v1; Criticality: SHOULD -->
 - _Rationale:_ Disabling this feature keeps internal users from inviting guest users. Therefore guest users can be limited from accessing potentially risky data/APIs. If an agency needs to allow guest access, the agency can limit the invitation feature to users in specific security groups to help limit risk.
@@ -246,7 +246,7 @@ Several high-level use cases for service principals:
 #### MS.POWERBI.4.1v1
 Service principals with access to APIs SHOULD be restricted to specific security groups.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi41v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.4.1v1; Criticality: SHOULD -->
 - _Rationale:_ With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.
@@ -259,7 +259,7 @@ Service principals with access to APIs SHOULD be restricted to specific security
 #### MS.POWERBI.4.2v1
 Service principals creating and using profiles SHOULD be restricted to specific security groups.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi42v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.4.2v1; Criticality: SHOULD -->
 - _Rationale:_ With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.
@@ -301,14 +301,22 @@ Service principals creating and using profiles SHOULD be restricted to specific 
 
 ### Implementation
 #### MS.POWERBI.4.1v1 Instructions
+If your organization has service principals that need to access Power BI APIs, then you configure the setting per the instructions below.
+If you don't have service principals that need access then for step 4, configure the setting to Disabled.
+
 1. Navigate to the **PowerBI Admin Portal**
 
 2. Click on **Tenant settings**
 
 3. Scroll to **Developer settings**
 
-4. Click on **Service Principals can call Fabric public APIs** set to **Enabled**.
-Choose a specific security group allowed to use service principles for the APIs.
+4. Click on **Service Principals can call Fabric public APIs**
+
+5. If don't have service principals that need access to Power BI APIs, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.
+
+6. If you have service principals that need to access Power BI APIs, then configure the setting to **Enabled**.
+
+7. Select the specific security groups that contain the service principals authorized to call the APIs.
 
 
 #### MS.POWERBI.4.2v1 Instructions
@@ -318,8 +326,13 @@ Choose a specific security group allowed to use service principles for the APIs.
 
 3. Scroll to **Developer settings**
 
-4. Then, click on **Allow service principals to create and use profiles** and set to **Enabled**.
-Choose a specific security group allowed to use service principles to create and use profiles
+4. Then, click on **Allow service principals to create and use profiles**
+
+5. If don't have service principals that need to create and use profiles, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.
+
+6. If you have service principals that need to create and use profiles, then configure the setting to **Enabled**.
+
+7. Select the specific security groups that contain the service principals authorized to to create and use profiles.
 
 
 ## 5. Power BI ResourceKey Authentication
@@ -340,7 +353,7 @@ This setting applies to streaming and PUSH datasets. If ResourceKey-based authen
 #### MS.POWERBI.5.1v1
 ResourceKey-based authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi51v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.5.1v1; Criticality: SHOULD -->
 - _Rationale:_ If resource keys are allowed, someone can move data without Microsoft Entra ID OAuth bearer token, causing possibly malicious or junk data to be stored. Disabling resource keys reduces risk that an unauthorized individual will make changes.
@@ -391,7 +404,7 @@ and the scripts are deemed free of security risks.
 #### MS.POWERBI.6.1v1
 Python and R interactions SHOULD be disabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi61v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.6.1v1; Criticality: SHOULD -->
 - _Rationale:_ External code poses a security and privacy risk as there is no good way to regulate use of  data or integrations. Disabling this feature reduces the risk of a data leak or malicious threat activity.
@@ -444,7 +457,7 @@ DLP.
 #### MS.POWERBI.7.1v1
 Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerbi71v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERBI.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ A document without sensitivity labels may be opened unknowingly, potentially exposing data to someone who is not supposed to have access to it. This policy will help organize and classify data, making it easier to keep data out of the wrong hands.
