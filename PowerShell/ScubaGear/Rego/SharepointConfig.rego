@@ -43,16 +43,14 @@ else := concat("", [
 ]) if Negation == true
 
 # All of the SharePoint settings
-SharepointSettings[settingname] := setting if {
-    tenants := object.get(input, "SPO_tenant", [])
-    count(tenants) > 0
-
-    tenant := tenants[0]
-    some settingname, setting in tenant
-}
+default SPOTenant := {}
+SPOTenant := object.get(input, "SPO_tenant", [{}])[0] if {
+    count(object.get(input, "SPO_tenant", [])) > 0
+} 
 
 # SharingCapability is referenced by many of the policies
-SharingCapabilitySetting := object.get(SharepointSettings, "SharingCapability", null)
+SharingCapabilitySetting := object.get(SPOTenant, "SharingCapability", null)
+
 ### End Constants and helper rulesets
 
 
@@ -94,7 +92,8 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        # count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         SharingCapabilitySetting == null
     ]
 
@@ -107,7 +106,8 @@ tests contains {
 # MS.SHAREPOINT.1.2v1
 #--
 
-ODBSharingCapabilitySetting := object.get(SharepointSettings, "ODBSharingCapability", null)
+ODBSharingCapabilitySetting := object.get(SPOTenant, "ODBSharingCapability", null)
+
 
 # If ODBSharingCapability is set to Only People In Organization
 # OR Existing Guests, the policy should pass.
@@ -139,7 +139,8 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        # count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         ODBSharingCapabilitySetting == null
     ]
 
@@ -156,7 +157,7 @@ tests contains {
 # SharingDomainRestrictionMode == 1 Checked
 # SharingAllowedDomainList == "domains" Domain list
 
-SharingDomainRestrictionModeSetting := object.get(SharepointSettings, "SharingDomainRestrictionMode", null)
+SharingDomainRestrictionModeSetting := object.get(SPOTenant, "SharingDomainRestrictionMode", null)
 
 # At this time we are unable to test for approved security groups
 # because we have yet to find the setting to check
@@ -211,7 +212,8 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        # count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         SharingCapabilitySetting == null,
         SharingDomainRestrictionModeSetting == null
     ]
@@ -229,7 +231,7 @@ tests contains {
 # MS.SHAREPOINT.2.1v1
 #--
 
-DefaultSharingLinkTypeSetting := object.get(SharepointSettings, "DefaultSharingLinkType", null)
+DefaultSharingLinkTypeSetting := object.get(SPOTenant, "DefaultSharingLinkType", null)
 
 # DefaultSharingLinkType == 1 for Specific People
 # DefaultSharingLinkType == 2 for Only people in your organization
@@ -257,7 +259,7 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         DefaultSharingLinkTypeSetting == null
     ]
 
@@ -270,7 +272,7 @@ tests contains {
 # MS.SHAREPOINT.2.2v1
 #--
 
-DefaultLinkPermissionSetting := object.get(SharepointSettings, "DefaultLinkPermission", null)
+DefaultLinkPermissionSetting := object.get(SPOTenant, "DefaultLinkPermission", null)
 
 # DefaultLinkPermission == 1 view
 # DefaultLinkPermission == 2 edit
@@ -299,7 +301,7 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         DefaultLinkPermissionSetting == null
     ]
 
@@ -316,7 +318,7 @@ tests contains {
 # MS.SHAREPOINT.3.1v1
 #--
 
-RequireAnonymousLinksExpireInDaysSetting := object.get(SharepointSettings, "RequireAnonymousLinksExpireInDays", null)
+RequireAnonymousLinksExpireInDaysSetting := object.get(SPOTenant, "RequireAnonymousLinksExpireInDays", null)
 
 ErrStr := concat(" ", [
     "Requirement not met:",
@@ -372,7 +374,7 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         SharingCapabilitySetting == null,
         RequireAnonymousLinksExpireInDaysSetting == null
     ]
@@ -387,8 +389,8 @@ tests contains {
 # MS.SHAREPOINT.3.2v1
 #--
 
-FileAnonymousLinkTypeSetting := object.get(SharepointSettings, "FileAnonymousLinkType", null)
-FolderAnonymousLinkTypeSetting := object.get(SharepointSettings, "FolderAnonymousLinkType", null)
+FileAnonymousLinkTypeSetting := object.get(SPOTenant, "FileAnonymousLinkType", null)
+FolderAnonymousLinkTypeSetting := object.get(SPOTenant, "FolderAnonymousLinkType", null)
 
 # Create Report Details string based on File link type & Folder link type
 PERMISSION_STRING := "are not limited to view for Anyone"
@@ -458,7 +460,7 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         SharingCapabilitySetting == null,
         FileAnonymousLinkTypeSetting == null,
         FolderAnonymousLinkTypeSetting == null
@@ -474,8 +476,8 @@ tests contains {
 # MS.SHAREPOINT.3.3v2
 #--
 
-EmailAttestationRequiredSetting := object.get(SharepointSettings, "EmailAttestationRequired", null)
-EmailAttestationReAuthDaysSetting := object.get(SharepointSettings, "EmailAttestationReAuthDays", null)
+EmailAttestationRequiredSetting := object.get(SPOTenant, "EmailAttestationRequired", null)
+EmailAttestationReAuthDaysSetting := object.get(SPOTenant, "EmailAttestationReAuthDays", null)
 
 VERIFICATION_STRING := "Expiration time for 'People who use a verification code' NOT"
 
@@ -556,7 +558,7 @@ tests contains {
     "RequirementMet": false
 } if {
     MissingConditions := [
-        count(SharepointSettings) == 0,
+        count(SPOTenant) == 0,
         SharingCapabilitySetting == null,
         EmailAttestationRequiredSetting == null,
         EmailAttestationReAuthDaysSetting == null
