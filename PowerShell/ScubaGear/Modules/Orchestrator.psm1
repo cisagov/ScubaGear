@@ -1868,7 +1868,7 @@ function Get-ServicePrincipalParams {
         $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
     }
     else {
-        throw "Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments"
+        throw "When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization."
     }
     $ServicePrincipalParams
 }
