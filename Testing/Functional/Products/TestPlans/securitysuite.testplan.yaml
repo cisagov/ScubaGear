@@ -149,7 +149,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.4.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked 
         Preconditions: []
         Postconditions: []
         IsNotChecked: true

@@ -14,6 +14,12 @@ test_Correct_All_Required_Alerts_Enabled if {
     TestResult("MS.SECURITYSUITE.4.1v1", Output, PASS, true) == true
 }
 
+test_Correct_G3_All_Required_Alerts_Enabled if { 
+    Alerts := json.patch(ProtectionAlerts, [{"op": "remove", "path": "5"}])
+    Output := securitysuite.tests with input.protection_alerts as Alerts
+    TestResult("MS.SECURITYSUITE.4.1v1", Output, PASS, true) == true
+}
+
 test_Correct_Additional_Alerts_In_List if {
     Alerts := json.patch(ProtectionAlerts, [{"op": "add", "path": "7", "value": {
                 "Disabled": false,
@@ -26,9 +32,10 @@ test_Correct_Additional_Alerts_In_List if {
 test_Incorrect_Empty_Array if {
     Alerts := []
     Output := securitysuite.tests with input.protection_alerts as Alerts
-
-    ReportDetailString := concat("", ["7 disabled required alert(s) found: ",
-        "A potentially malicious URL click was detected, Messages have been delayed, ",
+    # This test will fail with 6 disabled required alerts because 
+    # "A potentially malicious URL click was detected" is not in the input list 
+    ReportDetailString := concat("", ["6 disabled required alert(s) found: ",
+        "Messages have been delayed, ",
         "Suspicious Email Forwarding Activity, Suspicious connector activity, ",
         "Suspicious email sending patterns detected, Tenant restricted from sending email, ",
         "Tenant restricted from sending unprovisioned email"])

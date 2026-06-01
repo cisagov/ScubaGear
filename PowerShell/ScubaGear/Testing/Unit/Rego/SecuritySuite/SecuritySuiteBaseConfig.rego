@@ -1,7 +1,6 @@
 package securitysuite_test
 import rego.v1
 
-<<<<<<< HEAD
 ConnFilter:= {
     "IPAllowList": [],
     "EnableSafeList": false,
@@ -12,8 +11,6 @@ AdminAuditLogConfig := {
     "Identity": "Admin Audit Log Settings",
     "UnifiedAuditLogIngestionEnabled": true
 }
-=======
-
 
 ScubaConfig := {
     "OutPath": ".",
@@ -21,7 +18,6 @@ ScubaConfig := {
     "SecuritySuite": {
     }
 }
-
 
 ProtectionAlerts := [
     {
@@ -54,4 +50,3 @@ ProtectionAlerts := [
     }
 ]
 
->>>>>>> 461fded2 (Updated rego unit tests)
