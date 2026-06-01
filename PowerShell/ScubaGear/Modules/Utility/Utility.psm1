@@ -415,6 +415,18 @@ function Invoke-GraphBatchRequest {
         The Microsoft Graph API version to use (default: v1.0).
         Valid values are "v1.0" and "beta".
 
+    .PARAMETER MaxRetries
+        Maximum number of times to retry sub-requests that return HTTP 429 (throttled).
+        Default is 5. Safeguard against runaway retries.
+
+        Added per recommendation in Microsoft Graph throttling documentation to implement retry logic when receiving 429s:
+        If the request fails again with a 429 error code, you're still being throttled. Continue to use the recommended Retry-After delay and retry the request until it succeeds.
+
+    .PARAMETER BatchSize
+        Number of requests packed into each Graph $batch envelope (1-20). Default is 20 as that the maximum allowed by the Graph API.
+        Lower values reduce burst pressure on rate-limited endpoints (e.g. the PIM policy store
+        when using $filter) at the cost of more HTTP round-trips.
+
     .EXAMPLE
         $requests = @(
             @{ id = "1"; method = "GET"; url = "/servicePrincipals/12345" }
@@ -458,6 +470,28 @@ function Invoke-GraphBatchRequest {
     .NOTES
         This function is part of the ScubaGear PowerShell module and is intended for internal use to facilitate
         efficient Graph API interactions by minimizing the number of HTTP requests.
+
+        Individual sub-requests in a Graph $batch can return HTTP 429 even when the batch envelope
+        returns 200, and Graph doesn't automatically retry throttled batched requests.
+        This function retries only the throttled sub-requests, using each response's Retry-After
+        header value as the base wait time.
+
+        Retry backoff: the first retry honors the server's Retry-After value verbatim. Each
+        subsequent retry doubles the wait (Retry-After * 2^attempt), capped at 300 seconds per
+        sleep. This deviates from "honor Retry-After exactly" as there are times when it will
+        still fail and adding an additional offset can help mitigate repeated failures.
+
+        References:
+          https://learn.microsoft.com/en-us/graph/throttling
+          https://learn.microsoft.com/en-us/graph/throttling#throttling-and-batching
+          https://learn.microsoft.com/en-us/graph/json-batching
+          https://learn.microsoft.com/en-us/graph/throttling-limits
+
+        Microsoft documentation also recommends an exponential backoff fallback when Retry-After is
+        absent. ScubaGear does not implement that fallback because all batched URLs target the
+        identity-and-access service currently, which always returns Retry-After per the throttling-limits
+        reference above. If a throttled sub-response lacks Retry-After, this function returns the
+        429 to the caller rather than guess a wait time.
     #>
     [CmdletBinding(DefaultParameterSetName = 'Requests')]
     param(
@@ -479,7 +513,14 @@ function Invoke-GraphBatchRequest {
 
         [Parameter(Mandatory = $false)]
         [ValidateSet("v1.0", "beta", IgnoreCase = $True)]
-        [string]$ApiVersion = "v1.0"
+        [string]$ApiVersion = "v1.0",
+
+        [Parameter(Mandatory = $false)]
+        [int]$MaxRetries = 5,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(1, 20)]
+        [int]$BatchSize = 20
     )
 
     # If InputObject parameter set is used, build $Requests from the collection + scriptblocks
@@ -495,32 +536,146 @@ function Invoke-GraphBatchRequest {
     }
 
     $allResults = @{}
-    $batchSize = 20  # Microsoft Graph batch limit
+    # $currentBatchSize controls how many requests we put in each batch we send.
+    # It starts at the caller's $BatchSize (up to 20, which is the Graph limit).
+    # When we get a 429 statusCode (too many requests), we cut it in half (down to 1 minimum)
+    # so the next batch we send is smaller. Microsoft's throttling guidance says to
+    # "reduce the number of operations per request" when you get throttled, see:
+    # https://learn.microsoft.com/en-us/graph/throttling#best-practices-to-handle-throttling
+    # Once we shrink the batch call, we stay shrunk for the rest of this call.
+    $currentBatchSize = $BatchSize
 
-    # Split requests into batches of 20
-    for ($i = 0; $i -lt $Requests.Count; $i += $batchSize) {
-        $batchRequests = $Requests[$i..[Math]::Min($i + $batchSize - 1, $Requests.Count - 1)]
+    # Split requests into batches
+    for ($i = 0; $i -lt $Requests.Count;) {
+        # Select the next batch of requests, capped at the end of the array.
+        $batchRequests = $Requests[$i..[Math]::Min($i + $currentBatchSize - 1, $Requests.Count - 1)]
+        $requestCountForThisBatch = $batchRequests.Count
+        $pendingRequests = @($batchRequests)
+        $attempt = 0
 
-        # Build batch request body
-        $batchBody = @{
-            requests = @($batchRequests)
-        }
-
-        try {
-            # Execute batch request using Invoke-MgGraphRequest
-            Write-Verbose "Executing batch request with $($batchRequests.Count) requests"
-            $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
-            $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
-
-            # Parse responses
-            foreach ($response in $batchResponse.responses) {
-                $allResults[$response.id] = $response
+        while ($pendingRequests.Count -gt 0) {
+            # Build batch request body
+            $batchBody = @{
+                requests = @($pendingRequests)
             }
+
+            try {
+                # Execute batch request using Invoke-MgGraphRequest
+                Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
+                $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
+                $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
+            }
+            catch {
+                # Entire batch request failed (e.g., network error, auth error, or even a 429 if the batch envelope itself is too large).
+                # Retry only when a parseable Retry-After
+                # header is present (https://learn.microsoft.com/en-us/graph/throttling#sample-response).
+                $statusCode = $null
+                $retryAfter = 0
+                $response   = $_.Exception.Response
+                if ($response) {
+                    $statusCode = [int]$response.StatusCode
+                    # Only retry HTTP 429 responses when Graph provides a parseable Retry-After delay.
+                    if ($statusCode -eq 429 -and $attempt -lt $MaxRetries -and $response.Headers) {
+                        $headerValue = $response.Headers['Retry-After']
+                        if ($headerValue) {
+                            [void][int]::TryParse([string]$headerValue, [ref]$retryAfter)
+                        }
+                    }
+                }
+                if ($statusCode -eq 429 -and $attempt -lt $MaxRetries -and $retryAfter -gt 0) {
+                    # First retry waits exactly the Retry-After value the server told us to wait.
+                    # Later retries double that wait time, but never sleep more than 300 seconds.
+                    # See .NOTES for why we double instead of using Retry-After every time.
+                    $waitSeconds = [int]([Math]::Min([double]$retryAfter * [Math]::Pow(2, $attempt), 300))
+                    # We got throttled, so cut the batch size in half and trim the request list
+                    # down to the new size before we retry. The requests we trimmed off don't get
+                    # lost: this batch only advances by the number of requests we keep, so the next
+                    # pass will pick up the trimmed requests in a new (smaller) batch.
+                    if ($currentBatchSize -gt 1) {
+                        $currentBatchSize = [Math]::Max(1, [int][Math]::Floor($currentBatchSize / 2))
+                        Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP 429." -Level Info -Source "Invoke-GraphBatchRequest"
+                        $pendingRequests = @($pendingRequests | Select-Object -First $currentBatchSize)
+                        $requestCountForThisBatch = $pendingRequests.Count
+                    }
+                    if ($attempt -eq 0) {
+                        Write-ScubaLog -Message "Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                    } else {
+                        Write-ScubaLog -Message "Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
+                    }
+                    Start-Sleep -Seconds $waitSeconds
+                    $attempt++
+                    continue
+                }
+                Write-ScubaLog -Message "Batch request failed" -Level Error -Source "Invoke-GraphBatchRequest" -Data @{
+                    Error = $_.Exception.Message
+                    StackTrace = $_.ScriptStackTrace
+                }
+                throw
+            }
+
+            # Per https://learn.microsoft.com/en-us/graph/throttling#throttling-and-batching,
+            # retry only failed sub-requests in a new batch using the longest Retry-After value
+            # across them. Each sub-response carries its own headers object
+            # (https://learn.microsoft.com/en-us/graph/json-batching).
+            $throttled = @()
+            foreach ($response in $batchResponse.responses) {
+                if ($response.status -eq 429 -and $attempt -lt $MaxRetries) {
+                    $throttled += $response
+                }
+                else {
+                    $allResults[$response.id] = $response
+                }
+            }
+
+            if ($throttled.Count -eq 0) { break }
+
+            # Find the longest Retry-After value returned by any throttled sub-request.
+            $longestRetryAfterSeconds = 0
+            $hasRetryAfter = $false
+            foreach ($r in $throttled) {
+                if ($r.headers -and $r.headers.'Retry-After') {
+                    $value = 0
+                    if ([int]::TryParse([string]$r.headers.'Retry-After', [ref]$value)) {
+                        $hasRetryAfter = $true
+                        if ($value -gt $longestRetryAfterSeconds) { $longestRetryAfterSeconds = $value }
+                    }
+                }
+            }
+
+            if (-not $hasRetryAfter) {
+                # No parseable Retry-After on any throttled sub-response. Identity-and-access
+                # endpoints always return Retry-After per
+                # https://learn.microsoft.com/en-us/graph/throttling-limits, so if it is missing
+                # the wait time is unknown. Surface the 429s to the caller instead of guessing.
+                foreach ($r in $throttled) { $allResults[$r.id] = $r }
+                break
+            }
+
+            # First retry honors Retry-After verbatim; subsequent retries double the wait,
+            # capped at 300 seconds per sleep. See .NOTES for rationale.
+            $waitSeconds = [int][Math]::Min($longestRetryAfterSeconds * [Math]::Pow(2, $attempt), 300)
+
+            if ($attempt -eq 0) {
+                Write-ScubaLog -Message "Batch request: $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+            } else {
+                Write-ScubaLog -Message "Batch request: $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
+            }
+            # Cut the batch size in half so later batches in this call are smaller.
+            # We don't trim $pendingRequests here because it already only holds the throttled
+            # requests, which is no more than the original batch size, so it still fits in one send.
+            if ($currentBatchSize -gt 1) {
+                $currentBatchSize = [Math]::Max(1, [int][Math]::Floor($currentBatchSize / 2))
+                Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP 429." -Level Info -Source "Invoke-GraphBatchRequest"
+            }
+            Start-Sleep -Seconds $waitSeconds
+
+            # Rebuild pending requests by matching ids of throttled responses to their originals.
+            $throttledIds = @($throttled | ForEach-Object { [string]$_.id })
+            $pendingRequests = @($pendingRequests | Where-Object { $throttledIds -contains [string]$_.id })
+            $attempt++
         }
-        catch {
-            Write-Warning "Batch request failed: $($_.Exception.Message)"
-            throw
-        }
+
+        $i += $requestCountForThisBatch
     }
 
     return $allResults
