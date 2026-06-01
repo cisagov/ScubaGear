@@ -1373,6 +1373,8 @@ function Merge-JsonOutput {
                 "ToolVersion" = $ModuleVersion;
                 "TimestampZulu" = $TimestampZulu;
                 "ReportUUID" = $Guid;
+                "OrgName" = $SettingsExportObject.scuba_config.OrgName;
+                "OrgUnitName" = $SettingsExportObject.scuba_config.OrgUnitName;
             }
 
 
