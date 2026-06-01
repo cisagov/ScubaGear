@@ -116,30 +116,32 @@ test_MissingClientAppTypes_Incorrect_V1 if {
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
 
-test_EnvironmentNotSupportedGCCHigh_Correct_V1 if {
+test_EnvironmentNotSupportedGCCHigh_Incorrect_V1 if {
     ScubaConf := json.patch(ScubaConfig,
                 [{"op": "add", "path": "M365Environment", "value": "gcchigh"},])
-    Output := aad.tests with input.scuba_config as ScubaConf
+    Output := aad.tests with input.service_plans as ServicePlans
+                        with input.scuba_config as ScubaConf
 
     ReportDetailString := concat("", [
         "This policy is not applicable to GCC High or DOD environments. See <a href=",
         "\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear/baselines/aad.md#msaad91v1\"",
         " target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
     ])
-    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
+    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
 
-test_EnvironmentNotSupportedDoD_Correct_V1 if {
+test_EnvironmentNotSupportedDoD_Incorrect_V1 if {
     ScubaConf := json.patch(ScubaConfig,
                 [{"op": "add", "path": "M365Environment", "value": "dod"},])
-    Output := aad.tests with input.scuba_config as ScubaConf
-
+    Output := aad.tests with input.service_plans as ServicePlans
+                        with input.scuba_config as ScubaConf
+    
     ReportDetailString := concat("", [
         "This policy is not applicable to GCC High or DOD environments. See <a href=",
         "\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear/baselines/aad.md#msaad91v1\"",
         " target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
     ])
-    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
+    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
 
 test_NoP2License_Incorrect_V1 if {
@@ -154,7 +156,7 @@ test_NoP2License_Incorrect_V1 if {
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
 
-test_PrioritizeEnvironmentOverLicense_Correct_V1 if {
+test_PrioritizeLicenseOverEnvironment_Incorrect_V1 if {
     ScubaConf := json.patch(ScubaConfig,
                 [{"op": "add", "path": "M365Environment", "value": "gcchigh"},])
     ServPlans := json.patch(ServicePlans,
@@ -163,15 +165,14 @@ test_PrioritizeEnvironmentOverLicense_Correct_V1 if {
                         with input.scuba_config as ScubaConf
 
     ReportDetailString := concat("", [
-        "This policy is not applicable to GCC High or DOD environments. See <a href=",
-        "\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear/baselines/aad.md#msaad91v1\"",
-        " target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+        "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license,",
+        " which is required for this feature**"
     ])
-    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
+    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
 
-#Future proofing test to ensure that if the policy is applied properly, it will pass based on that 
-#and not pass due to the environment. GCCHigh and DoD tenants may acquire this feature in the future
+# Future proofing test to ensure that if the policy is applied properly, it will pass based on that 
+# and not pass due to the environment. GCCHigh and DoD tenants may acquire this feature in the future
 test_PrioritizePolicyOverEnvironment_Correct_V1 if {
     ScubaConf := json.patch(ScubaConfig,
                 [{"op": "add", "path": "M365Environment", "value": "gcchigh"},])
