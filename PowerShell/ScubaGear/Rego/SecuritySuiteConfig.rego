@@ -1,6 +1,9 @@
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
+import data.utils.report.ArraySizeStr
+import data.utils.report.Description
+import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
 
 
@@ -331,25 +334,50 @@ tests contains {
 #
 # MS.SECURITYSUITE.8.1v1
 #--
+
+# Loop thorugh connection filter. If filter has an IP allow
+# list, save the filter name to ConnFiltersWithIPAllowList array.
+ConnFiltersWithIPAllowList contains ConnFilter.Name if {
+    some ConnFilter in input.conn_filter
+    count(ConnFilter.IPAllowList) > 0
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.8.1v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.8.1v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-HostedConnectionFilterPolicy"],
+    "ActualValue": input.conn_filter,
+    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "RequirementMet": Status
+} if {
+    ErrString := "connection filter polic(ies) with an IP allowlist:"
+    ErrMessage := Description([ArraySizeStr(ConnFiltersWithIPAllowList), ErrString , concat(", ", ConnFiltersWithIPAllowList)])
+    Status := count(ConnFiltersWithIPAllowList) == 0
 }
 #--
 
 #
 # MS.SECURITYSUITE.8.2v1
 #--
+
+# Loop thorugh connection filter. If filter has safe
+# list enabled, save filter name to ConnFiltersWithSafeList
+# array.
+ConnFiltersWithSafeList contains ConnFilter.Name if {
+    some ConnFilter in input.conn_filter
+    ConnFilter.EnableSafeList == true
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.8.2v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.8.2v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-HostedConnectionFilterPolicy"],
+    "ActualValue": input.conn_filter,
+    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "RequirementMet": Status
+} if {
+    ErrString := "connection filter polic(ies) with a safe list:"
+    ErrMessage := Description([ArraySizeStr(ConnFiltersWithSafeList), ErrString , concat(", ", ConnFiltersWithSafeList)])
+    Status := count(ConnFiltersWithSafeList) == 0
 }
 #--

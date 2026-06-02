@@ -262,13 +262,12 @@ tests contains {
     ],
     "ActualValue": input.dmarc_records,
     "ReportDetails": concat(". ", [
-        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        ReportDetailsArray(Status, DomainsWithoutDmarc, "agency domain(s) found in violation:"),
         DNSLink
     ]),
     "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutDmarc
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutDmarc) == 0
 }
 #--
 
@@ -294,13 +293,12 @@ tests contains {
     ],
     "ActualValue": input.dmarc_records,
     "ReportDetails": concat(". ", [
-        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        ReportDetailsArray(Status, DomainsWithoutPreject, "agency domain(s) found in violation:"),
         DNSLink
     ]),
     "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutPreject
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutPreject) == 0
 }
 #--
 
@@ -337,12 +335,11 @@ tests contains {
     ],
     "ActualValue": input.dmarc_records,
     "ReportDetails": concat(". ", [
-        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        ReportDetailsArray(Status, DomainsWithoutDHSContact, "agency domain(s) found in violation:"),
         DNSLink
     ]),    "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutDHSContact
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutDHSContact) == 0
 }
 #--
 
@@ -395,12 +392,11 @@ tests contains {
     ],
     "ActualValue": input.dmarc_records,
     "ReportDetails": concat(". ", [
-        ReportDetailsArray(Status, Domains, "agency domain(s) found in violation:"),
+        ReportDetailsArray(Status, DomainsWithoutAgencyContact, "agency domain(s) found in violation:"),
         DNSLink
     ]),    "RequirementMet": Status
 } if {
-    Domains := DomainsWithoutAgencyContact
-    Status := count(Domains) == 0
+    Status := count(DomainsWithoutAgencyContact) == 0
 }
 #--
 
@@ -460,14 +456,13 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMessage),
     "RequirementMet": Status
 } if {
-    ContactsSharingPolicies := SharingPolicyContactsAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing contacts folders with all domains by default:"
     ErrMessage := Description([
-        ArraySizeStr(ContactsSharingPolicies),
+        ArraySizeStr(SharingPolicyContactsAllowedAllDomains),
         ErrString ,
-        concat(", ", ContactsSharingPolicies)
+        concat(", ", SharingPolicyContactsAllowedAllDomains)
     ])
-    Status := count(ContactsSharingPolicies) == 0
+    Status := count(SharingPolicyContactsAllowedAllDomains) == 0
 }
 #--
 
@@ -493,14 +488,13 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMessage),
     "RequirementMet": Status
 } if {
-    CalendarSharingPolicies := SharingPolicyCalendarAllowedAllDomains
     ErrString := "sharing polic(ies) are sharing calendar details with all domains by default:"
     ErrMessage := Description([
-        ArraySizeStr(CalendarSharingPolicies),
+        ArraySizeStr(SharingPolicyCalendarAllowedAllDomains),
         ErrString ,
-        concat(", ", CalendarSharingPolicies)
+        concat(", ", SharingPolicyCalendarAllowedAllDomains)
     ])
-    Status := count(CalendarSharingPolicies) == 0
+    Status := count(SharingPolicyCalendarAllowedAllDomains) == 0
 }
 #--
 
@@ -516,10 +510,9 @@ tests contains {
 # Loop through email rules, if rule is: enabled, set to enforce,
 # & PrependSubject >= 1, then save rule in EnabledRules
 EnabledRules contains Rule if {
-    Rules := input.transport_rule
-    some Rule in Rules;
-    Rule.State == "Enabled";
-    Rule.Mode == "Enforce";
+    some Rule in input.transport_rule
+    Rule.State == "Enabled"
+    Rule.Mode == "Enforce"
     count(Rule.PrependSubject) >= 1
 }
 

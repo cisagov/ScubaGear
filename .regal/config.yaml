@@ -20,6 +20,11 @@ rules:
           targets:
             - package
   idiomatic:
+    # https://docs.styra.com/regal/rules/idiomatic/directory-package-mismatch
+    directory-package-mismatch:
+      # The project uses a flat Rego/ directory regardless of package name.
+      # Restructuring to mirror packages would be a large breaking change.
+      level: ignore
     # https://docs.styra.com/regal/rules/idiomatic/no-defined-entrypoint
     no-defined-entrypoint:
       # This is a good practice for documentation, and

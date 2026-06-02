@@ -28,13 +28,12 @@ tests contains {
     "PolicyId": "MS.TEAMS.1.1v1",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsMeetingPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": MeetingsAllowingExternalControl,
+    "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingExternalControl, String),
     "RequirementMet": Status
 } if {
-    Policies := MeetingsAllowingExternalControl
     String := "meeting policy(ies) found that allows external control:"
-    Status := count(Policies) == 0
+    Status := count(MeetingsAllowingExternalControl) == 0
 }
 #--
 
@@ -54,13 +53,12 @@ tests contains {
     "PolicyId": "MS.TEAMS.1.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTeamsMeetingPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": MeetingsAllowingAnonStart,
+    "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingAnonStart, String),
     "RequirementMet": Status
 } if {
-    Policies := MeetingsAllowingAnonStart
     String := "meeting policy(ies) found that allows anonymous users to start meetings:"
-    Status := count(Policies) == 0
+    Status := count(MeetingsAllowingAnonStart) == 0
 }
 #--
 
@@ -141,12 +139,11 @@ tests contains {
     # This control specifically states that non-global policies MAY be different,
     # so filter for the global policy
     Policy.Identity == "Global"
-    AllowedUsers := [
+    Status := Policy.AutoAdmittedUsers in [
         "EveryoneInCompany",
         "EveryoneInSameAndFederatedCompany",
         "EveryoneInCompanyExcludingGuests"
     ]
-    Status := Policy.AutoAdmittedUsers in AllowedUsers
 }
 
 # Edge case where pulling configuration from tenant fails
@@ -178,13 +175,12 @@ tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsMeetingPolicy"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": MeetingsAllowingPSTNBypass,
+    "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingPSTNBypass, String),
     "RequirementMet": Status
 } if {
-    Policies := MeetingsAllowingPSTNBypass
     String := "meeting policy(ies) found that allow everyone or dial-in users to bypass lobby:"
-    Status := count(Policies) == 0
+    Status := count(MeetingsAllowingPSTNBypass) == 0
 }
 
 # Edge case where pulling configuration from tenant fails
@@ -296,13 +292,12 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.1v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": ExternalAccessConfig,
+    "ReportDetails": ReportDetailsArray(Status, ExternalAccessConfig, String),
     "RequirementMet": Status
 } if {
-    Policies := ExternalAccessConfig
     String := "meeting policy(ies) that allow external access across all domains:"
-    Status := count(Policies) == 0
+    Status := count(ExternalAccessConfig) == 0
 }
 #--
 
@@ -352,14 +347,13 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": FederationConfiguration,
+    "ReportDetails": ReportDetailsArray(Status, FederationConfiguration, String),
     "RequirementMet": Status
 } if {
     not IsUSGovTenantRegion
-    Policies := FederationConfiguration
     String := "Configuration allowed unmanaged users to initiate contact with internal user across domains:"
-    Status := count(Policies) == 0
+    Status := count(FederationConfiguration) == 0
 }
 #--
 
@@ -392,14 +386,13 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": Policies,
-    "ReportDetails": ReportDetailsArray(Status, Policies, String),
+    "ActualValue": InternalCannotEnable,
+    "ReportDetails": ReportDetailsArray(Status, InternalCannotEnable, String),
     "RequirementMet": Status
 } if {
     not IsUSGovTenantRegion
-    Policies := InternalCannotEnable
     String := "Internal users are enabled to initiate contact with unmanaged users across domains:"
-    Status := count(Policies) == 0
+    Status := count(InternalCannotEnable) == 0
 }
 #--
 
@@ -466,11 +459,10 @@ tests contains {
         "AssignedPlans": AssignedPlans
     },
     "ReportDetails": ReportDetails4_1(IsEnabled),
-    "RequirementMet": Status
+    "RequirementMet": IsEnabled
 } if {
     not IsUSGovTenantRegion
     IsEnabled := count(ConfigsAllowingEmail) == 0
-    Status := IsEnabled
 }
 
 # Edge case where pulling configuration from tenant fails
@@ -556,27 +548,23 @@ tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": {"Policies": Policies, "TenantSetting": DefaultAppSettingValue},
+    "ActualValue": {"Policies": PoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    Policies := PoliciesBlockingDefaultApps
-    LegacyCompliant := count(Policies) == 0
+    LegacyCompliant := count(PoliciesBlockingDefaultApps) == 0
 
     # Determine compliance based on what's available
     Status := GetDefaultAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesBlockingDefaultApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "Microsoft Apps by default:"
     ]))
 
-    # Determine tenant details based on setting state
-    TenantDetails := GetDefaultAppTenantDetails
-
     # Use helper function to build details with proper prioritization
-    Details := BuildDefaultAppDetails(DefaultAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
+    Details := BuildDefaultAppDetails(DefaultAppSettingValue, GetDefaultAppTenantDetails, LegacyDetails, LegacyCompliant)
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
@@ -724,27 +712,23 @@ tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": {"Policies": Policies, "TenantSetting": GlobalAppSettingValue},
+    "ActualValue": {"Policies": PoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    Policies := PoliciesAllowingGlobalApps
-    LegacyCompliant := count(Policies) == 0
+    LegacyCompliant := count(PoliciesAllowingGlobalApps) == 0
 
     # Determine compliance based on what's available
     Status := GetGlobalAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesAllowingGlobalApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "third-party apps by default:"
     ]))
 
-    # Determine tenant details based on setting state
-    TenantDetails := GetGlobalAppTenantDetails
-
     # Use helper function to build details with proper prioritization
-    Details := BuildGlobalAppDetails(GlobalAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
+    Details := BuildGlobalAppDetails(GlobalAppSettingValue, GetGlobalAppTenantDetails, LegacyDetails, LegacyCompliant)
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
@@ -892,27 +876,23 @@ tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": {"Policies": Policies, "TenantSetting": PrivateAppSettingValue},
+    "ActualValue": {"Policies": PoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    Policies := PoliciesAllowingCustomApps
-    LegacyCompliant := count(Policies) == 0
+    LegacyCompliant := count(PoliciesAllowingCustomApps) == 0
 
     # Determine compliance based on what's available
     Status := GetPrivateAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, Policies, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesAllowingCustomApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "custom apps by default:"
     ]))
 
-    # Determine tenant details based on setting state
-    TenantDetails := GetPrivateAppTenantDetails
-
     # Use helper function to build details with proper prioritization
-    Details := BuildPrivateAppDetails(PrivateAppSettingValue, TenantDetails, LegacyDetails, LegacyCompliant)
+    Details := BuildPrivateAppDetails(PrivateAppSettingValue, GetPrivateAppTenantDetails, LegacyDetails, LegacyCompliant)
 }
 
 # Helper function to build details message - prioritizes org-wide settings when available
