@@ -657,7 +657,8 @@ RiskyDelegatedPermissionClassifications contains Policy.Id if {
     some Policy in input.authorization_policies
     "ManagePermissionGrantsForSelf.microsoft-user-default-low" in Policy.PermissionGrantPolicyIdsAssignedToDefaultUserRole
     # Checks if any delegated permissions have a classification of low and are found in the RiskyAppPermissions.json file
-    count([x | some x in input.risky_delegated_permission_classifications; x != null]) > 0
+    some x in input.risky_delegated_permission_classifications
+    x != null
 }
 
 # Return the Id if non-compliant user consent policies
