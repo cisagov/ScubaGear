@@ -1625,8 +1625,6 @@ AIAgents contains CAPolicy.DisplayName if {
 
     ### Common checks for conditional access policies
     Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    Count(CAPolicy.Conditions.Applications.ExcludeApplications) == 0
     CAPolicy.State == "enabled"
     ###
 
@@ -1666,7 +1664,10 @@ tests contains {
     "RequirementMet": false
 } if {
     PolicyId := "MS.AAD.9.1v1"
-    Reason := "This policy is not applicable to GCC High or DOD environments. See %v for more info"
+    Reason := concat(" ", [
+    "This policy is not applicable to GCC High or DOD environments because the feature",
+    "is not yet available. See %v for more info"
+    ])
     AAD_9_1_Not_Applicable_Due_To_Environment == true
 }
 

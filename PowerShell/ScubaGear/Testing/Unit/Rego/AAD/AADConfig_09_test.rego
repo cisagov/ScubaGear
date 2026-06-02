@@ -123,9 +123,9 @@ test_EnvironmentNotSupportedGCCHigh_Incorrect_V1 if {
                         with input.scuba_config as ScubaConf
 
     ReportDetailString := concat("", [
-        "This policy is not applicable to GCC High or DOD environments. See <a href=",
-        "\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear/baselines/aad.md#msaad91v1\"",
-        " target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+        "This policy is not applicable to GCC High or DOD environments because the feature is not yet ",
+        "available. See <a href=\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear",
+        "/baselines/aad.md#msaad91v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -137,9 +137,9 @@ test_EnvironmentNotSupportedDoD_Incorrect_V1 if {
                         with input.scuba_config as ScubaConf
     
     ReportDetailString := concat("", [
-        "This policy is not applicable to GCC High or DOD environments. See <a href=",
-        "\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear/baselines/aad.md#msaad91v1\"",
-        " target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+        "This policy is not applicable to GCC High or DOD environments because the feature is not yet ",
+        "available. See <a href=\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear",
+        "/baselines/aad.md#msaad91v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -184,6 +184,28 @@ test_PrioritizePolicyOverEnvironment_Correct_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config as ScubaConf
+
+    ReportDetailString := concat("", [
+        "1 conditional access policy(s) found that meet(s) all requirements:",
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
+}
+
+test_AppExclusions_Correct_V1 if {
+    ScubaConf := json.patch(ScubaConfig,
+                [{"op": "add", "path": "M365Environment", "value": "commercial"},])
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/AgentIdRiskLevels", "value": "high"},
+                {"op": "add", "path": "Conditions/ClientApplications", "value": {} },
+                {"op": "add", "path": "Conditions/ClientApplications/IncludeAgentIdServicePrincipals", "value": ["All"] },
+                {"op": "add", "path": "Conditions/ClientAppTypes", "value": ["all"] },
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["testapp"]},])
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config as ScubaConf
+                        with input.scuba_config.Aad["MS.AAD.9.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.9.1v1"].CapExclusions.Applications as ["testapp"]
 
     ReportDetailString := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
