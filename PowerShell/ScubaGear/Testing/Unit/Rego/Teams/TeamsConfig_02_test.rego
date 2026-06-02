@@ -90,12 +90,12 @@ test_AllowedDomains_Incorrect_multi if {
 #--
 
 #
-# Policy MS.TEAMS.2.2v2
+# Policy MS.TEAMS.2.2v3
 #--
 test_AllowTeamsConsumerInbound_Correct_V1 if {
     Output := teams.tests with input.federation_configuration as [FederationConfiguration]
 
-    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumerInbound_Correct_V1_multi if {
@@ -104,7 +104,7 @@ test_AllowTeamsConsumerInbound_Correct_V1_multi if {
 
     Output := teams.tests with input.federation_configuration as [FederationConfiguration, Config]
 
-    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2 if {
@@ -112,7 +112,7 @@ test_AllowTeamsConsumerInbound_Correct_V2 if {
 
     Output := teams.tests with input.federation_configuration as [Config]
 
-    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumerInbound_Correct_V2_multi if {
@@ -123,7 +123,7 @@ test_AllowTeamsConsumerInbound_Correct_V2_multi if {
 
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
-    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_V1 if {
@@ -135,7 +135,7 @@ test_AllowTeamsConsumer_Incorrect_V1 if {
 
     ReportDetailStr :=
         "1 Configuration allowed unmanaged users to initiate contact with internal user across domains: Global"
-    TestResult("MS.TEAMS.2.2v2", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.2v3", Output, ReportDetailStr, false) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_multi_V1 if {
@@ -154,7 +154,7 @@ test_AllowTeamsConsumer_Incorrect_multi_V1 if {
         "Global, Tag:AllOn"
     ])
 
-    TestResult("MS.TEAMS.2.2v2", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.2v3", Output, ReportDetailStr, false) == true
 }
 
 test_AllowTeamsConsumer_Correct_V1 if {
@@ -162,7 +162,7 @@ test_AllowTeamsConsumer_Correct_V1 if {
 
     Output := teams.tests with input.federation_configuration as [Config]
 
-    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Correct_multi_V1 if {
@@ -173,17 +173,17 @@ test_AllowTeamsConsumer_Correct_multi_V1 if {
 
     Output := teams.tests with input.federation_configuration as [Config1, Config2]
 
-    TestResult("MS.TEAMS.2.2v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.2v3", Output, PASS, true) == true
 }
 #--
 
 #
-# Policy MS.TEAMS.2.3v2
+# Policy MS.TEAMS.2.3v3
 #--
 test_AllowTeamsConsumer_Correct_V2 if {
     Output := teams.tests with input.federation_configuration as [FederationConfiguration]
 
-    TestResult("MS.TEAMS.2.3v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.3v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Correct_multi_V2 if {
@@ -192,7 +192,7 @@ test_AllowTeamsConsumer_Correct_multi_V2 if {
 
     Output := teams.tests with input.federation_configuration as [FederationConfiguration, Config]
 
-    TestResult("MS.TEAMS.2.3v2", Output, PASS, true) == true
+    TestResult("MS.TEAMS.2.3v3", Output, PASS, true) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_V2 if {
@@ -201,7 +201,7 @@ test_AllowTeamsConsumer_Incorrect_V2 if {
     Output := teams.tests with input.federation_configuration as [Config]
 
     ReportDetailStr := "1 Internal users are enabled to initiate contact with unmanaged users across domains: Global"
-    TestResult("MS.TEAMS.2.3v2", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.3v3", Output, ReportDetailStr, false) == true
 }
 
 test_AllowTeamsConsumer_Incorrect_multi_V2 if {
@@ -217,6 +217,6 @@ test_AllowTeamsConsumer_Incorrect_multi_V2 if {
         "Global, Tag:AllOn"
     ])
 
-    TestResult("MS.TEAMS.2.3v2", Output, ReportDetailStr, false) == true
+    TestResult("MS.TEAMS.2.3v3", Output, ReportDetailStr, false) == true
 }
 #--

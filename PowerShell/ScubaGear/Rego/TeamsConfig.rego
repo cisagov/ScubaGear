@@ -302,21 +302,8 @@ tests contains {
 #--
 
 #
-# MS.TEAMS.2.2v2
+# MS.TEAMS.2.2v3
 #--
-
-# GCC/GCC High/DoD environments: Not applicable
-tests contains {
-    "PolicyId": "MS.TEAMS.2.2v2",
-    "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
-    "RequirementMet": true
-} if {
-    Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    IsUSGovTenantRegion
-}
 
 # There are two relevant settings:
 #    - AllowTeamsConsumer: Is contact to or from unmanaged users allowed at all?
@@ -344,35 +331,21 @@ FederationConfiguration contains Policy.Identity if {
 
 # Pass if FederationConfiguration does not have any policies saved.
 tests contains {
-    "PolicyId": "MS.TEAMS.2.2v2",
+    "PolicyId": "MS.TEAMS.2.2v3",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": FederationConfiguration,
     "ReportDetails": ReportDetailsArray(Status, FederationConfiguration, String),
     "RequirementMet": Status
 } if {
-    not IsUSGovTenantRegion
     String := "Configuration allowed unmanaged users to initiate contact with internal user across domains:"
     Status := count(FederationConfiguration) == 0
 }
 #--
 
 #
-# MS.TEAMS.2.3v2
+# MS.TEAMS.2.3v3
 #--
-
-# GCC/GCC High/DoD environments: Not applicable
-tests contains {
-    "PolicyId": "MS.TEAMS.2.3v2",
-    "Criticality": "Should",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": [],
-    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
-    "RequirementMet": true
-} if {
-    Reason := "This policy is not applicable to GCC, GCC High, or DOD environments. See %v for more info"
-    IsUSGovTenantRegion
-}
 
 # Iterate through all meeting policies. For each, check if AllowTeamsConsumer
 # is true. If so, save the policy Identity to the InternalCannotEnable list.
@@ -383,14 +356,13 @@ InternalCannotEnable contains Policy.Identity if {
 
 # Pass if InternalCannotEnable does not have any policies saved.
 tests contains {
-    "PolicyId": "MS.TEAMS.2.3v2",
+    "PolicyId": "MS.TEAMS.2.3v3",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
     "ActualValue": InternalCannotEnable,
     "ReportDetails": ReportDetailsArray(Status, InternalCannotEnable, String),
     "RequirementMet": Status
 } if {
-    not IsUSGovTenantRegion
     String := "Internal users are enabled to initiate contact with unmanaged users across domains:"
     Status := count(InternalCannotEnable) == 0
 }

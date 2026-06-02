@@ -1,9 +1,9 @@
 ProductName: teams
 TestPlan:
-  - PolicyId: MS.TEAMS.2.2v2
+  - PolicyId: MS.TEAMS.2.2v3
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.2v2 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v3 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -11,7 +11,7 @@ TestPlan:
               AllowTeamsConsumerInbound: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v3 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -19,7 +19,7 @@ TestPlan:
               AllowTeamsConsumerInbound: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.2v2 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v3 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -27,7 +27,7 @@ TestPlan:
               AllowTeamsConsumerInbound: true
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.2v3 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
@@ -35,17 +35,17 @@ TestPlan:
               AllowTeamsConsumerInbound: false
         Postconditions: []
         ExpectedResult: true
-  - PolicyId: MS.TEAMS.2.3v2
+  - PolicyId: MS.TEAMS.2.3v3
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.TEAMS.2.3v2 Non-compliant - AllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.3v3 Non-compliant - AllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
               AllowTeamsConsumer: true
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.TEAMS.2.3v2 Compliant - DoNotAllowTeamsConsumer
+      - TestDescription: MS.TEAMS.2.3v3 Compliant - DoNotAllowTeamsConsumer
         Preconditions:
           - Command: Set-CsTenantFederationConfiguration
             Splat:
