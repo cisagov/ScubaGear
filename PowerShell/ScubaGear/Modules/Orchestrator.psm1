@@ -482,7 +482,7 @@ function Invoke-SCuBA {
             Write-ScubaLog -Message "ScubaGear logging initialized" -Level "Info" -Source "InvokeScuba" -Data @{
                 Version = $ModuleVersion
                 ProductNames = ($ProductNames -join ', ')
-                Environment = $M365Environment
+                UserPassedEnvironment = $M365Environment
                 OutputFolder = $OutFolderPath
                 LogFolder = $ScubaLogFolder
                 TranscriptEnabled = $Transcript
@@ -527,11 +527,19 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $false
         }
 
+        # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
+        # This overrides any user provided command line value for M365Environment and the default value of "commercial"
+        $ServicePrincipalParams = $null
+        if ($ScubaConfig.CertificateThumbprint) {
+            $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
+            $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ServicePrincipalParams.CertThumbprintParams.Organization
+        }
+
         # Product Authentication - parameters consolidated into ScubaConfig
         Write-ScubaLog -Message "Starting product authentication..." -Level "Info" -Source "InvokeScuba" -Data @{
             ProductNames = ($ScubaConfig.ProductNames -join ', ')
             M365Environment = $ScubaConfig.M365Environment
-            UsesServicePrincipal = (-not [string]::IsNullOrEmpty($ScubaConfig.AppID)) #$null -ne $ScubaConfig.AppID)
+            UsesServicePrincipal = (-not [string]::IsNullOrEmpty($ScubaConfig.AppID))
         }
 
         $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig
@@ -1906,7 +1914,7 @@ function Import-Resources {
 
         @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support', 'Utility') | ForEach-Object {
             $ModulePath = Join-Path -Path $PSScriptRoot -ChildPath $_ -ErrorAction 'Stop'
-            Write-Debug "Importing $_ module"
+            Write-Debug "Importing $_ module $ModulePath"
             Import-Module -Name $ModulePath
         }
     }
