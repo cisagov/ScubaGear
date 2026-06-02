@@ -372,12 +372,11 @@ tests contains {
     "PolicyId": "MS.DEFENDER.3.1v1",
     "Criticality": "Should",
     "Commandlet": ["Get-AtpPolicyForO365"],
-    "ActualValue": Policies,
+    "ActualValue": ATPPolicies,
     "ReportDetails": ApplyLicenseWarning(Status),
     "RequirementMet": Status
 } if {
-    Policies := ATPPolicies
-    Status := count(Policies) > 0
+    Status := count(ATPPolicies) > 0
 }
 #--
 
@@ -702,13 +701,12 @@ tests contains {
     "PolicyId": "MS.DEFENDER.4.3v1",
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
-    "ActualValue": Rules,
-    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_3(Rules)),
+    "ActualValue": SensitiveRulesNotBlocking,
+    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_3(SensitiveRulesNotBlocking)),
     "RequirementMet": Status
 } if {
-    Rules := SensitiveRulesNotBlocking
     Conditions := [
-        count(Rules) == 0,
+        count(SensitiveRulesNotBlocking) == 0,
         count(PoliciesWithFullProtection) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2
@@ -724,7 +722,7 @@ tests contains {
 # to notify,
 SensitiveRulesNotNotifying contains Rule.Name if {
     some Rule in PoliciesWithFullProtection
-    count(SensitiveRules) > 0
+    some _ in SensitiveRules
     Rule.ParentPolicyName in Rule
     count(Rule.NotifyUser) == 0
 }
@@ -747,13 +745,12 @@ tests contains {
     "PolicyId": "MS.DEFENDER.4.4v1",
     "Criticality": "Should",
     "Commandlet": ["Get-DlpComplianceRule"],
-    "ActualValue": Rules,
-    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_4(Rules)),
+    "ActualValue": SensitiveRulesNotNotifying,
+    "ReportDetails": DLPLicenseWarningString(Status, DefenderErrorMessage4_4(SensitiveRulesNotNotifying)),
     "RequirementMet": Status
 } if {
-    Rules := SensitiveRulesNotNotifying
     Conditions := [
-        count(Rules) == 0,
+        count(SensitiveRulesNotNotifying) == 0,
         count(PoliciesWithFullProtection) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2

@@ -16,9 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Convert AAD to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -27,7 +27,7 @@ jobs:
             PowerShell/ScubaGear/baselines/aad.md
             --output=baselines/aad.txt
       - name: Convert Defender to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -36,7 +36,7 @@ jobs:
             PowerShell/ScubaGear/baselines/defender.md
             --output=baselines/defender.txt
       - name: Convert Exchange to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -45,7 +45,7 @@ jobs:
             PowerShell/ScubaGear/baselines/exo.md
             --output=baselines/exo.txt
       - name: Convert Power BI to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -54,7 +54,7 @@ jobs:
             PowerShell/ScubaGear/baselines/powerbi.md
             --output=baselines/powerbi.txt
       - name: Convert Power Platform to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -63,7 +63,7 @@ jobs:
             PowerShell/ScubaGear/baselines/powerplatform.md
             --output=baselines/powerflatform.txt
       - name: Convert Sharepoint to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -72,7 +72,7 @@ jobs:
             PowerShell/ScubaGear/baselines/sharepoint.md
             --output=baselines/sharepoint.txt
       - name: Convert Teams to Text
-        uses: docker://pandoc/core:3.5
+        uses: docker://pandoc/core:3.9.0.2
         with:
           args: >-
             --standalone
@@ -92,7 +92,7 @@ jobs:
           markdown-to-html --source PowerShell/ScubaGear/baselines/sharepoint.md --output baselines/sharepoint.html
           markdown-to-html --source PowerShell/ScubaGear/baselines/teams.md --output baselines/teams.html
       - name: Upload
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: output
           path: baselines
