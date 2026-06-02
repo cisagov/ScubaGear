@@ -85,7 +85,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.3.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -93,7 +93,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.3.5v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -149,7 +149,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.4.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked 
+      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
