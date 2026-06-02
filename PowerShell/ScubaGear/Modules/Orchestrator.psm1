@@ -583,7 +583,7 @@ function Invoke-SCuBA {
             M365Environment = $ScubaConfig.M365Environment
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment
+        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment -ConnectionResult $ConnectionResult
         Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
 
         # Generate a GUID to uniquely identify the output JSON
@@ -851,7 +851,13 @@ function Invoke-ProviderList {
                             $RetVal = Export-AADProvider -M365Environment $ScubaConfig.M365Environment | Select-Object -Last 1
                         }
                         "exo" {
-                            $RetVal = Export-EXOProvider -PreferredDnsResolvers $ScubaConfig.PreferredDnsResolvers -SkipDoH $ScubaConfig.SkipDoH | Select-Object -Last 1
+                            $EXOProviderParams = @{
+                                'PreferredDnsResolvers' = $ScubaConfig.PreferredDnsResolvers
+                                'SkipDoH'              = $ScubaConfig.SkipDoH
+                                'AccessToken'          = $ConnectionResult.EXOAccessToken
+                                'ApiEndpoint'          = $ConnectionResult.EXOApiEndpoint
+                            }
+                            $RetVal = Export-EXOProvider @EXOProviderParams | Select-Object -Last 1
                         }
                         "securitysuite" {
                             $RetVal = Export-SecuritySuiteProvider @ConnectTenantParams  | Select-Object -Last 1
@@ -1717,7 +1723,11 @@ function Get-TenantDetail {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $ConnectionResult = @{}
     )
 
     # organized by best tenant details information
@@ -1737,10 +1747,14 @@ function Get-TenantDetail {
         Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("exo")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment
+        Get-EXOTenantDetail -M365Environment $M365Environment `
+            -AccessToken $ConnectionResult.EXOAccessToken `
+            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
     }
     elseif ($ProductNames.Contains("securitysuite")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment
+        Get-EXOTenantDetail -M365Environment $M365Environment `
+            -AccessToken $ConnectionResult.EXOAccessToken `
+            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
     }
     else {
         $TenantInfo = @{

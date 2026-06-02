@@ -37,6 +37,7 @@
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -55,12 +56,14 @@
 
    # Token data for REST-based products (populated during connection)
    $TokenData = @{
-       SPOAccessToken  = $null
-       SPOAdminUrl     = $null
-       PPAccessToken   = $null
-       PPBaseUrl       = $null
-       PBIAccessToken  = $null
-       PBIBaseUrl      = $null
+       SPOAccessToken     = $null
+       SPOAdminUrl        = $null
+       PPAccessToken      = $null
+       PPBaseUrl          = $null
+       PBIAccessToken     = $null
+       PBIBaseUrl         = $null
+       EXOAccessToken     = $null
+       EXOApiEndpoint     = $null
    }
 
    $N = 0
@@ -95,14 +98,56 @@
                }
                {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
-                       $EXOHelperParams = @{
-                           M365Environment = $M365Environment;
+                       if ($AADAuthRequired) {
+                           $LimitedGraphParams = @{
+                               'M365Environment' = $M365Environment;
+                               'ErrorAction' = 'Stop';
+                           }
+                           if ($ServicePrincipalParams) {
+                               $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                           }
+                           Connect-GraphHelper @LimitedGraphParams
+                           $AADAuthRequired = $false
                        }
-                       if ($ServicePrincipalParams) {
-                           $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+
+                       # Resolve tenant info if not already cached
+                       if ([string]::IsNullOrEmpty($TenantName)) {
+                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                           $TenantName = $InitialDomain.Name
+                           $InitialDomainPrefix = $TenantName.split(".")[0]
                        }
-                       Write-Verbose "For the Security Suite baseline, Defender will require a sign in every single run regardless of what the LogIn parameter is set"
-                       Connect-EXOHelper @EXOHelperParams
+
+                       # Acquire Exchange Online access token
+                       $EXOScope = Get-ExchangeOnlineScope -M365Environment $M365Environment
+
+                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                           $TokenData.EXOAccessToken = Get-MsalAccessToken `
+                               -Scope $EXOScope `
+                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                               -M365Environment $M365Environment
+                       }
+                       else {
+                           # Microsoft Exchange Online Remote PowerShell well-known client ID
+                           $EXOClientId = "fb78d390-0c51-40cd-8e17-fdbfab77341b"
+                           $TokenData.EXOAccessToken = Get-MsalAccessToken `
+                               -Scope $EXOScope `
+                               -ClientId $EXOClientId `
+                               -Tenant $TenantName `
+                               -M365Environment $M365Environment
+                       }
+
+                       # Resolve the EXO API endpoint (handles redirects)
+                       $TenantId = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value.Id
+                       $TokenData.EXOApiEndpoint = Get-ExchangeOnlineApiEndpoint `
+                           -TenantId $TenantId `
+                           -TenantDomain $TenantName `
+                           -M365Environment $M365Environment `
+                           -AccessToken $TokenData.EXOAccessToken
+
+                       Write-Verbose "Exchange Online token and endpoint acquired successfully"
                        $EXOAuthRequired = $false
                    }
                }
@@ -348,6 +393,8 @@
        PPBaseUrl       = $TokenData.PPBaseUrl
        PBIAccessToken  = $TokenData.PBIAccessToken
        PBIBaseUrl      = $TokenData.PBIBaseUrl
+       EXOAccessToken  = $TokenData.EXOAccessToken
+       EXOApiEndpoint  = $TokenData.EXOApiEndpoint
    }
 }
 
@@ -408,7 +455,8 @@ function Disconnect-SCuBATenant {
                if($Product -eq "securitysuite") {
                    Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
                }
-               Disconnect-ExchangeOnline -Confirm:$false -ErrorAction SilentlyContinue -InformationAction SilentlyContinue | Out-Null
+               # EXO now uses REST API with on-demand token - no persistent connection to disconnect
+               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
            }
            else {
                Write-Warning "Product $Product not recognized, skipping..."
