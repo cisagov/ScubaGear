@@ -97,10 +97,10 @@ function Export-AADProvider {
 
     # Load the risky permissions module and JSON once for reuse by multiple functions below
     Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
-    $RiskyPermissionsJson = Get-RiskyPermissionsJson
+    $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
 
     # The RiskyDelegatedPermissionClassifications is for user consent policy 5.2 to determine if any delegated permission classifications considered risky by Scuba are classified as low risk in the tenant
-    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment; "RiskyPermissionsJson"=$RiskyPermissionsJson}))
+    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment; "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson}))
 
     ##### Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
@@ -185,12 +185,12 @@ function Export-AADProvider {
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
         "ResourcePermissionCache"=$ResourcePermissionCache;
-        "RiskyPermissionsJson"=$RiskyPermissionsJson
+        "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
     })
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
         "ResourcePermissionCache"=$ResourcePermissionCache;
-        "RiskyPermissionsJson"=$RiskyPermissionsJson
+        "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
     })
 
     $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }

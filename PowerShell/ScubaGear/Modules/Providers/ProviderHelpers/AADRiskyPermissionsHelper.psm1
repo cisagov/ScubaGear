@@ -1,7 +1,7 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
 # Module-scoped cache for RiskyAppPermissions.json - loaded once, reused across all function calls
-$script:CachedRiskyPermissionsJson = $null
+$script:CachedRiskyAppPermissionsJson = $null
 $script:CachedPermissionLookup = $null
 
 function Get-ResourcePermissions {
@@ -44,7 +44,7 @@ function Get-ResourcePermissions {
     }
 }
 
-function Get-RiskyPermissionsJson {
+function Get-RiskyAppPermissionsJson {
     <#
     .Description
     Returns the parsed RiskyAppPermissions.json data. Uses a module-scoped cache to avoid
@@ -53,22 +53,22 @@ function Get-RiskyPermissionsJson {
     Internal
     #>
     process {
-        if ($null -eq $script:CachedRiskyPermissionsJson) {
+        if ($null -eq $script:CachedRiskyAppPermissionsJson) {
             try {
                 $SchemasPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.Parent.FullName) -ChildPath "schemas"
-                $script:CachedRiskyPermissionsJson = Get-Content -Path (
+                $script:CachedRiskyAppPermissionsJson = Get-Content -Path (
                     Join-Path -Path (Get-Item -Path $SchemasPath) -ChildPath "RiskyAppPermissions.json"
                 ) -Raw | ConvertFrom-Json
                 # Build the hashtable lookup on first load
-                $script:CachedPermissionLookup = Build-PermissionLookup -Json $script:CachedRiskyPermissionsJson
+                $script:CachedPermissionLookup = Build-PermissionLookup -Json $script:CachedRiskyAppPermissionsJson
             }
             catch {
-                Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
+                Write-Warning "An error occurred in Get-RiskyAppPermissionsJson: $($_.Exception.Message)"
                 Write-Warning "Stack trace: $($_.ScriptStackTrace)"
                 throw $_
             }
         }
-        return $script:CachedRiskyPermissionsJson
+        return $script:CachedRiskyAppPermissionsJson
     }
 }
 
@@ -115,18 +115,18 @@ function Get-PermissionLookup {
     #>
     param (
         [PSCustomObject]
-        $RiskyPermissionsJson
+        $RiskyAppPermissionsJson
     )
 
     if ($null -ne $script:CachedPermissionLookup) {
         return $script:CachedPermissionLookup
     }
 
-    if ($null -eq $RiskyPermissionsJson) {
-        $RiskyPermissionsJson = Get-RiskyPermissionsJson
+    if ($null -eq $RiskyAppPermissionsJson) {
+        $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
     }
 
-    $script:CachedPermissionLookup = Build-PermissionLookup -Json $RiskyPermissionsJson
+    $script:CachedPermissionLookup = Build-PermissionLookup -Json $RiskyAppPermissionsJson
     return $script:CachedPermissionLookup
 }
 
@@ -167,7 +167,7 @@ function Format-Permission {
     )
     $Map = @()
     if ($null -ne $RoleType) {
-        $Lookup = Get-PermissionLookup -RiskyPermissionsJson $Json
+        $Lookup = Get-PermissionLookup -RiskyAppPermissionsJson $Json
         $IsRisky = $false
         $RiskLevel = $null
 
@@ -304,12 +304,12 @@ function Get-ApplicationsWithRiskyPermissions {
         $ResourcePermissionCache,
 
         [PSCustomObject]
-        $RiskyPermissionsJson
+        $RiskyAppPermissionsJson
     )
     process {
         try {
-            if ($null -eq $RiskyPermissionsJson) {
-                $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            if ($null -eq $RiskyAppPermissionsJson) {
+                $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
             }
             # Get all applications in the tenant
             $Applications = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplication" -M365Environment $M365Environment).Value
@@ -342,9 +342,9 @@ function Get-ApplicationsWithRiskyPermissions {
                     $IsAdminConsented = $false
 
                     # Only map on resources stored in RiskyAppPermissions.json file
-                    if ($RiskyPermissionsJson.resources.PSObject.Properties.Name -contains $ResourceAppId) {
+                    if ($RiskyAppPermissionsJson.resources.PSObject.Properties.Name -contains $ResourceAppId) {
                         foreach ($Role in $Roles) {
-                            $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
+                            $ResourceDisplayName = $RiskyAppPermissionsJson.resources.$ResourceAppId
                             $RoleId = $Role.Id
 
                             if ($Role.Type -eq "Role") {
@@ -362,7 +362,7 @@ function Get-ApplicationsWithRiskyPermissions {
                             }
 
                             $MappedPermissions += Format-Permission `
-                                -Json $RiskyPermissionsJson `
+                                -Json $RiskyAppPermissionsJson `
                                 -AppDisplayName $ResourceDisplayName `
                                 -Id $RoleId `
                                 -RoleType $ReadableRoleType `
@@ -437,12 +437,12 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         $ResourcePermissionCache,
 
         [PSCustomObject]
-        $RiskyPermissionsJson
+        $RiskyAppPermissionsJson
     )
     process {
         try {
-            if ($null -eq $RiskyPermissionsJson) {
-                $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            if ($null -eq $RiskyAppPermissionsJson) {
+                $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
             }
             $ServicePrincipalResults = @()
             # Get all service principals
@@ -499,8 +499,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                     $IsAdminConsented = $true
 
                                     # Only map on resources stored in RiskyAppPermissions.json file
-                                    if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
-                                        $ResourceAppId = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
+                                    if ($RiskyAppPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
+                                        $ResourceAppId = $RiskyAppPermissionsJson.resources.PSObject.Properties | Where-Object {
                                             $_.Value -eq $ResourceDisplayName
                                         } | Select-Object -ExpandProperty Name
 
@@ -539,7 +539,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                                         }
 
                                         $MappedPermissions += Format-Permission `
-                                            -Json $RiskyPermissionsJson `
+                                            -Json $RiskyAppPermissionsJson `
                                             -AppDisplayName $ResourceDisplayName `
                                             -Id $RoleId `
                                             -RoleType $ReadableRoleType `
@@ -597,14 +597,14 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
         $M365Environment,
 
         [PSCustomObject]
-        $RiskyPermissionsJson
+        $RiskyAppPermissionsJson
     )
     process {
         try {
-            if ($null -eq $RiskyPermissionsJson) {
-                $RiskyPermissionsJson = Get-RiskyPermissionsJson
+            if ($null -eq $RiskyAppPermissionsJson) {
+                $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
             }
-            $Resources = $RiskyPermissionsJson.resources.PSObject.Properties
+            $Resources = $RiskyAppPermissionsJson.resources.PSObject.Properties
 
 
             $RiskyDelegatedPermissionClassificationResults = @()
@@ -623,7 +623,7 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
 
                 $ServicePrincipalId = $ServicePrincipal.id
 
-                $RiskyDelegatedPermissions = $RiskyPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties
+                $RiskyDelegatedPermissions = $RiskyAppPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties
 
                 $PermClassifications = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipalDelagatedPermissionClassifications" -M365Environment $M365Environment -ID $ServicePrincipalId).Value
 
@@ -1219,7 +1219,7 @@ function Set-SeverityScore {
 }
 
 Export-ModuleMember -Function @(
-    "Get-RiskyPermissionsJson",
+    "Get-RiskyAppPermissionsJson",
     "Build-PermissionLookup",
     "Get-PermissionLookup",
     "Format-Credentials",

@@ -1,5 +1,5 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly
-Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials, Get-RiskyPermissionsJson
+Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials, Get-RiskyAppPermissionsJson
 
 function Get-ExchangeHybridIds {
     <#
@@ -12,16 +12,16 @@ function Get-ExchangeHybridIds {
     #>
     param (
         [PSCustomObject]
-        $RiskyPermissionsJson
+        $RiskyAppPermissionsJson
     )
     process {
-        if ($null -eq $RiskyPermissionsJson) {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
+        if ($null -eq $RiskyAppPermissionsJson) {
+            $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
         }
 
         # $ExchangeOnlineResource.Name represents the exchange online appId (00000002-0000-0ff1-ce00-000000000000)
         # $ExchangeOnlineResource.Value represents the display name ("Office 365 Exchange Online")
-        $ExchangeOnlineResource = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
+        $ExchangeOnlineResource = $RiskyAppPermissionsJson.resources.PSObject.Properties | Where-Object {
             $_.Value -eq "Office 365 Exchange Online"
         } | Select-Object -First 1
 
@@ -31,7 +31,7 @@ function Get-ExchangeHybridIds {
 
         # $FullAccessAsAppRoleId.Name represents the role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
         # $FullAccessAsAppRoleId.Value represents the role name ("full_access_as_app")
-        $FullAccessAsAppRoleId = $RiskyPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
+        $FullAccessAsAppRoleId = $RiskyAppPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
             $_.Value.Name -eq "full_access_as_app"
         } | Select-Object -First 1
 

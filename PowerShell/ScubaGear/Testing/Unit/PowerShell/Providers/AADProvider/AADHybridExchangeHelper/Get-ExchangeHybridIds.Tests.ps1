@@ -29,7 +29,7 @@ InModuleScope AADHybridExchangeHelper {
 
         Context "When Office 365 Exchange Online is missing from RiskyAppPermissions.json" {
             BeforeEach {
-                Mock Get-RiskyPermissionsJson {
+                Mock Get-RiskyAppPermissionsJson {
                     return [PSCustomObject]@{
                         resources = [PSCustomObject]@{}
                         permissions = [PSCustomObject]@{}
@@ -44,7 +44,7 @@ InModuleScope AADHybridExchangeHelper {
 
         Context "When full_access_as_app is missing from RiskyAppPermissions.json" {
             BeforeEach {
-                Mock Get-RiskyPermissionsJson {
+                Mock Get-RiskyAppPermissionsJson {
                     return [PSCustomObject]@{
                         resources = [PSCustomObject]@{
                             "00000002-0000-0ff1-ce00-000000000000" = "Office 365 Exchange Online"
