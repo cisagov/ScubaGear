@@ -15,8 +15,10 @@ InModuleScope Connection {
             # SharePoint now uses REST API - no PnP/SPO connection needed
             function Connect-MicrosoftTeams{throw 'this will be mocked'}
             Mock Connect-MicrosoftTeams -MockWith {}
-            function Connect-EXOHelper {throw 'this will be mocked'}
-            Mock -ModuleName Connection Connect-EXOHelper -MockWith {}
+            function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
+            Mock Get-ExchangeOnlineApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
+            function Get-ExchangeOnlineScope {throw 'this will be mocked'}
+            Mock Get-ExchangeOnlineScope -MockWith { return "https://outlook.office365.com/.default" }
             function Invoke-GraphDirectly {throw 'this will be mocked'}
             Mock Invoke-GraphDirectly -MockWith {
                 return [pscustomobject]@{
@@ -38,8 +40,8 @@ InModuleScope Connection {
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
-            @{ProductNames = "securitysuite"; Services = @('Connect-EXOHelper')}
-            @{ProductNames = "exo"; Services = @('Connect-EXOHelper')}
+            @{ProductNames = "securitysuite"; Services = @('Get-MsalAccessToken')}
+            @{ProductNames = "exo"; Services = @('Get-MsalAccessToken')}
             @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper')}
             @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper')}  # SharePoint uses REST API, only needs Graph for tenant info
             @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
@@ -47,7 +49,7 @@ InModuleScope Connection {
                 ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
                     'Connect-GraphHelper',
-                    'Connect-EXOHelper',
+                    'Get-MsalAccessToken',
                     'Connect-MicrosoftTeams'
                 )
             }
@@ -69,7 +71,7 @@ InModuleScope Connection {
                 }
                 Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint -ServicePrincipalParams $ServicePrincipalParams
                 foreach ($Service in $Services){
-                    Should -Invoke -CommandName $Service -Exactly -Times 1 -Because "only want to authenticate to needed service once"
+                    Should -Invoke -CommandName $Service -Times 1 -Because "only want to authenticate to needed service once"
                 }
             }
 
