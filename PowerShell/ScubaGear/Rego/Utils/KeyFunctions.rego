@@ -26,10 +26,10 @@ IsEmptyContainer(container) := true if {
 } else := false
 
 # Check if string is in array
-Contains(null, _) := false
+ContainsValue(null, _) := false
 
-Contains(array, item) := true if {
-    item in array
+ContainsValue(Collection, item) := true if {
+    item in Collection
 } else := false
 
 # Returns size of set/array

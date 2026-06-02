@@ -107,14 +107,16 @@ test_PhishingResistantMFAExcludeGroup_Incorrect if {
 
 # Make sure user and group exclusions defined in config file pass the policy
 test_PhishingResistantMFAUserGroupExclusion_Correct if {
+    ExcludedUsers := ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "39b4dcdf-1f90-41a7c3609b425-9dd7-5e2"]
+    ExcludedGroups := ["59b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "69b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
     CAP := json.patch(ConditionalAccessPolicies,
-                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "39b4dcdf-1f90-41a7c3609b425-9dd7-5e2"]},
-                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["59b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "69b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ExcludedUsers},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ExcludedGroups}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.1v1"] as ScubaConfig
-                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "39b4dcdf-1f90-41a7c3609b425-9dd7-5e2"]
-                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Groups as ["59b4dcdf-1f90-41a7c3609b425-9dd7-5e3", "69b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Users as ExcludedUsers
+                        with input.scuba_config.Aad["MS.AAD.3.1v1"].CapExclusions.Groups as ExcludedGroups
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
@@ -692,7 +694,9 @@ test_MicrosoftAuthDisabled_NotApplicable if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -711,7 +715,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_1 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -725,7 +731,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_2 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -740,7 +748,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_3 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -756,7 +766,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_4 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -771,7 +783,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_5 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -786,7 +800,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_6 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}    
@@ -802,7 +818,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_7 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -817,7 +835,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_8 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -832,7 +852,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_9 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -848,7 +870,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_10 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -863,7 +887,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_11 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -879,7 +905,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_12 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -895,7 +923,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_13 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -911,7 +941,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_14 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"} 
@@ -927,7 +959,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_15 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"} 
@@ -943,7 +977,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_True_16 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": true},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"} 
@@ -959,7 +995,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_1 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -976,7 +1014,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_2 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -992,7 +1032,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_3 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -1008,7 +1050,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_4 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -1024,7 +1068,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_5 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -1040,7 +1086,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_6 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -1056,7 +1104,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_7 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -1072,7 +1122,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_8 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -1088,7 +1140,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_9 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -1104,7 +1158,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_10 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -1120,7 +1176,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_11 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}
@@ -1136,7 +1194,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_12 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}
@@ -1152,7 +1212,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_13 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/id", "value": "all_users"}
@@ -1168,7 +1230,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_14 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "enabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}  
@@ -1184,7 +1248,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_15 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "all_users"}  
@@ -1201,7 +1267,9 @@ test_MicrosoftAuthEnabled_IsSoftwareOathEnabled_False_16 if {
     Auth := json.patch(AuthenticationMethod, [
         {"op": "add", "path": "authentication_method_feature_settings/0/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/IsSoftwareOathEnabled", "value": false},
-        {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State", "value": "disabled"},
+        {"op": "add",
+            "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/State",
+            "value": "disabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayAppInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/State", "value": "enabled"},
         {"op": "add", "path": "authentication_method_feature_settings/0/FeatureSettings/DisplayLocationInformationRequiredState/IncludeTarget/Id", "value": "not_all_users"}  

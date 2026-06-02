@@ -26,6 +26,11 @@ on:
         required: false
         type: boolean
         default: true
+      compareHeadRef:
+        description: "Compare head ref (branch or tag) for release notes, e.g. main or release/1.9.0. Defaults to the branch selected when running the workflow."
+        required: false
+        type: string
+        default: ""
 
 permissions: read-all
 
@@ -44,7 +49,7 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Install Azure Signing Tool
@@ -54,12 +59,380 @@ jobs:
           Install-AzureSignTool
       # OpenID Connect (OIDC) login to Azure Public Cloud with AzPowershell
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           enable-AzPSSession: true
+      - name: Get previous release tag
+        id: previous-release
+        uses: actions/github-script@v9
+        with:
+          script: |
+            function parseVersion(tagName) {
+              const match = tagName.match(/^v?(\d+)\.(\d+)(?:\.(\d+))?$/i);
+              if (!match) {
+                return null;
+              }
+
+              return {
+                tag: tagName,
+                parts: [
+                  Number(match[1]),
+                  Number(match[2]),
+                  Number(match[3] ?? 0)
+                ]
+              };
+            }
+
+            function compareVersions(left, right) {
+              for (let index = 0; index < 3; index++) {
+                if (left.parts[index] !== right.parts[index]) {
+                  return left.parts[index] - right.parts[index];
+                }
+              }
+              return 0;
+            }
+
+            const releases = await github.paginate(
+              github.rest.repos.listReleases,
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                per_page: 100
+              }
+            );
+
+            const currentTag = `v${{ inputs.version }}`;
+            const currentVersion = parseVersion(currentTag);
+            if (!currentVersion) {
+              core.setFailed(`Unable to parse release version from tag ${currentTag}.`);
+              return;
+            }
+
+            const publishedReleases = releases
+              .filter(
+                (release) =>
+                  !release.draft &&
+                  !release.prerelease &&
+                  release.tag_name.toLowerCase() !== currentTag.toLowerCase()
+              )
+              .map((release) => ({
+                release,
+                version: parseVersion(release.tag_name)
+              }))
+              .filter((entry) => entry.version)
+              .filter((entry) => compareVersions(entry.version, currentVersion) < 0)
+              .sort((left, right) => compareVersions(right.version, left.version));
+
+            const previousEntry = publishedReleases[0];
+            if (!previousEntry) {
+              core.setFailed(
+                `Unable to find a published release older than ${currentTag}.`
+              );
+              return;
+            }
+
+            const previousRelease = previousEntry.release;
+            core.info(
+              `Using previous tag ${previousRelease.tag_name} (published ${previousRelease.published_at}) for release notes.`
+            );
+            core.setOutput("tag", previousRelease.tag_name);
+      - name: Generate release notes
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+
+            const excludedLabels = new Set([
+              "epic",
+              "Testing",
+              "hands-on-prototyping",
+              "blocked",
+              "duplicate",
+              "wontfix"
+            ]);
+            const sectionOrder = [
+              "Major Changes",
+              "Bugs Fixed",
+              "Baselines",
+              "Documentation",
+              "Dependencies"
+            ];
+
+            function isDependencyPullRequest(pr) {
+              const dependencyAuthors = new Set([
+                "github-actions[bot]",
+                "dependabot[bot]"
+              ]);
+              return (
+                dependencyAuthors.has(pr.user.login) ||
+                /^Bump /i.test(pr.title)
+              );
+            }
+
+            function categorize(pr) {
+              const names = pr.labels.map((label) => label.name);
+              if (names.some((name) => excludedLabels.has(name))) {
+                return null;
+              }
+              if (isDependencyPullRequest(pr)) {
+                return "Dependencies";
+              }
+              if (names.includes("baseline-document")) {
+                return "Baselines";
+              }
+              if (names.includes("documentation")) {
+                return "Documentation";
+              }
+              if (names.includes("bug")) {
+                return "Bugs Fixed";
+              }
+              if (names.includes("enhancement")) {
+                return "Major Changes";
+              }
+              return "Dependencies";
+            }
+
+            function formatPullRequest(pr) {
+              return `* ${pr.title} by @${pr.user.login} in #${pr.number}`;
+            }
+
+            function buildIssuesUrl(query) {
+              return (
+                `https://github.com/${context.repo.owner}/${context.repo.repo}/issues?q=` +
+                encodeURIComponent(query)
+              );
+            }
+
+            const sectionFooters = {
+              "Major Changes": {
+                linkLabel: "enhancements",
+                query:
+                  "is:issue is:closed label:enhancement -label:baseline-document -label:documentation -label:Testing -label:hands-on-prototyping -label:epic"
+              },
+              "Bugs Fixed": {
+                linkLabel: "bug fixes",
+                query:
+                  "is:issue is:closed label:bug -label:baseline-document -label:Testing -label:documentation -label:epic"
+              },
+              Documentation: {
+                linkLabel: "documentation updates",
+                query: "state:closed label:documentation"
+              }
+            };
+
+            function formatSection(title, items) {
+              const lines = [`## ${title}`, "", ...items];
+              const footer = sectionFooters[title];
+              if (footer) {
+                lines.push(
+                  `* See full list of ${footer.linkLabel} [here](${buildIssuesUrl(footer.query)})`
+                );
+              }
+              return `${lines.join("\r\n")}\r\n`;
+            }
+
+            const bodConfigurationsUrl =
+              "https://www.cisa.gov/resources-tools/services/bod-25-01-implementing-secure-practices-cloud-services-required-configurations";
+
+            function formatBaselinesSection(baselineItems) {
+              const baselineIssuesUrl = buildIssuesUrl(
+                "is:issue is:closed label:baseline-document -label:Testing -label:documentation -label:epic"
+              );
+
+              const lines = [
+                "## Baselines",
+                "",
+                "### BOD 25-01 required configuration policy changes",
+                "",
+                "This section lists baseline policy changes that affect current " +
+                  `[BOD 25-01 Required Configurations](${bodConfigurationsUrl}).`,
+                "",
+                "#### Additions",
+                "",
+                "No new required configuration policies added in this release.",
+                "",
+                "#### Removals",
+                "",
+                "_Move BOD 25-01 policy removals here before publishing._",
+                "",
+                "#### Updates",
+                "",
+                "_Move BOD 25-01 policy version updates here before publishing._",
+                "",
+                "### Other baseline changes",
+                ""
+              ];
+
+              if (baselineItems.length > 0) {
+                lines.push(...baselineItems);
+              } else {
+                lines.push("No baseline updates included in this release.");
+              }
+
+              lines.push(
+                `* See full list of baseline updates [here](${baselineIssuesUrl})`
+              );
+
+              return `${lines.join("\r\n")}\r\n`;
+            }
+
+            function formatDependenciesSection(items) {
+              const dependencyIssuesUrl = buildIssuesUrl(
+                "is:pr is:merged (author:app/github-actions OR author:dependabot) sort:updated-desc"
+              );
+              const lines = ["## Dependencies", ""];
+              if (items.length > 0) {
+                lines.push(...items);
+              } else {
+                lines.push("No dependency updates included in this release.");
+              }
+              lines.push(
+                `* See full list of dependency updates [here](${dependencyIssuesUrl})`
+              );
+              return `${lines.join("\r\n")}\r\n`;
+            }
+
+            async function resolveTagCommitSha(tagName) {
+              const { data: ref } = await github.rest.git.getRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${tagName}`
+              });
+
+              if (ref.object.type === "commit") {
+                return ref.object.sha;
+              }
+
+              const { data: tag } = await github.rest.git.getTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag_sha: ref.object.sha
+              });
+
+              return tag.object.sha;
+            }
+
+            async function resolveCompareHeadRef(currentTag, compareHeadRefInput) {
+              if (compareHeadRefInput) {
+                return compareHeadRefInput;
+              }
+
+              try {
+                await resolveTagCommitSha(currentTag);
+                core.info(
+                  `Tag ${currentTag} already exists; using it as the compare head for release notes.`
+                );
+                return currentTag;
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+              }
+
+              core.info(
+                `Tag ${currentTag} does not exist yet (expected before publish). ` +
+                  `Using branch ${context.ref_name} as the compare head.`
+              );
+              return context.ref_name;
+            }
+
+            async function listMergedPullRequests(previousTag, currentTag, compareHeadRefInput) {
+              const headRef = await resolveCompareHeadRef(
+                currentTag,
+                compareHeadRefInput
+              );
+              const basehead = `${previousTag}...${headRef}`;
+              const pullRequestsByNumber = new Map();
+
+              const { data: comparison } =
+                await github.rest.repos.compareCommitsWithBasehead({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  basehead
+                });
+
+              core.info(
+                `Comparing ${basehead}: ${comparison.commits.length} commits (status: ${comparison.status}).`
+              );
+
+              for (const commit of comparison.commits) {
+                const { data: pulls } =
+                  await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    commit_sha: commit.sha
+                  });
+
+                for (const pr of pulls) {
+                  if (pr.merged_at) {
+                    pullRequestsByNumber.set(pr.number, pr);
+                  }
+                }
+              }
+
+              core.info(
+                `Found ${pullRequestsByNumber.size} pull requests associated with commits in ${basehead}.`
+              );
+
+              return { pullRequestsByNumber, headRef, basehead };
+            }
+
+            const tagName = `v${{ inputs.version }}`;
+            const previousTag = "${{ steps.previous-release.outputs.tag }}";
+            const compareHeadRefInput = "${{ inputs.compareHeadRef }}".trim();
+            const { pullRequestsByNumber, headRef, basehead } =
+              await listMergedPullRequests(
+                previousTag,
+                tagName,
+                compareHeadRefInput
+              );
+            const grouped = Object.fromEntries(
+              sectionOrder.map((title) => [title, []])
+            );
+
+            for (const pr of pullRequestsByNumber.values()) {
+              const section = categorize(pr);
+              if (section) {
+                grouped[section].push(formatPullRequest(pr));
+              }
+            }
+
+            const sections = sectionOrder
+              .filter(
+                (title) =>
+                  title === "Baselines" ||
+                  title === "Dependencies" ||
+                  grouped[title].length > 0
+              )
+              .map((title) => {
+                if (title === "Baselines") {
+                  return formatBaselinesSection(grouped.Baselines);
+                }
+                if (title === "Dependencies") {
+                  return formatDependenciesSection(grouped.Dependencies);
+                }
+                return formatSection(title, grouped[title]);
+              });
+
+            const compareUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/compare/${basehead}`;
+            const body = `${sections.join("\r\n")}\r\n**Full Changelog**: ${compareUrl}\r\n`;
+
+            fs.writeFileSync(path.join(process.cwd(), "release-body.md"), body, "utf8");
+
+            const dependencyCount = grouped.Dependencies.length;
+            core.info(
+              `Release notes include ${pullRequestsByNumber.size} pull requests (${dependencyCount} in Dependencies).`
+            );
+            if (dependencyCount === 0) {
+              core.warning(
+                `No dependency pull requests were linked to commits in ${basehead}. ` +
+                  "Cherry-picked changes may need to be added manually."
+              );
+            }
       - name: Get Key Vault info
         id: key-vault-info
         env:
@@ -77,24 +450,24 @@ jobs:
             -ReleaseVersion ${{ inputs.version }} `
             -RootFolderName "repo"
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         id: create-release
         with:
           draft: true
           prerelease: false
           name: ${{ inputs.releaseName }}
           tag_name: v${{ inputs.version }}
+          body_path: release-body.md
           files: |
             ScubaGear-${{ inputs.version }}.zip
             ScubaGear-${{ inputs.version }}/PowerShell/ScubaGear/schemas/ScubaBaselines.json
-          generate_release_notes: true
           fail_on_unmatched_files: true
       - name: Download Release
-        uses: dsaltares/fetch-gh-release-asset@1.1.1
         if: ${{ inputs.runQuickCheck }}
-        with:
-          version: ${{ steps.create-release.outputs.id}}
-          file: "ScubaGear-${{ inputs.version }}.zip"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download "v${{ inputs.version }}" --repo "${{ github.repository }}" --pattern "ScubaGear-${{ inputs.version }}.zip" --clobber
       - name: Quick Check Release
         if: ${{ inputs.runQuickCheck }}
         run: |
