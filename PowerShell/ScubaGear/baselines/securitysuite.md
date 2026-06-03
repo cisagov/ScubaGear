@@ -1053,7 +1053,7 @@ implementations steps are provided below.
 #### MS.SECURITYSUITE.7.1v1
 URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams messages, and Office documents.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo151v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
@@ -1066,7 +1066,7 @@ URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams mes
 #### MS.SECURITYSUITE.7.2v1
 Direct download links SHOULD be scanned for malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo152v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.15.2v1; Criticality: SHOULD -->
 - _Rationale:_ URLs in emails may direct users to download and run malware.
@@ -1081,7 +1081,7 @@ users from infecting their devices.
 #### MS.SECURITYSUITE.7.3v1
 User click tracking SHOULD be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo153v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.7.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
