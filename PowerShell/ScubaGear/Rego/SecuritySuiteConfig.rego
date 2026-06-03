@@ -409,39 +409,66 @@ tests contains {
 #
 # MS.SECURITYSUITE.7.1v1
 #--
+
+CompliantPolicies contains SafeLinksPolicy.Name if {
+    some SafeLinksPolicy in input.safe_links
+    SafeLinksPolicy.EnableSafeLinksForEmail == true
+    SafeLinksPolicy.EnableSafeLinksForTeams == true
+    SafeLinksPolicy.EnableSafeLinksForOffice == true
+    SafeLinksPolicy.EnableforInternalSenders == true
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.1v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.1v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy"],
+    "ActualValue": input.safe_links,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    Status := count(CompliantPolicies) >= 1
 }
+
 #--
 
 #
 # MS.SECURITYSUITE.7.2v1
 #--
+CompliantPolicies contains SafeLinksPolicy.Name if {
+    some SafeLinksPolicy in input.safe_links
+    SafeLinksPolicy.ScanUrls == true
+    SafeLinksPolicy.DeliverMessageAfterScan == true
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.2v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.2v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy"],
+    "ActualValue": input.safe_links,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    Status := count(CompliantPolicies) >= 1
 }
 #--
 
 #
 # MS.SECURITYSUITE.7.3v1
 #--
+CompliantPolicies contains SafeLinksPolicy.Name if {
+    some SafeLinksPolicy in input.safe_links
+    SafeLinksPolicy.TrackClicks == true
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.3v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.3v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy"],
+    "ActualValue": input.safe_links,
+    "ReportDetails": ReportDetailsBoolean(Status),
+    "RequirementMet": Status
+} if {
+    Status := count(CompliantPolicies) >= 1
 }
 #--
 
