@@ -529,10 +529,10 @@ function Invoke-SCuBA {
 
         # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
         # This overrides any user provided command line value for M365Environment and the default value of "commercial"
-        $ServicePrincipalParams = $null
-        if ($ScubaConfig.CertificateThumbprint) {
-            $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
-            $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ServicePrincipalParams.CertThumbprintParams.Organization
+        if ($ScubaConfig.CertificateThumbprint -or $ScubaConfig.AppID) {
+            # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
+            $null = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
+            $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
@@ -2241,7 +2241,7 @@ function Invoke-SCuBACached {
                 Write-ScubaLog -Message "ScubaGear logging initialized (Cached Mode)" -Level "Info" -Source "ScubaCached" -Data @{
                     Version = $ModuleVersion
                     ProductNames = ($ProductNames -join ', ')
-                    Environment = $M365Environment
+                    UserPassedEnvironment = $M365Environment
                     OutputFolder = $OutFolderPath
                     LogFolder = $ScubaLogFolder
                     ExportProvider = $ExportProvider
@@ -2305,6 +2305,14 @@ function Invoke-SCuBACached {
                 'OutCsvFileName' = $OutCsvFileName;
                 'OutActionPlanFileName' = $OutActionPlanFileName;
                 'NumberOfUUIDCharactersToTruncate' = $NumberOfUUIDCharactersToTruncate
+            }
+
+            # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
+            # This overrides any user provided command line value for M365Environment and the default value of "commercial"
+            if ($TempScubaConfig.CertificateThumbprint -or $TempScubaConfig.AppID) {
+                # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
+                $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
+                $TempScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TempScubaConfig.Organization
             }
 
             try {
