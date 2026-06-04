@@ -438,13 +438,11 @@ For commercial and GCC tenants:
 
 2.  Under **External Collaboration** select **External access.**
 
-3.  Select the **Policies** tab.
+3.  Ensure the **Organizational settings** tab is selected at the top of the page.
 
-4.  Select **Global (Org-wide Default).**
+4.  Toggle **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
 
-5.  Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
-
-6.  Click **Save.**
+5.  Click **Save.**
 
 For GCC high tenants:
 
