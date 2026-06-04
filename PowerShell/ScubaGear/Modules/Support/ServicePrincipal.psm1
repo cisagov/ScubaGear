@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper -force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest -force
@@ -51,7 +53,6 @@ function Compare-ScubaGearRole {
         [string[]]$Roles,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
         # Add the SkipConnect parameter
@@ -169,7 +170,6 @@ function Compare-ScubaGearPermission {
         [object]$AppRoleIDs,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -179,7 +179,6 @@ function Compare-ScubaGearPermission {
         [Object]$SPPerms,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
         [string[]]$ProductNames
     )
 
@@ -470,7 +469,6 @@ function Set-ScubaGearRole {
         [string]$roleDefinitionID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -566,7 +564,6 @@ function Get-ScubaGearAppRoleID {
         [object]$ScubaGearSPPermissions,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -680,7 +677,6 @@ function Set-AppRegistrationPermission {
         [array]$ScubaGearSPPermissions,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -900,11 +896,17 @@ function Get-ScubaGearAppPermission {
         [string]$AppID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({
+            $valid = [ScubaConfig]::GetAllValidProductNames()
+            $_ | ForEach-Object {
+                if ($_ -notin $valid) { throw "Invalid ProductName '$_'. Valid values: $($valid -join ', ')" }
+            }
+            $true
+        })]
         [string[]]$ProductNames = '*'
     )
 
@@ -1462,14 +1464,20 @@ function Set-ScubaGearAppPermission {
             Mandatory = $true,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(
             Mandatory = $false,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({
+            $valid = [ScubaConfig]::GetAllValidProductNames()
+            $_ | ForEach-Object {
+                if ($_ -notin $valid) { throw "Invalid ProductName '$_'. Valid values: $($valid -join ', ')" }
+            }
+            $true
+        })]
         [string[]]$ProductNames = '*'
     )
 
@@ -2111,7 +2119,6 @@ function Connect-PowerPlatformApp {
         [string]$TenantId,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
         [string]$M365Environment
     )
 
@@ -2296,11 +2303,17 @@ function New-ScubaGearServicePrincipal {
         [string]$CertName = "ScubaGearCert-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))Z",
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory=$false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({
+            $valid = [ScubaConfig]::GetAllValidProductNames()
+            $_ | ForEach-Object {
+                if ($_ -notin $valid) { throw "Invalid ProductName '$_'. Valid values: $($valid -join ', ')" }
+            }
+            $true
+        })]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory=$false)]
@@ -2583,7 +2596,7 @@ function Get-ScubaGearAppCert {
         [string]$AppID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -2762,7 +2775,7 @@ function Remove-ScubaGearAppCert {
         [string]$CertThumbprint,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -2914,7 +2927,7 @@ function New-ScubaGearAppCert {
         [int]$CertValidityMonths = 6,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
