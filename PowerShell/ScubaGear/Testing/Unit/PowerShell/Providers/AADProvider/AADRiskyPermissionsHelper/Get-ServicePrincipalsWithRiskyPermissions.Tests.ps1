@@ -73,17 +73,23 @@ InModuleScope AADRiskyPermissionsHelper {
 
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
-            }
+            } -ParameterFilter { $commandlet -eq "Get-MgServicePrincipal" } -ModuleName AADRiskyPermissionsHelper
+
+            Mock Get-ScubaGearPermissions {
+                return "https://graph.microsoft.com"
+            } -ParameterFilter { $CmdletName -eq "Connect-MgGraph" -and $OutAs -eq "endpoint" } -ModuleName AADRiskyPermissionsHelper
         }
 
         It "returns a list of service principals with valid properties" {
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
 
-            Mock Invoke-MgGraphRequest {
-                return @{
-                    responses = $MockAppRoleAssignmentResponses
+            Mock Invoke-GraphBatchRequestsWithRetry {
+                $responses = @{}
+                foreach ($response in $MockAppRoleAssignmentResponses) {
+                    $responses[[string]$response.id] = $response
                 }
-            }
+                return $responses
+            } -ModuleName AADRiskyPermissionsHelper
 
             $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
             $RiskySPs | Should -HaveCount 5
@@ -133,11 +139,13 @@ InModuleScope AADRiskyPermissionsHelper {
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockSafePermissions
-            Mock Invoke-MgGraphRequest {
-                return @{
-                    responses = $MockAppRoleAssignmentResponses
+            Mock Invoke-GraphBatchRequestsWithRetry {
+                $responses = @{}
+                foreach ($response in $MockAppRoleAssignmentResponses) {
+                    $responses[[string]$response.id] = $response
                 }
-            }
+                return $responses
+            } -ModuleName AADRiskyPermissionsHelper
 
             $RiskySPs = @()
             foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
@@ -154,11 +162,13 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
-            Mock Invoke-MgGraphRequest {
-                return @{
-                    responses = $MockAppRoleAssignmentResponses
+            Mock Invoke-GraphBatchRequestsWithRetry {
+                $responses = @{}
+                foreach ($response in $MockAppRoleAssignmentResponses) {
+                    $responses[[string]$response.id] = $response
                 }
-            }
+                return $responses
+            } -ModuleName AADRiskyPermissionsHelper
 
             $RiskySPs = @()
             foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
