@@ -76,7 +76,6 @@ InModuleScope Orchestrator {
                         }
                     }
                 }
-                Mock -CommandName ConvertTo-Json { "" }
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MergeParams')]
                 $MergeParams = @{
                     TenantDetails       = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
@@ -103,7 +102,6 @@ InModuleScope Orchestrator {
                         "scuba_config"   = @{}
                     }
                 }
-                Mock -CommandName ConvertTo-Json { "" }
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MergeParams')]
                 $MergeParams = @{
                     TenantDetails       = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
