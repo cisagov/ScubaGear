@@ -11,7 +11,6 @@ function Get-PowerPlatformBaseUrl {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
 
@@ -30,7 +29,6 @@ function Get-PowerPlatformScope {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
 

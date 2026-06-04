@@ -509,7 +509,6 @@ function Invoke-GraphBatchRequest {
         [scriptblock]$UrlScript,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]

@@ -25,7 +25,9 @@
       "SilenceBODWarnings",
       "DarkMode",
       "Verbose",
-      "Debug"
+      "Debug",
+      "ScubaGitHubUrl",
+      "IndividualReportFolderName"
       ],
 
     "policyExclusionMappings": {
@@ -70,6 +72,17 @@
         "supportsExclusions": false,
         "supportedExclusionTypes": []
       }
+    },
+
+    "reportProductNames": {
+      "_comment": "Maps lowercase product identifiers to their PascalCase baseline name and full display name",
+      "aad":           { "baselineName": "AAD",           "displayName": "Microsoft Entra ID" },
+      "exo":           { "baselineName": "EXO",           "displayName": "Exchange Online" },
+      "securitysuite": { "baselineName": "SecuritySuite", "displayName": "Security Suite" },
+      "powerplatform": { "baselineName": "PowerPlatform", "displayName": "Microsoft Power Platform" },
+      "sharepoint":    { "baselineName": "SharePoint",    "displayName": "SharePoint Online" },
+      "teams":         { "baselineName": "Teams",         "displayName": "Microsoft Teams" },
+      "powerbi":       { "baselineName": "PowerBI",       "displayName": "Microsoft Power BI" }
     }
   },
 

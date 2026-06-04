@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Connect-Tenant {
     <#
    .Description
@@ -13,7 +15,6 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -21,7 +22,6 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
    [string]
    $M365Environment,
 
@@ -451,7 +451,13 @@ function Disconnect-SCuBATenant {
    #>
    [CmdletBinding()]
    param(
-    [ValidateSet("aad", "securitysuite", "exo","powerplatform", "sharepoint", "teams", "powerbi", IgnoreCase = $false)]
+       [ValidateScript({
+           $valid = [ScubaConfig]::GetAllValidProductNames()
+           $_ | ForEach-Object {
+               if ($_ -notin $valid) { throw "Invalid ProductName '$_'. Valid values: $($valid -join ', ')" }
+           }
+           $true
+       })]
        [ValidateNotNullOrEmpty()]
        [string[]]
     $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi")
