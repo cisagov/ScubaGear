@@ -60,7 +60,7 @@ function Get-RiskyAppPermissionsJson {
                     Join-Path -Path (Get-Item -Path $SchemasPath) -ChildPath "RiskyAppPermissions.json"
                 ) -Raw | ConvertFrom-Json
                 # Build the hashtable lookup on first load
-                $script:CachedPermissionLookup = Build-PermissionLookup -Json $script:CachedRiskyAppPermissionsJson
+                $script:CachedPermissionLookup = New-PermissionLookup -Json $script:CachedRiskyAppPermissionsJson
             }
             catch {
                 Write-Warning "An error occurred in Get-RiskyAppPermissionsJson: $($_.Exception.Message)"
@@ -72,7 +72,7 @@ function Get-RiskyAppPermissionsJson {
     }
 }
 
-function Build-PermissionLookup {
+function New-PermissionLookup {
     <#
     .Description
     Builds a nested hashtable from the RiskyAppPermissions.json PSObject for O(1) permission lookups.
@@ -126,7 +126,7 @@ function Get-PermissionLookup {
         $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
     }
 
-    $script:CachedPermissionLookup = Build-PermissionLookup -Json $RiskyAppPermissionsJson
+    $script:CachedPermissionLookup = New-PermissionLookup -Json $RiskyAppPermissionsJson
     return $script:CachedPermissionLookup
 }
 
@@ -1220,7 +1220,7 @@ function Set-SeverityScore {
 
 Export-ModuleMember -Function @(
     "Get-RiskyAppPermissionsJson",
-    "Build-PermissionLookup",
+    "New-PermissionLookup",
     "Get-PermissionLookup",
     "Format-Credentials",
     "Get-ApplicationsWithRiskyPermissions",
