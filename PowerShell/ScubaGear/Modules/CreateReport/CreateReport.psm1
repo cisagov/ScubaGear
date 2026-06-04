@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
 function Get-RegoResult {
@@ -149,15 +151,9 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetProductBaselineNames() })]
         [string]
         $BaselineName,
-
-        [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", IgnoreCase = $false)]
-        [string]
-        $FullName,
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
@@ -194,7 +190,8 @@ function New-Report {
         $SecureBaselines
     )
 
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
+    $FullName = [ScubaConfig]::GetDisplayNameFromBaselineName($BaselineName)
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
@@ -779,7 +776,6 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
@@ -1017,7 +1013,7 @@ function Get-IndicatorHtml {
         return ""
     }
 
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
     $IndicatorHtml = "<div class='policy-indicators'>"
 
     foreach ($Indicator in $Indicators) {

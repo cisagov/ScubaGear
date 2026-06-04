@@ -122,6 +122,11 @@ class ScubaConfig {
         }
     }
 
+    # Returns the ScubaGear GitHub repository URL from defaults.
+    static [string]GetScubaGitHubUrl() {
+        return [ScubaConfig]::ScubaDefault('DefaultScubaGitHubUrl')
+    }
+
     # Returns default OPA version from configuration. Wrapper around ScubaDefault('DefaultOPAVersion').
     static [string]GetOpaVersion() {
         return [ScubaConfig]::ScubaDefault('DefaultOPAVersion')
@@ -758,6 +763,36 @@ class ScubaConfig {
     static [array] GetSupportedEnvironments() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigSchema.properties.M365Environment.enum
+    }
+
+    # Returns all valid product name values from the schema (includes defender, *, and all canonical names).
+    static [array] GetAllValidProductNames() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigSchema.properties.ProductNames.items.enum
+    }
+
+    # Returns the PascalCase baseline name for a lowercase product name (e.g., "aad" -> "AAD").
+    static [string] GetProductBaselineName([string]$ProductName) {
+        [ScubaConfig]::InitializeValidator()
+        $info = [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.$ProductName
+        if ($null -eq $info) { throw "Unknown product name: '$ProductName'" }
+        return $info.baselineName
+    }
+
+    # Returns all PascalCase baseline names from the schema (e.g., "AAD", "EXO", "SecuritySuite", ...).
+    static [array] GetProductBaselineNames() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties |
+            ForEach-Object { $_.Value.baselineName }
+    }
+
+    # Returns the full display name for a PascalCase baseline name (e.g., "AAD" -> "Azure Active Directory").
+    static [string] GetDisplayNameFromBaselineName([string]$BaselineName) {
+        [ScubaConfig]::InitializeValidator()
+        foreach ($prop in [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties) {
+            if ($prop.Value.baselineName -eq $BaselineName) { return $prop.Value.displayName }
+        }
+        throw "Unknown baseline name: '$BaselineName'"
     }
 
     # Returns configuration information for specified product (baseline file, capabilities, etc.).

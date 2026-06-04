@@ -49,6 +49,8 @@
     Invoke-Pester -Configuration $Config
 #>
 
+using module '../../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfig.psm1'
+
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Thumbprint', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantDomain', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantDisplayName', Justification = 'False positive as rule does not scan child scopes')]
@@ -80,7 +82,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateScript({ $_ -in ([ScubaConfig]::GetAllValidProductNames() | Where-Object { $_ -ne '*' }) })]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]

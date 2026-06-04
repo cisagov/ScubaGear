@@ -8,7 +8,6 @@ function Get-PowerBIBaseUrl {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
 
@@ -30,7 +29,6 @@ function Get-PowerBIScope {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
     switch ($M365Environment) {

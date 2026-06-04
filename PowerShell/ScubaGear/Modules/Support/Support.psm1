@@ -745,12 +745,18 @@ function New-SCuBAConfig {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        [ValidateScript({
+            $valid = [ScubaConfig]::GetAllValidProductNames()
+            $_ | ForEach-Object {
+                if ($_ -notin $valid) { throw "Invalid ProductName '$_'. Valid values: $($valid -join ', ')" }
+            }
+            $true
+        })]
         [string[]]
         $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment = "commercial",
