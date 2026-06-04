@@ -412,6 +412,8 @@ For commercial and GCC tenants:
 
 7.  Click **Save.**
 
+Note: If **People in my organization can communicate with unmanaged Teams accounts** is set to **Off** the policy will also pass.
+
 For GCC high tenants:
 
 1.  Sign in to the **Microsoft Teams admin center.**
