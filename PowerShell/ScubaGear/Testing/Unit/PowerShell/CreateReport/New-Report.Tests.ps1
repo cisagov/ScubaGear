@@ -20,15 +20,6 @@ InModuleScope CreateReport {
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
             }
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProdToFullName')]
-            $ProdToFullName = @{
-                Teams         = "Microsoft Teams";
-                EXO           = "Exchange Online";
-                SecuritySuite = "Security Suite";
-                AAD           = "Azure Active Directory";
-                PowerPlatform = "Microsoft Power Platform";
-                SharePoint    = "SharePoint Online";
-            }
         }
         BeforeEach {
             $IndividualReportPath = (Join-Path -Path $TestDrive -ChildPath "CreateReportStubs/CreateReportUnitFolder/IndividualReports")
@@ -51,7 +42,6 @@ InModuleScope CreateReport {
         ){
             $CreateReportParams += @{
                 'BaselineName'    = $ArgToProd[$Product];
-                'FullName'        = $ProdToFullName[$Product];
                 'SecureBaselines' = Import-SecureBaseline -ProductNames $Product -BaselinePath (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve)
             }
 

@@ -152,7 +152,6 @@ function Get-EXOTenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,

@@ -8,7 +8,6 @@
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
@@ -112,7 +111,6 @@ function Get-MsalAccessToken {
         [string]$Tenant,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
 
