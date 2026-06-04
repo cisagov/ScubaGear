@@ -473,7 +473,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         if (-Not $PrivilegedUsers.ContainsKey($ObjectId)) {
             # This will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
             $AADUser = Invoke-GraphDirectly -Commandlet "Get-MgBetaUser" -M365Environment $M365Environment -id $ObjectId
-            $PrivilegedUsers[$ObjectId] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+            $PrivilegedUsers[$ObjectId] = @{"id"=$ObjectId; "DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
         }
         # If the current role has not already been added to the user's roles array then add the role
         if ($PrivilegedUsers[$ObjectId].roles -notcontains $RoleName) {
@@ -511,7 +511,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
                 if (-Not $PrivilegedUsers.ContainsKey($GroupMember.Id)) {
                     # This will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
                     $AADUser = Invoke-GraphDirectly -Commandlet "Get-MgBetaUser" -M365Environment $M365Environment -id $GroupMember.Id
-                    $PrivilegedUsers[$GroupMember.Id] = @{"DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
+                    $PrivilegedUsers[$GroupMember.Id] = @{"id"=$GroupMember.Id; "DisplayName"=$AADUser.DisplayName; "OnPremisesImmutableId"=$AADUser.OnPremisesImmutableId; "roles"=@()}
                 }
                 # If the current role has not already been added to the user's roles array then add the role
                 if ($PrivilegedUsers[$GroupMember.Id].roles -notcontains $RoleName) {

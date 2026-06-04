@@ -569,17 +569,41 @@ function New-Report {
             $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
 
             # Create a section header for the service principal information
-            $privilegedServicePrincipalsTableHTML = "<h2>Service Principals with Privileged Roles</h2>" + $privilegedServicePrincipalsTable
+            $privilegedServicePrincipalsTableHTML = "<h2>Service Principals with Privileged Role Assignments</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
         }
         else {
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
+        }
+
+        if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_users) {
+
+            # Create a section for users with privileged roles
+            $privilegedUsersTable = $SettingsExport.privileged_users.psobject.properties | ForEach-Object {
+                $user = $_.Value
+                [pscustomobject]@{
+                    "Display Name" = $user.DisplayName
+                    "Object ID" = $user.id
+                    "Roles" = ($user.roles -join ", ")
+                    "On-Prem Immutable ID" = $user.OnPremisesImmutableId
+                }
+            } | ConvertTo-Html -Fragment
+
+            $privilegedUsersTable = $privilegedUsersTable -replace '^(.*?)<table>', '<table id="privileged-users" style="text-align:center;">'
+
+            # Create a section header for the privileged user information
+            $privilegedUsersTableHTML = "<h2>Users with Privileged Roles</h2>" + $privilegedUsersTable
+            $ReportHTML = $ReportHTML.Replace("{PRIVILEGED_USERS}", $privilegedUsersTableHTML)
+        }
+        else {
+            $ReportHTML = $ReportHTML.Replace("{PRIVILEGED_USERS}", "")
         }
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
+        $ReportHTML = $ReportHTML.Replace("{PRIVILEGED_USERS}", "")
         $CapJson = "null"
         $RiskyAppsJson = "null"
         $RiskyThirdPartySPJson = "null"

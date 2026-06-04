@@ -58,7 +58,16 @@ InModuleScope CreateReport {
             { New-Report @CreateReportParams } | Should -Not -Throw
             Should -Invoke -CommandName Write-Warning -Exactly -Times $WarningCount
 
-            Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html" -PathType leaf | Should -Be $true
+            $ReportPath = "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html"
+            Test-Path -Path $ReportPath -PathType leaf | Should -Be $true
+
+            # The AAD report should render the "Users with Privileged Roles" table built
+            # from the privileged_users data in the provider settings export.
+            if ($Product -eq 'aad') {
+                $ReportContent = Get-Content -Path $ReportPath -Raw
+                $ReportContent | Should -Match '<h2>Users with Privileged Roles</h2>'
+                $ReportContent | Should -Match 'id="privileged-users"'
+            }
         }
     }
 

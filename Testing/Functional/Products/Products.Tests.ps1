@@ -471,6 +471,15 @@ Describe "Policy Checks for <ProductName>" {
                         $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
                         $RowHeaders.Count | Should -BeExactly 4
                     }
+                    elseif ($Table.GetProperty("id") -eq "privileged-users"){
+                        $Rows.Count | Should -BeGreaterThan 0
+                        $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
+                        $RowHeaders.Count | Should -BeExactly 4
+                        $RowHeaders[0].text | Should -BeLikeExactly "Display Name"
+                        $RowHeaders[1].text | Should -BeLikeExactly "Object ID"
+                        $RowHeaders[2].text | Should -BeLikeExactly "Roles"
+                        $RowHeaders[3].text | Should -BeLikeExactly "On-Prem Immutable ID"
+                    }
                     elseif ($null -ne $Table.GetAttribute("class") -and $Table.GetAttribute("class").Contains("dns-table")) {
                         foreach ($Row in $Rows) {
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
