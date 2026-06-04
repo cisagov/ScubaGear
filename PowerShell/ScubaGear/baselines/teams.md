@@ -326,6 +326,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 <!--Policy: MS.TEAMS.2.2v3; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting.
 - _Last modified:_ April 2026
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC) High tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -339,6 +340,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 <!--Policy: MS.TEAMS.2.3v3; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ April 2026
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC) High tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -412,24 +414,6 @@ For commercial and GCC tenants:
 
 Note: If **People in my organization can communicate with unmanaged Teams accounts** is set to **Off** the policy will also pass.
 
-For GCC high tenants:
-
-1.  Sign in to the **Microsoft Teams admin center.**
-
-2.  Under **Users** select **External access.**
-
-3.  Select the **Policies** tab.
-
-4.  Select the policy named **Global (Org-wide Default)**.
-
-5. If **People in my org can chat and have meetings with external users who have unmanaged Microsoft accounts** is set to **On**.
-
-6.  Clear the check next to **People in my org can join external meetings and receive new chats from users who have unmanaged Microsoft accounts.**
-
-7.  Click **Save.**
-
-Note: If **People in my organization can communicate with unmanaged Teams accounts** is set to **Off** the policy will also pass.
-
 #### MS.TEAMS.2.3v3 Instructions
 
 For commercial and GCC tenants:
@@ -444,19 +428,6 @@ For commercial and GCC tenants:
 
 5.  Click **Save.**
 
-For GCC high tenants:
-
-1.  Sign in to the **Microsoft Teams admin center.**
-
-2.  Under **Users** select **External access.**
-
-3.  Select the **Policies** tab.
-
-4.  Select **Global (Org-wide Default).**
-
-5.  Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
-
-6.  Click **Save.**
 
 ## 4. Teams Email Integration
 This section helps reduce security risks related to Teams email integration. Teams provides an optional feature allowing channels to have an email address and receive email.

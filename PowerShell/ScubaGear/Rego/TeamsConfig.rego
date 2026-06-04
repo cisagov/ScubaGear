@@ -301,6 +301,12 @@ tests contains {
 }
 #--
 
+# If AssignedPlan contains "GCCHIGH", return true, else return false
+default IsGCCHighTenantRegion := false
+IsGCCHighTenantRegion := true if {
+    contains(AssignedPlans, "GCCHIGH")
+}
+
 #
 # MS.TEAMS.2.2v3
 #--
@@ -329,6 +335,19 @@ FederationConfiguration contains Policy.Identity if {
     Policy.AllowTeamsConsumer == true
 }
 
+# GCC High environment: Not applicable
+tests contains {
+    "PolicyId": "MS.TEAMS.2.2v3",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-CsTenantFederationConfiguration", "Get-CsTenant"],
+    "ActualValue": {"AssignedPlans": AssignedPlans},
+    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v3", Reason),
+    "RequirementMet": true
+} if {
+    Reason := "This policy is not applicable to GCC High environments. See %v for more info"
+    IsGCCHighTenantRegion
+}
+
 # Pass if FederationConfiguration does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v3",
@@ -338,6 +357,7 @@ tests contains {
     "ReportDetails": ReportDetailsArray(Status, FederationConfiguration, String),
     "RequirementMet": Status
 } if {
+    not IsGCCHighTenantRegion
     String := "Configuration allowed unmanaged users to initiate contact with internal user across domains:"
     Status := count(FederationConfiguration) == 0
 }
@@ -354,6 +374,19 @@ InternalCannotEnable contains Policy.Identity if {
     Policy.AllowTeamsConsumer == true
 }
 
+# GCC High environment: Not applicable
+tests contains {
+    "PolicyId": "MS.TEAMS.2.3v3",
+    "Criticality": "Should",
+    "Commandlet": ["Get-CsTenantFederationConfiguration", "Get-CsTenant"],
+    "ActualValue": {"AssignedPlans": AssignedPlans},
+    "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v3", Reason),
+    "RequirementMet": true
+} if {
+    Reason := "This policy is not applicable to GCC High environments. See %v for more info"
+    IsGCCHighTenantRegion
+}
+
 # Pass if InternalCannotEnable does not have any policies saved.
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v3",
@@ -363,6 +396,7 @@ tests contains {
     "ReportDetails": ReportDetailsArray(Status, InternalCannotEnable, String),
     "RequirementMet": Status
 } if {
+    not IsGCCHighTenantRegion
     String := "Internal users are enabled to initiate contact with unmanaged users across domains:"
     Status := count(InternalCannotEnable) == 0
 }
