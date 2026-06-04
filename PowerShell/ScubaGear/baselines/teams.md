@@ -402,15 +402,13 @@ For commercial and GCC tenants:
 
 2.  Under **External Collaboration** select **External access.**
 
-3.  Select the **Policies** tab.
+3.  Ensure the **Organizational settings** tab is selected at the top of the page.
 
-4.  Select the policy named **Global (Org-wide Default)**.
+4. If **People in my org can chat and have meetings with external users who have unmanaged Microsoft accounts** is set to **On**.
 
-5.  Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **On**.
+5.  Clear the check next to **People in my org can join external meetings and receive new chats from users who have unmanaged Microsoft accounts.**
 
-6.  Clear the check next to **People in my org can join external meetings and receive new chats from users who have unmanaged Microsoft accounts.**
-
-7.  Click **Save.**
+6.  Click **Save.**
 
 Note: If **People in my organization can communicate with unmanaged Teams accounts** is set to **Off** the policy will also pass.
 
@@ -424,11 +422,13 @@ For GCC high tenants:
 
 4.  Select the policy named **Global (Org-wide Default)**.
 
-5.  Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to **On**.
+5. If **People in my org can chat and have meetings with external users who have unmanaged Microsoft accounts** is set to **On**.
 
 6.  Clear the check next to **People in my org can join external meetings and receive new chats from users who have unmanaged Microsoft accounts.**
 
 7.  Click **Save.**
+
+Note: If **People in my organization can communicate with unmanaged Teams accounts** is set to **Off** the policy will also pass.
 
 #### MS.TEAMS.2.3v3 Instructions
 
