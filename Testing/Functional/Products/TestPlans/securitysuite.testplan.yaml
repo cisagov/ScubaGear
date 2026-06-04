@@ -159,7 +159,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.3.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -167,7 +167,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.3.5v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -176,15 +176,50 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.4.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.4.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.4.1v1 Non-Compliant case - Required alert is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: true
+                  - Name: Suspicious connector activity
+                    Disabled: false
+                  - Name: Suspicious Email Forwarding Activity
+                    Disabled: false
+                  - Name: Messages have been delayed
+                    Disabled: false
+                  - Name: Tenant restricted from sending unprovisioned email
+                    Disabled: false
+                  - Name: Tenant restricted from sending email
+                    Disabled: false
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.4.1v1 Compliant case - Required alerts are enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: false
+                  - Name: Suspicious connector activity
+                    Disabled: false
+                  - Name: Suspicious Email Forwarding Activity
+                    Disabled: false
+                  - Name: Messages have been delayed
+                    Disabled: false
+                  - Name: Tenant restricted from sending unprovisioned email
+                    Disabled: false
+                  - Name: Tenant restricted from sending email
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.4.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -261,18 +296,29 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.8.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.8.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.8.1v1 Non-Compliant case - IP allow list is created
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList 192.168.1.10,192.168.1.23"
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.8.1v1 Compliant case - IP allow list is empty
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList @{}"
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.SECURITYSUITE.8.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.8.2v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Enabled
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $true"
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Disabled
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $false"
+        Postconditions: []
+        ExpectedResult: true

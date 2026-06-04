@@ -1057,7 +1057,7 @@ TestPlan:
                     IsRoot: false
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
+      - TestDescription: MS.AAD.6.1v1 Compliant case - root domains with null PasswordValidityPeriodInDays (Post-Oct 2021 behavior)
         Preconditions:
           - Command: UpdateProviderExport
             Splat:
@@ -1065,6 +1065,44 @@ TestPlan:
                 domain_settings:
                   - Id: root1.com
                     PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: true
+                  - Id: root2.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: true
+                  - Id: sub.root1.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: sub.root2.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: true
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: unverified.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Managed"
+                    IsRoot: false
+                  - Id: federated.domain.com
+                    PasswordValidityPeriodInDays: null
+                    IsVerified: false
+                    AuthenticationType: "Federated"
+                    IsRoot: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.6.1v1 Non-Compliant case - User passwords for some domains are set to expire
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                domain_settings:
+                  - Id: root1.com
+                    PasswordValidityPeriodInDays: 90
                     IsVerified: true
                     AuthenticationType: "Managed"
                     IsRoot: true

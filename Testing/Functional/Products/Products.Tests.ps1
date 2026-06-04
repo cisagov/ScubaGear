@@ -80,7 +80,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -167,6 +167,7 @@ BeforeAll {
         aad = "Azure Active Directory"
         securitysuite = "Security Suite"
         exo = "Exchange Online"
+        powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"
         teams = "Microsoft Teams"
@@ -230,6 +231,33 @@ BeforeAll {
                 -M365Environment $M365Environment `
                 -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
                 -Scope $PPScope
+        }
+    }
+
+    # Power BI functional tests: acquire REST token for precondition helper calls.
+    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
+    # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
+    if ($ProductName -eq "powerbi") {
+        $PBIHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerBIRestHelper.psm1"
+        Import-Module $PBIHelperPath -Force
+        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
+        Import-Module $ConnectHelpersPath -Force
+        $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+        $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+        if (-Not [string]::IsNullOrEmpty($AppId)) {
+            $script:PBIAccessToken = Get-MsalAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -Scope $PBIScope
+        }
+        else {
+            $script:PBIAccessToken = Get-MsalAccessToken `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -Scope $PBIScope
         }
     }
 

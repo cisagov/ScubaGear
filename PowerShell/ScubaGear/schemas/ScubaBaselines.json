@@ -1,5 +1,5 @@
 {
-  "Version": "2.4.8 [updated 4/8/2026]",
+  "Version": "2.5.28 [updated 5/28/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -839,7 +839,7 @@
         "name": "Managed Devices SHOULD be required to register MFA.",
         "policySection": "Strong Authentication and a Secure Registration Process",
         "sectionDescription": "This section provides policies that help reduce security risks related to user authentication and registration. Phishing-resistant MFA is required per [Office of Management and Budget Memorandum 22-09](https://www.whitehouse.gov/wp-content/uploads/2022/01/M-22-09.pdf). <img src=\"/images/aad-mfa.png\" alt=\"Weak MFA methods are SMS and Voice. Stronger MFA are Authenticator Push Notifications, Authenticator Phone Sign-in, Software Tokens OTP, and Hardware Tokens OTP. Strongest MFA methods are FIDO2 (preferred), Windows Hello (preferred), Microsoft Entra certificate-based authentication (preferred) and federated PIV card.\" /> Figure 1: Depiction of MFA methods from weakest to strongest. _Adapted from [Microsoft Page](https://learn.microsoft.com/en-us/entra/identity/authentication/concept-authentication-methods)_",
-        "exclusionField": "CapExclusions",
+        "exclusionField": "CapExclusionsWithoutApps",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
         "rationale": "Reduce risk of an adversary using stolen user credentials and then registering their own MFA device to access the tenant by requiring a managed device provisioned and controlled by the agency to perform registration actions. This prevents the adversary from using their own unmanaged device to perform the registration.",
@@ -1087,6 +1087,18 @@
           {
             "Name": "Configure the admin consent workflow",
             "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+          },
+          {
+            "Name": "Configure restrictions on how applications can be configured",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies"
+          },
+          {
+            "Name": "Tutorial: Enforce secret and certificate standards using application management policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards"
+          },
+          {
+            "Name": "Application Management Policies API Overview",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy"
           }
         ],
         "licenseRequirements": [
@@ -1139,6 +1151,18 @@
           {
             "Name": "Configure the admin consent workflow",
             "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+          },
+          {
+            "Name": "Configure restrictions on how applications can be configured",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies"
+          },
+          {
+            "Name": "Tutorial: Enforce secret and certificate standards using application management policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards"
+          },
+          {
+            "Name": "Application Management Policies API Overview",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy"
           }
         ],
         "licenseRequirements": [
@@ -1191,6 +1215,18 @@
           {
             "Name": "Configure the admin consent workflow",
             "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+          },
+          {
+            "Name": "Configure restrictions on how applications can be configured",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies"
+          },
+          {
+            "Name": "Tutorial: Enforce secret and certificate standards using application management policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards"
+          },
+          {
+            "Name": "Application Management Policies API Overview",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy"
           }
         ],
         "licenseRequirements": [
@@ -1210,6 +1246,171 @@
         ]
       },
       {
+        "id": "MS.AAD.5.5v1",
+        "name": "Application Password Addition SHOULD be blocked.",
+        "policySection": "Application Registration and Consent",
+        "sectionDescription": "This section provides policies that help reduce security risk of malicious applications or service principals added to the tenant by non-privileged users. Malicious applications can perform many of the same operations as interactive users and can access data on behalf of compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "rationale": "Applications that use client secrets might store them in configuration files, hardcode them in scripts, or risk exposure in other ways. The complexities of secret management make client secrets susceptible to leaks and attractive to attackers. Blocking password addition forces the use of more secure certificate-based authentication.",
+        "criticality": "SHOULD",
+        "lastModified": "April 2026",
+        "implementation": "1. In **Microsoft Entra admin center**, select **Enterprise apps**.\n\n2. Under **Security**, select **Application policies**.\n\n3. Select **Block password addition**.\n\n4. Set status to **On**. Ensure **Applies to** is set to **All applications**.\n\n5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.\n\n6. Click **Save**.",
+        "mitreMapping": [
+          {
+            "Name": "T1098: Account Manipulation",
+            "Url": "https://attack.mitre.org/techniques/T1098/"
+          },
+          {
+            "Name": "T1098.001: Additional Cloud Credentials",
+            "Url": "https://attack.mitre.org/techniques/T1098/001/"
+          },
+          {
+            "Name": "T1528: Steal Application Access Token",
+            "Url": "https://attack.mitre.org/techniques/T1528/"
+          }
+        ],
+        "resources": [
+          {
+            "Name": "Restrict Application Registration for Non-Privileged Users",
+            "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html"
+          },
+          {
+            "Name": "Configure the admin consent workflow",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+          },
+          {
+            "Name": "Configure restrictions on how applications can be configured",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies"
+          },
+          {
+            "Name": "Tutorial: Enforce secret and certificate standards using application management policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards"
+          },
+          {
+            "Name": "Application Management Policies API Overview",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy"
+          }
+        ],
+        "licenseRequirements": [
+          "N/A"
+        ],
+        "badges": [
+          {
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
+          }
+        ]
+      },
+      {
+        "id": "MS.AAD.5.6v1",
+        "name": "Application password lifetime SHOULD be restricted to 180 days or less.",
+        "policySection": "Application Registration and Consent",
+        "sectionDescription": "This section provides policies that help reduce security risk of malicious applications or service principals added to the tenant by non-privileged users. Malicious applications can perform many of the same operations as interactive users and can access data on behalf of compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "rationale": "Long-lived credentials increase the window of opportunity for attackers to exploit compromised secrets. Enforcing a maximum password lifetime of 180 days ensures regular credential rotation, reducing the impact of credential theft and improving overall security hygiene.",
+        "criticality": "SHOULD",
+        "lastModified": "April 2026",
+        "implementation": "1. In **Microsoft Entra admin center**, select **Enterprise apps**.\n\n2. Under **Security**, select **Application policies**.\n\n3. Select **Restrict max password lifetime**.\n\n4. Set status to **On**. Set maximum lifetime to **181 days**. Ensure **Applies to** is set to **All applications**.\n\n5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.\n\n6. Click **Save**.",
+        "mitreMapping": [
+          {
+            "Name": "T1552: Unsecured Credentials",
+            "Url": "https://attack.mitre.org/techniques/T1552/"
+          },
+          {
+            "Name": "T1552.001: Credentials In Files",
+            "Url": "https://attack.mitre.org/techniques/T1552/001/"
+          }
+        ],
+        "resources": [
+          {
+            "Name": "Restrict Application Registration for Non-Privileged Users",
+            "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html"
+          },
+          {
+            "Name": "Configure the admin consent workflow",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+          },
+          {
+            "Name": "Configure restrictions on how applications can be configured",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies"
+          },
+          {
+            "Name": "Tutorial: Enforce secret and certificate standards using application management policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards"
+          },
+          {
+            "Name": "Application Management Policies API Overview",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy"
+          }
+        ],
+        "licenseRequirements": [
+          "N/A"
+        ],
+        "badges": [
+          {
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
+          }
+        ]
+      },
+      {
+        "id": "MS.AAD.5.7v1",
+        "name": "Application certificate lifetime SHOULD be restricted to 365 days or less.",
+        "policySection": "Application Registration and Consent",
+        "sectionDescription": "This section provides policies that help reduce security risk of malicious applications or service principals added to the tenant by non-privileged users. Malicious applications can perform many of the same operations as interactive users and can access data on behalf of compromised users. These policies apply to custom-developed applications and applications published by third-party vendors.",
+        "exclusionField": "none",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "rationale": "While certificates provide more secure authentication than passwords, long-lived certificates can still be compromised. Limiting certificate lifetime to 365 days reduces the risk of exploitation while balancing operational overhead. Regular certificate rotation is a security best practice that minimizes exposure from compromised keys.",
+        "criticality": "SHOULD",
+        "lastModified": "April 2026",
+        "implementation": "1. In **Microsoft Entra admin center**, select **Enterprise apps**.\n\n2. Under **Security**, select **Application policies**.\n\n3. Select **Restrict max certificate lifetime**.\n\n4. Set status to **On**. Set maximum lifetime to **366 days**. Ensure **Applies to** is set to **All applications**.\n\n5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.\n\n6. Click **Save**.",
+        "mitreMapping": [
+          {
+            "Name": "T1649: Steal or Forge Authentication Certificates",
+            "Url": "https://attack.mitre.org/techniques/T1649/"
+          }
+        ],
+        "resources": [
+          {
+            "Name": "Restrict Application Registration for Non-Privileged Users",
+            "Url": "https://www.trendmicro.com/cloudoneconformity/knowledge-base/azure/ActiveDirectory/users-can-register-applications.html"
+          },
+          {
+            "Name": "Configure the admin consent workflow",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-admin-consent-workflow"
+          },
+          {
+            "Name": "Configure restrictions on how applications can be configured",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-app-management-policies"
+          },
+          {
+            "Name": "Tutorial: Enforce secret and certificate standards using application management policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/tutorial-enforce-secret-standards"
+          },
+          {
+            "Name": "Application Management Policies API Overview",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/applicationauthenticationmethodpolicy"
+          }
+        ],
+        "licenseRequirements": [
+          "N/A"
+        ],
+        "badges": [
+          {
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
+          }
+        ]
+      },
+      {
         "id": "MS.AAD.6.1v1",
         "name": "User passwords SHALL NOT expire.",
         "policySection": "Passwords",
@@ -1220,11 +1421,15 @@
         "rationale": "The National Institute of Standards and Technology (NIST), OMB, and Microsoft have published guidance indicating mandated periodic password changes make user accounts less secure. For example, OMB-22-09 states, \"Password policies must not require use of special characters or regular rotation.\"",
         "criticality": "SHALL",
         "lastModified": "June 2023",
-        "implementation": "1. [Configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).",
+        "implementation": "> **Note:** Tenants created after October 2021 have password expiration disabled by default (`passwordValidityPeriodInDays = null`), which Microsoft treats as equivalent to \"never expire.\" Tenants created before October 2021, or any tenant where the policy was explicitly configured and then reverted, will show `2147483647` (INT_MAX). ScubaGear treats both values as compliant. The M365 admin center password expiration checkbox applies to all managed domains in the tenant. If a tenant has **multiple root domains**, use the PowerShell in Step 2 to audit all of them and remediate any that have a finite expiration period set.\n\n1. Sign in to the [Microsoft 365 admin center](https://admin.microsoft.com) and [configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).\n\n2. Optionally, verify and remediate all root domains via PowerShell. This is useful if any domain had a finite expiration configured explicitly. This uses `Invoke-MgGraphRequest`, which is included with the `Microsoft.Graph.Authentication` module already required by ScubaGear. To audit only, connect with `Domain.Read.All`; to also remediate, use `Domain.ReadWrite.All`.\n\n  Connect-MgGraph -Scopes \"Domain.ReadWrite.All\" # or alternatively \"Domain.Read.All\" for determining which domains are in a non-compliant state.\n\n  $NonCompliantDomains = (Invoke-MgGraphRequest -Method GET -Uri \"https://graph.microsoft.com/v1.0/domains\").value | Where-Object {\n    $_.isRoot -and $_.isVerified -and\n    $null -ne $_.passwordValidityPeriodInDays -and\n    $_.passwordValidityPeriodInDays -ne [int32]::MaxValue\n  }\n\n  Write-Host $NonCompliantDomains | Format-List\n\n  # Remediate each non-compliant domain\n  Invoke-MgGraphRequest -Method PATCH -Uri \"https://graph.microsoft.com/v1.0/domains/example.com\" `\n    -Body @{ passwordValidityPeriodInDays = [int32]::MaxValue }\n\n  # Verify domain configurations\n  $AllDomains = (Invoke-MgGraphRequest -Method GET -Uri \"https://graph.microsoft.com/v1.0/domains\").value | Where-Object {\n    $_.isRoot -and $_.isVerified\n  }\n\n  Write-Host \"All current domain password expiration policies\"\n  foreach ($Domain in $AllDomains) {\n    Write-Host \"Domain passwordValidityPeriodInDays: $($Domain.id) $($Domain.passwordValidityPeriodInDays)\"\n  }",
         "resources": [
           {
             "Name": "Password expiration requirements for users",
             "Url": "https://learn.microsoft.com/en-us/microsoft-365/admin/misc/password-policy-recommendations?view=o365-worldwide#password-expiration-requirements-for-users"
+          },
+          {
+            "Name": "passwordValidityPeriodInDays property",
+            "Url": "https://learn.microsoft.com/en-us/graph/api/resources/domain?view=graph-rest-1.0#properties"
           },
           {
             "Name": "Eliminate bad passwords using Microsoft Entra Password Protection",
@@ -3930,9 +4135,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi11v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -3985,9 +4190,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi21v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4048,9 +4253,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi31v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4065,7 +4270,7 @@
         "rationale": "With unrestricted service principals, unwanted access to APIs is possible. Allowing service principals through security groups, and only where necessary, mitigates this risk.",
         "criticality": "SHOULD",
         "lastModified": "June 2023",
-        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Service Principals can call Fabric public APIs** set to **Enabled**.\nChoose a specific security group allowed to use service principles for the APIs.",
+        "implementation": "If your organization has service principals that need to access Power BI APIs, then you configure the setting per the instructions below.\nIf you don't have service principals that need access then for step 4, configure the setting to Disabled.\n\n1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Click on **Service Principals can call Fabric public APIs**\n\n5. If don't have service principals that need access to Power BI APIs, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.\n\n6. If you have service principals that need to access Power BI APIs, then configure the setting to **Enabled**.\n\n7. Select the specific security groups that contain the service principals authorized to call the APIs.",
         "mitreMapping": [
           {
             "Name": "T1059: Command and Scripting Interpreter",
@@ -4107,9 +4312,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi41v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4124,7 +4329,7 @@
         "rationale": "With unrestricted service principals creating/using profiles, there is risk of an unauthorized user using a profile with more permissions than they have. Allowing service principals through security groups will mitigate that risk.",
         "criticality": "SHOULD",
         "lastModified": "June 2023",
-        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Then, click on **Allow service principals to create and use profiles** and set to **Enabled**.\nChoose a specific security group allowed to use service principles to create and use profiles",
+        "implementation": "1. Navigate to the **PowerBI Admin Portal**\n\n2. Click on **Tenant settings**\n\n3. Scroll to **Developer settings**\n\n4. Then, click on **Allow service principals to create and use profiles**\n\n5. If don't have service principals that need to create and use profiles, then configure the setting to **Disabled** and you are finished. Otherwise go to step 6.\n\n6. If you have service principals that need to create and use profiles, then configure the setting to **Enabled**.\n\n7. Select the specific security groups that contain the service principals authorized to to create and use profiles.",
         "mitreMapping": [
           {
             "Name": "T1098: Account Manipulation",
@@ -4166,9 +4371,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi42v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4213,9 +4418,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi51v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4258,9 +4463,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi61v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },
@@ -4324,9 +4529,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#mspowerbi71v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       }
@@ -6266,7 +6471,7 @@
         ]
       },
       {
-        "id": "MS.SHAREPOINT.3.3v1",
+        "id": "MS.SHAREPOINT.3.3v2",
         "name": "Reauthentication days for people who use a verification code SHALL be set to 30 days or less.",
         "policySection": "Securing Anyone Links and Verification Code Users",
         "sectionDescription": "Sharing files with external users via the usage of **Anyone links** or **Verification codes** is strongly discouraged because it provides access to data within a tenant with weak or no authentication. If these features are used, this section details some access restrictions that could provide limited security risk mitigations. **Note**: The settings in this section are only applicable if an agency is using **Anyone links** or **Verification code** sharing. See each policy below for details.",
@@ -6275,7 +6480,7 @@
         "annotationField": "Annotations",
         "rationale": "By setting expiration timers for verification code access, administrators can prevent unintended sustained access to documents.",
         "criticality": "SHALL",
-        "lastModified": "March 2025",
+        "lastModified": "April 2026",
         "implementation": "1.  Sign in to the **SharePoint admin center**.\n\n2.  Select **Policies** \\> **Sharing**.\n\n3.  Expand **More external sharing settings**.\n\n4. Select **People who use a verification code must reauthenticate after this many days**.\n\n5.  Enter **30** days or less.\n\n6. Select **Save**.\n\n**`TLP:CLEAR`**",
         "mitreMapping": [
           {

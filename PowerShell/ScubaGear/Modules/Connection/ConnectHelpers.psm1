@@ -1,4 +1,4 @@
-function Connect-GraphHelper {
+﻿function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
@@ -285,6 +285,7 @@ function Get-MsalAccessToken {
 
                 $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                     WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+                    WithUseEmbeddedWebView($true).
                     ExecuteAsync().GetAwaiter().GetResult()
             }
             return $TokenResult.AccessToken

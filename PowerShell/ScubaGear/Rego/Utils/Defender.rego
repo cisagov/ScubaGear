@@ -80,12 +80,6 @@ SensitiveAccountsSetting(Policies) := {
 
 default SensitiveAccounts(_, _) := false
 
-### Case 1 - No Strict Policy assignment ###
-# Is there a Strict Policy present, if not always fail
-SensitiveAccounts(SensitiveAccountsSetting, _) := false if {
-    count(SensitiveAccountsSetting.Policy) == 0
-}
-
 ### Case 2 ###
 # Is there a Strict Policy present and no assignment conditions or exceptions, all users included. Always pass
 SensitiveAccounts(SensitiveAccountsSetting, _) := true if {
@@ -96,25 +90,7 @@ SensitiveAccounts(SensitiveAccountsSetting, _) := true if {
 
 ### Case 3 ###
 # Is there a Strict Policy present and assignment conditions, but no include config.  Always fail
-SensitiveAccounts(SensitiveAccountsSetting, SensitiveAccountsConfig) := false if {
-    count(SensitiveAccountsSetting.Policy) > 0
-
-    # Policy filter includes one or more conditions or exclusions
-    ConditionsAbsent := [
-        SensitiveAccountsSetting.Policy.Conditions == null,
-        SensitiveAccountsSetting.Policy.Exceptions == null
-    ]
-    count(FilterArray(ConditionsAbsent, false)) > 0
-
-    # No config is defined (unify all sets & check if empty)
-    count(
-        SensitiveAccountsConfig.IncludedUsers |
-        SensitiveAccountsConfig.ExcludedUsers |
-        SensitiveAccountsConfig.IncludedGroups |
-        SensitiveAccountsConfig.ExcludedGroups |
-        SensitiveAccountsConfig.IncludedDomains |
-        SensitiveAccountsConfig.ExcludedDomains) == 0
-}
+# (covered by default := false when Case 4 conditions are not met)
 
 ### Case 4 ###
 # When settings and config are present, do they match?

@@ -11,6 +11,7 @@ ScubaGear queries various M365 APIs to gather information about their security s
 | Entra ID                | Global Reader                                                           |
 | Defender for Office 365 | Global Reader (or Exchange Administrator)                               |
 | Exchange Online         | Global Reader (or Exchange Administrator)                               |
+| Power BI                | Fabric Administrator (or Global Administrator) with a Power BI or Fabric license <sup>1</sup> |
 | Power Platform          | Power Platform Administrator with a "Power Apps for Office 365" license |
 | Sharepoint Online       | Global Reader (or SharePoint Administrator)                             |
 | Microsoft Teams         | Global Reader (or Teams Administrator)                                  |
@@ -18,7 +19,9 @@ ScubaGear queries various M365 APIs to gather information about their security s
 > [!NOTE]
 > Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
-[This article](https://learn.microsoft.com/en-us/microsoft-365/admin/add-users/assign-admin-roles?view=o365-worldwide) explains how to assign user roles in M365.
+> [!NOTE]
+> <sup>1</sup> When running Power BI, the user running ScubaGear interactively must have a Power BI or Microsoft Fabric license assigned to their account (e.g., Microsoft Fabric (Free), Power BI Pro, or Power BI Premium Per User). The user must also login to the Power BI portal at least once to setup their account in Power BI before running ScubaGear.
+
 
 ## Application Permissions
 
