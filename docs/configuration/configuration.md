@@ -310,7 +310,7 @@ SecuritySuite:
 
 #### User impersonation protection
 
-The policy `MS.SECURITYSUITE.2.1v1` supports a variable called `SensitiveUsers` that can be defined as a list of sensitive user accounts denoted by a display name and email address in the Strict and Standard Preset Security Policies impersonation protection section.
+The policy `MS.SECURITYSUITE.2.1v1` supports a variable called `SensitiveUsers` that can be defined as a list of sensitive user accounts denoted by a display name and email address in the impersonation protection section of anti-phishing policies.
 
 Each value should be one of the following:
 - An email address (e.g., `jdoe@example.com`)
@@ -318,7 +318,7 @@ Each value should be one of the following:
 
 #### Agency Partner Domain Impersonation
 
-The policy `MS.SECURTIYSUITE.2.3v1` supports a variable called `PartnerDomains` that can be defined as a list of sensitive DNS domains used by important partner organizations for which impersonation protection should be enabled in the anti-phish policy.
+The policy `MS.SECURTIYSUITE.2.3v1` supports a variable called `PartnerDomains` that can be defined as a list of sensitive DNS domains used by important partner organizations for which impersonation protection should be enabled in anti-phish policies.
 
 ### Exchange Online Configuration
 
