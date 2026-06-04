@@ -13,6 +13,10 @@ InModuleScope Orchestrator {
                     "Results"        = @();
                     "timestamp_zulu" = "";
                     "report_uuid" = "00000000-0000-0000-0000-000000000000"
+                    "scuba_config"   = @{
+                        "OrgName"     = "Test Organization";
+                        "OrgUnitName" = "Test Unit";
+                    }
                 }
             }
             Mock -CommandName Add-Member {}
@@ -56,6 +60,63 @@ InModuleScope Orchestrator {
                 { Merge-JsonOutput @JsonParameters } | Should -Not -Throw
                 Should -Invoke -CommandName Remove-Item -Exactly -Times 3
                 $JsonParameters.ProductNames = @()
+            }
+        }
+        Context 'When OrgName and OrgUnitName are present in scuba_config' {
+            BeforeAll {
+                Mock -CommandName Join-Path { "." }
+                Mock -CommandName ConvertFrom-Json { @{
+                        "ReportSummary"  = @{"Date" = "" }
+                        "Results"        = @();
+                        "timestamp_zulu" = "";
+                        "report_uuid"    = "00000000-0000-0000-0000-000000000000"
+                        "scuba_config"   = @{
+                            "OrgName"     = "My Agency";
+                            "OrgUnitName" = "My Division";
+                        }
+                    }
+                }
+                Mock -CommandName ConvertTo-Json { param($InputObject) $InputObject | ConvertTo-Json -Depth 3 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MergeParams')]
+                $MergeParams = @{
+                    TenantDetails       = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
+                    ModuleVersion       = '1.0';
+                    OutFolderPath       = "./";
+                    OutProviderFileName = "ProviderSettingsExport";
+                    FullScubaResultsName = "ScubaResults.json";
+                    Guid                = "00000000-0000-0000-0000-000000000000";
+                    ProductNames        = @("aad");
+                }
+            }
+            It 'Does not throw when OrgName and OrgUnitName are set' {
+                { Merge-JsonOutput @MergeParams } | Should -Not -Throw
+            }
+        }
+        Context 'When OrgName and OrgUnitName are absent from scuba_config' {
+            BeforeAll {
+                Mock -CommandName Join-Path { "." }
+                Mock -CommandName ConvertFrom-Json { @{
+                        "ReportSummary"  = @{"Date" = "" }
+                        "Results"        = @();
+                        "timestamp_zulu" = "";
+                        "report_uuid"    = "00000000-0000-0000-0000-000000000000"
+                        "scuba_config"   = @{}
+                    }
+                }
+                Mock -CommandName ConvertTo-Json { param($InputObject) $InputObject | ConvertTo-Json -Depth 3 }
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MergeParams')]
+                $MergeParams = @{
+                    TenantDetails       = @{"DisplayName" = "displayName"; "TenantId" = "tenantId"; "DomainName" = "domainName" };
+                    ModuleVersion       = '1.0';
+                    OutFolderPath       = "./";
+                    OutProviderFileName = "ProviderSettingsExport";
+                    FullScubaResultsName = "ScubaResults.json";
+                    Guid                = "00000000-0000-0000-0000-000000000000";
+                    ProductNames        = @("aad");
+                }
+            }
+            It 'Does not throw when OrgName and OrgUnitName are null' {
+                { Merge-JsonOutput @MergeParams } | Should -Not -Throw
             }
         }
     }
