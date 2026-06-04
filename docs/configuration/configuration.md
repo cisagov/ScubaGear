@@ -297,12 +297,12 @@ Example Security Suite configuration:
 
 ```yaml
 SecuritySuite:
-  MS.SecuritySuite.2.1v1:
+  MS.SECURITYSUITE.2.1v1:
     SensitiveUsers:
       - "jdoe@contoso.com"
       - "jsmith@contoso.com"
 
-  MS.SecuritySuite.2.3v1:
+  MS.SECURITYSUITE.2.3v1:
     PartnerDomains:
       - "partner1.com"
       - "contractor.org"
