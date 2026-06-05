@@ -1,16 +1,10 @@
 package securitysuite
 import rego.v1
-import data.utils.defender.ApplyLicenseWarningString
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
-import data.utils.securitysuite.ListConfigValues
-import data.utils.securitysuite.OrganizationDomainProtectionCompliant
-import data.utils.securitysuite.PartnerDomainConfig
-import data.utils.securitysuite.PartnerDomainImpersonationCompliant
-import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.report.ReportDetailsArray
 
 
@@ -80,40 +74,11 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.1v1",
-    "Criticality": "Should",
-    "Commandlet": [
-        "Get-AntiPhishPolicy",
-        "Get-AntiPhishRule",
-        "Get-EOPProtectionPolicyRule",
-        "Get-AcceptedDomain"
-    ],
-    "ActualValue": {"SensitiveUsers": SensitiveUsers},
-    "ReportDetails": ApplyLicenseWarningString(false, ErrorMessage),
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.1v1"),
     "RequirementMet": false
-} if {
-    SensitiveUsers := ListConfigValues("MS.SECURITYSUITE.2.1v1", "SensitiveUsers")
-    count(SensitiveUsers) == 0
-    ErrorMessage := "No users defined as sensitive users in the ScubaGear config file."
-}
-
-tests contains {
-    "PolicyId": "MS.SECURITYSUITE.2.1v1",
-    "Criticality": "Should",
-    "Commandlet": [
-        "Get-AntiPhishPolicy",
-        "Get-AntiPhishRule",
-        "Get-EOPProtectionPolicyRule",
-        "Get-AcceptedDomain"
-    ],
-    "ActualValue": Evaluation,
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
-} if {
-    SensitiveUsers := ListConfigValues("MS.SECURITYSUITE.2.1v1", "SensitiveUsers")
-    count(SensitiveUsers) > 0
-    Evaluation := UserImpersonationCompliant(SensitiveUsers)
-    Status := Evaluation.Compliant
-    ErrorMessage := Evaluation.Message
 }
 #--
 
@@ -122,15 +87,11 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.2v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-AntiPhishPolicy"],
-    "ActualValue": {"Policies": Policies},
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
-} if {
-    Policies := [P | some P in input.anti_phish_policies; P.Enabled == true]
-    Status := OrganizationDomainProtectionCompliant == true
-    ErrorMessage := "No anti-phish policy has 'Include domains I own' enabled."
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.2v1"),
+    "RequirementMet": false
 }
 #--
 
@@ -139,42 +100,10 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.3v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-AntiPhishPolicy"],
-    "ActualValue": {"PartnerDomains": PartnerDomains},
-    "ReportDetails": ApplyLicenseWarningString(false, ErrorMessage),
-    "RequirementMet": false
-} if {
-    PartnerDomains := PartnerDomainConfig("MS.SECURITYSUITE.2.3v1")
-    count(PartnerDomains) == 0
-    ErrorMessage := "No partner domains defined in the ScubaGear config file."
-}
-
-tests contains {
-    "PolicyId": "MS.SECURITYSUITE.2.3v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-AntiPhishPolicy"],
-    "ActualValue": Evaluation,
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
-} if {
-    PartnerDomains := PartnerDomainConfig("MS.SECURITYSUITE.2.3v1")
-    count(PartnerDomains) > 0
-    Evaluation := PartnerDomainImpersonationCompliant(PartnerDomains)
-    Status := Evaluation.Compliant
-    ErrorMessage := Evaluation.Message
-}
-#--
-
-#
-# MS.SECURITYSUITE.2.4v1
-#--
-tests contains {
-    "PolicyId": "MS.SECURITYSUITE.2.4v1",
     "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.3v1"),
     "RequirementMet": false
 }
 #--

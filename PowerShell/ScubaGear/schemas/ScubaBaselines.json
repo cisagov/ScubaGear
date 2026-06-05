@@ -5300,53 +5300,6 @@
         ]
       },
       {
-        "id": "MS.SECURITYSUITE.2.4v1",
-        "name": "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.",
-        "policySection": "Impersonation Protection",
-        "sectionDescription": "Impersonation protection checks incoming emails to see if the sender address is similar to the users or domains on an agency-defined list. If the sender address is significantly similar, as to indicate an impersonation attempt, the email is quarantined.",
-        "exclusionField": "none",
-        "omissionField": "Omissions",
-        "annotationField": "Annotations",
-        "rationale": "Many tasks are better suited for automated processes, such as identifying unusual characters in the `FROM` address or identifying a first-time sender. User warnings can handle these tasks, reducing the burden on end users and the risk of successful phishing attempts.",
-        "criticality": "SHOULD",
-        "lastModified": "March 2026",
-        "implementation": "Any product meeting the requirements outlined in this baseline policy may be\nused. If the agency uses Microsoft Defender, see the following\nimplementation steps for\n[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies) which\ninclude user safety tips to warn users.",
-        "mitreMapping": [
-          {
-            "Name": "T1566: Phishing",
-            "Url": "https://attack.mitre.org/techniques/T1566/"
-          },
-          {
-            "Name": "T1656: Impersonation",
-            "Url": "https://attack.mitre.org/techniques/T1656/"
-          }
-        ],
-        "resources": [
-          {
-            "Name": "Impersonation settings in anti-phishing policies in Microsoft Defender for Office 365 \\| Microsoft Learn",
-            "Url": "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-policies-about?view=o365-worldwide#impersonation-settings-in-anti-phishing-policies-in-microsoft-defender-for-office-365"
-          },
-          {
-            "Name": "Use the Microsoft 365 Defender portal to assign Standard and Strict preset security policies to users \\| Microsoft Learn",
-            "Url": "https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide#use-the-microsoft-365-defender-portal-to-assign-standard-and-strict-preset-security-policies-to-users"
-          },
-          {
-            "Name": "User impersonation protection \\| Microsoft Learn",
-            "Url": "https://learn.microsoft.com/en-us/defender-office-365/anti-phishing-policies-about#user-impersonation-protection"
-          }
-        ],
-        "licenseRequirements": [
-          "Impersonation protection and advanced phishing thresholds require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5 and are available as add-ons for E3 and G3. As of January 2026, anti-phishing for user and domain impersonation and spoof intelligence are not yet available in M365 Government Community Cloud (GCC High) and Department of Defense (DoD) environments. See [Platform features \\| Microsoft Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/office-365-platform-service-description/office-365-us-government/office-365-us-government#platform-features) for current offerings."
-        ],
-        "badges": [
-          {
-            "label": "Manual",
-            "linkUrl": "#mssecuritysuite24v1-instructions",
-            "color": "046B9A"
-          }
-        ]
-      },
-      {
         "id": "MS.SECURITYSUITE.3.1v1",
         "name": "A DLP policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).",
         "policySection": "Data Loss Prevention",

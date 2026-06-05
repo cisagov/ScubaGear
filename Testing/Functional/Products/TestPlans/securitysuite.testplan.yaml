@@ -36,97 +36,23 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.2.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.1v1 Compliant case - sensitive user matches tenant policy
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                scuba_config.SecuritySuite:
-                  MS.SECURITYSUITE.2.1v1:
-                    SensitiveUsers:
-                      - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.2.1v1 Compliant case - sensitive user specified as email only
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                scuba_config.SecuritySuite:
-                  MS.SECURITYSUITE.2.1v1:
-                    SensitiveUsers:
-                      - agencyuserglobalreader@y2zj1.onmicrosoft.com
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.2.1v1 Non-Compliant case - sensitive user not in tenant policy
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                scuba_config.SecuritySuite:
-                  MS.SECURITYSUITE.2.1v1:
-                    SensitiveUsers:
-                      - Mismatched User;mmuser@someemail.com
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.2.1v1 Non-Compliant case - no sensitive users in config file
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                scuba_config.SecuritySuite:
-                  MS.SECURITYSUITE.2.1v1: {}
-        Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.2.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.2v1 Non-Compliant case - include domains I own is disabled
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                anti_phish_policies[0].EnableOrganizationDomainsProtection: false
-                anti_phish_policies[1].EnableOrganizationDomainsProtection: false
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.2.2v1 Compliant case - include domains I own is enabled
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                anti_phish_policies[0].EnableOrganizationDomainsProtection: true
-        Postconditions: []
-        ExpectedResult: true
-  - PolicyId: MS.SECURITYSUITE.2.3v1
-    TestDriver: RunScuba
-    Tests:
-      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - partner domain not in tenant policy
-        ConfigFileName: PartnerDomainList.yaml
+      - TestDescription: MS.SECURITYSUITE.2.2v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - no partner domains in config file
-        ConfigFileName: EmptyPartnerDomains.yaml
-        Preconditions: []
-        Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.2.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - partner domains removed from anti-phish policy
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                anti_phish_policies[0].TargetedDomainsToProtect: []
-                anti_phish_policies[1].TargetedDomainsToProtect: []
-        Postconditions: []
-        ExpectedResult: false
-  - PolicyId: MS.SECURITYSUITE.2.4v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.SECURITYSUITE.2.4v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
