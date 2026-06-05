@@ -12,10 +12,23 @@ function Get-FunctionalTestHeaderValue {
   }
 
   if ($Headers -is [System.Collections.IDictionary]) {
-    return $Headers[$Name]
+    foreach ($Key in $Headers.Keys) {
+      if ([string]::Equals([string]$Key, $Name, [System.StringComparison]::OrdinalIgnoreCase)) {
+        return [string]$Headers[$Key]
+      }
+    }
+    return $null
   }
 
-  return $Headers.$Name
+  $Property = $Headers.PSObject.Properties | Where-Object {
+    [string]::Equals($_.Name, $Name, [System.StringComparison]::OrdinalIgnoreCase)
+  } | Select-Object -First 1
+
+  if ($null -eq $Property) {
+    return $null
+  }
+
+  return [string]$Property.Value
 }
 
 function Resolve-FunctionalTestPollingUri {
@@ -49,6 +62,12 @@ function Invoke-FunctionalTestRestRequest {
       Method = $RequestMethod
       Headers = $Headers
       ErrorAction = 'Stop'
+    }
+
+    # PowerShell 5.1 can throw parser null-reference errors for Invoke-WebRequest
+    # unless -UseBasicParsing is explicitly supplied.
+    if ($null -ne (Get-Command Invoke-WebRequest).Parameters['UseBasicParsing']) {
+      $RequestParams.UseBasicParsing = $true
     }
 
     if (-not [string]::IsNullOrWhiteSpace($Body) -and $RequestMethod -ne 'GET') {
