@@ -27,7 +27,12 @@ class CommandTracker {
         }
 
         $isGraphDirect = $false
+        $TrackedCommand = $Command
         $Result = @()
+
+        if ($Command -eq "Invoke-EXORestMethod" -and $CommandArgs.ContainsKey("CmdletName") -and -not [string]::IsNullOrWhiteSpace($CommandArgs.CmdletName)) {
+            $TrackedCommand = $CommandArgs.CmdletName
+        }
 
         # Pre-process command arguments
         if ($CommandArgs.ContainsKey("GraphDirect")) {
@@ -64,7 +69,7 @@ class CommandTracker {
                 }
             }
 
-            $this.SuccessfulCommands += $Command
+            $this.SuccessfulCommands += $TrackedCommand
         }
         catch {
             if (-not $SuppressWarning) {
@@ -78,7 +83,7 @@ class CommandTracker {
                 StackTrace = $_.ScriptStackTrace
             }
 
-            $this.UnSuccessfulCommands += $Command
+            $this.UnSuccessfulCommands += $TrackedCommand
             $Result = @()
         }
 
