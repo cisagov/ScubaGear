@@ -90,9 +90,8 @@ action is needed to enable it for other products.
 #### MS.SECURITYSUITE.1.1v1
 Emails with click-to-run file attachments SHALL be blocked, including at a minimum .exe, .cmd, and .vbe files.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-[![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
-<!-- todo link to proper config doc -->
 
 <!--Policy: MS.SECURITYSUITE.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
@@ -109,9 +108,8 @@ prevent spread of malware distributed via click-to-run email attachments.
 #### MS.SECURITYSUITE.1.2v1
 Email scanning SHALL be capable of reviewing emails after delivery.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-[![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
-<!-- todo link to proper config doc -->
 
 <!--Policy: MS.SECURITYSUITE.1.2v1; Criticality: SHALL -->
 - _Rationale:_ As known malware signatures are updated, it is possible for an email to be retroactively identified as containing malware after delivery. By scanning emails, the number of malware-infected in users' mailboxes can be reduced.
@@ -124,9 +122,8 @@ Email scanning SHALL be capable of reviewing emails after delivery.
 #### MS.SECURITYSUITE.1.3v1
 Emails identified as containing malware SHALL be quarantined or dropped.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-[![Configurable](https://img.shields.io/badge/Configurable-005288)](#)
-<!-- todo link to proper config doc -->
 
 <!--Policy: MS.SECURITYSUITE.1.3v1; Criticality: SHALL -->
 - _Rationale:_ Email can be used as a mechanism for delivering malware.
@@ -280,7 +277,7 @@ impersonation attempt, the email is quarantined.
 User impersonation protection SHOULD be enabled for sensitive accounts.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#security-suite-configuration)
 
 <!--Policy: MS.SECURITYSUITE.2.1v1; Criticality: SHOULD -->
 <!--ExclusionType: SensitiveUsers-->
@@ -299,7 +296,6 @@ this risk.
 Domain impersonation protection SHOULD be enabled for domains owned by the agency.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
 
 <!--Policy: MS.SECURITYSUITE.2.2v1; Criticality: SHOULD -->
 <!--ExclusionType: AgencyDomains-->
@@ -317,7 +313,7 @@ reduces the risk of a user being deceived by a look-alike domain.
 Domain impersonation protection SHOULD be added for key suppliers and partners.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
-[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#defender-configuration)
+[![Requires Configuration](https://img.shields.io/badge/Requires_Configuration-981D20)](../../../docs/configuration/configuration.md#security-suite-configuration)
 
 <!--Policy: MS.SECURITYSUITE.2.3v1; Criticality: SHOULD -->
 <!--ExclusionType: PartnerDomains-->
@@ -333,7 +329,7 @@ Domain impersonation protection SHOULD be added for key suppliers and partners.
 #### MS.SECURITYSUITE.2.4v1
 User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite24v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.2.4v1; Criticality: SHOULD -->
 - _Rationale:_ Many tasks are better suited for automated processes, such as identifying
@@ -377,6 +373,8 @@ policy. However, agencies are welcome to instead configure it in the other
 policies if desired, as long as ultimately all recipients recieve the
 impersonation protection checks.
 
+**Note**: If the preset security policies are used, both the standard and strict preset policies meet the requirements for MS.SECURITYSUITE.2.2v1 and MS.SECURITYSUITE.2.4v1. However, additional configuration is required for MS.SECURITYSUITE.2.1v1 and MS.SECURITYSUITE.2.3v1, as the sensitive users need to be added on the **Add email addresses to flag when impersonated by attackers** page and the parner domains need to be added on the **Add domains to flag when impersonated by attackers** page. See [Preset security policies in cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies) for detailed instructions.
+
 #### MS.SECURITYSUITE.2.1v1 Instructions
 
 1.  Sign in to **Microsoft 365 Defender**.
@@ -390,6 +388,15 @@ impersonation protection checks.
 9.  On the **Manage senders for impersonation protection** page, click **Add user**
 then add a name and valid email address for each sensitive account and click **Add** after each.
 10. Click **Done** then **Save**.
+11. Click **Edit actions**.
+12. Under **If a message is detected as user impersonation**, select one of the following:
+    - **Redirect the message to other email addresses**
+    - **Move the message to the recipients' Junk Email folders**
+    - **Quarantine the message**
+    - **Delete the message before it's delivered**
+13. Click **Save**.
+
+**Note**: In order for ScubaGear to evaluate MS.SECURITYSUITE.2.1v1, it needs to know which users are considered sensitive. To configure this, use the `SensitiveUsers` config file option. If this config file option is not used or is empty, ScubaGear will report this policy as non-compliant. See [Security Suite Configuration](/docs/configuration/configuration.md#security-suite-configuration) for more details.
 
 #### MS.SECURITYSUITE.2.2v1 Instructions
 
@@ -400,7 +407,14 @@ then add a name and valid email address for each sensitive account and click **A
 5.  Select the **Office365 AntiPhish Default (Default)** policy.
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
-8.  Click **Done** then **Save**.
+8.  Click **Save**.
+9. Click **Edit actions**.
+10. Under **If a message is detected as user impersonation**, select one of the following:
+    - **Redirect the message to other email addresses**
+    - **Move the message to the recipients' Junk Email folders**
+    - **Quarantine the message**
+    - **Delete the message before it's delivered**
+11.  Click **Done** then **Save**.
 
 #### MS.SECURITYSUITE.2.3v1 Instructions
 
@@ -412,17 +426,29 @@ then add a name and valid email address for each sensitive account and click **A
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include custom domains**.
 8.  Click **Manage [x] custom domain(s)**.
-9.  On the **Manage custom domains for impersonation protection** page, click **Add domain**
-then add each partner domain.
-10. Click **Add domains**, **Done**, then **Save**.
+9.  On the **Manage custom domains for impersonation protection** page, click **Add domain**.
+10. Under **Domain**, enter each partner domain, then click **Add domains**.
+11. Click **Done** then **Save**.
+12. Click **Edit actions**.
+13. Under **If a message is detected as user impersonation**, select one of the following:
+    - **Redirect the message to other email addresses**
+    - **Move the message to the recipients' Junk Email folders**
+    - **Quarantine the message**
+    - **Delete the message before it's delivered**
+14. Click **Save**.
+
+**Note**: In order for ScubaGear to evaluate MS.SECURITYSUITE.2.3v1, it needs to know which domains should be protected. To configure this, use the `PartnerDomains` config file option. If this config file option is not used or is empty, ScubaGear will report this policy as non-compliant. See [Security Suite Configuration](/docs/configuration/configuration.md#security-suite-configuration) for more details.
 
 #### MS.SECURITYSUITE.2.4v1 Instructions
 
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender, see the following
-implementation steps for
-[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies) which
-include user safety tips to warn users.
+1.  Sign in to **Microsoft 365 Defender**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
+3.  Select **Threat policies**.
+4.  Under **Policies**, select **Anti-phishing**.
+5.  Select the **Office365 AntiPhish Default (Default)** policy.
+6.  Click **Edit actions**.
+7.  Under **Safety tips & indicators**, ensure each safety tip and indicator is enabled.
+8.  Click **Save**.
 
 ## 3. Data Loss Prevention
 
@@ -933,7 +959,8 @@ used.
 #### MS.SECURITYSUITE.6.1v1
 Emails detected as spam and phishing SHALL NOT be delivered to the user's inbox.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo142v1-instructions)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
@@ -946,7 +973,8 @@ Moving spam messages to a separate junk or quarantine folder helps users filter 
 #### MS.SECURITYSUITE.6.2v1
 Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo143v1-instructions)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Legitimate emails may be incorrectly filtered
@@ -1077,7 +1105,7 @@ implementations steps are provided below.
 #### MS.SECURITYSUITE.7.1v1
 URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams messages, and Office documents.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo151v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.7.1v1; Criticality: SHOULD -->
 - _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
@@ -1090,7 +1118,7 @@ URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams mes
 #### MS.SECURITYSUITE.7.2v1
 Direct download links SHOULD be scanned for malware.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo152v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.15.2v1; Criticality: SHOULD -->
 - _Rationale:_ URLs in emails may direct users to download and run malware.
@@ -1105,7 +1133,7 @@ users from infecting their devices.
 #### MS.SECURITYSUITE.7.3v1
 User click tracking SHOULD be enabled.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msexo153v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.7.3v1; Criticality: SHOULD -->
 - _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
@@ -1117,11 +1145,12 @@ User click tracking SHOULD be enabled.
 
 ### Resources
 
-- None
+- [Set up Safe Links policies in Microsoft Defender for Office 365 \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/defender-office-365/safe-links-policies-configure)
 
 ### License Requirements
-
-- N/A
+Safe links require Defender for Office 365 Plan 1 or 2. These are included with
+E5 and G5 and are available as add-ons for E3 and G3.
 
 ### Implementation
 
