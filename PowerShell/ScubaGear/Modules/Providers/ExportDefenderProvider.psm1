@@ -25,6 +25,16 @@ function Export-DefenderProvider {
         $ApiEndpoint
     )
 
+        Write-Verbose "Running Defender provider export for environment '$M365Environment'."
+
+        if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+            throw "AccessToken is required for Defender provider export."
+        }
+
+        if ([string]::IsNullOrWhiteSpace($ApiEndpoint)) {
+            throw "ApiEndpoint is required for Defender provider export."
+        }
+
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")

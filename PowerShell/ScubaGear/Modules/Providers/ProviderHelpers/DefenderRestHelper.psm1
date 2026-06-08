@@ -36,8 +36,6 @@ function Get-DefenderApiEndpoint {
         https://api.security.microsoft.com/api/GetOrganizationReportData
     .PARAMETER M365Environment
         The M365 environment (commercial, gcc, gcchigh, dod).
-    .PARAMETER AccessToken
-        The OAuth2 access token for Defender.
     .FUNCTIONALITY
         Internal
     #>
@@ -45,10 +43,7 @@ function Get-DefenderApiEndpoint {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
-        [string]$M365Environment,
-
-        [Parameter(Mandatory = $true)]
-        [string]$AccessToken
+        [string]$M365Environment
     )
 
     $ApiEndpoint = switch ($M365Environment.ToLower()) {
