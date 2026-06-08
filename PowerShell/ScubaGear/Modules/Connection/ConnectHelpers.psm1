@@ -1,4 +1,4 @@
-﻿function Connect-GraphHelper {
+function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
@@ -129,31 +129,18 @@ function Connect-DefenderHelper {
 function Initialize-Msal {
     <#
     .SYNOPSIS
-        Ensures the MSAL (Microsoft.Identity.Client) assembly is loaded and types are resolvable.
-
-    .DESCRIPTION
-        The Microsoft.Graph.Authentication module loads the MSAL assembly, but PowerShell cannot
-        resolve the types via [TypeName] syntax until Add-Type is called explicitly.
-        This function finds the DLL from the Graph module and loads it.
-
-    .EXAMPLE
-        Initialize-Msal
-        Loads the MSAL assembly so that types like [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
-        become resolvable in the current session.
-
+        Ensures the MSAL assembly is loaded and types are resolvable.
     .FUNCTIONALITY
         Internal
     #>
     [CmdletBinding()]
     param()
 
-    # Check if already resolvable
     try {
         $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
         return
     }
     catch {
-        # Type not yet resolvable, need to load explicitly
         Write-Verbose "MSAL types not yet resolvable. Loading Microsoft.Identity.Client.dll explicitly."
     }
 
@@ -180,46 +167,7 @@ function Initialize-Msal {
 function Get-MsalAccessToken {
     <#
     .SYNOPSIS
-        Acquires an OAuth2 access token via MSAL using certificate or interactive browser authentication.
-
-    .DESCRIPTION
-        Unified MSAL token acquisition function supporting two authentication flows:
-        - ServicePrincipal: Certificate-based ConfidentialClientApplication (automated/unattended)
-        - Interactive: Browser-based PublicClientApplication (user sign-in)
-        PowerShell resolves the parameter set automatically based on which parameters are provided.
-
-    .PARAMETER Scope
-        The OAuth2 scope to request (e.g., "https://contoso-admin.sharepoint.com/.default").
-
-    .PARAMETER CertificateThumbprint
-        The thumbprint of the certificate to use for authentication (ServicePrincipal set).
-
-    .PARAMETER AppID
-        The Azure AD Application (Client) ID for certificate auth (ServicePrincipal set).
-
-    .PARAMETER ClientId
-        The well-known client ID to use for interactive auth (Interactive set).
-        Examples: Azure PowerShell ID for Power Platform, SPO Management Shell ID for SharePoint.
-
-    .PARAMETER Tenant
-        The tenant domain or ID.
-
-    .PARAMETER M365Environment
-        The M365 environment (commercial, gcc, gcchigh, dod).
-
-    .EXAMPLE
-        Get-MsalAccessToken -Scope "https://contoso-admin.sharepoint.com/.default" `
-            -CertificateThumbprint "AB12CD34EF56" -AppID "00000000-0000-0000-0000-000000000001" `
-            -Tenant "contoso.onmicrosoft.com" -M365Environment "commercial"
-        Acquires a certificate-based access token scoped to the SharePoint Admin API.
-
-    .EXAMPLE
-        Get-MsalAccessToken -Scope "https://contoso-admin.sharepoint.com/.default" `
-            -ClientId "9bc3ab49-b65d-410a-85ad-de819febfddc" `
-            -Tenant "contoso.onmicrosoft.com" -M365Environment "commercial"
-        Opens a browser window for the user to sign in and acquires a SharePoint access token
-        using the SPO Management Shell well-known client ID.
-
+        Acquires an OAuth2 access token via MSAL using certificate or interactive auth.
     .FUNCTIONALITY
         Internal
     #>
@@ -252,7 +200,6 @@ function Get-MsalAccessToken {
         { $_ -in @("gcchigh", "dod") } { "https://login.microsoftonline.us/$Tenant" }
     }
 
-    # Certificate-based: load certificate from store before retry loop
     if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
         $Certificate = Get-ChildItem -Path "Cert:\CurrentUser\My\$CertificateThumbprint" -ErrorAction SilentlyContinue
         if (-not $Certificate) {
@@ -263,42 +210,27 @@ function Get-MsalAccessToken {
         }
     }
 
-    $MaxAttempts = 3
-    $Attempt = 0
-    while ($Attempt -lt $MaxAttempts) {
-        $Attempt++
-        try {
-            if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
-                $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
-                    WithCertificate($Certificate).
-                    WithAuthority($Authority).
-                    Build()
+    if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
+        $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+            WithCertificate($Certificate).
+            WithAuthority($Authority).
+            Build()
 
-                $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
-            }
-            else {
-                $RedirectUri = "http://localhost"
-                $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-                    WithAuthority($Authority).
-                    WithRedirectUri($RedirectUri).
-                    Build()
-
-                $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
-                    WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                    WithUseEmbeddedWebView($true).
-                    ExecuteAsync().GetAwaiter().GetResult()
-            }
-            return $TokenResult.AccessToken
-        }
-        catch {
-            if ($Attempt -ge $MaxAttempts) {
-                Write-Warning "Failed to acquire access token after $MaxAttempts attempts"
-                throw
-            }
-            Write-Warning "Token acquisition attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
-            Start-Sleep -Seconds 5
-        }
+        $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
     }
+    else {
+        $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+            WithAuthority($Authority).
+            WithRedirectUri("http://localhost").
+            Build()
+
+        $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
+            WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+            WithUseEmbeddedWebView($false).
+            ExecuteAsync().GetAwaiter().GetResult()
+    }
+
+    return $TokenResult.AccessToken
 }
 
 Export-ModuleMember -Function @(

@@ -2,7 +2,6 @@ Import-Module -Name $PSScriptRoot/../ExportEXOProvider.psm1 -Function Get-ScubaS
 Import-Module -Name $PSScriptRoot/../ExportAADProvider.psm1 -Function Get-PrivilegedRole, Get-PrivilegedUser
 Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-ApplicationsWithRiskyPermissions, Get-ServicePrincipalsWithRiskyPermissions, Format-RiskyApplications, Format-RiskyThirdPartyServicePrincipals, Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications
 Import-Module -Name $PSScriptRoot/AADHybridExchangeHelper.psm1 -Function Get-LegacyExchangeServicePrincipal, Get-DedicatedExchangeHybridApplications
-Import-Module -Name $PSScriptRoot/EXORestHelper.psm1 -Function Invoke-EXORestMethod
 Import-Module -Name $PSScriptRoot/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformTenantSettingsRest, Get-PowerPlatformEnvironmentsRest, Get-PowerPlatformDlpPoliciesRest, Get-PowerPlatformTenantIsolationRest
 Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
@@ -28,14 +27,7 @@ class CommandTracker {
         }
 
         $isGraphDirect = $false
-        $TrackedCommand = $Command
         $Result = @()
-
-        # EXO REST calls are executed through a shared wrapper, but downstream report logic
-        # expects the underlying EXO cmdlet name when checking command dependencies.
-        if ($Command -eq "Invoke-EXORestMethod" -and $CommandArgs.ContainsKey("CmdletName") -and -not [string]::IsNullOrWhiteSpace($CommandArgs.CmdletName)) {
-            $TrackedCommand = $CommandArgs.CmdletName
-        }
 
         # Pre-process command arguments
         if ($CommandArgs.ContainsKey("GraphDirect")) {
@@ -53,40 +45,37 @@ class CommandTracker {
             if ($isGraphDirect) {
                 # This will pull the Graph API vice the PowerShell module
                 Write-Verbose "Running $($Command) API Call"
-                # We set LogErrors to false because we handle the logging of errors here in the TryCommand catch block.
-                $ModCommand = Trace-ScubaFunction -FunctionName $Command -LogErrors $false -ScriptBlock {
+                $ModCommand = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
                     Invoke-GraphDirectly -Commandlet $Command @CommandArgs
                 }
                 $Result = $ModCommand
 
                 # Check if $Result.value exists, if it does, return it if not return just $Result
-                if ($Result.value) {
+                if ($null -ne $Result.value) {
                     $Result = $Result.value
                 }
             }
             else {
                 Write-Verbose "Running $($Command) with arguments: $($CommandArgs)"
-                # We set LogErrors to false because we handle the logging of errors here in the TryCommand catch block.
-                $Result = Trace-ScubaFunction -FunctionName $Command -LogErrors $false -ScriptBlock {
+                $Result = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
                     & $Command @CommandArgs
                 }
             }
 
-            $this.SuccessfulCommands += $TrackedCommand
+            $this.SuccessfulCommands += $Command
         }
         catch {
             if (-not $SuppressWarning) {
                 Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
             }
 
-            # We set the log level to Info here because Write-ScubaLog will track Warning or Error as a terminating error.
-            Write-ScubaLog -Message "Error running command" -Level "Info" -Source "TryCommand" -Data @{
+            Write-ScubaLog -Message "Error running command" -Level "Warning" -Source "ProviderList" -Data @{
                 Command = $Command
                 Error   = $_.Exception.Message
                 StackTrace = $_.ScriptStackTrace
             }
 
-            $this.UnSuccessfulCommands += $TrackedCommand
+            $this.UnSuccessfulCommands += $Command
             $Result = @()
         }
 

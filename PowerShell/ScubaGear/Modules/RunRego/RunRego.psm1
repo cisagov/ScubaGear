@@ -60,7 +60,37 @@ function Invoke-ExternalCmd{
         $PassThruArgs
     )
 
-    & $LiteralPath $PassThruArgs
+    $ProcessStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $ProcessStartInfo.FileName = $LiteralPath
+    $ProcessStartInfo.UseShellExecute = $false
+    $ProcessStartInfo.RedirectStandardOutput = $true
+    $ProcessStartInfo.RedirectStandardError = $true
+    $ProcessStartInfo.CreateNoWindow = $true
+
+    foreach ($Arg in $PassThruArgs) {
+        $null = $ProcessStartInfo.ArgumentList.Add([string]$Arg)
+    }
+
+    $Process = [System.Diagnostics.Process]::new()
+    $Process.StartInfo = $ProcessStartInfo
+    $null = $Process.Start()
+
+    $StdOut = $Process.StandardOutput.ReadToEnd()
+    $StdErr = $Process.StandardError.ReadToEnd()
+    $Process.WaitForExit()
+
+    if ($Process.ExitCode -ne 0) {
+        if ([string]::IsNullOrWhiteSpace($StdErr)) {
+            $StdErr = "Unknown error from external command."
+        }
+        throw "Program '$LiteralPath' failed with exit code $($Process.ExitCode): $StdErr"
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($StdErr)) {
+        Write-Verbose "External command stderr: $StdErr"
+    }
+
+    return $StdOut
 }
 
 Export-ModuleMember -Function @(

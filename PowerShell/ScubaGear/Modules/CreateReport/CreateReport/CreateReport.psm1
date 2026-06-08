@@ -139,7 +139,7 @@ function Add-Annotation {
 function New-Report {
      <#
     .Description
-    This function creates the individual HTML/json reports using the RegoOutput.json.
+    This function creates the individual HTML/json reports using the TestResults.json.
     Output will be stored as HTML/json files in the InvidualReports folder in the OutPath Folder.
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
@@ -149,13 +149,13 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "Defender", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
+        [ValidateSet("Teams", "EXO", "Defender", "AAD", "PowerPlatform", "SharePoint", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", IgnoreCase = $false)]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Microsoft 365 Defender", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -202,7 +202,7 @@ function New-Report {
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
-    $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
+    $TestResults =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
 
@@ -243,7 +243,7 @@ function New-Report {
 
         foreach ($Control in $BaselineGroup.Controls){
 
-            $Test = $RegoOutput | Where-Object -Property PolicyId -eq $Control.Id
+            $Test = $TestResults | Where-Object -Property PolicyId -eq $Control.Id
 
             # Generate indicator HTML for this control and track which types are used
             $IndicatorHtml = Get-IndicatorHtml -Indicators $Control.Indicators -BaselineName $BaselineName -ModuleVersion $SettingsExport.module_version
@@ -268,7 +268,7 @@ function New-Report {
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
 
-                # Declare annotation fields at the top level. If they exist, these fields need to be included
+                # Declare annotation fields at the top level. If they exist, these fields need to be included 
                 # in the control object regardless if the control is omitted, incorrect, or normal
                 $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
                 $RemediationDate = $Config.AnnotatePolicy.$($Control.Id).RemediationDate
@@ -478,7 +478,7 @@ function New-Report {
     $IndicatorLegendItems = ""
     if ($UsedIndicatorTypes.Count -gt 0) {
         # Sort: BOD first (order 0), then rest alphabetically by name
-        $SortedTypes = $UsedIndicatorTypes.Keys | Sort-Object {
+        $SortedTypes = $UsedIndicatorTypes.Keys | Sort-Object { 
             $def = $IndicatorDefinitions[$_]
             if ($def.Order -eq 0) { "0" } else { $def.Name }
         }
@@ -518,10 +518,9 @@ function New-Report {
         # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
         $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
 
-        # Same for risky applications, third-party service principals, and severity score weights
+        # Same for risky applications and third-party service principals
         $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
         $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
-        $SeverityScoreWeightsJson = ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -569,50 +568,20 @@ function New-Report {
             $privilegedServicePrincipalsTable = $privilegedServicePrincipalsTable -replace '^(.*?)<table>', '<table id="privileged-service-principals" style="text-align:center;">'
 
             # Create a section header for the service principal information
-            $privilegedServicePrincipalsTableHTML = "<h2>Service Principals with Privileged Role Assignments</h2>" + $privilegedServicePrincipalsTable
+            $privilegedServicePrincipalsTableHTML = "<h2>Privileged Service Principal Table</h2>" + $privilegedServicePrincipalsTable
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", $privilegedServicePrincipalsTableHTML)
         }
         else {
             $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-        }
-
-        if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_users) {
-
-            # Create a section for users with privileged roles
-            $privilegedUsersTable = $SettingsExport.privileged_users.psobject.properties |
-                ForEach-Object { $_.Value } |
-                Sort-Object @{
-                    Expression = { 'Global Administrator' -notin $_.roles }
-                }, DisplayName |
-                ForEach-Object {
-                    $user = $_
-                    [pscustomobject]@{
-                        "Display Name" = $user.DisplayName
-                        "Object ID" = $user.id
-                        "Roles" = ($user.roles -join ", ")
-                        "On-Prem Immutable ID" = $user.OnPremisesImmutableId
-                    }
-                } | ConvertTo-Html -Fragment
-
-            $privilegedUsersTable = $privilegedUsersTable -replace '^(.*?)<table>', '<table id="privileged-users" style="text-align:center;">'
-
-            # Create a section header for the privileged user information
-            $privilegedUsersTableHTML = "<h2>Users with Privileged Roles</h2>" + $privilegedUsersTable
-            $ReportHTML = $ReportHTML.Replace("{PRIVILEGED_USERS}", $privilegedUsersTableHTML)
-        }
-        else {
-            $ReportHTML = $ReportHTML.Replace("{PRIVILEGED_USERS}", "")
         }
     }
     else {
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $NoWarning)
         $ReportHTML = $ReportHTML.Replace("{LICENSING_INFO}", "")
         $ReportHTML = $ReportHTML.Replace("{SERVICE_PRINCIPAL}", "")
-        $ReportHTML = $ReportHTML.Replace("{PRIVILEGED_USERS}", "")
         $CapJson = "null"
         $RiskyAppsJson = "null"
         $RiskyThirdPartySPJson = "null"
-        $SeverityScoreWeightsJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -670,11 +639,10 @@ function New-Report {
         "<script type='application/json' id='cap-json'> $($CapJson) </script>"
         "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
         "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
-        "<script type='application/json' id='severity-score-weights-json'> $($SeverityScoreWeightsJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
-    # Load JS files
+    # Load JS files 
     $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
     $IndividualReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "IndividualReport.js") -Raw
     $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
@@ -808,7 +776,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
@@ -820,10 +788,9 @@ function Import-SecureBaseline{
 
     foreach ($Product in $ProductNames) {
         try {
-            $BaselineProduct = if ($Product -eq "securitysuite") { "defender" } else { $Product }
             Write-Debug "Processing secure baseline markdown for $Product"
-            $Output[$BaselineProduct] = @()
-            $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$BaselineProduct.md"
+            $Output[$Product] = @()
+            $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
             $MdLines = Get-Content -Path $ProductPath
 
             # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
@@ -837,7 +804,7 @@ function Import-SecureBaseline{
                 $Group.GroupName = $GroupName.Split(".")[1].Trim() # 1 to remove the leading space
                 $Group.Controls = @()
 
-                $IdRegex =  "#### MS\.[$($BaselineProduct.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
+                $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
                 # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
                 $LineNumbers = Select-String $IdRegex $ProductPath | ForEach-Object {$_."LineNumber"-1}
 
@@ -914,17 +881,17 @@ function Import-SecureBaseline{
                         # Look for badge lines between policy ID and criticality comment
                         for ($i = 1; $i -lt $MaxBadgeSearch; $i++) {
                             $BadgeLine = ([string]$MdLines[$LineNumber + $i]).Trim()
-
+                            
                             # Stop if we hit a comment line (criticality marker)
                             if ($BadgeLine -match "^<!--") {
                                 break
                             }
-
+                            
                             # Match badge pattern: [![Badge Name](image_url)](link_url)
                             if ($BadgeLine -match '\[!\[([^\]]+)\]\([^\)]+\)\]\(([^\)]+)\)') {
                                 $BadgeName = $Matches[1]
                                 $BadgeLink = $Matches[2]
-
+                                
                                 # Determine badge type based on name
                                 $BadgeType = switch -Regex ($BadgeName) {
                                     "BOD.25-01" { "bod" }
@@ -934,7 +901,7 @@ function Import-SecureBaseline{
                                     "Requires.Configuration" { "requires-config" }
                                     default { "other" }
                                 }
-
+                                
                                 $Indicators += @{
                                     "Name" = $BadgeName
                                     "Link" = $BadgeLink
@@ -957,7 +924,7 @@ function Import-SecureBaseline{
                     }
                 }
 
-                $Output[$BaselineProduct] += $Group
+                $Output[$Product] += $Group
             }
         }
         catch {
