@@ -1,0 +1,41 @@
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+        <title>{TITLE}</title>
+        {MAIN_CSS}
+        {JSON_SCRIPT_TAGS}
+        {JS_FILES}
+    </head>
+    <body>
+        <main>
+            <header>
+                <a href="../BaselineReports.html" title="Return to the report summary"><img src="images/cisa_logo.png" alt="Cybersecurity and Infrastructure Security Agency Logo"></a>
+                <div class="links">
+                    <a href="https://www.cisa.gov/scuba" target="_blank"><h3 style="width: 210px;">Secure Cloud Business Applications (SCuBA)</h3></a>
+                    <div style="width:10px;"></div>
+                    {BASELINE_URL}
+                </div>
+            </header>
+            <div id="toggle-container">
+                <p id="toggle-text">Light mode</p>
+                <label class="switch">
+                    <input id="toggle" type="checkbox" autocomplete="off" onclick="toggleDarkMode()" aria-labelledby="toggle-text">
+                    <span class="slider round"></span>
+              </label>
+            </div>
+            <dialog id="details-dialog" aria-modal="true">
+              <section id="details-header">
+                <h3 id="details-title"> Details </h3>
+                <button id="details-close" aria-label="Close">&times;</button>
+              </section>
+              <section id="details-content"></section>
+            </dialog>
+            <h1>{TITLE}</h1>
+            <h4>{AADWARNING}</h4>
+            {TABLES}
+            {LICENSING_INFO}
+            {SERVICE_PRINCIPAL}
+            {DNS_LOGS}
+        </main>
+    </body>
+</html>
