@@ -2297,7 +2297,7 @@ function Invoke-SCuBACached {
                 # logging product authentication start with details on which products are being authenticated, the environment, and whether service principal auth is being used
                 Write-ScubaLog -Message "Starting product authentication" -Level "Info" -Source "ScubaCached" -Data @{
                     ProductNames = ($ProductNames -join ', ')
-                    M365Environment = $M365Environment
+                    M365Environment = $TempScubaConfig.M365Environment
                     UsesServicePrincipal = ($null -ne $TempScubaConfig.AppID)
                 }
 
@@ -2339,7 +2339,7 @@ function Invoke-SCuBACached {
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
-                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $M365Environment
+                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
