@@ -216,6 +216,23 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         }
                     }
                 }
+                elseif ($Table.GetProperty("id") -eq "privileged-users"){
+
+                    # Iterate through each row in the table ensuring there are 4 columns
+                    foreach ($Row in $Rows) {
+                        $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                        $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                        if ($RowHeaders.Count -gt 0){
+                            $RowHeaders.Count | Should -BeExactly 4
+                            $RowHeaders[0].text | Should -BeLikeExactly "Display Name"
+                        }
+
+                        if ($RowData.Count -gt 0){
+                            $RowData.Count | Should -BeExactly 4
+                        }
+                    }
+                }
                 elseif ($null -ne $Table.GetAttribute("class") -and $Table.GetAttribute("class").Contains("dns-table")){
 
                     # Iterate through each row in the table ensuring there are 4 columns
