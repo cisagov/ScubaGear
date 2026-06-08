@@ -1621,7 +1621,7 @@ AIAgents contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
 
     ### Common checks for conditional access policies
-    Contains(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
+    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
     CAPolicy.State == "enabled"
     ###
 
