@@ -67,6 +67,19 @@ InModuleScope CreateReport {
                 $ReportContent = Get-Content -Path $ReportPath -Raw
                 $ReportContent | Should -Match '<h2>Users with Privileged Roles</h2>'
                 $ReportContent | Should -Match 'id="privileged-users"'
+
+                $PrivilegedUsersTable = [regex]::Match($ReportContent, 'id="privileged-users".*?</table>', 'Singleline').Value
+                $DataRows = [regex]::Matches($PrivilegedUsersTable, '<tr>.*?</tr>', 'Singleline') | Select-Object -Skip 1
+                $FoundNonGlobalAdmin = $false
+                foreach ($Row in $DataRows) {
+                    $HasGlobalAdmin = $Row.Value -match 'Global Administrator'
+                    if (-not $HasGlobalAdmin) {
+                        $FoundNonGlobalAdmin = $true
+                    }
+                    elseif ($FoundNonGlobalAdmin) {
+                        throw "Global Administrator user found after non-Global Administrator user in privileged users table"
+                    }
+                }
             }
         }
     }

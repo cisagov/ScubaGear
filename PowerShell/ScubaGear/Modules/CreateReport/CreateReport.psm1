@@ -579,15 +579,20 @@ function New-Report {
         if ($null -ne $SettingsExport -and $null -ne $SettingsExport.privileged_users) {
 
             # Create a section for users with privileged roles
-            $privilegedUsersTable = $SettingsExport.privileged_users.psobject.properties | ForEach-Object {
-                $user = $_.Value
-                [pscustomobject]@{
-                    "Display Name" = $user.DisplayName
-                    "Object ID" = $user.id
-                    "Roles" = ($user.roles -join ", ")
-                    "On-Prem Immutable ID" = $user.OnPremisesImmutableId
-                }
-            } | ConvertTo-Html -Fragment
+            $privilegedUsersTable = $SettingsExport.privileged_users.psobject.properties |
+                ForEach-Object { $_.Value } |
+                Sort-Object @{
+                    Expression = { 'Global Administrator' -notin $_.roles }
+                }, DisplayName |
+                ForEach-Object {
+                    $user = $_
+                    [pscustomobject]@{
+                        "Display Name" = $user.DisplayName
+                        "Object ID" = $user.id
+                        "Roles" = ($user.roles -join ", ")
+                        "On-Prem Immutable ID" = $user.OnPremisesImmutableId
+                    }
+                } | ConvertTo-Html -Fragment
 
             $privilegedUsersTable = $privilegedUsersTable -replace '^(.*?)<table>', '<table id="privileged-users" style="text-align:center;">'
 
