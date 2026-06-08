@@ -1846,41 +1846,6 @@ function Compare-ProductList {
     }
 }
 
-function Get-ServicePrincipalParams {
-    <#
-    .Description
-    Returns a valid a hastable of parameters for authentication via
-    Service Principal. Throws an error if there are none.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [object]
-    $ScubaConfig
-    )
-
-    $ServicePrincipalParams = @{}
-
-    $CheckThumbprintParams = ($ScubaConfig.CertificateThumbprint) `
-    -and ($ScubaConfig.AppID) -and ($ScubaConfig.Organization)
-
-    if ($CheckThumbprintParams) {
-        $CertThumbprintParams = @{
-            CertificateThumbprint = $ScubaConfig.CertificateThumbprint;
-            AppID = $ScubaConfig.AppID;
-            Organization = $ScubaConfig.Organization;
-        }
-        $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
-    }
-    else {
-        throw "When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization."
-    }
-    $ServicePrincipalParams
-}
-
 function Import-Resources {
     <#
     .Description

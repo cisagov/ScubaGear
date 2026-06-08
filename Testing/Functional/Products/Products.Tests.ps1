@@ -104,7 +104,9 @@ BeforeDiscovery {
 
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
     Import-Module $ScubaModule
+    Import-Module $ConnectionModule
 
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
@@ -120,13 +122,13 @@ BeforeDiscovery {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    InModuleScope Connection -Parameters @{
-        ProductName = $ProductName
-        M365Environment = $M365Environment
-        Thumbprint = $Thumbprint
-        AppId = $AppId
-        TenantDomain = $TenantDomain
-    }{
+    # InModuleScope Connection -Parameters @{
+    #     ProductName = $ProductName
+    #     M365Environment = $M365Environment
+    #     Thumbprint = $Thumbprint
+    #     AppId = $AppId
+    #     TenantDomain = $TenantDomain
+    # }{
         if ($ProductName -eq "securitysuite"){
             $ProductNames = @($ProductName, "exo")
         }
@@ -135,18 +137,27 @@ BeforeDiscovery {
         }
 
         if (-Not [string]::IsNullOrEmpty($AppId)){
-        $ServicePrincipalParams = @{CertThumbprintParams = @{
-            CertificateThumbprint = $Thumbprint;
-            AppID = $AppId;
-            Organization = $TenantDomain;
-        }}
-        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+            $TempScubaConfig = New-Object -Type PSObject -Property @{
+                'AppID' = $AppID;
+                'CertificateThumbprint' = $Thumbprint;
+                'Organization' = $TenantDomain;
+            }
+            # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
+            $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
+            $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
+
+            $ServicePrincipalParams = @{CertThumbprintParams = @{
+                CertificateThumbprint = $Thumbprint;
+                AppID = $AppId;
+                Organization = $TenantDomain;
+            }}
+            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
         else {
-        Write-Debug "Manual Connect to Tenant"
-        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
+            Write-Debug "Manual Connect to Tenant"
+            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
         }
-    }
+    # }
 }
 
 BeforeAll {
@@ -297,7 +308,7 @@ BeforeAll {
   function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
             Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings

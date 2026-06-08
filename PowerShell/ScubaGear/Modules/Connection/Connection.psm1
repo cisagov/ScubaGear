@@ -427,6 +427,41 @@ function Disconnect-SCuBATenant {
 
 }
 
+function Get-ServicePrincipalParams {
+    <#
+    .Description
+    Returns a valid a hastable of parameters for authentication via
+    Service Principal. Throws an error if there are none.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [object]
+    $ScubaConfig
+    )
+
+    $ServicePrincipalParams = @{}
+
+    $CheckThumbprintParams = ($ScubaConfig.CertificateThumbprint) `
+    -and ($ScubaConfig.AppID) -and ($ScubaConfig.Organization)
+
+    if ($CheckThumbprintParams) {
+        $CertThumbprintParams = @{
+            CertificateThumbprint = $ScubaConfig.CertificateThumbprint;
+            AppID = $ScubaConfig.AppID;
+            Organization = $ScubaConfig.Organization;
+        }
+        $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
+    }
+    else {
+        throw "Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments"
+    }
+    $ServicePrincipalParams
+}
+
 function Get-M365EnvironmentByDomain {
     <#
     .SYNOPSIS
@@ -472,5 +507,6 @@ function Get-M365EnvironmentByDomain {
 Export-ModuleMember -Function @(
     'Connect-Tenant',
     'Disconnect-SCuBATenant',
+    'Get-ServicePrincipalParams',
     'Get-M365EnvironmentByDomain'
 )
