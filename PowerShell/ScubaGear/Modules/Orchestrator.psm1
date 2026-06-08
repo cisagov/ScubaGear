@@ -1366,6 +1366,8 @@ function Merge-JsonOutput {
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
                 "DomainName" = $TenantDetails.DomainName;
+                "OrgName" = $SettingsExportObject.scuba_config.OrgName;
+                "OrgUnitName" = $SettingsExportObject.scuba_config.OrgUnitName;
                 "ProductSuite" = "Microsoft 365";
                 "ProductsAssessed" = $FullNames;
                 "ProductAbbreviationMapping" = $ProductAbbreviationMapping

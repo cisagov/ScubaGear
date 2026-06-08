@@ -63,7 +63,7 @@ jobs:
       total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Import PFX
@@ -77,17 +77,17 @@ jobs:
         with:
           PfxPassword: ${{ secrets.PfxPassword }}
       - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: scubagear-directory-
       - name: Restore Dependencies
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: powershell-directory-
       - name: Restore OPA
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
@@ -115,7 +115,7 @@ jobs:
       total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Import PFX
@@ -129,17 +129,17 @@ jobs:
         with:
           PfxPassword: ${{ secrets.PfxPassword }}
       - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: scubagear-directory-
       - name: Restore Dependencies
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: powershell-directory-
       - name: Restore OPA
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
@@ -167,7 +167,7 @@ jobs:
       total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Import PFX
@@ -181,17 +181,17 @@ jobs:
         with:
           PfxPassword: ${{ secrets.PfxPassword }}
       - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: scubagear-directory-
       - name: Restore Dependencies
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: powershell-directory-
       - name: Restore OPA
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
@@ -219,7 +219,7 @@ jobs:
       total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: repo
       - name: Import PFX
@@ -233,17 +233,17 @@ jobs:
         with:
           PfxPassword: ${{ secrets.PfxPassword }}
       - name: Restore ScubaGear
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: scubagear-directory-
       - name: Restore Dependencies
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: powershell-directory-
       - name: Restore OPA
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
@@ -265,7 +265,7 @@ jobs:
     if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Extract Email
         id: extract-email
         uses: ./.github/actions/extract-email
@@ -274,7 +274,7 @@ jobs:
           Alias: Shr_Tenant1_PNP
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        uses: dawidd6/action-send-mail@v3
+        uses: dawidd6/action-send-mail@v17
         with:
           server_address: smtp.gmail.com
           server_port: 465

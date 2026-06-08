@@ -15,8 +15,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
+      - name: Checkout PR branch
+        uses: actions/checkout@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0

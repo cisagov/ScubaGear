@@ -5,6 +5,7 @@ import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsArray
 
 
 ######################
@@ -107,6 +108,18 @@ tests contains {
 }
 #--
 
+#
+# MS.SECURITYSUITE.2.4v1
+#--
+tests contains {
+    "PolicyId": "MS.SECURITYSUITE.2.4v1",
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
+    "RequirementMet": false
+}
+#--
 
 ######################
 # MS.SECURITYSUITE.3 #
@@ -185,13 +198,37 @@ tests contains {
 #
 # MS.SECURITYSUITE.4.1v1
 #--
+BaseRequiredAlerts := {
+    "Suspicious email sending patterns detected",
+    "Suspicious connector activity",
+    "Suspicious Email Forwarding Activity",
+    "Messages have been delayed",
+    "Tenant restricted from sending unprovisioned email",
+    "Tenant restricted from sending email",
+}
+AdditionalRequiredAlerts contains "A potentially malicious URL click was detected" if {
+    some alert in input.protection_alerts
+    alert.Name == "A potentially malicious URL click was detected"
+}
+RequiredAlerts := BaseRequiredAlerts | AdditionalRequiredAlerts
+EnabledAlerts contains alert.Name if {
+    some alert in input.protection_alerts
+    alert.Name in RequiredAlerts
+    alert.Disabled == false
+}
+# if there are any missing required alerts, the test fails
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.4.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.4.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-ProtectionAlert"],
+    "ActualValue": MissingAlerts,
+    "ReportDetails": ReportDetailsString(Status,
+        ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
+    "RequirementMet": Status
+} if {
+    MissingAlerts := RequiredAlerts - EnabledAlerts
+    ErrorMessage := "disabled required alert(s) found:"
+    Status := count(MissingAlerts) == 0
 }
 #--
 
@@ -350,10 +387,9 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMessage),
     "RequirementMet": Status
 } if {
-    ConnFilterPolicies := ConnFiltersWithIPAllowList
     ErrString := "connection filter polic(ies) with an IP allowlist:"
-    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
-    Status := count(ConnFilterPolicies) == 0
+    ErrMessage := Description([ArraySizeStr(ConnFiltersWithIPAllowList), ErrString , concat(", ", ConnFiltersWithIPAllowList)])
+    Status := count(ConnFiltersWithIPAllowList) == 0
 }
 #--
 
@@ -377,9 +413,8 @@ tests contains {
     "ReportDetails": ReportDetailsString(Status, ErrMessage),
     "RequirementMet": Status
 } if {
-    ConnFilterPolicies := ConnFiltersWithSafeList
     ErrString := "connection filter polic(ies) with a safe list:"
-    ErrMessage := Description([ArraySizeStr(ConnFilterPolicies), ErrString , concat(", ", ConnFilterPolicies)])
-    Status := count(ConnFilterPolicies) == 0
+    ErrMessage := Description([ArraySizeStr(ConnFiltersWithSafeList), ErrString , concat(", ", ConnFiltersWithSafeList)])
+    Status := count(ConnFiltersWithSafeList) == 0
 }
 #--

@@ -46,8 +46,11 @@ function New-ModuleSignature {
   . $PublishPath
 
   # TODO Update and test with new function in utils/workflow
-  # Remove non-release files, like the .git dir, required for non-Windows machines
-  Remove-Item -Recurse -Force $RootFolderName -Include .git*
+  # Remove the .git directory only (do not use .git*; that pattern also matches .github)
+  $GitDirectory = Join-Path -Path $RootFolderName -ChildPath '.git'
+  if (Test-Path -Path $GitDirectory) {
+    Remove-Item -Recurse -Force $GitDirectory
+  }
   Write-Warning "Creating an array of the files to sign..."
   $ArrayOfFilePaths = New-ArrayOfFilePaths `
     -ModuleDestinationPath $RootFolderName
