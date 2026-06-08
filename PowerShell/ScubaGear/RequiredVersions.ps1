@@ -8,13 +8,6 @@ $ModuleList = @(
         IsPinned = "False"
     },
     @{
-        ModuleName = 'ExchangeOnlineManagement' # includes Defender
-        ModuleVersion = [version] '3.2.0'
-        MaximumVersion = [version] '3.9.2'
-        Purpose = 'Exchange Online and Microsoft Defender management'
-        IsPinned = "False"
-    },
-    @{
         ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.25.0'
