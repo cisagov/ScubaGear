@@ -242,12 +242,12 @@ IsGeneralMFA(Policy) := true if {
 # Case 3: Input is a string -> output is an array of trimmed items split by commas
 EnsureTrimmedArray(JsonObject) := [] if {
     JsonObject == null
-} else := arr if {
+} else := JsonObject if {
     is_array(JsonObject)
-    arr := JsonObject
 } else := arr if {
     is_string(JsonObject)
-    arr = [trim(y, " ") | y := split(JsonObject, ",")[_]]
+    parts := split(JsonObject, ",")
+    arr = [trim(y, " ") | some y in parts]
 }
 
 ############################################################################

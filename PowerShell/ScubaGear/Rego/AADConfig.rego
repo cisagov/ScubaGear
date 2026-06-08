@@ -1679,11 +1679,11 @@ tests contains {
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    AAD_9_1_Not_Applicable_Due_To_Environment == false
     Conditions := [
         Count(Aad2P2Licenses) > 0,
         Count(AIAgents) > 0
     ]
-    AAD_9_1_Not_Applicable_Due_To_Environment == false
     Status := Count(FilterArray(Conditions, false)) == 0
 }
 #--
