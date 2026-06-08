@@ -179,6 +179,18 @@ tests contains {
 }
 #--
 
+#
+# MS.SECURITYSUITE.2.4v1
+#--
+tests contains {
+    "PolicyId": "MS.SECURITYSUITE.2.4v1",
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
+    "RequirementMet": false
+}
+#--
 
 ######################
 # MS.SECURITYSUITE.3 #
@@ -268,20 +280,20 @@ BaseRequiredAlerts := {
 AdditionalRequiredAlerts contains "A potentially malicious URL click was detected" if {
     some alert in input.protection_alerts
     alert.Name == "A potentially malicious URL click was detected"
-} 
+}
 RequiredAlerts := BaseRequiredAlerts | AdditionalRequiredAlerts
 EnabledAlerts contains alert.Name if {
     some alert in input.protection_alerts
     alert.Name in RequiredAlerts
     alert.Disabled == false
 }
-# if there are any missing required alerts, the test fails 
+# if there are any missing required alerts, the test fails
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.4.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-ProtectionAlert"],
     "ActualValue": MissingAlerts,
-    "ReportDetails": ReportDetailsString(Status, 
+    "ReportDetails": ReportDetailsString(Status,
         ReportDetailsArray(false, MissingAlerts, ErrorMessage)),
     "RequirementMet": Status
 } if {
