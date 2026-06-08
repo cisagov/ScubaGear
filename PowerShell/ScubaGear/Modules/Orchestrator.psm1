@@ -21,8 +21,8 @@ function Invoke-SCuBA {
     This parameter is used to authenticate to the different commercial/government environments.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
-    - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
-    - For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Government Community Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government Community Cloud High tenants enter the value **"gcchigh"**.
     - For M365 Department of Defense tenants enter the value **"dod"**.
     Default value is 'commercial'.
     .Parameter OPAPath
@@ -127,7 +127,7 @@ function Invoke-SCuBA {
     'dod' teams endpoint.
     .Example
     Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
-    Run the tool against Azure Active Directory and Exchange Online security
+    Run the tool against Entra Id and Exchange Online security
     baselines, disconnecting connections for those products when complete.
     .Example
     Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
@@ -1982,8 +1982,8 @@ function Invoke-SCuBACached {
     This parameter is used to authenticate to the different commercial/government environments.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
-    For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
-    For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
+    For M365 Government community cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    For M365 Government community cloud High tenants enter the value **"gcchigh"**.
     For M365 Department of Defense tenants enter the value **"dod"**.
     Default is 'commercial'.
     .Parameter OPAPath
