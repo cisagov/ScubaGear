@@ -353,7 +353,8 @@ function Get-PrivilegedUser {
     $AADRoles = (Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryRole" -M365Environment $M365Environment).Value | Where-Object { $_.DisplayName -in $PrivilegedRoles }
 
     # Construct a list of privileged users based on the Active role assignments
-    Trace-ScubaFunction -FunctionName "Get-PrivilegedUser Active assignments" -ScriptBlock {
+    # We set LogErrors to false because we handle errors locally
+    Trace-ScubaFunction -FunctionName "Get-PrivilegedUser Active assignments" -LogErrors $false -ScriptBlock {
         foreach ($Role in $AADRoles) {
 
             # Get a list of all the users and groups Actively assigned to this role
@@ -381,7 +382,8 @@ function Get-PrivilegedUser {
 
     # Process the Eligible role assignments if the premium license for PIM is there
     if ($TenantHasPremiumLicense) {
-        Trace-ScubaFunction -FunctionName "Get-PrivilegedUser Eligible assignments" -ScriptBlock {
+        # We set LogErrors to false because we handle errors locally
+        Trace-ScubaFunction -FunctionName "Get-PrivilegedUser Eligible assignments" -LogErrors $false -ScriptBlock {
             # Get a list of all the users and groups that have Eligible assignments, this will retrieve information from the Graph API directly and not use the cmdlet.
             $AllPIMRoleAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
 
@@ -755,22 +757,24 @@ function Get-PrivilegedRole {
 
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
+        # In this block We set LogErrors to false when calling Trace-ScubaFunction because we handle errors locally
+
         # Get ALL the roles and users actively assigned to them, API information is contained within the Permissions JSON file.
-        $AllRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -ScriptBlock {
+        $AllRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -LogErrors $false -ScriptBlock {
             (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance" -M365Environment $M365Environment).Value
         }
-        $AllEligibleRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -ScriptBlock {
+        $AllEligibleRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -LogErrors $false -ScriptBlock {
             (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
         }
 
         # Each of the helper functions below add configuration settings (aka rules) to the role array.
         # Get the PIM configurations for the roles
-        Trace-ScubaFunction -FunctionName "GetConfigurationsForRoles" -ScriptBlock {
+        Trace-ScubaFunction -FunctionName "GetConfigurationsForRoles" -LogErrors $false -ScriptBlock {
             GetConfigurationsForRoles -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments
         }
         # Get the PIM configurations for the groups
         $AllRoleAssignments += $AllEligibleRoleAssignments # Add eligible only for PIM groups
-        Trace-ScubaFunction -FunctionName "GetConfigurationsForPimGroups" -ScriptBlock {
+        Trace-ScubaFunction -FunctionName "GetConfigurationsForPimGroups" -LogErrors $false -ScriptBlock {
             GetConfigurationsForPimGroups -PrivilegedRoleArray $PrivilegedRoleArray -AllRoleAssignments $AllRoleAssignments -M365Environment $M365Environment
         }
     }
