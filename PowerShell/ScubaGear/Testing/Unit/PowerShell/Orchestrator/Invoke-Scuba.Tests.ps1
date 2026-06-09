@@ -60,6 +60,9 @@ InModuleScope Orchestrator {
 
             function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Get-M365EnvironmentByDomain {}
+
+            function Get-ServicePrincipalParams {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
