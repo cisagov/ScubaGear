@@ -210,27 +210,44 @@ function Get-MsalAccessToken {
         }
     }
 
-    if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
-        $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
-            WithCertificate($Certificate).
-            WithAuthority($Authority).
-            Build()
+    $MaxAttempts = 3
+    $Attempt = 0
+    while ($Attempt -lt $MaxAttempts) {
+        $Attempt++
+        try {
+            if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
+                $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+                    WithCertificate($Certificate).
+                    WithAuthority($Authority).
+                    Build()
 
-        $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
+                $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
+            }
+            else {
+                $RedirectUri = "http://localhost"
+                $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                    WithAuthority($Authority).
+                    WithRedirectUri($RedirectUri).
+                    Build()
+
+                $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
+                    WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+                    WithUseEmbeddedWebView($false).
+                    ExecuteAsync().GetAwaiter().GetResult()
+            }
+
+            return $TokenResult.AccessToken
+        }
+        catch {
+            if ($Attempt -ge $MaxAttempts) {
+                Write-Warning "Failed to acquire access token after $MaxAttempts attempts"
+                throw
+            }
+
+            Write-Warning "Token acquisition attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
+            Start-Sleep -Seconds 5
+        }
     }
-    else {
-        $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-            WithAuthority($Authority).
-            WithRedirectUri("http://localhost").
-            Build()
-
-        $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
-            WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-            WithUseEmbeddedWebView($false).
-            ExecuteAsync().GetAwaiter().GetResult()
-    }
-
-    return $TokenResult.AccessToken
 }
 
 Export-ModuleMember -Function @(
