@@ -25,6 +25,10 @@ if ($thumbprint) {
     $params["Thumbprint"] = $thumbprint
 }
 
+if ($interactive) {
+    $params["Interactive"] = $true
+}
+
 # Create an array of test containers
 $testContainers = @()
 $testContainers += New-PesterContainer -Path $testScriptDir -Data $params
