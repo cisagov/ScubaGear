@@ -46,12 +46,10 @@ UNACCEPTABLE_USER_PROTECTION_ACTIONS := {
 
 default TenantDomainNames := set()
 
-TenantDomainNames := Domains if {
-    Domains := {
-        lower(trim_space(Domain.DomainName)) |
-        some Domain in input.accepted_domains
-        Domain.DomainName != null
-    }
+TenantDomainNames := {
+    lower(trim_space(Domain.DomainName)) |
+    some Domain in input.accepted_domains
+    Domain.DomainName != null
 }
 
 IsPresetAntiPhishPolicy(Identity) if {
