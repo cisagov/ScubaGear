@@ -87,9 +87,16 @@ function Invoke-ExternalCmd{
     $ProcessStartInfo.RedirectStandardError = $true
     $ProcessStartInfo.CreateNoWindow = $true
 
-    foreach ($Arg in $PassThruArgs) {
-        $null = $ProcessStartInfo.ArgumentList.Add([string]$Arg)
+    $EscapedArgs = foreach ($Arg in $PassThruArgs) {
+        $ArgText = [string]$Arg
+        if ($ArgText -match '[\s"]') {
+            '"' + ($ArgText -replace '"', '\\"') + '"'
+        }
+        else {
+            $ArgText
+        }
     }
+    $ProcessStartInfo.Arguments = ($EscapedArgs -join ' ')
 
     $Process = [System.Diagnostics.Process]::new()
     $Process.StartInfo = $ProcessStartInfo
