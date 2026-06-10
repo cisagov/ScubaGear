@@ -179,6 +179,30 @@ BeforeAll {
     # Dot source utility functions
     . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
 
+    # EXO functional tests still use Exchange cmdlets in pre/postconditions.
+    # Establish a dedicated EXO session here so test setup can mutate tenant
+    # state without changing the production EXO runtime path.
+    if ($ProductName -eq "exo") {
+        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
+        Import-Module $ConnectHelpersPath -Force
+
+        $EXOHelperParams = @{
+            M365Environment = $M365Environment
+        }
+
+        if (-not [string]::IsNullOrEmpty($AppId)) {
+            $EXOHelperParams.ServicePrincipalParams = @{
+                CertThumbprintParams = @{
+                    CertificateThumbprint = $Thumbprint
+                    AppID = $AppId
+                    Organization = $TenantDomain
+                }
+            }
+        }
+
+        Connect-EXOHelper @EXOHelperParams
+    }
+
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
