@@ -44,9 +44,29 @@ function Invoke-Rego {
     }
 
     # Load Utils
-    $RegoFileObject = Get-Item $RegoFile
-    $ScubaUtils = Join-Path -Path $RegoFileObject.DirectoryName -ChildPath "Utils"
+    if (-not (Test-Path $RegoFile -PathType Leaf)) {
+        throw "Rego file not found at: $RegoFile"
+    }
+
+    $RegoFileObject = Get-Item $RegoFile -ErrorAction Stop
+    if ($null -eq $RegoFileObject) {
+        throw "Failed to get Rego file object at: $RegoFile"
+    }
+
+    $ScubaUtils = Join-Path -Path $RegoFileObject.DirectoryName -ChildPath "Utils" -ErrorAction 'Stop'
+    if (-not (Test-Path $ScubaUtils -PathType Container)) {
+        throw "Rego Utils directory not found at: $ScubaUtils"
+    }
+
     $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $InputFile, "-d", $RegoFile, "-d", $ScubaUtils, "-f", "values")
+
+    Write-Debug "OPA Command: $Cmd"
+    Write-Debug "OPA Arguments: $($CmdArgs -join ' ')"
+    Write-Debug "InputFile: $InputFile"
+    Write-Debug "RegoFile: $RegoFile"
+    Write-Debug "ScubaUtils: $ScubaUtils"
+    Write-Debug "PackageName: $PackageName"
+
     $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
     $RegoOutput
 }
@@ -73,10 +93,27 @@ function Invoke-ExternalCmd{
 
     $Process = [System.Diagnostics.Process]::new()
     $Process.StartInfo = $ProcessStartInfo
-    $null = $Process.Start()
+    try {
+        $ProcessStarted = $Process.Start()
+        if (-not $ProcessStarted) {
+            throw "Failed to start process '$LiteralPath'. The process returned false on Start()."
+        }
+    }
+    catch {
+        throw "Failed to start process '$LiteralPath': $($_.Exception.Message)"
+    }
 
-    $StdOut = $Process.StandardOutput.ReadToEnd()
-    $StdErr = $Process.StandardError.ReadToEnd()
+    $StdOut = ""
+    $StdErr = ""
+
+    if ($null -ne $Process.StandardOutput) {
+        $StdOut = $Process.StandardOutput.ReadToEnd()
+    }
+
+    if ($null -ne $Process.StandardError) {
+        $StdErr = $Process.StandardError.ReadToEnd()
+    }
+
     $Process.WaitForExit()
 
     if ($Process.ExitCode -ne 0) {

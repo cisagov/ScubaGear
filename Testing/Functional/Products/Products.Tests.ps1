@@ -361,6 +361,10 @@ BeforeAll {
 Describe "Policy Checks for <ProductName>" {
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan {
         BeforeEach {
+            $script:RunScubaError = $null
+            $script:Driver = $null
+
+            try {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
@@ -442,8 +446,14 @@ Describe "Policy Checks for <ProductName>" {
             Write-Debug "OutputFolder: $OutputFolder"
             $IntermediateRegoOutput = LoadRegoOutput($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
+            $CandidatePolicyIds = @($PolicyId)
+            if ($PolicyId -like "MS.SECURITYSUITE.*") {
+                $CandidatePolicyIds += ($PolicyId -replace '^MS\.SECURITYSUITE\.', 'MS.DEFENDER.')
+            }
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ComparisonPolicyId', Justification = 'Variable is used in ScriptBlock')]
+            $ComparisonPolicyId = $CandidatePolicyIds[-1]
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
-            $PolicyResultObj = $IntermediateRegoOutput | Where-Object { $_.PolicyId -eq $PolicyId }
+            $PolicyResultObj = $IntermediateRegoOutput | Where-Object { $_.PolicyId -in $CandidatePolicyIds }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
             try {
@@ -456,9 +466,18 @@ Describe "Policy Checks for <ProductName>" {
                 $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
             }
             Open-SeUrl $Url -Driver $Driver | Out-Null
+            }
+            catch {
+                $script:RunScubaError = $_
+                Write-Warning "Functional setup failed for policy [$PolicyId]: $($_.Exception.Message)"
+            }
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" -Tag $PolicyId {
+                if ($null -ne $script:RunScubaError) {
+                    throw "Functional setup failed before assertions for [$PolicyId]: $($script:RunScubaError.Exception.Message)`n$($script:RunScubaError.ScriptStackTrace)"
+                }
+
                 #Check intermediate output
                 ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
@@ -467,7 +486,11 @@ Describe "Policy Checks for <ProductName>" {
 
                 # Check final HTML output
                 $FoundPolicy = $false
-                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $ProductDetails.$script:ExecutionProductName
+                $ExecutionProductNameForLookup = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductNameForLookup | Should -Not -BeNullOrEmpty -Because "execution product name must be set for policy [$PolicyId]"
+                $DetailLinkText = $ProductDetails[$ExecutionProductNameForLookup]
+                $DetailLinkText | Should -Not -BeNullOrEmpty -Because "product detail link text must exist for execution product [$ExecutionProductNameForLookup]"
+                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $DetailLinkText
                 $DetailLink | Should -Not -BeNullOrEmpty
                 Invoke-SeClick -Element $DetailLink
 
@@ -489,7 +512,9 @@ Describe "Policy Checks for <ProductName>" {
                         if ($Rows.Count -lt 2) {
                             continue
                         }
+                        $Rows[1] | Should -Not -BeNullOrEmpty -Because "tenant-data table row is missing for policy [$PolicyId]"
                         $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
+                        $TenantDataColumns | Should -Not -BeNullOrEmpty -Because "tenant-data columns are missing for policy [$PolicyId]"
                         $Tenant = $TenantDataColumns[0].Text
                         $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
                     }
@@ -573,7 +598,7 @@ Describe "Policy Checks for <ProductName>" {
                             if ($RowData.Count -gt 0){
                                 $RowData.Count | Should -BeExactly 5
 
-                                if ($RowData[0].text -eq $PolicyId) {
+                                if ($RowData[0].text -eq $ComparisonPolicyId) {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
@@ -605,14 +630,16 @@ Describe "Policy Checks for <ProductName>" {
                     }
                 }
 
-                $FoundPolicy | Should -BeTrue -Because "all policies should have a result. [$PolicyId]"
+                $FoundPolicy | Should -BeTrue -Because "all policies should have a result. [Requested=$PolicyId, Compared=$ComparisonPolicyId]"
                 # Turn implict wait back on
                 $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
             }
         }
         AfterEach {
             SetConditions -Conditions $Postconditions.ToArray()
-            Stop-SeDriver -Driver $Driver | Out-Null
+            if ($null -ne $Driver) {
+                Stop-SeDriver -Driver $Driver | Out-Null
+            }
         }
     }
 }
