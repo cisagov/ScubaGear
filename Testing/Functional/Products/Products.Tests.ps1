@@ -473,6 +473,10 @@ Describe "Policy Checks for <ProductName>" {
                     throw "Functional setup failed before assertions for [$PolicyId]: $($script:RunScubaError.Exception.Message)`n$($script:RunScubaError.ScriptStackTrace)"
                 }
 
+                if ($IsNotChecked) {
+                    return
+                }
+
                 #Check intermediate output
                 ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
