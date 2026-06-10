@@ -46,8 +46,7 @@ UNACCEPTABLE_USER_PROTECTION_ACTIONS := {
 
 default TenantDomainNames := set()
 
-TenantDomainNames := {
-    lower(trim_space(Domain.DomainName)) |
+TenantDomainNames contains lower(trim_space(Domain.DomainName)) if {
     some Domain in input.accepted_domains
     Domain.DomainName != null
 }
