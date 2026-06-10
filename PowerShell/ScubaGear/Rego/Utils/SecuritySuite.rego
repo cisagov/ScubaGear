@@ -44,8 +44,6 @@ UNACCEPTABLE_USER_PROTECTION_ACTIONS := {
     "bccmessage",
 }
 
-default TenantDomainNames := set()
-
 TenantDomainNames contains lower(trim_space(Domain.DomainName)) if {
     some Domain in input.accepted_domains
     Domain.DomainName != null
