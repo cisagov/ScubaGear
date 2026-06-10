@@ -98,6 +98,14 @@ param (
 
 $script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
+function Get-ExecutionProductName {
+    if ($ProductName -eq "defender") {
+        return "securitysuite"
+    }
+
+    return $ProductName
+}
+
 BeforeDiscovery {
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
@@ -343,12 +351,13 @@ BeforeAll {
     }
 
   function RunScuba() {
+        $ExecutionProductName = Get-ExecutionProductName
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $script:ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
-            Invoke-SCuBA -Login $false -Productnames $script:ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
     }
 
@@ -360,7 +369,8 @@ Describe "Policy Checks for <ProductName>" {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
-                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$script:ExecutionProductName/$PolicyId/$ConfigFileName"
+                $ExecutionProductName = Get-ExecutionProductName
+                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ExecutionProductName/$PolicyId/$ConfigFileName"
 
                 $ScubaConfig = Get-Content -Path $FullPath | ConvertFrom-Yaml
 
@@ -414,7 +424,8 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $script:ExecutionProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                $ExecutionProductName = Get-ExecutionProductName
+                Invoke-SCuBACached -Productnames $ExecutionProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Save the ModifiedProviderSettingsExport so that it can be referenced during dev testing of functional test scenarios
                 $SavedModifiedProviderFileName = "ModifiedProviderSettingsExport-{0}-{1}.json" -f (Get-Date -Format "yyyyMMdd_HHmmss_fff"), [guid]::NewGuid()
