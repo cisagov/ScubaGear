@@ -130,13 +130,12 @@ tests contains {
         "Get-EOPProtectionPolicyRule",
         "Get-AcceptedDomain"
     ],
-    "ActualValue": Evaluation,
+    "ActualValue": OrganizationDomainProtectionCompliant,
     "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
-    Evaluation := OrganizationDomainProtectionCompliant
-    Status := Evaluation.Compliant
-    ErrorMessage := Evaluation.Message
+    Status := OrganizationDomainProtectionCompliant.Compliant
+    ErrorMessage := OrganizationDomainProtectionCompliant.Message
 }
 #--
 
@@ -184,13 +183,12 @@ tests contains {
         "Get-EOPProtectionPolicyRule",
         "Get-AcceptedDomain"
     ],
-    "ActualValue": Evaluation,
+    "ActualValue": UserWarningsCompliant,
     "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
-    Evaluation := UserWarningsCompliant
-    Status := Evaluation.Compliant
-    ErrorMessage := Evaluation.Message
+    Status := UserWarningsCompliant.Compliant
+    ErrorMessage := UserWarningsCompliant.Message
 }
 #--
 

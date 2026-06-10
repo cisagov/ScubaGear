@@ -44,13 +44,15 @@ UNACCEPTABLE_USER_PROTECTION_ACTIONS := {
     "bccmessage",
 }
 
+default TenantDomainNames := set()
+
 TenantDomainNames := Domains if {
     Domains := {
         lower(trim_space(Domain.DomainName)) |
         some Domain in input.accepted_domains
         Domain.DomainName != null
     }
-} else := set()
+}
 
 IsPresetAntiPhishPolicy(Identity) if {
     regex.match(`(?i)Standard Preset Security Policy`, Identity)
@@ -91,8 +93,7 @@ AntiPhishRuleForPolicy(Rule, Policy) if {
 }
 
 CustomPolicyCoversAllRecipients(Policy) if {
-    TenantDomains := TenantDomainNames
-    count(TenantDomains) > 0
+    count(TenantDomainNames) > 0
     count([
         Rule |
         some Rule in input.anti_phish_rules
@@ -103,7 +104,7 @@ CustomPolicyCoversAllRecipients(Policy) if {
         RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
         RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
         RuleDomains := ConvertToSet(Rule.RecipientDomainIs)
-        count(TenantDomains - RuleDomains) == 0
+        count(TenantDomainNames - RuleDomains) == 0
     ]) > 0
 }
 
@@ -254,6 +255,12 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     "Policies": [],
 }
 
+default OrganizationDomainProtectionCompliant := {
+    "Compliant": false,
+    "Message": "No anti-phish policy has 'Include domains I own' enabled.",
+    "Policies": [],
+}
+
 OrganizationDomainProtectionCompliant := Result if {
     Compliant := {PhishPolicy |
         some PhishPolicy in EnabledAntiPhishPolicies
@@ -314,10 +321,6 @@ OrganizationDomainProtectionCompliant := Result if {
         "Message": "No anti-phish policy has 'Include domains I own' enabled for all recipients.",
         "Policies": Partial,
     }
-} else := {
-    "Compliant": false,
-    "Message": "No anti-phish policy has 'Include domains I own' enabled.",
-    "Policies": [],
 }
 
 ##############################################
@@ -348,6 +351,12 @@ CustomSafetyTipsPolicies contains Policy if {
     not IsPresetAntiPhishPolicy(Policy.Identity)
     HasSafetyTipsEnabled(Policy)
     AntiPhishPolicyCoversAllRecipients(Policy)
+}
+
+default UserWarningsCompliant := {
+    "Compliant": false,
+    "Message": "No anti-phish policy applies safety tips to all recipients.",
+    "Policies": [],
 }
 
 UserWarningsCompliant := Result if {
@@ -402,8 +411,4 @@ UserWarningsCompliant := Result if {
         "Message": "No anti-phish policy applies safety tips to all recipients.",
         "Policies": PartialRecipients,
     }
-} else := {
-    "Compliant": false,
-    "Message": "No anti-phish policy applies safety tips to all recipients.",
-    "Policies": [],
 }
