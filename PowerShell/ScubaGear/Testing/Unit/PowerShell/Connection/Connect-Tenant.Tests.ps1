@@ -35,6 +35,8 @@ InModuleScope Connection {
             }
             function Get-MsalAccessToken {throw 'this will be mocked'}
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
+            function Connect-EXOHelper {throw 'this will be mocked'}
+            Mock Connect-EXOHelper -MockWith {}
             Mock -CommandName Write-Progress {
             }
         }
