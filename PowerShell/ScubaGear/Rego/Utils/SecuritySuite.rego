@@ -254,9 +254,68 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     "Policies": [],
 }
 
-default OrganizationDomainProtectionCompliant := false
-
-OrganizationDomainProtectionCompliant := true if {
-    some Policy in EnabledAntiPhishPolicies
-    Policy.EnableOrganizationDomainsProtection == true
+OrganizationDomainProtectionCompliant := Result if {
+    Compliant := {PhishPolicy |
+        some PhishPolicy in EnabledAntiPhishPolicies
+        PhishPolicy.EnableOrganizationDomainsProtection == true
+        AntiPhishPolicyCoversAllRecipients(PhishPolicy)
+    }
+    count(Compliant) > 0
+    Result := {
+        "Compliant": true,
+        "Message": "",
+        "Policies": Compliant,
+    }
+} else := Result if {
+    Compliant := {PhishPolicy |
+        some PhishPolicy in EnabledAntiPhishPolicies
+        PhishPolicy.EnableOrganizationDomainsProtection == true
+        AntiPhishPolicyCoversAllRecipients(PhishPolicy)
+    }
+    Partial := [Entry |
+        some Policy in EnabledAntiPhishPolicies
+        Policy.EnableOrganizationDomainsProtection == true
+        not AntiPhishPolicyCoversAllRecipients(Policy)
+        Entry := {
+            "Name": Policy.Identity,
+            "MissingRecipients": true,
+        }
+    ]
+    count(Compliant) == 0
+    count(Partial) == 1
+    PartialPolicy := Partial[0]
+    Result := {
+        "Compliant": false,
+        "Message": concat(" ", [
+            sprintf("1 anti-phish policy found that has 'Include domains I own' enabled ('%v'),", [PartialPolicy.Name]),
+            "but not all users have been added as recipients.",
+        ]),
+        "Policies": Partial,
+    }
+} else := Result if {
+    Compliant := {PhishPolicy |
+        some PhishPolicy in EnabledAntiPhishPolicies
+        PhishPolicy.EnableOrganizationDomainsProtection == true
+        AntiPhishPolicyCoversAllRecipients(PhishPolicy)
+    }
+    Partial := [Entry |
+        some Policy in EnabledAntiPhishPolicies
+        Policy.EnableOrganizationDomainsProtection == true
+        not AntiPhishPolicyCoversAllRecipients(Policy)
+        Entry := {
+            "Name": Policy.Identity,
+            "MissingRecipients": true,
+        }
+    ]
+    count(Compliant) == 0
+    count(Partial) > 1
+    Result := {
+        "Compliant": false,
+        "Message": "No anti-phish policy has 'Include domains I own' enabled for all recipients.",
+        "Policies": Partial,
+    }
+} else := {
+    "Compliant": false,
+    "Message": "No anti-phish policy has 'Include domains I own' enabled.",
+    "Policies": [],
 }

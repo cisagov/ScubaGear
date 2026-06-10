@@ -123,14 +123,19 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-AntiPhishPolicy"],
-    "ActualValue": {"Policies": Policies},
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": Evaluation,
     "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
 } if {
-    Policies := [P | some P in input.anti_phish_policies; P.Enabled == true]
-    Status := OrganizationDomainProtectionCompliant == true
-    ErrorMessage := "No anti-phish policy has 'Include domains I own' enabled."
+    Evaluation := OrganizationDomainProtectionCompliant
+    Status := Evaluation.Compliant
+    ErrorMessage := Evaluation.Message
 }
 #--
 

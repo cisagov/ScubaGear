@@ -5184,7 +5184,7 @@
         "name": "Domain impersonation protection SHOULD be enabled for domains owned by the agency.",
         "policySection": "Impersonation Protection",
         "sectionDescription": "Impersonation protection checks incoming emails to see if the sender address is similar to the users or domains on an agency-defined list. If the sender address is significantly similar, as to indicate an impersonation attempt, the email is quarantined.",
-        "exclusionField": "AgencyDomains",
+        "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
         "rationale": "Configuring domain impersonation protection for agency-owned domains reduces the risk of a user being deceived by a look-alike domain.",
@@ -5231,11 +5231,6 @@
             "label": "Automated Check",
             "linkUrl": "#key-terminology",
             "color": "5E9732"
-          },
-          {
-            "label": "Requires Configuration",
-            "linkUrl": "../../../docs/configuration/configuration.md#defender-configuration",
-            "color": "981D20"
           }
         ]
       },

@@ -298,7 +298,6 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.2.2v1; Criticality: SHOULD -->
-<!--ExclusionType: AgencyDomains-->
 - _Rationale:_ Configuring domain impersonation protection for agency-owned domains
 reduces the risk of a user being deceived by a look-alike domain.
 - _Last modified:_ March 2026

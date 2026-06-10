@@ -106,11 +106,67 @@ test_SensitiveUsers_NoLicense if {
 #
 # Policy MS.SECURITYSUITE.2.2v1
 #--
-test_OrganizationDomains_Correct if {
+test_OrganizationDomains_PresetPolicy_AllRecipients if {
     Output := securitysuite.tests with input.anti_phish_policies as AntiPhishPolicies
+                            with input.anti_phish_rules as AntiPhishRules
+                            with input.protection_policy_rules as ProtectionPolicyRules
+                            with input.accepted_domains as AcceptedDomains
                             with input.defender_license as true
 
     TestResult("MS.SECURITYSUITE.2.2v1", Output, PASS, true) == true
+}
+
+test_OrganizationDomains_DefaultPolicy_AllRecipients if {
+    Output := securitysuite.tests with input.anti_phish_policies as [DefaultAntiPhishPolicy]
+                            with input.anti_phish_rules as []
+                            with input.protection_policy_rules as []
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as true
+
+    TestResult("MS.SECURITYSUITE.2.2v1", Output, PASS, true) == true
+}
+
+test_OrganizationDomains_CustomPolicy_AllRecipients if {
+    Output := securitysuite.tests with input.anti_phish_policies as [CustomAntiPhishPolicy]
+                            with input.anti_phish_rules as AntiPhishRules
+                            with input.protection_policy_rules as []
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as true
+
+    TestResult("MS.SECURITYSUITE.2.2v1", Output, PASS, true) == true
+}
+
+test_OrganizationDomains_PartialRecipientsMessage if {
+    Rule := json.patch(AntiPhishRules[0], [
+        {"op": "replace", "path": "AntiPhishPolicy", "value": "Custom AntiPhish"},
+        {"op": "replace", "path": "RecipientDomainIs", "value": ["example.com"]}
+    ])
+    Output := securitysuite.tests with input.anti_phish_policies as [CustomAntiPhishPolicy]
+                            with input.anti_phish_rules as [Rule]
+                            with input.protection_policy_rules as []
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as true
+
+    ReportDetailString := concat(" ", [
+        "1 anti-phish policy found that has 'Include domains I own' enabled ('Custom AntiPhish'),",
+        "but not all users have been added as recipients.",
+    ])
+    TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
+}
+
+test_OrganizationDomains_PresetNotAllRecipients if {
+    ProtectionPolicies := json.patch(ProtectionPolicyRules,
+                                [{"op": "add", "path": "0/SentTo", "value": ["user@example.com"]},
+                                {"op": "add", "path": "1/SentTo", "value": ["user@example.com"]}])
+
+    Output := securitysuite.tests with input.anti_phish_policies as AntiPhishPolicies
+                            with input.anti_phish_rules as AntiPhishRules
+                            with input.protection_policy_rules as ProtectionPolicies
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as true
+
+    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled for all recipients."
+    TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_OrganizationDomains_Incorrect if {
