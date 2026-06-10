@@ -35,6 +35,7 @@ TestPlan:
                   - Name: A potentially malicious URL click was detected
                     Disabled: false
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.4.1v1 Compliant case - Required alerts are enabled
         Preconditions:
@@ -57,4 +58,5 @@ TestPlan:
                   - Name: A potentially malicious URL click was detected
                     Disabled: false
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: true
