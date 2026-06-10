@@ -103,18 +103,30 @@ function Invoke-ExternalCmd{
         throw "Failed to start process '$LiteralPath': $($_.Exception.Message)"
     }
 
+    $Process.WaitForExit()
+
     $StdOut = ""
     $StdErr = ""
 
-    if ($null -ne $Process.StandardOutput) {
-        $StdOut = $Process.StandardOutput.ReadToEnd()
+    try {
+        $OutStream = $Process.StandardOutput
+        if ($null -ne $OutStream) {
+            $StdOut = $OutStream.ReadToEnd()
+        }
+    }
+    catch {
+        Write-Verbose "Failed to read StandardOutput: $($_.Exception.Message)"
     }
 
-    if ($null -ne $Process.StandardError) {
-        $StdErr = $Process.StandardError.ReadToEnd()
+    try {
+        $ErrStream = $Process.StandardError
+        if ($null -ne $ErrStream) {
+            $StdErr = $ErrStream.ReadToEnd()
+        }
     }
-
-    $Process.WaitForExit()
+    catch {
+        Write-Verbose "Failed to read StandardError: $($_.Exception.Message)"
+    }
 
     if ($Process.ExitCode -ne 0) {
         if ([string]::IsNullOrWhiteSpace($StdErr)) {
