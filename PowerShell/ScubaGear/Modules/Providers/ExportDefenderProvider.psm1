@@ -65,7 +65,6 @@ function Export-DefenderProvider {
     $AdminAuditLogConfig = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
     $ProtectionPolicyRule = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
     $AntiPhishPolicy = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-AntiPhishPolicy")
-    $ConnectionFilter = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-HostedConnectionFilterPolicy")
 
     $ATPPolicyResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
     $ATPProtectionPolicyRuleResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
@@ -127,7 +126,6 @@ function Export-DefenderProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
-    "conn_filter": $ConnectionFilter,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
     "defender_successful_commands": $SuccessfulCommands,

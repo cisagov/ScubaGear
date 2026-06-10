@@ -1,3 +1,10 @@
+# NOTE: This file (package securitysuite) is NOT evaluated at runtime.
+# The Orchestrator maps the 'securitysuite' product to BaselineName "Defender",
+# which resolves to DefenderConfig.rego (package defender) for both OPA evaluation
+# and report generation. This file is retained as a scaffold for future use if
+# the securitysuite product is ever decoupled from the defender baseline.
+# See Orchestrator.psm1: ArgToProd mapping (securitysuite = "Defender") and
+# RegoPackageName override ($Product -eq "securitysuite" => "defender").
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
