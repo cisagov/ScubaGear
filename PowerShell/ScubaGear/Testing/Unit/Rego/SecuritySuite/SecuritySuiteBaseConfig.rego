@@ -104,6 +104,15 @@ AntiPhishPolicies := [
     }
 ]
 
+SafetyTipsEnabled := {
+    "EnableFirstContactSafetyTips": true,
+    "EnableSimilarUsersSafetyTips": true,
+    "EnableSimilarDomainsSafetyTips": true,
+    "EnableUnusualCharactersSafetyTips": true,
+    "EnableViaTag": true,
+    "EnableSuspiciousSafetyTip": true,
+}
+
 DefaultAntiPhishPolicy := {
     "Identity": "Office365 AntiPhish Default",
     "Name": "Office365 AntiPhish Default",
@@ -120,7 +129,13 @@ DefaultAntiPhishPolicy := {
     "TargetedDomainsToProtect": [
         "random.mail.example.com",
         "random.example.com"
-    ]
+    ],
+    "EnableFirstContactSafetyTips": SafetyTipsEnabled.EnableFirstContactSafetyTips,
+    "EnableSimilarUsersSafetyTips": SafetyTipsEnabled.EnableSimilarUsersSafetyTips,
+    "EnableSimilarDomainsSafetyTips": SafetyTipsEnabled.EnableSimilarDomainsSafetyTips,
+    "EnableUnusualCharactersSafetyTips": SafetyTipsEnabled.EnableUnusualCharactersSafetyTips,
+    "EnableViaTag": SafetyTipsEnabled.EnableViaTag,
+    "EnableSuspiciousSafetyTip": SafetyTipsEnabled.EnableSuspiciousSafetyTip,
 }
 
 CustomAntiPhishPolicy := {
@@ -139,7 +154,13 @@ CustomAntiPhishPolicy := {
     "TargetedDomainsToProtect": [
         "random.mail.example.com",
         "random.example.com"
-    ]
+    ],
+    "EnableFirstContactSafetyTips": SafetyTipsEnabled.EnableFirstContactSafetyTips,
+    "EnableSimilarUsersSafetyTips": SafetyTipsEnabled.EnableSimilarUsersSafetyTips,
+    "EnableSimilarDomainsSafetyTips": SafetyTipsEnabled.EnableSimilarDomainsSafetyTips,
+    "EnableUnusualCharactersSafetyTips": SafetyTipsEnabled.EnableUnusualCharactersSafetyTips,
+    "EnableViaTag": SafetyTipsEnabled.EnableViaTag,
+    "EnableSuspiciousSafetyTip": SafetyTipsEnabled.EnableSuspiciousSafetyTip,
 }
 
 AntiPhishRules := [
@@ -157,11 +178,6 @@ AntiPhishRules := [
         "ExceptIfRecipientDomainIs": null
     }
 ]
-    "OutPath": ".",
-    "OutRegoFileName": "TestResults",
-    "SecuritySuite": {
-    }
-}
 
 ProtectionAlerts := [
     {

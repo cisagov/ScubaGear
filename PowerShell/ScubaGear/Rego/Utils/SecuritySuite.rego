@@ -319,3 +319,91 @@ OrganizationDomainProtectionCompliant := Result if {
     "Message": "No anti-phish policy has 'Include domains I own' enabled.",
     "Policies": [],
 }
+
+##############################################
+# User warnings / safety tips (2.4) helpers  #
+##############################################
+
+default PresetRecipientsCovered := false
+
+PresetRecipientsCovered := true if {
+    PresetPolicyCoversAllRecipients(`(?i)Standard Preset Security Policy`)
+}
+
+PresetRecipientsCovered := true if {
+    PresetPolicyCoversAllRecipients(`(?i)Strict Preset Security Policy`)
+}
+
+HasSafetyTipsEnabled(Policy) if {
+    Policy.EnableFirstContactSafetyTips == true
+    Policy.EnableSimilarUsersSafetyTips == true
+    Policy.EnableSimilarDomainsSafetyTips == true
+    Policy.EnableUnusualCharactersSafetyTips == true
+    Policy.EnableViaTag == true
+    Policy.EnableSuspiciousSafetyTip == true
+}
+
+CustomSafetyTipsPolicies contains Policy if {
+    some Policy in EnabledAntiPhishPolicies
+    not IsPresetAntiPhishPolicy(Policy.Identity)
+    HasSafetyTipsEnabled(Policy)
+    AntiPhishPolicyCoversAllRecipients(Policy)
+}
+
+UserWarningsCompliant := Result if {
+    count(CustomSafetyTipsPolicies) > 0
+    Result := {
+        "Compliant": true,
+        "Message": "",
+        "Policies": CustomSafetyTipsPolicies,
+    }
+} else := Result if {
+    PresetRecipientsCovered == true
+    Result := {
+        "Compliant": true,
+        "Message": "",
+        "Policies": set(),
+    }
+} else := Result if {
+    PartialRecipients := [Entry |
+        some Policy in EnabledAntiPhishPolicies
+        not IsPresetAntiPhishPolicy(Policy.Identity)
+        HasSafetyTipsEnabled(Policy)
+        not AntiPhishPolicyCoversAllRecipients(Policy)
+        Entry := {
+            "Name": Policy.Identity,
+            "MissingRecipients": true,
+        }
+    ]
+    count(PartialRecipients) == 1
+    PartialPolicy := PartialRecipients[0]
+    Result := {
+        "Compliant": false,
+        "Message": concat(" ", [
+            sprintf("1 anti-phish policy found with all safety tips enabled ('%v'),", [PartialPolicy.Name]),
+            "but not all users have been added as recipients.",
+        ]),
+        "Policies": PartialRecipients,
+    }
+} else := Result if {
+    PartialRecipients := [Entry |
+        some Policy in EnabledAntiPhishPolicies
+        not IsPresetAntiPhishPolicy(Policy.Identity)
+        HasSafetyTipsEnabled(Policy)
+        not AntiPhishPolicyCoversAllRecipients(Policy)
+        Entry := {
+            "Name": Policy.Identity,
+            "MissingRecipients": true,
+        }
+    ]
+    count(PartialRecipients) > 1
+    Result := {
+        "Compliant": false,
+        "Message": "No anti-phish policy applies safety tips to all recipients.",
+        "Policies": PartialRecipients,
+    }
+} else := {
+    "Compliant": false,
+    "Message": "No anti-phish policy applies safety tips to all recipients.",
+    "Policies": [],
+}

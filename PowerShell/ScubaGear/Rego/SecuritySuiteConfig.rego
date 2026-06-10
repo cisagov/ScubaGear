@@ -11,6 +11,7 @@ import data.utils.securitysuite.OrganizationDomainProtectionCompliant
 import data.utils.securitysuite.PartnerDomainConfig
 import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
+import data.utils.securitysuite.UserWarningsCompliant
 import data.utils.report.ReportDetailsArray
 
 
@@ -176,24 +177,20 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.4v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
-    "RequirementMet": false
-}
-#--
-
-#
-# MS.SECURITYSUITE.2.4v1
-#--
-tests contains {
-    "PolicyId": "MS.SECURITYSUITE.2.4v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": Evaluation,
+    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
+    "RequirementMet": Status
+} if {
+    Evaluation := UserWarningsCompliant
+    Status := Evaluation.Compliant
+    ErrorMessage := Evaluation.Message
 }
 #--
 

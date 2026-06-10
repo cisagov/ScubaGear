@@ -126,10 +126,33 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.2.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.4v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.2.4v1 Compliant case - default policy has all safety tips enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].EnableFirstContactSafetyTips: true
+                anti_phish_policies[0].EnableSimilarUsersSafetyTips: true
+                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: true
+                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: true
+                anti_phish_policies[0].EnableViaTag: true
+                anti_phish_policies[0].EnableSuspiciousSafetyTip: true
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.2.4v1 Non-Compliant case - safety tips disabled on default policy
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].EnableFirstContactSafetyTips: false
+                anti_phish_policies[0].EnableSimilarUsersSafetyTips: false
+                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: false
+                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: false
+                anti_phish_policies[0].EnableViaTag: false
+                anti_phish_policies[0].EnableSuspiciousSafetyTip: false
+                protection_policy_rules[0].SentTo: ["user@example.com"]
+                protection_policy_rules[1].SentTo: ["user@example.com"]
+        Postconditions: []
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.3.1v1
