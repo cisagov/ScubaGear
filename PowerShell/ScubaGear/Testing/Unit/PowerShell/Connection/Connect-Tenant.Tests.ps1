@@ -41,12 +41,12 @@ InModuleScope Connection {
             }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
-            @{ProductNames = "aad"; Services = @('Connect-GraphHelper')}
-            @{ProductNames = "securitysuite"; Services = @('Get-MsalAccessToken')}
-            @{ProductNames = "exo"; Services = @('Get-MsalAccessToken')}
-            @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper')}
-            @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper')}  # SharePoint uses REST API, only needs Graph for tenant info
-            @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams')}
+            @{ProductNames = "aad"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
+            @{ProductNames = "securitysuite"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 1}
+            @{ProductNames = "exo"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
+            @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
+            @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}  # SharePoint uses REST API, only needs Graph for tenant info
+            @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams'); EXOHelperCalls = 0}
             @{
                 ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
                 Services = @(
@@ -54,6 +54,7 @@ InModuleScope Connection {
                     'Get-MsalAccessToken',
                     'Connect-MicrosoftTeams'
                 )
+                EXOHelperCalls = 1
             }
 
         ){
@@ -75,6 +76,7 @@ InModuleScope Connection {
                 foreach ($Service in $Services){
                     Should -Invoke -CommandName $Service -Times 1 -Because "only want to authenticate to needed service once"
                 }
+                Should -Invoke -CommandName 'Connect-EXOHelper' -Times $EXOHelperCalls
             }
 
         }
