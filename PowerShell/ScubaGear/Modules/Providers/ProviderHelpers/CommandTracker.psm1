@@ -30,6 +30,8 @@ class CommandTracker {
         $TrackedCommand = $Command
         $Result = @()
 
+        # EXO REST calls are executed through a shared wrapper, but downstream report logic
+        # expects the underlying EXO cmdlet name when checking command dependencies.
         if ($Command -eq "Invoke-EXORestMethod" -and $CommandArgs.ContainsKey("CmdletName") -and -not [string]::IsNullOrWhiteSpace($CommandArgs.CmdletName)) {
             $TrackedCommand = $CommandArgs.CmdletName
         }
