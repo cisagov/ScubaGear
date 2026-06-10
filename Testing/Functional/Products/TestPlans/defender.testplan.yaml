@@ -1,0 +1,250 @@
+ProductName: defender
+TestPlan:
+  - PolicyId: MS.SECURITYSUITE.1.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.1.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.1.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.1.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.1.4v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.2.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.2.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.2.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.3.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.3.5v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.4.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.4.1v1 Non-Compliant case - Required alert is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: true
+                  - Name: Suspicious connector activity
+                    Disabled: false
+                  - Name: Suspicious Email Forwarding Activity
+                    Disabled: false
+                  - Name: Messages have been delayed
+                    Disabled: false
+                  - Name: Tenant restricted from sending unprovisioned email
+                    Disabled: false
+                  - Name: Tenant restricted from sending email
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.4.1v1 Compliant case - Required alerts are enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: false
+                  - Name: Suspicious connector activity
+                    Disabled: false
+                  - Name: Suspicious Email Forwarding Activity
+                    Disabled: false
+                  - Name: Messages have been delayed
+                    Disabled: false
+                  - Name: Tenant restricted from sending unprovisioned email
+                    Disabled: false
+                  - Name: Tenant restricted from sending email
+                    Disabled: false
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.SECURITYSUITE.4.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.4.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.5.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.5.1v1 Non-Compliant case - Unified Audit logging is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.1v1 Compliant case - Unified Audit logging is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                admin_audit_log_config[0].UnifiedAuditLogIngestionEnabled: true
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.SECURITYSUITE.5.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.6.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.6.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.7.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.7.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.7.3v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Not Checked # TODO update once implemented
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
+  - PolicyId: MS.SECURITYSUITE.8.1v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.8.1v1 Non-Compliant case - IP allow list is created
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList 192.168.1.10,192.168.1.23"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.8.1v1 Compliant case - IP allow list is empty
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -IPAllowList @{}"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.SECURITYSUITE.8.2v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Enabled
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $true"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Disabled
+        Preconditions:
+          - Command: "Get-HostedConnectionFilterPolicy | Set-HostedConnectionFilterPolicy -EnableSafeList: $false"
+        Postconditions: []
+        ExpectedResult: true
