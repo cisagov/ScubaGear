@@ -129,12 +129,7 @@ BeforeDiscovery {
         AppId = $AppId
         TenantDomain = $TenantDomain
     }{
-        if ($ProductName -eq "securitysuite"){
-            $ProductNames = @($ProductName, "exo")
-        }
-        else {
-            $ProductNames = @($ProductName)
-        }
+        $ProductNames = @($ProductName)
 
         $ServicePrincipalParams = @{CertThumbprintParams = @{
             CertificateThumbprint = $Thumbprint;

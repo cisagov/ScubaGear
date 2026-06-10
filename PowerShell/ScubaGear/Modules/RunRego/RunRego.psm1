@@ -48,7 +48,10 @@ function Invoke-Rego {
         throw "Rego file not found at: $RegoFile"
     }
 
-    $RegoFileObject = Get-Item $RegoFile -ErrorAction Stop
+    $ResolvedInputFile = (Resolve-Path -Path $InputFile -ErrorAction Stop).Path
+    $ResolvedRegoFile = (Resolve-Path -Path $RegoFile -ErrorAction Stop).Path
+
+    $RegoFileObject = Get-Item $ResolvedRegoFile -ErrorAction Stop
     if ($null -eq $RegoFileObject) {
         throw "Failed to get Rego file object at: $RegoFile"
     }
@@ -57,14 +60,15 @@ function Invoke-Rego {
     if (-not (Test-Path $ScubaUtils -PathType Container)) {
         throw "Rego Utils directory not found at: $ScubaUtils"
     }
+    $ResolvedScubaUtils = (Resolve-Path -Path $ScubaUtils -ErrorAction Stop).Path
 
-    $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $InputFile, "-d", $RegoFile, "-d", $ScubaUtils, "-f", "values")
+    $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $ResolvedInputFile, "-d", $ResolvedRegoFile, "-d", $ResolvedScubaUtils, "-f", "values")
 
     Write-Debug "OPA Command: $Cmd"
     Write-Debug "OPA Arguments: $($CmdArgs -join ' ')"
-    Write-Debug "InputFile: $InputFile"
-    Write-Debug "RegoFile: $RegoFile"
-    Write-Debug "ScubaUtils: $ScubaUtils"
+    Write-Debug "InputFile: $ResolvedInputFile"
+    Write-Debug "RegoFile: $ResolvedRegoFile"
+    Write-Debug "ScubaUtils: $ResolvedScubaUtils"
     Write-Debug "PackageName: $PackageName"
 
     $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
