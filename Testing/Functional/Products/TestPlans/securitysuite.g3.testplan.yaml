@@ -267,6 +267,7 @@ TestPlan:
                   - Name: Tenant restricted from sending email
                     Disabled: false
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.4.1v1 Compliant case - Required alerts are enabled
         Preconditions:
@@ -287,6 +288,7 @@ TestPlan:
                   - Name: Tenant restricted from sending email
                     Disabled: false
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.5.2v1
