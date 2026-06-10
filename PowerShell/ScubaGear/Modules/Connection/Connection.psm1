@@ -147,6 +147,15 @@
                            -M365Environment $M365Environment `
                            -AccessToken $TokenData.EXOAccessToken
 
+                       # Also establish an EXO module session so that EXO management cmdlets
+                       # (e.g. Set-TransportConfig, New-SharingPolicy) are available for
+                       # functional test setup/teardown and Defender baseline checks.
+                       $EXOHelperParams = @{ M365Environment = $M365Environment }
+                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                           $EXOHelperParams += @{ ServicePrincipalParams = $ServicePrincipalParams }
+                       }
+                       Connect-EXOHelper @EXOHelperParams
+
                        Write-Verbose "Exchange Online token and endpoint acquired successfully"
                        $EXOAuthRequired = $false
                    }
