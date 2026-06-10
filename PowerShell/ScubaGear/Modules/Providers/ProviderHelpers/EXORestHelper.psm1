@@ -81,27 +81,57 @@ function Get-ExchangeOnlineApiEndpoint {
         "X-AnchorMailbox" = "UPN:SystemMailbox{bb558c35-97f1-4cb9-8ff7-d53741dc928c}@$TenantDomain"
     }
 
+    $DefaultInvokeEndpoint = "$AdminApiFrontDoorBaseUri/adminapi/beta/$TenantId/InvokeCommand"
+
+    $Handler = $null
+    $HttpClient = $null
+    $Request = $null
+    $Response = $null
+
     try {
         $FrontDoorEndpoint = "$AdminApiFrontDoorBaseUri/AdminApi/v1.0/$TenantId/EXOModuleFile"
-        $Response = Invoke-WebRequest `
-            -Uri $FrontDoorEndpoint `
-            -Method Get `
-            -MaximumRedirection 0 `
-            -UseBasicParsing `
-            -Headers $Headers `
-            -ErrorAction SilentlyContinue
+        $Handler = [System.Net.Http.HttpClientHandler]::new()
+        $Handler.AllowAutoRedirect = $false
+        $HttpClient = [System.Net.Http.HttpClient]::new($Handler)
+        $Request = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Get, $FrontDoorEndpoint)
 
-        if ($Response.StatusCode -eq 302) {
-            $RedirectUri = [Uri]$Response.Headers["Location"]
+        foreach ($Header in $Headers.GetEnumerator()) {
+            $null = $Request.Headers.TryAddWithoutValidation($Header.Key, $Header.Value)
+        }
+
+        $Response = $HttpClient.SendAsync(
+            $Request,
+            [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead
+        ).GetAwaiter().GetResult()
+
+        if ((([int]$Response.StatusCode) -ge 300) -and (([int]$Response.StatusCode) -lt 400) -and $Response.Headers.Location) {
+            $RedirectUri = $Response.Headers.Location
+            if (-not $RedirectUri.IsAbsoluteUri) {
+                $RedirectUri = [Uri]::new([Uri]$AdminApiFrontDoorBaseUri, $RedirectUri)
+            }
             $Prefix = $RedirectUri.Host.Split('.')[0]
             return "https://$Prefix$BackendSuffix/adminapi/beta/$TenantId/InvokeCommand"
         }
         else {
-            return "$AdminApiFrontDoorBaseUri/adminapi/beta/$TenantId/InvokeCommand"
+            return $DefaultInvokeEndpoint
         }
     }
     catch {
         throw "Failed to resolve Exchange Online API endpoint: $($_.Exception.Message)"
+    }
+    finally {
+        if ($Response) {
+            $Response.Dispose()
+        }
+        if ($Request) {
+            $Request.Dispose()
+        }
+        if ($HttpClient) {
+            $HttpClient.Dispose()
+        }
+        if ($Handler) {
+            $Handler.Dispose()
+        }
     }
 }
 
