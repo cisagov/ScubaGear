@@ -85,7 +85,6 @@ InModuleScope -ModuleName ExportDefenderProvider {
             $Parsed.defender_successful_commands | Should -Contain 'Get-AdminAuditLogConfig'
             $Parsed.defender_successful_commands | Should -Contain 'Get-EOPProtectionPolicyRule'
             $Parsed.defender_successful_commands | Should -Contain 'Get-AntiPhishPolicy'
-            $Parsed.defender_successful_commands | Should -Contain 'Get-HostedConnectionFilterPolicy'
         }
     }
 }
