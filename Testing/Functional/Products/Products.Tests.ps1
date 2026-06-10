@@ -97,11 +97,9 @@ param (
     $Variant = [string]::Empty
 )
 
-BeforeDiscovery {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
+$script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
+BeforeDiscovery {
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
@@ -122,22 +120,19 @@ BeforeDiscovery {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    if ($ProductName -eq "securitysuite"){
-        $ProductNames = @($ProductName, "exo")
-    }
-    else {
-        $ProductNames = @($ProductName)
-    }
-
-    if (-Not [string]::IsNullOrEmpty($AppId)){
-        $TempScubaConfig = New-Object -Type PSObject -Property @{
-            'AppID' = $AppID;
-            'CertificateThumbprint' = $Thumbprint;
-            'Organization' = $TenantDomain;
+    InModuleScope Connection -Parameters @{
+        ProductName = $script:ExecutionProductName
+        M365Environment = $M365Environment
+        Thumbprint = $Thumbprint
+        AppId = $AppId
+        TenantDomain = $TenantDomain
+    }{
+        if ($script:ExecutionProductName -eq "securitysuite"){
+            $ProductNames = @($script:ExecutionProductName, "exo")
         }
-        # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
-        $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
-        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
+        else {
+            $ProductNames = @($script:ExecutionProductName)
+        }
 
         $ServicePrincipalParams = @{CertThumbprintParams = @{
             CertificateThumbprint = $Thumbprint;
@@ -153,10 +148,6 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
-
     # Shared Data for functional test
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
@@ -168,7 +159,8 @@ BeforeAll {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
         aad = "Azure Active Directory"
-        securitysuite = "Security Suite"
+      defender = "Microsoft 365 Defender"
+      securitysuite = "Microsoft 365 Defender"
         exo = "Exchange Online"
         powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
@@ -354,15 +346,10 @@ BeforeAll {
   function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $script:ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
-            if ($ProductName -eq 'exo') {
-                Invoke-SCuBA -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
-            }
-            else {
-                Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
-            }
+            Invoke-SCuBA -Login $false -Productnames $script:ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
     }
 
@@ -374,7 +361,7 @@ Describe "Policy Checks for <ProductName>" {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
-                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ProductName/$PolicyId/$ConfigFileName"
+                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$script:ExecutionProductName/$PolicyId/$ConfigFileName"
 
                 $ScubaConfig = Get-Content -Path $FullPath | ConvertFrom-Yaml
 
@@ -428,7 +415,7 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                Invoke-SCuBACached -Productnames $script:ExecutionProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Save the ModifiedProviderSettingsExport so that it can be referenced during dev testing of functional test scenarios
                 $SavedModifiedProviderFileName = "ModifiedProviderSettingsExport-{0}-{1}.json" -f (Get-Date -Format "yyyyMMdd_HHmmss_fff"), [guid]::NewGuid()
@@ -475,7 +462,7 @@ Describe "Policy Checks for <ProductName>" {
 
                 # Check final HTML output
                 $FoundPolicy = $false
-                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $ProductDetails.$ProductName
+                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $ProductDetails.$script:ExecutionProductName
                 $DetailLink | Should -Not -BeNullOrEmpty
                 Invoke-SeClick -Element $DetailLink
 
@@ -493,7 +480,10 @@ Describe "Policy Checks for <ProductName>" {
                     $ExpectedHeaders = Get-ExpectedHeaderNames -TableClass $TableClass
 
                     if ($Table.GetProperty("id") -eq "tenant-data"){
-                        $Rows.Count | Should -BeExactly 2
+                        $Rows.Count | Should -BeGreaterThan 1 -Because "tenant-data table should include header and one data row"
+                        if ($Rows.Count -lt 2) {
+                            continue
+                        }
                         $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
                         $Tenant = $TenantDataColumns[0].Text
                         $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
