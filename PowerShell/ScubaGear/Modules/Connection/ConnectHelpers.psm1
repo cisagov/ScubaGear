@@ -86,46 +86,6 @@ function Connect-EXOHelper {
     Connect-ExchangeOnline @EXOParams | Out-Null
 }
 
-function Connect-DefenderHelper {
-    <#
-    .Description
-    This function is used for assisting in connecting to different M365 Environments for EXO.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [hashtable]
-        $ServicePrincipalParams
-    )
-    $IPPSParams = @{
-        'ErrorAction' = 'Stop';
-        'ShowBanner' = $false;
-    }
-    switch ($M365Environment) {
-        "gcchigh" {
-            $IPPSParams += @{'ConnectionUri' = "https://ps.compliance.protection.office365.us/powershell-liveid";}
-            $IPPSParams += @{'AzureADAuthorizationEndpointUri' = "https://login.microsoftonline.us/common";}
-        }
-        "dod" {
-            $IPPSParams += @{'ConnectionUri' = "https://l5.ps.compliance.protection.office365.us/powershell-liveid";}
-            $IPPSParams += @{'AzureADAuthorizationEndpointUri' = "https://login.microsoftonline.us/common";}
-        }
-    }
-    if ($ServicePrincipalParams.CertThumbprintParams) {
-        $IPPSParams += $ServicePrincipalParams.CertThumbprintParams
-    }
-    Connect-IPPSSession @IPPSParams | Out-Null
-}
-
 function Initialize-Msal {
     <#
     .SYNOPSIS
@@ -253,7 +213,6 @@ function Get-MsalAccessToken {
 Export-ModuleMember -Function @(
     'Connect-GraphHelper',
     'Connect-EXOHelper',
-    'Connect-DefenderHelper',
     'Initialize-Msal',
     'Get-MsalAccessToken'
 )
