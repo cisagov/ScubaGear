@@ -13,6 +13,8 @@ InModuleScope Orchestrator {
                 }
                 function Connect-Tenant { throw 'this will be mocked' }
                 Mock -ModuleName Orchestrator Connect-Tenant { @() }
+                function Get-ServicePrincipalParams { throw 'this will be mocked' }
+                Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @() }
             }
 
             It 'connects to aad (single product)' {

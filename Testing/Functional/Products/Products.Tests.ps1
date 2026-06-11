@@ -18,8 +18,8 @@
     This parameter is used to authenticate to the different commercial/government environments.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
-    - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
-    - For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Government community cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government community cloud High tenants enter the value **"gcchigh"**.
     - For M365 Department of Defense tenants enter the value **"dod"**.
     Default value is 'commercial'.
     .EXAMPLE
@@ -104,7 +104,9 @@ BeforeDiscovery {
 
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
     Import-Module $ScubaModule
+    Import-Module $ConnectionModule
 
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
@@ -120,32 +122,33 @@ BeforeDiscovery {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    InModuleScope Connection -Parameters @{
-        ProductName = $ProductName
-        M365Environment = $M365Environment
-        Thumbprint = $Thumbprint
-        AppId = $AppId
-        TenantDomain = $TenantDomain
-    }{
-        if ($ProductName -eq "securitysuite"){
-            $ProductNames = @($ProductName, "exo")
-        }
-        else {
-            $ProductNames = @($ProductName)
-        }
+    if ($ProductName -eq "securitysuite"){
+        $ProductNames = @($ProductName, "exo")
+    }
+    else {
+        $ProductNames = @($ProductName)
+    }
 
-        if (-Not [string]::IsNullOrEmpty($AppId)){
+    if (-Not [string]::IsNullOrEmpty($AppId)){
+        $TempScubaConfig = New-Object -Type PSObject -Property @{
+            'AppID' = $AppID;
+            'CertificateThumbprint' = $Thumbprint;
+            'Organization' = $TenantDomain;
+        }
+        # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
+        $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
+        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
+
         $ServicePrincipalParams = @{CertThumbprintParams = @{
             CertificateThumbprint = $Thumbprint;
             AppID = $AppId;
             Organization = $TenantDomain;
         }}
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-        }
-        else {
+    }
+    else {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
-        }
     }
 }
 
@@ -297,7 +300,7 @@ BeforeAll {
   function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
             Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings

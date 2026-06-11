@@ -1,8 +1,8 @@
-$OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Get-ServicePrincipalParams'
+$ConnectionModulePath = '../../../../Modules/Connection/Connection.psm1'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionModulePath) -Function 'Get-ServicePrincipalParams'
 
-Describe -Tag 'Orchestrator' -Name 'Get-ServicePrincipalParams' {
-    InModuleScope Orchestrator {
+Describe -Tag 'Connection' -Name 'Get-ServicePrincipalParams' {
+    InModuleScope Connection {
         Context "Service Principal provided"{
             BeforeAll{
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
@@ -56,5 +56,5 @@ Describe -Tag 'Orchestrator' -Name 'Get-ServicePrincipalParams' {
 }
 
 AfterAll {
-    Remove-Module Orchestrator -ErrorAction SilentlyContinue
+    Remove-Module Connection -ErrorAction SilentlyContinue
 }
