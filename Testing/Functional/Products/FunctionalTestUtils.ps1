@@ -454,8 +454,8 @@ function Set-ExoEnabledSharingPoliciesDomain {
   }
 
   # The Domains property may be returned as an array by EXO REST; check both forms.
-  # Use a long window (300 s) because GCC replica propagation can take several minutes.
-  Wait-FunctionalExoCondition -MaxAttempts 30 -DelaySeconds 10 -Condition {
+  # Use a long window (600 s) because GCC replica propagation can take several minutes.
+  Wait-FunctionalExoCondition -MaxAttempts 60 -DelaySeconds 10 -Condition {
     @(Get-SharingPolicy |
       Where-Object {
         (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true -and
