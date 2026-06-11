@@ -598,9 +598,9 @@ function Invoke-GraphBatchRequest {
                         $requestCountForThisBatch = $pendingRequests.Count
                     }
                     if ($attempt -eq 0) {
-                        Write-ScubaLog -Message "Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
                     } else {
-                        Write-ScubaLog -Message "Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
                     }
                     Start-Sleep -Seconds $waitSeconds
                     $attempt++
@@ -656,9 +656,9 @@ function Invoke-GraphBatchRequest {
             $waitSeconds = [int][Math]::Min($longestRetryAfterSeconds * [Math]::Pow(2, $attempt), 300)
 
             if ($attempt -eq 0) {
-                Write-ScubaLog -Message "Batch request: $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
             } else {
-                Write-ScubaLog -Message "Batch request: $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
             }
             # Cut the batch size in half so later batches in this call are smaller.
             # We don't trim $pendingRequests here because it already only holds the throttled

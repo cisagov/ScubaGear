@@ -610,9 +610,14 @@ function GetConfigurationsForPimGroups{
 
     # Get all groups enrolled in PIM for Groups management in the tenant. This only returns the ObjectID of the PIM Group as ID.
     # This will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
-    $PIMGroups = (Invoke-GraphDirectly -Commandlet "Get-MgBetaIdentityGovernancePrivilegedAccessGroup" -M365Environment $M365Environment).Value
+    $AllPIMGroups = (Invoke-GraphDirectly -Commandlet "Get-MgBetaIdentityGovernancePrivilegedAccessGroup" -M365Environment $M365Environment).Value
+    if ($null -eq $AllPIMGroups -or $AllPIMGroups.Count -eq 0) {
+        return
+    }
 
-    if ($null -eq $PIMGroups -or $PIMGroups.Count -eq 0) {
+    # Filter to retain only the PIM groups assigned to Scuba privileged roles
+    $PIMGroups = @($AllPIMGroups | Where-Object { $_.Id -in $AllRoleAssignments.PrincipalId })
+    if ($PIMGroups.Count -eq 0) {
         return
     }
 
@@ -621,15 +626,24 @@ function GetConfigurationsForPimGroups{
         -UrlScript { "/groups/$($_.Id)?`$select=displayName" } `
         -M365Environment $M365Environment -ApiVersion "beta"
 
+    # Write a note to the log about PIM groups that no longer exist in the Entra directory
+    $PhantomPIMGroups = $PIMGroups | Where-Object { $resp = $GroupDisplayNameResults[$_.Id]; $resp.status -eq 404; }
+    $PhantomPIMGroups | ForEach-Object { Write-ScubaLog -Message "Skipping phantom PIM group: $($_.Id)" -Level Info -Source "GetConfigurationsForPimGroups" }
+
+    # Filter out phantom groups from $PIMGroups
+    $PIMGroups = @($PIMGroups | Where-Object { $PhantomPIMGroups.Id -notcontains $_.Id })
+
     # Add display names to the PIM group objects for easier access later
     foreach ($Group in $PIMGroups) {
         $displayNameResponse = $GroupDisplayNameResults[$Group.Id]
         if ($displayNameResponse.status -eq 200) {
             $Group | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value $displayNameResponse.body.displayName
         }
-        # If there were any errors batch fetching the PIM group names, abort execution with the details of the error.
+        # If there was an errors fetching the group name, write to log and use the group ID instead of the name.
         else {
-            throw "Failed to fetch display name for group $($Group.Id) from batch results. Status: $($displayNameResponse.status). Body: $(($displayNameResponse.body | ConvertTo-Json -Depth 10))"
+            $GroupNameFetchError = "Failed to fetch display name for group $($Group.Id) from batch results. Status: $($displayNameResponse.status). Body: $(($displayNameResponse.body | ConvertTo-Json -Depth 10))"
+            Write-ScubaLog -Message $GroupNameFetchError -Level Info -Source "GetConfigurationsForPimGroups"
+            $Group | Add-Member -MemberType NoteProperty -Name "DisplayName" -Value "$($Group.Id)"
         }
     }
 
