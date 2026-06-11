@@ -190,32 +190,6 @@ function New-SharingPolicy {
   }
 }
 
-function Set-SharingPolicy {
-  [CmdletBinding()]
-  param(
-    [Parameter(ValueFromPipeline = $true)]
-    [AllowNull()]
-    [object]$InputObject,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$Identity,
-    [Parameter(Mandatory = $true)]
-    [string]$Domains
-  )
-
-  process {
-    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
-    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
-      throw 'Set-SharingPolicy requires an Identity or piped object with Identity.'
-    }
-
-    Invoke-FunctionalExoCommand -CmdletName 'Set-SharingPolicy' -Parameters @{
-      Identity = $ResolvedIdentity
-      Domains = $Domains
-    } | Out-Null
-  }
-}
-
 function Remove-SharingPolicy {
   [CmdletBinding()]
   param(
@@ -424,47 +398,6 @@ function Remove-ExoSharingPolicy {
   )
 
   Remove-SharingPolicy -Identity $Identity
-}
-
-function Set-ExoEnabledSharingPoliciesDomain {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Domains
-  )
-
-  $Targets = @(Get-SharingPolicy |
-      Where-Object { (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true })
-
-  if ($Targets.Count -eq 0) {
-    throw 'Set-ExoEnabledSharingPoliciesDomain did not find any enabled sharing policies to update.'
-  }
-
-  # Use foreach+try/catch instead of pipeline so that a stale ghost policy left
-  # behind by the previous test's Remove postcondition does not abort the entire
-  # update. A failed Set on a deleted policy is logged and skipped; valid policies
-  # still get updated.
-  foreach ($Target in $Targets) {
-    try {
-      Set-SharingPolicy -InputObject $Target -Domains $Domains
-    }
-    catch {
-      Write-Warning "Set-ExoEnabledSharingPoliciesDomain: Could not update policy '$([string]$Target.Name)' - $($_.Exception.Message). Skipping."
-    }
-  }
-
-  # The Domains property may be returned as an array by EXO REST; check both forms.
-  # Use a long window (600 s) because GCC replica propagation can take several minutes.
-  Wait-FunctionalExoCondition -MaxAttempts 60 -DelaySeconds 10 -Condition {
-    @(Get-SharingPolicy |
-      Where-Object {
-        (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true -and
-        (
-          ($_.Domains -is [array] -and $_.Domains -contains $Domains) -or
-          ([string]$_.Domains -eq $Domains)
-        )
-      }).Count -gt 0
-  } -FailureMessage "Failed to observe enabled sharing policies updated to Domains='$Domains'."
 }
 
 function Disable-ExoExternalSenderWarningRules {
