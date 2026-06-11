@@ -271,10 +271,14 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.EXO.6.1v1 Compliant case - Contacts NOT shared with all domains
         Preconditions:
-          - Command: Set-ExoEnabledSharingPoliciesDomain
+          - Command: New-ExoSharingPolicy
             Splat:
+              Name: "FunctionalTest ContactSharingLimitedDomains"
               Domains: "ted.com:ContactsSharing"
-        Postconditions: []
+        Postconditions:
+          - Command: Remove-ExoSharingPolicy
+            Splat:
+              Identity: "FunctionalTest ContactSharingLimitedDomains"
         ExpectedResult: true
 
   - PolicyId: MS.EXO.6.2v1
@@ -293,10 +297,14 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.EXO.6.2v1 Compliant case - Calendar NOT shared with all domains
         Preconditions:
-          - Command: Set-ExoEnabledSharingPoliciesDomain
+          - Command: New-ExoSharingPolicy
             Splat:
+              Name: "FunctionalTest CalendarSharingLimitedDomains"
               Domains: "ted.com:CalendarSharingFreeBusyReviewer"
-        Postconditions: []
+        Postconditions:
+          - Command: Remove-ExoSharingPolicy
+            Splat:
+              Identity: "FunctionalTest CalendarSharingLimitedDomains"
         ExpectedResult: true
 
   - PolicyId: MS.EXO.7.1v1
