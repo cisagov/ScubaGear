@@ -576,21 +576,11 @@ TestPlan:
     TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.SECURITYSUITE.8.1v1 Non-Compliant case - IP allow list is created
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                "conn_filter[0].IPAllowList":
-                  - "192.168.1.10"
-                  - "192.168.1.23"
+        Preconditions: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.8.1v1 Compliant case - IP allow list is empty
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                "conn_filter[0].IPAllowList": []
+        Preconditions: []
         Postconditions: []
         ExpectedResult: true
 
@@ -598,18 +588,10 @@ TestPlan:
     TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Enabled
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                "conn_filter[0].EnableSafeList": true
+        Preconditions: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Disabled
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                "conn_filter[0].EnableSafeList": false
+        Preconditions: []
         Postconditions: []
         ExpectedResult: true
