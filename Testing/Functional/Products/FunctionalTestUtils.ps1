@@ -41,12 +41,17 @@ function Resolve-FunctionalExoIdentity {
     return $null
   }
 
-  # Prefer Name over Identity: the REST canonical identity path (e.g. "tenant\PolicyName")
-  # is often rejected by mutating cmdlets, while Name is consistently accepted.
+  # Prefer Guid: accepted by all EXO REST mutating endpoints in every cloud.
+  # Name alone causes 404 in commercial tenants (e.g. "FederatedSharing" rejected).
+  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Guid)) {
+    return [string]$InputObject.Guid
+  }
+  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.ExchangeObjectId)) {
+    return [string]$InputObject.ExchangeObjectId
+  }
   if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Name)) {
     return [string]$InputObject.Name
   }
-
   if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Identity)) {
     return [string]$InputObject.Identity
   }
@@ -369,6 +374,11 @@ function Set-ExoRemoteDomainAutoForwardEnabled {
         }).Count -gt 0
     } -FailureMessage "Failed to observe at least one remote domain with AutoForwardEnabled=true after update."
   }
+
+  # Allow time for the write to propagate to all EXO backend replicas before
+  # ScubaGear's independent REST session reads tenant state. Without this,
+  # ScubaGear may read a replica that hasn't received the update yet.
+  Start-Sleep -Seconds 60
 }
 
 function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
@@ -433,7 +443,8 @@ function Set-ExoEnabledSharingPoliciesDomain {
   $Targets | Set-SharingPolicy -Domains $Domains
 
   # The Domains property may be returned as an array by EXO REST; check both forms.
-  Wait-FunctionalExoCondition -Condition {
+  # Use a long window (300 s) because GCC replica propagation can take several minutes.
+  Wait-FunctionalExoCondition -MaxAttempts 30 -DelaySeconds 10 -Condition {
     @(Get-SharingPolicy |
       Where-Object {
         (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true -and
@@ -505,10 +516,17 @@ function Set-ExoOrganizationAuditDisabled {
   }
   catch {
     # Some tenants (GCC/GCCH) lock the audit policy and reject this change
-    # via service-principal REST calls. Log a warning and continue so the
-    # test can still evaluate the tenant's current (immutable) state rather
-    # than crashing the entire test run.
+    # via service-principal REST calls. Log a warning and verify actual state.
     Write-Warning "Set-ExoOrganizationAuditDisabled: Could not set AuditDisabled=$AuditDisabled - $($_.Exception.Message). The tenant may not permit this change."
+  }
+
+  # Verify the actual state matches the desired state regardless of whether the
+  # call succeeded or was silently rejected. If not, throw so the test reports
+  # a clear environment-restriction error rather than a misleading assertion failure.
+  $ActualConfig = Invoke-FunctionalExoCommand -CmdletName 'Get-OrganizationConfig' | Select-Object -First 1
+  $ActualValue = ConvertTo-FunctionalExoBoolean -Value $ActualConfig.AuditDisabled
+  if ($ActualValue -ne $AuditDisabled) {
+    throw "Set-ExoOrganizationAuditDisabled: Tenant AuditDisabled is '$ActualValue' but '$AuditDisabled' was requested. Tenant policy prohibits this change - this test cannot complete in this environment."
   }
 }
 
