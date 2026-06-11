@@ -58,7 +58,29 @@ InModuleScope CreateReport {
             { New-Report @CreateReportParams } | Should -Not -Throw
             Should -Invoke -CommandName Write-Warning -Exactly -Times $WarningCount
 
-            Test-Path -Path "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html" -PathType leaf | Should -Be $true
+            $ReportPath = "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html"
+            Test-Path -Path $ReportPath -PathType leaf | Should -Be $true
+
+            # The AAD report should render the "Users with Privileged Roles" table built
+            # from the privileged_users data in the provider settings export.
+            if ($Product -eq 'aad') {
+                $ReportContent = Get-Content -Path $ReportPath -Raw
+                $ReportContent | Should -Match '<h2>Users with Privileged Roles</h2>'
+                $ReportContent | Should -Match 'id="privileged-users"'
+
+                $PrivilegedUsersTable = [regex]::Match($ReportContent, 'id="privileged-users".*?</table>', 'Singleline').Value
+                $DataRows = [regex]::Matches($PrivilegedUsersTable, '<tr>.*?</tr>', 'Singleline') | Select-Object -Skip 1
+                $FoundNonGlobalAdmin = $false
+                foreach ($Row in $DataRows) {
+                    $HasGlobalAdmin = $Row.Value -match 'Global Administrator'
+                    if (-not $HasGlobalAdmin) {
+                        $FoundNonGlobalAdmin = $true
+                    }
+                    elseif ($FoundNonGlobalAdmin) {
+                        throw "Global Administrator user found after non-Global Administrator user in privileged users table"
+                    }
+                }
+            }
         }
     }
 
