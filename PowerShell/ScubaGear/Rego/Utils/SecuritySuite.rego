@@ -128,6 +128,11 @@ HasAcceptableUserProtectionAction(Policy) if {
     not Action in UNACCEPTABLE_USER_PROTECTION_ACTIONS
 }
 
+HasAcceptableDomainProtectionAction(Policy) if {
+    Action := lower(Policy.TargetedDomainProtectionAction)
+    not Action in UNACCEPTABLE_USER_PROTECTION_ACTIONS
+}
+
 NormalizeListEntry(Raw) := Normalized if {
     is_string(Raw)
     Normalized := lower(trim_space(Raw))
@@ -237,6 +242,7 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
         some PhishPolicy in EnabledAntiPhishPolicies
         PhishPolicy.EnableTargetedDomainsProtection == true
         PolicyIncludesAllPartnerDomains(PhishPolicy, ConfigDomains)
+        HasAcceptableDomainProtectionAction(PhishPolicy)
     }
     count(Compliant) > 0
     Result := {
@@ -246,7 +252,7 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     }
 } else := {
     "Compliant": false,
-    "Message": "No anti-phish policy that includes all partner domains.",
+    "Message": "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action.",
     "Policies": [],
 }
 
@@ -260,6 +266,7 @@ OrganizationDomainProtectionCompliant := Result if {
     Compliant := {PhishPolicy |
         some PhishPolicy in EnabledAntiPhishPolicies
         PhishPolicy.EnableOrganizationDomainsProtection == true
+        HasAcceptableDomainProtectionAction(PhishPolicy)
         AntiPhishPolicyCoversAllRecipients(PhishPolicy)
     }
     count(Compliant) > 0
@@ -272,11 +279,13 @@ OrganizationDomainProtectionCompliant := Result if {
     Compliant := {PhishPolicy |
         some PhishPolicy in EnabledAntiPhishPolicies
         PhishPolicy.EnableOrganizationDomainsProtection == true
+        HasAcceptableDomainProtectionAction(PhishPolicy)
         AntiPhishPolicyCoversAllRecipients(PhishPolicy)
     }
     Partial := [Entry |
         some Policy in EnabledAntiPhishPolicies
         Policy.EnableOrganizationDomainsProtection == true
+        HasAcceptableDomainProtectionAction(Policy)
         not AntiPhishPolicyCoversAllRecipients(Policy)
         Entry := {
             "Name": Policy.Identity,
@@ -298,11 +307,13 @@ OrganizationDomainProtectionCompliant := Result if {
     Compliant := {PhishPolicy |
         some PhishPolicy in EnabledAntiPhishPolicies
         PhishPolicy.EnableOrganizationDomainsProtection == true
+        HasAcceptableDomainProtectionAction(PhishPolicy)
         AntiPhishPolicyCoversAllRecipients(PhishPolicy)
     }
     Partial := [Entry |
         some Policy in EnabledAntiPhishPolicies
         Policy.EnableOrganizationDomainsProtection == true
+        HasAcceptableDomainProtectionAction(Policy)
         not AntiPhishPolicyCoversAllRecipients(Policy)
         Entry := {
             "Name": Policy.Identity,

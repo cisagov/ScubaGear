@@ -130,6 +130,7 @@ DefaultAntiPhishPolicy := {
         "random.mail.example.com",
         "random.example.com"
     ],
+    "TargetedDomainProtectionAction": "Quarantine",
     "EnableFirstContactSafetyTips": SafetyTipsEnabled.EnableFirstContactSafetyTips,
     "EnableSimilarUsersSafetyTips": SafetyTipsEnabled.EnableSimilarUsersSafetyTips,
     "EnableSimilarDomainsSafetyTips": SafetyTipsEnabled.EnableSimilarDomainsSafetyTips,
@@ -155,6 +156,7 @@ CustomAntiPhishPolicy := {
         "random.mail.example.com",
         "random.example.com"
     ],
+    "TargetedDomainProtectionAction": "Quarantine",
     "EnableFirstContactSafetyTips": SafetyTipsEnabled.EnableFirstContactSafetyTips,
     "EnableSimilarUsersSafetyTips": SafetyTipsEnabled.EnableSimilarUsersSafetyTips,
     "EnableSimilarDomainsSafetyTips": SafetyTipsEnabled.EnableSimilarDomainsSafetyTips,

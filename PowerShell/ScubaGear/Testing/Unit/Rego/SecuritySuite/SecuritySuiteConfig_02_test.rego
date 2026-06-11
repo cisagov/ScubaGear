@@ -180,6 +180,18 @@ test_OrganizationDomains_Incorrect if {
     ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled."
     TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
 }
+
+test_OrganizationDomains_NoActionFails if {
+    BadPolicy := json.patch(DefaultAntiPhishPolicy, [{"op": "replace", "path": "TargetedDomainProtectionAction", "value": "NoAction"}])
+    Output := securitysuite.tests with input.anti_phish_policies as [BadPolicy]
+                            with input.anti_phish_rules as []
+                            with input.protection_policy_rules as []
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as true
+
+    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled."
+    TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
+}
 #--
 
 #
@@ -206,6 +218,19 @@ test_PartnerDomains_Incorrect if {
     AntiPhish := json.patch(AntiPhishPolicies, [
         {"op": "replace", "path": "0/TargetedDomainsToProtect", "value": []},
         {"op": "replace", "path": "1/TargetedDomainsToProtect", "value": []}
+    ])
+    Output := securitysuite.tests with input.anti_phish_policies as AntiPhish
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+
+    ReportDetailString := "No anti-phish policy that includes all partner domains."
+    TestResult("MS.SECURITYSUITE.2.3v1", Output, ReportDetailString, false) == true
+}
+
+test_PartnerDomains_NoActionFails if {
+    AntiPhish := json.patch(AntiPhishPolicies, [
+        {"op": "replace", "path": "0/TargetedDomainProtectionAction", "value": "NoAction"},
+        {"op": "replace", "path": "1/TargetedDomainProtectionAction", "value": "NoAction"}
     ])
     Output := securitysuite.tests with input.anti_phish_policies as AntiPhish
                             with input.scuba_config as ScubaConfig

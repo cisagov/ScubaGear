@@ -408,7 +408,7 @@ then add a name and valid email address for each sensitive account and click **A
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
 8.  Click **Save**.
 9. Click **Edit actions**.
-10. Under **If a message is detected as user impersonation**, select one of the following:
+10. Under **If a message is detected as domain impersonation**, select one of the following:
     - **Redirect the message to other email addresses**
     - **Move the message to the recipients' Junk Email folders**
     - **Quarantine the message**
@@ -429,7 +429,7 @@ then add a name and valid email address for each sensitive account and click **A
 10. Under **Domain**, enter each partner domain, then click **Add domains**.
 11. Click **Done** then **Save**.
 12. Click **Edit actions**.
-13. Under **If a message is detected as user impersonation**, select one of the following:
+13. Under **If a message is detected as domain impersonation**, select one of the following:
     - **Redirect the message to other email addresses**
     - **Move the message to the recipients' Junk Email folders**
     - **Quarantine the message**
@@ -448,14 +448,6 @@ then add a name and valid email address for each sensitive account and click **A
 6.  Click **Edit actions**.
 7.  Under **Safety tips & indicators**, ensure each safety tip and indicator is enabled.
 8.  Click **Save**.
-
-#### MS.SECURITYSUITE.2.4v1 Instructions
-
-Any product meeting the requirements outlined in this baseline policy may be
-used. If the agency uses Microsoft Defender, see the following
-implementation steps for
-[Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies) which
-include user safety tips to warn users.
 
 ## 3. Data Loss Prevention
 
