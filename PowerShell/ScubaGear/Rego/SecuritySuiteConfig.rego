@@ -14,7 +14,7 @@ import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
 import data.utils.report.ReportDetailsArray
-import data.utils.report.Count
+import data.utils.key.Count
 
 
 ######################
@@ -379,11 +379,35 @@ tests contains {
 #
 # MS.SECURITYSUITE.6.1v1
 #--
+
+ActivePresetContentFilterPolicies contains Rule.HostedContentFilterPolicy if {
+    some Rule in input.protection_policy_rules
+    Rule.State == "Enabled"
+}
+
+ActiveCustomContentFilterPolicies contains Rule.HostedContentFilterPolicy if {
+    some Rule in input.hosted_content_filter_rules
+    Rule.State == "Enabled"
+}
+
+ActiveContentFilterPolicy(Policy) if { Policy.IsDefault == true }
+
+ActiveContentFilterPolicy(Policy) if {
+    Policy.RecommendedPolicyType in { "Standard", "Strict" }
+    Policy.Identity in ActivePresetContentFilterPolicies
+}
+
+ActiveContentFilterPolicy(Policy) if {
+    Policy.RecommendedPolicyType == "Custom"
+    Policy.IsDefault == false
+    Policy.Identity in ActiveCustomContentFilterPolicies
+}
+
 AllowedSpamActions := { "MoveToJmf", "Quarantine", "Redirect", "Delete" }
 
 PoliciesWithInboxDelivery contains Policy.Identity if {
     some Policy in input.hosted_content_filter_policies
-    Policy.RecommendedPolicyType == "Custom"
+    ActiveContentFilterPolicy(Policy)
     Actions := {
         Policy.SpamAction,
         Policy.HighConfidenceSpamAction,
@@ -393,19 +417,41 @@ PoliciesWithInboxDelivery contains Policy.Identity if {
     Count(Actions - AllowedSpamActions) > 0
 }
 
+ActiveContentFilterPoliciesChecked contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    ActiveContentFilterPolicy(Policy)
+}
+
+# On pass, list the policies that were checked.
+ReportDetailsSpamPolicy(true, _, CheckedPolicies, _) := concat(" ", [
+    "Requirement met. Active policies checked:",
+    concat(", ", CheckedPolicies)
+])
+
+# On fail, list which policies failed.
+ReportDetailsSpamPolicy(false, FailingPolicies, _, ErrString) := Description([
+    ArraySizeStr(FailingPolicies),
+    ErrString,
+    concat(", ", FailingPolicies)
+])
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.6.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-HostedContentFilterPolicy"],
+    "Commandlet": [
+        "Get-HostedContentFilterPolicy",
+        "Get-HostedContentFilterRule",
+        "Get-EOPProtectionPolicyRule"
+    ],
     "ActualValue": PoliciesWithInboxDelivery,
-    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "ReportDetails": ReportDetailsSpamPolicy(
+        Status,
+        PoliciesWithInboxDelivery,
+        ActiveContentFilterPoliciesChecked,
+        "anti-spam polic(ies) that may deliver spam/phishing to inbox:"
+    ),
     "RequirementMet": Status
 } if {
-    ErrMessage := Description([
-        ArraySizeStr(PoliciesWithInboxDelivery),
-        "anti-spam polic(ies) that may delivery spam/phishing to inbox:",
-        concat(", ", PoliciesWithInboxDelivery)
-    ])
     Status := Count(PoliciesWithInboxDelivery) == 0
 }
 #--
@@ -413,13 +459,30 @@ tests contains {
 #
 # MS.SECURITYSUITE.6.2v1
 #--
+PoliciesWithAllowedDomains contains Policy.Identity if {    
+    some Policy in input.hosted_content_filter_policies
+    ActiveContentFilterPolicy(Policy)
+    Count(Policy.AllowedSenderDomains) > 0
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.6.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.6.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-HostedContentFilterPolicy",
+        "Get-HostedContentFilterRule",
+        "Get-EOPProtectionPolicyRule"
+    ],
+    "ActualValue": PoliciesWithAllowedDomains,
+    "ReportDetails": ReportDetailsSpamPolicy(
+        Status,
+        PoliciesWithAllowedDomains,
+        ActiveContentFilterPoliciesChecked,
+        "anti-spam polic(ies) with allowed domains:"
+    ),
+    "RequirementMet": Status
+} if {
+    Status := Count(PoliciesWithAllowedDomains) == 0
 }
 #--
 
