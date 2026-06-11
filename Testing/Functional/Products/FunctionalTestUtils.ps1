@@ -2,6 +2,384 @@ $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShe
 Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
 # -----------------------------------------------------------------------
+# Exchange Online REST wrappers for functional test pre/postconditions.
+# These replace ExchangeOnlineManagement cmdlets in EXO test plans.
+# $script:EXOApiEndpoint and $script:EXOAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+function Invoke-FunctionalExoCommand {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$CmdletName,
+    [Parameter(Mandatory = $false)]
+    [hashtable]$Parameters = @{}
+  )
+
+  return Invoke-EXORestMethod `
+    -CmdletName $CmdletName `
+    -ApiEndpoint $script:EXOApiEndpoint `
+    -AccessToken $script:EXOAccessToken `
+    -Parameters $Parameters
+}
+
+function Resolve-FunctionalExoIdentity {
+  param(
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [object]$InputObject,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$Identity
+  )
+
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    return $Identity
+  }
+
+  if ($null -eq $InputObject) {
+    return $null
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Identity)) {
+    return [string]$InputObject.Identity
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Name)) {
+    return [string]$InputObject.Name
+  }
+
+  return $null
+}
+
+function Get-RemoteDomain {
+  [CmdletBinding()]
+  param()
+
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-RemoteDomain'
+}
+
+function Set-RemoteDomain {
+  [CmdletBinding()]
+  param(
+    [Parameter(ValueFromPipeline = $true)]
+    [AllowNull()]
+    [object]$InputObject,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$Identity,
+    [Parameter(Mandatory = $true)]
+    [bool]$AutoForwardEnabled
+  )
+
+  process {
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+      throw 'Set-RemoteDomain requires an Identity or piped object with Identity.'
+    }
+
+    Invoke-FunctionalExoCommand -CmdletName 'Set-RemoteDomain' -Parameters @{
+      Identity = $ResolvedIdentity
+      AutoForwardEnabled = $AutoForwardEnabled
+    } | Out-Null
+  }
+}
+
+function Set-TransportConfig {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [bool]$SmtpClientAuthenticationDisabled
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Set-TransportConfig' -Parameters @{
+    SmtpClientAuthenticationDisabled = $SmtpClientAuthenticationDisabled
+  } | Out-Null
+}
+
+function Get-SharingPolicy {
+  [CmdletBinding()]
+  param()
+
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-SharingPolicy'
+}
+
+function New-SharingPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $true)]
+    [string]$Domains
+  )
+
+  return Invoke-FunctionalExoCommand -CmdletName 'New-SharingPolicy' -Parameters @{
+    Name = $Name
+    Domains = $Domains
+  }
+}
+
+function Set-SharingPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(ValueFromPipeline = $true)]
+    [AllowNull()]
+    [object]$InputObject,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$Identity,
+    [Parameter(Mandatory = $true)]
+    [string]$Domains
+  )
+
+  process {
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+      throw 'Set-SharingPolicy requires an Identity or piped object with Identity.'
+    }
+
+    Invoke-FunctionalExoCommand -CmdletName 'Set-SharingPolicy' -Parameters @{
+      Identity = $ResolvedIdentity
+      Domains = $Domains
+    } | Out-Null
+  }
+}
+
+function Remove-SharingPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Remove-SharingPolicy' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Get-TransportRule {
+  [CmdletBinding()]
+  param()
+
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-TransportRule'
+}
+
+function Disable-TransportRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(ValueFromPipeline = $true)]
+    [AllowNull()]
+    [object]$InputObject,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$Identity
+  )
+
+  process {
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+      throw 'Disable-TransportRule requires an Identity or piped object with Identity.'
+    }
+
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-TransportRule' -Parameters @{
+      Identity = $ResolvedIdentity
+    } | Out-Null
+  }
+}
+
+function Enable-TransportRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(ValueFromPipeline = $true)]
+    [AllowNull()]
+    [object]$InputObject,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$Identity
+  )
+
+  process {
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+      throw 'Enable-TransportRule requires an Identity or piped object with Identity.'
+    }
+
+    Invoke-FunctionalExoCommand -CmdletName 'Enable-TransportRule' -Parameters @{
+      Identity = $ResolvedIdentity
+    } | Out-Null
+  }
+}
+
+function New-TransportRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true, Position = 0)]
+    [string]$Name,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$FromScope,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$PrependSubject
+  )
+
+  $Params = @{
+    Name = $Name
+  }
+  if (-not [string]::IsNullOrWhiteSpace($FromScope)) {
+    $Params.FromScope = $FromScope
+  }
+  if ($null -ne $PrependSubject) {
+    $Params.PrependSubject = $PrependSubject
+  }
+
+  return Invoke-FunctionalExoCommand -CmdletName 'New-TransportRule' -Parameters $Params
+}
+
+function Remove-TransportRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(ValueFromPipeline = $true)]
+    [AllowNull()]
+    [object]$InputObject,
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [string]$Identity
+  )
+
+  process {
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+      throw 'Remove-TransportRule requires an Identity or piped object with Identity.'
+    }
+
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-TransportRule' -Parameters @{
+      Identity = $ResolvedIdentity
+    } | Out-Null
+  }
+}
+
+function Set-OrganizationConfig {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [bool]$AuditDisabled
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Set-OrganizationConfig' -Parameters @{
+    AuditDisabled = $AuditDisabled
+  } | Out-Null
+}
+
+function Set-ExoRemoteDomainAutoForwardEnabled {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [bool]$CurrentValue,
+    [Parameter(Mandatory = $true)]
+    [bool]$DesiredValue
+  )
+
+  Get-RemoteDomain |
+    Where-Object { $_.AutoForwardEnabled -eq $CurrentValue } |
+    Set-RemoteDomain -AutoForwardEnabled $DesiredValue
+}
+
+function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [bool]$SmtpClientAuthenticationDisabled
+  )
+
+  Set-TransportConfig -SmtpClientAuthenticationDisabled $SmtpClientAuthenticationDisabled
+}
+
+function New-ExoSharingPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $true)]
+    [string]$Domains
+  )
+
+  New-SharingPolicy -Name $Name -Domains $Domains | Out-Null
+}
+
+function Remove-ExoSharingPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  Remove-SharingPolicy -Identity $Identity
+}
+
+function Set-ExoEnabledSharingPoliciesDomain {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Domains
+  )
+
+  Get-SharingPolicy |
+    Where-Object { $_.Enabled -eq $true } |
+    Set-SharingPolicy -Domains $Domains
+}
+
+function Disable-ExoExternalSenderWarningRules {
+  [CmdletBinding()]
+  param()
+
+  Get-TransportRule |
+    Where-Object { $_.State -eq 'Enabled' -and $_.Mode -eq 'Enforce' -and $_.FromScope -eq 'NotInOrganization' } |
+    Disable-TransportRule
+}
+
+function Enable-ExoExternalSenderWarningRules {
+  [CmdletBinding()]
+  param()
+
+  Get-TransportRule |
+    Where-Object { $_.State -eq 'Disabled' -and $_.Mode -eq 'Enforce' -and $_.FromScope -eq 'NotInOrganization' } |
+    Enable-TransportRule
+}
+
+function New-ExoExternalSenderWarningRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Name = 'FunctionalTest External sender warning'
+  )
+
+  New-TransportRule $Name -FromScope 'NotInOrganization' -PrependSubject '[External] ' | Out-Null
+}
+
+function Remove-ExoExternalSenderWarningRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity = 'FunctionalTest External sender warning'
+  )
+
+  Get-TransportRule |
+    Where-Object { $_.Identity -eq $Identity } |
+    Remove-TransportRule
+}
+
+function Set-ExoOrganizationAuditDisabled {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [bool]$AuditDisabled
+  )
+
+  Set-OrganizationConfig -AuditDisabled $AuditDisabled
+}
+
+# -----------------------------------------------------------------------
 # Power Platform REST wrappers for functional test preconditions
 # These replace the removed Microsoft.PowerApps.Administration.PowerShell
 # cmdlets. $script:PPBaseUrl and $script:PPAccessToken must be set by
