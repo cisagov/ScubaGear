@@ -14,6 +14,7 @@ import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
 import data.utils.report.ReportDetailsArray
+import data.utils.report.Count
 
 
 ######################
@@ -378,13 +379,34 @@ tests contains {
 #
 # MS.SECURITYSUITE.6.1v1
 #--
+AllowedSpamActions := { "MoveToJmf", "Quarantine", "Redirect", "Delete" }
+
+PoliciesWithInboxDelivery contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Custom"
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) > 0
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.6.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.6.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-HostedContentFilterPolicy"],
+    "ActualValue": PoliciesWithInboxDelivery,
+    "ReportDetails": ReportDetailsString(Status, ErrMessage),
+    "RequirementMet": Status
+} if {
+    ErrMessage := Description([
+        ArraySizeStr(PoliciesWithInboxDelivery),
+        "anti-spam polic(ies) that may delivery spam/phishing to inbox:",
+        concat(", ", PoliciesWithInboxDelivery)
+    ])
+    Status := Count(PoliciesWithInboxDelivery) == 0
 }
 #--
 
