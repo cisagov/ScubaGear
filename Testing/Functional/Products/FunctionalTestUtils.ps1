@@ -52,6 +52,60 @@ function Resolve-FunctionalExoIdentity {
   return $null
 }
 
+function ConvertTo-FunctionalExoBoolean {
+  param(
+    [Parameter(Mandatory = $false)]
+    [AllowNull()]
+    [object]$Value
+  )
+
+  if ($null -eq $Value) {
+    return $null
+  }
+
+  if ($Value -is [bool]) {
+    return [bool]$Value
+  }
+
+  $AsString = [string]$Value
+  if ([string]::IsNullOrWhiteSpace($AsString)) {
+    return $null
+  }
+
+  $Parsed = $false
+  if ([bool]::TryParse($AsString, [ref]$Parsed)) {
+    return $Parsed
+  }
+
+  return $null
+}
+
+function Wait-FunctionalExoCondition {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [scriptblock]$Condition,
+    [Parameter(Mandatory = $false)]
+    [int]$MaxAttempts = 10,
+    [Parameter(Mandatory = $false)]
+    [int]$DelaySeconds = 2,
+    [Parameter(Mandatory = $false)]
+    [string]$FailureMessage = 'Condition was not met in the expected time window.'
+  )
+
+  for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+    if (& $Condition) {
+      return
+    }
+
+    if ($Attempt -lt $MaxAttempts) {
+      Start-Sleep -Seconds $DelaySeconds
+    }
+  }
+
+  throw $FailureMessage
+}
+
 function Get-RemoteDomain {
   [CmdletBinding()]
   param()
@@ -95,6 +149,13 @@ function Set-TransportConfig {
   Invoke-FunctionalExoCommand -CmdletName 'Set-TransportConfig' -Parameters @{
     SmtpClientAuthenticationDisabled = $SmtpClientAuthenticationDisabled
   } | Out-Null
+}
+
+function Get-TransportConfig {
+  [CmdletBinding()]
+  param()
+
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-TransportConfig'
 }
 
 function Get-SharingPolicy {
@@ -280,9 +341,18 @@ function Set-ExoRemoteDomainAutoForwardEnabled {
     [bool]$DesiredValue
   )
 
-  Get-RemoteDomain |
-    Where-Object { $_.AutoForwardEnabled -eq $CurrentValue } |
-    Set-RemoteDomain -AutoForwardEnabled $DesiredValue
+  $Targets = @(Get-RemoteDomain |
+      Where-Object { (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $CurrentValue })
+
+  if ($Targets.Count -gt 0) {
+    $Targets | Set-RemoteDomain -AutoForwardEnabled $DesiredValue
+  }
+
+  Wait-FunctionalExoCondition -Condition {
+    @(Get-RemoteDomain | Where-Object {
+        (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $DesiredValue
+      }).Count -gt 0
+  } -FailureMessage "Failed to observe remote domains with AutoForwardEnabled=$DesiredValue after update."
 }
 
 function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
@@ -293,6 +363,12 @@ function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
   )
 
   Set-TransportConfig -SmtpClientAuthenticationDisabled $SmtpClientAuthenticationDisabled
+
+  Wait-FunctionalExoCondition -Condition {
+    $Config = Get-TransportConfig | Select-Object -First 1
+    $CurrentValue = ConvertTo-FunctionalExoBoolean -Value $Config.SmtpClientAuthenticationDisabled
+    $CurrentValue -eq $SmtpClientAuthenticationDisabled
+  } -FailureMessage "Failed to observe SmtpClientAuthenticationDisabled=$SmtpClientAuthenticationDisabled after update."
 }
 
 function New-ExoSharingPolicy {
@@ -324,9 +400,22 @@ function Set-ExoEnabledSharingPoliciesDomain {
     [string]$Domains
   )
 
-  Get-SharingPolicy |
-    Where-Object { $_.Enabled -eq $true } |
-    Set-SharingPolicy -Domains $Domains
+  $Targets = @(Get-SharingPolicy |
+      Where-Object { (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true })
+
+  if ($Targets.Count -eq 0) {
+    throw 'Set-ExoEnabledSharingPoliciesDomain did not find any enabled sharing policies to update.'
+  }
+
+  $Targets | Set-SharingPolicy -Domains $Domains
+
+  Wait-FunctionalExoCondition -Condition {
+    @(Get-SharingPolicy |
+      Where-Object {
+        (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true -and
+        [string]$_.Domains -eq $Domains
+      }).Count -gt 0
+  } -FailureMessage "Failed to observe enabled sharing policies updated to Domains='$Domains'."
 }
 
 function Disable-ExoExternalSenderWarningRules {
@@ -334,7 +423,11 @@ function Disable-ExoExternalSenderWarningRules {
   param()
 
   Get-TransportRule |
-    Where-Object { $_.State -eq 'Enabled' -and $_.Mode -eq 'Enforce' -and $_.FromScope -eq 'NotInOrganization' } |
+    Where-Object {
+      [string]$_.State -eq 'Enabled' -and
+      [string]$_.Mode -eq 'Enforce' -and
+      [string]$_.FromScope -eq 'NotInOrganization'
+    } |
     Disable-TransportRule
 }
 
@@ -343,7 +436,11 @@ function Enable-ExoExternalSenderWarningRules {
   param()
 
   Get-TransportRule |
-    Where-Object { $_.State -eq 'Disabled' -and $_.Mode -eq 'Enforce' -and $_.FromScope -eq 'NotInOrganization' } |
+    Where-Object {
+      [string]$_.State -eq 'Disabled' -and
+      [string]$_.Mode -eq 'Enforce' -and
+      [string]$_.FromScope -eq 'NotInOrganization'
+    } |
     Enable-TransportRule
 }
 
