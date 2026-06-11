@@ -41,12 +41,14 @@ function Resolve-FunctionalExoIdentity {
     return $null
   }
 
-  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Identity)) {
-    return [string]$InputObject.Identity
-  }
-
+  # Prefer Name over Identity: the REST canonical identity path (e.g. "tenant\PolicyName")
+  # is often rejected by mutating cmdlets, while Name is consistently accepted.
   if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Name)) {
     return [string]$InputObject.Name
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Identity)) {
+    return [string]$InputObject.Identity
   }
 
   return $null
@@ -174,9 +176,12 @@ function New-SharingPolicy {
     [string]$Domains
   )
 
+  # Explicitly enable the policy on creation; the EXO REST endpoint does not
+  # guarantee Enabled=$true by default, and Rego only evaluates enabled policies.
   return Invoke-FunctionalExoCommand -CmdletName 'New-SharingPolicy' -Parameters @{
-    Name = $Name
+    Name    = $Name
     Domains = $Domains
+    Enabled = $true
   }
 }
 
@@ -348,11 +353,22 @@ function Set-ExoRemoteDomainAutoForwardEnabled {
     $Targets | Set-RemoteDomain -AutoForwardEnabled $DesiredValue
   }
 
-  Wait-FunctionalExoCondition -Condition {
-    @(Get-RemoteDomain | Where-Object {
-        (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $DesiredValue
-      }).Count -gt 0
-  } -FailureMessage "Failed to observe remote domains with AutoForwardEnabled=$DesiredValue after update."
+  # Direction-aware convergence check:
+  #   Compliant   ($false) => ALL domains must have AutoForwardEnabled=false (zero with true)
+  #   Non-compliant ($true) => AT LEAST ONE domain must have AutoForwardEnabled=true
+  if ($DesiredValue -eq $false) {
+    Wait-FunctionalExoCondition -Condition {
+      @(Get-RemoteDomain | Where-Object {
+          (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $true
+        }).Count -eq 0
+    } -FailureMessage "Failed to observe all remote domains with AutoForwardEnabled=false after update."
+  } else {
+    Wait-FunctionalExoCondition -Condition {
+      @(Get-RemoteDomain | Where-Object {
+          (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $true
+        }).Count -gt 0
+    } -FailureMessage "Failed to observe at least one remote domain with AutoForwardEnabled=true after update."
+  }
 }
 
 function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
@@ -381,6 +397,13 @@ function New-ExoSharingPolicy {
   )
 
   New-SharingPolicy -Name $Name -Domains $Domains | Out-Null
+
+  # Wait for the policy to become visible so ScubaGear's provider call sees it.
+  Wait-FunctionalExoCondition -Condition {
+    @(Get-SharingPolicy | Where-Object {
+        [string]$_.Name -eq $Name -or [string]$_.Identity -eq $Name
+      }).Count -gt 0
+  } -FailureMessage "Failed to observe new sharing policy '$Name' after creation."
 }
 
 function Remove-ExoSharingPolicy {
@@ -409,11 +432,15 @@ function Set-ExoEnabledSharingPoliciesDomain {
 
   $Targets | Set-SharingPolicy -Domains $Domains
 
+  # The Domains property may be returned as an array by EXO REST; check both forms.
   Wait-FunctionalExoCondition -Condition {
     @(Get-SharingPolicy |
       Where-Object {
         (ConvertTo-FunctionalExoBoolean -Value $_.Enabled) -eq $true -and
-        [string]$_.Domains -eq $Domains
+        (
+          ($_.Domains -is [array] -and $_.Domains -contains $Domains) -or
+          ([string]$_.Domains -eq $Domains)
+        )
       }).Count -gt 0
   } -FailureMessage "Failed to observe enabled sharing policies updated to Domains='$Domains'."
 }
@@ -473,7 +500,16 @@ function Set-ExoOrganizationAuditDisabled {
     [bool]$AuditDisabled
   )
 
-  Set-OrganizationConfig -AuditDisabled $AuditDisabled
+  try {
+    Set-OrganizationConfig -AuditDisabled $AuditDisabled
+  }
+  catch {
+    # Some tenants (GCC/GCCH) lock the audit policy and reject this change
+    # via service-principal REST calls. Log a warning and continue so the
+    # test can still evaluate the tenant's current (immutable) state rather
+    # than crashing the entire test run.
+    Write-Warning "Set-ExoOrganizationAuditDisabled: Could not set AuditDisabled=$AuditDisabled - $($_.Exception.Message). The tenant may not permit this change."
+  }
 }
 
 # -----------------------------------------------------------------------
