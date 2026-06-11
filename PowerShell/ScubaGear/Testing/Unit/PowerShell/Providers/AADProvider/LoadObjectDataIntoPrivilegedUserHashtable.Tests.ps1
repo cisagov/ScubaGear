@@ -64,6 +64,7 @@ InModuleScope ExportAADProvider {
             # Test 1 - Do NOT pass ObjectType
             LoadObjectDataIntoPrivilegedUserHashtable -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense -M365Environment $M365Environment
             # Assertions to ensure the user was processed correctly
+             $PrivilegedUsers[$ObjectId].id | Should -Be $ObjectId
              $PrivilegedUsers[$ObjectId].DisplayName | Should -Be "John Doe"
              $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Be "ABC123"
              $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
@@ -74,6 +75,7 @@ InModuleScope ExportAADProvider {
             LoadObjectDataIntoPrivilegedUserHashtable -Objecttype $Objecttype -RoleName $RoleName -PrivilegedUsers $PrivilegedUsers -ObjectId $ObjectId -TenantHasPremiumLicense $TenantHasPremiumLicense  -M365Environment $M365Environment
 
             # Assertions to ensure the user was processed correctly
+            $PrivilegedUsers[$ObjectId].id | Should -Be $ObjectId
             $PrivilegedUsers[$ObjectId].DisplayName | Should -Be "John Doe"
             $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Be "ABC123"
             $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
@@ -143,10 +145,11 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers.Count | Should -Be 2  # Two users should have been added
 
             # Ensure both users have their properties set correctly
-            $PrivilegedUsers.Values | ForEach-Object {
-                $_.roles | Should -Contain $RoleName
-                $_.DisplayName | Should -Match "User"
-                $_.OnPremisesImmutableId | Should -Match "ImmutableId"
+            foreach ($Key in $PrivilegedUsers.Keys) {
+                $PrivilegedUsers[$Key].id | Should -Be $Key
+                $PrivilegedUsers[$Key].roles | Should -Contain $RoleName
+                $PrivilegedUsers[$Key].DisplayName | Should -Match "User"
+                $PrivilegedUsers[$Key].OnPremisesImmutableId | Should -Match "ImmutableId"
             }
 
             ########## Test 2 - Pass ObjectType
@@ -158,10 +161,11 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers.Count | Should -Be 2  # Two users should have been added
 
             # Ensure both users have their properties set correctly
-            $PrivilegedUsers.Values | ForEach-Object {
-                $_.roles | Should -Contain $RoleName
-                $_.DisplayName | Should -Match "User"
-                $_.OnPremisesImmutableId | Should -Match "ImmutableId"
+            foreach ($Key in $PrivilegedUsers.Keys) {
+                $PrivilegedUsers[$Key].id | Should -Be $Key
+                $PrivilegedUsers[$Key].roles | Should -Contain $RoleName
+                $PrivilegedUsers[$Key].DisplayName | Should -Match "User"
+                $PrivilegedUsers[$Key].OnPremisesImmutableId | Should -Match "ImmutableId"
             }
 
             ########## Test 3 - Trigger recursion by mocking Invoke-GraphDirectly to return some users
@@ -176,10 +180,11 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers.Count | Should -Be 6
 
             # Ensure all users have their properties set correctly
-            $PrivilegedUsers.Values | ForEach-Object {
-                $_.roles | Should -Contain $RoleName
-                $_.DisplayName | Should -Match "User"
-                $_.OnPremisesImmutableId | Should -Match "ImmutableId"
+            foreach ($Key in $PrivilegedUsers.Keys) {
+                $PrivilegedUsers[$Key].id | Should -Be $Key
+                $PrivilegedUsers[$Key].roles | Should -Contain $RoleName
+                $PrivilegedUsers[$Key].DisplayName | Should -Match "User"
+                $PrivilegedUsers[$Key].OnPremisesImmutableId | Should -Match "ImmutableId"
             }
         }
     }

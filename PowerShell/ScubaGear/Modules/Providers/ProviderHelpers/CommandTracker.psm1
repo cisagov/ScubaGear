@@ -5,7 +5,6 @@ Import-Module -Name $PSScriptRoot/AADHybridExchangeHelper.psm1 -Function Get-Leg
 Import-Module -Name $PSScriptRoot/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformTenantSettingsRest, Get-PowerPlatformEnvironmentsRest, Get-PowerPlatformDlpPoliciesRest, Get-PowerPlatformTenantIsolationRest
 Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
-Import-Module -Name $PSScriptRoot/../../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
 Import-Module -Name $PSScriptRoot/AADAppManagementPolicyHelper.psm1 -Function Get-AppManagementPolicies
 
 class CommandTracker {
@@ -45,7 +44,8 @@ class CommandTracker {
             if ($isGraphDirect) {
                 # This will pull the Graph API vice the PowerShell module
                 Write-Verbose "Running $($Command) API Call"
-                $ModCommand = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
+                # We set LogErrors to false because we handle the logging of errors here in the TryCommand catch block.
+                $ModCommand = Trace-ScubaFunction -FunctionName $Command -LogErrors $false -ScriptBlock {
                     Invoke-GraphDirectly -Commandlet $Command @CommandArgs
                 }
                 $Result = $ModCommand
@@ -57,7 +57,8 @@ class CommandTracker {
             }
             else {
                 Write-Verbose "Running $($Command) with arguments: $($CommandArgs)"
-                $Result = Trace-ScubaFunction -FunctionName $Command -ScriptBlock {
+                # We set LogErrors to false because we handle the logging of errors here in the TryCommand catch block.
+                $Result = Trace-ScubaFunction -FunctionName $Command -LogErrors $false -ScriptBlock {
                     & $Command @CommandArgs
                 }
             }
@@ -69,7 +70,8 @@ class CommandTracker {
                 Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
             }
 
-            Write-ScubaLog -Message "Error running command" -Level "Warning" -Source "ProviderList" -Data @{
+            # We set the log level to Info here because Write-ScubaLog will track Warning or Error as a terminating error.
+            Write-ScubaLog -Message "Error running command" -Level "Info" -Source "TryCommand" -Data @{
                 Command = $Command
                 Error   = $_.Exception.Message
                 StackTrace = $_.ScriptStackTrace

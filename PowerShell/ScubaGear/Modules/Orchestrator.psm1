@@ -361,7 +361,7 @@ function Invoke-SCuBA {
         }
 
         Remove-Resources # Unload helper modules if they are still in the PowerShell session
-        Import-Resources # Imports Providers, RunRego, CreateReport, Connection
+        Import-Resources # Imports Providers, RunRego, etc.
 
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
@@ -506,10 +506,10 @@ function Invoke-SCuBA {
                 InvocationLine = $MyInvocation.Line
             }
 
-            # Capture environment diagnostics using Get-ScubaRunDetails
+            # Capture environment diagnostics using Write-ScubaRunDetails
             Write-ScubaLog -Message "Capturing environment diagnostics" -Level "Info" -Source "InvokeScuba"
             try {
-                Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $ScubaConfig.OPAPath -ErrorAction Stop
+                Write-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $ScubaConfig.OPAPath -ErrorAction Stop
             }
             catch {
                 Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "InvokeScuba" -Data @{
@@ -1366,6 +1366,8 @@ function Merge-JsonOutput {
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
                 "DomainName" = $TenantDetails.DomainName;
+                "OrgName" = $SettingsExportObject.scuba_config.OrgName;
+                "OrgUnitName" = $SettingsExportObject.scuba_config.OrgUnitName;
                 "ProductSuite" = "Microsoft 365";
                 "ProductsAssessed" = $FullNames;
                 "ProductAbbreviationMapping" = $ProductAbbreviationMapping
@@ -1866,7 +1868,7 @@ function Get-ServicePrincipalParams {
         $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
     }
     else {
-        throw "Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments"
+        throw "When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization."
     }
     $ServicePrincipalParams
 }
@@ -2208,6 +2210,9 @@ function Invoke-SCuBACached {
             $OutFolderPath = $OutPath
             $ProductNames = $ProductNames | Sort-Object -Unique
 
+            Remove-Resources
+            Import-Resources # Imports Providers, RunRego, etc.
+
             # Initialize logging for troubleshooting - debug logs are ALWAYS created
             # Logs are placed in a DebugLogs subfolder within the output folder
             # Transcript logging is optional and enabled only when -Transcript is specified
@@ -2254,10 +2259,10 @@ function Invoke-SCuBACached {
                     InvocationLine = $MyInvocation.Line
                 }
 
-                # Capture environment diagnostics using Get-ScubaRunDetails
+                # Capture environment diagnostics using Write-ScubaRunDetails
                 Write-ScubaLog -Message "Capturing environment diagnostics (Cached Mode)" -Level "Info" -Source "ScubaCached"
                 try {
-                    Get-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $OPAPath -ErrorAction Stop
+                    Write-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $OPAPath -TestNetworkConnectivity $false -ErrorAction Stop
                 }
                 catch {
                     Write-ScubaLog -Message "Failed to capture environment diagnostics" -Level "Warning" -Source "ScubaCached" -Data @{
@@ -2274,10 +2279,6 @@ function Invoke-SCuBACached {
                 Write-Warning "Failed to initialize ScubaGear logging: $_"
                 $Script:ScubaLoggingEnabled = $false
             }
-
-            Remove-Resources
-            Import-Resources # Imports Providers, RunRego, CreateReport, Connection, Support, Utility
-            Write-ScubaLog -Message "Resources imported successfully" -Level "Debug" -Source "ScubaCached"
 
             # Authenticate - parameters consolidated into a temporary ScubaConfig for cached execution
             $TempScubaConfig = New-Object -Type PSObject -Property @{

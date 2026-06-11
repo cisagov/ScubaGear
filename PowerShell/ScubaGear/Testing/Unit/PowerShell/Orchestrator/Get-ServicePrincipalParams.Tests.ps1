@@ -28,21 +28,21 @@ Describe -Tag 'Orchestrator' -Name 'Get-ServicePrincipalParams' {
                     AppID = '34289UFAHWFALL'
                 }
                 {Get-ServicePrincipalParams -ScubaConfig $ScubaConfig} |
-                    Should -Throw  'Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments'
+                    Should -Throw  'When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization.'
             }
             It "Only Thumbprint Only"{
                 $ScubaConfig = [PSCustomObject]@{
                     CertificateThumbprint = 'WPOEALFN425A'
                 }
                 {Get-ServicePrincipalParams -ScubaConfig $ScubaConfig} |
-                    Should -Throw  'Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments'
+                    Should -Throw  'When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization.'
             }
             It "Only Organization Only"{
                 $ScubaConfig = [PSCustomObject]@{
                     Organization = 'example.onmicrosoft.com'
                 }
                 {Get-ServicePrincipalParams -ScubaConfig $ScubaConfig} |
-                    Should -Throw  'Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments'
+                    Should -Throw  'When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization.'
             }
         }
         Context "No Service Principal provided"{
