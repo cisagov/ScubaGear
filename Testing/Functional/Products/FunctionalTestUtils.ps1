@@ -440,7 +440,18 @@ function Set-ExoEnabledSharingPoliciesDomain {
     throw 'Set-ExoEnabledSharingPoliciesDomain did not find any enabled sharing policies to update.'
   }
 
-  $Targets | Set-SharingPolicy -Domains $Domains
+  # Use foreach+try/catch instead of pipeline so that a stale ghost policy left
+  # behind by the previous test's Remove postcondition does not abort the entire
+  # update. A failed Set on a deleted policy is logged and skipped; valid policies
+  # still get updated.
+  foreach ($Target in $Targets) {
+    try {
+      Set-SharingPolicy -InputObject $Target -Domains $Domains
+    }
+    catch {
+      Write-Warning "Set-ExoEnabledSharingPoliciesDomain: Could not update policy '$([string]$Target.Name)' - $($_.Exception.Message). Skipping."
+    }
+  }
 
   # The Domains property may be returned as an array by EXO REST; check both forms.
   # Use a long window (300 s) because GCC replica propagation can take several minutes.
@@ -520,14 +531,17 @@ function Set-ExoOrganizationAuditDisabled {
     Write-Warning "Set-ExoOrganizationAuditDisabled: Could not set AuditDisabled=$AuditDisabled - $($_.Exception.Message). The tenant may not permit this change."
   }
 
-  # Verify the actual state matches the desired state regardless of whether the
-  # call succeeded or was silently rejected. If not, throw so the test reports
-  # a clear environment-restriction error rather than a misleading assertion failure.
-  $ActualConfig = Invoke-FunctionalExoCommand -CmdletName 'Get-OrganizationConfig' | Select-Object -First 1
-  $ActualValue = ConvertTo-FunctionalExoBoolean -Value $ActualConfig.AuditDisabled
-  if ($ActualValue -ne $AuditDisabled) {
-    throw "Set-ExoOrganizationAuditDisabled: Tenant AuditDisabled is '$ActualValue' but '$AuditDisabled' was requested. Tenant policy prohibits this change - this test cannot complete in this environment."
-  }
+  # Wait for the desired value to become visible on a read replica. An immediate
+  # single readback can return a stale value even when the write succeeded.
+  # If the wait times out the tenant likely prohibits this change via service principal.
+  Wait-FunctionalExoCondition -MaxAttempts 12 -DelaySeconds 10 -Condition {
+    $Cfg = Invoke-FunctionalExoCommand -CmdletName 'Get-OrganizationConfig' | Select-Object -First 1
+    (ConvertTo-FunctionalExoBoolean -Value $Cfg.AuditDisabled) -eq $AuditDisabled
+  } -FailureMessage "Set-ExoOrganizationAuditDisabled: Tenant AuditDisabled did not reach '$AuditDisabled' after waiting. Tenant policy prohibits this change - this test cannot complete in this environment."
+
+  # Allow extra time for the write to propagate to all EXO replicas before
+  # ScubaGear's independent REST session reads tenant state.
+  Start-Sleep -Seconds 60
 }
 
 # -----------------------------------------------------------------------
