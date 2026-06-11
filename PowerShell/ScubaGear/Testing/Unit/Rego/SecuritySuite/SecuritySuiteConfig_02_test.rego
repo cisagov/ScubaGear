@@ -223,7 +223,7 @@ test_PartnerDomains_Incorrect if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy that includes all partner domains."
+    ReportDetailString := "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action."
     TestResult("MS.SECURITYSUITE.2.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -236,7 +236,7 @@ test_PartnerDomains_NoActionFails if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy that includes all partner domains."
+    ReportDetailString := "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action."
     TestResult("MS.SECURITYSUITE.2.3v1", Output, ReportDetailString, false) == true
 }
 #--
