@@ -66,6 +66,9 @@ function Invoke-MgGraphRequest {
 # Override the helper module's private Invoke-GraphDirectly within module session state.
 $helperModule = Get-Module AADRiskyPermissionsHelper
 & $helperModule {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'apps')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'feds')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'sps')]
     param($apps, $feds, $sps)
 
     function Invoke-GraphDirectly {
@@ -147,7 +150,7 @@ if (-not [string]::IsNullOrWhiteSpace($resultDir) -and -not (Test-Path $resultDi
 }
 
 $result | ConvertTo-Json -Depth 6 | Set-Content -Path $OutputPath -Encoding UTF8
-$result | Format-List | Out-String | Write-Host
-Write-Host "Baseline benchmark saved to $OutputPath"
+$result | Format-List | Out-String | Write-Output
+Write-Output "Baseline benchmark saved to $OutputPath"
 
 Remove-Module AADRiskyPermissionsHelper -Force -ErrorAction SilentlyContinue

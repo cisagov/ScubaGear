@@ -47,7 +47,7 @@ Get-Content -Path $DebugLogPath | ForEach-Object {
             $current.Data = ($Matches.Json | ConvertFrom-Json)
         }
         catch {
-            # Ignore malformed JSON data lines.
+            Write-Verbose "Skipped malformed JSON data line: $line"
         }
     }
 }
@@ -107,7 +107,7 @@ if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
         New-Item -Path $outDir -ItemType Directory -Force | Out-Null
     }
     $result | ConvertTo-Json -Depth 8 | Set-Content -Path $OutputPath -Encoding UTF8
-    Write-Host "Timing summary saved to $OutputPath"
+    Write-Output "Timing summary saved to $OutputPath"
 }
 
 $result | ConvertTo-Json -Depth 8
