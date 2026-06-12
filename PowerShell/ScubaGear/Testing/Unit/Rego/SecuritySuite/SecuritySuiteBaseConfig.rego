@@ -212,3 +212,79 @@ ProtectionAlerts := [
     }
 ]
 
+DefaultPolicy := {
+    "Identity": "Default",
+    "IsDefault": true,
+    "RecommendedPolicyType": "Custom",
+    "SpamAction": "MoveToJmf",
+    "HighConfidenceSpamAction": "MoveToJmf",
+    "PhishSpamAction": "Quarantine",
+    "HighConfidencePhishAction": "Quarantine",
+    "AllowedSenderDomains": []
+}
+
+StandardPresetPolicy := {
+    "Identity": "Standard Preset Security Policy1659535429826",
+    "IsDefault": false,
+    "RecommendedPolicyType": "Standard",
+    "SpamAction": "MoveToJmf",
+    "HighConfidenceSpamAction": "MoveToJmf",
+    "PhishSpamAction": "Quarantine",
+    "HighConfidencePhishAction": "Quarantine",
+    "AllowedSenderDomains": []
+}
+
+StrictPresetPolicy := {
+    "Identity": "Strict Preset Security Policy1659535429827",
+    "IsDefault": false,
+    "RecommendedPolicyType": "Strict",
+    "SpamAction": "Quarantine",
+    "HighConfidenceSpamAction": "Quarantine",
+    "PhishSpamAction": "Quarantine",
+    "HighConfidencePhishAction": "Quarantine",
+    "AllowedSenderDomains": []
+}
+
+CustomPolicy := {
+    "Identity": "Custom Policy A",
+    "IsDefault": false,
+    "RecommendedPolicyType": "Custom",
+    "SpamAction": "MoveToJmf",
+    "HighConfidenceSpamAction": "Quarantine",
+    "PhishSpamAction": "Quarantine",
+    "HighConfidencePhishAction": "Quarantine",
+    "AllowedSenderDomains": []
+}
+
+# EOP preset rules with both Standard and Strict enabled
+ProtectionPolicyRulesEnabled := [
+    {
+        "Identity": "Standard Preset Security Policy",
+        "HostedContentFilterPolicy": "Standard Preset Security Policy1659535429826",
+        "State": "Enabled"
+    },
+    {
+        "Identity": "Strict Preset Security Policy",
+        "HostedContentFilterPolicy": "Strict Preset Security Policy1659535429827",
+        "State": "Enabled"
+    }
+]
+
+# Custom policy rule - enabled
+CustomPolicyRuleEnabled := [
+    {
+        "Identity": "Custom Policy A Rule",
+        "HostedContentFilterPolicy": "Custom Policy A",
+        "State": "Enabled"
+    }
+]
+
+# Custom policy rule - disabled
+CustomPolicyRuleDisabled := [
+    {
+        "Identity": "Custom Policy A Rule",
+        "HostedContentFilterPolicy": "Custom Policy A",
+        "State": "Disabled"
+    }
+]
+
