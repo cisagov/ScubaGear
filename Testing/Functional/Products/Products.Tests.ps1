@@ -131,16 +131,18 @@ BeforeDiscovery {
     }{
         $ProductNames = @($ProductName)
 
+        if (-Not [string]::IsNullOrEmpty($AppId)){
         $ServicePrincipalParams = @{CertThumbprintParams = @{
             CertificateThumbprint = $Thumbprint;
             AppID = $AppId;
             Organization = $TenantDomain;
         }}
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-    }
-    else {
+        }
+        else {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
+        }
     }
 }
 
