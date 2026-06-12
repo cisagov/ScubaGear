@@ -335,7 +335,7 @@ function Connect-Tenant {
                                    $TenantName = $InitialDomain.Name
                                    $InitialDomainPrefix = $TenantName.split(".")[0]
                                }
-                               # Same ClientId as PowerPlatform — MSAL cache and SSO enable silent acquisition
+                               # Same ClientId as PowerPlatform - MSAL cache and SSO enable silent acquisition
                                # if PowerPlatform already signed in interactively this session.
                                $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
                                $TokenData.PBIAccessToken = Get-MsalAccessToken `
