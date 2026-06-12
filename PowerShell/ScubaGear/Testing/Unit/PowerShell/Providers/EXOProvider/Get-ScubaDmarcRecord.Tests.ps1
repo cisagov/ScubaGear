@@ -8,7 +8,7 @@ InModuleScope 'ExportEXOProvider' {
             BeforeAll {
                 Mock -CommandName Invoke-RobustDnsTxt {
                     @{
-                        "Answers" = @("v=DMARC1...");
+                        "Answers" = @("v=DMARC1; p=reject");
                         "Errors" = @();
                         "NXDomain" = $false;
                         "LogEntries" = @("some text")
@@ -16,7 +16,6 @@ InModuleScope 'ExportEXOProvider' {
                 }
             }
             It "Resolves 1 domain name" {
-                # Test basic functionality
                 $Response = Get-ScubaDmarcRecord -Domains @(
                     @{
                         "DomainName" = "example.com";
@@ -24,7 +23,7 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 ) -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
-                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $Response.rdata -Contains "v=DMARC1; p=reject" | Should -Be $true
             }
 
             It "Resolves multiple domain names" {
@@ -40,12 +39,10 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 ) -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
-                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $Response.rdata -Contains "v=DMARC1; p=reject" | Should -Be $true
             }
 
             It "Ignores the coexistence domain" {
-                # Get-ScubaDmarcRecord needs to skip the coexistence domain because DMARC
-                # records can't be added for it
                 $Response = Get-ScubaDmarcRecord -Domains @(
                     @{
                         "DomainName" = "example1.com";
@@ -57,40 +54,96 @@ InModuleScope 'ExportEXOProvider' {
                     }
                 ) -PreferredDnsResolvers @() -SkipDoH $false
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
-                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $Response.rdata -Contains "v=DMARC1; p=reject" | Should -Be $true
             }
         }
 
         Context "When the DMARC record is unavailable at the full domain" {
             BeforeAll {
                 Mock -CommandName Invoke-RobustDnsTxt {
-                    Mock -CommandName Invoke-RobustDnsTxt {
-                        if ($Qname -eq "_dmarc.example.com") {
-                            @{
-                                "Answers" = @("v=DMARC1...");
-                                "Errors" = @();
-                                "NXDomain" = $false;
-                                "LogEntries" = @("some text")
-                            }
+                    if ($Qname -eq "_dmarc.example.com") {
+                        @{
+                            "Answers" = @("v=DMARC1; p=reject");
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("some text")
                         }
-                        else {
-                            @{
-                                "Answers" = @();
-                                "Errors" = @();
-                                "NXDomain" = $false;
-                                "LogEntries" = @("Query returned NXDomain")
-                            }
+                    }
+                    else {
+                        @{
+                            "Answers" = @();
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("Query returned NXDomain")
                         }
                     }
                 }
             }
-            It "Checks at the organization level" {
-                # There are two locations where DMARC records can be found. If it's not available at the
-                # full domain level, GetScubaDmarcRecord should try again at the organization domain level
+            It "Returns the highest valid policy found by the tree walk" {
                 $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
                     -PreferredDnsResolvers @() -SkipDoH $false
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 4
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -ParameterFilter {
+                    $Qname -eq "_dmarc.example.com"
+                } -Exactly -Times 1
+                $Response.rdata -Contains "v=DMARC1; p=reject" | Should -Be $true
+            }
+        }
+
+        Context "When the public suffix contains multiple labels" {
+            BeforeAll {
+                Mock -CommandName Invoke-RobustDnsTxt {
+                    if ($Qname -eq "_dmarc.example.fed.us") {
+                        @{
+                            "Answers" = @("v=DMARC1; p=reject; psd=n");
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("some text")
+                        }
+                    }
+                    else {
+                        @{
+                            "Answers" = @();
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("Query returned NXDomain")
+                        }
+                    }
+                }
+            }
+
+            It "Finds the organizational-domain policy and stops at its PSD boundary" {
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{"DomainName" = "subdomain.example.fed.us"}
+                ) -PreferredDnsResolvers @() -SkipDoH $false
+
                 Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
-                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -ParameterFilter {
+                    $Qname -eq "_dmarc.example.fed.us"
+                } -Exactly -Times 1
+                $Response.rdata -Contains "v=DMARC1; p=reject; psd=n" | Should -Be $true
+            }
+        }
+
+        Context "When the domain exceeds the tree-walk query limit" {
+            BeforeAll {
+                Mock -CommandName Invoke-RobustDnsTxt {
+                    @{
+                        "Answers" = @();
+                        "Errors" = @();
+                        "NXDomain" = $false;
+                        "LogEntries" = @("Query returned NXDomain")
+                    }
+                }
+            }
+
+            It "Makes no more than eight DNS queries" {
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{"DomainName" = "a.b.c.d.e.f.g.h.i.j.k.example.com"}
+                ) -PreferredDnsResolvers @() -SkipDoH $false
+
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 8
+                $Response.rdata.Count | Should -Be 0
             }
         }
     }
