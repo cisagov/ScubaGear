@@ -717,26 +717,51 @@ function Get-ScubaDmarcRecord {
             continue
         }
         $LogEntries = @()
-        # First check to see if the record is available at the full domain level
         $DomainName = $d.DomainName
-        $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName" -PreferredDnsResolvers $PreferredDnsResolvers `
-            -SkipDoH $SkipDoH
-        $LogEntries += $Response.LogEntries
-        if ($Response.Answers.Length -eq 0) {
-            # The domain does not exist. If the record is not available at the full domain
-            # level, we need to check at the organizational domain level.
-            $Labels = $d.DomainName.Split(".")
-            $Labels = $d.DomainName.Split(".")
-            $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-            $Response = Invoke-RobustDnsTxt "_dmarc.$OrgDomain" -PreferredDnsResolvers $PreferredDnsResolvers `
-                -SkipDoH $SkipDoH
-            $LogEntries += $Response.LogEntries
+        $Labels = @($DomainName.Split(".", [System.StringSplitOptions]::RemoveEmptyEntries))
+        $QueryDomains = @($DomainName)
+
+        if ($Labels.Count -gt 1) {
+            # RFC 9989 section 4.10 limits the tree walk to eight total queries.
+            $StartIndex = if ($Labels.Count -gt 7) {
+                $Labels.Count - 7
+            }
+            else {
+                1
+            }
+
+            for ($Index = $StartIndex; $Index -lt $Labels.Count; $Index++) {
+                $QueryDomains += $Labels[$Index..($Labels.Count - 1)] -join "."
+            }
         }
 
-        $DomainName = $d.DomainName
+        $SelectedResponse = $null
+        foreach ($QueryDomain in $QueryDomains) {
+            $Response = Invoke-RobustDnsTxt "_dmarc.$QueryDomain" `
+                -PreferredDnsResolvers $PreferredDnsResolvers `
+                -SkipDoH $SkipDoH
+            $LogEntries += $Response.LogEntries
+
+            $DmarcAnswers = @($Response.Answers | Where-Object {
+                $_ -match "^\s*v=DMARC1\s*;"
+            })
+            if ($DmarcAnswers.Count -ne 1) {
+                continue
+            }
+
+            $SelectedResponse = $Response
+            if ($QueryDomain -eq $DomainName -or $DmarcAnswers[0] -match "(?i)(?:^|;)\s*psd\s*=\s*[yn]\s*(?:;|$)") {
+                break
+            }
+        }
+
+        if ($null -eq $SelectedResponse) {
+            $SelectedResponse = $Response
+        }
+
         $DMARCRecords += [PSCustomObject]@{
             "domain" = $DomainName;
-            "rdata" = @($Response.Answers);
+            "rdata" = @($SelectedResponse.Answers);
             "log" = $LogEntries;
         }
     }
