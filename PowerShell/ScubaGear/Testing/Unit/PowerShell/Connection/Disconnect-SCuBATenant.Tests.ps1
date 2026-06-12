@@ -21,9 +21,8 @@ InModuleScope Connection {
             Should -Invoke -ModuleName Connection -CommandName Disconnect-MgGraph -Times 1 -Exactly
         }
         It 'Disconnects from Exchange Online' {
-            Disconnect-SCuBATenant -ProductNames 'exo'
-            # EXO now uses REST API - disconnect only cleans up Graph session
-            Should -Invoke -ModuleName Connection -CommandName Disconnect-MgGraph -Times 1 -Exactly
+            # EXO uses REST API with on-demand token - no persistent connection to disconnect
+            {Disconnect-SCuBATenant -ProductNames 'exo'} | Should -Not -Throw
         }
         It 'Disconnects from Security Suite (Exchange Online and Security & Compliance)' {
             {Disconnect-SCuBATenant -ProductNames 'securitysuite'} | Should -Not -Throw
