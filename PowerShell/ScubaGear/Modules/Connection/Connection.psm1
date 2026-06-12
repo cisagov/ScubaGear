@@ -147,15 +147,17 @@ function Connect-Tenant {
                            -M365Environment $M365Environment `
                            -AccessToken $TokenData.EXOAccessToken
 
+                       # EXO product checks use REST; only establish an EXO module session
+                       # when the exo product is part of the requested product list.
                        if ($RequiresExoSession) {
-                           $EXOHelperParams = @{
-                               M365Environment = $M365Environment;
-                           }
-                           if ($ServicePrincipalParams) {
-                               $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                           $EXOHelperParams = @{ M365Environment = $M365Environment }
+                           if ($ServicePrincipalParams.CertThumbprintParams) {
+                               $EXOHelperParams += @{ ServicePrincipalParams = $ServicePrincipalParams }
                            }
                            Connect-EXOHelper @EXOHelperParams
                        }
+
+                       Write-Verbose "Exchange Online token and endpoint acquired successfully"
                        $EXOAuthRequired = $false
                    }
                }
