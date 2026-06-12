@@ -31,8 +31,6 @@ runs:
         Import-Module -Name Selenium
         cd repo
 
-        . Testing/Functional/SmokeTest/UpdateSelenium.ps1
-
         . utils/action/Test-Product.ps1
         Test-Product `
           -Thumbprint "${{ inputs.Thumbprint }}" `
