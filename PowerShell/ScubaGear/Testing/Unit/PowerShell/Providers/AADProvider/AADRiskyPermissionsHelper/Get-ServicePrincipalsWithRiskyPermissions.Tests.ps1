@@ -45,6 +45,8 @@ InModuleScope AADRiskyPermissionsHelper {
                     "00000002-0000-0ff1-ce00-000000000000" = "Office 365 Exchange Online"
                 }
             }
+            # Convert nested hashtables to PSCustomObject so PSObject.Properties enumerates JSON keys as expected.
+            $MockRiskyAppPermissionsJson = $MockRiskyAppPermissionsJson | ConvertTo-Json -Depth 20 | ConvertFrom-Json
 
             function New-MockMgGraphResponseAppRoleAssignments {
                 param (
