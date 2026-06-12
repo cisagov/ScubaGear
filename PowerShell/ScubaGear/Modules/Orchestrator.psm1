@@ -1828,7 +1828,6 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerbi", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
