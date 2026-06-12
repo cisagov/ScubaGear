@@ -127,7 +127,6 @@ Verify the service principal can authenticate:
 Invoke-Scuba `
     -AppID $NewSP.AppID `
     -CertificateThumbprint $NewSP.CertThumbprint `
-    -M365Environment $NewSP.M365Environment `
     -ProductNames $NewSP.ProductNames `
     -Organization 'example.onmicrosoft.com'
 ```
@@ -256,10 +255,9 @@ Test ScubaGear execution with the new certificate:
 
 ```powershell
 # Test with new certificate
-Invoke-ScubaGear `
+Invoke-Scuba `
     -AppID "your-app-id-here" `
     -CertificateThumbprint $NewCert.Thumbprint `
-    -M365Environment commercial `
     -ProductNames 'aad'
 ```
 
@@ -367,4 +365,4 @@ Get-ScubaGearAppPermission -AppID $AppID -M365Environment commercial -ProductNam
 ## Next Steps
 
 - **Troubleshooting:** See [Service Principal Troubleshooting](serviceprincipal-troubleshooting.md) for common issues
-- **Configuration:** See [Parameters Reference](../configuration/parameters.md) for Invoke-ScubaGear parameters
+- **Configuration:** See [Parameters Reference](../configuration/parameters.md) for Invoke-Scuba parameters

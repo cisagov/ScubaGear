@@ -116,11 +116,8 @@ In the **Power BI Admin portal**:
 After enabling the setting, confirm the SP can reach the API:
 
 ```powershell
-Invoke-SCuBA -ProductNames powerbi -AppID <app-id> -CertificateThumbprint <thumbprint> -Organization <tenant>.onmicrosoft.com -M365Environment gcc
+Invoke-SCuBA -ProductNames powerbi -AppID <app-id> -CertificateThumbprint <thumbprint> -Organization <tenant>.onmicrosoft.com
 ```
-
-> [!NOTE]
-> For GCC High tenants, use `-M365Environment gcchigh`. See [Power BI in GCC High](#power-bi-in-gcc-high) for additional details.
 
 ## Power Platform Registration
 
@@ -175,7 +172,3 @@ When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, t
 ### SharePoint in GCC High
 
 When running ScubaGear to assess SharePoint Online in a GCC High tenant, the `Sites.FullControl.All` application permission must be added from the GCC High-unique `Office 365 SharePoint Online` API rather than the commercial-unique `SharePoint` API located in commercial/government community cloud tenants.
-
-### Power BI in GCC High
-
-When running ScubaGear to assess Power BI in a GCC High tenant, the same [Power BI Tenant Setting](#power-bi-tenant-setting) configuration applies — create an Entra security group containing the service principal and add it to the "Service principals can access read-only admin APIs" setting in the Power BI Admin portal. No API permissions need to be added to the App Registration. Use `-M365Environment gcchigh` when invoking ScubaGear.
