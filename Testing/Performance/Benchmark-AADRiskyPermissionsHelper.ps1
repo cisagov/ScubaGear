@@ -66,10 +66,10 @@ function Invoke-MgGraphRequest {
 # Override the helper module's private Invoke-GraphDirectly within module session state.
 $helperModule = Get-Module AADRiskyPermissionsHelper
 & $helperModule {
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'apps')]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'feds')]
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'sps')]
     param($apps, $feds, $sps)
+
+    # Suppress unused parameter warnings - parameters are used in return statements below
+    $null = $apps, $feds, $sps
 
     function Invoke-GraphDirectly {
         param(

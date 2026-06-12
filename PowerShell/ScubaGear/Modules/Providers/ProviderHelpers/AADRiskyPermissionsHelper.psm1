@@ -1197,7 +1197,7 @@ function ConvertFrom-DotNetDate {
     if ([string]::IsNullOrEmpty($DateString)) {
         return $null
     }
-    
+
     # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
     if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
         $EpochMs = $Matches[1]
@@ -1329,7 +1329,7 @@ function Set-SeverityScore {
         $AdminConsentedPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
             $Weights.PermissionRiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
-        
+
         $Score += $AdminConsentedPoints
         $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $AdminConsentedRiskyPermissions.Count
