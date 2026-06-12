@@ -1,9 +1,14 @@
 Describe "RiskyAppPermissions cloud mappings" {
     BeforeAll {
         $SchemaPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../../../../schemas/RiskyAppPermissions.json"
+
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RiskyAppPermissions')]
         $RiskyAppPermissions = Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json
+
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'AllowedCloudValues')]
         $AllowedCloudValues = @("Commercial", "GCC", "GCCHigh", "DoD")
 
+        [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'RequiredGcchighGuidMap')]
         $RequiredGcchighGuidMap = @{
             "ecd0c692-8a5a-49fc-9e89-ecbbb58b04a9" = "SharePointTenantSettings.Read.All"
             "70549927-dd38-44e4-a76f-e91b5ec6acc4" = "TeamworkDevice.ReadWrite.All"
