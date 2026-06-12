@@ -123,6 +123,15 @@ TestPlan:
                 anti_phish_policies[1].TargetedDomainsToProtect: []
         Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - preset policy does not apply to all recipients
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_policy_rules[0].SentTo: ["user@example.com"]
+                protection_policy_rules[1].SentTo: ["user@example.com"]
+        Postconditions: []
+        ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.2.4v1
     TestDriver: ScubaCached
     Tests:

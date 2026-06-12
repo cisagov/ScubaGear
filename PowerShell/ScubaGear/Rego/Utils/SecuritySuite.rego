@@ -243,12 +243,43 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
         PhishPolicy.EnableTargetedDomainsProtection == true
         PolicyIncludesAllPartnerDomains(PhishPolicy, ConfigDomains)
         HasAcceptableDomainProtectionAction(PhishPolicy)
+        AntiPhishPolicyCoversAllRecipients(PhishPolicy)
     }
     count(Compliant) > 0
     Result := {
         "Compliant": true,
         "Message": "",
         "Policies": Compliant,
+    }
+} else := Result if {
+    Compliant := {PhishPolicy |
+        some PhishPolicy in EnabledAntiPhishPolicies
+        PhishPolicy.EnableTargetedDomainsProtection == true
+        PolicyIncludesAllPartnerDomains(PhishPolicy, ConfigDomains)
+        HasAcceptableDomainProtectionAction(PhishPolicy)
+        AntiPhishPolicyCoversAllRecipients(PhishPolicy)
+    }
+    Partial := [Entry |
+        some Policy in EnabledAntiPhishPolicies
+        Policy.EnableTargetedDomainsProtection == true
+        PolicyIncludesAllPartnerDomains(Policy, ConfigDomains)
+        HasAcceptableDomainProtectionAction(Policy)
+        not AntiPhishPolicyCoversAllRecipients(Policy)
+        Entry := {
+            "Name": Policy.Identity,
+            "MissingRecipients": true,
+        }
+    ]
+    count(Compliant) == 0
+    count(Partial) == 1
+    PartialPolicy := Partial[0]
+    Result := {
+        "Compliant": false,
+        "Message": concat(" ", [
+            sprintf("1 anti-phish policy found that includes all partner domains ('%v'),", [PartialPolicy.Name]),
+            "but not all users have been added as recipients.",
+        ]),
+        "Policies": Partial,
     }
 } else := {
     "Compliant": false,

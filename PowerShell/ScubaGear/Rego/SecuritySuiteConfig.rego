@@ -145,7 +145,12 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-AntiPhishPolicy"],
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
     "ActualValue": {"PartnerDomains": PartnerDomains},
     "ReportDetails": ApplyLicenseWarningString(false, ErrorMessage),
     "RequirementMet": false
@@ -158,7 +163,12 @@ tests contains {
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-AntiPhishPolicy"],
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
     "ActualValue": Evaluation,
     "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
     "RequirementMet": Status
