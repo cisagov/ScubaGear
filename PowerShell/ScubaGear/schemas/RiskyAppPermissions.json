@@ -738,19 +738,23 @@
         },
         "ecd0c692-8a5a-49fc-9e89-ecbbb58b04a9": {
           "Name": "SharePointTenantSettings.Read.All",
-          "RiskLevel": "Low"
+          "RiskLevel": "Low",
+          "Clouds": ["GCCHigh"]
         },
         "70549927-dd38-44e4-a76f-e91b5ec6acc4": {
           "Name": "TeamworkDevice.ReadWrite.All",
-          "RiskLevel": "High"
+          "RiskLevel": "High",
+          "Clouds": ["GCCHigh"]
         },
         "8cbe86c1-747b-4599-a1bc-f872f7f221f0": {
           "Name": "Presence.Read.All",
-          "RiskLevel": "Medium"
+          "RiskLevel": "Medium",
+          "Clouds": ["GCCHigh"]
         },
         "a76e26a7-ad88-4264-bb86-01a1e214c175": {
           "Name": "SecurityAlert.ReadWrite.All",
-          "RiskLevel": "High"
+          "RiskLevel": "High",
+          "Clouds": ["GCCHigh"]
         },
         "5f804853-e3b1-447b-9a8b-6d3e1257c72a": {
           "Name": "ThreatHunting.Read.All",

@@ -10,14 +10,8 @@ function Get-ExchangeHybridIds {
     .Functionality
     Internal
     #>
-    param (
-        [PSCustomObject]
-        $RiskyAppPermissionsJson
-    )
     process {
-        if ($null -eq $RiskyAppPermissionsJson) {
-            $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
-        }
+        $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
 
         # $ExchangeOnlineResource.Name represents the exchange online appId (00000002-0000-0ff1-ce00-000000000000)
         # $ExchangeOnlineResource.Value represents the display name ("Office 365 Exchange Online")

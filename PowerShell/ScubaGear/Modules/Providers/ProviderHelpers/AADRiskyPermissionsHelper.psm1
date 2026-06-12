@@ -1489,10 +1489,9 @@ function Set-SeverityScore {
     }
 }
 
+# Keep Get-RiskyAppPermissionsJson exported for cross-module usage in AADHybridExchangeHelper.
 Export-ModuleMember -Function @(
     "Get-RiskyAppPermissionsJson",
-    "New-PermissionLookup",
-    "Get-PermissionLookup",
     "Format-Credentials",
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
