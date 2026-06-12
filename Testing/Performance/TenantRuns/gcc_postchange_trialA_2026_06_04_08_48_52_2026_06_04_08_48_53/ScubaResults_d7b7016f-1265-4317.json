@@ -1,0 +1,3065 @@
+{
+    "MetaData": {
+  "TenantId": "45655f67-ea9e-496d-8686-f73c4c7d5e49",
+  "DisplayName": "SCuBA G3 For Thee",
+  "DomainName": "scubag3forthee.onmicrosoft.com",
+  "OrgName": null,
+  "OrgUnitName": null,
+  "ProductSuite": "Microsoft 365",
+  "ProductsAssessed": [
+    "Azure Active Directory"
+  ],
+  "ProductAbbreviationMapping": {
+    "Azure Active Directory": "AAD"
+  },
+  "Tool": "ScubaGear",
+  "ToolVersion": "1.8.0",
+  "TimestampZulu": "2026-06-04T12:49:35.705Z",
+  "ReportUUID": "d7b7016f-1265-4317-8af5-95c90734e5d4"
+},
+    "Summary": {
+  "AAD": {
+    "Failures": 14,
+    "Errors": 0,
+    "IncorrectResults": 0,
+    "Warnings": 6,
+    "Manual": 3,
+    "Omits": 0,
+    "Passes": 10
+  }
+},
+    "AnnotatedFailedPolicies": {
+  "MS.AAD.7.2v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.7.4v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.7.7v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.3.1v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.5.1v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.3.6v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.7.8v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.7.1v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.2.1v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.2.3v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.3.3v2": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.7.5v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.3.2v2": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  },
+  "MS.AAD.7.6v1": {
+    "IncorrectResult": false,
+    "Comment": null,
+    "RemediationDate": null
+  }
+},
+    "Results": {
+  "AAD": [
+    {
+      "GroupName": "Legacy Authentication",
+      "GroupNumber": "1",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#1-legacy-authentication",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.1.1v1",
+          "Requirement": "Legacy authentication SHALL be blocked.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "1 conditional access policy(s) found that meet(s) all requirements: MS.AAD.1.1v1 Legacy authentication SHALL be blocked. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.1.1v1 Legacy authentication SHALL be blocked. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Risk Based Policies",
+      "GroupNumber": "2",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#2-risk-based-policies",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.2.1v1",
+          "Requirement": "Users detected as high risk SHALL be blocked.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.2.2v1",
+          "Requirement": "A notification SHOULD be sent to the administrator when high-risk users are detected.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1-instructions' target='_blank' class='indicator indicator-manual' title='Manual'>Manual</a></div>",
+          "Result": "N/A",
+          "Criticality": "Should/Not-Implemented",
+          "Details": "This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1 for instructions on manual check",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "N/A",
+          "OriginalDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.2.3v1",
+          "Requirement": "Sign-ins detected as high risk SHALL be blocked.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Strong Authentication and a Secure Registration Process",
+      "GroupNumber": "3",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#3-strong-authentication-and-a-secure-registration-process",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.3.1v1",
+          "Requirement": "Phishing-resistant MFA SHALL be enforced for all users.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "0 conditional access policy(s) found that meet(s) all requirements. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.2v2",
+          "Requirement": "MFA SHALL be enforced for all users.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "0 conditional access policy(s) found that meet(s) all requirements. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.3v2",
+          "Requirement": "If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "Requirement not met",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "Requirement not met",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.4v1",
+          "Requirement": "The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "Requirement met",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "Requirement met",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.5v2",
+          "Requirement": "The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "Requirement met",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "Requirement met",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.6v1",
+          "Requirement": "Phishing-resistant MFA SHALL be required for highly privileged roles.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "0 conditional access policy(s) found that meet(s) all requirements. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.7v1",
+          "Requirement": "Managed devices SHOULD be required for authentication.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Warning",
+          "Criticality": "Should",
+          "Details": "0 conditional access policy(s) found that meet(s) all requirements. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Warning",
+          "OriginalDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.8v1",
+          "Requirement": "Managed Devices SHOULD be required to register MFA.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Warning",
+          "Criticality": "Should",
+          "Details": "0 conditional access policy(s) found that meet(s) all requirements. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Warning",
+          "OriginalDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.9v1",
+          "Requirement": "Device code authentication SHOULD be blocked.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Pass",
+          "Criticality": "Should",
+          "Details": "1 conditional access policy(s) found that meet(s) all requirements: MS.AAD.3.9v1 Device code authentication SHOULD be blocked. ",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.3.9v1 Device code authentication SHOULD be blocked. <a href='#caps'>View all CA policies</a>.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Centralized Log Collection",
+      "GroupNumber": "4",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#4-centralized-log-collection",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.4.1v1",
+          "Requirement": "Security logs SHALL be sent to the agency's security operations center for monitoring.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1-instructions' target='_blank' class='indicator indicator-manual' title='Manual'>Manual</a></div>",
+          "Result": "N/A",
+          "Criticality": "Shall/Not-Implemented",
+          "Details": "This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1 for instructions on manual check",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "N/A",
+          "OriginalDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Application Registration and Consent",
+      "GroupNumber": "5",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#5-application-registration-and-consent",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.5.1v1",
+          "Requirement": "Only administrators SHALL be allowed to register applications.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "1 authorization policies found that allow non-admin users to register third-party applications: authorizationPolicy",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "1 authorization policies found that allow non-admin users to register third-party applications:<br/>authorizationPolicy",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.2v1",
+          "Requirement": "User consent to applications SHALL be restricted.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "0 authorization policies found that allow non-admin users to consent to third-party applications",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "0 authorization policies found that allow non-admin users to consent to third-party applications",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.3v1",
+          "Requirement": "An admin consent workflow SHALL be configured for applications.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "Requirement met",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "Requirement met",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.5v1",
+          "Requirement": "Application Password Addition SHOULD be blocked.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Should",
+          "Details": "0 Password addition restriction(s) not meeting requirements",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "0 Password addition restriction(s) not meeting requirements",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.6v1",
+          "Requirement": "Application password lifetime SHOULD be restricted to 180 days or less.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Warning",
+          "Criticality": "Should",
+          "Details": "1 password lifetime restriction(s) not meeting requirements: Password lifetime not restricted for apps",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Warning",
+          "OriginalDetails": "1 password lifetime restriction(s) not meeting requirements:<br/>Password lifetime not restricted for apps",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.7v1",
+          "Requirement": "Application certificate lifetime SHOULD be restricted to 365 days or less.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Warning",
+          "Criticality": "Should",
+          "Details": "1 certificate lifetime restriction(s) not meeting requirements: Certificate lifetime not restricted for apps",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Warning",
+          "OriginalDetails": "1 certificate lifetime restriction(s) not meeting requirements:<br/>Certificate lifetime not restricted for apps",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Passwords",
+      "GroupNumber": "6",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#6-passwords",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.6.1v1",
+          "Requirement": "User passwords SHALL NOT expire.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "Requirement met; however, there are 1 federated domain(s) present: mtocisa.net  ScubaGear is unable to read the user password expiration settings for federated domains because it is controlled in a system external to the tenant. Check with your identity provider on how to configure this policy in a federated context.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "Requirement met; however, there are 1 federated domain(s) present:<br/>mtocisa.net<br/><br/>ScubaGear is unable to read the user password expiration settings for federated domains because it is controlled in a system external to the tenant. Check with your identity provider on how to configure this policy in a federated context.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Highly Privileged User Access",
+      "GroupNumber": "7",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#7-highly-privileged-user-access",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.7.1v1",
+          "Requirement": "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "14 global admin(s) found: Alden Hilton, Alex Jacquay, Andrew Huynh, David Bui, David Comiskey, Devesh Agarwal, Elijah Agbayani (Sandia), Jacob Davis, Javis Chapman, Marc Mould, Mitchel Baker, Sean Kirkpatrick, Ted Kolovos, okta-api2",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "14 global admin(s) found:<br/>Alden Hilton, Alex Jacquay, Andrew Huynh, David Bui, David Comiskey, Devesh Agarwal, Elijah Agbayani (Sandia), Jacob Davis, Javis Chapman, Marc Mould, Mitchel Baker, Sean Kirkpatrick, Ted Kolovos, okta-api2",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.2v1",
+          "Requirement": "Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "Requirement not met: Policy MS.AAD.7.1 failed so score not computed",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "Requirement not met: Policy MS.AAD.7.1 failed so score not computed",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.3v1",
+          "Requirement": "Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Shall",
+          "Details": "0 admin(s) that are not cloud-only found",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "0 admin(s) that are not cloud-only found",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.4v1",
+          "Requirement": "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#privileged-user-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.5v1",
+          "Requirement": "Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.6v1",
+          "Requirement": "Activation of the Global Administrator role SHALL require approval.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.7v1",
+          "Requirement": "Eligible and active highly privileged role assignments SHALL trigger an alert.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.8v1",
+          "Requirement": "User activation of the Global Administrator role SHALL trigger an alert.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Fail",
+          "Criticality": "Shall",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Fail",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.9v1",
+          "Requirement": "User activation of other highly privileged roles SHOULD trigger an alert.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Warning",
+          "Criticality": "Should",
+          "Details": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Warning",
+          "OriginalDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Guest User Access",
+      "GroupNumber": "8",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#8-guest-user-access",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.8.1v1",
+          "Requirement": "Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Pass",
+          "Criticality": "Should",
+          "Details": "Permission level set to \"Limited access\" (authorizationPolicy)",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Pass",
+          "OriginalDetails": "Permission level set to \"Limited access\" (authorizationPolicy)",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.8.2v1",
+          "Requirement": "Only users with the Guest Inviter role SHOULD be able to invite guest users.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Warning",
+          "Criticality": "Should",
+          "Details": "Permission level set to \"everyone\" (authorizationPolicy)",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Warning",
+          "OriginalDetails": "Permission level set to \"everyone\" (authorizationPolicy)",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.8.3v1",
+          "Requirement": "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1-instructions' target='_blank' class='indicator indicator-manual' title='Manual'>Manual</a></div>",
+          "Result": "N/A",
+          "Criticality": "Should/Not-Implemented",
+          "Details": "This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1 for instructions on manual check",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "N/A",
+          "OriginalDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    }
+  ]
+},
+    "Raw":         {
+                "baseline_version": "1",
+                "module_version": "1.8.0",
+                "date": "06/04/2026 08:49:35 Eastern Daylight Time",
+                "timestamp_zulu": "2026-06-04T12:49:35.705Z",
+                "report_uuid": "d7b7016f-1265-4317-8af5-95c90734e5d4",
+                "tenant_details": [
+  {
+    "TenantId": "45655f67-ea9e-496d-8686-f73c4c7d5e49",
+    "DomainName": "scubag3forthee.onmicrosoft.com",
+    "DisplayName": "SCuBA G3 For Thee",
+    "AADAdditionalData": [
+      {
+        "PrivacyProfile": null,
+        "TenantType": "AAD",
+        "Id": "45655f67-ea9e-496d-8686-f73c4c7d5e49",
+        "OnPremisesSyncStatus": [
+          {
+            "AttributeSetName": "iab",
+            "Version": 2,
+            "State": "enabled"
+          }
+        ],
+        "OnPremisesSyncEnabled": true,
+        "PostalCode": "22201-4795",
+        "Country": null,
+        "BusinessPhones": [
+          "2023042508"
+        ],
+        "PartnerTenantType": null,
+        "PreferredLanguage": "en",
+        "CountryLetterCode": "US",
+        "TechnicalNotificationMails": [
+          "ethan.bowen@cisa.dhs.gov"
+        ],
+        "ProvisionedPlans": [
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "Adallom"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "exchange"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "exchange"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "exchange"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "exchange"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "RMSOnline"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "RMSOnline"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "MicrosoftCommunicationsOnline"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "ProjectWorkManagement"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "SharePoint"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "SharePoint"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "SCO"
+          },
+          {
+            "ProvisioningStatus": "Success",
+            "CapabilityStatus": "Enabled",
+            "Service": "exchange"
+          }
+        ],
+        "Street": "1110 N Glebe Rd",
+        "DefaultUsageLocation": null,
+        "OnPremisesLastPasswordSyncDateTime": null,
+        "DisplayName": "SCuBA G3 For Thee",
+        "SecurityComplianceNotificationPhones": [],
+        "VerifiedDomains": [
+          {
+            "Type": "Managed",
+            "IsInitial": true,
+            "IsDefault": true,
+            "Name": "scubag3forthee.onmicrosoft.com",
+            "Capabilities": "Email, OfficeCommunicationsOnline"
+          },
+          {
+            "Type": "Federated",
+            "IsInitial": false,
+            "IsDefault": false,
+            "Name": "mtocisa.net",
+            "Capabilities": "None"
+          },
+          {
+            "Type": "Managed",
+            "IsInitial": false,
+            "IsDefault": false,
+            "Name": "scubag3forthee.mail.onmicrosoft.com",
+            "Capabilities": "None"
+          }
+        ],
+        "OnPremisesLastSyncDateTime": "2025-06-03T12:46:54Z",
+        "SecurityComplianceNotificationMails": [],
+        "IsMultipleDataLocationsForServicesEnabled": null,
+        "AssignedPlans": [
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "6e5b7995-bd4f-4cbd-9d19-0e32010c72f0",
+            "Service": "exchange"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "41781fb2-bc02-4b7c-bd55-b576c07bb09d",
+            "Service": "AADPremiumService"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "6a76346d-5d6e-4051-9fe3-ed3f312b5597",
+            "Service": "RMSOnline"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "292cc034-7b7c-4950-aaf5-943befd3f1d4",
+            "Service": "WindowsDefenderATP"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "e7d09ae4-099a-4c34-a2a2-3e166e95c44a",
+            "Service": "ProjectProgramsAndPortfolios"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "c1ec4a95-1f05-45b3-a911-aa3fa01094f5",
+            "Service": "SCO"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "8f9f0f3b-ca90-406c-a842-95579171f8ec",
+            "Service": "SharePoint"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:46Z",
+            "ServicePlanId": "8c3069c0-ccdb-44be-ab77-986203a67df2",
+            "Service": "exchange"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "8a256a2b-b617-496d-b51b-e76466e88db0",
+            "Service": "MultiFactorService"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "1b66aedf-8ca1-4f73-af76-ec76c6180f98",
+            "Service": "RMSOnline"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "c537f360-6a00-4ace-a7f5-9128d0ac1e4b",
+            "Service": "ProcessSimpleGCC"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "2b815d45-56e4-4e3a-b65c-66cb9175b560",
+            "Service": "M365LabelAnalytics"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "06162da2-ebf9-4954-99a0-00fee96f95cc",
+            "Service": "CRM"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "a31ef4a2-f787-435e-8335-e47eb0cafc94",
+            "Service": "MicrosoftCommunicationsOnline"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "153f85dd-d912-4762-af6c-d6e0fb4f6692",
+            "Service": "SharePoint"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "94a54592-cd8b-425e-87c6-97868b000b91",
+            "Service": "WhiteboardServices"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "94065c59-bc8e-4e8b-89e5-5138d471eaff",
+            "Service": "Bing"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:46Z",
+            "ServicePlanId": "24af5f65-d0f3-467b-9f78-ea798c4aeffc",
+            "Service": "OfficeForms"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "a70bbf38-cdda-470d-adb8-5804b8770f41",
+            "Service": "CRM"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "c87f142c-d1e9-4363-8630-aaea9c4d9ae5",
+            "Service": "To-Do"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "0a20c815-5e81-4727-9bdc-2b5a117850c3",
+            "Service": "PowerAppsServiceGCC"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:43Z",
+            "ServicePlanId": "932ad362-64a8-4783-9106-97849a1a30b9",
+            "Service": "Adallom"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:45Z",
+            "ServicePlanId": "de9234ff-6483-44d9-b15e-dca72fdd27af",
+            "Service": "MicrosoftOffice"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "199a5c09-e0ca-4e37-8f7c-b05d533e1ea2",
+            "Service": "exchange"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:46Z",
+            "ServicePlanId": "2c1ada27-dbaa-46f9-bda6-ecb94445f758",
+            "Service": "MicrosoftStream"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:46Z",
+            "ServicePlanId": "5b4ef465-7ea1-459a-9f91-033317755a51",
+            "Service": "ProjectWorkManagement"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:46Z",
+            "ServicePlanId": "304767db-7d23-49e8-a945-4a7eb65f9f28",
+            "Service": "TeamspaceAPI"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "d9fa6af4-e046-4c89-9226-729a0786685d",
+            "Service": "M365LabelAnalytics"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-03-19T14:52:44Z",
+            "ServicePlanId": "5136a095-5cf0-4aff-bec3-e84448b38ea5",
+            "Service": "exchange"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2024-11-12T08:01:57Z",
+            "ServicePlanId": "a6520331-d7d4-4276-95f5-15c0933bc757",
+            "Service": "exchange"
+          },
+          {
+            "CapabilityStatus": "Enabled",
+            "AssignedDateTime": "2025-11-26T06:43:41Z",
+            "ServicePlanId": "9923a87f-3992-4997-b861-04c1a2b71cfc",
+            "Service": "MicrosoftPrint"
+          }
+        ],
+        "City": "Arlington",
+        "DeletedDateTime": null,
+        "State": "va",
+        "DirectorySizeQuota": {
+          "Total": 300000,
+          "Used": 512
+        },
+        "MarketingNotificationEmails": [],
+        "CreatedDateTime": "2022-09-15T13:37:19Z"
+      }
+    ]
+  }
+],
+                "scuba_config": {
+  "SkipDoH": false,
+  "OPAPath": "C:\\Users\\skirkpatrick\\.scubagear\\Tools",
+  "CertificateThumbprint": "",
+  "M365Environment": "gcc",
+  "ProductNames": "aad",
+  "OutJsonFileName": "ScubaResults",
+  "OutRegoFileName": "RegoOutput",
+  "Organization": "",
+  "OutProviderFileName": "ProviderSettingsExport",
+  "LogIn": false,
+  "OutPath": ".\\Testing\\Performance\\TenantRuns",
+  "PreferredDnsResolvers": [],
+  "OutCsvFileName": "ScubaResults",
+  "DisconnectOnExit": {
+    "IsPresent": false
+  },
+  "NumberOfUUIDCharactersToTruncate": 18,
+  "AppID": "",
+  "OutFolderName": "gcc_postchange_trialA_2026_06_04_08_48_52",
+  "OutReportName": "BaselineReports",
+  "OutActionPlanFileName": "ActionPlan",
+  "KeepIndividualJSON": {
+    "IsPresent": false
+  }
+},
+                    "conditional_access_policies": [
+  {
+    "ModifiedDateTime": "2024-01-30T17:28:03.4466914Z",
+    "State": "enabledForReportingButNotEnforced",
+    "DeletedDateTime": null,
+    "Id": "a759e1de-d932-4f27-8270-18da4508fd05",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "e3ba1799-8673-43bb-82f0-30eadf5df73d"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2023-05-09T19:46:29.9971989Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('a759e1de-d932-4f27-8270-18da4508fd05')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": {
+        "Description": "Passwordless methods that satisfy strong authentication, such as Passwordless sign-in with the Microsoft Authenticator",
+        "ModifiedDateTime": "2021-12-01T08:00:00Z",
+        "PolicyType": "builtIn",
+        "AllowedCombinations": [
+          "windowsHelloForBusiness",
+          "fido2",
+          "x509CertificateMultiFactor",
+          "deviceBasedPush"
+        ],
+        "Id": "00000000-0000-0000-0000-000000000003",
+        "RequirementsSatisfied": "mfa",
+        "CreatedDateTime": "2021-12-01T08:00:00Z",
+        "CombinationConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('a759e1de-d932-4f27-8270-18da4508fd05')/grantControls/authenticationStrength/combinationConfigurations",
+        "CombinationConfigurations": [],
+        "DisplayName": "Passwordless MFA"
+      },
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": []
+    },
+    "DisplayName": "Test - Phishing Resistant Authentication Strength",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": null,
+    "State": "enabledForReportingButNotEnforced",
+    "DeletedDateTime": null,
+    "Id": "892486e7-4e89-40d6-8e3b-692bb8c67902",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "All"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2023-10-25T20:35:27.8926426Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('892486e7-4e89-40d6-8e3b-692bb8c67902')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "mfa"
+      ]
+    },
+    "DisplayName": "Automated Test 1 - DO NOT MODIFY",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": "2025-06-03T14:09:07.2038923Z",
+    "State": "enabled",
+    "DeletedDateTime": null,
+    "Id": "a25d9d1b-aae9-4a35-ae13-0b43bfb628d8",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "exchangeActiveSync",
+        "other"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "All"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2023-10-25T20:36:19.7948159Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('a25d9d1b-aae9-4a35-ae13-0b43bfb628d8')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "block"
+      ]
+    },
+    "DisplayName": "MS.AAD.1.1v1 Legacy authentication SHALL be blocked",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": "2025-06-03T14:33:22.8234275Z",
+    "State": "enabled",
+    "DeletedDateTime": null,
+    "Id": "68e558de-299a-4c93-817b-ca8692901048",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "All"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [
+          "6075e128-0437-4d54-bcf4-d5817ddc6241",
+          "3081c0a0-7f73-46e1-9d95-3daafde44913",
+          "58d5fce0-69e9-4322-994c-d51c358eb04f"
+        ],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2023-10-25T20:38:44.9060026Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('68e558de-299a-4c93-817b-ca8692901048')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "mfa"
+      ]
+    },
+    "DisplayName": "MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": "2024-10-07T15:21:13.1112483Z",
+    "State": "enabledForReportingButNotEnforced",
+    "DeletedDateTime": null,
+    "Id": "9e363190-6d5d-44e2-bdce-e8ba102e994f",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [
+          "62e90394-69f5-4237-9190-012177145e10",
+          "194ae4cb-b126-40b2-bd5b-6091b380977d",
+          "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+          "29232cdf-9323-42fd-ade2-1d097af3e4de",
+          "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+          "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+          "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+          "fe930be7-5e62-47db-91af-98c3a49a38b1",
+          "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+          "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+          "158c047a-c907-4556-b7ef-446551a6b5f7",
+          "966707d0-3269-4727-9be2-8c3a10f19b9d",
+          "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+          "e8611ab8-c189-46e8-94e1-60213ab1f814"
+        ],
+        "IncludeUsers": [],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [
+          "58d5fce0-69e9-4322-994c-d51c358eb04f",
+          "3081c0a0-7f73-46e1-9d95-3daafde44913",
+          "6075e128-0437-4d54-bcf4-d5817ddc6241"
+        ],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "MicrosoftAdminPortals"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2023-11-29T21:12:21.3403824Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('9e363190-6d5d-44e2-bdce-e8ba102e994f')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "mfa"
+      ]
+    },
+    "DisplayName": "Microsoft-managed: Multifactor authentication for admins accessing Microsoft Admin Portals",
+    "TemplateId": "4200930c-0da2-4e33-ca01-000000000000"
+  },
+  {
+    "ModifiedDateTime": "2024-09-10T17:49:34.8068497Z",
+    "State": "enabled",
+    "DeletedDateTime": null,
+    "Id": "972fa40a-c320-4a37-9fd2-80457da799f9",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [
+          "51c24aee-874b-40f5-9a3d-b703dfd0e179"
+        ],
+        "IncludeRoles": [],
+        "IncludeUsers": [],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": [
+          "d98a1cfe-c7b4-4713-91fc-92e93a6d7fa1",
+          "fb8f2a73-524d-4c02-af4b-5cf6d48380a1",
+          "a802cc22-eecf-49d2-b351-df4aa8c30bbb",
+          "97d00fc5-01ba-4030-a2d3-43f5c9210b8d",
+          "e2c3be53-ca14-448c-84ce-936bad95327d",
+          "c41655a2-3a17-433c-bbe5-6e99b9635cdb",
+          "0c218d2a-e327-4406-8d8d-db91ba98ea58",
+          "b39bc7a4-2a41-4582-9359-30d1737ce0dc"
+        ]
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2024-09-10T17:38:47.0916056Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('972fa40a-c320-4a37-9fd2-80457da799f9')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "block"
+      ]
+    },
+    "DisplayName": "Internal Operations – Block CAP Exclusion Test Accounts",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": "2025-01-27T21:06:17.8808354Z",
+    "State": "enabled",
+    "DeletedDateTime": null,
+    "Id": "69e93a57-e23e-475b-8094-2de778e7707f",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [
+          "b06ec811-928e-4b93-a982-9302e2035994"
+        ],
+        "IncludeRoles": [],
+        "IncludeUsers": [],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2025-01-27T20:44:26.9128743Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('69e93a57-e23e-475b-8094-2de778e7707f')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": {
+        "Description": "",
+        "ModifiedDateTime": "2025-01-27T21:03:47.5090159Z",
+        "PolicyType": "custom",
+        "AllowedCombinations": [
+          "fido2",
+          "temporaryAccessPassOneTime",
+          "temporaryAccessPassMultiUse"
+        ],
+        "Id": "1dd66ca3-2831-4e55-8ef9-6a180d7bd6e5",
+        "RequirementsSatisfied": "mfa",
+        "CreatedDateTime": "2025-01-27T21:03:47.5090159Z",
+        "CombinationConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('69e93a57-e23e-475b-8094-2de778e7707f')/grantControls/authenticationStrength/combinationConfigurations",
+        "CombinationConfigurations": [],
+        "DisplayName": "Custom phishing-resistant MFA"
+      },
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": []
+    },
+    "DisplayName": "Manual Test- Phishing Resistant MFA specific users - All apps",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": null,
+    "State": "enabled",
+    "DeletedDateTime": null,
+    "Id": "b95f9778-c96c-47a8-a920-6420b6d063d4",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "18fe1011-c4b2-4a20-9265-90b4c67e84e9"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      },
+      "ClientAppTypes": [
+        "all"
+      ],
+      "Locations": {
+        "ExcludeLocations": [
+          "00000000-0000-0000-0000-000000000000"
+        ],
+        "IncludeLocations": [
+          "All"
+        ]
+      },
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "None"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2025-04-18T18:12:16.4925184Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('b95f9778-c96c-47a8-a920-6420b6d063d4')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "block"
+      ]
+    },
+    "DisplayName": "Jacob SC Testing",
+    "TemplateId": null
+  },
+  {
+    "ModifiedDateTime": "2025-07-03T19:24:17.9199008Z",
+    "State": "disabled",
+    "DeletedDateTime": null,
+    "Id": "9a6e19e6-c45e-4cc9-a63a-99c283ef2159",
+    "Conditions": {
+      "Agents": null,
+      "UserRiskLevels": [],
+      "Platforms": null,
+      "DeviceStates": null,
+      "Devices": null,
+      "Locations": null,
+      "ClientAppTypes": [
+        "exchangeActiveSync",
+        "other"
+      ],
+      "ClientApplications": null,
+      "SignInRiskLevels": [],
+      "Times": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "All"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      },
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2025-04-22T00:57:46.1831232Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('9a6e19e6-c45e-4cc9-a63a-99c283ef2159')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "block"
+      ]
+    },
+    "DisplayName": "Microsoft-managed: Block legacy authentication",
+    "TemplateId": "4200930c-0da2-4e33-ca01-000000000009"
+  },
+  {
+    "ModifiedDateTime": "2025-07-03T19:24:38.4718428Z",
+    "State": "disabled",
+    "DeletedDateTime": null,
+    "Id": "919bb4b8-cdc8-4624-9478-9c80f011a42a",
+    "Conditions": {
+      "AuthenticationFlows": {
+        "TransferMethods": "deviceCodeFlow"
+      },
+      "UserRiskLevels": [],
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      },
+      "Platforms": null,
+      "DeviceStates": null,
+      "SignInRiskLevels": [],
+      "Agents": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "Locations": null,
+      "Times": null,
+      "ClientApplications": null,
+      "Devices": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "All"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2025-04-22T01:08:54.4079375Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('919bb4b8-cdc8-4624-9478-9c80f011a42a')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "block"
+      ]
+    },
+    "DisplayName": "Microsoft-managed: Block device code flow",
+    "TemplateId": "4200930c-0da2-4e33-ca01-000000000008"
+  },
+  {
+    "ModifiedDateTime": null,
+    "State": "enabled",
+    "DeletedDateTime": null,
+    "Id": "b3270b6b-67dd-47ed-99e1-6a0cca25f04c",
+    "Conditions": {
+      "AuthenticationFlows": {
+        "TransferMethods": "deviceCodeFlow"
+      },
+      "UserRiskLevels": [],
+      "Applications": {
+        "IncludeAuthenticationContextClassReferences": [],
+        "IncludeUserActions": [],
+        "IncludeApplications": [
+          "All"
+        ],
+        "ExcludeApplications": [],
+        "ApplicationFilter": null
+      },
+      "Platforms": null,
+      "DeviceStates": null,
+      "SignInRiskLevels": [],
+      "Agents": null,
+      "ClientAppTypes": [
+        "all"
+      ],
+      "Locations": null,
+      "Times": null,
+      "ClientApplications": null,
+      "Devices": null,
+      "Users": {
+        "ExcludeGuestsOrExternalUsers": null,
+        "IncludeGroups": [],
+        "IncludeRoles": [],
+        "IncludeUsers": [
+          "All"
+        ],
+        "IncludeGuestsOrExternalUsers": null,
+        "ExcludeGroups": [],
+        "ExcludeRoles": [],
+        "ExcludeUsers": []
+      }
+    },
+    "PartialEnablementStrategy": null,
+    "CreatedDateTime": "2025-07-03T19:30:04.0581224Z",
+    "SessionControls": null,
+    "GrantControls": {
+      "Operator": "OR",
+      "AuthenticationStrength@odata.context": "https://graph.microsoft.com/beta/$metadata#identity/conditionalAccess/policies('b3270b6b-67dd-47ed-99e1-6a0cca25f04c')/grantControls/authenticationStrength/$entity",
+      "TermsOfUse": [],
+      "AuthenticationStrength": null,
+      "CustomAuthenticationFactors": [],
+      "BuiltInControls": [
+        "block"
+      ]
+    },
+    "DisplayName": "MS.AAD.3.9v1 Device code authentication SHOULD be blocked",
+    "TemplateId": null
+  }
+],
+    "cap_table_data": [
+  {
+    "Name": "Internal Operations – Block CAP Exclusion Test Accounts",
+    "State": "On",
+    "Users": [
+      "Users included: 1 specific group",
+      "Users excluded: 8 specific users"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Block access",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Jacob SC Testing",
+    "State": "On",
+    "Users": [
+      "Users included: None",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: 1 specific app",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Locations included: all locations",
+      "Locations excluded: 1 specific location",
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Block access",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Manual Test- Phishing Resistant MFA specific users - All apps",
+    "State": "On",
+    "Users": [
+      "Users included: 1 specific group",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Allow access but require authentication strength (Custom phishing-resistant MFA)",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "MS.AAD.1.1v1 Legacy authentication SHALL be blocked",
+    "State": "On",
+    "Users": [
+      "Users included: All",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: Exchange ActiveSync Clients, Other clients"
+    ],
+    "Block/Grant Access": "Block access",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users",
+    "State": "On",
+    "Users": [
+      "Users included: All",
+      "Users excluded: 3 specific groups"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Allow access but require multifactor authentication",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "MS.AAD.3.9v1 Device code authentication SHOULD be blocked",
+    "State": "On",
+    "Users": [
+      "Users included: All",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Block access",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Automated Test 1 - DO NOT MODIFY",
+    "State": "Report-only",
+    "Users": [
+      "Users included: All",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Allow access but require multifactor authentication",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Microsoft-managed: Multifactor authentication for admins accessing Microsoft Admin Portals",
+    "State": "Report-only",
+    "Users": [
+      "Users included: 14 specific roles",
+      "Users excluded: 3 specific groups"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: 1 specific app",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Allow access but require multifactor authentication",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Test - Phishing Resistant Authentication Strength",
+    "State": "Report-only",
+    "Users": [
+      "Users included: 1 specific user",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Allow access but require authentication strength (Passwordless MFA)",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Microsoft-managed: Block device code flow",
+    "State": "Off",
+    "Users": [
+      "Users included: All",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: all"
+    ],
+    "Block/Grant Access": "Block access",
+    "Session Controls": [
+      "None"
+    ]
+  },
+  {
+    "Name": "Microsoft-managed: Block legacy authentication",
+    "State": "Off",
+    "Users": [
+      "Users included: All",
+      "Users excluded: None"
+    ],
+    "Apps/Actions": [
+      "Policy applies to: apps",
+      "Apps included: All",
+      "Apps excluded: None"
+    ],
+    "Conditions": [
+      "Client apps included: Exchange ActiveSync Clients, Other clients"
+    ],
+    "Block/Grant Access": "Block access",
+    "Session Controls": [
+      "None"
+    ]
+  }
+],
+    "authorization_policies": [
+  {
+    "GuestUserRoleId": "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+    "DisplayName": "Authorization Policy",
+    "Description": "Used to manage authorization related settings across the company.",
+    "AllowEmailVerifiedUsersToJoinOrganization": true,
+    "AllowedToUseSSPR": true,
+    "PermissionGrantPolicyIdsAssignedToDefaultUserRole": [
+      "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+      "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat"
+    ],
+    "BlockMsolPowerShell": false,
+    "EnabledPreviewFeatures": [],
+    "AllowUserConsentForRiskyApps": false,
+    "AllowedToSignUpEmailBasedSubscriptions": true,
+    "Id": "authorizationPolicy",
+    "DefaultUserRolePermissions": {
+      "AllowedToReadBitlockerKeysForOwnedDevice": true,
+      "AllowedToCreateTenants": true,
+      "AllowedToReadOtherUsers": true,
+      "AllowedToCreateApps": true,
+      "AllowedToCreateSecurityGroups": true
+    },
+    "AllowInvitesFrom": "everyone"
+  }
+],
+    "privileged_users": {
+  "0f420cb8-672b-458a-8215-0c386ff26656": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Gary Rubin"
+  },
+  "da583d09-c090-4e51-8f71-8e0233ce8fa9": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "David Comiskey"
+  },
+  "dcc91ceb-616d-471a-b885-77fb07a42c30": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "Marc Mould"
+  },
+  "41411757-043b-44fb-8e1a-13236f678276": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Nicholas Ward"
+  },
+  "d12eb5e1-2190-4ef4-b114-0774f363eef2": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Hybrid Identity Administrator",
+      "Global Administrator"
+    ],
+    "DisplayName": "Javis Chapman"
+  },
+  "a802cc22-eecf-49d2-b351-df4aa8c30bbb": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "David Bui"
+  },
+  "cf3b9889-99e6-4b9f-8fd6-afb4db607618": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "Jacob Davis"
+  },
+  "9fa0dade-3dc2-4ec2-ad42-e474d5fa6c2a": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "Alex Jacquay"
+  },
+  "b12dc5ee-03b6-4ed3-9d1f-2d556c955a0f": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator"
+    ],
+    "DisplayName": "Benjamin Salazar"
+  },
+  "2f44db64-8047-4d65-87c3-0be6e5cf22d8": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Patrick Rodjom"
+  },
+  "f22dab89-2e71-4b40-bd08-51fd7fcb93f0": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Paul Kuykendall"
+  },
+  "d1160421-046f-476f-9a56-85838b5c47ae": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Cloud Application Administrator",
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Devesh Agarwal"
+  },
+  "67540712-71b7-435e-9d50-718086faf343": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Jonathan Kaufman"
+  },
+  "17996333-6eba-41bc-97dd-d4cf332c8039": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Cloud Application Administrator",
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Dick Tracy"
+  },
+  "b39bc7a4-2a41-4582-9359-30d1737ce0dc": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Ted Kolovos"
+  },
+  "9f61c027-a688-4d6b-a8dc-4db6bd06d5db": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Obed Ampah"
+  },
+  "7f4e0c26-ba72-4384-bac0-da314bb5d901": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Josh Mosby"
+  },
+  "4f0d58f4-f319-497b-a211-bff167223d17": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Maxwell Dueltgen"
+  },
+  "c9c74da6-4323-41a0-bfcd-242ddc36a447": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Angela Tuo"
+  },
+  "fb8f2a73-524d-4c02-af4b-5cf6d48380a1": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Alden Hilton"
+  },
+  "bb7550b0-ad64-4775-893a-d39f7c341337": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "Elijah Agbayani (Sandia)"
+  },
+  "93c02ba5-7ce7-4b57-bf8f-47725cc0cdb9": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Joseph Walter"
+  },
+  "4e0ce88d-7454-41b4-ba64-53dbec165335": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Andrew Huynh"
+  },
+  "b48e20c9-3e42-4534-8397-357d304fdb50": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Cloud Application Administrator",
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Sean Kirkpatrick"
+  },
+  "8d7e10f0-2b63-4bd1-9bdf-3a1003cfea6e": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "okta-api2"
+  },
+  "9e233857-559d-4cd4-89ba-3de6d2937ea8": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Rafael Martinez"
+  },
+  "ff817197-b86c-4961-bf56-ec3ef78a2fa9": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "Cloud Application Administrator",
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Michael Hicks"
+  },
+  "e2c3be53-ca14-448c-84ce-936bad95327d": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Global Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Mitchel Baker"
+  },
+  "18ac32b8-8f8d-4a0d-b242-27a282e65072": {
+    "OnPremisesImmutableId": null,
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Jason Smith"
+  }
+},
+    "privileged_service_principals": {
+  "77576d0c-ec31-48c2-bc17-1da80fb0da0b": {
+    "roles": [
+      "Exchange Administrator"
+    ],
+    "DisplayName": "Scuba Functional Test Orchestrator",
+    "ServicePrincipalId": "77576d0c-ec31-48c2-bc17-1da80fb0da0b",
+    "AppId": "ed2cb57b-9208-4abe-b99c-3acf35c91f5f"
+  },
+  "a1bc8aad-10fd-42fb-a52d-6146acd126bb": {
+    "roles": [
+      "SharePoint Administrator",
+      "Exchange Administrator"
+    ],
+    "DisplayName": "DavidsSP",
+    "ServicePrincipalId": "a1bc8aad-10fd-42fb-a52d-6146acd126bb",
+    "AppId": "33cac1c0-a6e0-4322-8d38-00f82dea15b2"
+  },
+  "efc9f4a8-c8cf-43d3-8e75-c3c54f707db7": {
+    "roles": [
+      "Global Administrator"
+    ],
+    "DisplayName": "Okta AAD Service Principal:0oajsqv67z0hFcyFd0j6",
+    "ServicePrincipalId": "efc9f4a8-c8cf-43d3-8e75-c3c54f707db7",
+    "AppId": "8d4d4f40-c709-4fc0-8e98-1e34b1952532"
+  }
+},
+    "privileged_roles": [
+  {
+    "DisplayName": "Global Administrator",
+    "RoleTemplateId": "62e90394-69f5-4237-9190-012177145e10"
+  },
+  {
+    "DisplayName": "User Administrator",
+    "RoleTemplateId": "fe930be7-5e62-47db-91af-98c3a49a38b1"
+  },
+  {
+    "DisplayName": "Exchange Administrator",
+    "RoleTemplateId": "29232cdf-9323-42fd-ade2-1d097af3e4de"
+  },
+  {
+    "DisplayName": "SharePoint Administrator",
+    "RoleTemplateId": "f28a1f50-f6e7-4571-818b-6a12f2af6b6c"
+  },
+  {
+    "DisplayName": "Application Administrator",
+    "RoleTemplateId": "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3"
+  },
+  {
+    "DisplayName": "Privileged Role Administrator",
+    "RoleTemplateId": "e8611ab8-c189-46e8-94e1-60213ab1f814"
+  },
+  {
+    "DisplayName": "Cloud Application Administrator",
+    "RoleTemplateId": "158c047a-c907-4556-b7ef-446551a6b5f7"
+  },
+  {
+    "DisplayName": "Hybrid Identity Administrator",
+    "RoleTemplateId": "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2"
+  }
+],
+    "service_plans": [
+  {
+    "ServicePlanName": "UNIVERSAL_PRINT_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "MicrosoftPrint",
+    "ServicePlanId": "9923a87f-3992-4997-b861-04c1a2b71cfc",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "GRAPH_CONNECTORS_SEARCH_INDEX",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Exchange",
+    "ServicePlanId": "a6520331-d7d4-4276-95f5-15c0933bc757",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "MDE_LITE",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "WindowsDefenderATP",
+    "ServicePlanId": "292cc034-7b7c-4950-aaf5-943befd3f1d4",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "PROJECT_O365_P2_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "ProjectProgramsAndPortfolios",
+    "ServicePlanId": "e7d09ae4-099a-4c34-a2a2-3e166e95c44a",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "BPOS_S_TODO_2",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "To-Do",
+    "ServicePlanId": "c87f142c-d1e9-4363-8630-aaea9c4d9ae5",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "WHITEBOARD_PLAN2",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "WhiteboardServices",
+    "ServicePlanId": "94a54592-cd8b-425e-87c6-97868b000b91",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "MICROSOFT_SEARCH",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Bing",
+    "ServicePlanId": "94065c59-bc8e-4e8b-89e5-5138d471eaff",
+    "AppliesTo": "Company"
+  },
+  {
+    "ServicePlanName": "ADALLOM_S_DISCOVERY",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Adallom",
+    "ServicePlanId": "932ad362-64a8-4783-9106-97849a1a30b9",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "CDS_O365_P2_GCC",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "CRM",
+    "ServicePlanId": "a70bbf38-cdda-470d-adb8-5804b8770f41",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "DYN365_CDS_O365_P2_GCC",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "CRM",
+    "ServicePlanId": "06162da2-ebf9-4954-99a0-00fee96f95cc",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "ContentExplorer_Standard",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "M365LabelAnalytics",
+    "ServicePlanId": "2b815d45-56e4-4e3a-b65c-66cb9175b560",
+    "AppliesTo": "Company"
+  },
+  {
+    "ServicePlanName": "Content_Explorer",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "M365LabelAnalytics",
+    "ServicePlanId": "d9fa6af4-e046-4c89-9226-729a0786685d",
+    "AppliesTo": "Company"
+  },
+  {
+    "ServicePlanName": "MICROSOFTBOOKINGS",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Exchange",
+    "ServicePlanId": "199a5c09-e0ca-4e37-8f7c-b05d533e1ea2",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "MIP_S_CLP1",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Exchange",
+    "ServicePlanId": "5136a095-5cf0-4aff-bec3-e84448b38ea5",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "MYANALYTICS_P2_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Exchange",
+    "ServicePlanId": "6e5b7995-bd4f-4cbd-9d19-0e32010c72f0",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "POWERAPPS_O365_P2_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "PowerAppsServiceGCC",
+    "ServicePlanId": "0a20c815-5e81-4727-9bdc-2b5a117850c3",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "FLOW_O365_P2_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "ProcessSimpleGCC",
+    "ServicePlanId": "c537f360-6a00-4ace-a7f5-9128d0ac1e4b",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "INTUNE_A",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "SCO",
+    "ServicePlanId": "c1ec4a95-1f05-45b3-a911-aa3fa01094f5",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "MFA_PREMIUM",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "MultiFactorService",
+    "ServicePlanId": "8a256a2b-b617-496d-b51b-e76466e88db0",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "RMS_S_PREMIUM_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "RMSOnline",
+    "ServicePlanId": "1b66aedf-8ca1-4f73-af76-ec76c6180f98",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "RMS_S_ENTERPRISE_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "RMSOnline",
+    "ServicePlanId": "6a76346d-5d6e-4051-9fe3-ed3f312b5597",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "AAD_PREMIUM",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "AADPremiumService",
+    "ServicePlanId": "41781fb2-bc02-4b7c-bd55-b576c07bb09d",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "MCOSTANDARD_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "MicrosoftCommunicationsOnline",
+    "ServicePlanId": "a31ef4a2-f787-435e-8335-e47eb0cafc94",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "SHAREPOINTENTERPRISE_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "SharePoint",
+    "ServicePlanId": "153f85dd-d912-4762-af6c-d6e0fb4f6692",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "SHAREPOINTWAC_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "SharePoint",
+    "ServicePlanId": "8f9f0f3b-ca90-406c-a842-95579171f8ec",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "OFFICESUBSCRIPTION_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "MicrosoftOffice",
+    "ServicePlanId": "de9234ff-6483-44d9-b15e-dca72fdd27af",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "PROJECTWORKMANAGEMENT_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "ProjectWorkManagement",
+    "ServicePlanId": "5b4ef465-7ea1-459a-9f91-033317755a51",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "TEAMS_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "TeamspaceAPI",
+    "ServicePlanId": "304767db-7d23-49e8-a945-4a7eb65f9f28",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "STREAM_O365_E3_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Microsoftstream",
+    "ServicePlanId": "2c1ada27-dbaa-46f9-bda6-ecb94445f758",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "FORMS_GOV_E3",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "OfficeForms",
+    "ServicePlanId": "24af5f65-d0f3-467b-9f78-ea798c4aeffc",
+    "AppliesTo": "User"
+  },
+  {
+    "ServicePlanName": "EXCHANGE_S_ENTERPRISE_GOV",
+    "ProvisioningStatus": "Success",
+    "ServicePlanType": "Exchange",
+    "ServicePlanId": "8c3069c0-ccdb-44be-ab77-986203a67df2",
+    "AppliesTo": "User"
+  }
+],
+    "directory_settings": [
+  {
+    "Values": [
+      {
+        "Value": "true",
+        "Name": "BlockUserConsentForRiskyApps"
+      },
+      {
+        "Value": "true",
+        "Name": "EnableAdminConsentRequests"
+      }
+    ],
+    "DisplayName": "Consent Policy Settings",
+    "Id": "a8db55b8-399c-4983-9831-2ee8fe9ffbcc",
+    "TemplateId": "dffd5d46-495d-40a9-8e21-954ff55e198a"
+  }
+],
+    "authentication_method": [
+  {
+    "authentication_method_feature_settings": [
+      {
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "b06ec811-928e-4b93-a982-9302e2035994",
+            "AllowedPasskeyProfiles": [
+              "00000000-0000-0000-0000-000000000001"
+            ]
+          }
+        ],
+        "State": "enabled",
+        "Id": "Fido2",
+        "PasskeyProfiles": [
+          {
+            "PasskeyTypes": "deviceBound",
+            "KeyRestrictions": {
+              "AaGuids": [
+                "90a3ccdf-635c-4729-a248-9b709135078f",
+                "de1e552d-db1d-4423-a619-566b625cdc84"
+              ],
+              "IsEnforced": true,
+              "EnforcementType": "allow"
+            },
+            "Name": "Default passkey profile",
+            "Id": "00000000-0000-0000-0000-000000000001",
+            "AttestationEnforcement": "registrationOnly"
+          }
+        ],
+        "ExcludeTargets": [],
+        "IsAttestationEnforced": true,
+        "@odata.type": "#microsoft.graph.fido2AuthenticationMethodConfiguration",
+        "IsSelfServiceRegistrationAllowed": true,
+        "KeyRestrictions": {
+          "AaGuids": [
+            "90a3ccdf-635c-4729-a248-9b709135078f",
+            "de1e552d-db1d-4423-a619-566b625cdc84"
+          ],
+          "IsEnforced": true,
+          "EnforcementType": "allow"
+        },
+        "DefaultPasskeyProfile": "00000000-0000-0000-0000-000000000001",
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Fido2')/microsoft.graph.fido2AuthenticationMethodConfiguration/includeTargets"
+      },
+      {
+        "State": "enabled",
+        "ExcludeTargets": [],
+        "IsSoftwareOathEnabled": false,
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "AuthenticationMode": "any",
+            "Id": "all_users"
+          }
+        ],
+        "@odata.type": "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+        "Id": "MicrosoftAuthenticator",
+        "FeatureSettings": {
+          "NumberMatchingRequiredState": {
+            "ExcludeTarget": {
+              "TargetType": "group",
+              "Id": "00000000-0000-0000-0000-000000000000"
+            },
+            "IncludeTarget": {
+              "TargetType": "group",
+              "Id": "all_users"
+            },
+            "State": "enabled"
+          },
+          "DisplayAppInformationRequiredState": {
+            "ExcludeTarget": {
+              "TargetType": "group",
+              "Id": "00000000-0000-0000-0000-000000000000"
+            },
+            "IncludeTarget": {
+              "TargetType": "group",
+              "Id": "all_users"
+            },
+            "State": "default"
+          },
+          "DisplayLocationInformationRequiredState": {
+            "ExcludeTarget": {
+              "TargetType": "group",
+              "Id": "00000000-0000-0000-0000-000000000000"
+            },
+            "IncludeTarget": {
+              "TargetType": "group",
+              "Id": "all_users"
+            },
+            "State": "default"
+          },
+          "CompanionAppAllowedState": {
+            "ExcludeTarget": {
+              "TargetType": "group",
+              "Id": "00000000-0000-0000-0000-000000000000"
+            },
+            "IncludeTarget": {
+              "TargetType": "group",
+              "Id": "all_users"
+            },
+            "State": "default"
+          }
+        },
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('MicrosoftAuthenticator')/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets"
+      },
+      {
+        "@odata.type": "#microsoft.graph.smsAuthenticationMethodConfiguration",
+        "Id": "Sms",
+        "State": "disabled",
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Sms')/microsoft.graph.smsAuthenticationMethodConfiguration/includeTargets",
+        "IncludeTargets": [
+          {
+            "IsUsableForSignIn": true,
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "ExcludeTargets": []
+      },
+      {
+        "IsUsableOnce": false,
+        "State": "enabled",
+        "Id": "TemporaryAccessPass",
+        "MaximumLifetimeInMinutes": 480,
+        "DefaultLength": 8,
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "b06ec811-928e-4b93-a982-9302e2035994"
+          }
+        ],
+        "@odata.type": "#microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration",
+        "MinimumLifetimeInMinutes": 60,
+        "ExcludeTargets": [],
+        "DefaultLifetimeInMinutes": 60,
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('TemporaryAccessPass')/microsoft.graph.temporaryAccessPassAuthenticationMethodConfiguration/includeTargets"
+      },
+      {
+        "@odata.type": "#microsoft.graph.hardwareOathAuthenticationMethodConfiguration",
+        "Id": "HardwareOath",
+        "State": "disabled",
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('HardwareOath')/microsoft.graph.hardwareOathAuthenticationMethodConfiguration/includeTargets",
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "ExcludeTargets": []
+      },
+      {
+        "@odata.type": "#microsoft.graph.softwareOathAuthenticationMethodConfiguration",
+        "Id": "SoftwareOath",
+        "State": "enabled",
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('SoftwareOath')/microsoft.graph.softwareOathAuthenticationMethodConfiguration/includeTargets",
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "ExcludeTargets": [
+          {
+            "TargetType": "group",
+            "Id": "b06ec811-928e-4b93-a982-9302e2035994"
+          }
+        ]
+      },
+      {
+        "IsOfficePhoneAllowed": false,
+        "State": "disabled",
+        "IsCustomGreetingEnabled": false,
+        "Id": "Voice",
+        "CallerIdNumber": null,
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "@odata.type": "#microsoft.graph.voiceAuthenticationMethodConfiguration",
+        "ExcludeTargets": [],
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Voice')/microsoft.graph.voiceAuthenticationMethodConfiguration/includeTargets"
+      },
+      {
+        "@odata.type": "#microsoft.graph.emailAuthenticationMethodConfiguration",
+        "Id": "Email",
+        "State": "disabled",
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('Email')/microsoft.graph.emailAuthenticationMethodConfiguration/includeTargets",
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "AllowExternalIdToUseEmailOtp": "default",
+        "ExcludeTargets": []
+      },
+      {
+        "CertificateAuthorityScopes": [],
+        "AuthenticationModeConfiguration": {
+          "X509CertificateAuthenticationDefaultMode": "x509CertificateSingleFactor",
+          "X509CertificateDefaultRequiredAffinityLevel": "low",
+          "Rules": []
+        },
+        "State": "disabled",
+        "IssuerHintsConfiguration": {
+          "State": "disabled"
+        },
+        "Id": "X509Certificate",
+        "CrlValidationConfiguration": {
+          "State": "disabled",
+          "ExemptedCertificateAuthoritiesSubjectKeyIdentifiers": []
+        },
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "@odata.type": "#microsoft.graph.x509CertificateAuthenticationMethodConfiguration",
+        "CertificateUserBindings": [
+          {
+            "TrustAffinityLevel": "low",
+            "UserProperty": "userPrincipalName",
+            "Priority": 1,
+            "X509CertificateField": "PrincipalName"
+          },
+          {
+            "TrustAffinityLevel": "low",
+            "UserProperty": "userPrincipalName",
+            "Priority": 2,
+            "X509CertificateField": "RFC822Name"
+          },
+          {
+            "TrustAffinityLevel": "high",
+            "UserProperty": "certificateUserIds",
+            "Priority": 3,
+            "X509CertificateField": "SubjectKeyIdentifier"
+          }
+        ],
+        "ExcludeTargets": [],
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('X509Certificate')/microsoft.graph.x509CertificateAuthenticationMethodConfiguration/includeTargets"
+      },
+      {
+        "@odata.type": "#microsoft.graph.verifiableCredentialsAuthenticationMethodConfiguration",
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users",
+            "VerifiedIdProfiles": []
+          }
+        ],
+        "ExcludeTargets": [],
+        "Id": "VerifiableCredentials",
+        "State": "disabled"
+      },
+      {
+        "State": "disabled",
+        "ExcludeTargets": [],
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "Id": "all_users"
+          }
+        ],
+        "@odata.type": "#microsoft.graph.qrCodePinAuthenticationMethodConfiguration",
+        "Id": "QRCodePin",
+        "PinLength": 8,
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('QRCodePin')/microsoft.graph.qrCodePinAuthenticationMethodConfiguration/includeTargets",
+        "StandardQRCodeLifetimeInDays": 365
+      },
+      {
+        "State": "disabled",
+        "ExcludeTargets": [],
+        "Profiles": [],
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "IsRegistrationRequired": false,
+            "AllowedProfiles": [],
+            "Id": "all_users"
+          }
+        ],
+        "Profiles@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('FederatedIdentityCredential')/microsoft.graph.federatedIdentityCredentialAuthenticationMethodConfiguration/profiles",
+        "Id": "FederatedIdentityCredential",
+        "@odata.type": "#microsoft.graph.federatedIdentityCredentialAuthenticationMethodConfiguration",
+        "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('FederatedIdentityCredential')/microsoft.graph.federatedIdentityCredentialAuthenticationMethodConfiguration/includeTargets"
+      }
+    ],
+    "authentication_method_policy": {
+      "RegistrationEnforcement": {
+        "AuthenticationMethodsRegistrationCampaign": {
+          "EnforceRegistrationAfterAllowedSnoozes": true,
+          "IncludeTargets": [
+            {
+              "TargetType": "group",
+              "TargetedAuthenticationMethod": "microsoftAuthenticator",
+              "Id": "all_users"
+            }
+          ],
+          "SnoozeDurationInDays": 1,
+          "ExcludeTargets": [],
+          "State": "default"
+        }
+      },
+      "ReportSuspiciousActivitySettings": {
+        "VoiceReportingCode": 0,
+        "IncludeTarget": {
+          "TargetType": "group",
+          "Id": "all_users"
+        },
+        "State": "default"
+      },
+      "Description": "The tenant-wide policy that controls which authentication methods are allowed in the tenant, authentication method registration requirements, and self-service password reset settings",
+      "PolicyMigrationState": "migrationComplete",
+      "Id": "authenticationMethodsPolicy",
+      "LastModifiedDateTime": "2025-01-27T21:11:34.778489Z",
+      "PolicyVersion": "1.5",
+      "@odata.context": "https://graph.microsoft.com/beta/$metadata#authenticationMethodsPolicy",
+      "DisplayName": "Authentication Methods Policy",
+      "SystemCredentialPreferences": {
+        "ExcludeTargets": [],
+        "IncludeTargets": [
+          {
+            "TargetType": "group",
+            "Id": "all_users"
+          }
+        ],
+        "State": "default"
+      },
+      "AuthenticationMethodConfigurations@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
+    }
+  }
+],
+    "domain_settings": [
+  {
+    "PasswordNotificationWindowInDays": 14,
+    "IsInitial": true,
+    "IsVerified": true,
+    "State": null,
+    "IsRoot": true,
+    "Id": "scubag3forthee.onmicrosoft.com",
+    "IsDefault": true,
+    "PasswordValidityPeriodInDays": 2147483647,
+    "SupportedServices": [
+      "Email",
+      "OfficeCommunicationsOnline"
+    ],
+    "AvailabilityStatus": null,
+    "IsAdminManaged": true,
+    "AuthenticationType": "Managed"
+  },
+  {
+    "PasswordNotificationWindowInDays": null,
+    "IsInitial": false,
+    "IsVerified": true,
+    "State": null,
+    "IsRoot": true,
+    "Id": "mtocisa.net",
+    "IsDefault": false,
+    "PasswordValidityPeriodInDays": null,
+    "SupportedServices": [],
+    "AvailabilityStatus": null,
+    "IsAdminManaged": true,
+    "AuthenticationType": "Federated"
+  },
+  {
+    "PasswordNotificationWindowInDays": 14,
+    "IsInitial": false,
+    "IsVerified": true,
+    "State": null,
+    "IsRoot": true,
+    "Id": "scubag3forthee.mail.onmicrosoft.com",
+    "IsDefault": false,
+    "PasswordValidityPeriodInDays": 2147483647,
+    "SupportedServices": [],
+    "AvailabilityStatus": null,
+    "IsAdminManaged": true,
+    "AuthenticationType": "Managed"
+  }
+],
+    "license_information": {
+  "SkuId": "e823ca47-49c4-46b3-b38d-ca11d5abe3d2",
+  "SkuPartNumber": "M365_G3_GOV",
+  "ConsumedUnits": 20,
+  "PrepaidUnits": {
+    "Suspended": 0,
+    "LockedOut": 0,
+    "Warning": 0,
+    "Enabled": 20
+  }
+},
+    "license_state": [
+  {
+    "state": "Active",
+    "warning_days_threshold": 30,
+    "has_active_plans": true,
+    "is_expiring_soon": false,
+    "days_until_expiration": null,
+    "has_any_sku": true,
+    "is_expired": false,
+    "state_reason": "At least one service plan is provisioned successfully."
+  }
+],
+    "total_user_count": 60,
+    "risky_applications": [],
+    "risky_third_party_service_principals": [],
+    "severity_score_weights": {
+  "PermissionRiskLevelWeights": {
+    "Medium": 5,
+    "Description": "Risk level weights are assigned based on the level of access granted by each permission.",
+    "High": 15,
+    "Low": 2,
+    "Critical": 50
+  },
+  "PermissionVolume": {
+    "PointsPer10Permissions": 1,
+    "Description": "Over-permissioned applications/service principals represent an increased attack surface regardless of individual permission risk level."
+  },
+  "MultiTenant": {
+    "Description": "Multi-tenant applications can be used across multiple organizations, increasing their attack surface.",
+    "Points": 10
+  },
+  "ThirdPartyServicePrincipal": {
+    "Description": "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals.",
+    "Points": 20
+  },
+  "PrivilegedRoles": {
+    "PointsPerRole": 8,
+    "Description": "Service principals with privileged roles (e.g., Global Administrator) have elevated permissions and pose a higher risk."
+  },
+  "CredentialContextWeights": {
+    "Medium": 15,
+    "Description": "Credential base points dynamically scale by the highest risk level permission on the app/SP.",
+    "High": 35,
+    "Low": 5,
+    "Critical": 50
+  },
+  "CredentialTypeDiscounts": {
+    "Description": "Multiplier applied to credential and base points by credential type. Passwords hold the highest risk, then certificates, and federated creds with the least.",
+    "Federated": 0.25,
+    "Password": 1.0,
+    "Key": 0.5
+  },
+  "PasswordCredentialLifetimeTiers": [
+    {
+      "MinDays": 730,
+      "Points": 5
+    },
+    {
+      "MinDays": 365,
+      "Points": 3
+    },
+    {
+      "MinDays": 180,
+      "Points": 2
+    }
+  ],
+  "KeyCredentialLifetimeTiers": [
+    {
+      "MinDays": 1095,
+      "Points": 5
+    },
+    {
+      "MinDays": 730,
+      "Points": 3
+    },
+    {
+      "MinDays": 365,
+      "Points": 2
+    }
+  ],
+  "CredentialVolume": {
+    "PointsPerCredentialAfterFirst": 5,
+    "Description": "Multiple active credentials increase the authentication attack surface. Each active credential beyond the first adds bonus points."
+  },
+  "CredentialRiskIndicatorTiers": {
+    "Medium": 0.25,
+    "High": 0.5,
+    "Critical": 0.75
+  }
+},
+    "risky_delegated_permission_classifications": [
+  null
+],
+    "legacy_exchange_service_principal": [
+  {
+    "ObjectId": "abdad998-1d49-4a22-bf58-7b10d0e752ae",
+    "AppId": "00000002-0000-0ff1-ce00-000000000000",
+    "DisplayName": "Office 365 Exchange Online",
+    "SignInAudience": "AzureADMultipleOrgs",
+    "HasKeyCredentials": false,
+    "KeyCredentials": null,
+    "PasswordCredentials": null,
+    "FederatedCredentials": null,
+    "AppOwnerOrganizationId": "f8cdef31-a31e-4b4a-93e4-5f571e91255a"
+  }
+],
+    "dedicated_exchange_hybrid_applications": [
+  {
+    "DedicatedHybridAppConfigured": false,
+    "Apps": null
+  }
+],
+    "default_app_management_policy": [
+  {
+    "IsEnabled": true,
+    "Id": "00000000-0000-0000-0000-000000000000",
+    "@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/defaultAppManagementPolicy/$entity",
+    "ApplicationRestrictions": {
+      "TrustedSubjectNameAndIssuers": null,
+      "IdentifierUris": {
+        "UriAdditionWithoutUniqueTenantIdentifier": {
+          "RestrictForAppsCreatedAfterDateTime": "0001-01-01T00:00:00Z",
+          "ExcludeActors": null,
+          "State": "enabled",
+          "ExcludeAppsReceivingV2Tokens": true,
+          "ExcludeSaml": true,
+          "IsStateSetByMicrosoft": true
+        },
+        "NonDefaultUriAddition": null
+      },
+      "FederatedIdentityCredentials": null,
+      "KeyCredentials": [],
+      "RedirectUris": null,
+      "PasswordCredentials": [],
+      "Audiences": null
+    },
+    "DisplayName": "Default app management tenant policy",
+    "ServicePrincipalRestrictions": {
+      "PasswordCredentials": [],
+      "KeyCredentials": []
+    },
+    "Description": "Default tenant policy that enforces app management restrictions on applications and service principals. To apply policy to targeted resources, create a new policy under appManagementPolicies collection."
+  }
+],
+    "app_management_policies": [],
+    "aad_successful_commands": [
+  "Get-MgBetaIdentityConditionalAccessPolicy",
+  "Get-MgBetaSubscribedSku",
+  "Get-MgBetaUserCount",
+  "Get-MgBetaPolicyAuthorizationPolicy",
+  "Get-MgBetaDirectorySetting",
+  "Get-MgBetaPolicyAuthenticationMethodPolicy",
+  "Get-MgBetaDomain",
+  "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications",
+  "Get-MgBetaPolicyDefaultAppManagementPolicy",
+  "Get-MgBetaPolicyAppManagementPolicy",
+  "Get-PrivilegedUser",
+  "Get-PrivilegedRole",
+  "Get-LegacyExchangeServicePrincipal",
+  "Get-DedicatedExchangeHybridApplications"
+],
+    "aad_unsuccessful_commands": [
+  "Get-ApplicationsWithRiskyPermissions",
+  "Get-ServicePrincipalsWithRiskyPermissions"
+]
+        }
+}

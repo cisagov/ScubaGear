@@ -1,0 +1,25 @@
+{
+  "Label": "gcc-postchange-single-2026-06-04-1459",
+  "GeneratedAt": "2026-06-04T15:00:37.5184319-04:00",
+  "DebugLogPath": "C:\\Users\\skirkpatrick\\SCUBA2004\\PowerShell\\ScubaGear\\M365BaselineConformance_2026_06_04_14_59_35\\DebugLogs\\ScubaGear-DebugLog-20260604-145935-929.log",
+  "Metrics": {
+    "Get-ServicePrincipalsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 7176.0,
+      "MinMs": 7176.0,
+      "MaxMs": 7176.0,
+      "ValuesMs": [
+        7176.0
+      ]
+    },
+    "Get-ApplicationsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 4855.0,
+      "MinMs": 4855.0,
+      "MaxMs": 4855.0,
+      "ValuesMs": [
+        4855.0
+      ]
+    }
+  }
+}

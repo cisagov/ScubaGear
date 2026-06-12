@@ -1,0 +1,25 @@
+{
+  "Label": "commercial-baseline-2026-06-04",
+  "GeneratedAt": "2026-06-04T14:20:20.1066332-04:00",
+  "DebugLogPath": "C:\\Users\\skirkpatrick\\SCUBA2004\\PowerShell\\ScubaGear\\M365BaselineConformance_2026_06_04_12_33_06\\DebugLogs\\ScubaGear-DebugLog-20260604-123306-026.log",
+  "Metrics": {
+    "Get-ServicePrincipalsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 8408.0,
+      "MinMs": 8408.0,
+      "MaxMs": 8408.0,
+      "ValuesMs": [
+        8408.0
+      ]
+    },
+    "Get-ApplicationsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 5262.0,
+      "MinMs": 5262.0,
+      "MaxMs": 5262.0,
+      "ValuesMs": [
+        5262.0
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "Timestamp": "2026-06-04T08:09:17.2517514-04:00",
+  "Mode": "Pester mocked unit tests",
+  "Trials": 5,
+  "AppMeanMs": 433.91,
+  "AppMinMs": 311.75,
+  "AppMaxMs": 700.74,
+  "SpMeanMs": 610.92,
+  "SpMinMs": 446.87,
+  "SpMaxMs": 750.05
+}

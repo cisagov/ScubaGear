@@ -1,0 +1,764 @@
+{
+    "MetaData": {
+  "TenantId": "Error retrieving Tenant ID",
+  "DisplayName": "Error retrieving Display name",
+  "DomainName": "Error retrieving Domain name",
+  "OrgName": null,
+  "OrgUnitName": null,
+  "ProductSuite": "Microsoft 365",
+  "ProductsAssessed": [
+    "Azure Active Directory"
+  ],
+  "ProductAbbreviationMapping": {
+    "Azure Active Directory": "AAD"
+  },
+  "Tool": "ScubaGear",
+  "ToolVersion": "1.8.0",
+  "TimestampZulu": "2026-06-04T18:26:11.026Z",
+  "ReportUUID": "2d19673c-69a2-4502-9050-923f94d4876f"
+},
+    "Summary": {
+  "AAD": {
+    "Omits": 0,
+    "Failures": 0,
+    "Warnings": 0,
+    "IncorrectResults": 0,
+    "Passes": 0,
+    "Errors": 30,
+    "Manual": 3
+  }
+},
+    "AnnotatedFailedPolicies": {},
+    "Results": {
+  "AAD": [
+    {
+      "GroupName": "Legacy Authentication",
+      "GroupNumber": "1",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#1-legacy-authentication",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.1.1v1",
+          "Requirement": "Legacy authentication SHALL be blocked.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Risk Based Policies",
+      "GroupNumber": "2",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#2-risk-based-policies",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.2.1v1",
+          "Requirement": "Users detected as high risk SHALL be blocked.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.2.2v1",
+          "Requirement": "A notification SHOULD be sent to the administrator when high-risk users are detected.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1-instructions' target='_blank' class='indicator indicator-manual' title='Manual'>Manual</a></div>",
+          "Result": "N/A",
+          "Criticality": "Should/Not-Implemented",
+          "Details": "This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1 for instructions on manual check",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "N/A",
+          "OriginalDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.2.3v1",
+          "Requirement": "Sign-ins detected as high risk SHALL be blocked.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Strong Authentication and a Secure Registration Process",
+      "GroupNumber": "3",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#3-strong-authentication-and-a-secure-registration-process",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.3.1v1",
+          "Requirement": "Phishing-resistant MFA SHALL be enforced for all users.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.2v2",
+          "Requirement": "MFA SHALL be enforced for all users.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.3v2",
+          "Requirement": "If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthenticationMethodPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthenticationMethodPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.4v1",
+          "Requirement": "The Authentication Methods Manage Migration feature SHALL be set to Migration Complete.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error - Test results missing",
+          "Criticality": "-",
+          "Details": "Report issue on GitHub, https://github.com/cisagov/ScubaGear/issues",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error - Test results missing",
+          "OriginalDetails": "Report issue on <a href=\"https://github.com/cisagov/ScubaGear/issues\" target=\"_blank\">GitHub</a>",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.5v2",
+          "Requirement": "The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthenticationMethodPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthenticationMethodPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.6v1",
+          "Requirement": "Phishing-resistant MFA SHALL be required for highly privileged roles.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.7v1",
+          "Requirement": "Managed devices SHOULD be required for authentication.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.8v1",
+          "Requirement": "Managed Devices SHOULD be required to register MFA.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.3.9v1",
+          "Requirement": "Device code authentication SHOULD be blocked.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#conditional-access-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaIdentityConditionalAccessPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Centralized Log Collection",
+      "GroupNumber": "4",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#4-centralized-log-collection",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.4.1v1",
+          "Requirement": "Security logs SHALL be sent to the agency's security operations center for monitoring.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1-instructions' target='_blank' class='indicator indicator-manual' title='Manual'>Manual</a></div>",
+          "Result": "N/A",
+          "Criticality": "Shall/Not-Implemented",
+          "Details": "This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1 for instructions on manual check",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "N/A",
+          "OriginalDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Application Registration and Consent",
+      "GroupNumber": "5",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#5-application-registration-and-consent",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.5.1v1",
+          "Requirement": "Only administrators SHALL be allowed to register applications.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.2v1",
+          "Requirement": "User consent to applications SHALL be restricted.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.3v1",
+          "Requirement": "An admin consent workflow SHALL be configured for applications.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaDirectorySetting. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaDirectorySetting. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.5v1",
+          "Requirement": "Application Password Addition SHOULD be blocked.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyDefaultAppManagementPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyDefaultAppManagementPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.6v1",
+          "Requirement": "Application password lifetime SHOULD be restricted to 180 days or less.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyDefaultAppManagementPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyDefaultAppManagementPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.5.7v1",
+          "Requirement": "Application certificate lifetime SHOULD be restricted to 365 days or less.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyDefaultAppManagementPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyDefaultAppManagementPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Passwords",
+      "GroupNumber": "6",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#6-passwords",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.6.1v1",
+          "Requirement": "User passwords SHALL NOT expire.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaDomain. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaDomain. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Highly Privileged User Access",
+      "GroupNumber": "7",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#7-highly-privileged-user-access",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.7.1v1",
+          "Requirement": "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedUser. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedUser. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.2v1",
+          "Requirement": "Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedUser. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedUser. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.3v1",
+          "Requirement": "Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedUser. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedUser. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.4v1",
+          "Requirement": "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/docs/configuration/configuration.md#privileged-user-policy-exclusions' target='_blank' class='indicator indicator-configurable' title='Configurable'>Configurable</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.5v1",
+          "Requirement": "Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.6v1",
+          "Requirement": "Activation of the Global Administrator role SHALL require approval.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.7v1",
+          "Requirement": "Eligible and active highly privileged role assignments SHALL trigger an alert.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.8v1",
+          "Requirement": "User activation of the Global Administrator role SHALL trigger an alert.<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Shall",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.7.9v1",
+          "Requirement": "User activation of other highly privileged roles SHOULD trigger an alert.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaSubscribedSku, Get-PrivilegedRole. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    },
+    {
+      "GroupName": "Guest User Access",
+      "GroupNumber": "8",
+      "GroupReferenceURL": "https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#8-guest-user-access",
+      "Controls": [
+        {
+          "Control ID": "MS.AAD.8.1v1",
+          "Requirement": "Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.8.2v1",
+          "Requirement": "Only users with the Guest Inviter role SHOULD be able to invite guest users.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+          "Result": "Error",
+          "Criticality": "Should",
+          "Details": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "Error",
+          "OriginalDetails": "This test depends on the following command(s) which did not execute successfully: Get-MgBetaPolicyAuthorizationPolicy. See terminal output for more details.",
+          "Comments": [],
+          "ResolutionDate": null
+        },
+        {
+          "Control ID": "MS.AAD.8.3v1",
+          "Requirement": "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1-instructions' target='_blank' class='indicator indicator-manual' title='Manual'>Manual</a></div>",
+          "Result": "N/A",
+          "Criticality": "Should/Not-Implemented",
+          "Details": "This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1 for instructions on manual check",
+          "OmittedEvaluationResult": "N/A",
+          "OmittedEvaluationDetails": "N/A",
+          "IncorrectResult": "N/A",
+          "IncorrectResultDetails": "N/A",
+          "OriginalResult": "N/A",
+          "OriginalDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+          "Comments": [],
+          "ResolutionDate": null
+        }
+      ]
+    }
+  ]
+},
+    "Raw":         {
+                "baseline_version": "1",
+                "module_version": "1.8.0",
+                "date": "06/04/2026 14:26:11 Eastern Daylight Time",
+                "timestamp_zulu": "2026-06-04T18:26:11.026Z",
+                "report_uuid": "2d19673c-69a2-4502-9050-923f94d4876f",
+                "tenant_details": [
+  {
+    "TenantId": "Error retrieving Tenant ID",
+    "AADAdditionalData": "Error retrieving additional data",
+    "DomainName": "Error retrieving Domain name",
+    "DisplayName": "Error retrieving Display name"
+  }
+],
+                "scuba_config": {
+  "OPAPath": "C:\\Users\\skirkpatrick\\.scubagear\\Tools",
+  "OutProviderFileName": "ProviderSettingsExport",
+  "OutRegoFileName": "RegoOutput",
+  "Organization": "",
+  "AppID": "",
+  "NumberOfUUIDCharactersToTruncate": 18,
+  "OutJsonFileName": "ScubaResults",
+  "OutFolderName": "gcc_postchange_latest_2026_06_04_14_24_04",
+  "ProductNames": "aad",
+  "OutReportName": "BaselineReports",
+  "CertificateThumbprint": "",
+  "LogIn": true,
+  "OutPath": "./Testing/Performance/TenantRuns",
+  "DisconnectOnExit": {
+    "IsPresent": false
+  },
+  "OutActionPlanFileName": "ActionPlan",
+  "M365Environment": "gcc",
+  "PreferredDnsResolvers": [],
+  "SkipDoH": false,
+  "OutCsvFileName": "ScubaResults",
+  "KeepIndividualJSON": {
+    "IsPresent": false
+  }
+},
+                    "conditional_access_policies": [],
+    "cap_table_data": null,
+    "authorization_policies": [],
+    "privileged_users": [],
+    "privileged_service_principals": "[]",
+    "privileged_roles": [],
+    "service_plans": [],
+    "directory_settings": [],
+    "authentication_method": [
+  {
+    "authentication_method_feature_settings": [],
+    "authentication_method_policy": null
+  }
+],
+    "domain_settings": [],
+    "license_information": ,
+    "license_state": [
+  {
+    "has_active_plans": false,
+    "has_any_sku": false,
+    "is_expiring_soon": false,
+    "warning_days_threshold": 30,
+    "days_until_expiration": null,
+    "is_expired": false,
+    "state_reason": "No subscribed SKUs were found for the tenant.",
+    "state": "NoLicense"
+  }
+],
+    "total_user_count": -1,
+    "risky_applications": [],
+    "risky_third_party_service_principals": [],
+    "severity_score_weights": {
+  "PermissionRiskLevelWeights": {
+    "Low": 2,
+    "Medium": 5,
+    "Critical": 50,
+    "Description": "Risk level weights are assigned based on the level of access granted by each permission.",
+    "High": 15
+  },
+  "PermissionVolume": {
+    "PointsPer10Permissions": 1,
+    "Description": "Over-permissioned applications/service principals represent an increased attack surface regardless of individual permission risk level."
+  },
+  "MultiTenant": {
+    "Points": 10,
+    "Description": "Multi-tenant applications can be used across multiple organizations, increasing their attack surface."
+  },
+  "ThirdPartyServicePrincipal": {
+    "Points": 20,
+    "Description": "Third-party service principals are owned by external organizations and do not fall under the same security policies as internal service principals."
+  },
+  "PrivilegedRoles": {
+    "PointsPerRole": 8,
+    "Description": "Service principals with privileged roles (e.g., Global Administrator) have elevated permissions and pose a higher risk."
+  },
+  "CredentialContextWeights": {
+    "Low": 5,
+    "Medium": 15,
+    "Critical": 50,
+    "Description": "Credential base points dynamically scale by the highest risk level permission on the app/SP.",
+    "High": 35
+  },
+  "CredentialTypeDiscounts": {
+    "Password": 1.0,
+    "Federated": 0.25,
+    "Key": 0.5,
+    "Description": "Multiplier applied to credential and base points by credential type. Passwords hold the highest risk, then certificates, and federated creds with the least."
+  },
+  "PasswordCredentialLifetimeTiers": [
+    {
+      "Points": 5,
+      "MinDays": 730
+    },
+    {
+      "Points": 3,
+      "MinDays": 365
+    },
+    {
+      "Points": 2,
+      "MinDays": 180
+    }
+  ],
+  "KeyCredentialLifetimeTiers": [
+    {
+      "Points": 5,
+      "MinDays": 1095
+    },
+    {
+      "Points": 3,
+      "MinDays": 730
+    },
+    {
+      "Points": 2,
+      "MinDays": 365
+    }
+  ],
+  "CredentialVolume": {
+    "PointsPerCredentialAfterFirst": 5,
+    "Description": "Multiple active credentials increase the authentication attack surface. Each active credential beyond the first adds bonus points."
+  },
+  "CredentialRiskIndicatorTiers": {
+    "Medium": 0.25,
+    "Critical": 0.75,
+    "High": 0.5
+  }
+},
+    "risky_delegated_permission_classifications": [],
+    "legacy_exchange_service_principal": [],
+    "dedicated_exchange_hybrid_applications": [
+  {
+    "DedicatedHybridAppConfigured": false,
+    "Apps": null
+  }
+],
+    "default_app_management_policy": [],
+    "app_management_policies": [],
+    "aad_successful_commands": [
+  "Get-DedicatedExchangeHybridApplications"
+],
+    "aad_unsuccessful_commands": [
+  "Get-MgBetaIdentityConditionalAccessPolicy",
+  "Get-MgBetaSubscribedSku",
+  "Get-MgBetaUserCount",
+  "Get-MgBetaPolicyAuthorizationPolicy",
+  "Get-MgBetaDirectorySetting",
+  "Get-MgBetaPolicyAuthenticationMethodPolicy",
+  "Get-MgBetaDomain",
+  "Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications",
+  "Get-MgBetaPolicyDefaultAppManagementPolicy",
+  "Get-MgBetaPolicyAppManagementPolicy",
+  "Get-PrivilegedRole",
+  "Get-PrivilegedUser",
+  "Get-ApplicationsWithRiskyPermissions",
+  "Get-ServicePrincipalsWithRiskyPermissions",
+  "Get-LegacyExchangeServicePrincipal"
+]
+        }
+}

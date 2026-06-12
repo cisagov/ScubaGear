@@ -1,0 +1,25 @@
+{
+  "Label": "gcc-postchange-single-2026-06-04-1448",
+  "GeneratedAt": "2026-06-04T14:50:07.5138839-04:00",
+  "DebugLogPath": "C:\\Users\\skirkpatrick\\SCUBA2004\\Testing\\Performance\\TenantRuns\\gcc_postchange_single_2026_06_04_14_48_49_2026_06_04_14_48_50\\DebugLogs\\ScubaGear-DebugLog-20260604-144850-346.log",
+  "Metrics": {
+    "Get-ServicePrincipalsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 6159.0,
+      "MinMs": 6159.0,
+      "MaxMs": 6159.0,
+      "ValuesMs": [
+        6159.0
+      ]
+    },
+    "Get-ApplicationsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 4759.0,
+      "MinMs": 4759.0,
+      "MaxMs": 4759.0,
+      "ValuesMs": [
+        4759.0
+      ]
+    }
+  }
+}

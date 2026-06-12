@@ -1,0 +1,6 @@
+{
+  "Timestamp": "2026-06-04T08:09:03.5374020-04:00",
+  "BaselineMode": "Pester mocked unit tests",
+  "GetApplicationsWithRiskyPermissions_ms": 419.66,
+  "GetServicePrincipalsWithRiskyPermissions_ms": 699.02
+}

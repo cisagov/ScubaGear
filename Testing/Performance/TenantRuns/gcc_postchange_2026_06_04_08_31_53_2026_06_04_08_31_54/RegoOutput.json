@@ -1,0 +1,500 @@
+[
+  {
+    "ActualValue": "",
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedUser"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.3v1",
+    "ReportDetails": "0 admin(s) that are not cloud-only found",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [],
+    "Criticality": "Shall/Not-Implemented",
+    "PolicyId": "MS.AAD.4.1v1",
+    "ReportDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [],
+    "Criticality": "Should/Not-Implemented",
+    "PolicyId": "MS.AAD.2.2v1",
+    "ReportDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [],
+    "Criticality": "Should/Not-Implemented",
+    "PolicyId": "MS.AAD.8.3v1",
+    "ReportDetails": "This product does not currently have the capability to check compliance for this policy. See <a href=\"https://github.com/cisagov/ScubaGear/blob/v1.8.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for instructions on manual check",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [
+      "migrationComplete"
+    ],
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthenticationMethodPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.3.4v1",
+    "ReportDetails": "Requirement met",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": [
+      [
+        {
+          "Id": "Email",
+          "State": "disabled"
+        },
+        {
+          "Id": "Sms",
+          "State": "disabled"
+        },
+        {
+          "Id": "Voice",
+          "State": "disabled"
+        }
+      ]
+    ],
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthenticationMethodPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.3.5v2",
+    "ReportDetails": "Requirement met",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": {
+      "@odata.type": "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+      "ExcludeTargets": [],
+      "FeatureSettings": {
+        "CompanionAppAllowedState": {
+          "ExcludeTarget": {
+            "Id": "00000000-0000-0000-0000-000000000000",
+            "TargetType": "group"
+          },
+          "IncludeTarget": {
+            "Id": "all_users",
+            "TargetType": "group"
+          },
+          "State": "default"
+        },
+        "DisplayAppInformationRequiredState": {
+          "ExcludeTarget": {
+            "Id": "00000000-0000-0000-0000-000000000000",
+            "TargetType": "group"
+          },
+          "IncludeTarget": {
+            "Id": "all_users",
+            "TargetType": "group"
+          },
+          "State": "default"
+        },
+        "DisplayLocationInformationRequiredState": {
+          "ExcludeTarget": {
+            "Id": "00000000-0000-0000-0000-000000000000",
+            "TargetType": "group"
+          },
+          "IncludeTarget": {
+            "Id": "all_users",
+            "TargetType": "group"
+          },
+          "State": "default"
+        },
+        "NumberMatchingRequiredState": {
+          "ExcludeTarget": {
+            "Id": "00000000-0000-0000-0000-000000000000",
+            "TargetType": "group"
+          },
+          "IncludeTarget": {
+            "Id": "all_users",
+            "TargetType": "group"
+          },
+          "State": "enabled"
+        }
+      },
+      "Id": "MicrosoftAuthenticator",
+      "IncludeTargets": [
+        {
+          "AuthenticationMode": "any",
+          "Id": "all_users",
+          "IsRegistrationRequired": false,
+          "TargetType": "group"
+        }
+      ],
+      "IncludeTargets@odata.context": "https://graph.microsoft.com/beta/$metadata#policies/authenticationMethodsPolicy/authenticationMethodConfigurations('MicrosoftAuthenticator')/microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration/includeTargets",
+      "IsSoftwareOathEnabled": false,
+      "State": "enabled"
+    },
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthenticationMethodPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.3.3v2",
+    "ReportDetails": "Requirement not met",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": {
+      "FederatedDomains": [
+        "mtocisa.net"
+      ],
+      "InvalidDomains": [],
+      "ValidDomains": [
+        "scubag3forthee.mail.onmicrosoft.com",
+        "scubag3forthee.onmicrosoft.com"
+      ]
+    },
+    "Commandlet": [
+      "Get-MgBetaDomain"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.6.1v1",
+    "ReportDetails": "Requirement met; however, there are 1 federated domain(s) present:<br/>mtocisa.net<br/><br/>ScubaGear is unable to read the user password expiration settings for federated domains because it is controlled in a system external to the tenant. Check with your identity provider on how to configure this policy in a federated context.",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": {
+      "all_admin_consent_policies": [
+        {
+          "Name": "EnableAdminConsentRequests",
+          "SettingsGroup": "Consent Policy Settings",
+          "Value": "true"
+        }
+      ]
+    },
+    "Commandlet": [
+      "Get-MgBetaDirectorySetting"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.5.3v1",
+    "ReportDetails": "Requirement met",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": {
+      "all_allow_invite_values": [
+        {
+          "AllowInvitesFromValue": "everyone",
+          "PolicyId": "authorizationPolicy"
+        }
+      ]
+    },
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthorizationPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.8.2v1",
+    "ReportDetails": "Permission level set to \"everyone\" (authorizationPolicy)",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": {
+      "all_allowed_create_values": [
+        {
+          "DefaultUser_AllowedToCreateApps": true,
+          "PolicyId": "authorizationPolicy"
+        }
+      ]
+    },
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthorizationPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.5.1v1",
+    "ReportDetails": "1 authorization policies found that allow non-admin users to register third-party applications:<br/>authorizationPolicy",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": {
+      "all_grant_policy_values": [
+        {
+          "DefaultUser_DefaultGrantPolicy": [
+            "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-team",
+            "ManagePermissionGrantsForOwnedResource.microsoft-dynamically-managed-permissions-for-chat"
+          ],
+          "PolicyId": "authorizationPolicy"
+        }
+      ]
+    },
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthorizationPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.5.2v1",
+    "ReportDetails": "0 authorization policies found that allow non-admin users to consent to third-party applications",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": {
+      "all_roleid_values": [
+        {
+          "GuestUserRoleId": "10dae51f-b6af-4016-8d66-8c2a99b929b3",
+          "GuestUserRoleIdString": "Limited access",
+          "Id": "authorizationPolicy"
+        }
+      ]
+    },
+    "Commandlet": [
+      "Get-MgBetaPolicyAuthorizationPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.8.1v1",
+    "ReportDetails": "Permission level set to \"Limited access\" (authorizationPolicy)",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.2.1v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.2.3v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.3.1v1",
+    "ReportDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.3.2v2",
+    "ReportDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.3.6v1",
+    "ReportDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.3.7v1",
+    "ReportDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.3.8v1",
+    "ReportDetails": "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaPolicyDefaultAppManagementPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.5.5v1",
+    "ReportDetails": "0 Password addition restriction(s) not meeting requirements",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedRole"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.4v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedRole"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.5v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedRole"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.6v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedRole"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.7v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedRole"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.8v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedRole"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.7.9v1",
+    "ReportDetails": "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [
+      "Alden Hilton",
+      "Alex Jacquay",
+      "Andrew Huynh",
+      "David Bui",
+      "David Comiskey",
+      "Devesh Agarwal",
+      "Elijah Agbayani (Sandia)",
+      "Jacob Davis",
+      "Javis Chapman",
+      "Marc Mould",
+      "Mitchel Baker",
+      "Sean Kirkpatrick",
+      "Ted Kolovos",
+      "okta-api2"
+    ],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedUser"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.1v1",
+    "ReportDetails": "14 global admin(s) found:<br/>Alden Hilton, Alex Jacquay, Andrew Huynh, David Bui, David Comiskey, Devesh Agarwal, Elijah Agbayani (Sandia), Jacob Davis, Javis Chapman, Marc Mould, Mitchel Baker, Sean Kirkpatrick, Ted Kolovos, okta-api2",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [
+      "Alden Hilton",
+      "Alex Jacquay",
+      "Andrew Huynh",
+      "David Bui",
+      "David Comiskey",
+      "Devesh Agarwal",
+      "Elijah Agbayani (Sandia)",
+      "Jacob Davis",
+      "Javis Chapman",
+      "Marc Mould",
+      "Mitchel Baker",
+      "Sean Kirkpatrick",
+      "Ted Kolovos",
+      "okta-api2"
+    ],
+    "Commandlet": [
+      "Get-MgBetaSubscribedSku",
+      "Get-PrivilegedUser"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.7.2v1",
+    "ReportDetails": "Requirement not met: Policy MS.AAD.7.1 failed so score not computed",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [
+      "Certificate lifetime not restricted for apps"
+    ],
+    "Commandlet": [
+      "Get-MgBetaPolicyDefaultAppManagementPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.5.7v1",
+    "ReportDetails": "1 certificate lifetime restriction(s) not meeting requirements:<br/>Certificate lifetime not restricted for apps",
+    "RequirementMet": false
+  },
+  {
+    "ActualValue": [
+      "MS.AAD.1.1v1 Legacy authentication SHALL be blocked"
+    ],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Shall",
+    "PolicyId": "MS.AAD.1.1v1",
+    "ReportDetails": "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.1.1v1 Legacy authentication SHALL be blocked. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": [
+      "MS.AAD.3.9v1 Device code authentication SHOULD be blocked"
+    ],
+    "Commandlet": [
+      "Get-MgBetaIdentityConditionalAccessPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.3.9v1",
+    "ReportDetails": "1 conditional access policy(s) found that meet(s) all requirements:<br/>MS.AAD.3.9v1 Device code authentication SHOULD be blocked. <a href='#caps'>View all CA policies</a>.",
+    "RequirementMet": true
+  },
+  {
+    "ActualValue": [
+      "Password lifetime not restricted for apps"
+    ],
+    "Commandlet": [
+      "Get-MgBetaPolicyDefaultAppManagementPolicy"
+    ],
+    "Criticality": "Should",
+    "PolicyId": "MS.AAD.5.6v1",
+    "ReportDetails": "1 password lifetime restriction(s) not meeting requirements:<br/>Password lifetime not restricted for apps",
+    "RequirementMet": false
+  }
+]

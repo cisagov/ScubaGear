@@ -1,0 +1,25 @@
+{
+  "Label": "commercial-postchange-2026-06-04",
+  "GeneratedAt": "2026-06-04T14:20:21.3836658-04:00",
+  "DebugLogPath": "C:\\Users\\skirkpatrick\\SCUBA2004\\Testing\\Performance\\TenantRuns\\commercial_postchange_2026_06_04_14_18_33_2026_06_04_14_18_34\\DebugLogs\\ScubaGear-DebugLog-20260604-141834-440.log",
+  "Metrics": {
+    "Get-ApplicationsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 3416.0,
+      "MinMs": 3416.0,
+      "MaxMs": 3416.0,
+      "ValuesMs": [
+        3416.0
+      ]
+    },
+    "Get-ServicePrincipalsWithRiskyPermissions": {
+      "Count": 1,
+      "MeanMs": 7421.0,
+      "MinMs": 7421.0,
+      "MaxMs": 7421.0,
+      "ValuesMs": [
+        7421.0
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "Trial": "seed",
+    "Folder": "gcc_postchange_2026_06_04_08_31_53_2026_06_04_08_31_54",
+    "ApplicationsMs": 1848.0,
+    "ServicePrincipalsMs": 11075.0
+  },
+  {
+    "Trial": "extra1",
+    "Folder": "gcc_postchange_trialB_2026_06_04_08_49_48_2026_06_04_08_49_48",
+    "ApplicationsMs": 2214.0,
+    "ServicePrincipalsMs": 15272.0
+  },
+  {
+    "Trial": "extra2",
+    "Folder": "gcc_postchange_trialA_2026_06_04_08_48_52_2026_06_04_08_48_53",
+    "ApplicationsMs": 2098.0,
+    "ServicePrincipalsMs": 13083.0
+  }
+]
