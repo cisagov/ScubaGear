@@ -286,21 +286,120 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.6.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy HighConfidenceSpamAction set to AddXHeader
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction AddXHeader"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction MoveToJmf"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy PhishSpamAction set to AddXHeader
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction AddXHeader"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction Quarantine"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy HighConfidencePhishAction set to AddXHeader
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidencePhishAction AddXHeader"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidencePhishAction Quarantine"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default SpamAction non-compliant, Standard preset active and compliant
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default SpamAction non-compliant, Strict preset active and compliant
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default SpamAction non-compliant, custom policy active and compliant
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs ((Get-AcceptedDomain | Where-Object Default -eq $true).DomainName)"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default policy spam actions set to compliant values
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default compliant, Standard preset active and compliant
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default compliant, custom policy active and compliant
+        Preconditions:
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs ((Get-AcceptedDomain | Where-Object Default -eq $true).DomainName)"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.6.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default has allowed domains, Standard preset active with none
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default has allowed domains, Strict preset active with none
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default has allowed domains, custom policy active with none
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs ((Get-AcceptedDomain | Where-Object Default -eq $true).DomainName)"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default policy has no allowed sender domains
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default and custom policy both have no allowed sender domains
+        Preconditions:
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs ((Get-AcceptedDomain | Where-Object Default -eq $true).DomainName)"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+        ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.7.1v1
     TestDriver: ScubaCached
