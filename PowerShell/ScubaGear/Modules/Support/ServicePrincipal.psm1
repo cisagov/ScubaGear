@@ -132,7 +132,7 @@ function Compare-ScubaGearPermission {
         Used to pass in the service principal permissions if already obtained. This can be used to skip the call to Microsoft Graph to get the service principal permissions.
 
     .PARAMETER ProductNames
-        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "defender", "securitysuite", and "*". The default is to check for all permissions.
+        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", and "*". The default is to check for all permissions.
 
     .EXAMPLE
         Compare-ScubaGearPermission -ServicePrincipalID "AppID" -AppRoleIDs $AppRoleIDs -M365Environment commercial
@@ -179,7 +179,7 @@ function Compare-ScubaGearPermission {
         [Object]$SPPerms,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
         [string[]]$ProductNames
     )
 
@@ -859,7 +859,7 @@ function Get-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be assessing and only compare against those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', 'securitysuite', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*' (which includes all products)
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames 'aad'
@@ -904,20 +904,11 @@ function Get-ScubaGearAppPermission {
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*'
     )
 
     $M365Environment = $M365Environment.ToLower()
-
-    # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
-    if ($ProductNames -contains 'defender'){
-        if (-not ($ProductNames -contains 'securitysuite')) {
-            $ProductNames = $ProductNames + 'securitysuite'
-        }
-        $ProductNames = @($ProductNames | Where-Object {$_ -ne "defender" })
-        Write-Debug "Substituting defender with securitysuite in ProductNames"
-    }
 
     try {
         # Connect to Microsoft Graph
@@ -1419,7 +1410,7 @@ function Set-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         Products to configure permissions for. Required when not using pipeline.
-        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', 'securitysuite', '*'
+        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*'
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames "aad" | Set-ScubaGearAppPermission
@@ -1478,7 +1469,7 @@ function Set-ScubaGearAppPermission {
             Mandatory = $false,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*'
     )
 
@@ -1489,15 +1480,6 @@ function Set-ScubaGearAppPermission {
     }
 
     process {
-        # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
-        if ($ProductNames -contains 'defender'){
-            if (-not ($ProductNames -contains 'securitysuite')) {
-                $ProductNames = $ProductNames + 'securitysuite'
-            }
-            $ProductNames = @($ProductNames | Where-Object {$_ -ne "defender" })
-            Write-Debug "Substituting defender with securitysuite in ProductNames"
-        }
-
         # Determine which parameter set is being used
         if ($PSCmdlet.ParameterSetName -eq 'Standalone') {
             Write-Verbose "Running in standalone mode - fetching current permissions"
@@ -2259,7 +2241,7 @@ function New-ScubaGearServicePrincipal {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be configured for and only apply those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'defender', 'securitysuite', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*' (which includes all products)
 
     .PARAMETER ServicePrincipalName
         Used to define the name of the Service Principal that will be created. The default is "ScubaGear Application"
@@ -2318,7 +2300,7 @@ function New-ScubaGearServicePrincipal {
         [string]$M365Environment,
 
         [Parameter(Mandatory=$false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "defender", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory=$false)]
@@ -2331,15 +2313,6 @@ function New-ScubaGearServicePrincipal {
     )
 
     Try {
-        # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
-        if ($ProductNames -contains 'defender'){
-            if (-not ($ProductNames -contains 'securitysuite')) {
-                $ProductNames = $ProductNames + 'securitysuite'
-            }
-            $ProductNames = @($ProductNames | Where-Object {$_ -ne "defender" })
-            Write-Debug "Substituting defender with securitysuite in ProductNames"
-        }
-
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
             # If wildcard is specified, include all products

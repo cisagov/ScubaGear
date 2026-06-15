@@ -44,7 +44,7 @@ ScubaGear supports two setup approaches:
 > The custom PowerShell functions were **created exclusively for ScubaGear**. They configure service principals with the exact permissions and roles needed for ScubaGear assessments.
 
 **Get started with automated setup:**
-- [Service Principal Workflows](serviceprincipal-workflows.md/#initial-setup-workflow) - Step-by-step guide
+- [Service Principal Workflows](serviceprincipal-workflows.md#initial-setup-workflow) - Step-by-step guide
 - [Service Principal Troubleshooting](serviceprincipal-troubleshooting.md) - Solutions to common issues
 
 ---
