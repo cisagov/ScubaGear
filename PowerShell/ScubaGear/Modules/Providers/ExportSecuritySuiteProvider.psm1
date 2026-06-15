@@ -1,7 +1,7 @@
-function Export-DefenderProvider {
+function Export-SecuritySuiteProvider {
     <#
     .Description
-    Gets the Microsoft 365 Defender settings that are relevant
+    Gets the Microsoft 365 Security Suite settings that are relevant
     to the SCuBA Microsoft 365 Defender baselines using direct EXO Admin API calls.
     .Functionality
     Internal
@@ -25,14 +25,14 @@ function Export-DefenderProvider {
         $ApiEndpoint
     )
 
-        Write-Verbose "Running Defender provider export for environment '$M365Environment'."
+        Write-Verbose "Running SecuritySuite provider export for environment '$M365Environment'."
 
         if ([string]::IsNullOrWhiteSpace($AccessToken)) {
-            throw "AccessToken is required for Defender provider export."
+            throw "AccessToken is required for SecuritySuite provider export."
         }
 
         if ([string]::IsNullOrWhiteSpace($ApiEndpoint)) {
-            throw "ApiEndpoint is required for Defender provider export."
+            throw "ApiEndpoint is required for SecuritySuite provider export."
         }
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -40,7 +40,7 @@ function Export-DefenderProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    function Invoke-DefenderTrackedCommand {
+    function Invoke-SecuritySuiteTrackedCommand {
         param(
             [Parameter(Mandatory = $true)]
             [string]$CmdletName,
@@ -62,12 +62,12 @@ function Export-DefenderProvider {
         }
     }
 
-    $AdminAuditLogConfig = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
-    $ProtectionPolicyRule = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
-    $AntiPhishPolicy = ConvertTo-Json @(Invoke-DefenderTrackedCommand -CmdletName "Get-AntiPhishPolicy")
+    $AdminAuditLogConfig = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
+    $ProtectionPolicyRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
+    $AntiPhishPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishPolicy")
 
-    $ATPPolicyResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
-    $ATPProtectionPolicyRuleResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
+    $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
+    $ATPProtectionPolicyRuleResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
 
     if (($Tracker.GetUnSuccessfulCommands() -contains "Get-AtpPolicyForO365") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ATPProtectionPolicyRule")) {
         $ATPPolicyResult = @()
@@ -85,9 +85,9 @@ function Export-DefenderProvider {
     $ATPPolicy = ConvertTo-Json @($ATPPolicyResult)
     $ATPProtectionPolicyRule = ConvertTo-Json @($ATPProtectionPolicyRuleResult)
 
-    $DLPCompliancePolicyResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-DlpCompliancePolicy" -SuppressWarning $true)
-    $DLPComplianceRulesResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
-    $ProtectionAlertResult = @(Invoke-DefenderTrackedCommand -CmdletName "Get-ProtectionAlert" -SuppressWarning $true)
+    $DLPCompliancePolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-DlpCompliancePolicy" -SuppressWarning $true)
+    $DLPComplianceRulesResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
+    $ProtectionAlertResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ProtectionAlert" -SuppressWarning $true)
 
     if (($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpCompliancePolicy") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpComplianceRule") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ProtectionAlert")) {
         $DLPCompliancePolicyResult = @()

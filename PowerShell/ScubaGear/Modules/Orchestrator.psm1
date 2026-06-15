@@ -858,27 +858,16 @@ function Invoke-ProviderList {
                             }
                             $RetVal = Export-EXOProvider @EXOProviderParams | Select-Object -Last 1
                         }
-                        "defender" {
+                        {($_ -eq "defender") -or ($_ -eq "securitysuite")} {
                             if ([string]::IsNullOrEmpty($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrEmpty($ConnectionResult.EXOApiEndpoint)) {
-                                throw "Missing EXO token or endpoint for Defender provider. Re-run with -LogIn or check authentication." 
+                                throw "Missing EXO token or endpoint for SecuritySuite provider. Re-run with -LogIn or check authentication."
                             }
-                            $DefenderProviderParams = @{
+                            $SecuritySuiteProviderParams = @{
                                 'M365Environment' = $ScubaConfig.M365Environment
                                 'AccessToken' = $ConnectionResult.EXOAccessToken
                                 'ApiEndpoint' = $ConnectionResult.EXOApiEndpoint
                             }
-                            $RetVal = Export-DefenderProvider @DefenderProviderParams | Select-Object -Last 1
-                        }
-                        "securitysuite" {
-                            if ([string]::IsNullOrEmpty($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrEmpty($ConnectionResult.EXOApiEndpoint)) {
-                                throw "Missing EXO token or endpoint for Defender provider. Re-run with -LogIn or check authentication."
-                            }
-                            $DefenderProviderParams = @{
-                                'M365Environment' = $ScubaConfig.M365Environment
-                                'AccessToken' = $ConnectionResult.EXOAccessToken
-                                'ApiEndpoint' = $ConnectionResult.EXOApiEndpoint
-                            }
-                            $RetVal = Export-DefenderProvider @DefenderProviderParams | Select-Object -Last 1
+                            $RetVal = Export-SecuritySuiteProvider @SecuritySuiteProviderParams | Select-Object -Last 1
                         }
                         "powerplatform" {
                             $PPProviderParams = @{
@@ -1998,7 +1987,7 @@ function Remove-Resources {
     #>
     [CmdletBinding()]
     $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
+    "ExportSecuritySuiteProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
