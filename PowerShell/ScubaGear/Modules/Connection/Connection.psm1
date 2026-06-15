@@ -427,7 +427,86 @@ function Disconnect-SCuBATenant {
 
 }
 
+function Get-ServicePrincipalParams {
+    <#
+    .Description
+    Returns a valid a hastable of parameters for authentication via
+    Service Principal. Throws an error if there are none.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [object]
+    $ScubaConfig
+    )
+
+    $ServicePrincipalParams = @{}
+
+    $CheckThumbprintParams = ($ScubaConfig.CertificateThumbprint) `
+    -and ($ScubaConfig.AppID) -and ($ScubaConfig.Organization)
+
+    if ($CheckThumbprintParams) {
+        $CertThumbprintParams = @{
+            CertificateThumbprint = $ScubaConfig.CertificateThumbprint;
+            AppID = $ScubaConfig.AppID;
+            Organization = $ScubaConfig.Organization;
+        }
+        $ServicePrincipalParams += @{CertThumbprintParams = $CertThumbprintParams}
+    }
+    else {
+        throw "When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization."
+    }
+    $ServicePrincipalParams
+}
+
+function Get-M365EnvironmentByDomain {
+    <#
+    .SYNOPSIS
+        Determines the M365 environment based on the tenant domain.
+
+    .DESCRIPTION
+        Determines the M365 environment based on the tenant domain.
+
+    .PARAMETER TenantDomain
+        The domain of the tenant for which to determine the environment.
+
+    .EXAMPLE
+        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain "contoso.onmicrosoft.com"
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding(DefaultParameterSetName = 'Interactive')]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TenantDomain
+    )
+
+    $MetadataUri = "https://login.microsoftonline.com/$TenantDomain/.well-known/openid-configuration"
+
+    $Metadata = Invoke-RestMethod -Uri $MetadataUri -Method Get -ErrorAction Stop
+
+    $TenantRegionSubScope = $Metadata.tenant_region_sub_scope
+
+    $M365Environment = switch ($TenantRegionSubScope) {
+        "DODCON" { "gcchigh" }
+        "GCC"    { "gcc" }
+        "DOD"    { "dod" }
+        $null    { "commercial" }
+        default  {
+            throw "Unknown tenant_region_sub_scope value: '$TenantRegionSubScope'"
+        }
+    }
+
+    return $M365Environment
+}
+
 Export-ModuleMember -Function @(
-   'Connect-Tenant',
-   'Disconnect-SCuBATenant'
+    'Connect-Tenant',
+    'Disconnect-SCuBATenant',
+    'Get-ServicePrincipalParams',
+    'Get-M365EnvironmentByDomain'
 )

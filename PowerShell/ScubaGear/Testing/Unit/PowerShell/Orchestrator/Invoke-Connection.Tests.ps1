@@ -6,6 +6,8 @@ InModuleScope Orchestrator {
         BeforeAll {
             function Connect-Tenant {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Connect-Tenant {$null}
+            function Get-ServicePrincipalParams {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
         }
         It 'Basic connection without AppID'{
                 $ScubaConfig = [PSCustomObject]@{
@@ -22,8 +24,6 @@ InModuleScope Orchestrator {
                 {Invoke-Connection -ScubaConfig $ScubaConfig} | Should -Not -Throw
         }
         It 'Has AppId - Service Principal Auth'{
-                Mock -ModuleName Orchestrator Connect-Tenant {$null}
-                Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
                 $ScubaConfig = [PSCustomObject]@{
                     ProductNames = @('aad')
                     M365Environment = 'commercial'
