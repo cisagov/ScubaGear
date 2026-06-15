@@ -19,10 +19,10 @@ function Get-FunctionalTestHeaderValue {
   $HeadersValueType = $Response.Headers[$Name].GetType()
 
   if ($HeadersValueType -eq [string]) {
-    Write-Host "PS 5 Header '$Name' value: $HeadersValue"
+    # Write-Information "PS 5 Header '$Name' value: $HeadersValue" -InformationAction Continue
     return $HeadersValue
   } elseif ($HeadersValueType -eq [string[]]) {
-    Write-Host "PS 7 Header '$Name' values: $($HeadersValue[0])"
+    # Write-Information "PS 7 Header '$Name' values: $($HeadersValue[0])" -InformationAction Continue
     # Return the first item in array
     return $HeadersValue[0]
   } else {
@@ -136,8 +136,8 @@ function Invoke-FunctionalTestRestRequest {
         $RetryAfterSeconds = $DefaultRetryAfterSeconds
       }
 
-      Write-Host "Request to $RequestUri is still processing."
-      Write-Host "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)"
+      Write-Information "Request to $RequestUri is still processing." -InformationAction Continue
+      Write-Information "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)" -InformationAction Continue
       Start-Sleep -Seconds $RetryAfterSeconds
       $RequestUri = Resolve-FunctionalTestPollingUri -RequestUri $RequestUri -PollingUri $PollingUri
       $RequestMethod = 'GET'
