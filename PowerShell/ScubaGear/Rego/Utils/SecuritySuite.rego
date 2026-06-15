@@ -380,7 +380,7 @@ HasSafetyTipsEnabled(Policy) if {
     Policy.EnableSimilarDomainsSafetyTips == true
     Policy.EnableUnusualCharactersSafetyTips == true
     Policy.EnableViaTag == true
-    Policy.EnableSuspiciousSafetyTip == true
+    Policy.EnableUnauthenticatedSender == true
 }
 
 CustomSafetyTipsPolicies contains Policy if {
