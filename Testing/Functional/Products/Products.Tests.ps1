@@ -225,7 +225,6 @@ BeforeAll {
     }
 
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
-    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "sharepoint") {
         $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
@@ -349,7 +348,12 @@ BeforeAll {
             Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
-            Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            if ($ProductName -eq 'exo') {
+                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            }
+            else {
+                Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            }
         }
     }
 
