@@ -101,7 +101,7 @@ Yes, but you must export the certificate with private key and import it on each 
 Currently, New-ScubaGearServicePrincipal and New-ScubaGearAppCert create new certificates. To use an existing certificate, manually attach it through Entra Admin Center:
 1. Go to App registrations > Your app > Certificates & secrets
 2. Upload your certificate (.cer or .pem file)
-3. Use its thumbprint with Invoke-ScubaGear
+3. Use its thumbprint with Invoke-Scuba
 
 ---
 
