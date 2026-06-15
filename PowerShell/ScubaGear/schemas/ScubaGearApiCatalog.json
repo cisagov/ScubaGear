@@ -1643,7 +1643,7 @@
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "defender"
+            "securitysuite"
         ],
         "supportedEnv": [
             "commercial",
@@ -1673,7 +1673,7 @@
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "defender"
+            "securitysuite"
         ],
         "supportedEnv": [
             "gcchigh"
@@ -1702,7 +1702,7 @@
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "defender"
+            "securitysuite"
         ],
         "supportedEnv": [
             "dod"

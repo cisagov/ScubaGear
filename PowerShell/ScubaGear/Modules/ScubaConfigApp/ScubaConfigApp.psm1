@@ -110,7 +110,7 @@ Function Start-SCuBAConfigApp {
         [ValidateScript({ Test-Path $_ -PathType Leaf })]
         [string]$ConfigFilePath,
 
-        [ValidateSet('en-US')]
+        [ValidateSet('en-US','en-ES','fr-FR','de-DE')]
         $Language = 'en-US',
 
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
