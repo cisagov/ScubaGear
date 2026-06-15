@@ -908,7 +908,7 @@ function New-ExoSharingPolicy {
 function Remove-ExoSharingPolicy {
     [CmdletBinding()]
     param([Parameter(Mandatory = $true)][string]$Identity)
-    # Resolve name to GUID — EXO REST mutations require GUID on some tenants (name alone causes 404)
+    # Resolve name to GUID - EXO REST mutations require GUID on some tenants (name alone causes 404)
     $Policy = Get-SharingPolicy | Where-Object {
         [string]$_.Name -eq $Identity -or [string]$_.Identity -eq $Identity
     } | Select-Object -First 1
