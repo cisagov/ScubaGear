@@ -11,24 +11,42 @@ function Get-FunctionalTestHeaderValue {
     return $null
   }
 
-  if ($Headers -is [System.Collections.IDictionary]) {
-    foreach ($Key in $Headers.Keys) {
-      if ([string]::Equals([string]$Key, $Name, [System.StringComparison]::OrdinalIgnoreCase)) {
-        return [string]$Headers[$Key]
-      }
-    }
+  if (-not $Response.Headers.ContainsKey($Name)) {
     return $null
   }
 
-  $Property = $Headers.PSObject.Properties | Where-Object {
-    [string]::Equals($_.Name, $Name, [System.StringComparison]::OrdinalIgnoreCase)
-  } | Select-Object -First 1
+  $HeadersValue = $Response.Headers[$Name]
+  $HeadersValueType = $Response.Headers[$Name].GetType()
 
-  if ($null -eq $Property) {
-    return $null
+  if ($HeadersValueType -eq [string]) {
+    Write-Host "PS 5 Header '$Name' value: $HeadersValue"
+    return $HeadersValue
+  } elseif ($HeadersValueType -eq [string[]]) {
+    Write-Host "PS 7 Header '$Name' values: $($HeadersValue[0])"
+    # Return the first item in array
+    return $HeadersValue[0]
+  } else {
+    throw "Unexpected HTTP header value type: $HeadersValueType"
   }
 
-  return [string]$Property.Value
+  # if ($Headers -is [System.Collections.IDictionary]) {
+  #   foreach ($Key in $Headers.Keys) {
+  #     if ([string]::Equals([string]$Key, $Name, [System.StringComparison]::OrdinalIgnoreCase)) {
+  #       return [string]$Headers[$Key]
+  #     }
+  #   }
+  #   return $null
+  # }
+
+  # $Property = $Headers.PSObject.Properties | Where-Object {
+  #   [string]::Equals($_.Name, $Name, [System.StringComparison]::OrdinalIgnoreCase)
+  # } | Select-Object -First 1
+
+  # if ($null -eq $Property) {
+  #   return $null
+  # }
+
+  # return [string]$Property.Value
 }
 
 function Resolve-FunctionalTestPollingUri {
@@ -118,6 +136,8 @@ function Invoke-FunctionalTestRestRequest {
         $RetryAfterSeconds = $DefaultRetryAfterSeconds
       }
 
+      Write-Host "Request to $RequestUri is still processing."
+      Write-Host "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)"
       Start-Sleep -Seconds $RetryAfterSeconds
       $RequestUri = Resolve-FunctionalTestPollingUri -RequestUri $RequestUri -PollingUri $PollingUri
       $RequestMethod = 'GET'
