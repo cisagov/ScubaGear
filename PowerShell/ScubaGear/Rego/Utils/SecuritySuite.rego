@@ -289,7 +289,7 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
 
 default OrganizationDomainProtectionCompliant := {
     "Compliant": false,
-    "Message": "No anti-phish policy has 'Include domains I own' enabled", includes all recipients, and has an appropriate domain impersonation action.,
+    "Message": "No anti-phish policy has 'Include domains I own' enabled", includes all recipients, and has an appropriate domain impersonation action.",
     "Policies": [],
 }
 
