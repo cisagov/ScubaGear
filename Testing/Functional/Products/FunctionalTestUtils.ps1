@@ -908,7 +908,12 @@ function New-ExoSharingPolicy {
 function Remove-ExoSharingPolicy {
     [CmdletBinding()]
     param([Parameter(Mandatory = $true)][string]$Identity)
-    Remove-SharingPolicy -Identity $Identity
+    # Resolve name to GUID — EXO REST mutations require GUID on some tenants (name alone causes 404)
+    $Policy = Get-SharingPolicy | Where-Object {
+        [string]$_.Name -eq $Identity -or [string]$_.Identity -eq $Identity
+    } | Select-Object -First 1
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $Policy -Identity $Identity
+    Remove-SharingPolicy -Identity $ResolvedIdentity
 }
 
 function Disable-ExoExternalSenderWarningRules {
@@ -921,6 +926,16 @@ function Disable-ExoExternalSenderWarningRules {
             [string]$_.FromScope -eq 'NotInOrganization'
         } |
         Disable-TransportRule
+
+    # Wait for change to propagate to all EXO replicas before ScubaGear reads state
+    Wait-FunctionalExoCondition -Condition {
+        @(Get-TransportRule | Where-Object {
+            [string]$_.State -eq 'Enabled' -and
+            [string]$_.Mode -eq 'Enforce' -and
+            [string]$_.FromScope -eq 'NotInOrganization'
+        }).Count -eq 0
+    } -FailureMessage "Failed to observe all external sender warning rules disabled after update."
+    Start-Sleep -Seconds 60
 }
 
 function Enable-ExoExternalSenderWarningRules {
@@ -933,6 +948,16 @@ function Enable-ExoExternalSenderWarningRules {
             [string]$_.FromScope -eq 'NotInOrganization'
         } |
         Enable-TransportRule
+
+    # Wait for the enabled rule to become visible before ScubaGear reads state
+    Wait-FunctionalExoCondition -Condition {
+        @(Get-TransportRule | Where-Object {
+            [string]$_.State -eq 'Enabled' -and
+            [string]$_.Mode -eq 'Enforce' -and
+            [string]$_.FromScope -eq 'NotInOrganization'
+        }).Count -gt 0
+    } -FailureMessage "Failed to observe any external sender warning rules enabled after update."
+    Start-Sleep -Seconds 60
 }
 
 function New-ExoExternalSenderWarningRule {
