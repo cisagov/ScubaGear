@@ -70,7 +70,7 @@ InModuleScope Utility {
             }
         }
 
-        # Tests to ensure that corrent Microsoft Graph API URL is returned. The URL is stored in the permissions configuration file (ScubaGearPermissions.json).
+        # Tests to ensure that corrent Microsoft Graph API URL is returned. The URL is stored in the permissions configuration file (ScubaGearApiCatalog.json).
         It "should return the expected value from Invoke-GraphDirectly for <Cmdlet> in <EnvName>" -TestCases $combinedCases {
             param($EnvName, $EnvUrl, $Cmdlet, $Path, $NeedsID, $IdValue)
 
@@ -85,7 +85,7 @@ InModuleScope Utility {
             $result | Should -Be $expected
         }
 
-        # Tests to ensure that the correct API header is returned for each cmdlet that requires it. The API header is stored in the permissions configuration file (ScubaGearPermissions.json).
+        # Tests to ensure that the correct API header is returned for each cmdlet that requires it. The API header is stored in the permissions configuration file (ScubaGearApiCatalog.json).
         $ApiHeaderCases = @(
             @{ Cmdlet = "Get-MgBetaUserCount"; Path = "users/`$count"; NeedsID = $false; IdValue = $null; apiHeader = @{ConsistencyLevel = "eventual"} }
         )

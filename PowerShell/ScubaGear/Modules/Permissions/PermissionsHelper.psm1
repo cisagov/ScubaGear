@@ -147,8 +147,8 @@ Function Get-ScubaGearPermissions {
 
         [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
 
-        $permissionSet = Get-Content -Path "$ResourceRoot\ScubaGearPermissions.json" | ConvertFrom-Json
-        Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\ScubaGearPermissions.json' | ConvertFrom-Json"
+        $permissionSet = Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json
+        Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json"
 
         $ResourceAPIHash = @{
             'aad'        = '00000003-0000-0000-c000-000000000000'

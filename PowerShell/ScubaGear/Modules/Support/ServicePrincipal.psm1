@@ -446,7 +446,7 @@ function Set-ScubaGearRole {
         Used to define the AppID of the service principal that will be added to the roles specified by the ScubaGearSPRole parameter.
 
     .PARAMETER roleDefinitionID
-        The role definition ID that is required for the ScubaGear application. Current roles are defined in the ScubaGearPermissions.json file.
+        The role definition ID that is required for the ScubaGear application. Current roles are defined in the ScubaGearApiCatalog.json file.
 
     .PARAMETER M365Environment
         Used to define the environment that the application will be created in. The options are commercial, gcc, gcchigh, dod
@@ -532,7 +532,7 @@ function Get-ScubaGearAppRoleID {
         This function will retrieve the AppRole IDs for the permissions specified in the ScubaGearSPPermissions parameter.
 
     .PARAMETER ScubaGearSPPermissions
-        The permissions that are required for the ScubaGear application. Current permissions are defined in the ScubaGearPermissions.json file.
+        The permissions that are required for the ScubaGear application. Current permissions are defined in the ScubaGearApiCatalog.json file.
 
     .PARAMETER M365Environment
         Used to define the environment that the application will be created in. The options are commercial, gcc, gcchigh, dod
@@ -651,7 +651,7 @@ function Set-AppRegistrationPermission {
         Used to define the AppID of the service principal that will be updated with the required permissions.
 
     .PARAMETER ScubaGearSPPermissions
-        The permissions that are required for the ScubaGear application. Current permissions are defined in the ScubaGearPermissions.json file.
+        The permissions that are required for the ScubaGear application. Current permissions are defined in the ScubaGearApiCatalog.json file.
 
     .PARAMETER M365Environment
         Used to define the environment that the application will be created in. The options are commercial, gcc, gcchigh, dod
