@@ -1,12 +1,12 @@
 <#
- # Defender provider now uses EXO Admin API calls directly.
+ # SecuritySuite provider uses EXO Admin API calls directly.
 #>
 
 $ProviderPath = '../../../../../Modules/Providers'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportDefenderProvider.psm1") -Function Export-DefenderProvider -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/ExportSecuritySuiteProvider.psm1") -Function Export-SecuritySuiteProvider -Force
 
-InModuleScope -ModuleName ExportDefenderProvider {
-    Describe -Tag 'ExportDefenderProvider' -Name 'Export-DefenderProvider' -ForEach @(
+InModuleScope -ModuleName ExportSecuritySuiteProvider {
+    Describe -Tag 'ExportSecuritySuiteProvider' -Name 'Export-SecuritySuiteProvider' -ForEach @(
         'commercial',
         'gcc',
         'gcchigh',
@@ -37,11 +37,11 @@ InModuleScope -ModuleName ExportDefenderProvider {
             function Get-CommandTracker {}
             function Invoke-EXORestMethod {}
 
-            Mock -ModuleName ExportDefenderProvider Import-Module {}
-            Mock -ModuleName ExportDefenderProvider Get-CommandTracker {
+            Mock -ModuleName ExportSecuritySuiteProvider Import-Module {}
+            Mock -ModuleName ExportSecuritySuiteProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
             }
-            Mock -ModuleName ExportDefenderProvider Invoke-EXORestMethod {
+            Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
                 switch ($CmdletName) {
                     'Get-DlpComplianceRule' {
                         [pscustomobject]@{
@@ -74,13 +74,13 @@ InModuleScope -ModuleName ExportDefenderProvider {
         }
 
         It "When called with -M365Environment '<_>', returns valid JSON" {
-            $Json = Export-DefenderProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
+            $Json = Export-SecuritySuiteProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
 
         It "When called with -M365Environment '<_>', records expected command names" {
-            $Json = Export-DefenderProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
+            $Json = Export-SecuritySuiteProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
             $Parsed = ('{' + $Json.TrimEnd(',') + '}') | ConvertFrom-Json
             $Parsed.defender_successful_commands | Should -Contain 'Get-AdminAuditLogConfig'
             $Parsed.defender_successful_commands | Should -Contain 'Get-EOPProtectionPolicyRule'
@@ -90,6 +90,6 @@ InModuleScope -ModuleName ExportDefenderProvider {
 }
 
 AfterAll {
-    Remove-Module ExportDefenderProvider -Force -ErrorAction SilentlyContinue
+    Remove-Module ExportSecuritySuiteProvider -Force -ErrorAction SilentlyContinue
     Remove-Module CommandTracker -Force -ErrorAction SilentlyContinue
 }
