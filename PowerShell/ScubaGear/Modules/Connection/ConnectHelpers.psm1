@@ -47,45 +47,6 @@ function Connect-GraphHelper {
     Connect-MgGraph @GraphParams | Out-Null
 }
 
-function Connect-EXOHelper {
-    <#
-    .Description
-    This function is used for assisting in connecting to different M365 Environments for EXO.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [hashtable]
-        $ServicePrincipalParams
-    )
-    $EXOParams = @{
-        ErrorAction = "Stop";
-        ShowBanner = $false;
-    }
-    switch ($M365Environment) {
-        "gcchigh" {
-            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovGCCHigh";}
-        }
-        "dod" {
-            $EXOParams += @{'ExchangeEnvironmentName' = "O365USGovDoD";}
-        }
-    }
-
-    if ($ServicePrincipalParams.CertThumbprintParams) {
-        $EXOParams += $ServicePrincipalParams.CertThumbprintParams
-    }
-    Connect-ExchangeOnline @EXOParams | Out-Null
-}
-
 function Initialize-Msal {
     <#
     .SYNOPSIS
@@ -212,7 +173,6 @@ function Get-MsalAccessToken {
 
 Export-ModuleMember -Function @(
     'Connect-GraphHelper',
-    'Connect-EXOHelper',
     'Initialize-Msal',
     'Get-MsalAccessToken'
 )
