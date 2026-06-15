@@ -122,27 +122,35 @@ BeforeDiscovery {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    InModuleScope Connection -Parameters @{
-        ProductName = $script:ExecutionProductName
-        M365Environment = $M365Environment
-        Thumbprint = $Thumbprint
-        AppId = $AppId
-        TenantDomain = $TenantDomain
-    }{
-        $ProductNames = @($ProductName)
+    # Convert product name to execution name (defender -> securitysuite mapping)
+    $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
-        if (-Not [string]::IsNullOrEmpty($AppId)){
+    if ($ExecutionProductName -eq "securitysuite") {
+        $ProductNames = @($ExecutionProductName, "exo")
+    }
+    else {
+        $ProductNames = @($ExecutionProductName)
+    }
+
+    if (-Not [string]::IsNullOrEmpty($AppId)) {
+        $TempScubaConfig = New-Object -Type PSObject -Property @{
+            'AppID' = $AppId;
+            'CertificateThumbprint' = $Thumbprint;
+            'Organization' = $TenantDomain;
+        }
+        $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
+        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
+
         $ServicePrincipalParams = @{CertThumbprintParams = @{
             CertificateThumbprint = $Thumbprint;
             AppID = $AppId;
             Organization = $TenantDomain;
         }}
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-        }
-        else {
+    }
+    else {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
-        }
     }
 }
 
@@ -345,7 +353,7 @@ BeforeAll {
         $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
             if ($ProductName -eq 'exo') {
