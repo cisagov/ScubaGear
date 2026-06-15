@@ -896,6 +896,14 @@ function New-ExoSharingPolicy {
         [Parameter(Mandatory = $true)][string]$Name,
         [Parameter(Mandatory = $true)][string]$Domains
     )
+    # Remove any leftover policy from a prior failed run to avoid 400 on re-create
+    $Existing = Get-SharingPolicy | Where-Object {
+        [string]$_.Name -eq $Name -or [string]$_.Identity -eq $Name
+    } | Select-Object -First 1
+    if ($null -ne $Existing) {
+        $ExistingId = Resolve-FunctionalExoIdentity -InputObject $Existing
+        Remove-SharingPolicy -Identity $ExistingId
+    }
     New-SharingPolicy -Name $Name -Domains $Domains | Out-Null
     # Wait for the policy to become visible so ScubaGear's provider call sees it.
     Wait-FunctionalExoCondition -Condition {
@@ -941,6 +949,9 @@ function Disable-ExoExternalSenderWarningRules {
 function Enable-ExoExternalSenderWarningRules {
     [CmdletBinding()]
     param()
+    # Postcondition restore only - no propagation wait needed. The subsequent
+    # compliant test creates fresh state via New-ExoExternalSenderWarningRule.
+    # A wait for Count -gt 0 breaks on tenants that had no rules to begin with.
     Get-TransportRule |
         Where-Object {
             [string]$_.State -eq 'Disabled' -and
@@ -948,21 +959,19 @@ function Enable-ExoExternalSenderWarningRules {
             [string]$_.FromScope -eq 'NotInOrganization'
         } |
         Enable-TransportRule
-
-    # Wait for the enabled rule to become visible before ScubaGear reads state
-    Wait-FunctionalExoCondition -Condition {
-        @(Get-TransportRule | Where-Object {
-            [string]$_.State -eq 'Enabled' -and
-            [string]$_.Mode -eq 'Enforce' -and
-            [string]$_.FromScope -eq 'NotInOrganization'
-        }).Count -gt 0
-    } -FailureMessage "Failed to observe any external sender warning rules enabled after update."
-    Start-Sleep -Seconds 60
 }
 
 function New-ExoExternalSenderWarningRule {
     [CmdletBinding()]
     param([Parameter(Mandatory = $false)][string]$Name = 'FunctionalTest External sender warning')
+    # Remove any leftover rule from a prior failed run to avoid 400 on re-create
+    $Existing = Get-TransportRule | Where-Object {
+        [string]$_.Identity -eq $Name -or [string]$_.Name -eq $Name
+    } | Select-Object -First 1
+    if ($null -ne $Existing) {
+        $ExistingId = Resolve-FunctionalExoIdentity -InputObject $Existing
+        Remove-TransportRule -Identity $ExistingId
+    }
     New-TransportRule $Name -FromScope 'NotInOrganization' -PrependSubject '[External] ' | Out-Null
 }
 
