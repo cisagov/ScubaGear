@@ -31,6 +31,8 @@
 **/M365BaselineConformance*
 /Testing/Functional/Reports*
 /Testing/Functional/Archive*
+/Testing/Performance/TenantRuns/
+/Testing/Performance/*.json
 
 # Debug Logs
 /testing/M365Baseline*
