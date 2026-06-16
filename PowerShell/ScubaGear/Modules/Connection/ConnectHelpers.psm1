@@ -285,7 +285,7 @@ function Get-MsalAccessToken {
 
                 $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                     WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                    WithUseEmbeddedWebView($false).
+                    WithUseEmbeddedWebView($true).
                     ExecuteAsync().GetAwaiter().GetResult()
             }
             return $TokenResult.AccessToken
