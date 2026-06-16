@@ -909,7 +909,7 @@ Defend Against Evolving Cyber Threats \| Office of Management and
 - The creation of a custom audit
 log retention policy requires E5/G5 licenses or E3/G3 licenses with
 add-on compliance licenses.
-
+- To maintain logs in M365 for longer than 180 days, the user generating the logs must must have an Office 365 E5 or Microsoft 365 E5 license or a Microsoft Purview Suite (formerly known as Microsoft 365 E5 Compliance) or E5 eDiscovery and Audit add-on license.
 - Additionally, maintaining logs in the M365 environment for longer than
   one year requires an add-on license. For more information, see
   [Manage audit log retention policies | Microsoft Learn](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?tabs=microsoft-purview-portal#before-you-create-an-audit-log-retention-policy). However, this requirement can also be met by exporting the logs from M365 and storing them with your solution of choice, in which case audit log retention policies are not necessary.
