@@ -906,7 +906,9 @@ Defend Against Evolving Cyber Threats \| Office of Management and
 
 - Microsoft Purview Audit (Premium) logging capabilities, including the creation of a custom audit
   log retention policy, requires E5/G5 licenses or E3/G3 licenses with
-  add-on compliance licenses.
+- The creation of a custom audit
+log retention policy requires E5/G5 licenses or E3/G3 licenses with
+add-on compliance licenses.
 
 - Additionally, maintaining logs in the M365 environment for longer than
   one year requires an add-on license. For more information, see
