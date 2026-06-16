@@ -36,6 +36,10 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
 
             function Get-CommandTracker {}
             function Invoke-EXORestMethod {}
+            function Trace-ScubaFunction {
+                param($FunctionName, $Parameters, [scriptblock]$ScriptBlock, $LogReturnValue, $LogErrors)
+                & $ScriptBlock
+            }
 
             Mock -ModuleName ExportSecuritySuiteProvider Import-Module {}
             Mock -ModuleName ExportSecuritySuiteProvider Get-CommandTracker {
