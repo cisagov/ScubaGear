@@ -37,6 +37,7 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             function Get-CommandTracker {}
             function Invoke-EXORestMethod {}
             function Trace-ScubaFunction {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
                 param($FunctionName, $Parameters, [scriptblock]$ScriptBlock, $LogReturnValue, $LogErrors)
                 & $ScriptBlock
             }
