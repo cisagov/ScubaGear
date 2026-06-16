@@ -38,6 +38,7 @@ function Export-SecuritySuiteProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Trace-ScubaFunction
     $Tracker = Get-CommandTracker
 
     function Invoke-SecuritySuiteTrackedCommand {
@@ -49,7 +50,9 @@ function Export-SecuritySuiteProvider {
         )
 
         try {
-            $Result = Invoke-EXORestMethod -CmdletName $CmdletName -ApiEndpoint $ApiEndpoint -AccessToken $AccessToken
+            $Result = Trace-ScubaFunction -FunctionName $CmdletName -LogErrors $false -ScriptBlock {
+                Invoke-EXORestMethod -CmdletName $CmdletName -ApiEndpoint $ApiEndpoint -AccessToken $AccessToken
+            }
             $Tracker.AddSuccessfulCommand($CmdletName)
             return @($Result)
         }
