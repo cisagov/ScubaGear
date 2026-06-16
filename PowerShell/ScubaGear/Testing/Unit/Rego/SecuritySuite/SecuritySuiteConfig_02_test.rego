@@ -177,7 +177,7 @@ test_OrganizationDomains_Incorrect if {
     Output := securitysuite.tests with input.anti_phish_policies as AntiPhish
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled."
+    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled, includes all recipients, and has an appropriate domain impersonation action."
     TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -189,7 +189,7 @@ test_OrganizationDomains_NoActionFails if {
                             with input.accepted_domains as AcceptedDomains
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled."
+    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled, includes all recipients, and has an appropriate domain impersonation action."
     TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -343,7 +343,7 @@ test_UserWarnings_CustomPolicy_PartialRecipients if {
 
 test_UserWarnings_CustomPolicy_MissingSafetyTips if {
     BadPolicy := json.patch(CustomAntiPhishPolicy, [
-        {"op": "replace", "path": "EnableSuspiciousSafetyTip", "value": false}
+        {"op": "replace", "path": "EnableUnauthenticatedSender", "value": false}
     ])
     Output := securitysuite.tests with input.anti_phish_policies as [BadPolicy]
                             with input.anti_phish_rules as AntiPhishRules

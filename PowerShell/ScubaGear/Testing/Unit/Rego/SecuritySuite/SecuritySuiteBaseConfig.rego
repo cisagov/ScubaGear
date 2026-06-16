@@ -110,7 +110,7 @@ SafetyTipsEnabled := {
     "EnableSimilarDomainsSafetyTips": true,
     "EnableUnusualCharactersSafetyTips": true,
     "EnableViaTag": true,
-    "EnableSuspiciousSafetyTip": true,
+    "EnableUnauthenticatedSender": true,
 }
 
 DefaultAntiPhishPolicy := {
@@ -136,7 +136,7 @@ DefaultAntiPhishPolicy := {
     "EnableSimilarDomainsSafetyTips": SafetyTipsEnabled.EnableSimilarDomainsSafetyTips,
     "EnableUnusualCharactersSafetyTips": SafetyTipsEnabled.EnableUnusualCharactersSafetyTips,
     "EnableViaTag": SafetyTipsEnabled.EnableViaTag,
-    "EnableSuspiciousSafetyTip": SafetyTipsEnabled.EnableSuspiciousSafetyTip,
+    "EnableUnauthenticatedSender": SafetyTipsEnabled.EnableUnauthenticatedSender,
 }
 
 CustomAntiPhishPolicy := {
@@ -162,7 +162,7 @@ CustomAntiPhishPolicy := {
     "EnableSimilarDomainsSafetyTips": SafetyTipsEnabled.EnableSimilarDomainsSafetyTips,
     "EnableUnusualCharactersSafetyTips": SafetyTipsEnabled.EnableUnusualCharactersSafetyTips,
     "EnableViaTag": SafetyTipsEnabled.EnableViaTag,
-    "EnableSuspiciousSafetyTip": SafetyTipsEnabled.EnableSuspiciousSafetyTip,
+    "EnableUnauthenticatedSender": SafetyTipsEnabled.EnableUnauthenticatedSender,
 }
 
 AntiPhishRules := [
