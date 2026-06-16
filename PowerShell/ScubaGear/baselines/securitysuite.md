@@ -862,28 +862,24 @@ Unified Audit logging SHALL be enabled.
     - [T1562.008: Disable or Modify Cloud Logs](https://attack.mitre.org/techniques/T1562/008/)
 
 #### MS.SECURITYSUITE.5.2v1
-Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.
+Audit logs SHALL be retained and searchable for a minimum of 3 months and retrievable for a minimum of 12 months.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite52v1-instructions)
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SECURITYSUITE.5.3v1; Criticality: SHALL -->
+<!--Policy: MS.SECURITYSUITE.5.2v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
-- _Last modified:_ March 2026
-- _Note_: Purview Audit (Premium) provides a default audit log retention policy,
-          retaining Exchange Online, SharePoint Online, OneDrive for
-          Business, and Microsoft Entra ID audit records for one year.
-          Additional record types require custom audit retention policies.
-          Agencies may also consider alternate storage locations and services
-          to meet audit log retention needs.
+- _Last modified:_ June 2026
+- _Note:_ If the user generating the audit log doesn't meet the licensing requirements, data is retained according to the highest priority retention policy. This retention might be either the default retention policy for the user's license or the highest priority policy that matches the user and its record type.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
 
 ### Resources
 
-- [OMB M-21-31, Improving the Federal Government's Investigative and Remediation Capabilities
-Related to Cybersecurity Incidents \| Office of Management and
-  Budget](https://www.whitehouse.gov/wp-content/uploads/2021/08/M-21-31-Improving-the-Federal-Governments-Investigative-and-Remediation-Capabilities-Related-to-Cybersecurity-Incidents.pdf)
+- [OMB M-26-14, Ensuring Effective and Efficient Agency Logging and Network Visibility to
+Defend Against Evolving Cyber Threats \| Office of Management and
+  Budget](https://www.whitehouse.gov/wp-content/uploads/2026/05/M-26-14-Ensuring-Effective-and-Efficient-Agency-Logging-and-Network-Visibility-to-Defend-Against-Evolving-Cyber-Threats.pdf)
 
 - [Turn auditing on or off \| Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/audit-log-enable-disable?view=o365-worldwide)
