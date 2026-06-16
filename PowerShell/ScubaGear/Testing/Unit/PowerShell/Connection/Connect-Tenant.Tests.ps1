@@ -35,8 +35,6 @@ InModuleScope Connection {
             }
             function Get-MsalAccessToken {throw 'this will be mocked'}
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
-            function Connect-EXOHelper {throw 'this will be mocked'}
-            Mock Connect-EXOHelper -MockWith {}
             Mock -CommandName Write-Progress {
             }
         }
@@ -54,7 +52,6 @@ InModuleScope Connection {
                     'Get-MsalAccessToken',
                     'Connect-MicrosoftTeams'
                 )
-                EXOHelperCalls = 1
             }
 
         ){
@@ -76,7 +73,6 @@ InModuleScope Connection {
                 foreach ($Service in $Services){
                     Should -Invoke -CommandName $Service -Times 1 -Because "only want to authenticate to needed service once"
                 }
-                Should -Invoke -CommandName 'Connect-EXOHelper' -Times $EXOHelperCalls
             }
 
         }
