@@ -870,7 +870,7 @@ Audit logs SHALL be retained and searchable for a minimum of 3 months and retrie
 <!--Policy: MS.SECURITYSUITE.5.2v1; Criticality: SHALL -->
 - _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
 - _Last modified:_ June 2026
-- _Note:_ If the user generating the audit log doesn't meet the licensing requirements, data is retained according to the highest priority retention policy. This retention might be either the default retention policy for the user's license or the highest priority policy that matches the user and its record type.
+- _Note:_ To maintain logs in M365 for longer than 180 days, the user generating the logs must meet the license requirement described below. If the user does not meet these requirements, their data is retained according to the highest priority retention policy. This retention might be either the default retention policy for the user's license or the highest priority policy that matches the user and its record type.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
