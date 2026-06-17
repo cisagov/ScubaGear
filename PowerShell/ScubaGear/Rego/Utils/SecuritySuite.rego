@@ -299,12 +299,6 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     "Policies": [],
 }
 
-default OrganizationDomainProtectionCompliant := {
-    "Compliant": false,
-    "Message": ORG_DOMAIN_FAIL_MESSAGE,
-    "Policies": [],
-}
-
 OrganizationDomainProtectionCompliant := Result if {
     Compliant := {PhishPolicy |
         some PhishPolicy in EnabledAntiPhishPolicies
@@ -373,6 +367,10 @@ OrganizationDomainProtectionCompliant := Result if {
         "Message": "No anti-phish policy has 'Include domains I own' enabled for all recipients.",
         "Policies": Partial,
     }
+} else := {
+    "Compliant": false,
+    "Message": ORG_DOMAIN_FAIL_MESSAGE,
+    "Policies": [],
 }
 
 ##############################################
