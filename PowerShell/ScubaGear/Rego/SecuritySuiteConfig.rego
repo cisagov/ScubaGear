@@ -405,9 +405,112 @@ ActiveContentFilterPolicy(Policy) if {
 
 AllowedSpamActions := { "MoveToJmf", "Quarantine", "Redirect", "Delete" }
 
+# Per Microsoft's order of precedence for anti-spam policies:
+# 1. Strict preset
+# 2. Standard preset
+# 3. Custom policies
+# 4. Default policy
+#
+# A lower-priority policy's non-compliance is only counted when no
+# higher-priority active compliant policy shields it for shared recipients.
+
+# Strict preset is active and has compliant spam action settings
+StrictPresetIsCompliantForSpam if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Strict"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) == 0
+}
+
+# Standard preset is active and has compliant spam action settings
+StandardPresetIsCompliantForSpam if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Standard"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) == 0
+}
+
+AnyPresetIsCompliantForSpam if { StrictPresetIsCompliantForSpam }
+AnyPresetIsCompliantForSpam if { StandardPresetIsCompliantForSpam }
+
+# At least one active custom policy has compliant spam action settings
+AnyCustomIsCompliantForSpam if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Custom"
+    Policy.IsDefault == false
+    Policy.Identity in ActiveCustomContentFilterPolicies
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) == 0
+}
+
+# Strict preset: always check if active (highest priority, nothing overrides it)
 PoliciesWithInboxDelivery contains Policy.Identity if {
     some Policy in input.hosted_content_filter_policies
-    ActiveContentFilterPolicy(Policy)
+    Policy.RecommendedPolicyType == "Strict"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) > 0
+}
+
+# Standard preset: check only when strict preset policy is not active and compliant
+PoliciesWithInboxDelivery contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Standard"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    not StrictPresetIsCompliantForSpam
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) > 0
+}
+
+# Custom policies: check only when no active compliant preset exists
+PoliciesWithInboxDelivery contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Custom"
+    Policy.IsDefault == false
+    Policy.Identity in ActiveCustomContentFilterPolicies
+    not AnyPresetIsCompliantForSpam
+    Actions := {
+        Policy.SpamAction,
+        Policy.HighConfidenceSpamAction,
+        Policy.PhishSpamAction,
+        Policy.HighConfidencePhishAction
+    }
+    Count(Actions - AllowedSpamActions) > 0
+}
+
+# Default policy: check only when no higher-priority active compliant policy exists
+PoliciesWithInboxDelivery contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.IsDefault == true
+    not AnyPresetIsCompliantForSpam
+    not AnyCustomIsCompliantForSpam
     Actions := {
         Policy.SpamAction,
         Policy.HighConfidenceSpamAction,
@@ -422,14 +525,24 @@ ActiveContentFilterPoliciesChecked contains Policy.Identity if {
     ActiveContentFilterPolicy(Policy)
 }
 
-# On pass, list the policies that were checked.
-ReportDetailsSpamPolicy(true, _, CheckedPolicies, _) := concat(" ", [
-    "Requirement met. Active policies checked:",
-    concat(", ", CheckedPolicies)
+# Describes the active precedence tier and what was not evaluated
+SpamCascadeStatus := "Strict preset is active and compliant. Standard preset, Custom, and Default policies not evaluated" if {
+    StrictPresetIsCompliantForSpam
+} else := "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated" if {
+    StandardPresetIsCompliantForSpam
+} else := "No active compliant preset. Custom policy evaluation applied; Default policy not evaluated" if {
+    AnyCustomIsCompliantForSpam
+} else := "No active compliant preset or Custom policy. All active policies evaluated"
+
+# On pass, describe which tier is applied and what was not evaluated
+ReportDetailsSpamPolicy(true, _, CascadeStatus, _) := concat(" ", [
+    "Requirement met.",
+    CascadeStatus
 ])
 
-# On fail, list which policies failed.
-ReportDetailsSpamPolicy(false, FailingPolicies, _, ErrString) := Description([
+# On fail, lead with the cascade context, then list which policies failed.
+ReportDetailsSpamPolicy(false, FailingPolicies, CascadeStatus, ErrString) := Description([
+    concat("", [CascadeStatus, "."]),
     ArraySizeStr(FailingPolicies),
     ErrString,
     concat(", ", FailingPolicies)
@@ -447,7 +560,7 @@ tests contains {
     "ReportDetails": ReportDetailsSpamPolicy(
         Status,
         PoliciesWithInboxDelivery,
-        ActiveContentFilterPoliciesChecked,
+        SpamCascadeStatus,
         "anti-spam polic(ies) that may deliver spam/phishing to inbox:"
     ),
     "RequirementMet": Status
@@ -459,11 +572,78 @@ tests contains {
 #
 # MS.SECURITYSUITE.6.2v1
 #--
-PoliciesWithAllowedDomains contains Policy.Identity if {    
+
+# Strict preset is active and has no allowed sender domains
+StrictPresetIsCompliantForDomains if {
     some Policy in input.hosted_content_filter_policies
-    ActiveContentFilterPolicy(Policy)
+    Policy.RecommendedPolicyType == "Strict"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    Count(Policy.AllowedSenderDomains) == 0
+}
+
+# Standard preset is active and has no allowed sender domains
+StandardPresetIsCompliantForDomains if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Standard"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    Count(Policy.AllowedSenderDomains) == 0
+}
+
+AnyPresetIsCompliantForDomains if { StrictPresetIsCompliantForDomains }
+AnyPresetIsCompliantForDomains if { StandardPresetIsCompliantForDomains }
+
+# At least one active Custom policy has no allowed sender domains
+AnyCustomIsCompliantForDomains if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Custom"
+    Policy.IsDefault == false
+    Policy.Identity in ActiveCustomContentFilterPolicies
+    Count(Policy.AllowedSenderDomains) == 0
+}
+
+# Strict preset: always check if active
+PoliciesWithAllowedDomains contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Strict"
+    Policy.Identity in ActivePresetContentFilterPolicies
     Count(Policy.AllowedSenderDomains) > 0
 }
+
+# Standard preset: check only when Strict is not active and compliant
+PoliciesWithAllowedDomains contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Standard"
+    Policy.Identity in ActivePresetContentFilterPolicies
+    not StrictPresetIsCompliantForDomains
+    Count(Policy.AllowedSenderDomains) > 0
+}
+
+# Custom policies: check only when no active compliant preset exists
+PoliciesWithAllowedDomains contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.RecommendedPolicyType == "Custom"
+    Policy.IsDefault == false
+    Policy.Identity in ActiveCustomContentFilterPolicies
+    not AnyPresetIsCompliantForDomains
+    Count(Policy.AllowedSenderDomains) > 0
+}
+
+# Default policy: check only when no higher-priority active compliant policy exists
+PoliciesWithAllowedDomains contains Policy.Identity if {
+    some Policy in input.hosted_content_filter_policies
+    Policy.IsDefault == true
+    not AnyPresetIsCompliantForDomains
+    not AnyCustomIsCompliantForDomains
+    Count(Policy.AllowedSenderDomains) > 0
+}
+
+DomainsCascadeStatus := "Strict preset is active and compliant. Standard preset, Custom, and Default policies not evaluated" if {
+    StrictPresetIsCompliantForDomains
+} else := "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated" if {
+    StandardPresetIsCompliantForDomains
+} else := "No active compliant preset. Custom policy evaluation applied; Default policy not evaluated" if {
+    AnyCustomIsCompliantForDomains
+} else := "No active compliant preset or Custom policy. All active policies evaluated"
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.6.2v1",
@@ -477,7 +657,7 @@ tests contains {
     "ReportDetails": ReportDetailsSpamPolicy(
         Status,
         PoliciesWithAllowedDomains,
-        ActiveContentFilterPoliciesChecked,
+        DomainsCascadeStatus,
         "anti-spam polic(ies) with allowed domains:"
     ),
     "RequirementMet": Status
