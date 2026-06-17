@@ -17,7 +17,7 @@ Description: |
 ProductNames:
   - aad
   - exo
-  - defender
+  - securitysuite
   - teams
   - sharepoint
   - powerplatform
@@ -150,62 +150,26 @@ Exo:
       - example2.com
 
 # ============================
-# EXCLUSIONS : DEFENDER SAMPLE
+# EXCLUSIONS : Security Suite SAMPLE
 # ============================
-# This is for the Defender product.
-Defender:
-  # Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.
-  MS.DEFENDER.1.4v1: &CommonSensitiveAccountFilter
-    # Defines sensitive accounts filters used to select accounts to assign to
-    # the Strict Preset Security Policy for Exchange Online Protections
-    # Values for each key should match those shown in the 'Apply Exchange
-    # Online Protection' section of the manage protection settings dialog.
-    SensitiveAccounts:
-      IncludedUsers:
-        - johndoe@example.com
-      IncludedGroups:
-        - SG-MDE-Users@example.com
-      IncludedDomains:
-        - random.mail.example.com
-      ExcludedUsers:
-        - janedoe-ga@example.com
-      ExcludedGroups:
-        - SG-MDE-SensitiveAdmins@example.com
-      ExcludedDomains:
-        - contoso.com
-
-  # Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.
-  MS.DEFENDER.1.5v1:
-    *CommonSensitiveAccountFilter
-    # Defines sensitive accounts filters used to select accounts to assign to
-    # the Strict Preset Security Policy for Defender for Office 365.
-    # Values for each key should match those shown in the 'Apply Defender for
-    # Office 365 protection' section of the manage protection settings dialog.
-    # Note:  This example uses a YAML alias to re-use MS.DEFENDER.1.4v1 values
-
-  # User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
-  MS.DEFENDER.2.1v1: &UserImpersonationProtection
+# This is for the Security Suite baseline.
+SecuritySuite:
+  # User impersonation protection SHOULD be enabled for sensitive accounts
+  MS.SECURITYSUITE.2.1v1:
     # Defines sensitive user accounts by display name and email address in
     # the Strict and Standard Preset Security Policies impersonation
     # protection section.
-    # Each value should be a string in the form of the display name and
-    # email address separated by a semicolon.
+    # Each value should one of the following:
+    # - an email address
+    # - a string in the form of the display name and email address separated by a semicolon.
     SensitiveUsers:
-      - John Doe;jdoe@someemail.com
+      - jdoe@first.example.com
+      - John Doe;jdoe@second.example.com
 
-  # Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.
-  MS.DEFENDER.2.2v1: &AgencyDomainImpersonationProtection
-    # Defines a list of agency domain names that should be specified
-    # in the Strict and Standard Preset Security Policies impersonation
-    # protection section.
-    AgencyDomains:
-      - random.mail.example.com
-
-  # Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.
-  MS.DEFENDER.2.3v1: &PartnerDomainImpersonationProtection
+  # Domain impersonation protection SHOULD be added for important partners
+  MS.SECURITYSUITE.2.3v1:
     # Defines a list of frequent partner domain names that should be
-    # specified in the Strict and Standard Preset Security Policies
-    # impersonation protection section.
+    # specified in the anti-phishing policies
     PartnerDomains:
       - random.mail.example.com
 
@@ -308,16 +272,12 @@ OmitPolicy:
     Expiration: 2026-01-03
 
   # -------------------------------------
-  # OMIT POLICY : DEFENDER SAMPLE
+  # OMIT POLICY : SECURITYSUITE SAMPLE
   # -------------------------------------
   # User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.
-  MS.DEFENDER.2.1v1:
-    Rationale: "The user impersonation protection is not applicable to our environment. Our organization does not have any sensitive users
-      defined in the standard or strict preset policies."
-
-  # A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.
-  MS.DEFENDER.4.5v1:
-    Rationale: *DLPRationale
+  MS.SECURITYSUITE.2.1v1:
+    Rationale: "The user impersonation protection is not applicable to our environment as we use a 3rd party tool
+      instead of Defender."
 
 
 # Use this parameter to control what DNS resolver is used to fetch the SPF,
