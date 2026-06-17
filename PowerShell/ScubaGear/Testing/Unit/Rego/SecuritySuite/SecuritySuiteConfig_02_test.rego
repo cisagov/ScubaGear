@@ -59,7 +59,9 @@ test_SensitiveUsers_DefaultPolicy_AllRecipients if {
 }
 
 test_SensitiveUsers_NoActionFails if {
-    BadPolicy := json.patch(DefaultAntiPhishPolicy, [{"op": "replace", "path": "TargetedUserProtectionAction", "value": "NoAction"}])
+    BadPolicy := json.patch(DefaultAntiPhishPolicy, [
+        {"op": "replace", "path": "TargetedUserProtectionAction", "value": "NoAction"},
+    ])
     Output := securitysuite.tests with input.anti_phish_policies as [BadPolicy]
                             with input.anti_phish_rules as []
                             with input.protection_policy_rules as []
@@ -95,8 +97,7 @@ test_SensitiveUsers_NoLicense if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as false
 
-    ReportDetailString := DEFLICENSEWARNSTR
-    TestResult("MS.SECURITYSUITE.2.1v1", Output, ReportDetailString, false) == true
+    TestResult("MS.SECURITYSUITE.2.1v1", Output, DEFLICENSEWARNSTR, false) == true
 }
 #--
 
@@ -174,19 +175,27 @@ test_OrganizationDomains_Incorrect if {
     Output := securitysuite.tests with input.anti_phish_policies as AntiPhish
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled, includes all recipients, and has an appropriate domain impersonation action."
+    ReportDetailString := concat(" ", [
+        "No anti-phish policy has 'Include domains I own' enabled, includes all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ])
     TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
 }
 
 test_OrganizationDomains_NoActionFails if {
-    BadPolicy := json.patch(DefaultAntiPhishPolicy, [{"op": "replace", "path": "TargetedDomainProtectionAction", "value": "NoAction"}])
+    BadPolicy := json.patch(DefaultAntiPhishPolicy, [
+        {"op": "replace", "path": "TargetedDomainProtectionAction", "value": "NoAction"},
+    ])
     Output := securitysuite.tests with input.anti_phish_policies as [BadPolicy]
                             with input.anti_phish_rules as []
                             with input.protection_policy_rules as []
                             with input.accepted_domains as AcceptedDomains
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy has 'Include domains I own' enabled, includes all recipients, and has an appropriate domain impersonation action."
+    ReportDetailString := concat(" ", [
+        "No anti-phish policy has 'Include domains I own' enabled, includes all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ])
     TestResult("MS.SECURITYSUITE.2.2v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -256,7 +265,10 @@ test_PartnerDomains_PresetNotAllRecipients if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action."
+    ReportDetailString := concat(" ", [
+        "No anti-phish policy that includes all partner domains, all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ])
     TestResult("MS.SECURITYSUITE.2.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -269,7 +281,10 @@ test_PartnerDomains_Incorrect if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action."
+    ReportDetailString := concat(" ", [
+        "No anti-phish policy that includes all partner domains, all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ])
     TestResult("MS.SECURITYSUITE.2.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -282,7 +297,10 @@ test_PartnerDomains_NoActionFails if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as true
 
-    ReportDetailString := "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action."
+    ReportDetailString := concat(" ", [
+        "No anti-phish policy that includes all partner domains, all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ])
     TestResult("MS.SECURITYSUITE.2.3v1", Output, ReportDetailString, false) == true
 }
 #--

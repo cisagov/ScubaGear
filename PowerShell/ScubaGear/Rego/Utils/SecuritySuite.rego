@@ -285,13 +285,19 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     }
 } else := {
     "Compliant": false,
-    "Message": "No anti-phish policy that includes all partner domains, all recipients, and has an appropriate domain impersonation action.",
+    "Message": concat(" ", [
+        "No anti-phish policy that includes all partner domains, all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ]),
     "Policies": [],
 }
 
 default OrganizationDomainProtectionCompliant := {
     "Compliant": false,
-    "Message": "No anti-phish policy has 'Include domains I own' enabled, includes all recipients, and has an appropriate domain impersonation action.",
+    "Message": concat(" ", [
+        "No anti-phish policy has 'Include domains I own' enabled, includes all recipients,",
+        "and has an appropriate domain impersonation action.",
+    ]),
     "Policies": [],
 }
 
@@ -331,7 +337,10 @@ OrganizationDomainProtectionCompliant := Result if {
     Result := {
         "Compliant": false,
         "Message": concat(" ", [
-            sprintf("1 anti-phish policy found that has 'Include domains I own' enabled ('%v'),", [PartialPolicy.Name]),
+            sprintf(
+                "1 anti-phish policy found that has 'Include domains I own' enabled ('%v'),",
+                [PartialPolicy.Name],
+            ),
             "but not all users have been added as recipients.",
         ]),
         "Policies": Partial,
@@ -471,6 +480,7 @@ ImpersonationProtectionReportDetails(_, _) := DEFLICENSEWARNSTR if {
     input.defender_license == false
 }
 
-ImpersonationProtectionReportDetails(Status, Message) := ApplyLicenseWarningString(Status, Message) if {
+ImpersonationProtectionReportDetails(Status, Message) :=
+    ApplyLicenseWarningString(Status, Message) if {
     input.defender_license == true
 }
