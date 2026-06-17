@@ -1,0 +1,6 @@
+Description: Test Config for MS.SECURITYSUITE.2.3v1 - empty PartnerDomains list
+ProductNames:
+  - securitysuite
+LogIn: false
+SecuritySuite:
+  MS.SECURITYSUITE.2.3v1: {}
