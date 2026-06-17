@@ -87,7 +87,7 @@ AntiPhishRuleForPolicy(Rule, Policy) if {
     Rule.AntiPhishPolicy == Policy.Identity
 }
 
-CustomPolicyCoversAllRecipients(Policy) if {
+CustomAntiPhishPolicyCoversAllRecipients(Policy) if {
     count(TenantDomainNames) > 0
     count([
         Rule |
@@ -120,7 +120,7 @@ AntiPhishPolicyCoversAllRecipients(Policy) if {
 AntiPhishPolicyCoversAllRecipients(Policy) if {
     not Policy.IsDefault == true
     not IsPresetAntiPhishPolicy(Policy.Identity)
-    CustomPolicyCoversAllRecipients(Policy)
+    CustomAntiPhishPolicyCoversAllRecipients(Policy)
 }
 
 HasAcceptableUserProtectionAction(Policy) if {
