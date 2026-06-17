@@ -1,6 +1,7 @@
 package securitysuite_test
 import rego.v1
 import data.securitysuite
+import data.utils.defender.DEFLICENSEWARNSTR
 import data.utils.key.TestResult
 import data.utils.key.PASS
 
@@ -94,11 +95,7 @@ test_SensitiveUsers_NoLicense if {
                             with input.scuba_config as ScubaConfig
                             with input.defender_license as false
 
-    ReportDetailString := concat(" ", [
-        "Requirement not met **NOTE: Either you do not have sufficient permissions or",
-        "your tenant does not have a license for Microsoft Defender",
-        "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
-    ])
+    ReportDetailString := DEFLICENSEWARNSTR
     TestResult("MS.SECURITYSUITE.2.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -301,6 +298,26 @@ test_UserWarnings_PresetPolicy_AllRecipients if {
                             with input.defender_license as true
 
     TestResult("MS.SECURITYSUITE.2.4v1", Output, PASS, true) == true
+}
+
+test_UserWarnings_PresetPolicy_NoDefenderLicense if {
+    Output := securitysuite.tests with input.anti_phish_policies as []
+                            with input.anti_phish_rules as []
+                            with input.protection_policy_rules as ProtectionPolicyRules
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as false
+
+    TestResult("MS.SECURITYSUITE.2.4v1", Output, DEFLICENSEWARNSTR, false) == true
+}
+
+test_OrganizationDomains_PresetPolicy_NoDefenderLicense if {
+    Output := securitysuite.tests with input.anti_phish_policies as AntiPhishPolicies
+                            with input.anti_phish_rules as AntiPhishRules
+                            with input.protection_policy_rules as ProtectionPolicyRules
+                            with input.accepted_domains as AcceptedDomains
+                            with input.defender_license as false
+
+    TestResult("MS.SECURITYSUITE.2.2v1", Output, DEFLICENSEWARNSTR, false) == true
 }
 
 test_UserWarnings_CustomPolicy_AllRecipients if {

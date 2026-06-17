@@ -1,5 +1,7 @@
 package utils.securitysuite
 
+import data.utils.defender.ApplyLicenseWarningString
+import data.utils.defender.DEFLICENSEWARNSTR
 import data.utils.key.ConvertToSet
 import rego.v1
 
@@ -448,4 +450,27 @@ UserWarningsCompliant := Result if {
         "Message": "No anti-phish policy applies safety tips to all recipients.",
         "Policies": PartialRecipients,
     }
+}
+
+##############################################
+# Defender license (policy group 2) helpers  #
+##############################################
+
+# Impersonation and safety-tip policies require Defender for Office 365 Plan 1
+# or 2. Without it, automated results are not reliable; report a license warning
+# and do not pass the requirement.
+ImpersonationProtectionRequirementMet(_) := false if {
+    input.defender_license == false
+}
+
+ImpersonationProtectionRequirementMet(Status) := Status if {
+    input.defender_license == true
+}
+
+ImpersonationProtectionReportDetails(_, _) := DEFLICENSEWARNSTR if {
+    input.defender_license == false
+}
+
+ImpersonationProtectionReportDetails(Status, Message) := ApplyLicenseWarningString(Status, Message) if {
+    input.defender_license == true
 }

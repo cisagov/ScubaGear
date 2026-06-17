@@ -1,11 +1,12 @@
 package securitysuite
 import rego.v1
-import data.utils.defender.ApplyLicenseWarningString
 import data.utils.report.NotCheckedDetails
 import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
+import data.utils.securitysuite.ImpersonationProtectionReportDetails
+import data.utils.securitysuite.ImpersonationProtectionRequirementMet
 import data.utils.securitysuite.ListConfigValues
 import data.utils.securitysuite.OrganizationDomainProtectionCompliant
 import data.utils.securitysuite.PartnerDomainConfig
@@ -89,8 +90,8 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": {"SensitiveUsers": SensitiveUsers},
-    "ReportDetails": ApplyLicenseWarningString(false, ErrorMessage),
-    "RequirementMet": false
+    "ReportDetails": ImpersonationProtectionReportDetails(false, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(false)
 } if {
     SensitiveUsers := ListConfigValues("MS.SECURITYSUITE.2.1v1", "SensitiveUsers")
     count(SensitiveUsers) == 0
@@ -107,8 +108,8 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": Evaluation,
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
 } if {
     SensitiveUsers := ListConfigValues("MS.SECURITYSUITE.2.1v1", "SensitiveUsers")
     count(SensitiveUsers) > 0
@@ -131,8 +132,8 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": OrganizationDomainProtectionCompliant,
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
 } if {
     Status := OrganizationDomainProtectionCompliant.Compliant
     ErrorMessage := OrganizationDomainProtectionCompliant.Message
@@ -152,8 +153,8 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": {"PartnerDomains": PartnerDomains},
-    "ReportDetails": ApplyLicenseWarningString(false, ErrorMessage),
-    "RequirementMet": false
+    "ReportDetails": ImpersonationProtectionReportDetails(false, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(false)
 } if {
     PartnerDomains := PartnerDomainConfig("MS.SECURITYSUITE.2.3v1")
     count(PartnerDomains) == 0
@@ -170,8 +171,8 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": Evaluation,
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
 } if {
     PartnerDomains := PartnerDomainConfig("MS.SECURITYSUITE.2.3v1")
     count(PartnerDomains) > 0
@@ -194,8 +195,8 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": UserWarningsCompliant,
-    "ReportDetails": ApplyLicenseWarningString(Status, ErrorMessage),
-    "RequirementMet": Status
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
 } if {
     Status := UserWarningsCompliant.Compliant
     ErrorMessage := UserWarningsCompliant.Message
