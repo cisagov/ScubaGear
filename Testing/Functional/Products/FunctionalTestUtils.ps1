@@ -1,6 +1,166 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
 Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
+function Get-FunctionalTestHeaderValue {
+  param(
+    [Parameter(Mandatory = $true)] $Headers,
+    [Parameter(Mandatory = $true)] [string] $Name
+  )
+
+  if ($null -eq $Headers) {
+    return $null
+  }
+
+  if (-not $Response.Headers.ContainsKey($Name)) {
+    return $null
+  }
+
+  $HeadersValue = $Response.Headers[$Name]
+  $HeadersValueType = $Response.Headers[$Name].GetType()
+
+  if ($HeadersValueType -eq [string]) {
+    # Write-Information "PS 5 Header '$Name' value: $HeadersValue" -InformationAction Continue
+    return $HeadersValue
+  } elseif ($HeadersValueType -eq [string[]]) {
+    # Write-Information "PS 7 Header '$Name' values: $($HeadersValue[0])" -InformationAction Continue
+    # Return the first item in array
+    return $HeadersValue[0]
+  } else {
+    throw "Unexpected HTTP header value type: $HeadersValueType"
+  }
+
+  # if ($Headers -is [System.Collections.IDictionary]) {
+  #   foreach ($Key in $Headers.Keys) {
+  #     if ([string]::Equals([string]$Key, $Name, [System.StringComparison]::OrdinalIgnoreCase)) {
+  #       return [string]$Headers[$Key]
+  #     }
+  #   }
+  #   return $null
+  # }
+
+  # $Property = $Headers.PSObject.Properties | Where-Object {
+  #   [string]::Equals($_.Name, $Name, [System.StringComparison]::OrdinalIgnoreCase)
+  # } | Select-Object -First 1
+
+  # if ($null -eq $Property) {
+  #   return $null
+  # }
+
+  # return [string]$Property.Value
+}
+
+function Resolve-FunctionalTestPollingUri {
+  param(
+    [Parameter(Mandatory = $true)] [string] $RequestUri,
+    [Parameter(Mandatory = $true)] [string] $PollingUri
+  )
+
+  return [System.Uri]::new([System.Uri]$RequestUri, $PollingUri).AbsoluteUri
+}
+
+function Invoke-FunctionalTestRestRequest {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)] [string] $Uri,
+    [Parameter(Mandatory = $true)] [string] $Method,
+    [Parameter(Mandatory = $true)] [hashtable] $Headers,
+    [string] $Body,
+    [string] $ContentType,
+    [int] $DefaultRetryAfterSeconds = 5,
+    [int] $MaxPollAttempts = 10
+  )
+
+  $RequestUri = $Uri
+  $RequestMethod = $Method
+  $PollAttempts = 0
+
+  while ($true) {
+    $RequestParams = @{
+      Uri = $RequestUri
+      Method = $RequestMethod
+      Headers = $Headers
+      ErrorAction = 'Stop'
+    }
+
+    # PowerShell 5.1 can throw parser null-reference errors for Invoke-WebRequest
+    # unless -UseBasicParsing is explicitly supplied.
+    if ($null -ne (Get-Command Invoke-WebRequest).Parameters['UseBasicParsing']) {
+      $RequestParams.UseBasicParsing = $true
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($Body) -and $RequestMethod -ne 'GET') {
+      $RequestParams.Body = $Body
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($ContentType) -and $RequestMethod -ne 'GET') {
+      $RequestParams.ContentType = $ContentType
+    }
+
+    try {
+      $Response = Invoke-WebRequest @RequestParams
+    }
+    catch {
+      $StatusCode = $null
+      if ($null -ne $_.Exception.Response -and $null -ne $_.Exception.Response.StatusCode) {
+        $StatusCode = [int] $_.Exception.Response.StatusCode
+      }
+
+      if ($null -ne $StatusCode) {
+        throw "Request to $RequestUri failed with HTTP status code $StatusCode. $($_.Exception.Message)"
+      }
+
+      throw
+    }
+
+    $StatusCode = [int] $Response.StatusCode
+    if ($StatusCode -eq 202) {
+      $PollAttempts++
+      if ($PollAttempts -gt $MaxPollAttempts) {
+        throw "Request to $Uri did not complete after $MaxPollAttempts polling attempt(s)."
+      }
+
+      $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Location'
+      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Operation-Location'
+      }
+      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Azure-AsyncOperation'
+      }
+      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+        throw "Request to $RequestUri returned HTTP 202 without a polling location."
+      }
+
+      $RetryAfter = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Retry-After'
+      $RetryAfterSeconds = 0
+      if (-not [int]::TryParse([string] $RetryAfter, [ref] $RetryAfterSeconds) -or $RetryAfterSeconds -lt 1) {
+        $RetryAfterSeconds = $DefaultRetryAfterSeconds
+      }
+
+      Write-Information "Request to $RequestUri is still processing." -InformationAction Continue
+      Write-Information "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)" -InformationAction Continue
+      Start-Sleep -Seconds $RetryAfterSeconds
+      $RequestUri = Resolve-FunctionalTestPollingUri -RequestUri $RequestUri -PollingUri $PollingUri
+      $RequestMethod = 'GET'
+      continue
+    }
+
+    if ($StatusCode -lt 200 -or $StatusCode -ge 300) {
+      throw "Request to $RequestUri returned unexpected HTTP status code $StatusCode."
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Response.Content)) {
+      return $null
+    }
+
+    try {
+      return $Response.Content | ConvertFrom-Json
+    }
+    catch {
+      return $Response.Content
+    }
+  }
+}
+
 # -----------------------------------------------------------------------
 # Exchange Online REST wrappers for functional test pre/postconditions.
 # These replace ExchangeOnlineManagement cmdlets in EXO test plans.
@@ -484,8 +644,8 @@ function Set-ExoOrganizationAuditDisabled {
 # Products.Tests.ps1 BeforeAll before these functions are called.
 # -----------------------------------------------------------------------
 function Get-TenantSettings {
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01" `
-        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -ContentType "application/json"
+  $Response = Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01" `
+    -Method 'POST' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -ContentType 'application/json'
     return $Response
 }
 
@@ -493,14 +653,14 @@ function Set-TenantSettings {
     param([Parameter(Position=0)][object]$Settings, [hashtable]$RequestBody)
     if ($RequestBody) { $Body = $RequestBody | ConvertTo-Json -Depth 10 }
     else              { $Body = $Settings    | ConvertTo-Json -Depth 10 }
-    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01" `
-        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+  Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01" `
+    -Method 'POST' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType 'application/json' | Out-Null
 }
 
 function Get-AdminPowerAppEnvironment {
     param([switch]$Default)
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01" `
-        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+  $Response = Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01" `
+    -Method 'GET' -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
     if ($Default) {
         return $Response.value | Where-Object { $_.properties.isDefault -eq $true } | Select-Object -First 1 |
                Select-Object @{ Name="EnvironmentName"; Expression={ $_.name } }
@@ -509,8 +669,8 @@ function Get-AdminPowerAppEnvironment {
 }
 
 function Get-DlpPolicy {
-    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
-        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+  $Response = Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+    -Method 'GET' -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
     # Normalize ARM response: hoist properties.displayName and id to root to
     # match original Get-DlpPolicy cmdlet output expected by test plan filters.
     # id is preserved as the full ARM resource path for use in Remove-DlpPolicy.
@@ -536,8 +696,8 @@ function Remove-DlpPolicy {
         } else {
             "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$PolicyName"
         }
-        Invoke-RestMethod -Uri "$script:PPBaseUrl${Path}?api-version=2016-11-01" `
-            -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
+        Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl${Path}?api-version=2016-11-01" `
+          -Method 'DELETE' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
     }
 }
 
@@ -565,8 +725,8 @@ function New-AdminDlpPolicy {
             }
         }
     } | ConvertTo-Json -Depth 10
-    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
-        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+    Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+      -Method 'POST' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType 'application/json' | Out-Null
 }
 
 function Get-PowerAppTenantIsolationPolicy {
@@ -574,8 +734,8 @@ function Get-PowerAppTenantIsolationPolicy {
     $MaxAttempts = 3
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-            return Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
-                -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+        return Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+          -Method 'GET' -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
         }
         catch {
             if ($Attempt -ge $MaxAttempts) { throw }
@@ -591,8 +751,8 @@ function Set-PowerAppTenantIsolationPolicy {
     $MaxAttempts = 3
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-            Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
-                -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
+        Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+          -Method 'PUT' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType 'application/json' | Out-Null
             return
         }
         catch {
@@ -619,9 +779,9 @@ function Set-PowerBITenantSetting {
     $MaxAttempts = 3
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-            Invoke-RestMethod -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
-                -Method POST -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
-                -Body $Body -ContentType "application/json" | Out-Null
+        Invoke-FunctionalTestRestRequest -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
+          -Method 'POST' -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
+          -Body $Body -ContentType 'application/json' | Out-Null
             return
         }
         catch {
