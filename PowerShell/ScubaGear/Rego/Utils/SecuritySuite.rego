@@ -14,6 +14,16 @@ DEFENDER_POLICY_ALIASES := {
     "MS.SECURITYSUITE.2.3v1": "MS.DEFENDER.2.3v1",
 }
 
+PARTNER_DOMAIN_FAIL_MESSAGE := concat(" ", [
+    "No anti-phish policy that includes all partner domains, all recipients,",
+    "and has an appropriate domain impersonation action.",
+])
+
+ORG_DOMAIN_FAIL_MESSAGE := concat(" ", [
+    "No anti-phish policy has 'Include domains I own' enabled, includes all recipients,",
+    "and has an appropriate domain impersonation action.",
+])
+
 PolicyConfigSection(PolicyID) := Section if {
     Section := input.scuba_config.SecuritySuite[PolicyID]
 }
@@ -285,19 +295,13 @@ PartnerDomainImpersonationCompliant(ConfigDomains) := Result if {
     }
 } else := {
     "Compliant": false,
-    "Message": concat(" ", [
-        "No anti-phish policy that includes all partner domains, all recipients,",
-        "and has an appropriate domain impersonation action.",
-    ]),
+    "Message": PARTNER_DOMAIN_FAIL_MESSAGE,
     "Policies": [],
 }
 
 default OrganizationDomainProtectionCompliant := {
     "Compliant": false,
-    "Message": concat(" ", [
-        "No anti-phish policy has 'Include domains I own' enabled, includes all recipients,",
-        "and has an appropriate domain impersonation action.",
-    ]),
+    "Message": ORG_DOMAIN_FAIL_MESSAGE,
     "Policies": [],
 }
 
