@@ -99,19 +99,23 @@ AntiPhishRuleForPolicy(Rule, Policy) if {
     Rule.AntiPhishPolicy == Policy.Identity
 }
 
+CustomRuleCoversAllRecipients(Rule) if {
+    RuleFieldEmpty(Rule.SentTo)
+    RuleFieldEmpty(Rule.SentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfSentTo)
+    RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
+    RuleDomains := ConvertToSet(Rule.RecipientDomainIs)
+    count(TenantDomainNames - RuleDomains) == 0
+}
+
 CustomAntiPhishPolicyCoversAllRecipients(Policy) if {
     count(TenantDomainNames) > 0
     count([
         Rule |
         some Rule in input.anti_phish_rules
         AntiPhishRuleForPolicy(Rule, Policy)
-        RuleFieldEmpty(Rule.SentTo)
-        RuleFieldEmpty(Rule.SentToMemberOf)
-        RuleFieldEmpty(Rule.ExceptIfSentTo)
-        RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
-        RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
-        RuleDomains := ConvertToSet(Rule.RecipientDomainIs)
-        count(TenantDomainNames - RuleDomains) == 0
+        CustomRuleCoversAllRecipients(Rule)
     ]) > 0
 }
 
