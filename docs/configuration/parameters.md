@@ -24,8 +24,7 @@ Here is an example using `-AppID`:
 Invoke-SCuBA -ProductNames teams `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com `
-  -M365Environment gcc
+  -Organization contoso.onmicrosoft.com
 ```
 
 > **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
@@ -48,8 +47,7 @@ Here is an example using `-CertificateThumbprint`:
 Invoke-SCuBA -ProductNames teams `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com `
-  -M365Environment gcc
+  -Organization contoso.onmicrosoft.com
 ```
 
 > **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.
@@ -154,7 +152,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## M365Environment
 
-**M365Environment** is used to authenticate to the various M365 commercial/government environments.
+**M365Environment** is used to authenticate to the various M365 commercial/government environments. It is not required when authenticating using non-interactive (service principal) authentication.
 
 | Parameter   | Value        |
 |-------------|--------------|
@@ -163,10 +161,10 @@ Invoke-SCuBA -ProductNames teams `
 | Default     | `commercial` |
 | Config File | Yes          |
 
-> **Note**: This parameter is required if authenticating to Power Platform. It is also required if executing the tool against GCC High or DoD tenants.
+> **Note**: This parameter is required if authenticating to a GCC, GCC High or DoD tenants.
 
 ```powershell
-# Assess a government commercial account
+# Assess a government community cloud (gcc) tenant
 Invoke-SCuBA -ProductNames teams `
   -M365Environment gcc
 ```
@@ -176,8 +174,8 @@ The list of acceptable values are:
 | Tenant                          | Value      |
 |---------------------------------|------------|
 | Non-government tenants          | commercial |
-| Government cloud tenants        | gcc        |
-| Government cloud tenants (high) | gcchigh    |
+| Government community cloud        | gcc        |
+| Government community cloud (high) | gcchigh    |
 | Department of Defense tenants   | dod        |
 
 
@@ -229,7 +227,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## Organization
 
-**Organization** is the organization that's used in non-interactive mode authentication.  It is of the form `contoso.onmicrosoft.com`.
+**Organization** is the initial domain assigned when the tenant was created and is of the form `contoso.onmicrosoft.com`.
 
 | Parameter   | Value  |
 |-------------|--------|
@@ -245,8 +243,7 @@ Here is an example using Organization:
 Invoke-SCuBA -ProductNames teams `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com `
-  -M365Environment gcc
+  -Organization contoso.onmicrosoft.com
 ```
 
 > **Note**: AppID, CertificateThumbprint, and Organization are part of a parameter set used for authentication; if one is specified, all three must be specified.

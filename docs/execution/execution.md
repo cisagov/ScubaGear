@@ -80,16 +80,14 @@ More information about the resulting reports can be found on the [reports](repor
 
 ## Non-interactive Mode
 
-Non-interactive mode means that the credentials that are required by the underlying Microsoft libraries are supplied via command-line parameters or the config file. It uses an Entra ID [service principal](../prerequisites/noninteractive.md) and a certificate thumbprint, thus enabling ScubaGear to be used in automated processes, such as pipelines and scheduled jobs. 
+Non-interactive mode means that the credentials that are required to authenticate are supplied via command-line parameters or the config file. It uses an Entra ID [service principal](../prerequisites/noninteractive.md) and a certificate thumbprint, thus enabling ScubaGear to be used in automated processes, such as pipelines and scheduled jobs. 
 
 ```powershell
 # Assess with service principal
-# Must pass M365Environment. Acceptable values are: commercial, gcc, gcchigh
 Invoke-SCuBA -ProductNames * `
   -CertificateThumbprint fedcba9876543210fedcba9876543210fedcba98 `
   -AppID abcdef0123456789abcde01234566789 `
-  -Organization contoso.onmicrosoft.com `
-  -M365Environment gcc
+  -Organization contoso.onmicrosoft.com
 ```
 
 ## Parameters
