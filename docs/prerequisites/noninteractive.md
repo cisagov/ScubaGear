@@ -21,7 +21,7 @@ The table below lists the minimum permissions and roles required for ScubaGear t
 |                         | RoleManagement.Read.Directory                   |               |                                       |                                       |
 |                         | RoleManagementPolicy.Read.AzureADGroup          |               |                                       |                                       |
 |                         | User.Read.All                                   |               |                                       |                                       |
-| Defender for Office 365 |                                                 | Global Reader |                                       |                                       |
+| Security Suite          | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
 | Exchange Online         | Exchange.ManageAsApp                            | Global Reader | Office 365 Exchange Online<sup>1</sup>            | 00000002-0000-0ff1-ce00-000000000000  |
 | Power BI                | Tenant setting required <sup>3</sup>            |               |                                       |                                       |
 | Power Platform          | Registration required <sup>2</sup>                                     |               |                                       |                                       |
@@ -168,9 +168,9 @@ Get-PowerAppManagementApp -ApplicationId "your-app-id"
 
 This section contains additional, non-interactive authentication details that are required to successfully run ScubaGear against a GCC High tenant.
 
-### Defender in GCC High
+### Security Suite in GCC High
 
-When running ScubaGear to assess Defender for Office 365 in a GCC High tenant, the `Exchange.ManageAsApp` must be added as an application permission from both the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online`  APIs. This is mentioned in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
+When running ScubaGear to assess the Security Suite baseline in a GCC High tenant, the `Exchange.ManageAsApp` must be added as an application permission from both the `Microsoft Exchange Online Protection` and the `Office 365 Exchange Online`  APIs. This is mentioned in a GCC High application manifest writer's note in this section of the [Exchange Online App Only Auth MS Learn documentation](https://learn.microsoft.com/en-us/powershell/exchange/app-only-auth-powershell-v2?view=exchange-ps#modify-the-app-manifest-to-assign-api-permissions).
 
 ### SharePoint in GCC High
 

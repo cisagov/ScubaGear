@@ -109,3 +109,103 @@ InModuleScope PermissionsHelper {
         }
     }
 }
+
+InModuleScope PermissionsHelper {
+    Describe -Tag 'PermissionsHelper' -Name "Get-ScubaGearPermissions - securitysuite" {
+
+        Context "Check service principal API permissions for securitysuite (commercial)" {
+            It "should return Exchange.ManageAsApp for securitysuite commercial" {
+                $expected = @(
+                    "Exchange.ManageAsApp"
+                )
+                $result = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal
+                $result | Should -Be $expected
+            }
+        }
+
+        Context "Check service principal API permissions for securitysuite (gcchigh)" {
+            It "should return Exchange.ManageAsApp for securitysuite gcchigh" {
+                $result = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal -Environment gcchigh
+                $result | Should -Contain "Exchange.ManageAsApp"
+            }
+
+            It "should include both Exchange Online and EOP resource API IDs for securitysuite gcchigh" {
+                # gcchigh requires Exchange.ManageAsApp on BOTH
+                #   00000002-0000-0ff1-ce00-000000000000 (Exchange Online)
+                #   00000007-0000-0ff1-ce00-000000000000 (Exchange Online Protection)
+                $result = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal -OutAs appId -Environment gcchigh
+                $result | Should -HaveCount 2
+                $result | Should -Contain "00000002-0000-0ff1-ce00-000000000000"
+                $result | Should -Contain "00000007-0000-0ff1-ce00-000000000000"
+            }
+        }
+
+        Context "Check role permissions for securitysuite" {
+            It "should return Global Reader for securitysuite" {
+                $expected = @(
+                    "Global Reader"
+                )
+                $result = Get-ScubaGearPermissions -Product securitysuite -OutAs role
+                $result | Should -Be $expected
+            }
+        }
+
+        Context "Check that 'defender' is a valid alias for securitysuite" {
+            It "should return the same result for -Product defender as -Product securitysuite" {
+                $expected = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal
+                $result   = Get-ScubaGearPermissions -Product defender    -ServicePrincipal
+                $result | Should -Be $expected
+            }
+        }
+
+        Context "Wildcard expansion includes securitysuite" {
+            It "should include securitysuite permissions when -Product * is used with -ServicePrincipal" {
+                $result = Get-ScubaGearPermissions -Product * -ServicePrincipal
+                $result | Should -Contain "Exchange.ManageAsApp"
+            }
+        }
+    }
+}
+
+InModuleScope PermissionsHelper {
+    Describe -Tag 'PermissionsHelper' -Name "Get-ServicePrincipalPermissions - securitysuite" {
+
+        Context "securitysuite entries are included in service principal permission table" {
+            It "should return at least one row with scubaGearProduct containing securitysuite" {
+                $result = Get-ServicePrincipalPermissions
+                $ssRows = $result | Where-Object { $_.scubaGearProduct -contains "securitysuite" }
+                $ssRows | Should -Not -BeNullOrEmpty
+            }
+
+            It "should return Exchange.ManageAsApp as leastPermissions for securitysuite" {
+                $result = Get-ServicePrincipalPermissions
+                $ssRows = $result | Where-Object { $_.scubaGearProduct -contains "securitysuite" }
+                $ssRows.leastPermissions | Should -Contain "Exchange.ManageAsApp"
+            }
+
+            It "should reference the Office 365 Exchange Online resource API for securitysuite" {
+                $result = Get-ServicePrincipalPermissions
+                $ssRows = $result | Where-Object { $_.scubaGearProduct -contains "securitysuite" }
+                $ssRows.resourceAPIAppId | Should -Contain "00000002-0000-0ff1-ce00-000000000000"
+            }
+        }
+
+        Context "EXO service principal permissions are still present" {
+            It "should still include Exchange.ManageAsApp for exo product" {
+                $result = Get-ServicePrincipalPermissions
+                $exoRows = $result | Where-Object { $_.scubaGearProduct -contains "exo" }
+                $exoRows | Should -Not -BeNullOrEmpty
+                $exoRows.leastPermissions | Should -Contain "Exchange.ManageAsApp"
+            }
+        }
+
+        Context "SharePoint service principal permissions are still present" {
+            It "should still include Sites.FullControl.All for sharepoint product" {
+                $result = Get-ServicePrincipalPermissions
+                $spRows = $result | Where-Object { $_.scubaGearProduct -contains "sharepoint" }
+                $spRows | Should -Not -BeNullOrEmpty
+                $spRows.leastPermissions | Should -Contain "Sites.FullControl.All"
+            }
+        }
+    }
+}

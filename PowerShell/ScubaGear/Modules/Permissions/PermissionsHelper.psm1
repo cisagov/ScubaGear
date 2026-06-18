@@ -137,6 +137,11 @@ Function Get-ScubaGearPermissions {
             $Product = @('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform')
         }
 
+        # Alias: 'defender' is a backward-compatible alias for 'securitysuite'
+        if ($Product) {
+            $Product = $Product | ForEach-Object { if ($_ -eq 'defender') { 'securitysuite' } else { $_ } }
+        }
+
         if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){
             Write-Error -Message "Parameter [-Domain] is required when OutAs is endpoint"
         }
@@ -156,8 +161,14 @@ Function Get-ScubaGearPermissions {
                 '00000002-0000-0ff1-ce00-000000000000',
                 '00000007-0000-0ff1-ce00-000000000000'
             )
-            'defender'   = '00000002-0000-0ff1-ce00-000000000000'
-            'securitysuite' = '00000002-0000-0ff1-ce00-000000000000'
+            'defender'      = @(
+                '00000002-0000-0ff1-ce00-000000000000',
+                '00000007-0000-0ff1-ce00-000000000000'
+            )
+            'securitysuite' = @(
+                '00000002-0000-0ff1-ce00-000000000000',
+                '00000007-0000-0ff1-ce00-000000000000'
+            )
             'sharepoint' = '00000003-0000-0ff1-ce00-000000000000'
             'scubatank'  = '00000003-0000-0000-c000-000000000000'
         }
@@ -312,7 +323,7 @@ Function Get-ScubaGearPermissions {
             }
             'appId'{
                 Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty resourceAPIAppId -Unique"
-                $output += ($collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique).Split('#')[0]
+                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique | ForEach-Object { $_.Split('#')[0] }
             }
             'role' {
                 Try{
@@ -438,7 +449,7 @@ Function Get-ServicePrincipalPermissions {
         [string]$Environment = 'commercial'
     )
 
-    $ProductNames = "aad", "exo", "sharepoint"
+    $ProductNames = "aad", "exo", "sharepoint", "securitysuite"
 
     # Create a list to hold the filtered permissions
     $filteredPermissions = @()
