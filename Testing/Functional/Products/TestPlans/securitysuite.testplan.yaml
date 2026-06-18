@@ -312,6 +312,18 @@ TestPlan:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy PhishSpamAction set to AddXHeader
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction AddXHeader"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction Quarantine"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Standard preset active and compliant (Default not evaluated)
         Preconditions:
           - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader"
