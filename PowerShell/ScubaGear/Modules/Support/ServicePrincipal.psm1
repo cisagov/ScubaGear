@@ -2326,7 +2326,11 @@ function New-ScubaGearServicePrincipal {
         $allPermissions = Get-ServicePrincipalPermissions -Environment $M365Environment
 
         # Filter permissions based on selected products
-        $filteredPermissions = $allPermissions | Where-Object { $_.scubaGearProduct -in $ProductNames }
+        # scubaGearProduct is an array on each row, so use -contains instead of -in
+        $filteredPermissions = $allPermissions | Where-Object {
+            $prod = $_.scubaGearProduct
+            ($ProductNames | Where-Object { $prod -contains $_ }).Count -gt 0
+        }
 
         if ($(@($filteredPermissions).Count) -eq 0) {
             Write-Verbose "No API permissions needed for selected products (may require Entra role instead)"
