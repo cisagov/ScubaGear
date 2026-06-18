@@ -526,13 +526,22 @@ ActiveContentFilterPoliciesChecked contains Policy.Identity if {
 }
 
 # Describes the active precedence tier and what was not evaluated
+default SpamCascadeStatus := "No active compliant preset or Custom policy. All active policies evaluated"
+
 SpamCascadeStatus := "Strict preset is active and compliant. Standard preset, Custom, and Default policies not evaluated" if {
     StrictPresetIsCompliantForSpam
-} else := "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated" if {
+}
+
+SpamCascadeStatus := "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated" if {
+    not StrictPresetIsCompliantForSpam
     StandardPresetIsCompliantForSpam
-} else := "No active compliant preset. Custom policy evaluation applied; Default policy not evaluated" if {
+}
+
+SpamCascadeStatus := "No active compliant preset. Custom policy evaluation applied; Default policy not evaluated" if {
+    not StrictPresetIsCompliantForSpam
+    not StandardPresetIsCompliantForSpam
     AnyCustomIsCompliantForSpam
-} else := "No active compliant preset or Custom policy. All active policies evaluated"
+}
 
 # On pass, describe which tier is applied and what was not evaluated
 ReportDetailsSpamPolicy(true, _, CascadeStatus, _) := concat(" ", [
@@ -637,13 +646,22 @@ PoliciesWithAllowedDomains contains Policy.Identity if {
     Count(Policy.AllowedSenderDomains) > 0
 }
 
+default DomainsCascadeStatus := "No active compliant preset or Custom policy. All active policies evaluated"
+
 DomainsCascadeStatus := "Strict preset is active and compliant. Standard preset, Custom, and Default policies not evaluated" if {
     StrictPresetIsCompliantForDomains
-} else := "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated" if {
+}
+
+DomainsCascadeStatus := "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated" if {
+    not StrictPresetIsCompliantForDomains
     StandardPresetIsCompliantForDomains
-} else := "No active compliant preset. Custom policy evaluation applied; Default policy not evaluated" if {
+}
+
+DomainsCascadeStatus := "No active compliant preset. Custom policy evaluation applied; Default policy not evaluated" if {
+    not StrictPresetIsCompliantForDomains
+    not StandardPresetIsCompliantForDomains
     AnyCustomIsCompliantForDomains
-} else := "No active compliant preset or Custom policy. All active policies evaluated"
+}
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.6.2v1",

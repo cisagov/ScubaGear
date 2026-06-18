@@ -24,7 +24,10 @@ test_SpamPolicy_Correct_DefaultAndStandard if {
         with input.hosted_content_filter_rules as []
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
-    ReportDetailString := "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated"
+    ReportDetailString := concat("", [
+        "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). ",
+        "Custom and Default policies not evaluated"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, true) == true
 }
 
@@ -118,7 +121,10 @@ test_SpamPolicy_Incorrect_DefaultSpamAction if {
         with input.hosted_content_filter_rules as []
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -131,7 +137,10 @@ test_SpamPolicy_Incorrect_DefaultHighConfidenceSpamAction if {
         with input.hosted_content_filter_rules as []
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -144,7 +153,10 @@ test_SpamPolicy_Incorrect_DefaultPhishSpamAction if {
         with input.hosted_content_filter_rules as []
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -157,7 +169,10 @@ test_SpamPolicy_Incorrect_DefaultHighConfidencePhishAction if {
         with input.hosted_content_filter_rules as []
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -171,7 +186,8 @@ test_SpamPolicy_Incorrect_StandardPresetSpamAction if {
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
     ReportDetailString := concat("", [
-        "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
         StandardPresetPolicy.Identity
     ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
@@ -187,7 +203,8 @@ test_SpamPolicy_Incorrect_StrictPresetPhishSpamAction if {
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
     ReportDetailString := concat("", [
-        "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
         StrictPresetPolicy.Identity
     ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
@@ -202,7 +219,10 @@ test_SpamPolicy_Incorrect_ActiveCustomSpamAction if {
         with input.hosted_content_filter_rules as CustomPolicyRuleEnabled
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Custom Policy A"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Custom Policy A"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -217,7 +237,8 @@ test_SpamPolicy_Incorrect_TwoPoliciesFail if {
         with input.protection_policy_rules as []
 
     ReportDetailString := concat("", [
-        "No active compliant preset or Custom policy. All active policies evaluated. 2 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "2 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
         concat(", ", {"Custom Policy A", "Default"})
     ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
@@ -234,7 +255,8 @@ test_SpamPolicy_Incorrect_OnlyStrictFails if {
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
     ReportDetailString := concat("", [
-        "Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
+        "Standard preset is active and compliant (Strict not active or non-compliant). ",
+        "Custom and Default policies not evaluated. 1 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
         StrictPresetPolicy.Identity
     ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
@@ -253,7 +275,8 @@ test_SpamPolicy_Incorrect_AllPoliciesFail if {
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
     ReportDetailString := concat("", [
-        "No active compliant preset or Custom policy. All active policies evaluated. 4 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "4 anti-spam polic(ies) that may deliver spam/phishing to inbox: ",
         concat(", ", {
             "Custom Policy A",
             "Default",
@@ -288,7 +311,10 @@ test_SpamPolicy_Correct_PresetCompliantShieldsNonCompliantCustom if {
         with input.hosted_content_filter_rules as CustomPolicyRuleEnabled
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
-    ReportDetailString := "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated"
+    ReportDetailString := concat("", [
+        "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). ",
+        "Custom and Default policies not evaluated"
+    ])
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, true) == true
 }
 
@@ -400,7 +426,10 @@ test_AllowedDomains_Incorrect_Default if {
         with input.hosted_content_filter_rules as []
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) with allowed domains: Default"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) with allowed domains: Default"
+    ])
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -451,7 +480,10 @@ test_AllowedDomains_Incorrect_ActiveCustom if {
         with input.hosted_content_filter_rules as CustomPolicyRuleEnabled
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) with allowed domains: Custom Policy A"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) with allowed domains: Custom Policy A"
+    ])
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
 }
 
@@ -551,7 +583,10 @@ test_AllowedDomains_Correct_PresetCompliantShieldsNonCompliantCustom if {
         with input.hosted_content_filter_rules as CustomPolicyRuleEnabled
         with input.protection_policy_rules as ProtectionPolicyRulesEnabled
 
-    ReportDetailString := "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated"
+    ReportDetailString := concat("", [
+        "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). ",
+        "Custom and Default policies not evaluated"
+    ])
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, true) == true
 }
 
@@ -598,6 +633,9 @@ test_AllowedDomains_Incorrect_TwoCustomPoliciesOneDisabledOneEnabled if {
         with input.hosted_content_filter_rules as array.concat(CustomPolicyRuleDisabled, CustomPolicy2RuleEnabled)
         with input.protection_policy_rules as []
 
-    ReportDetailString := "No active compliant preset or Custom policy. All active policies evaluated. 1 anti-spam polic(ies) with allowed domains: Custom Policy B"
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) with allowed domains: Custom Policy B"
+    ])
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
 }
