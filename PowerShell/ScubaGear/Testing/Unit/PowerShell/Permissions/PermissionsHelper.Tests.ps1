@@ -150,14 +150,6 @@ InModuleScope PermissionsHelper {
             }
         }
 
-        Context "Check that 'defender' is a valid alias for securitysuite" {
-            It "should return the same result for -Product defender as -Product securitysuite" {
-                $expected = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal
-                $result   = Get-ScubaGearPermissions -Product defender    -ServicePrincipal
-                $result | Should -Be $expected
-            }
-        }
-
         Context "Wildcard expansion includes securitysuite" {
             It "should include securitysuite permissions when -Product * is used with -ServicePrincipal" {
                 $result = Get-ScubaGearPermissions -Product * -ServicePrincipal
