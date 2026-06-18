@@ -36,26 +36,132 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.2.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Compliant case - sensitive user matches tenant policy
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                scuba_config.SecuritySuite:
+                  MS.SECURITYSUITE.2.1v1:
+                    SensitiveUsers:
+                      - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Compliant case - sensitive user specified as email only
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                scuba_config.SecuritySuite:
+                  MS.SECURITYSUITE.2.1v1:
+                    SensitiveUsers:
+                      - agencyuserglobalreader@y2zj1.onmicrosoft.com
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Non-Compliant case - sensitive user not in tenant policy
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                scuba_config.SecuritySuite:
+                  MS.SECURITYSUITE.2.1v1:
+                    SensitiveUsers:
+                      - Mismatched User;mmuser@someemail.com
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.2.1v1 Non-Compliant case - no sensitive users in config file
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                scuba_config.SecuritySuite:
+                  MS.SECURITYSUITE.2.1v1: {}
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.2.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.2v1 Not Checked # TODO update once implemented
+      - TestDescription: MS.SECURITYSUITE.2.2v1 Non-Compliant case - include domains I own is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].EnableOrganizationDomainsProtection: false
+                anti_phish_policies[1].EnableOrganizationDomainsProtection: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.2.2v1 Compliant case - include domains I own is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].EnableOrganizationDomainsProtection: true
+        Postconditions: []
+        ExpectedResult: true
+  - PolicyId: MS.SECURITYSUITE.2.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - partner domain not in tenant policy
+        ConfigFileName: PartnerDomainList.yaml
         Preconditions: []
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - no partner domains in config file
+        ConfigFileName: EmptyPartnerDomains.yaml
+        Preconditions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.2.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.2.3v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - partner domains removed from anti-phish policy
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].TargetedDomainsToProtect: []
+                anti_phish_policies[1].TargetedDomainsToProtect: []
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - preset policy does not apply to all recipients
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_policy_rules[0].SentTo: ["user@example.com"]
+                protection_policy_rules[1].SentTo: ["user@example.com"]
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.2.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.2.4v1 Compliant case - default policy has all safety tips enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].EnableFirstContactSafetyTips: true
+                anti_phish_policies[0].EnableSimilarUsersSafetyTips: true
+                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: true
+                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: true
+                anti_phish_policies[0].EnableViaTag: true
+                anti_phish_policies[0].EnableSuspiciousSafetyTip: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.2.4v1 Non-Compliant case - safety tips disabled on default policy
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                anti_phish_policies[0].EnableFirstContactSafetyTips: false
+                anti_phish_policies[0].EnableSimilarUsersSafetyTips: false
+                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: false
+                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: false
+                anti_phish_policies[0].EnableViaTag: false
+                anti_phish_policies[0].EnableSuspiciousSafetyTip: false
+                protection_policy_rules[0].SentTo: ["user@example.com"]
+                protection_policy_rules[1].SentTo: ["user@example.com"]
+        Postconditions: []
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.3.1v1

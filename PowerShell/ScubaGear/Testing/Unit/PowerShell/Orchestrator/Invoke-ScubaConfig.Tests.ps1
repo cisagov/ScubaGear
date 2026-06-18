@@ -126,9 +126,39 @@ InModuleScope Orchestrator {
         }
         Mock -CommandName New-Item {}
         Mock -CommandName Copy-Item {}
-        Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
+        function Write-ScubaLog {throw 'this will be mocked'}
         Mock -ModuleName Orchestrator Write-ScubaLog {}
+        function Write-ScubaRunDetails {throw 'this will be mocked'}
         Mock -ModuleName Orchestrator Write-ScubaRunDetails {}
+
+        function Initialize-ScubaLogging {throw 'this will be mocked'}
+        Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
+        function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
+        Mock -ModuleName Orchestrator Get-M365EnvironmentByDomain {
+            return "commercial"
+        }
+
+        function Get-ServicePrincipalParams {throw 'this will be mocked'}
+        Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
+
+        function Trace-ScubaFunction {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
+            param(
+                [string] $FunctionName,
+                [hashtable] $Parameters,
+                [switch] $LogReturnValue,
+                [scriptblock] $ScriptBlock
+            )
+
+            throw 'this will be mocked'
+        }
+        Mock -ModuleName Orchestrator Trace-ScubaFunction {
+            $scriptBlockToInvoke = $args |
+                Where-Object { $_ -is [scriptblock] } |
+                Select-Object -First 1
+
+            & $scriptBlockToInvoke
+        }
     }
 
     Context  "Parameter override test"{
@@ -155,7 +185,7 @@ InModuleScope Orchestrator {
                         CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
                     }
                 }
-                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml") -SilenceBODWarnings
             }
 
             It "Verify parameter ""<parameter>"" with value ""<value>""" -ForEach @(
@@ -199,7 +229,7 @@ InModuleScope Orchestrator {
                 }
                 Invoke-SCuBA `
                   -ProductNames "*" `
-                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml")
+                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml") -SilenceBODWarnings
             }
 
             It "Verify parameter, ProductNames, with wildcard CLI override"{
@@ -228,7 +258,7 @@ InModuleScope Orchestrator {
                     }
                 }
                 Invoke-SCuBA `
-                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "product_wildcard_config_test.yaml")
+                  -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "product_wildcard_config_test.yaml") -SilenceBODWarnings
             }
 
             It "Verify parameter, ProductNames, reflects all products"{

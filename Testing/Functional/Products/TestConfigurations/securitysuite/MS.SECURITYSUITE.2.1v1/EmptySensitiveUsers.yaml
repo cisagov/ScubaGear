@@ -1,0 +1,6 @@
+Description: Test Config for MS.SECURITYSUITE.2.1v1 - empty SensitiveUsers list
+ProductNames:
+  - securitysuite
+LogIn: false
+SecuritySuite:
+  MS.SECURITYSUITE.2.1v1: {}

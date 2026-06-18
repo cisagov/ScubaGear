@@ -38,6 +38,10 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-AntiPhishRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             "Get-HostedConnectionFilterPolicy" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}

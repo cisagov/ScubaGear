@@ -2,12 +2,19 @@ Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-Graph
 
 function Export-AADProvider {
     <#
-    .Description
-    Gets the Azure Active Directory (AAD) settings that are relevant
-    to the SCuBA AAD baselines using a subset of the modules under the
-    overall Microsoft Graph PowerShell Module
-    .Functionality
-    Internal
+    .SYNOPSIS
+        Exports the Entra ID (Azure AD) configuration relevant to the ScubaGear AAD baselines.
+    .DESCRIPTION
+        Gets the Azure Active Directory (AAD) settings that are relevant
+        to the SCuBA AAD baselines using a subset of the modules under the
+        overall Microsoft Graph PowerShell Module. Returns a string of comma
+        separated JSON name/value pairs that are merged into the ScubaGear
+        provider settings output.
+    .PARAMETER M365Environment
+        The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
+        It selects the Graph endpoints used when retrieving the tenant configuration.
+    .FUNCTIONALITY
+        Internal
     #>
 
     [CmdletBinding()]
@@ -289,10 +296,18 @@ function Export-AADProvider {
 
 function Get-AADTenantDetail {
     <#
-    .Description
-    Gets the tenant details using the Microsoft Graph PowerShell Module
-    .Functionality
-    Internal
+    .SYNOPSIS
+        Returns identifying details about the connected Entra ID (Azure AD) tenant.
+    .DESCRIPTION
+        Gets the tenant details using the Microsoft Graph PowerShell Module. Returns a JSON
+        string with the tenant display name, initial domain name, and tenant id. If the
+        lookup fails the function returns placeholder error values instead of throwing so
+        that the rest of the export can continue.
+    .PARAMETER M365Environment
+        The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
+        It selects the Graph endpoint used to read the organization details.
+    .FUNCTIONALITY
+        Internal
     #>
     param (
         [ValidateNotNullOrEmpty()]
@@ -330,10 +345,22 @@ function Get-AADTenantDetail {
 
 function Get-PrivilegedUser {
     <#
-    .Description
-    Returns a hashtable of privileged users and their respective roles
-    .Functionality
-    Internal
+    .SYNOPSIS
+        Builds the set of users and service principals that hold privileged Entra ID roles.
+    .DESCRIPTION
+        Returns a hashtable of privileged users and their respective roles. The hashtable is
+        keyed by object id and includes users and service principals that are Actively
+        assigned to a privileged role, members reached transitively through assigned groups,
+        and, when the tenant has the required premium license, principals that hold Eligible
+        (PIM) assignments.
+    .PARAMETER TenantHasPremiumLicense
+        Indicates whether the tenant has the Entra ID premium (P2) license. When true the
+        function also processes Eligible PIM role assignments in addition to Active ones.
+    .PARAMETER M365Environment
+        The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
+        It selects the Graph endpoints used to enumerate roles and their members.
+    .FUNCTIONALITY
+        Internal
     #>
     param (
         [ValidateNotNullOrEmpty()]
@@ -406,11 +433,33 @@ function Get-PrivilegedUser {
 
 function LoadObjectDataIntoPrivilegedUserHashtable {
     <#
-    .Description
-    Takes an object Id (either a user or group) and loads metadata about the object in the provided privileged user hashtable.
-    If the object is a group, this function will iterate the group members and load metadata about each member.
-    .Functionality
-    Internal
+    .SYNOPSIS
+        Loads metadata for a privileged directory object into the privileged user hashtable.
+    .DESCRIPTION
+        Takes an object Id (either a user or group) and loads metadata about the object in the provided privileged user hashtable.
+        If the object is a group, this function will iterate the group members and load metadata about each member. Group nesting
+        is followed up to two levels deep, which also guards against infinite loops caused by circular PIM group assignments.
+    .PARAMETER RoleName
+        The display name of the privileged role to record against the object (and any of its members) in the hashtable.
+    .PARAMETER PrivilegedUsers
+        The hashtable that accumulates privileged user and service principal metadata. It is updated in place by this function.
+    .PARAMETER ObjectId
+        The Entra Id unique identifier for an object (either a user or a group) in the directory.
+        Metadata about this object will be loaded into the PrivilegedUsers hashtable which is passed as a parameter.
+    .PARAMETER TenantHasPremiumLicense
+        Indicates whether the tenant has the Entra ID premium (P2) license. When true, Eligible members of a PIM for Groups
+        group are also processed.
+    .PARAMETER M365Environment
+        The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
+        It selects the Graph endpoints used to read the object and any group members.
+    .PARAMETER Objecttype
+        The type of Entra Id object that the ObjectId parameter references. Valid values are "user", "serviceprincipal", and
+        "group". If this is not passed, the function calls Graph to dynamically determine the object type.
+    .PARAMETER Recursioncount
+        The current group nesting depth. Used internally when the function recurses into nested PIM groups; callers normally
+        leave it at the default of 0.
+    .FUNCTIONALITY
+        Internal
     #>
     param (
         [Parameter(Mandatory=$true)]
@@ -562,9 +611,20 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
 
 function AddRuleSource{
     <#
-        .NOTES
-        Internal helper function to add a source to policy rule for reporting purposes.
-        Source should be either PIM Group Name or Role Name
+    .SYNOPSIS
+        Tags policy rules with the source that contributed them, for reporting purposes.
+    .DESCRIPTION
+        Internal helper function that adds a source to policy rules for reporting purposes. Each rule receives a RuleSource
+        and a RuleSourceType note property. The source should be either a PIM Group name or a Role name.
+    .PARAMETER Source
+        The name of the source that contributed the rules, typically a PIM Group name or a directory Role name.
+    .PARAMETER SourceType
+        A label describing what kind of source the rules came from. Defaults to "Directory Role".
+    .PARAMETER Rules
+        The array of policy rule objects to annotate. Each rule is updated in place with the RuleSource and RuleSourceType
+        note properties.
+    .FUNCTIONALITY
+        Internal
     #>
     param(
         [ValidateNotNullOrEmpty()]
@@ -595,7 +655,19 @@ function GetConfigurationsForPimGroups{
         Retrieves all groups enrolled in PIM for Groups management using the
         privilegedAccess groups API, batch fetches display names, batch fetches
         policy assignments to get policyIds, then batch fetches all policy rules.
-
+        The resulting rules are attached to the matching roles in the privileged
+        role array.
+    .PARAMETER PrivilegedRoleArray
+        The array of privileged role objects to enrich. Policy rules for PIM groups are added to the roles those groups
+        are assigned to, in place.
+    .PARAMETER AllRoleAssignments
+        The combined set of role assignment objects (Active and Eligible) used to map each PIM group to the roles it is
+        assigned to.
+    .PARAMETER M365Environment
+        The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
+        It selects the Graph endpoints used for the PIM group, policy assignment, and policy rule lookups.
+    .FUNCTIONALITY
+        Internal
     #>
     param (
         [ValidateNotNullOrEmpty()]
@@ -706,6 +778,20 @@ function GetConfigurationsForPimGroups{
 }
 
 function GetConfigurationsForRoles{
+    <#
+    .SYNOPSIS
+        Attaches per-role PIM configuration settings and assignments to the privileged role array.
+    .DESCRIPTION
+        Gets the role management policy assignments and policy rules (aka configurations) for each directory role in the
+        privileged role array, along with the user and group assignments for that role. The assignments and rules are
+        added to each role object in place for later reporting.
+    .PARAMETER PrivilegedRoleArray
+        The array of privileged role objects to enrich. Assignments and configuration rules are added to each role in place.
+    .PARAMETER AllRoleAssignments
+        The set of role assignment objects used to determine which users and groups are assigned to each role.
+    .FUNCTIONALITY
+        Internal
+    #>
     param (
         [ValidateNotNullOrEmpty()]
         [array]
@@ -748,10 +834,20 @@ function GetConfigurationsForRoles{
 }
 function Get-PrivilegedRole {
     <#
-    .Description
-    Returns an array of the highly privileged roles along with the users actively assigned to the role and the security configurations applied to the role
-    .Functionality
-    Internal
+    .SYNOPSIS
+        Builds the array of highly privileged Entra ID roles with their assignments and PIM configurations.
+    .DESCRIPTION
+        Returns an array of the highly privileged roles along with the users actively assigned to the role and the security
+        configurations applied to the role. When the tenant has the required premium license, the array is also enriched with
+        the PIM role management policy rules for the roles and for any PIM for Groups groups assigned to them.
+    .PARAMETER TenantHasPremiumLicense
+        Indicates whether the tenant has the Entra ID premium (P2) license. When true the function reads PIM role and group
+        configurations and the active role assignments; when false only the base role list is returned.
+    .PARAMETER M365Environment
+        The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
+        It selects the Graph endpoints used to enumerate the roles, assignments, and policy rules.
+    .FUNCTIONALITY
+        Internal
     #>
     param (
         [ValidateNotNullOrEmpty()]
