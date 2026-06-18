@@ -159,8 +159,7 @@ function Export-AADProvider {
             }
         }
 
-        $PrivilegedUsers = ConvertTo-Json $PrivilegedUsers
-        $PrivilegedUsers = if ($null -eq $PrivilegedUsers) {"{}"} else {$PrivilegedUsers}
+        $PrivilegedUsers = ConvertTo-Json @($PrivilegedUsers)
 
         # Get-PrivilegedRole provides a list of security configurations for each privileged role and information about Active user assignments
         $PrivilegedRoles = $Tracker.TryCommand("Get-PrivilegedRole", @{"TenantHasPremiumLicense"=$TenantHasPremiumLicense; "M365Environment"=$M365Environment})
@@ -255,8 +254,7 @@ function Export-AADProvider {
     ##### End slowest functions block
 
     # PrivilegedServicePrincipals is converted to JSON here because earlier it is used as a PowerShell object.
-    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+    $PrivilegedServicePrincipals = ConvertTo-Json @($PrivilegedServicePrincipals)
 
     # This conversion to JSON needs to be last because other blocks above here rely on the $ServicePlans object in its PowerShell form.
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
