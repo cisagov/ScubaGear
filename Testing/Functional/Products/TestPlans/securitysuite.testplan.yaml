@@ -292,9 +292,11 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
           - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader"
         Postconditions:
           - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
@@ -302,29 +304,11 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
           - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction AddXHeader"
         Postconditions:
           - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction MoveToJmf"
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
-        ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy PhishSpamAction set to AddXHeader
-        Preconditions:
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction AddXHeader"
-        Postconditions:
-          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction Quarantine"
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
-        ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy HighConfidencePhishAction set to AddXHeader
-        Preconditions:
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
-          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidencePhishAction AddXHeader"
-        Postconditions:
-          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidencePhishAction Quarantine"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
