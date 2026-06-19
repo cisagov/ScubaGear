@@ -198,10 +198,16 @@ function New-Report {
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json" -Resolve
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
+    if (-not (Test-Path -LiteralPath $FileName -PathType Leaf)) {
+        throw "Provider settings file not found at '$FileName'. Verify the output path is accessible and does not contain issues (e.g., Some paths with spaces may require specifying an explicit -OutPath)."
+    }
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
+    if (-not (Test-Path -LiteralPath $FileName -PathType Leaf)) {
+        throw "Rego output file not found at '$FileName'. The OPA evaluation may have failed for all products. If the module is installed in a folder with spaces in the path, try specifying an explicit -OutPath to a local directory without spaces."
+    }
     $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
