@@ -62,7 +62,7 @@ function Get-Utf8NoBom {
         # The $false in the next line indicates that the BOM should not be used.
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False
 
-        $ResolvedPath = $(Resolve-Path $FilePath).ProviderPath
+        $ResolvedPath = $(Resolve-Path -LiteralPath $FilePath).ProviderPath
         $Content = Invoke-ReadAllText -Path $ResolvedPath -Encoding $Utf8NoBomEncoding
         $Content
     }
