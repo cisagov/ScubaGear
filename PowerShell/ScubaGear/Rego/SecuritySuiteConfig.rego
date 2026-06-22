@@ -484,13 +484,35 @@ tests contains {
 #
 # MS.SECURITYSUITE.3.5v1
 #--
+
+# Return true when a DLP rule has the requested endpoint restriction set to Block.
+EndpointRestrictionBlocks(Rule, Setting) if {
+    some Restriction in object.get(Rule, "EndpointDlpRestrictions", [])
+
+    Restriction.setting == Setting
+    Restriction.value == "Block"
+}
+
+# Save the rule name if a single DLP Endpoint restriction rule blocks
+# both restricted apps and unwanted Bluetooth transfer apps.
+RulesBlockingUnallowedAppsAndBluetooth contains Rule.Name if {
+    some Rule in input.dlp_compliance_rules
+
+    EndpointRestrictionBlocks(Rule, "UnallowedApps")
+    EndpointRestrictionBlocks(Rule, "UnallowedBluetoothTransferApps")
+}
+
+ErrorMessage3_5 := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.3.5v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.3.5v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-DLPComplianceRule"],
+    "ActualValue": RulesBlockingUnallowedAppsAndBluetooth,
+    "ReportDetails": DLPLicenseWarningString(Status, ErrorMessage3_5),
+    "RequirementMet": Status
+} if {
+    Status := count(RulesBlockingUnallowedAppsAndBluetooth) > 0
 }
 #--
 

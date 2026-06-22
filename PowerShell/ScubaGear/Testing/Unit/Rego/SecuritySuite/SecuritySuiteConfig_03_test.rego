@@ -1,7 +1,6 @@
 package securitysuite_test
 import rego.v1
 import data.securitysuite
-import data.utils.report.NotCheckedDetails
 import data.utils.key.TestResult
 import data.utils.key.PASS
 import data.utils.key.FAIL
@@ -546,5 +545,60 @@ test_NoDLPLicense_Incorrect_3_4_V1 if {
 #
 # MS.SECURITYSUITE.3.5v1
 #--
+test_UnallowedAppsAndBluetooth_Correct_V1 if {
+    DlpComplianceRule := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "EndpointDlpRestrictions", "value": [
+                                    {"setting": "UnallowedApps", "value": "Block"},
+                                    {"setting": "UnallowedBluetoothTransferApps", "value": "Block"}
+                                ]}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    TestResult("MS.SECURITYSUITE.3.5v1", Output, PASS, true) == true
+}
+
+test_UnallowedAppsAndBluetooth_Incorrect_V1 if {
+    DlpComplianceRule := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "EndpointDlpRestrictions", "value": [
+                                    {"setting": "UnallowedApps", "value": "Audit"},
+                                    {"setting": "UnallowedBluetoothTransferApps", "value": "Block"}
+                                ]}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
+    TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
+}
+
+test_UnallowedAppsAndBluetooth_Incorrect_V2 if {
+    DlpComplianceRuleApps := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "Name", "value": "Rule blocking unallowed apps"},
+                                {"op": "add", "path": "EndpointDlpRestrictions", "value": [
+                                    {"setting": "UnallowedApps", "value": "Block"}
+                                ]}])
+    DlpComplianceRuleBluetooth := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "Name", "value": "Rule blocking Bluetooth only"},
+                                {"op": "add", "path": "EndpointDlpRestrictions", "value": [
+                                    {"setting": "UnallowedApps", "value": "Audit"},
+                                    {"setting": "UnallowedBluetoothTransferApps", "value": "Block"}
+                                ]}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [
+                                DlpComplianceRuleApps,
+                                DlpComplianceRuleBluetooth
+                            ]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
+    TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
+}
 
 #--
