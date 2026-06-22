@@ -79,7 +79,10 @@ function DownLoadDriver{
     Write-Debug -Message "Downloading $DownloadUrl"
 
     try {
-        Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" -ErrorAction 'Stop' 2>&1 | Out-Null
+        Write-Information "Downloading new driver from $DownloadUrl..." -InformationAction Continue
+        # ProgressPreference is a reserved PowerShell variable and setting it to the value below makes Invoke-WebRequest super fast because it bypasses the slow progress bar.
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" -ErrorAction 'Stop'
 
         Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
 

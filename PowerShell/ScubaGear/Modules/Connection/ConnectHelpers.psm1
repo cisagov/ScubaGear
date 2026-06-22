@@ -44,6 +44,27 @@
             $GraphParams += @{'Environment' = "USGovDoD"; }
         }
     }
+    ########## New code (DELETE)
+    # Initialize-Msal
+    # $AssemblyDebugInfo =
+    #     [AppDomain]::CurrentDomain.GetAssemblies() |
+    #     Where-Object {
+    #         $_.GetName().Name -like '*Identity*' -or
+    #         $_.GetName().Name -like '*Graph*'
+    #     } |
+    #     Select-Object @{
+    #         Name = 'Name'
+    #         Expression = { $_.GetName().Name }
+    #     }, @{
+    #         Name = 'Version'
+    #         Expression = { $_.GetName().Version.ToString() }
+    #     }, Location |
+    #     Sort-Object Name, Version, Location |
+    #     Format-Table -AutoSize -Wrap |
+    #     Out-String -Width 4096
+
+    # Write-Information $AssemblyDebugInfo -InformationAction Continue
+    ############
     Connect-MgGraph @GraphParams | Out-Null
 }
 
@@ -147,34 +168,109 @@ function Initialize-Msal {
     [CmdletBinding()]
     param()
 
-    # Check if already resolvable
+    ###########################################
+    # Check if MSAL type is already available
     try {
-        $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
+        $null = [Microsoft.Identity.Client.PublicClientApplicationBuilder]
+        Write-Information "MSAL types already loaded." -InformationAction Continue
         return
     }
     catch {
-        # Type not yet resolvable, need to load explicitly
-        Write-Verbose "MSAL types not yet resolvable. Loading Microsoft.Identity.Client.dll explicitly."
+        Write-Information "MSAL types not yet resolvable. Implicitly loading through Microsoft.Graph.Authentication." -InformationAction Continue
     }
 
-    $GraphModule = Get-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
-    if (-not $GraphModule) {
-        throw "Microsoft.Graph.Authentication module is not loaded. Ensure Connect-MgGraph has been called before acquiring tokens."
+    # By calling Connect-MgGraph we implicitly load MSAL through Microsoft.Graph.Authentication.
+    # We are not authenticating to an actual tenant so we pass bogus parammeters and expect the cmdlet to produce an error which we ignore.
+    try {
+        $null = Connect-MgGraph -TenantId localhost -ClientId c2c07fbd-041e-45a0-9c13-1216e2a521dc -CertificateThumbprint 123456789B9F22EFA77A0EFF01930AD123456789 -ErrorAction Stop
+    }
+    catch {
+        # Ignore. We expect this error.
     }
 
-    $ModulePath = $GraphModule.Path | Split-Path
-    $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
-
-    if (-not $MsalDll) {
-        throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+    # $LoadedGraphAuth = Get-Module Microsoft.Graph.Authentication
+    # if (-not $LoadedGraphAuth) {
+    #     throw "Microsoft.Graph.Authentication was not successfully loaded by Initialize-Msal."
+    # }
+    # Try referencing MSAL again after implicit load
+    try {
+        $null = [Microsoft.Identity.Client.PublicClientApplicationBuilder]
+        Write-Information "MSAL loaded successfully." -InformationAction Continue
+        return
     }
-
-    $Sig = Get-AuthenticodeSignature -FilePath $MsalDll.FullName
-    if ($Sig.Status -ne 'Valid') {
-        throw "Microsoft.Identity.Client.dll signature is not valid (status: $($Sig.Status)). Aborting MSAL load."
+    catch {
+        throw "MSAL types still not resolvable after implicit load."
     }
+    ###########################################
 
-    Add-Type -Path $MsalDll.FullName
+    # $GraphModule = Import-LatestGraphAuthentication
+
+    # if (-not $GraphModule) {
+    #     throw "Microsoft.Graph.Authentication was imported, but the module could not be found in the current session."
+    # }
+
+    # $ModulePath = Split-Path -Path $GraphModule.Path -Parent
+
+    # if ($PSVersionTable.PSEdition -eq "Desktop") {
+    #     $DependencyFolder = Join-Path $ModulePath "Dependencies" | Join-Path -ChildPath "Desktop"
+    # }
+    # else {
+    #     $DependencyFolder = Join-Path $ModulePath "Dependencies" | Join-Path -ChildPath "Core"
+    # }
+
+    # $MsalDll = Join-Path $DependencyFolder "Microsoft.Identity.Client.dll"
+
+    # if (-not (Test-Path $MsalDll)) {
+    #     throw "Microsoft.Identity.Client.dll was not found at expected path: $MsalDll"
+    # }
+
+    # $Signature = Get-AuthenticodeSignature -FilePath $MsalDll
+
+    # if ($Signature.Status -ne "Valid") {
+    #     throw "Microsoft.Identity.Client.dll has an invalid Authenticode signature. Status: $($Signature.Status). Path: $($MsalDll)"
+    # }
+
+    # try {
+    #     Add-Type -Path $MsalDll -ErrorAction Stop
+    #     $null = [Microsoft.Identity.Client.PublicClientApplicationBuilder]
+    # }
+    # catch {
+    #     Write-Information "Microsoft.Identity.Client.dll was loaded, but MSAL type Microsoft.Identity.Client.PublicClientApplicationBuilder is still not resolvable. Path: $($MsalDll)" -InformationAction Continue
+    #     throw
+    # }
+
+    # Write-Information "Successfully loaded MSAL from: $($MsalDll)" -InformationAction Continue
+
+    ########## Old code (DELETE)
+    # try {
+    #     $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
+    #     Write-Information "MSAL is resolvable. No need to do anything." -InformationAction Continue
+    #     return
+    # }
+    # catch {
+    #     # Type not yet resolvable, need to load explicitly
+    #     Write-Information "MSAL types not yet resolvable. Loading Microsoft.Identity.Client.dll explicitly." -InformationAction Continue
+    # }
+
+    # $GraphModule = Get-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
+    # if (-not $GraphModule) {
+    #     throw "Microsoft.Graph.Authentication module is not loaded. Ensure Connect-MgGraph has been called before acquiring tokens."
+    # }
+
+    # $ModulePath = $GraphModule.Path | Split-Path
+    # $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+
+    # if (-not $MsalDll) {
+    #     throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+    # }
+
+    # $Sig = Get-AuthenticodeSignature -FilePath $MsalDll.FullName
+    # if ($Sig.Status -ne 'Valid') {
+    #     throw "Microsoft.Identity.Client.dll signature is not valid (status: $($Sig.Status)). Aborting MSAL load."
+    # }
+
+    # Add-Type -Path $MsalDll.FullName
+    # Write-Information "Loaded Microsoft.Identity.Client.dll from $($MsalDll.FullName)" -InformationAction Continue
 }
 
 function Get-MsalAccessToken {

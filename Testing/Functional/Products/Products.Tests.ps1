@@ -98,15 +98,16 @@ param (
 )
 
 BeforeDiscovery {
+    # Map defender to securitysuite for test parameter backwards compatibility (this should be removed when we change the functional test params in GitHub to securitysuite)
     if ($ProductName -eq "defender") {
         $ProductName = "securitysuite"
     }
 
-    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
-    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-    Import-Module $ScubaModule
-    Import-Module $ConnectionModule
+    # $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    # $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
+    # $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    # Import-Module $ScubaModule
+    # Import-Module $ConnectionModule
 
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
@@ -121,15 +122,36 @@ BeforeDiscovery {
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
+}
 
-    if ($ProductName -eq "securitysuite"){
-        $ProductNames = @($ProductName, "exo")
+BeforeAll {
+    # Map defender to securitysuite for test parameter backwards compatibility (this should be removed when we change the functional test params in GitHub to securitysuite)
+    if ($ProductName -eq "defender") {
+        $ProductName = "securitysuite"
     }
-    else {
+
+    # Products that need to call ScubaGear's Connect-Tenant in BeforeAll because those test plans call middleware PS cmdlets in SetConditions
+    $ProductsRequiringConnectTenant = @("securitysuite", "teams")
+
+    # aad does not alter the tenant at all in the test plan SetConditions, therefore it does not need any authentication in BeforeAll
+    # The products below alter the tenant in their test plan SetConditions but do NOT need Connect-Tenant because they are not calling middleware PowerShell cmdlets:
+    #   exo, powerbi, powerplatform, sharepoint         # These products use Get-MsalAccessToken below to acquire the tokens needed for SetConditions API calls
+
+    # if ($ProductName -eq "securitysuite"){
+    #     $ProductNames = @($ProductName, "exo")
+    # }
+    # else {
+        # ProductNames is only used when Connect-Tenant is needed for some products that call middleware cmdlets
         $ProductNames = @($ProductName)
-    }
+    # }
+    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
+    
+    Write-Information "Importing Connection module for auth helper functions such as Get-M365EnvironmentByDomain..." -InformationAction Continue
+    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    Import-Module $ConnectionModule
 
     if (-Not [string]::IsNullOrEmpty($AppId)){
+        ###### Dynamically determine the M365Environment value
         $TempScubaConfig = New-Object -Type PSObject -Property @{
             'AppID' = $AppID;
             'CertificateThumbprint' = $Thumbprint;
@@ -144,25 +166,23 @@ BeforeDiscovery {
             AppID = $AppId;
             Organization = $TenantDomain;
         }}
-        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+        ######
+
+        if ($ProductsRequiringConnectTenant -contains $ProductName) {
+            Write-Information "Calling Connect-Tenant for $ProductName so that we can properly call middleware cmdlets in SetConditions." -InformationAction Continue
+            Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+        }
     }
     else {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
     }
-}
 
-BeforeAll {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
+    Write-Information "Detected value of M365Environment: $M365Environment." -InformationAction Continue
 
-    # Shared Data for functional test
-    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    Write-Information "Importing ScubaGear so that we can call Invoke-Scuba in the tests..." -InformationAction Continue
     Import-Module $ScubaModule
-    Import-Module $ConnectionModule
     Import-Module Selenium
 
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
@@ -301,6 +321,7 @@ BeforeAll {
         Import-Module $ConnectHelpersPath -Force
         $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
         $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+        Write-Information "Calling Get-MsalAccessToken for $ProductName so that we can call REST APIs in the test plan SetConditions." -InformationAction Continue
         if (-Not [string]::IsNullOrEmpty($AppId)) {
             $script:PBIAccessToken = Get-MsalAccessToken `
                 -CertificateThumbprint $Thumbprint `
