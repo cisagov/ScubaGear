@@ -461,9 +461,10 @@ tests contains {
 # MS.SECURITYSUITE.7.2v1
 #--
 
+default CustomPolicyScanURLsEnabled := false
 CustomPolicyScanURLsEnabled := true if {
     some Policy in input.safe_links_policies
-    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.Identity
+    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
     Policy.ScanUrls == true
     Policy.DeliverMessageAfterScan == true
 }
@@ -491,9 +492,10 @@ tests contains {
 # MS.SECURITYSUITE.7.3v1
 #--
 
+default CustomPolicyTrackClicksEnabled := false
 CustomPolicyTrackClicksEnabled := true if {
     some Policy in input.safe_links_policies
-    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.Identity
+    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
     Policy.TrackClicks == true
 }
 
