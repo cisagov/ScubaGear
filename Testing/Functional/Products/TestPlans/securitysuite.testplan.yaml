@@ -396,7 +396,7 @@ TestPlan:
         Postconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case 
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
