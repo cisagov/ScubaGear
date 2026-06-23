@@ -380,7 +380,7 @@ TestPlan:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.7.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Standard Preset Policy is enabled
         Preconditions:
@@ -433,7 +433,7 @@ TestPlan:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.7.3v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case - Standard Preset Policy is enabled
         Preconditions:
