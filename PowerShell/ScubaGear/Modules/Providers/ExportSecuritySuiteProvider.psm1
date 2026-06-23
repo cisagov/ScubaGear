@@ -58,7 +58,6 @@ function Export-SecuritySuiteProvider {
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
     $SafeLinksPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksPolicy"))
     $SafeLinksRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksRule"))
-    $EOPPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
@@ -170,7 +169,6 @@ function Export-SecuritySuiteProvider {
     "conn_filter": $ConnectionFilter,
     "safe_links_policies": $SafeLinksPolicy,
     "safe_links_rules": $SafeLinksRule,
-    "eop_policies": $EOPPolicy,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
     "securitysuite_successful_commands": $SuccessfulCommands,
