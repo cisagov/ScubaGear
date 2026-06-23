@@ -452,12 +452,9 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
     "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    Status := SafeLinksCompliant
+    "ReportDetails": ReportDetailsBoolean(SafeLinksCompliant),
+    "RequirementMet": SafeLinksCompliant 
 }
-
 #--
 
 #
@@ -485,10 +482,8 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
     "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    Status := ScanURLsCompliant
+    "ReportDetails": ReportDetailsBoolean(ScanURLsCompliant),
+    "RequirementMet": ScanURLsCompliant 
 }
 #--
 
@@ -516,10 +511,8 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
     "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
-    "ReportDetails": ReportDetailsBoolean(Status),
-    "RequirementMet": Status
-} if {
-    Status := TrackClicksCompliant
+    "ReportDetails": ReportDetailsBoolean(TrackClicksCompliant),
+    "RequirementMet": TrackClicksCompliant
 }
 
 #--
