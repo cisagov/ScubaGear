@@ -400,7 +400,7 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -ScanUrls $true -DeliverMessageAfterScan $true"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $true -DeliverMessageAfterScan $true"
           - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
         Postconditions:
           - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
@@ -412,7 +412,7 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -ScanUrls $false -DeliverMessageAfterScan $true"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $false -DeliverMessageAfterScan $false"
           - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
         Postconditions:
           - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
@@ -424,7 +424,7 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -ScanUrls $true -DeliverMessageAfterScan $false"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $true -DeliverMessageAfterScan $false"
           - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
         Postconditions:
           - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
