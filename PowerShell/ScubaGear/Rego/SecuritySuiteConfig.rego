@@ -13,6 +13,8 @@ import data.utils.securitysuite.PartnerDomainConfig
 import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
+import data.utils.securitysuite.PresetRecipientsCovered
+import data.utils.securitysuite.RuleFieldEmpty
 import data.utils.report.ReportDetailsArray
 
 
@@ -410,23 +412,50 @@ tests contains {
 # MS.SECURITYSUITE.7.1v1
 #--
 
-CompliantPolicies contains SafeLinksPolicy.Name if {
-    some SafeLinksPolicy in input.safe_links
-    SafeLinksPolicy.EnableSafeLinksForEmail == true
-    SafeLinksPolicy.EnableSafeLinksForTeams == true
-    SafeLinksPolicy.EnableSafeLinksForOffice == true
-    SafeLinksPolicy.EnableforInternalSenders == true
+# Highest priority corresponds to the lowest priority number
+HighestPriorityEnabledRuleCoversAllRecipients := Rule if {
+    some Rule in input.safe_links_rules
+    Rule.State == "Enabled"
+    RuleFieldEmpty(Rule.SentTo)
+    RuleFieldEmpty(Rule.SentToMemberOf)
+    RuleFieldEmpty(Rule.RecipientDomainIs)
+    not LowerPriorityEnabledRuleExists(Rule)
+}
+
+LowerPriorityEnabledRuleExists(Rule) if {
+    some OtherRule in input.safe_links_rules
+    OtherRule.State == "Enabled"
+    OtherRule.Priority < Rule.Priority
+}
+
+default CustomPolicySafeLinksEnabled := false
+CustomPolicySafeLinksEnabled if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+    Policy.EnableSafeLinksForEmail == true
+    Policy.EnableSafeLinksForTeams == true
+    Policy.EnableSafeLinksForOffice == true
+    Policy.EnableForInternalSenders == true
+}
+
+default SafeLinksCompliant := false
+SafeLinksCompliant if {
+    PresetRecipientsCovered
+}
+
+SafeLinksCompliant if {
+    CustomPolicySafeLinksEnabled
 }
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-SafeLinksPolicy"],
-    "ActualValue": input.safe_links,
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := count(CompliantPolicies) >= 1
+    Status := SafeLinksCompliant
 }
 
 #--
@@ -434,42 +463,65 @@ tests contains {
 #
 # MS.SECURITYSUITE.7.2v1
 #--
-CompliantPolicies contains SafeLinksPolicy.Name if {
-    some SafeLinksPolicy in input.safe_links
-    SafeLinksPolicy.ScanUrls == true
-    SafeLinksPolicy.DeliverMessageAfterScan == true
+
+CustomPolicyScanURLsEnabled := true if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.Identity
+    Policy.ScanUrls == true
+    Policy.DeliverMessageAfterScan == true
+}
+
+default ScanURLsCompliant := false
+ScanURLsCompliant if {
+    PresetRecipientsCovered
+}
+
+ScanURLsCompliant if {
+    CustomPolicyScanURLsEnabled
 }
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-SafeLinksPolicy"],
-    "ActualValue": input.safe_links,
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := count(CompliantPolicies) >= 1
+    Status := ScanURLsCompliant
 }
 #--
 
 #
 # MS.SECURITYSUITE.7.3v1
 #--
-CompliantPolicies contains SafeLinksPolicy.Name if {
-    some SafeLinksPolicy in input.safe_links
-    SafeLinksPolicy.TrackClicks == true
+
+CustomPolicyTrackClicksEnabled := true if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.Identity
+    Policy.TrackClicks == true
+}
+
+default TrackClicksCompliant := false
+TrackClicksCompliant if {
+    PresetRecipientsCovered
+}
+
+TrackClicksCompliant if {
+    CustomPolicyTrackClicksEnabled
 }
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-SafeLinksPolicy"],
-    "ActualValue": input.safe_links,
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
 } if {
-    Status := count(CompliantPolicies) >= 1
+    Status := TrackClicksCompliant
 }
+
 #--
 
 
