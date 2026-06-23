@@ -129,26 +129,28 @@ BeforeAll {
     if ($ProductName -eq "defender") {
         $ProductName = "securitysuite"
     }
+    # ProductNames is only used when Connect-Tenant is needed for some products that call middleware cmdlets
+    # After all products are moved to REST, Connect-Tenant will no longer be needed and this variable can be removed.
+    $ProductNames = @($ProductName)
 
     # Products that need to call ScubaGear's Connect-Tenant in BeforeAll because those test plans call middleware PS cmdlets in SetConditions
+    # After securitysuite is moved to REST, it will no longer need Connect-Tenant in BeforeAll, and can be removed from this list.
     $ProductsRequiringConnectTenant = @("securitysuite", "teams")
 
     # aad does not alter the tenant at all in the test plan SetConditions, therefore it does not need any authentication in BeforeAll
-    # The products below alter the tenant in their test plan SetConditions but do NOT need Connect-Tenant because they are not calling middleware PowerShell cmdlets:
+    # The products in the comment below alter the tenant in their test plan SetConditions but do NOT need Connect-Tenant because they are not calling middleware cmdlets:
     #   exo, powerbi, powerplatform, sharepoint         # These products use Get-MsalAccessToken below to acquire the tokens needed for SetConditions API calls
 
-    # if ($ProductName -eq "securitysuite"){
-    #     $ProductNames = @($ProductName, "exo")
-    # }
-    # else {
-        # ProductNames is only used when Connect-Tenant is needed for some products that call middleware cmdlets
-        $ProductNames = @($ProductName)
-    # }
+    # Setup common module paths and import common modules
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
-    
     Write-Information "Importing Connection module for auth helper functions such as Get-M365EnvironmentByDomain..." -InformationAction Continue
     $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
     Import-Module $ConnectionModule
+    # ConnectHelpers is common to many products so putting its path here
+    $ConnectHelpersPath = Join-Path -Path $ScubaModulePath -ChildPath "Connection/ConnectHelpers.psm1"
+    # PermissionsHelper is needed by Connect-Tenant
+    $PermissionsHelpersPath = Join-Path -Path $ScubaModulePath -ChildPath "Permissions/PermissionsHelper.psm1"
+    Import-Module $PermissionsHelpersPath -Force
 
     if (-Not [string]::IsNullOrEmpty($AppId)){
         ###### Dynamically determine the M365Environment value
@@ -169,7 +171,7 @@ BeforeAll {
         ######
 
         if ($ProductsRequiringConnectTenant -contains $ProductName) {
-            Write-Information "Calling Connect-Tenant for $ProductName so that we can properly call middleware cmdlets in SetConditions." -InformationAction Continue
+            Write-Information "Calling Connect-Tenant for product: $ProductName so that we can properly call middleware cmdlets in SetConditions." -InformationAction Continue
             Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
         }
     }
@@ -202,12 +204,12 @@ BeforeAll {
     # EXO functional tests use REST-backed helper wrappers from FunctionalTestUtils.
     # Initialize EXO REST auth context for test pre/postconditions.
     if ($ProductName -eq "exo") {
-        $EXOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/EXORestHelper.psm1"
+        $EXOHelperPath = Join-Path -Path $ScubaModulePath -ChildPath "Providers/ProviderHelpers/EXORestHelper.psm1"
         Import-Module $EXOHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
         Import-Module $ConnectHelpersPath -Force
 
         $EXOScope = Get-ExchangeOnlineScope -M365Environment $M365Environment
+        Write-Information "Calling Get-MsalAccessToken for $ProductName so that we can call REST APIs in the test plan SetConditions." -InformationAction Continue
         if (-Not [string]::IsNullOrEmpty($AppId)) {
             $script:EXOAccessToken = Get-MsalAccessToken `
                 -CertificateThumbprint $Thumbprint `
@@ -257,9 +259,8 @@ BeforeAll {
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "sharepoint") {
-        $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
+        $SPOHelperPath = Join-Path -Path $ScubaModulePath -ChildPath "Providers/ProviderHelpers/SPORestHelper.psm1"
         Import-Module $SPOHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
         Import-Module $ConnectHelpersPath -Force
         $DomainPrefix = $TenantDomain.Split(".")[0]
         $script:SPOAdminUrl = switch ($M365Environment) {
@@ -267,6 +268,7 @@ BeforeAll {
             "dod"     { "https://$DomainPrefix-admin.sharepoint-mil.us" }
             default   { "https://$DomainPrefix-admin.sharepoint.com" }
         }
+        Write-Information "Calling Get-MsalAccessToken for $ProductName so that we can call REST APIs in the test plan SetConditions." -InformationAction Continue
         if (-Not [string]::IsNullOrEmpty($AppId)) {
             $script:SPOAccessToken = Get-MsalAccessToken `
                 -CertificateThumbprint $Thumbprint `
@@ -288,12 +290,12 @@ BeforeAll {
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "powerplatform") {
-        $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
+        $PPHelperPath = Join-Path -Path $ScubaModulePath -ChildPath "Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
         Import-Module $PPHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
         Import-Module $ConnectHelpersPath -Force
         $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
         $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
+        Write-Information "Calling Get-MsalAccessToken for $ProductName so that we can call REST APIs in the test plan SetConditions." -InformationAction Continue
         if (-Not [string]::IsNullOrEmpty($AppId)) {
             $script:PPAccessToken = Get-MsalAccessToken `
                 -CertificateThumbprint $Thumbprint `
@@ -315,9 +317,8 @@ BeforeAll {
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "powerbi") {
-        $PBIHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerBIRestHelper.psm1"
+        $PBIHelperPath = Join-Path -Path $ScubaModulePath -ChildPath "Providers/ProviderHelpers/PowerBIRestHelper.psm1"
         Import-Module $PBIHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
         Import-Module $ConnectHelpersPath -Force
         $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
         $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
