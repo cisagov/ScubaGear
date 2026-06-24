@@ -97,7 +97,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant1
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant1_G5:
     name: Sec_Tenant1_G5
     runs-on: windows-latest
@@ -152,7 +152,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant1_G5
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant2:
     name: Sec_Tenant2
     runs-on: windows-latest
@@ -204,7 +204,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant2
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant2_G3:
     name: Sec_Tenant2_G3
     runs-on: windows-latest
@@ -259,7 +259,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant2_G3
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant6:
     name: Sec_Tenant6
     runs-on: windows-latest
@@ -311,7 +311,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant6
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant6_G5:
     name: Sec_Tenant6_G5
     runs-on: windows-latest
@@ -366,7 +366,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant6_G5
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant7:
     name: Sec_Tenant7
     runs-on: windows-latest
@@ -418,7 +418,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant7
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   Sec_Tenant7_G5:
     name: Sec_Tenant7_G5
     runs-on: windows-latest
@@ -473,7 +473,7 @@ jobs:
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
           Alias: Sec_Tenant7_G5
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
   email:
     name: Email
     runs-on: windows-latest
@@ -496,7 +496,7 @@ jobs:
         env:
           # Could use any of previous jobs as the alias
           Alias: Sec_Tenant1
-          TestParams: ${{ secrets.TestParams }}
+          TestParams: ${{ secrets.TestParamsDev }}
       - name: Notify on Failure
         uses: dawidd6/action-send-mail@v17
         with:
