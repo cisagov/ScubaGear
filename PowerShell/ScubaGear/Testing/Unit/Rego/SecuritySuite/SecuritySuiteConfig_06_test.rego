@@ -246,7 +246,7 @@ test_SpamPolicy_Incorrect_TwoPoliciesFail if {
 
 test_SpamPolicy_Incorrect_OnlyStrictFails if {
     # All four policy types are active; Strict has a non-compliant action.
-    # Standard is compliant and shields Custom and Default.
+    # Standard is compliant, therefore Custom and Default not checked.
     BadStrict := json.patch(StrictPresetPolicy, [{"op": "add", "path": "HighConfidencePhishAction", "value": "AddXHeader"}])
 
     Output := securitysuite.tests
@@ -287,9 +287,9 @@ test_SpamPolicy_Incorrect_AllPoliciesFail if {
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 
-test_SpamPolicy_Correct_StrictCompliantShieldsNonCompliantStandard if {
+test_SpamPolicy_Correct_StrictCompliantStandardNotEvaluated if {
     # Strict preset is active and compliant; Standard is active but non-compliant.
-    # Per precedence, Strict shields Standard, Custom, and Default.
+    # Per precedence, only Strict is evaluated; Standard, Custom, and Default are not evaluated.
     BadStandard := json.patch(StandardPresetPolicy, [{"op": "add", "path": "SpamAction", "value": "AddXHeader"}])
 
     Output := securitysuite.tests
@@ -301,9 +301,9 @@ test_SpamPolicy_Correct_StrictCompliantShieldsNonCompliantStandard if {
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, true) == true
 }
 
-test_SpamPolicy_Correct_PresetCompliantShieldsNonCompliantCustom if {
+test_SpamPolicy_Correct_PresetCompliantCustomNotEvaluated if {
     # Standard preset is active and compliant; Custom is active but non-compliant.
-    # Per precedence, Standard shields Custom and Default.
+    # Per precedence, only Standard is evaluated; Custom and Default are not evaluated.
     BadCustom := json.patch(CustomPolicy, [{"op": "add", "path": "SpamAction", "value": "AddXHeader"}])
 
     Output := securitysuite.tests
@@ -318,9 +318,9 @@ test_SpamPolicy_Correct_PresetCompliantShieldsNonCompliantCustom if {
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, true) == true
 }
 
-test_SpamPolicy_Correct_StrictCompliantShieldsDefault if {
+test_SpamPolicy_Correct_StrictCompliantDefaultNotEvaluated if {
     # Strict preset is active and compliant; Default has non-compliant spam actions.
-    # Per precedence, Strict shields Standard, Custom, and Default — Default is not evaluated.
+    # Per precedence, only Strict is evaluated; Default is not evaluated.
     BadDefault := json.patch(DefaultPolicy, [{"op": "add", "path": "SpamAction", "value": "AddXHeader"}])
 
     Output := securitysuite.tests
@@ -330,6 +330,59 @@ test_SpamPolicy_Correct_StrictCompliantShieldsDefault if {
 
     ReportDetailString := "Requirement met. Strict preset is active and compliant. Standard preset, Custom, and Default policies not evaluated"
     TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, true) == true
+}
+
+test_SpamPolicy_Incorrect_StrictPartialRecipientsDefaultEvaluated if {
+    # Strict preset rule is enabled but scoped to a single recipient, so it does not
+    # cover all recipients and is not treated as active. Default's non-compliant
+    # spam actions must still be evaluated and flagged.
+    BadDefault := json.patch(DefaultPolicy, [{"op": "add", "path": "SpamAction", "value": "AddXHeader"}])
+
+    Output := securitysuite.tests
+        with input.hosted_content_filter_policies as [BadDefault, StrictPresetPolicy]
+        with input.hosted_content_filter_rules as []
+        with input.protection_policy_rules as ProtectionPolicyRulesStrictPartialRecipients
+
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ])
+    TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
+}
+
+test_SpamPolicy_Correct_StrictPartialRecipientsFallsThroughToCompliantStandard if {
+    # Strict preset rule is enabled but scoped to a single recipient, so it is not
+    # treated as active; Standard preset is active and compliant, so Custom and
+    # Default are not evaluated per precedence.
+    Output := securitysuite.tests
+        with input.hosted_content_filter_policies as [DefaultPolicy, StandardPresetPolicy, StrictPresetPolicy]
+        with input.hosted_content_filter_rules as []
+        with input.protection_policy_rules as ProtectionPolicyRulesStrictPartialRecipients
+
+    ReportDetailString := concat("", [
+        "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). ",
+        "Custom and Default policies not evaluated"
+    ])
+    TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, true) == true
+}
+
+test_SpamPolicy_Incorrect_CustomPartialRecipientsDefaultEvaluated if {
+    # Custom policy rule is enabled but scoped to a single recipient, so it does not
+    # cover all recipients and is not treated as active. Default's non-compliant
+    # spam actions must still be evaluated and flagged, even though Custom Policy A
+    # itself has compliant spam actions.
+    BadDefault := json.patch(DefaultPolicy, [{"op": "add", "path": "SpamAction", "value": "AddXHeader"}])
+
+    Output := securitysuite.tests
+        with input.hosted_content_filter_policies as [BadDefault, CustomPolicy]
+        with input.hosted_content_filter_rules as CustomPolicyRulePartialRecipients
+        with input.protection_policy_rules as []
+
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) that may deliver spam/phishing to inbox: Default"
+    ])
+    TestResult("MS.SECURITYSUITE.6.1v1", Output, ReportDetailString, false) == true
 }
 #--
 
@@ -487,8 +540,8 @@ test_AllowedDomains_Incorrect_ActiveCustom if {
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
 }
 
-test_AllowedDomains_Correct_StrictCompliantShieldsNonCompliantStandardAndDefault if {
-    # Strict preset is active and compliant, shielding non-compliant Standard and Default per precedence.
+test_AllowedDomains_Correct_StrictCompliantStandardAndDefaultNotEvaluated if {
+    # Strict preset is active and compliant, so non-compliant Standard and Default are not evaluated per precedence.
     BadDefault := json.patch(DefaultPolicy, [
         {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
     ])
@@ -505,8 +558,8 @@ test_AllowedDomains_Correct_StrictCompliantShieldsNonCompliantStandardAndDefault
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, true) == true
 }
 
-test_AllowedDomains_Correct_StrictCompliantShieldsAll if {
-    # Both presets are active and compliant, shielding non-compliant Custom and Default per precedence.
+test_AllowedDomains_Correct_StrictCompliantAllOthersNotEvaluated if {
+    # Both presets are active and compliant, so non-compliant Custom and Default are not evaluated per precedence.
     BadDefault := json.patch(DefaultPolicy, [
         {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
     ])
@@ -555,9 +608,9 @@ test_AllowedDomains_Incorrect_AllPoliciesFail if {
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
 }
 
-test_AllowedDomains_Correct_StrictCompliantShieldsNonCompliantStandard if {
+test_AllowedDomains_Correct_StrictCompliantStandardNotEvaluated if {
     # Strict preset is active and compliant; Standard is active but has allowed domains.
-    # Per precedence, Strict shields Standard, Custom, and Default.
+    # Per precedence, only Strict is evaluated; Standard, Custom, and Default are not evaluated.
     BadStandard := json.patch(StandardPresetPolicy, [
         {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
     ])
@@ -571,9 +624,9 @@ test_AllowedDomains_Correct_StrictCompliantShieldsNonCompliantStandard if {
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, true) == true
 }
 
-test_AllowedDomains_Correct_PresetCompliantShieldsNonCompliantCustom if {
+test_AllowedDomains_Correct_PresetCompliantCustomNotEvaluated if {
     # Standard preset is active and compliant; Custom is active but has allowed domains.
-    # Per precedence, Standard shields Custom and Default.
+    # Per precedence, only Standard is evaluated; Custom and Default are not evaluated.
     BadCustom := json.patch(CustomPolicy, [
         {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
     ])
@@ -590,9 +643,9 @@ test_AllowedDomains_Correct_PresetCompliantShieldsNonCompliantCustom if {
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, true) == true
 }
 
-test_AllowedDomains_Correct_StrictCompliantShieldsDefault if {
+test_AllowedDomains_Correct_StrictCompliantDefaultNotEvaluated if {
     # Strict preset is active and compliant; Default has allowed domains.
-    # Per precedence, Strict shields Standard, Custom, and Default — Default is not evaluated.
+    # Per precedence, only Strict is evaluated; Default is not evaluated.
     BadDefault := json.patch(DefaultPolicy, [
         {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
     ])
@@ -609,7 +662,7 @@ test_AllowedDomains_Correct_StrictCompliantShieldsDefault if {
 test_AllowedDomains_Incorrect_TwoCustomPoliciesOneDisabledOneEnabled if {
     # Two custom policies: Policy A is compliant but rule is disabled; Policy B has allowed domains and is enabled.
     # Since Policy A's rule is disabled it is not active, so AnyCustomIsCompliantForDomains is false.
-    # Policy B is active and non-compliant; Default has no shielding.
+    # Policy B is active and non-compliant; Default is still evaluated since no compliant policy precedes it.
     CustomPolicy2 := {
         "Identity": "Custom Policy B",
         "IsDefault": false,
@@ -624,7 +677,13 @@ test_AllowedDomains_Incorrect_TwoCustomPoliciesOneDisabledOneEnabled if {
         {
             "Identity": "Custom Policy B Rule",
             "HostedContentFilterPolicy": "Custom Policy B",
-            "State": "Enabled"
+            "State": "Enabled",
+            "SentTo": null,
+            "SentToMemberOf": null,
+            "RecipientDomainIs": null,
+            "ExceptIfSentTo": null,
+            "ExceptIfSentToMemberOf": null,
+            "ExceptIfRecipientDomainIs": null
         }
     ]
 
@@ -636,6 +695,63 @@ test_AllowedDomains_Incorrect_TwoCustomPoliciesOneDisabledOneEnabled if {
     ReportDetailString := concat("", [
         "No active compliant preset or Custom policy. All active policies evaluated. ",
         "1 anti-spam polic(ies) with allowed domains: Custom Policy B"
+    ])
+    TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AllowedDomains_Incorrect_StrictPartialRecipientsDefaultEvaluated if {
+    # Strict preset rule is enabled but scoped to a single recipient, so it does not
+    # cover all recipients and is not treated as active. Default's allowed sender
+    # domains must still be evaluated and flagged.
+    BadDefault := json.patch(DefaultPolicy, [
+        {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
+    ])
+
+    Output := securitysuite.tests
+        with input.hosted_content_filter_policies as [BadDefault, StrictPresetPolicy]
+        with input.hosted_content_filter_rules as []
+        with input.protection_policy_rules as ProtectionPolicyRulesStrictPartialRecipients
+
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) with allowed domains: Default"
+    ])
+    TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AllowedDomains_Correct_StrictPartialRecipientsFallsThroughToCompliantStandard if {
+    # Strict preset rule is enabled but scoped to a single recipient, so it is not
+    # treated as active; Standard preset is active and compliant, so Custom and
+    # Default are not evaluated per precedence.
+    Output := securitysuite.tests
+        with input.hosted_content_filter_policies as [DefaultPolicy, StandardPresetPolicy, StrictPresetPolicy]
+        with input.hosted_content_filter_rules as []
+        with input.protection_policy_rules as ProtectionPolicyRulesStrictPartialRecipients
+
+    ReportDetailString := concat("", [
+        "Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). ",
+        "Custom and Default policies not evaluated"
+    ])
+    TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, true) == true
+}
+
+test_AllowedDomains_Incorrect_CustomPartialRecipientsDefaultEvaluated if {
+    # Custom policy rule is enabled but scoped to a single recipient, so it does not
+    # cover all recipients and is not treated as active. Default's allowed sender
+    # domains must still be evaluated and flagged, even though Custom Policy A itself
+    # has no allowed sender domains.
+    BadDefault := json.patch(DefaultPolicy, [
+        {"op": "add", "path": "AllowedSenderDomains", "value": ["example.com"]}
+    ])
+
+    Output := securitysuite.tests
+        with input.hosted_content_filter_policies as [BadDefault, CustomPolicy]
+        with input.hosted_content_filter_rules as CustomPolicyRulePartialRecipients
+        with input.protection_policy_rules as []
+
+    ReportDetailString := concat("", [
+        "No active compliant preset or Custom policy. All active policies evaluated. ",
+        "1 anti-spam polic(ies) with allowed domains: Default"
     ])
     TestResult("MS.SECURITYSUITE.6.2v1", Output, ReportDetailString, false) == true
 }

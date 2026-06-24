@@ -256,26 +256,38 @@ CustomPolicy := {
     "AllowedSenderDomains": []
 }
 
-# EOP preset rules with both Standard and Strict enabled
+# EOP preset rules with both Standard and Strict enabled, scoped to all recipients
 ProtectionPolicyRulesEnabled := [
     {
         "Identity": "Standard Preset Security Policy",
         "HostedContentFilterPolicy": "Standard Preset Security Policy1659535429826",
-        "State": "Enabled"
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null
     },
     {
         "Identity": "Strict Preset Security Policy",
         "HostedContentFilterPolicy": "Strict Preset Security Policy1659535429827",
-        "State": "Enabled"
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null
     }
 ]
 
-# Custom policy rule - enabled
+# Custom policy rule - enabled, scoped to all recipients (all accepted domains)
 CustomPolicyRuleEnabled := [
     {
         "Identity": "Custom Policy A Rule",
         "HostedContentFilterPolicy": "Custom Policy A",
-        "State": "Enabled"
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": ["example.com", "example.mail.onmicrosoft.com"],
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
     }
 ]
 
@@ -284,7 +296,48 @@ CustomPolicyRuleDisabled := [
     {
         "Identity": "Custom Policy A Rule",
         "HostedContentFilterPolicy": "Custom Policy A",
-        "State": "Disabled"
+        "State": "Disabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": ["example.com", "example.mail.onmicrosoft.com"],
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
+    }
+]
+
+# Custom policy rule - enabled but scoped to a single recipient (does not cover all recipients)
+CustomPolicyRulePartialRecipients := [
+    {
+        "Identity": "Custom Policy A Rule",
+        "HostedContentFilterPolicy": "Custom Policy A",
+        "State": "Enabled",
+        "SentTo": ["onlyme@example.com"],
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null,
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
+    }
+]
+
+# EOP preset rule for Strict, enabled but scoped to a single recipient (does not cover all recipients)
+ProtectionPolicyRulesStrictPartialRecipients := [
+    {
+        "Identity": "Standard Preset Security Policy",
+        "HostedContentFilterPolicy": "Standard Preset Security Policy1659535429826",
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null
+    },
+    {
+        "Identity": "Strict Preset Security Policy",
+        "HostedContentFilterPolicy": "Strict Preset Security Policy1659535429827",
+        "State": "Enabled",
+        "SentTo": ["onlyme@example.com"],
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null
     }
 ]
 

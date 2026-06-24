@@ -13,6 +13,8 @@ import data.utils.securitysuite.PartnerDomainConfig
 import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
+import data.utils.securitysuite.PresetPolicyCoversAllRecipients
+import data.utils.securitysuite.CustomRuleCoversAllRecipients
 import data.utils.report.ReportDetailsArray
 import data.utils.key.Count
 
@@ -383,11 +385,13 @@ tests contains {
 ActivePresetContentFilterPolicies contains Rule.HostedContentFilterPolicy if {
     some Rule in input.protection_policy_rules
     Rule.State == "Enabled"
+    PresetPolicyCoversAllRecipients(Rule.Identity)
 }
 
 ActiveCustomContentFilterPolicies contains Rule.HostedContentFilterPolicy if {
     some Rule in input.hosted_content_filter_rules
     Rule.State == "Enabled"
+    CustomRuleCoversAllRecipients(Rule)
 }
 
 ActiveContentFilterPolicy(Policy) if { Policy.IsDefault == true }
