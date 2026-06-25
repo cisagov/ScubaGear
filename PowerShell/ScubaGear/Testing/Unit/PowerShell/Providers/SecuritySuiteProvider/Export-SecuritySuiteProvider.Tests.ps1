@@ -78,6 +78,12 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-PolicyConfig" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{
+                                    EndpointDlpGlobalSettings = @()
+                                }
+                            }
                             "Get-ProtectionAlert" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}

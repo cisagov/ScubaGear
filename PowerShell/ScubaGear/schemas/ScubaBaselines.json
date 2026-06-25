@@ -5578,7 +5578,7 @@
                                             },
                                             {
                                                 "id":  "MS.SECURITYSUITE.3.5v1",
-                                                "name":  "The DLP policy SHOULD include an action to block access to sensitive information by restricted apps",
+                                                "name":  "The DLP policy SHOULD include an action to block access to sensitive information by restricted apps and unwanted Bluetooth applications.",
                                                 "policySection":  "Data Loss Prevention",
                                                 "sectionDescription":  "There are several approaches to securing sensitive information, such as warning users, encryption, or blocking attempts to share. Agency policies for sensitive information, such as personally identifiable information (PII), should dictate how that information is handled and inform associated data loss prevention (DLP) policies. Defender can detect sensitive information and associates a default confidence level with this detection based on the sensitive information type matched. Confidence levels are used to reduce false positives in detecting access to sensitive information. Agencies may choose to use the default confidence levels or adjust the levels in custom DLP policies to fit their environment and needs.",
                                                 "exclusionField":  "none",
@@ -5634,9 +5634,9 @@
                                                                         ],
                                                 "badges":  [
                                                                {
-                                                                   "label":  "Manual",
-                                                                   "linkUrl":  "#msdefender46v1-instructions",
-                                                                   "color":  "046B9A"
+                                                                   "label":  "Automated Check",
+                                                                   "linkUrl":  "#key-terminology",
+                                                                   "color":  "5E9732"
                                                                }
                                                            ]
                                             },

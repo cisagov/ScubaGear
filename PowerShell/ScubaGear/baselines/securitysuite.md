@@ -534,7 +534,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 The DLP policy SHOULD include an action to block access to sensitive information by restricted apps
 and unwanted Bluetooth applications.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msdefender46v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.3.5v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files or not conform to agency policies
@@ -700,7 +700,7 @@ Defender for Endpoint.
     **Apply restrictions to specific activity**.
 17. Check the box next to **Copy or move using unallowed Bluetooth app**
     and set its action to **Block**.
-18. Under **Restricted app activities**, check the **Access by restricted apps** box
+18. Under **App access restrictions**, check the **Access by restricted apps** box
    and set the action drop-down to **Block**.
 19. Click **Save** to save the changes.
 20. Click **Next** on each page until reaching the
