@@ -49,6 +49,14 @@ function Export-SecuritySuiteProvider {
         }
     }
 
+    # Get the tenant's provisioned service plans via Graph. These are used to
+    # determine whether the tenant has the per-user license (E5 / E5 Compliance /
+    # E5 eDiscovery and Audit add-on) required to retain audit logs beyond 180
+    # days for MS.SECURITYSUITE.5.2v1. The Rego looks at the service_plans list.
+    $SubscribedSku = $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
+
     # Regular Exchange i.e non IPPSSession cmdlets
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
@@ -170,6 +178,7 @@ function Export-SecuritySuiteProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "service_plans": $ServicePlans,
     "unified_audit_log_retention_policies": $UnifiedAuditLogRetentionPolicy,
     "conn_filter": $ConnectionFilter,
     "defender_license": $DefenderLicense,

@@ -58,7 +58,18 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.2v1 No E5 license or add-on case - Custom audit log retention policy cannot be created
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.5.2v1 No E5 license or add-on case - A compliant 12 month policy exists but the advanced auditing service plan is not licensed
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: EXCHANGE_S_ENTERPRISE
+                    ServicePlanId: efb87545-963c-4e0d-99df-69c6916d9eb0
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
         Postconditions: []
         ExpectedResult: false

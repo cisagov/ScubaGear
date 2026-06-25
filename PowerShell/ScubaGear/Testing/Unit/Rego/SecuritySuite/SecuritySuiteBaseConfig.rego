@@ -54,6 +54,30 @@ DisabledRetentionPolicy := {
     "Enabled": false
 }
 
+# E5-level service plans, includes the advanced auditing plan required to
+# retain audit logs beyond 180 days (E5 / E5 Compliance / E5 eDiscovery and Audit)
+ServicePlansWithAdvancedAuditing := [
+    {
+        "ServicePlanName": "M365_ADVANCED_AUDITING",
+        "ServicePlanId": "2f442157-a11c-46b9-ae5b-6e39ff4e5849",
+        "ProvisioningStatus": "Success"
+    },
+    {
+        "ServicePlanName": "EXCHANGE_S_ENTERPRISE",
+        "ServicePlanId": "efb87545-963c-4e0d-99df-69c6916d9eb0",
+        "ProvisioningStatus": "Success"
+    }
+]
+
+# E3/G3-level service plans, does not include the advanced auditing plan
+ServicePlansWithoutAdvancedAuditing := [
+    {
+        "ServicePlanName": "EXCHANGE_S_ENTERPRISE",
+        "ServicePlanId": "efb87545-963c-4e0d-99df-69c6916d9eb0",
+        "ProvisioningStatus": "Success"
+    }
+]
+
 ScubaConfig := {
     "SecuritySuite": {
         "MS.SECURITYSUITE.2.1v1": {

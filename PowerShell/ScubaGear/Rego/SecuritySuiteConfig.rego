@@ -372,6 +372,15 @@ RetentionLicenseNote := concat(" ", [
     "(formerly known as Microsoft 365 E5 Compliance) or E5 eDiscovery and Audit add-on license."
 ])
 
+# Service plans that grant the advanced (premium) audit capability required to
+# retain audit logs beyond 180 days on a per-user basis. M365_ADVANCED_AUDITING
+# is included with Office 365/Microsoft 365 E5, the Microsoft Purview Suite (E5
+# Compliance), and the E5 eDiscovery and Audit add-on, but not with E3/G3.
+AdvancedAuditingLicenses contains ServicePlan.ServicePlanId if {
+    some ServicePlan in input.service_plans
+    ServicePlan.ServicePlanName == "M365_ADVANCED_AUDITING"
+}
+
 # Save audit log retention policies that retain logs for at least 12 months
 # and are not disabled.
 CompliantRetentionPolicies contains {
@@ -383,17 +392,25 @@ CompliantRetentionPolicies contains {
     not Policy.Enabled == false
 }
 
-# The test passes if at least one audit log retention policy retains logs
-# for 12 months or longer.
+# The requirement is met only when the tenant has the per-user license needed to
+# retain logs beyond 180 days AND at least one retention policy keeps logs for 12
+# months or longer. Tenants at the E3/G3 license level fail regardless of any
+# configured retention policy because the retention capability is not licensed.
+default AuditRetentionRequirementMet := false
+AuditRetentionRequirementMet if {
+    count(AdvancedAuditingLicenses) > 0
+    count(CompliantRetentionPolicies) >= 1
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy"],
+    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy", "Get-MgBetaSubscribedSku"],
     "ActualValue": CompliantRetentionPolicies,
     "ReportDetails": ReportDetailsBooleanWarning(Status, RetentionLicenseNote),
     "RequirementMet": Status
 } if {
-    Status := count(CompliantRetentionPolicies) >= 1
+    Status := AuditRetentionRequirementMet
 }
 #--
 

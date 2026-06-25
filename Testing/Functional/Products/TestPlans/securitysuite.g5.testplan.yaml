@@ -67,6 +67,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies: []
         Postconditions: []
         ExpectedResult: false
@@ -75,6 +79,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: Three month retention
                     RetentionDuration: ThreeMonths
@@ -86,6 +94,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: Six month retention
                     RetentionDuration: SixMonths
@@ -97,6 +109,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: Nine month retention
                     RetentionDuration: NineMonths
@@ -108,10 +124,29 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - E3/G3 license level lacks the advanced auditing service plan
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: EXCHANGE_S_ENTERPRISE
+                    ServicePlanId: efb87545-963c-4e0d-99df-69c6916d9eb0
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month audit log retention policy exists
@@ -119,6 +154,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
@@ -130,6 +169,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: 10 year retention
                     RetentionDuration: TenYears
@@ -141,6 +184,10 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
                 unified_audit_log_retention_policies:
                   - Name: Six month retention
                     RetentionDuration: SixMonths

@@ -26,6 +26,18 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-MgBetaSubscribedSku" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{
+                                    ServicePlans = @(
+                                        [pscustomobject]@{
+                                            ServicePlanName    = "M365_ADVANCED_AUDITING"
+                                            ServicePlanId      = "2f442157-a11c-46b9-ae5b-6e39ff4e5849"
+                                            ProvisioningStatus = "Success"
+                                        }
+                                    )
+                                }
+                            }
                             "Get-EOPProtectionPolicyRule" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}

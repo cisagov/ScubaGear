@@ -1408,7 +1408,8 @@
         ],
         "spRolePermissions": [],
         "scubaGearProduct": [
-            "aad"
+            "aad",
+            "securitysuite"
         ],
         "supportedEnv": [
             "commercial",
