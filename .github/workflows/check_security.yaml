@@ -20,7 +20,7 @@ jobs:
         shell: bash
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Config File
         run: cp Testing/Linting/MegaLinter/.mega-linter-security.yml .mega-linter.yml
       - name: Setup Checkov File
