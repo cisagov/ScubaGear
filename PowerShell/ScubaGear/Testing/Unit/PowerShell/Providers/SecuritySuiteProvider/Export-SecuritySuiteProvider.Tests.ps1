@@ -82,6 +82,10 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
+                            "Get-UnifiedAuditLogRetentionPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
                             "Get-ATPProtectionPolicyRule" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}

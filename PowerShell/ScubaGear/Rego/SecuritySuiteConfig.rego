@@ -5,6 +5,7 @@ import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsBooleanWarning
 import data.utils.securitysuite.ImpersonationProtectionReportDetails
 import data.utils.securitysuite.ImpersonationProtectionRequirementMet
 import data.utils.securitysuite.ListConfigValues
@@ -360,13 +361,39 @@ tests contains {
 #
 # MS.SECURITYSUITE.5.2v1
 #--
+# Retention durations that satisfy the 12 month minimum retention requirement.
+CompliantRetentionDurations := {"TwelveMonths", "TenYears"}
+
+# Note appended to the report details to clarify the license dependency of
+# audit log retention in M365.
+RetentionLicenseNote := concat(" ", [
+    "Note that the data retention policy only applies to users with an Office 365 E5",
+    "or Microsoft 365 E5 license or a Microsoft Purview Suite",
+    "(formerly known as Microsoft 365 E5 Compliance) or E5 eDiscovery and Audit add-on license."
+])
+
+# Save audit log retention policies that retain logs for at least 12 months
+# and are not disabled.
+CompliantRetentionPolicies contains {
+    "Name": Policy.Name,
+    "RetentionDuration": Policy.RetentionDuration
+} if {
+    some Policy in input.unified_audit_log_retention_policies
+    Policy.RetentionDuration in CompliantRetentionDurations
+    not Policy.Enabled == false
+}
+
+# The test passes if at least one audit log retention policy retains logs
+# for 12 months or longer.
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.5.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy"],
+    "ActualValue": CompliantRetentionPolicies,
+    "ReportDetails": ReportDetailsBooleanWarning(Status, RetentionLicenseNote),
+    "RequirementMet": Status
+} if {
+    Status := count(CompliantRetentionPolicies) >= 1
 }
 #--
 

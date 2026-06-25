@@ -100,10 +100,11 @@ function Export-SecuritySuiteProvider {
     }
     catch {
         Write-Warning "Error running Connect-IPPSSession: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-        Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
+        Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, Get-ProtectionAlert, and Get-UnifiedAuditLogRetentionPolicy."
         $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
         $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
         $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
+        $Tracker.AddUnSuccessfulCommand("Get-UnifiedAuditLogRetentionPolicy")
     }
     if ($IPPSConnected) {
         if (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue) {
@@ -140,6 +141,10 @@ function Export-SecuritySuiteProvider {
         # We need to specify the depth because the data contains some
         # nested tables.
         $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRules
+
+        # Audit log retention policies are managed through the Security &
+        # Compliance session and are needed to evaluate MS.SECURITYSUITE.5.2v1.
+        $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-UnifiedAuditLogRetentionPolicy"))
     }
     else {
         $DLPCompliancePolicy = ConvertTo-Json @()
@@ -147,6 +152,7 @@ function Export-SecuritySuiteProvider {
         $ProtectionAlert = ConvertTo-Json @()
         $DLPComplianceRules = ConvertTo-Json @()
         $DLPLicense = ConvertTo-Json $false
+        $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @()
     }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -164,6 +170,7 @@ function Export-SecuritySuiteProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "unified_audit_log_retention_policies": $UnifiedAuditLogRetentionPolicy,
     "conn_filter": $ConnectionFilter,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,

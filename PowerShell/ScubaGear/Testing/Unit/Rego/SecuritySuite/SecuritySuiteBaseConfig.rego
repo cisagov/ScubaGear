@@ -12,6 +12,48 @@ AdminAuditLogConfig := {
     "UnifiedAuditLogIngestionEnabled": true
 }
 
+# Compliant: 12 month retention, enabled
+UnifiedAuditLogRetentionPolicy := {
+    "Name": "12 month retention",
+    "RetentionDuration": "TwelveMonths",
+    "Enabled": true
+}
+
+# Compliant: 10 year retention, enabled
+TenYearRetentionPolicy := {
+    "Name": "10 year retention",
+    "RetentionDuration": "TenYears",
+    "Enabled": true
+}
+
+# Non-compliant: 3 month retention
+ThreeMonthRetentionPolicy := {
+    "Name": "Three month retention",
+    "RetentionDuration": "ThreeMonths",
+    "Enabled": true
+}
+
+# Non-compliant: 6 month retention
+SixMonthRetentionPolicy := {
+    "Name": "Six month retention",
+    "RetentionDuration": "SixMonths",
+    "Enabled": true
+}
+
+# Non-compliant: 9 month retention
+NineMonthRetentionPolicy := {
+    "Name": "Nine month retention",
+    "RetentionDuration": "NineMonths",
+    "Enabled": true
+}
+
+# Non-compliant: 12 month retention but disabled
+DisabledRetentionPolicy := {
+    "Name": "12 month retention",
+    "RetentionDuration": "TwelveMonths",
+    "Enabled": false
+}
+
 ScubaConfig := {
     "SecuritySuite": {
         "MS.SECURITYSUITE.2.1v1": {

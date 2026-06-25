@@ -54,3 +54,11 @@ TestPlan:
                     Disabled: false
         Postconditions: []
         ExpectedResult: true
+
+  - PolicyId: MS.SECURITYSUITE.5.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.5.2v1 No E5 license or add-on case - Custom audit log retention policy cannot be created
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
