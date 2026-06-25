@@ -63,3 +63,11 @@ TestPlan:
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
+
+  - PolicyId: MS.AAD.9.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.AAD.9.1v1 No P2 license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false

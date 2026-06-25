@@ -5,6 +5,14 @@ import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
+import data.utils.securitysuite.ImpersonationProtectionReportDetails
+import data.utils.securitysuite.ImpersonationProtectionRequirementMet
+import data.utils.securitysuite.ListConfigValues
+import data.utils.securitysuite.OrganizationDomainProtectionCompliant
+import data.utils.securitysuite.PartnerDomainConfig
+import data.utils.securitysuite.PartnerDomainImpersonationCompliant
+import data.utils.securitysuite.UserImpersonationCompliant
+import data.utils.securitysuite.UserWarningsCompliant
 import data.utils.report.ReportDetailsArray
 import data.utils.securitysuite.DLPLicenseWarningString
 import data.utils.key.FilterArray
@@ -76,11 +84,40 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.1v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.1v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": {"SensitiveUsers": SensitiveUsers},
+    "ReportDetails": ImpersonationProtectionReportDetails(false, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(false)
+} if {
+    SensitiveUsers := ListConfigValues("MS.SECURITYSUITE.2.1v1", "SensitiveUsers")
+    count(SensitiveUsers) == 0
+    ErrorMessage := "No users defined as sensitive users in the ScubaGear config file."
+}
+
+tests contains {
+    "PolicyId": "MS.SECURITYSUITE.2.1v1",
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": Evaluation,
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
+} if {
+    SensitiveUsers := ListConfigValues("MS.SECURITYSUITE.2.1v1", "SensitiveUsers")
+    count(SensitiveUsers) > 0
+    Evaluation := UserImpersonationCompliant(SensitiveUsers)
+    Status := Evaluation.Compliant
+    ErrorMessage := Evaluation.Message
 }
 #--
 
@@ -89,11 +126,19 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.2v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.2v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": OrganizationDomainProtectionCompliant,
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
+} if {
+    Status := OrganizationDomainProtectionCompliant.Compliant
+    ErrorMessage := OrganizationDomainProtectionCompliant.Message
 }
 #--
 
@@ -102,11 +147,40 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.3v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.3v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": {"PartnerDomains": PartnerDomains},
+    "ReportDetails": ImpersonationProtectionReportDetails(false, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(false)
+} if {
+    PartnerDomains := PartnerDomainConfig("MS.SECURITYSUITE.2.3v1")
+    count(PartnerDomains) == 0
+    ErrorMessage := "No partner domains defined in the ScubaGear config file."
+}
+
+tests contains {
+    "PolicyId": "MS.SECURITYSUITE.2.3v1",
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": Evaluation,
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
+} if {
+    PartnerDomains := PartnerDomainConfig("MS.SECURITYSUITE.2.3v1")
+    count(PartnerDomains) > 0
+    Evaluation := PartnerDomainImpersonationCompliant(PartnerDomains)
+    Status := Evaluation.Compliant
+    ErrorMessage := Evaluation.Message
 }
 #--
 
@@ -115,11 +189,19 @@ tests contains {
 #--
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.2.4v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.2.4v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": [
+        "Get-AntiPhishPolicy",
+        "Get-AntiPhishRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": UserWarningsCompliant,
+    "ReportDetails": ImpersonationProtectionReportDetails(Status, ErrorMessage),
+    "RequirementMet": ImpersonationProtectionRequirementMet(Status)
+} if {
+    Status := UserWarningsCompliant.Compliant
+    ErrorMessage := UserWarningsCompliant.Message
 }
 #--
 
