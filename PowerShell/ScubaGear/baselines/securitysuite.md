@@ -1032,6 +1032,9 @@ For users not added to the standard or strict preset policies:
       - **Redirect message to email address**
       - **Delete message**
       - **Quarantine message**
+
+     Note: **Delete message** is not available for **High confidence phishing**; choose one of the other three options for that classification.
+    
     6. If you selected **Redirect message to email address**, also fill in an appropriate email for
       the **Redirect to this email address** field, such as a mailbox set up for monitoring incoming
       spam and phishing messages.
@@ -1039,7 +1042,7 @@ For users not added to the standard or strict preset policies:
     8. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then
         **Delete** (the trash icon). (_MS.SECURITYSUITE.6.2v1_)
     9. Click **Save**.
-6.  If creating a new policy:
+7.  If creating a new policy:
     1. Click **Create**, then **Inbound**.
     2. After naming the policy, click **Next**.
     3. Add users, groups, and domains as needed. To make the policy apply to all users, under
