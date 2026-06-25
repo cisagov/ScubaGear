@@ -12,10 +12,31 @@ AdminAuditLogConfig := {
     "UnifiedAuditLogIngestionEnabled": true
 }
 
-# Compliant: 12 month retention, enabled
+# Compliant: 12 month (1 year) retention, enabled
 UnifiedAuditLogRetentionPolicy := {
     "Name": "12 month retention",
     "RetentionDuration": "TwelveMonths",
+    "Enabled": true
+}
+
+# Compliant: 3 year retention, enabled
+ThreeYearRetentionPolicy := {
+    "Name": "3 year retention",
+    "RetentionDuration": "ThreeYears",
+    "Enabled": true
+}
+
+# Compliant: 5 year retention, enabled
+FiveYearRetentionPolicy := {
+    "Name": "5 year retention",
+    "RetentionDuration": "FiveYears",
+    "Enabled": true
+}
+
+# Compliant: 7 year retention, enabled
+SevenYearRetentionPolicy := {
+    "Name": "7 year retention",
+    "RetentionDuration": "SevenYears",
     "Enabled": true
 }
 
@@ -26,7 +47,21 @@ TenYearRetentionPolicy := {
     "Enabled": true
 }
 
-# Non-compliant: 3 month retention
+# Non-compliant: 7 day retention (Purview portal "7 Days" option)
+SevenDayRetentionPolicy := {
+    "Name": "Seven day retention",
+    "RetentionDuration": "SevenDays",
+    "Enabled": true
+}
+
+# Non-compliant: 30 day (1 month) retention (Purview portal "30 Days" option)
+OneMonthRetentionPolicy := {
+    "Name": "One month retention",
+    "RetentionDuration": "OneMonth",
+    "Enabled": true
+}
+
+# Non-compliant: 90 day (3 month) retention (Purview portal "90 Days" option)
 ThreeMonthRetentionPolicy := {
     "Name": "Three month retention",
     "RetentionDuration": "ThreeMonths",

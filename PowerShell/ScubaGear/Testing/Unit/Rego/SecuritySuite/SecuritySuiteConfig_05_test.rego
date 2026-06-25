@@ -39,6 +39,30 @@ test_AuditLogRetention_Correct_TwelveMonths if {
     TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, true) == true
 }
 
+test_AuditLogRetention_Correct_ThreeYears if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [ThreeYearRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [PASS, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, true) == true
+}
+
+test_AuditLogRetention_Correct_FiveYears if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [FiveYearRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [PASS, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, true) == true
+}
+
+test_AuditLogRetention_Correct_SevenYears if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [SevenYearRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [PASS, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, true) == true
+}
+
 test_AuditLogRetention_Correct_TenYears if {
     Output := securitysuite.tests with input.unified_audit_log_retention_policies as [TenYearRetentionPolicy]
         with input.service_plans as ServicePlansWithAdvancedAuditing
@@ -57,6 +81,22 @@ test_AuditLogRetention_Correct_MultiplePolicies if {
 
 test_AuditLogRetention_Incorrect_NoPolicies if {
     Output := securitysuite.tests with input.unified_audit_log_retention_policies as []
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AuditLogRetention_Incorrect_SevenDays if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [SevenDayRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
+
+test_AuditLogRetention_Incorrect_OneMonth if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [OneMonthRetentionPolicy]
         with input.service_plans as ServicePlansWithAdvancedAuditing
 
     ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])

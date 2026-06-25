@@ -362,7 +362,10 @@ tests contains {
 # MS.SECURITYSUITE.5.2v1
 #--
 # Retention durations that satisfy the 12 month minimum retention requirement.
-CompliantRetentionDurations := {"TwelveMonths", "TenYears"}
+# Get-UnifiedAuditLogRetentionPolicy reports duration as one of: SevenDays,
+# OneMonth, ThreeMonths, SixMonths, NineMonths, TwelveMonths, ThreeYears,
+# FiveYears, SevenYears, TenYears. Anything 12 months or longer is compliant.
+CompliantRetentionDurations := {"TwelveMonths", "ThreeYears", "FiveYears", "SevenYears", "TenYears"}
 
 # Note appended to the report details to clarify the license dependency of
 # audit log retention in M365.
