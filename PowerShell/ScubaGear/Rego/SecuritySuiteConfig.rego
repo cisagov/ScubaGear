@@ -584,17 +584,43 @@ RulesBlockingUnallowedAppsAndBluetooth contains Rule.Name if {
     EndpointRestrictionBlocks(Rule, "UnallowedBluetoothTransferApps")
 }
 
-ErrorMessage3_5 := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
+# Check tenant-level setting: Include Bluetooth apps recommended by Microsoft.
+# This is retrieved from Get-PolicyConfig via endpoint_dlp_global_settings.
+default BluetoothRecommendedAppsEnabled := false
+
+BluetoothRecommendedAppsEnabled if {
+    some Setting in input.endpoint_dlp_global_settings
+    lower(Setting.Setting) == "includepredefinedunallowedbluetoothapps"
+    lower(Setting.Value) == "true"
+}
+
+# Each case is mutually exclusive by RulesBlocking/BluetoothOK boolean arguments.
+ErrorMessage3_5(false, false) := concat(" ", [
+    "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps.",
+    "Tenant-level 'Include Bluetooth apps recommended by Microsoft' is not enabled in DLP settings."
+])
+
+ErrorMessage3_5(false, true) := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
+
+ErrorMessage3_5(true, false) := "Tenant-level 'Include Bluetooth apps recommended by Microsoft' is not enabled in DLP settings."
+
+ErrorMessage3_5(true, true) := ""
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.3.5v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-DLPComplianceRule"],
-    "ActualValue": RulesBlockingUnallowedAppsAndBluetooth,
-    "ReportDetails": DLPLicenseWarningString(Status, ErrorMessage3_5),
+    "Commandlet": ["Get-DLPComplianceRule", "Get-PolicyConfig"],
+    "ActualValue": {
+        "RulesBlockingEndpointApps": RulesBlockingUnallowedAppsAndBluetooth,
+        "BluetoothRecommendedAppsEnabled": BluetoothRecommendedAppsEnabled
+    },
+    "ReportDetails": DLPLicenseWarningString(Status, ErrorMsg),
     "RequirementMet": Status
 } if {
-    Status := count(RulesBlockingUnallowedAppsAndBluetooth) > 0
+    RulesBlocking := count(RulesBlockingUnallowedAppsAndBluetooth) > 0
+    Conditions := [RulesBlocking, BluetoothRecommendedAppsEnabled]
+    Status := count(FilterArray(Conditions, false)) == 0
+    ErrorMsg := ErrorMessage3_5(RulesBlocking, BluetoothRecommendedAppsEnabled)
 }
 #--
 

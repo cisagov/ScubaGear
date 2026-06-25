@@ -545,6 +545,7 @@ test_NoDLPLicense_Incorrect_3_4_V1 if {
 #
 # MS.SECURITYSUITE.3.5v1
 #--
+# Compliant: rule blocks both endpoint restrictions AND Bluetooth recommended apps enabled
 test_UnallowedAppsAndBluetooth_Correct_V1 if {
     DlpComplianceRule := json.patch(DlpComplianceRules,
                                 [{"op": "add", "path": "EndpointDlpRestrictions", "value": [
@@ -554,12 +555,14 @@ test_UnallowedAppsAndBluetooth_Correct_V1 if {
 
     Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule]
                             with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.endpoint_dlp_global_settings as EndpointDlpGlobalSettings
                             with input.defender_license as true
                             with input.defender_dlp_license as true
 
     TestResult("MS.SECURITYSUITE.3.5v1", Output, PASS, true) == true
 }
 
+# Non-compliant: rule audits instead of blocks unallowed apps; Bluetooth setting is enabled
 test_UnallowedAppsAndBluetooth_Incorrect_V1 if {
     DlpComplianceRule := json.patch(DlpComplianceRules,
                                 [{"op": "add", "path": "EndpointDlpRestrictions", "value": [
@@ -569,6 +572,7 @@ test_UnallowedAppsAndBluetooth_Incorrect_V1 if {
 
     Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule]
                             with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.endpoint_dlp_global_settings as EndpointDlpGlobalSettings
                             with input.defender_license as true
                             with input.defender_dlp_license as true
 
@@ -576,6 +580,7 @@ test_UnallowedAppsAndBluetooth_Incorrect_V1 if {
     TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
 }
 
+# Non-compliant: endpoint restrictions split across rules, neither fully blocking both
 test_UnallowedAppsAndBluetooth_Incorrect_V2 if {
     DlpComplianceRuleApps := json.patch(DlpComplianceRules,
                                 [{"op": "add", "path": "Name", "value": "Rule blocking unallowed apps"},
@@ -594,10 +599,58 @@ test_UnallowedAppsAndBluetooth_Incorrect_V2 if {
                                 DlpComplianceRuleBluetooth
                             ]
                             with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.endpoint_dlp_global_settings as EndpointDlpGlobalSettings
                             with input.defender_license as true
                             with input.defender_dlp_license as true
 
     ReportDetailString := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
+    TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
+}
+
+# Non-compliant: rule blocks correctly but Bluetooth recommended apps setting is not enabled
+test_UnallowedAppsAndBluetooth_Incorrect_V3 if {
+    DlpComplianceRule := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "EndpointDlpRestrictions", "value": [
+                                    {"setting": "UnallowedApps", "value": "Block"},
+                                    {"setting": "UnallowedBluetoothTransferApps", "value": "Block"}
+                                ]}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.endpoint_dlp_global_settings as []
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := "Tenant-level 'Include Bluetooth apps recommended by Microsoft' is not enabled in DLP settings."
+    TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
+}
+
+# Non-compliant: neither rule blocking is correct nor Bluetooth recommended apps is enabled
+test_UnallowedAppsAndBluetooth_Incorrect_V4 if {
+    DlpComplianceRule := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "EndpointDlpRestrictions", "value": [
+                                    {"setting": "UnallowedApps", "value": "Audit"},
+                                    {"setting": "UnallowedBluetoothTransferApps", "value": "Block"}
+                                ]}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.endpoint_dlp_global_settings as []
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := concat(" ", [
+        "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps.",
+        "Tenant-level 'Include Bluetooth apps recommended by Microsoft' is not enabled in DLP settings."
+    ])
+    TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
+}
+
+test_NoDLPLicense_Incorrect_3_5_V1 if {
+    Output := securitysuite.tests with input.defender_license as false
+                            with input.defender_dlp_license as false
+
+    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
     TestResult("MS.SECURITYSUITE.3.5v1", Output, ReportDetailString, false) == true
 }
 
