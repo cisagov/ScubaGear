@@ -13,6 +13,7 @@ AdminAuditLogConfig := {
 }
 
 ScubaConfig := {
+    "OutRegoFileName": "TestResults",
     "SecuritySuite": {
         "MS.SECURITYSUITE.2.1v1": {
             "SensitiveUsers": [
