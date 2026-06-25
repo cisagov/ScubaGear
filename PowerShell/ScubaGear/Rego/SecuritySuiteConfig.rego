@@ -396,6 +396,9 @@ CompliantRetentionPolicies contains {
 # retain logs beyond 180 days AND at least one retention policy keeps logs for 12
 # months or longer. Tenants at the E3/G3 license level fail regardless of any
 # configured retention policy because the retention capability is not licensed.
+# Get-MgBetaSubscribedSku is intentionally omitted from the Commandlet list: when
+# the license data is unavailable the policy must report non-compliant rather
+# than a "command did not execute" dependency error.
 default AuditRetentionRequirementMet := false
 AuditRetentionRequirementMet if {
     count(AdvancedAuditingLicenses) > 0
@@ -405,12 +408,10 @@ AuditRetentionRequirementMet if {
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.2v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy", "Get-MgBetaSubscribedSku"],
+    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy"],
     "ActualValue": CompliantRetentionPolicies,
-    "ReportDetails": ReportDetailsBooleanWarning(Status, RetentionLicenseNote),
-    "RequirementMet": Status
-} if {
-    Status := AuditRetentionRequirementMet
+    "ReportDetails": ReportDetailsBooleanWarning(AuditRetentionRequirementMet, RetentionLicenseNote),
+    "RequirementMet": AuditRetentionRequirementMet
 }
 #--
 
