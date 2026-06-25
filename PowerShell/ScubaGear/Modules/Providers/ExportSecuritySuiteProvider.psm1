@@ -126,7 +126,7 @@ function Export-SecuritySuiteProvider {
             # including the Bluetooth recommended apps setting (IncludePredefinedUnallowedBluetoothApps).
             $PolicyConfigResult = @($Tracker.TryCommand("Get-PolicyConfig"))
             if ($PolicyConfigResult.Count -gt 0) {
-                $EndpointDlpGlobalSettings = ConvertTo-Json -Depth 3 ([array]($PolicyConfigResult[0].EndpointDlpGlobalSettings | ConvertFrom-Json))
+                $EndpointDlpGlobalSettings = ConvertTo-Json -Depth 3 @($PolicyConfigResult[0].EndpointDlpGlobalSettings | ConvertFrom-Json)
             }
             else {
                 $EndpointDlpGlobalSettings = ConvertTo-Json @()
