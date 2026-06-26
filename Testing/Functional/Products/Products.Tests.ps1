@@ -421,6 +421,7 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 Write-Debug "Output folder (ScubaCached) $script:OutputFolder"
+                Initialize-ProviderExportFile -OutputFolder $script:OutputFolder
                 SetConditions -Conditions $Preconditions.ToArray() -OutputFolder $script:OutputFolder
 
                 if (-not (Test-Path -Path "$script:OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){

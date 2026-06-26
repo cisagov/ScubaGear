@@ -45,6 +45,10 @@ TestPlan:
                   MS.SECURITYSUITE.2.1v1:
                     SensitiveUsers:
                       - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
+          - Command: Set-DefaultAntiPhishSensitiveUsers
+            Splat:
+              SensitiveUsers:
+                - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.2.1v1 Compliant case - sensitive user specified as email only
@@ -56,6 +60,10 @@ TestPlan:
                   MS.SECURITYSUITE.2.1v1:
                     SensitiveUsers:
                       - agencyuserglobalreader@y2zj1.onmicrosoft.com
+          - Command: Set-DefaultAntiPhishSensitiveUsers
+            Splat:
+              SensitiveUsers:
+                - agencyuserglobalreader@y2zj1.onmicrosoft.com
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.2.1v1 Non-Compliant case - sensitive user not in tenant policy
@@ -83,11 +91,10 @@ TestPlan:
     Tests:
       - TestDescription: MS.SECURITYSUITE.2.2v1 Non-Compliant case - include domains I own is disabled
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllAntiPhishPolicyProperty
             Splat:
-              Updates:
-                anti_phish_policies[0].EnableOrganizationDomainsProtection: false
-                anti_phish_policies[1].EnableOrganizationDomainsProtection: false
+              PropertyName: EnableOrganizationDomainsProtection
+              Value: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.2.2v1 Compliant case - include domains I own is enabled
@@ -116,11 +123,10 @@ TestPlan:
     Tests:
       - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - partner domains removed from anti-phish policy
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllAntiPhishPolicyProperty
             Splat:
-              Updates:
-                anti_phish_policies[0].TargetedDomainsToProtect: []
-                anti_phish_policies[1].TargetedDomainsToProtect: []
+              PropertyName: TargetedDomainsToProtect
+              Value: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - preset policy does not apply to all recipients
@@ -137,28 +143,19 @@ TestPlan:
     Tests:
       - TestDescription: MS.SECURITYSUITE.2.4v1 Compliant case - default policy has all safety tips enabled
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-DefaultAntiPhishSafetyTips
             Splat:
-              Updates:
-                anti_phish_policies[0].EnableFirstContactSafetyTips: true
-                anti_phish_policies[0].EnableSimilarUsersSafetyTips: true
-                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: true
-                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: true
-                anti_phish_policies[0].EnableViaTag: true
-                anti_phish_policies[0].EnableSuspiciousSafetyTip: true
+              Enabled: true
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.2.4v1 Non-Compliant case - safety tips disabled on default policy
         Preconditions:
+          - Command: Set-DefaultAntiPhishSafetyTips
+            Splat:
+              Enabled: false
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                anti_phish_policies[0].EnableFirstContactSafetyTips: false
-                anti_phish_policies[0].EnableSimilarUsersSafetyTips: false
-                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: false
-                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: false
-                anti_phish_policies[0].EnableViaTag: false
-                anti_phish_policies[0].EnableSuspiciousSafetyTip: false
                 protection_policy_rules[0].SentTo: ["user@example.com"]
                 protection_policy_rules[1].SentTo: ["user@example.com"]
         Postconditions: []
