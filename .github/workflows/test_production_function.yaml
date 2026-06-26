@@ -38,7 +38,7 @@ on:
   #     - ".github/workflows/test_production_function.yaml"
   #     - ".github/workflows/function_test_teams.yaml"
   #     - ".github/workflows/publish_private_package.yaml"
-  #     - ".github/workflows/securitysuite.yaml"
+  #     - ".github/workflows/function_test_securitysuite.yaml"
   #     - ".github/workflows/function_test_entra.yaml"
   #     - ".github/workflows/function_test_exchange.yaml"
   #     - ".github/workflows/function_test_powerplatform.yaml"
