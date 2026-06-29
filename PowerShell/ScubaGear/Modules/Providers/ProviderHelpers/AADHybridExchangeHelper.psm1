@@ -1,36 +1,36 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly
-Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials, Get-RiskyPermissionsJson
+Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Format-Credentials, Get-RiskyAppPermissionsJson
 
 function Get-ExchangeHybridIds {
     <#
     .Description
     Look up the Office 365 Exchange Online app ID and full_access_as_app role ID
-    from the RiskyPermissions.json reference.
+    from the RiskyAppPermissions.json reference.
 
     .Functionality
     Internal
     #>
     process {
-        $RiskyPermissionsJson = Get-RiskyPermissionsJson
+        $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
 
         # $ExchangeOnlineResource.Name represents the exchange online appId (00000002-0000-0ff1-ce00-000000000000)
         # $ExchangeOnlineResource.Value represents the display name ("Office 365 Exchange Online")
-        $ExchangeOnlineResource = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
+        $ExchangeOnlineResource = $RiskyAppPermissionsJson.resources.PSObject.Properties | Where-Object {
             $_.Value -eq "Office 365 Exchange Online"
         } | Select-Object -First 1
 
         if ($null -eq $ExchangeOnlineResource) {
-            throw "Could not find 'Office 365 Exchange Online' in RiskyPermissions.json."
+            throw "Could not find 'Office 365 Exchange Online' in RiskyAppPermissions.json."
         }
 
         # $FullAccessAsAppRoleId.Name represents the role ID (dc890d15-9560-4a4c-9b7f-a736ec74ec40)
         # $FullAccessAsAppRoleId.Value represents the role name ("full_access_as_app")
-        $FullAccessAsAppRoleId = $RiskyPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
+        $FullAccessAsAppRoleId = $RiskyAppPermissionsJson.permissions.($ExchangeOnlineResource.Value).Application.PSObject.Properties | Where-Object {
             $_.Value.Name -eq "full_access_as_app"
         } | Select-Object -First 1
 
         if ($null -eq $FullAccessAsAppRoleId) {
-            throw "Could not find 'full_access_as_app' in RiskyPermissions.json under permissions.'$($ExchangeOnlineResource.Value)'.Application"
+            throw "Could not find 'full_access_as_app' in RiskyAppPermissions.json under permissions.'$($ExchangeOnlineResource.Value)'.Application"
         }
 
         return @{

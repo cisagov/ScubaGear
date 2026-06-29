@@ -30,7 +30,7 @@ function Export-SharePointProvider {
     if ($TenantData.count -gt 0) {
         $SPOTenantJson = ConvertTo-Json @($TenantData) -Depth 10
     }
-    
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
