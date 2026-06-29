@@ -46,6 +46,43 @@ ListConfigValues(PolicyID, ListKey) := Values if {
     }
 } else := set()
 
+###############################
+# Anti-malware policy helpers #
+###############################
+
+HighestPriorityActiveAntiMalwarePolicyName := PolicyName if {
+    PresetPolicyCoversAllRecipients(`(?i)Strict Preset Security Policy`)
+    some Policy in input.anti_malware_policies
+    regex.match(`(?i)Strict Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    PresetPolicyCoversAllRecipients(`(?i)Standard Preset Security Policy`)
+    some Policy in input.anti_malware_policies
+    regex.match(`(?i)Standard Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    count(input.anti_malware_rules) > 0
+    EnabledRules := {Rule | some Rule in input.anti_malware_rules; Rule.State == "Enabled"}
+    count(EnabledRules) > 0
+    # The "highest" priority rules is actually the rule with the lowest "Priority" value
+    MinPriority := min({Rule.Priority | some Rule in input.anti_malware_rules})
+    some Rule in EnabledRules
+    Rule.Priority == MinPriority
+    CustomRuleCoversAllRecipients(Rule)
+    PolicyName := Rule.MalwareFilterPolicy
+} else := "Default"
+
+UserFriendlyPolicyName(PolicyName) := Name if {
+    regex.match(`(?i)Strict Preset Security Policy`, PolicyName)
+    Name := "strict preset"
+} else := Name if {
+    regex.match(`(?i)Standard Preset Security Policy`, PolicyName)
+    Name := "standard preset"
+} else := Name if {
+    PolicyName == "Default"
+    Name := "default"
+} else := PolicyName
+
 ##############################################
 # Impersonation protection — shared helpers
 ##############################################

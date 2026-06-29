@@ -15,6 +15,8 @@ import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
 import data.utils.securitysuite.PresetPolicyCoversAllRecipients
 import data.utils.securitysuite.CustomRuleCoversAllRecipients
+import data.utils.securitysuite.HighestPriorityActiveAntiMalwarePolicyName
+import data.utils.securitysuite.UserFriendlyPolicyName
 import data.utils.report.ReportDetailsArray
 import data.utils.key.Count
 
@@ -27,33 +29,115 @@ import data.utils.key.Count
 # MS.SECURITYSUITE.1.1v1
 #--
 
-PoliciesBlockingClickToRun contains Policy.Name if {
-    some Policy in input.anti_malware_policies
+PolicyCompliantForBlockClickToRun(Policy) := true if {
     Policy.EnableFileFilter == true
     RequiredTypes := {"exe", "cmd", "vbe"}
-    count(intersection({RequiredTypes, Policy.FileTypes})) == count(RequiredTypes)
+    MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
+    count(MissingTypes) == 0
+} else := false
+
+PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Policy.EnableFileFilter != true
+    Reason := "The common attachments filter is disabled."
+}
+
+PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    RequiredTypes := {"exe", "cmd", "vbe"}
+    MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
+    count(MissingTypes) > 0
+    Reason := concat("", [
+        "The common attachments filter does not include ",
+        concat(", ", MissingTypes),
+        "."
+    ])
+}
+
+SecuritySuite_1_1_Details(Status) := {
+    concat("", [
+        ReportDetailsBoolean(Status),
+        ". The highest priority anti-malware policy that applies to all users is the ",
+        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
+        " policy. ",
+        concat(" ", PolicyBlockClickToRunNoncomplianceReasons)
+    ])
 }
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-MalwareFilterPolicy",
+        "Get-MalwareFilterRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": [{
+        "ActivePolicy": HighestPriorityActiveAntiMalwarePolicyName,
+        "EnableFileFilter": Policy.EnableFileFilter,
+        "FileTypes": Policy.FileTypes
+    }],
+    "ReportDetails": SecuritySuite_1_1_Details(Status),
+    "RequirementMet": Status
+}
+if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Status := PolicyCompliantForBlockClickToRun(Policy)
 }
 #--
 
 #
 # MS.SECURITYSUITE.1.2v1
 #--
+
+PolicyCompliantForZAP(Policy) := true if {
+    Policy.EnableFileFilter == true
+    RequiredTypes := {"exe", "cmd", "vbe"}
+    MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
+    count(MissingTypes) == 0
+} else := false
+
+PolicyZAPNoncomplianceReasons contains Reason if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Policy.ZapEnabled != true
+    Reason := "Zero-hour auto purge is disabled."
+}
+
+SecuritySuite_1_2_Details(Status) := {
+    concat("", [
+        ReportDetailsBoolean(Status),
+        ". The highest priority anti-malware policy that applies to all users is the ",
+        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
+        " policy. ",
+        concat(" ", PolicyZAPNoncomplianceReasons)
+    ])
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-MalwareFilterPolicy",
+        "Get-MalwareFilterRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": [{
+        "ActivePolicy": HighestPriorityActiveAntiMalwarePolicyName,
+        "EnableFileFilter": Policy.ZapEnabled
+    }],
+    "ReportDetails": SecuritySuite_1_2_Details(Status),
+    "RequirementMet": Status
+}
+if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Status := Policy.ZapEnabled == true
 }
 #--
 
