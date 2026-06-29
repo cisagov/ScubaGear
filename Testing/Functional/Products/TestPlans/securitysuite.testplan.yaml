@@ -343,6 +343,7 @@ TestPlan:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
           - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null -SentToMemberOf $null -RecipientDomainIs $null"
         Postconditions:
           - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
           - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
