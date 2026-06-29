@@ -942,11 +942,26 @@ function Invoke-ProviderList {
         }
 "@
 
+            # Parse the JSON string and repair it if invalid JSON was found.
+            $ReturnObject = Repair-ScubaGearJson -JsonInputString $BaselineSettingsExport
+
+            $BaselineSettingsExportFinal = $null
+            if ($ReturnObject.RepairedJson) {
+                # Add code to save the invalid JSON to a Invalid_ version so the user can report it to ScubaGear and we can fix the troublesome provider
+                $BaselineSettingsExportFinal = $ReturnObject.JsonString
+                $InvalidJSONLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
+                    -Location $OutFolderPath -FileName "Invalid-$($ScubaConfig.OutProviderFileName).json"
+                Write-Warning "ScubaGear saved the invalid JSON file to the following location so you can provide it to the dev team for debugging: $InvalidJSONLocation"
+            }
+            else {
+                $BaselineSettingsExportFinal = $BaselineSettingsExport
+            }
+
             # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA (as of 0.68) appears to not
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
             # the BOM
-            $ActualSavedLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
+            $ActualSavedLocation = Set-Utf8NoBom -Content $BaselineSettingsExportFinal `
                 -Location $OutFolderPath -FileName "$($ScubaConfig.OutProviderFileName).json"
             Write-Debug $ActualSavedLocation
 
@@ -2408,7 +2423,7 @@ function Invoke-SCuBACached {
                     throw "No provider JSON or ScubaResults JSON file was found in folder: $OutPath. Double check the values you passed for -OutPath or -OutProviderFileName to ensure one of those file exists in that folder."
                 }
                 # Import the full ScubaResults file into a PowerShell object and fix any invalid JSON
-                $ImportedObject = Import-ScubaGearJsonWithRepair -Path $ScubaResultsFileObject.FullName
+                $ImportedObject = Repair-ScubaGearJson -FilePath $ScubaResultsFileObject.FullName
                 $ScubaResultsObject = $ImportedObject.JsonObject
 
                 # The provider settings are inside the ScubaResults object in the "Raw": { } property
@@ -2421,7 +2436,7 @@ function Invoke-SCuBACached {
             }
             # The provider file already exists so load its contents into the ProjectSettingsObject object and repair invalid JSON fields and save it back to disk for downstream use.
             else {
-                $ImportedObject = Import-ScubaGearJsonWithRepair -Path $ProviderJSONFilePath
+                $ImportedObject = Repair-ScubaGearJson -FilePath $ProviderJSONFilePath
                 $ProviderSettingsObject = $ImportedObject.JsonObject
                 # If the JSON was repaired as it loaded, save the repaired version back to disk so downstream functions won't crash from invalid JSON.
                 if ($ImportedObject.RepairedJson) {
@@ -2436,12 +2451,14 @@ function Invoke-SCuBACached {
             # If ScubaResults file exists and KeepIndividualJSON then rename ScubaResults file so it is ignored by functions that look for it; Otherwise it can cause conflicts.
             # If the user passes KeepIndividualJSON it signals that they do not want a ScubaResults file generated or processed by ScubaCached.
             if ($ScubaResultsFileFound -and $KeepIndividualJSON) {
-                $NewScubaResultsName = "Unused_$($ScubaResultsFileObject.Name)"
+                $NewScubaResultsName = "Unused-$($ScubaResultsFileObject.Name)"
                 $NewScubaResultsPath = Join-Path $ScubaResultsFileObject.DirectoryName $NewScubaResultsName
                 if (Test-Path $NewScubaResultsPath) {
                     Remove-Item $NewScubaResultsPath -Force
                 }
                 Rename-Item -Path $ScubaResultsFileObject.FullName -NewName $NewScubaResultsName
+                Write-Warning "Detected a ScubaResults file along with a ProviderSettingsExport file when calling with the -KeepIndividualJSON parameter."
+                Write-Warning "Renamed the ScubaResults to $NewScubaResultsName to avoid ambiguous results. ScubaCached will use the ProviderSettingsExport file since that takes priority."
             }
             #####################################
 
@@ -2504,7 +2521,7 @@ function Invoke-SCuBACached {
     }
 }
 
-function Import-ScubaGearJsonWithRepair {
+function Repair-ScubaGearJson {
     <#
     .SYNOPSIS
     Imports a Provider or ScubaResults JSON file and returns a PowerShell object of the JSON along with metadata indicating whether the JSON required automatic repair.
@@ -2538,45 +2555,91 @@ function Import-ScubaGearJsonWithRepair {
         it could be successfully parsed.
 
     .EXAMPLE
-    $ProviderSettingsObject = Import-ScubaGearJsonWithRepair -Path $ProviderJSONFilePath
+    $ReturnObject = Repair-ScubaGearJson -FilePath $ProviderJSONFilePath
 
-    if ($ProviderSettingsObject.RepairedJson) {
+    if ($ReturnObject.RepairedJson) {
         Write-Warning "The provider JSON file required automatic repair."
     }
-
+    
     $ProviderJsonObject = $ProviderSettingsObject.JsonObject
+
+    .EXAMPLE
+    $ProviderJSONString = "{ JSON STRING IS HERE }"
+    $ReturnObject = Repair-ScubaGearJson -JsonInputString $ProviderJSONString
+
+    if ($ProviderSettingsObject.RepairedJson) {
+        Write-Warning "The JSON string required automatic repair."
+        $RepairedJSONString = $ProviderSettingsObject.JsonString
+    }
+    else {
+        Write-Warning "The JSON string did not require repair."
+    }
 
     .FUNCTIONALITY
     Private
     #>
     param(
-        [Parameter(Mandatory)]
-        [string] $Path
+        [Parameter(Mandatory = $false)]
+        [string] $FilePath = $null,
+
+        [Parameter(Mandatory = $false)]
+        [string] $JsonInputString = $null
     )
+
+    if ((-not $FilePath -and -not $JsonInputString) -or ($FilePath -and $JsonInputString)) {
+        throw "Repair-ScubaGearJson: You must specify exactly one of -FilePath or JsonInputString."
+    }
 
     $ReturnObject = [PSCustomObject]@{
         RepairedJson = $false
         JsonObject   = $null
+        JsonString = $null
     }
 
-    # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
-    $JsonString = Get-Content $Path -Encoding UTF8 -Raw
+    # We are parsing a JSON file
+    if ($FilePath) {
+        # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
+        $JsonString = Get-Content $FilePath -Encoding UTF8 -Raw
+    }
+    # We are parsing a JSON string
+    else {
+        $JsonString = $JsonInputString
+    }
 
     try {
+        # In this block is Attempt number 1 to parse the JSON string
+
         $JsonReturnObject = $JsonString | ConvertFrom-Json -ErrorAction Stop
-        $ReturnObject.JsonObject = $JsonReturnObject
+        # We are parsing a JSON file so return the JSON converted into a PS Object
+        if ($FilePath) {
+             $ReturnObject.JsonObject = $JsonReturnObject
+        }
+        # We are parsing a JSON string so return the string as-is since we didn't need to repair it
+        else {
+            $ReturnObject.JsonString = $JsonInputString
+        }
+       
         return $ReturnObject
     }
     catch {
+        # If attempt 1 fails, we see if the error is a known message which indicates an invalid JSON string that we have seen before from the export providers.
+        # If the error is the known JSON primitive problem then we try to repair it, otherwise we throw the error since it may be some other problem that cannot be auto repaired.
         $OriginalErrorText = $_.Exception.Message
 
         if ($OriginalErrorText -notmatch 'Invalid JSON primitive') {
             throw
         }
 
-        Write-Warning "ScubaGear detected an invalid JSON object at the file: $Path"
+        if ($FilePath) {
+        # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
+            Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object at the file: $FilePath"
+        }
+        else {
+            Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object"
+        }
+        
         Write-Warning "Please report this to the ScubaGear team as a bug report either by GitHub or the Scuba mailbox."
-        Write-Warning "Attempting to auto repair the JSON file..."
+        Write-Warning "Attempting to auto repair the JSON..."
 
         # Fix any quoted JSON property that has a colon but no value:
         #   "some_property": ,      becomes     "some_property": [],
@@ -2588,20 +2651,26 @@ function Import-ScubaGearJsonWithRepair {
         )
 
         try {
-            $RepairedJsonObject = $RepairedJsonString | ConvertFrom-Json -ErrorAction Stop
-            Write-Warning "Auto repair of invalid JSON succeeded."
-            $ReturnObject.RepairedJson = $true
-            $ReturnObject.JsonObject = $RepairedJsonObject
-            return $ReturnObject
+            # In this block is Attempt 2. We try to parse the repaired JSON. If it works we return the fixed PS object or the fixed string, depending on what the caller needs.
+            if ($FilePath) {
+                $RepairedJsonObject = $RepairedJsonString | ConvertFrom-Json -ErrorAction Stop
+                Write-Warning "Auto repair of invalid JSON succeeded."
+                $ReturnObject.RepairedJson = $true
+                $ReturnObject.JsonObject = $RepairedJsonObject
+                return $ReturnObject
+            }
+            else {
+                Write-Warning "Auto repair of invalid JSON succeeded."
+                $ReturnObject.RepairedJson = $true
+                $ReturnObject.JsonString = $RepairedJsonString
+                return $ReturnObject
+            }
         }
         catch {
             $RepairErrorText = $_.Exception.Message
 
             throw @"
-ScubaGear created an invalid JSON export file, and the automatic repair attempt did not resolve it.
-
-File:
-$Path
+ScubaGear created an invalid JSON export string, and the automatic repair attempt did not resolve it.
 
 Original JSON parser error:
 $OriginalErrorText
