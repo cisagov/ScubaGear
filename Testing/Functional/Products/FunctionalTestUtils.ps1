@@ -980,51 +980,6 @@ function Set-NestedMemberValue {
   }
 }
 
-function Initialize-ProviderExportFile {
-  <#
-    .SYNOPSIS
-      Ensures ProviderSettingsExport.json exists in the output folder, extracting from ScubaResults if needed.
-  #>
-  param(
-    [Parameter(Mandatory = $true)]
-    [ValidateScript({Test-Path -PathType Container $_})]
-    [string]
-    $OutputFolder,
-
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $ProviderFileName = 'ProviderSettingsExport',
-
-    [Parameter(Mandatory = $false)]
-    [ValidateNotNullOrEmpty()]
-    [string]
-    $ScubaResultsFileName = 'ScubaResults'
-  )
-
-  $ProviderPath = Join-Path -Path $OutputFolder -ChildPath "$ProviderFileName.json"
-  if (Test-Path -Path $ProviderPath -PathType Leaf) {
-    return
-  }
-
-  $ScubaResultsPattern = Join-Path -Path $OutputFolder -ChildPath "$ScubaResultsFileName*.json"
-  $ScubaResultsFile = Get-ChildItem -Path $ScubaResultsPattern -File -ErrorAction SilentlyContinue |
-    Sort-Object CreationTime -Descending |
-    Select-Object -First 1
-
-  if ($null -eq $ScubaResultsFile) {
-    throw "Provider export file not found and no $ScubaResultsFileName file is available in '$OutputFolder'."
-  }
-
-  $ScubaResults = Get-Content -Path $ScubaResultsFile.FullName -Encoding UTF8 -Raw | ConvertFrom-Json
-  if ($null -eq $ScubaResults.Raw) {
-    throw "ScubaResults file '$($ScubaResultsFile.Name)' does not contain provider export data in the Raw property."
-  }
-
-  $RawJsonString = $ScubaResults.Raw | ConvertTo-Json -Depth 20 -Compress
-  Set-Utf8NoBom -Content $RawJsonString -Location $OutputFolder -FileName "$ProviderFileName.json" | Out-Null
-}
-
 function Set-AllAntiPhishPolicyProperty {
   <#
     .SYNOPSIS
@@ -1138,8 +1093,6 @@ function LoadProviderExport() {
       [string]
       $OutputFolder
   )
-  Initialize-ProviderExportFile -OutputFolder $OutputFolder
-
   # Create new settings file to use for modifications if one does not already exist
   # If modified settings file already exists, use as is.
   if (-not (Test-Path -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){
