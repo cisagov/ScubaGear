@@ -942,17 +942,27 @@ function Invoke-ProviderList {
         }
 "@
 
-            # Parse the JSON string and repair it if invalid JSON was found.
-            $ReturnObject = Repair-ScubaGearJson -JsonInputString $BaselineSettingsExport
+            # If any of the providers produced JSON data, we check it for invalid JSON and try to repair it if necessary.
+            if ($ProviderJSON.Length -gt 0) {
+                # Parse the JSON string and repair it if invalid JSON was found.
+                $ReturnObject = Repair-ScubaGearJson -JsonInputString $BaselineSettingsExport
 
-            $BaselineSettingsExportFinal = $null
-            if ($ReturnObject.RepairedJson) {
-                # Add code to save the invalid JSON to a Invalid_ version so the user can report it to ScubaGear and we can fix the troublesome provider
-                $BaselineSettingsExportFinal = $ReturnObject.JsonString
-                $InvalidJSONLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
-                    -Location $OutFolderPath -FileName "Invalid-$($ScubaConfig.OutProviderFileName).json"
-                Write-Warning "ScubaGear saved the invalid JSON file to the following location so you can provide it to the dev team for debugging: $InvalidJSONLocation"
+                $BaselineSettingsExportFinal = $null
+                # If we performed a repair.
+                if ($ReturnObject.RepairedJson) {
+                    # Make sure ScubaGear references the repaired ScubaResults JSON string.
+                    $BaselineSettingsExportFinal = $ReturnObject.JsonString
+                    # Save a backup of the invalid JSON file in case the user wants to report it to the ScubaGear dev team.
+                    $InvalidJSONLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
+                        -Location $OutFolderPath -FileName "Invalid-$($ScubaConfig.OutProviderFileName).json"
+                    Write-Warning "Saved the invalid JSON file to the following location so you can provide it to the ScubaGear team for debugging: $InvalidJSONLocation"
+                }
+                # Repair was not needed so use the ScubaResults JSON as-is
+                else {
+                    $BaselineSettingsExportFinal = $BaselineSettingsExport
+                }
             }
+            # If providers didn't produce any JSON data, there is nothing to repair, so use the ScubaResults JSON as-is
             else {
                 $BaselineSettingsExportFinal = $BaselineSettingsExport
             }
