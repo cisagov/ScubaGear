@@ -16,7 +16,10 @@ import data.utils.securitysuite.UserWarningsCompliant
 import data.utils.securitysuite.PresetPolicyCoversAllRecipients
 import data.utils.securitysuite.CustomRuleCoversAllRecipients
 import data.utils.securitysuite.HighestPriorityActiveAntiMalwarePolicyName
+import data.utils.securitysuite.HighestPriorityActiveSafeAttachmentPolicyName
 import data.utils.securitysuite.UserFriendlyPolicyName
+import data.utils.securitysuite.ApplyLicenseWarning
+import data.utils.securitysuite.ApplyLicenseWarningString
 import data.utils.report.ReportDetailsArray
 import data.utils.key.Count
 
@@ -80,7 +83,7 @@ tests contains {
         "EnableFileFilter": Policy.EnableFileFilter,
         "FileTypes": Policy.FileTypes
     }],
-    "ReportDetails": SecuritySuite_1_1_Details(Status),
+    "ReportDetails": ApplyLicenseWarningString(Status, SecuritySuite_1_1_Details(Status)),
     "RequirementMet": Status
 }
 if {
@@ -93,13 +96,6 @@ if {
 #
 # MS.SECURITYSUITE.1.2v1
 #--
-
-PolicyCompliantForZAP(Policy) := true if {
-    Policy.EnableFileFilter == true
-    RequiredTypes := {"exe", "cmd", "vbe"}
-    MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
-    count(MissingTypes) == 0
-} else := false
 
 PolicyZAPNoncomplianceReasons contains Reason if {
     some Policy in input.anti_malware_policies
@@ -131,7 +127,7 @@ tests contains {
         "ActivePolicy": HighestPriorityActiveAntiMalwarePolicyName,
         "EnableFileFilter": Policy.ZapEnabled
     }],
-    "ReportDetails": SecuritySuite_1_2_Details(Status),
+    "ReportDetails": ApplyLicenseWarningString(Status, SecuritySuite_1_2_Details(Status)),
     "RequirementMet": Status
 }
 if {
@@ -144,26 +140,87 @@ if {
 #
 # MS.SECURITYSUITE.1.3v1
 #--
+
+SecurySuite_1_3_Result := {
+    "Status": false,
+    "Description": concat("", [
+        ReportDetailsBoolean(false),
+        ". No safe attachments policy applies to all users, including built-in protection."
+    ])
+} if {
+    HighestPriorityActiveSafeAttachmentPolicyName == null
+} else := {
+    "Status": true,
+    "Description": concat("", [
+        ReportDetailsBoolean(true),
+        ". The highest priority safe attachments policy that applies to all users is the ",
+        UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
+        " policy. "
+    ])
+} if {
+    some Policy in input.safe_attachment_policies
+    Policy.Identity == HighestPriorityActiveSafeAttachmentPolicyName
+    Policy.Action in {"Block", "DynamicDelivery"}
+} else := {
+    "Status": false,
+    "Description": concat("", [
+        ReportDetailsBoolean(false),
+        ". The highest priority safe attachments policy that applies to all users is the ",
+        UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
+        "Safe Attachments unknown malware Malware response is set to ",
+        Policy.Action,
+        "."
+    ])
+} if {
+    some Policy in input.safe_attachment_policies
+    Policy.Identity == HighestPriorityActiveSafeAttachmentPolicyName
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.3v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.3v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-SafeAttachmentPolicy",
+        "Get-SafeAttachmentRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-ATPBuiltInProtectionRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": [{
+        "ActivePolicy": HighestPriorityActiveSafeAttachmentPolicyName
+    }],
+    "ReportDetails": ApplyLicenseWarningString(Status, Description),
+    "RequirementMet": Status
+}
+if {
+    Status := SecurySuite_1_3_Result.Status
+    Description := SecurySuite_1_3_Result.Description
 }
 #--
 
 #
 # MS.SECURITYSUITE.1.4v1
 #--
+# Find the set of policies that have EnableATPForSPOTeamsODB set to true
+ATPPolicies contains {
+    "Identity": Policy.Identity,
+    "EnableATPForSPOTeamsODB": Policy.EnableATPForSPOTeamsODB
+} if {
+    some Policy in input.atp_policy_for_o365
+    Policy.EnableATPForSPOTeamsODB == true
+}
+
+# Pass if at least one policy exists
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.4v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.4v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-AtpPolicyForO365"],
+    "ActualValue": ATPPolicies,
+    "ReportDetails": ApplyLicenseWarning(Status),
+    "RequirementMet": Status
+}
+if {
+    Status := count(ATPPolicies) > 0
 }
 #--
 

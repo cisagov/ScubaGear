@@ -1,9 +1,65 @@
 package utils.securitysuite
 
-import data.utils.defender.ApplyLicenseWarningString
-import data.utils.defender.DEFLICENSEWARNSTR
+import data.utils.key.FAIL
+import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsString
 import data.utils.key.ConvertToSet
 import rego.v1
+
+#############
+# Constants #
+#############
+
+DEFLICENSEWARNSTR := concat(" ", [
+    "**NOTE: Either you do not have sufficient permissions or",
+    "your tenant does not have a license for Microsoft Defender",
+    "for Office 365 Plan 1 or Plan 2, which is required for this feature.**"
+])
+
+DLPLICENSEWARNSTR := concat(" ", [
+    "**NOTE: Either you do not have sufficient permissions or",
+    "your tenant does not have a license for Microsoft Purview",
+    "Data Loss Prevention, which is required for this feature.",
+    "This feature is included in E3/G3/E5/G5 licenses.**"
+])
+
+#############################################
+# Specific Defender Report Details Function #
+#############################################
+
+# If a defender license is present, don't apply the warning
+# and leave the message unchanged
+ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
+    input.defender_license == true
+}
+
+# If a defender license is not present, assume failure and
+# replace the message with the warning
+ApplyLicenseWarning(_) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
+    input.defender_license == false
+}
+
+#################################################################################
+# Report Detail Functions for check that required Defender license #
+#################################################################################
+# If a defender license is present, don't apply the warning
+# and leave the message unchanged
+ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
+    input.defender_license == true
+}
+
+ApplyLicenseWarningString(_, _) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
+    input.defender_license == false
+}
+
+DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
+    input.defender_dlp_license == true
+}
+
+DLPLicenseWarningString(_, _) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
+    input.defender_dlp_license == false
+}
+
 
 #############################
 # Config (SecuritySuite + Defender alias)
@@ -82,6 +138,37 @@ UserFriendlyPolicyName(PolicyName) := Name if {
     PolicyName == "Default"
     Name := "default"
 } else := PolicyName
+
+##################################
+# Safe attachment policy helpers #
+##################################
+
+HighestPriorityActiveSafeAttachmentPolicyName := PolicyName if {
+    PresetPolicyCoversAllRecipients(`(?i)Strict Preset Security Policy`)
+    some Policy in input.safe_attachment_rules
+    regex.match(`(?i)Strict Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    PresetPolicyCoversAllRecipients(`(?i)Standard Preset Security Policy`)
+    some Policy in input.safe_attachment_rules
+    regex.match(`(?i)Standard Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    count(input.safe_attachment_rules) > 0
+    EnabledRules := {Rule | some Rule in input.safe_attachment_rules; Rule.State == "Enabled"}
+    count(EnabledRules) > 0
+    # The "highest" priority rules is actually the rule with the lowest "Priority" value
+    MinPriority := min({Rule.Priority | some Rule in input.anti_malware_rules})
+    some Rule in EnabledRules
+    Rule.Priority == MinPriority
+    CustomRuleCoversAllRecipients(Rule)
+    PolicyName := Rule.SafeAttachmentPolicy
+} else := "Built-In Protection Policy" if {
+    some Rule in input.built_in_protection_rules
+    RuleFieldEmpty(Rule.ExceptIfSentTo)
+    RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
+} else := null
 
 ##############################################
 # Impersonation protection — shared helpers
