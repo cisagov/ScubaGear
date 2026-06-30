@@ -4,7 +4,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $AADHybridExchangeHelper
 
 InModuleScope AADHybridExchangeHelper {
     Describe "Get-ExchangeHybridIds" {
-        Context "When RiskyPermissions.json is present and contaisn the expected entries" {
+        Context "When RiskyAppPermissions.json is present and contaisn the expected entries" {
             It "returns a hashtable" {
                 $Result = Get-ExchangeHybridIds
                 $Result | Should -BeOfType [hashtable]
@@ -27,9 +27,9 @@ InModuleScope AADHybridExchangeHelper {
             }
         }
 
-        Context "When Office 365 Exchange Online is missing from RiskyPermissions.json" {
+        Context "When Office 365 Exchange Online is missing from RiskyAppPermissions.json" {
             BeforeEach {
-                Mock Get-RiskyPermissionsJson {
+                Mock Get-RiskyAppPermissionsJson {
                     return [PSCustomObject]@{
                         resources = [PSCustomObject]@{}
                         permissions = [PSCustomObject]@{}
@@ -38,13 +38,13 @@ InModuleScope AADHybridExchangeHelper {
             }
 
             It "throws an error referencing 'Office 365 Exchange Online'" {
-                { Get-ExchangeHybridIds } | Should -Throw "Could not find 'Office 365 Exchange Online' in RiskyPermissions.json."
+                { Get-ExchangeHybridIds } | Should -Throw "Could not find 'Office 365 Exchange Online' in RiskyAppPermissions.json."
             }
         }
 
-        Context "When full_access_as_app is missing from RiskyPermissions.json" {
+        Context "When full_access_as_app is missing from RiskyAppPermissions.json" {
             BeforeEach {
-                Mock Get-RiskyPermissionsJson {
+                Mock Get-RiskyAppPermissionsJson {
                     return [PSCustomObject]@{
                         resources = [PSCustomObject]@{
                             "00000002-0000-0ff1-ce00-000000000000" = "Office 365 Exchange Online"
@@ -59,7 +59,7 @@ InModuleScope AADHybridExchangeHelper {
             }
 
             It "Should throw an error referencing 'full_access_as_app'" {
-                { Get-ExchangeHybridIds } | Should -Throw "Could not find 'full_access_as_app' in RiskyPermissions.json under permissions.'Office 365 Exchange Online'.Application"
+                { Get-ExchangeHybridIds } | Should -Throw "Could not find 'full_access_as_app' in RiskyAppPermissions.json under permissions.'Office 365 Exchange Online'.Application"
             }
         }
     }
