@@ -124,7 +124,7 @@ test_CustomPolicy_Correct if {
     TestResult("MS.SECURITYSUITE.7.3v1", Output, PASS, true) == true
 }
 
-# Compliant custom policy exists but is not enabled
+# Compliant custom policy exists but is not enabled, non-compliant custom policy is applied
 test_CustomPolicy_Incorrect_V1 if {
     PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
                             [{"op": "replace", "path": "0/State", "value": false}, 
@@ -139,7 +139,7 @@ test_CustomPolicy_Incorrect_V1 if {
     TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
 }
 
-# Compliant custom policy exists but is not the highest priority (lowest priority number) policy
+# Compliant custom policy exists but is not the highest priority (lowest priority number) policy, non-compliant custom policy is applied
 test_CustomPolicy_Incorrect_V2 if {
     PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
                             [{"op": "replace", "path": "0/State", "value": false}, 
@@ -156,7 +156,7 @@ test_CustomPolicy_Incorrect_V2 if {
 }
 
 
-# Compliant custom policy is enabled but SentTo field is not empty
+# Compliant custom policy is enabled but SentTo field is not empty, non-compliant custom policy is applied
 test_CustomPolicy_Incorrect_V3 if {
     PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
                             [{"op": "replace", "path": "0/State", "value": false}, 
@@ -171,7 +171,7 @@ test_CustomPolicy_Incorrect_V3 if {
     TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
 }
 
-# Compliant custom policy is enabled but SentToMemberOf is not empty
+# Compliant custom policy is enabled but SentToMemberOf is not empty, non-compliant custom policy is applied
 test_CustomPolicy_Incorrect_V4 if {
     PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
                             [{"op": "replace", "path": "0/State", "value": false}, 
@@ -186,7 +186,7 @@ test_CustomPolicy_Incorrect_V4 if {
     TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
 }
 
-# Compliant custom policy is enabled but RecipientDomainIs is not empty
+# Compliant custom policy is enabled but RecipientDomainIs is not empty, non-compliant custom policy is applied
 test_CustomPolicy_Incorrect_V5 if {
     PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
                             [{"op": "replace", "path": "0/State", "value": false}, 
@@ -257,6 +257,20 @@ test_SafeLinks_CustomPolicy_Incorrect_V4 if {
 
     TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
 }
+
+# All custom policies are disabled, built-in protection policy is applied
+test_SafeLinks_BuiltInPoilicy_Incorrect if {
+    PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
+                            [{"op": "replace", "path": "0/State", "value": false}, 
+                            {"op": "replace", "path": "1/State", "value": false}])
+    RuleDisabled :=  json.patch(SafeLinksRules, [{"op": "replace", "path": "0/State", "value": "Disabled"},
+                                                {"op": "replace", "path": "1/State", "value": "Disabled"}])
+    Output := securitysuite.tests with input.protection_policy_rules as PresetPoliciesDisabled
+                                    with input.safe_links_policies as SafeLinksPolicies
+                                    with input.safe_links_rules as RuleDisabled
+
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
+}
 #--
 
 #
@@ -288,6 +302,20 @@ test_CheckUrls_CustomPolicy_Incorrect_V2 if {
 
     TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
 }
+
+# All custom policies are disabled, built-in protection policy is applied
+test_CheckUrls_BuiltInPoilicy_Correct if {
+    PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
+                            [{"op": "replace", "path": "0/State", "value": false}, 
+                            {"op": "replace", "path": "1/State", "value": false}])
+    RuleDisabled :=  json.patch(SafeLinksRules, [{"op": "replace", "path": "0/State", "value": "Disabled"},
+                                                {"op": "replace", "path": "1/State", "value": "Disabled"}])
+    Output := securitysuite.tests with input.protection_policy_rules as PresetPoliciesDisabled
+                                    with input.safe_links_policies as SafeLinksPolicies
+                                    with input.safe_links_rules as RuleDisabled
+
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, PASS, true) == true
+}
 #--
 
 #
@@ -305,5 +333,19 @@ test_TrackChecks_CustomPolicy_Incorrect if {
                                     with input.safe_links_rules as SafeLinksRules
 
     TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+}
+
+# All custom policies are disabled, built-in protection policy is applied
+test_TrackChecks_BuiltInPoilicy_Incorrect if {
+    PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
+                            [{"op": "replace", "path": "0/State", "value": false}, 
+                            {"op": "replace", "path": "1/State", "value": false}])
+    RuleDisabled :=  json.patch(SafeLinksRules, [{"op": "replace", "path": "0/State", "value": "Disabled"},
+                                                {"op": "replace", "path": "1/State", "value": "Disabled"}])
+    Output := securitysuite.tests with input.protection_policy_rules as PresetPoliciesDisabled
+                                    with input.safe_links_policies as SafeLinksPolicies
+                                    with input.safe_links_rules as RuleDisabled
+
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, PASS, true) == true
 }
 #--
