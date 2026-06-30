@@ -58,6 +58,9 @@ function Export-SecuritySuiteProvider {
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
     $AntiMalwarePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterPolicy"))
     $AntiMalwareRule = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterRule"))
+    $SafeAttachmentPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentPolicy"))
+    $SafeAttachmentRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentRule"))
+    $BuiltInProtectionRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPBuiltInProtectionRule"))
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
@@ -162,6 +165,9 @@ function Export-SecuritySuiteProvider {
     "dlp_compliance_rules": $DLPComplianceRules,
     "anti_phish_policies": $AntiPhishPolicy,
     "anti_phish_rules": $AntiPhishRule,
+    "safe_attachment_policies": $SafeAttachmentPolicy,
+    "safe_attachment_rules": $SafeAttachmentRule,
+    "built_in_protection_rules": $BuiltInProtectionRule,
     "accepted_domains": $AcceptedDomains,
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
