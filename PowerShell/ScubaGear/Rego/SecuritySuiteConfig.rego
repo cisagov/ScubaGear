@@ -425,13 +425,21 @@ HighestPriorityEnabledRuleCoversAllRecipients := Rule if {
 LowerPriorityEnabledRuleExists(Rule) if {
     some OtherRule in input.safe_links_rules
     OtherRule.State == "Enabled"
+    RuleFieldEmpty(OtherRule.SentTo)
+    RuleFieldEmpty(OtherRule.SentToMemberOf)
+    RuleFieldEmpty(OtherRule.RecipientDomainIs)
     OtherRule.Priority < Rule.Priority
 }
 
+AppliedPolicy := CustomPolicy if {
+    CustomPolicy := HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+} else := "Built-In Protection Policy"
+
 default CustomPolicySafeLinksEnabled := false
 CustomPolicySafeLinksEnabled if {
+    print(AppliedPolicy)
     some Policy in input.safe_links_policies
-    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+    Policy.Identity == AppliedPolicy
     Policy.EnableSafeLinksForEmail == true
     Policy.EnableSafeLinksForTeams == true
     Policy.EnableSafeLinksForOffice == true
@@ -464,7 +472,7 @@ tests contains {
 default CustomPolicyScanURLsEnabled := false
 CustomPolicyScanURLsEnabled := true if {
     some Policy in input.safe_links_policies
-    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+    Policy.Identity == AppliedPolicy
     Policy.ScanUrls == true
     Policy.DeliverMessageAfterScan == true
 }
@@ -495,7 +503,7 @@ tests contains {
 default CustomPolicyTrackClicksEnabled := false
 CustomPolicyTrackClicksEnabled := true if {
     some Policy in input.safe_links_policies
-    Policy.Identity == HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+    Policy.Identity == AppliedPolicy
     Policy.TrackClicks == true
 }
 
