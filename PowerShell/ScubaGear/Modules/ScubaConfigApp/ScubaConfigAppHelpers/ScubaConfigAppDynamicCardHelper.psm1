@@ -1532,7 +1532,13 @@ Function New-FieldListCard {
             if ($syncHash.MigrationPendingReview) {
                 $cleared = $syncHash.MigrationPendingReview.Remove($migrationKey)
                 if (-not $cleared) {
-                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object { $_ -like "*|$PolicyId" } | Select-Object -First 1
+                    # Scope the fallback to THIS card's control type so dismissing one control
+                    # (e.g. an Annotation) never clears another (e.g. an Omission) for the same policy.
+                    $mkControlType = ($migrationKey -split '\|', 2)[0]
+                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object {
+                        $parts = $_ -split '\|', 2
+                        ($parts.Count -eq 2) -and ($parts[0] -eq $mkControlType) -and ($parts[1].Trim() -eq "$PolicyId".Trim())
+                    } | Select-Object -First 1
                     if ($fallbackKey) { [void]$syncHash.MigrationPendingReview.Remove($fallbackKey) }
                 }
             }
@@ -1903,7 +1909,13 @@ Function New-FieldListCard {
             if ($syncHash.MigrationPendingReview -and $syncHash.MigrationPendingReview.Count -gt 0) {
                 $cleared = $syncHash.MigrationPendingReview.Remove($migrationKey)
                 if (-not $cleared) {
-                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object { $_ -like "*|$policyId" } | Select-Object -First 1
+                    # Fallback stays scoped to THIS card's control type so saving one control
+                    # (e.g. an Annotation) never clears another (e.g. an Omission) for the same policy.
+                    $mkControlType = ($migrationKey -split '\|', 2)[0]
+                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object {
+                        $parts = $_ -split '\|', 2
+                        ($parts.Count -eq 2) -and ($parts[0] -eq $mkControlType) -and ($parts[1].Trim() -eq "$policyId".Trim())
+                    } | Select-Object -First 1
                     if ($fallbackKey) { $cleared = $syncHash.MigrationPendingReview.Remove($fallbackKey) }
                 }
                 if ($cleared) {
@@ -2040,7 +2052,13 @@ Function New-FieldListCard {
             if ($syncHash.MigrationPendingReview) {
                 $cleared = $syncHash.MigrationPendingReview.Remove($migrationKey)
                 if (-not $cleared) {
-                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object { $_ -like "*|$policyId" } | Select-Object -First 1
+                    # Scope the fallback to THIS card's control type so removing one control
+                    # (e.g. an Annotation) never clears another (e.g. an Omission) for the same policy.
+                    $mkControlType = ($migrationKey -split '\|', 2)[0]
+                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object {
+                        $parts = $_ -split '\|', 2
+                        ($parts.Count -eq 2) -and ($parts[0] -eq $mkControlType) -and ($parts[1].Trim() -eq "$policyId".Trim())
+                    } | Select-Object -First 1
                     if ($fallbackKey) { [void]$syncHash.MigrationPendingReview.Remove($fallbackKey) }
                 }
             }

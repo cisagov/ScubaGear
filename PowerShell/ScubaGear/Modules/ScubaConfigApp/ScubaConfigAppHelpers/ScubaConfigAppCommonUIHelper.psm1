@@ -882,19 +882,20 @@ Function Invoke-RequiredFieldValidation {
             $pendingList = ($syncHash.MigrationPendingReview | Sort-Object | ForEach-Object { ($_ -split '\|', 2)[-1] }) -join ", "
             $validationResults.Errors += "$($syncHash.MigrationPendingReview.Count) auto-migrated polic$(if($syncHash.MigrationPendingReview.Count -eq 1){'y has'}else{'ies have'}) not been reviewed. Open each orange card, verify the values, then click Save to confirm: $pendingList"
 
-            # Navigate to the first tab that contains a pending policy.
-            # Exclusions tab covers Pass-1 (product exclusion) migrations;
-            # fall back to AnnotationsPolicyTab for Pass-2 only migrations.
-            $hasPendingExclusion = $syncHash.MigrationPendingReview | Where-Object {
-                $_ -like 'Exclusions|*'
-            }
-            $migrationTab = if ($hasPendingExclusion) {
-                $syncHash.ExclusionsPolicyTab
-            } else {
-                $syncHash.AnnotationsPolicyTab
-            }
-            if ($migrationTab -and $migrationTab -notin $validationResults.TabsToNavigate) {
-                $validationResults.TabsToNavigate += $migrationTab
+            # Navigate to the tab(s) that actually contain pending policies. Each pending
+            # key is "{controlType}|{policyId}", and every control type has a matching
+            # "{controlType}PolicyTab" element (Exclusions/Annotations/Omissions), so the
+            # correct tab is resolved dynamically from the pending items - nothing is hardcoded.
+            $pendingControlTypes = @(
+                $syncHash.MigrationPendingReview |
+                ForEach-Object { ($_ -split '\|', 2)[0] } |
+                Sort-Object -Unique
+            )
+            foreach ($pendingControlType in $pendingControlTypes) {
+                $migrationTab = $syncHash."$($pendingControlType)PolicyTab"
+                if ($migrationTab -and $migrationTab -notin $validationResults.TabsToNavigate) {
+                    $validationResults.TabsToNavigate += $migrationTab
+                }
             }
             Write-DebugOutput -Message "Migration pending review blocks generate: $pendingList" -Source $MyInvocation.MyCommand -Level "Info"
         }
