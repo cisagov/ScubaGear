@@ -1,4 +1,4 @@
-# Consolidated popup function that handles both simple and rich popups
+﻿# Consolidated popup function that handles both simple and rich popups
 Function Add-ToolTipHoverPopup {
     <#
     .SYNOPSIS
