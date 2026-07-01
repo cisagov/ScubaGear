@@ -45,7 +45,7 @@ Function Get-ScubaGearPermissions {
     .EXAMPLE
         Get-ScubaGearPermissions -Product aad
         Get-ScubaGearPermissions -Product exo
-        Get-ScubaGearPermissions -Product scubatank
+        Get-ScubaGearPermissions -Product securitysuite
 
     .EXAMPLE
         Get-ScubaGearPermissions -CmdletName Get-MgBetaUser -OutAs modules
