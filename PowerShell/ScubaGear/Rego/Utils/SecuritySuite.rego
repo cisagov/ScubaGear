@@ -246,6 +246,15 @@ CustomRuleCoversAllRecipients(Rule) if {
     count(TenantDomainNames - RuleDomains) == 0
 }
 
+CustomRuleCoversAllRecipients(Rule) if {
+    RuleFieldEmpty(Rule.SentTo)
+    RuleFieldEmpty(Rule.SentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfSentTo)
+    RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
+    RuleFieldEmpty(Rule.RecipientDomainIs)
+}
+
 CustomAntiPhishPolicyCoversAllRecipients(Policy) if {
     count(TenantDomainNames) > 0
     count([
