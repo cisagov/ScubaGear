@@ -26,7 +26,7 @@ The benefits of using the ScubaGear Service Principal module include:
 > [!IMPORTANT]
 > **This module is designed exclusively for ScubaGear.**
  - ✅ Creates a service principal for ScubaGear assessments
- - ✅ Manages ScubaGear product permissions (Entra, Exchange, SharePoint, Teams, Defender, Power Platform)
+ - ✅ Manages ScubaGear product permissions (Entra, Exchange, SharePoint, Teams, SecuritySuite, Power Platform)
  - ✅ Handles certificate management
  - ✅ Audits and fixes ScubaGear Service Principal permission issues
  - ❌ NOT for general service principal management
