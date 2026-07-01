@@ -749,6 +749,11 @@ Function Invoke-PolicyMigration {
     $syncHash.MigrationLog           = [System.Collections.ArrayList]::new()
     $syncHash.MigrationPendingReview  = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 
+    # Tracks new products that actually received migrated data, so the product
+    # checkboxes (driven by ProductNames) can be kept in sync. Values are derived
+    # entirely from the CSV migration map - nothing here is hardcoded.
+    $migratedToProducts = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+
     # Helper: returns $true only if $policyId has a renderable card for $controlType.
     # A card is renderable when the policy exists in Baselines with a non-'none' fieldControlName value,
     # OR the control supports all products (annotations/omissions always render).
@@ -812,6 +817,7 @@ Function Invoke-PolicyMigration {
 
             $newProductKey = $entry.newProduct
             $newPolicyId   = $entry.newPolicyId
+            [void]$migratedToProducts.Add($entry.newProduct.ToLower())
 
             # Create the target product key if it does not yet exist in the config
             if (-not ($Config.Keys -contains $newProductKey)) {
@@ -877,6 +883,7 @@ Function Invoke-PolicyMigration {
             }
 
             $newPolicyId = $entry.newPolicyId
+            if ($entry.newProduct) { [void]$migratedToProducts.Add($entry.newProduct.ToLower()) }
 
             if (-not ($controlData.Keys -contains $newPolicyId)) {
                 $controlData[$newPolicyId] = $controlData[$oldPolicyId]
@@ -898,6 +905,65 @@ Function Invoke-PolicyMigration {
                 Write-DebugOutput -Message "Migration skipped - ${yamlValue} target exists: [$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
             }
             $controlData.Remove($oldPolicyId)
+        }
+    }
+
+    #---------------------------------------------------------------------------
+    # Pass 3 - ProductNames remap
+    #   Keeps the product selection in sync with the migrated data. Fully driven
+    #   by the CSV migration map + the products list in the control JSON:
+    #     * product codes that no longer exist (e.g. defender) are replaced with
+    #       their mapped successor (e.g. securitysuite)
+    #     * any product that actually received migrated data is ensured selected
+    #   Nothing is hardcoded here.
+    #---------------------------------------------------------------------------
+    if (($Config.Keys -contains 'ProductNames') -and $Config['ProductNames']) {
+        $validProductIds = @($syncHash.UIConfigs.products | Select-Object -ExpandProperty id | ForEach-Object { $_.ToLower() })
+
+        # Build old->new product rename map from the migration map. Only applied to
+        # products that no longer exist as selectable products (e.g. defender).
+        $productRenameMap = @{}
+        foreach ($mEntry in $migrationMap.Values) {
+            if ($mEntry.oldProduct -and $mEntry.newProduct) {
+                $oldP = $mEntry.oldProduct.ToLower()
+                $newP = $mEntry.newProduct.ToLower()
+                if (($oldP -ne $newP) -and ($validProductIds -notcontains $oldP) -and (-not $productRenameMap.ContainsKey($oldP))) {
+                    $productRenameMap[$oldP] = $newP
+                }
+            }
+        }
+
+        $remapped            = [System.Collections.Generic.List[string]]::new()
+        $productNamesChanged = $false
+
+        foreach ($p in @($Config['ProductNames'])) {
+            $pl = "$p".ToLower()
+            if ($validProductIds -contains $pl) {
+                if (-not $remapped.Contains($pl)) { [void]$remapped.Add($pl) }
+            } elseif ($productRenameMap.ContainsKey($pl)) {
+                $newP = $productRenameMap[$pl]
+                if (-not $remapped.Contains($newP)) { [void]$remapped.Add($newP) }
+                $productNamesChanged = $true
+                [void]$syncHash.MigrationLog.Add("$pfxMigrated ProductNames [$pl] -> [$newP]")
+                Write-DebugOutput -Message "Migrated ProductNames: [$pl] -> [$newP]" -Source $MyInvocation.MyCommand -Level "Info"
+            } else {
+                if (-not $remapped.Contains($pl)) { [void]$remapped.Add($pl) }
+            }
+        }
+
+        # Ensure any product that actually received migrated data is selected.
+        foreach ($mp in $migratedToProducts) {
+            $mpl = $mp.ToLower()
+            if (($validProductIds -contains $mpl) -and (-not $remapped.Contains($mpl))) {
+                [void]$remapped.Add($mpl)
+                $productNamesChanged = $true
+                Write-DebugOutput -Message "Added migrated product to ProductNames: [$mpl]" -Source $MyInvocation.MyCommand -Level "Info"
+            }
+        }
+
+        if ($productNamesChanged) {
+            $Config['ProductNames'] = [string[]]$remapped
+            Write-DebugOutput -Message "ProductNames after migration: $($remapped -join ', ')" -Source $MyInvocation.MyCommand -Level "Info"
         }
     }
 
