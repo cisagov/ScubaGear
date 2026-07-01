@@ -383,7 +383,7 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disabled-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
         Postconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
@@ -495,7 +495,7 @@ TestPlan:
         Preconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
-          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disabled-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
         Postconditions:
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
           - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
