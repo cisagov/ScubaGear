@@ -326,7 +326,7 @@ $Audit = Get-ScubaGearAppPermission `
     -ProductNames 'aad', 'exo', 'sharepoint'
 ```
 
-**Expected result:** Shows extra permissions for Teams and Defender.
+**Expected result:** Shows extra permissions for Teams and SecuritySuite.
 
 #### Step 2: Remove Extra Permissions
 
