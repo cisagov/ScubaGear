@@ -162,7 +162,6 @@ Function Get-ScubaGearPermissions {
                 '00000007-0000-0ff1-ce00-000000000000'
             )
             'sharepoint' = '00000003-0000-0ff1-ce00-000000000000'
-            'scubatank'  = '00000003-0000-0000-c000-000000000000'
         }
 
         # Start with an empty array to build the filter
