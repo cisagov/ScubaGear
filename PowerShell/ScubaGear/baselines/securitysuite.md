@@ -833,17 +833,7 @@ threat detection activity.
 By default, Microsoft retains the audit logs for 180 days. Activity
 by users with E5 licenses is logged for one year.
 
-However, in accordance with Office of Management and Budget (OMB) Memorandum
-21-31, _Improving the Federal Government's Investigative and Remediation
-Capabilities Related to Cybersecurity Incidents_, M365 audit logs are to be
-retained for at least 12 months in active storage and an additional 18 months
-in cold storage. This can be accomplished either by offloading the logs out of
-the cloud environment or natively through Microsoft by creating an [audit log
-retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy).
 
-OMB M-21-13 requires Advanced Audit Features be configured in M365.
-Advanced Audit, now Microsoft Purview Audit (Premium), adds additional event
-types to the Unified Audit Log.
 
 ### Policies
 #### MS.SECURITYSUITE.5.1v1
@@ -853,7 +843,7 @@ Unified Audit logging SHALL be enabled.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions. Furthermore, enabling the Unified Audit log is required for government agencies by OMB M-21-31.
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12
 - _MITRE ATT&CK TTP Mapping:_
