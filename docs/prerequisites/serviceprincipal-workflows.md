@@ -315,7 +315,7 @@ $Audit | Set-ScubaGearAppPermission
 
 ### Scenario 2: Remove Unused Products
 
-**Example:** You no longer need Teams and Defender permissions.
+**Example:** You no longer need Teams and SecuritySuite permissions.
 
 #### Step 1: Audit with Reduced Products
 
