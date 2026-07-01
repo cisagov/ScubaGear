@@ -1,4 +1,4 @@
-Function Update-UIFromSettingsData {
+﻿Function Update-UIFromSettingsData {
     <#
     .SYNOPSIS
     Updates all UI elements from the current data structures.
