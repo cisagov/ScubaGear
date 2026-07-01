@@ -95,6 +95,7 @@ Function Get-ScubaGearPermissions {
         2024-11-15 - Removed redundantpermissions and added verbose messages
         2024-12-20 - Added version and changelog. Added support for pipeline and for multiple products. Fixed issue with role output for null values
         2024-12-23 - Adjusted endpoint output based on structure changes in the permissions file
+        2026-06-19 - Added SecuritySuite and removed ScubaTank to product list
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'CmdletName')]
