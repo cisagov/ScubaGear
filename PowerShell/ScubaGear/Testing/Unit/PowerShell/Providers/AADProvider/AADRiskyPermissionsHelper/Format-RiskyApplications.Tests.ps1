@@ -211,7 +211,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 ($Weights.PermissionRiskLevelWeights.Medium * $NonAdminMediumCount) +
                 ($Weights.PermissionRiskLevelWeights.Low * $NonAdminLowCount)
             )
-
+            
             # IsMultiTenantEnabled = $true -> 10pts
             $ExpectedMultiTenantPoints = $Weights.MultiTenant.Points
 

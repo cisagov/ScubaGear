@@ -61,7 +61,7 @@ While the SCuBA compliance and full configuration files above are recommended, y
 
 **Basic Configuration**: Specify only essential parameters (ProductNames and M365Environment):
 ```yaml
-ProductNames: ['aad', 'securitysuite', 'exo']
+ProductNames: ['aad', 'defender', 'exo']
 M365Environment: commercial
 ```
 
@@ -77,7 +77,7 @@ Example configuration with service principal authentication:
 Organization: "example.onmicrosoft.com"
 AppID: "abcdef01-2345-6789-abcd-e0123456789a"  # Application (client) ID
 CertificateThumbprint: "FEDCBA9876543210FEDCBA9876543210FEDCBA98"  # 40-character hex string
-ProductNames: ['aad', 'securitysuite', 'exo']
+ProductNames: ['aad', 'defender', 'exo']
 M365Environment: commercial
 ```
 
@@ -124,7 +124,7 @@ Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values 
 
 ```powershell
 # Create config with pre-set values
-New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,securitysuite"
+New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,defender"
 ```
 
 The generated file can then be manually edited to add your specific configuration settings.
@@ -185,9 +185,9 @@ For each omitted policy, the config file allows you to indicate the following:
 
 ## Product-specific Configuration
 
-Config files can include a top-level level key for a given product whose values are related to that specific product. For example, the `SecuritySuite` key contains configuration options specific to the Security Suite baseline. Currently, only Entra ID, Security Suite, and Exchange Online use this extra configuration.
+Config files can include a top-level level key for a given product whose values are related to that specific product. For example, the `Defender` key contains Defender-specific configuration. Currently, only Entra ID, Defender, and Exchange Online use this extra configuration.
 
-Under a product key, there can be policy keys that provide configuration values unique to the product. In the Security Suite configuration, for example, there is the `MS.SECURITYSUITE.2.1v1` key.
+Under a product key, there can be policy keys that provide configuration values unique to the product. In the Defender configuration, for example, there is the `MS.DEFENDER.1.4v1` key.
 
 ### Entra ID Configuration
 
@@ -284,41 +284,96 @@ RoleExclusions are supported for the following policies:
 
 - MS.AAD.7.4v1
 
-### Security Suite Configuration
+### Defender Configuration
 
-The M365 Secure Configuration Security Suite Baseline includes several policies that help ensure an organization has configured protections for sensitive accounts and domains. The ScubaGear configuration file can be used along with policy-specific variables to inform the ScubaGear assessment checks which accounts and domains the organization considers sensitive.
+The M365 Defender Secure Configuration Baseline includes several policies that help ensure an organization has configured protections for sensitive accounts, groups, or domains. The ScubaGear configuration file can be used along with policy-specific variables to inform the ScubaGear assessment checks which accounts, groups, and domains the organization considers sensitive.
 
-All Security Suite related policy-specific variables are found under the `SecuritySuite` configuration namespace key within the ScubaGear configuration file. SecuritySuite policy items with associated configuration variables are:
+All Defender related policy-specific variables are found under the `Defender` configuration namespace key within the ScubaGear configuration file. Defender policy items with associated configuration variables are:
 
-- MS.SECURITYSUITE.2.1v1
-- MS.SECURITYSUITE.2.3v1
+- MS.DEFENDER.1.4v1
+- MS.DEFENDER.1.5v1
+- MS.DEFENDER.2.1v1
+- MS.DEFENDER.2.2v1
+- MS.DEFENDER.2.3v1
 
-Example Security Suite configuration:
+Example Defender configuration:
 
 ```yaml
-SecuritySuite:
-  MS.SECURITYSUITE.2.1v1:
-    SensitiveUsers:
-      - "jdoe@contoso.com"
-      - "jsmith@contoso.com"
+Defender:
+  # Define sensitive accounts filter (used by both policies)
+  SensitiveAccountsFilter: &CommonSensitiveAccountFilter
+    IncludedUsers:
+      - "user1@contoso.com"
+      - "user2@contoso.com"
+    IncludedGroups:
+      - "C-Suite Executives@contoso.com"
+      - "IT Administrators@contoso.com"
+    IncludedDomains:
+      - "contoso.com"
+    ExcludedUsers: ["user3@contoso.com"]
+    ExcludedGroups: ["excludedgroup@constoso.com"]
+    ExcludedDomains: []
 
-  MS.SECURITYSUITE.2.3v1:
+  MS.DEFENDER.1.4v1:
+    SensitiveAccounts: *CommonSensitiveAccountFilter
+
+  MS.DEFENDER.1.5v1:
+    SensitiveAccounts: *CommonSensitiveAccountFilter
+
+  MS.DEFENDER.2.1v1:
+    SensitiveUsers:
+      - "John Doe;jdoe@contoso.com"
+      - "Jane Smith;jsmith@contoso.com"
+
+  MS.DEFENDER.2.2v1:
+    AgencyDomains:
+      - "contoso.gov"
+      - "example.gov"
+
+  MS.DEFENDER.2.3v1:
     PartnerDomains:
       - "partner1.com"
       - "contractor.org"
 ```
 
+This example uses [Anchors and Aliases](#anchors-and-aliases) notation (`&CommonSensitiveAccountFilter` and `*CommonSensitiveAccountFilter`) to reuse variable definitions across policy items with the same values.
+
+#### Sensitive Accounts
+
+The Defender baseline defines sensitive accounts as a set of user accounts that have access to sensitive and high-value information. As a result, these accounts may be at a higher risk of being targeted. The organization itself determines the set of sensitive user accounts within their M365 tenants.
+
+The Defender baseline policies `MS.DEFENDER.1.4v1` and `MS.DEFENDER.1.5v1` dictate that accounts the organization designates as sensitive shall be assigned to the Strict Preset Security Profile. Accounts are assigned to a profile by an associated filter that specifies included and excluded users, groups, and domains. ScubaGear needs to know which accounts are considered sensitive to adequately assess these baseline policies.
+
+Policies `MS.DEFENDER.1.4v1` and `MS.DEFENDER.1.5v1` both take a variable called `SensitiveAccounts` to define the filter that should be used to assign sensitive user accounts to the Strict Preset Security Profile. `MS.DEFENDER.1.4v1` defines the filter for applying Exchange Online Protection policies, while `MS.DEFENDER.1.5v1` sets the filter for applying Defender for Office365 protection policies.
+
+Values for each key match those shown in the **Apply Defender for Office 365 protection** section of the manage protection settings dialog and are:
+
+- `IncludedUsers`
+- `IncludedGroups`
+- `IncludedDomains`
+- `ExcludedUsers`
+- `ExcludedGroups`
+- `ExcludedDomains`
+
+See the sample configuration file shown in the previous section [Defender Configuration](#defender-configuration) for an example of sensitive account filter settings.
+
 #### User impersonation protection
 
-The policy `MS.SECURITYSUITE.2.1v1` supports a variable called `SensitiveUsers` that can be defined as a list of sensitive user accounts denoted by a display name and email address in the impersonation protection section of anti-phishing policies.
+The policy `MS.DEFENDER.2.1v1` supports a variable called `SensitiveUsers` that can be defined as a list of sensitive user accounts denoted by a display name and email address in the Strict and Standard Preset Security Policies impersonation protection section.
 
-Each value should be one of the following:
-- An email address (e.g., `jdoe@example.com`)
-- A string in the form of the display name and email address separated by a semicolon (e.g.,`John Doe;jdoe@example.com`).
+Each value should be a string in the form of the display name and email address separated by a semicolon (e.g.,`John Doe;jdoe@example.com`).
+
+#### Agency Domain Impersonation Protection
+
+The policy `MS.DEFENDER.2.2v1` supports a variable called `AgencyDomains` that can be defined as a list of sensitive organization-controlled DNS domains for which impersonation protection should be enabled in both the Standard and Strict Preset Security Profiles.
+
+Each domain in the list should be shown as the fully-qualified domain name associated with the agency.  Note that domains already associated with the tenant will already be given domain impersonation protection by default. This setting is to support adding additional agency domains not already associated with the tenant directly. Within the impersonation protection settings, this is associated with the `Include custom domains` within the associated anti-phishing policy.
 
 #### Agency Partner Domain Impersonation
 
-The policy `MS.SECURTIYSUITE.2.3v1` supports a variable called `PartnerDomains` that can be defined as a list of sensitive DNS domains used by important partner organizations for which impersonation protection should be enabled in anti-phish policies.
+The policy `MS.DEFENDER.2.3v1` supports a variable called `PartnerDomains` that can be defined as a list of sensitive DNS domains used by important partner organizations for which impersonation protection should be enabled in both the Standard and Strict Preset Security Profiles.
+
+Each domain in the list should be shown as the fully-qualified domain name associated with the partner organization. These domains are also added to the `Include custom domains` list, but the variable is kept separate to document the association with the associated Defender baseline policy.
 
 ### Exchange Online Configuration
 
@@ -342,7 +397,8 @@ Exo:
 
 ## Anchors and Aliases
 
-If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values.
+If YAML is chosen as the config file format, YAML [anchors and aliases](https://smcleod.net/2022/11/yaml-anchors-and-aliases/) can be used to avoid repeating policy values. For example, in the Defender configuration shown above, `&CommonSensitiveAccountFilter` is an anchor whose value is referenced later by `*CommonSensitiveAccountFilter`, an alias.
+
 Using anchors and aliases is optional, but supports reuse in a way that allows for updating variable values in a consistent way when they apply to multiple policies.
 
 ## Muting the Version Check Warnings

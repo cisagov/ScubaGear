@@ -254,18 +254,12 @@ InModuleScope -ModuleName ExportAADProvider {
             # Force TryCommand to catch and return @() for user count retrieval.
             $MockCommandTracker.AddMockCommand("Get-MgBetaUserCount", { throw "Get-MgBetaUserCount failed" })
 
-            try {
-                $Json = Export-AADProvider
-                $Json = $Json.TrimEnd(",")
-                $Json = "{$($Json)}"
-                $ParsedJson = ConvertFrom-Json -InputObject $Json
+            $Json = Export-AADProvider
+            $Json = $Json.TrimEnd(",")
+            $Json = "{$($Json)}"
+            $ParsedJson = ConvertFrom-Json -InputObject $Json
 
-                $ParsedJson.total_user_count | Should -Be -1
-            }
-            finally {
-                # Restore default behavior so this failure-mode mock does not leak into later tests.
-                $MockCommandTracker.AddMockCommand("Get-MgBetaUserCount", { return 10 })
-            }
+            $ParsedJson.total_user_count | Should -Be -1
         }
 
         It "includes app_management_policy in the JSON output" {

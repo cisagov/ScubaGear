@@ -506,7 +506,7 @@ jobs:
           password: ${{ secrets.NotifierPassword }}
           subject: "ScubaGear Functional Test Failure - Entra ID - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
-          from: ${{ format('ScubaGear Notifier <{0}>', secrets.NotifierUsername) }}
+          from: ScubaGear Notifier
           body: |
             ScubaGear Functional Test Failure
 

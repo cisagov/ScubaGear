@@ -8,7 +8,7 @@ Description: |
 # The list of M365 Product/SCuBA baselines ScubaGear will assess.
 ProductNames:
   - aad
-  - securitysuite
+  - defender
   - exo
   - powerplatform
   - sharepoint
@@ -63,11 +63,29 @@ Aad:
         - ""
       Users:
         - ""
-SecuritySuite:
-  MS.SECURITYSUITE.2.1v1:
+Defender:
+  MS.DEFENDER.1.4v1: &OrgSensitiveAccountFilter
+    SensitiveAccounts:
+      ExcludedUsers:
+        - ""
+      IncludedGroups:
+        - ""
+      IncludedDomains:
+        - ""
+      ExcludedDomains:
+        - ""
+      ExcludedGroups:
+        - ""
+      IncludedUsers:
+        - ""
+  MS.DEFENDER.1.5v1: *OrgSensitiveAccountFilter
+  MS.DEFENDER.2.1v1:
     SensitiveUsers:
       - ""
-  MS.SECURITYSUITE.2.3v1:
+  MS.DEFENDER.2.2v1:
+    AgencyDomains:
+      - ""
+  MS.DEFENDER.2.3v1:
     PartnerDomains:
       - ""
 Exo:

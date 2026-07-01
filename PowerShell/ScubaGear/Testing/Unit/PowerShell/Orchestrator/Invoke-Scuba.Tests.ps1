@@ -30,39 +30,9 @@ InModuleScope Orchestrator {
 
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}
-            function Initialize-ScubaLogging {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
-
-            function Write-ScubaLog {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Write-ScubaLog {}
-
-            function Write-ScubaRunDetails {throw 'this will be mocked'}
-            Mock -ModuleName Orchestrator Write-ScubaRunDetails {}
-
-            function Trace-ScubaFunction {
-                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
-                param(
-                    [string] $FunctionName,
-                    [hashtable] $Parameters,
-                    [switch] $LogReturnValue,
-                    [scriptblock] $ScriptBlock
-                )
-
-                throw 'this will be mocked'
-            }
-            Mock -ModuleName Orchestrator Trace-ScubaFunction {
-                $scriptBlockToInvoke = $args |
-                    Where-Object { $_ -is [scriptblock] } |
-                    Select-Object -First 1
-
-                & $scriptBlockToInvoke
-            }
-
-            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
-            Mock -ModuleName Orchestrator Get-M365EnvironmentByDomain {}
-
-            function Get-ServicePrincipalParams {throw 'this will be mocked'}
-            Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
+            Mock -ModuleName Orchestrator Get-ScubaRunDetails {}
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
@@ -73,52 +43,46 @@ InModuleScope Orchestrator {
                 }
             }
             It 'Do it quietly (Do not automatically show report)' {
-                {Invoke-Scuba -Quiet -SilenceBODWarnings} | Should -Not -Throw
+                {Invoke-Scuba -Quiet} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter {$Quiet -eq $true}
             }
             It 'Show report' {
-                {Invoke-Scuba -SilenceBODWarnings} | Should -Not -Throw
+                {Invoke-Scuba} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter {$Quiet -eq $false}
             }
             It 'Given -ProductNames aad should not throw' {
                 $SplatParams += @{
                     ProductNames = @("aad")
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames securitysuite should not throw' {
                 $SplatParams += @{
                     ProductNames = @("securitysuite")
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames exo should not throw' {
                 $SplatParams += @{
                     ProductNames = @("exo")
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames powerplatform should not throw' {
                 $SplatParams += @{
                     ProductNames = @("powerplatform")
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames teams should not throw' {
                 $SplatParams += @{
                     ProductNames = @("teams")
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -ProductNames * should not throw' {
                 $SplatParams += @{
                     ProductNames = @("*")
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
@@ -126,12 +90,11 @@ InModuleScope Orchestrator {
                 $SplatParams += @{
                     ProductNames = @("*")
                     DisconnectOnExit = $true
-                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Should only run each baseline once if provider names contains duplicates' {
-                {Invoke-Scuba -ProductNames aad,aad -SilenceBODWarnings} | Should -Not -Throw
+                {Invoke-Scuba -ProductNames aad,aad} | Should -Not -Throw
                 # After refactor, -ProductNames are consolidated into ScubaConfig and duplicates removed
                 # Validate only a single invocation and that consolidated ProductNames contains exactly one 'aad'
                 Should -Invoke Invoke-ReportCreation -ParameterFilter {$ScubaConfig.ProductNames -eq 'aad'}

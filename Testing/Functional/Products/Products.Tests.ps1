@@ -18,8 +18,8 @@
     This parameter is used to authenticate to the different commercial/government environments.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
-    - For M365 Government community cloud tenants with G3/G5 licenses enter the value **"gcc"**.
-    - For M365 Government community cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
     - For M365 Department of Defense tenants enter the value **"dod"**.
     Default value is 'commercial'.
     .EXAMPLE
@@ -104,9 +104,7 @@ BeforeDiscovery {
 
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
     Import-Module $ScubaModule
-    Import-Module $ConnectionModule
 
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
@@ -122,33 +120,32 @@ BeforeDiscovery {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    if ($ProductName -eq "securitysuite"){
-        $ProductNames = @($ProductName, "exo")
-    }
-    else {
-        $ProductNames = @($ProductName)
-    }
-
-    if (-Not [string]::IsNullOrEmpty($AppId)){
-        $TempScubaConfig = New-Object -Type PSObject -Property @{
-            'AppID' = $AppID;
-            'CertificateThumbprint' = $Thumbprint;
-            'Organization' = $TenantDomain;
+    InModuleScope Connection -Parameters @{
+        ProductName = $ProductName
+        M365Environment = $M365Environment
+        Thumbprint = $Thumbprint
+        AppId = $AppId
+        TenantDomain = $TenantDomain
+    }{
+        if ($ProductName -eq "securitysuite"){
+            $ProductNames = @($ProductName, "exo")
         }
-        # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
-        $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
-        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
+        else {
+            $ProductNames = @($ProductName)
+        }
 
+        if (-Not [string]::IsNullOrEmpty($AppId)){
         $ServicePrincipalParams = @{CertThumbprintParams = @{
             CertificateThumbprint = $Thumbprint;
             AppID = $AppId;
             Organization = $TenantDomain;
         }}
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-    }
-    else {
+        }
+        else {
         Write-Debug "Manual Connect to Tenant"
         Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
+        }
     }
 }
 
@@ -178,60 +175,6 @@ BeforeAll {
 
     # Dot source utility functions
     . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
-
-    # EXO functional tests use REST-backed helper wrappers from FunctionalTestUtils.
-    # Initialize EXO REST auth context for test pre/postconditions.
-    if ($ProductName -eq "exo") {
-        $EXOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/EXORestHelper.psm1"
-        Import-Module $EXOHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
-
-        $EXOScope = Get-ExchangeOnlineScope -M365Environment $M365Environment
-        if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:EXOAccessToken = Get-MsalAccessToken `
-                -CertificateThumbprint $Thumbprint `
-                -AppID $AppId `
-                -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -Scope $EXOScope
-        }
-        else {
-            # Microsoft Exchange Online Remote PowerShell well-known client ID
-            $EXOClientId = "fb78d390-0c51-40cd-8e17-fdbfab77341b"
-            $script:EXOAccessToken = Get-MsalAccessToken `
-                -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -ClientId $EXOClientId `
-                -Scope $EXOScope
-        }
-
-        $TokenParts = $script:EXOAccessToken.Split('.')
-        if ($TokenParts.Count -lt 2) {
-            throw 'Unable to parse EXO access token for tenant id.'
-        }
-
-        $JwtPayload = $TokenParts[1].Replace('-', '+').Replace('_', '/')
-        switch ($JwtPayload.Length % 4) {
-            2 { $JwtPayload += '==' }
-            3 { $JwtPayload += '=' }
-        }
-
-        $PayloadJson = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($JwtPayload))
-        $Payload = $PayloadJson | ConvertFrom-Json
-        $script:EXOTenantId = $Payload.tid
-
-        if ([string]::IsNullOrWhiteSpace($script:EXOTenantId)) {
-            throw 'Unable to resolve tenant id (tid) from EXO access token.'
-        }
-
-        $script:EXOApiEndpoint = Get-ExchangeOnlineApiEndpoint `
-            -TenantId $script:EXOTenantId `
-            -TenantDomain $TenantDomain `
-            -M365Environment $M365Environment `
-            -AccessToken $script:EXOAccessToken
-
-    }
 
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
@@ -354,15 +297,10 @@ BeforeAll {
   function RunScuba() {
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
-            if ($ProductName -eq 'exo') {
-                Invoke-SCuBA -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
-            }
-            else {
-                Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
-            }
+            Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
     }
 
@@ -532,15 +470,6 @@ Describe "Policy Checks for <ProductName>" {
                         $Rows.Count | Should -BeGreaterThan 0
                         $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
                         $RowHeaders.Count | Should -BeExactly 4
-                    }
-                    elseif ($Table.GetProperty("id") -eq "privileged-users"){
-                        $Rows.Count | Should -BeGreaterThan 0
-                        $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
-                        $RowHeaders.Count | Should -BeExactly 4
-                        $RowHeaders[0].text | Should -BeLikeExactly "Display Name"
-                        $RowHeaders[1].text | Should -BeLikeExactly "Object ID"
-                        $RowHeaders[2].text | Should -BeLikeExactly "Roles"
-                        $RowHeaders[3].text | Should -BeLikeExactly "On-Prem Immutable ID"
                     }
                     elseif ($null -ne $Table.GetAttribute("class") -and $Table.GetAttribute("class").Contains("dns-table")) {
                         foreach ($Row in $Rows) {

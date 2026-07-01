@@ -1,8 +1,8 @@
-$ConnectionModulePath = '../../../../Modules/Connection/Connection.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ConnectionModulePath) -Function 'Get-ServicePrincipalParams'
+$OrchestratorPath = '../../../../Modules/Orchestrator.psm1'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Function 'Get-ServicePrincipalParams'
 
-Describe -Tag 'Connection' -Name 'Get-ServicePrincipalParams' {
-    InModuleScope Connection {
+Describe -Tag 'Orchestrator' -Name 'Get-ServicePrincipalParams' {
+    InModuleScope Orchestrator {
         Context "Service Principal provided"{
             BeforeAll{
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ScubaConfig')]
@@ -28,21 +28,21 @@ Describe -Tag 'Connection' -Name 'Get-ServicePrincipalParams' {
                     AppID = '34289UFAHWFALL'
                 }
                 {Get-ServicePrincipalParams -ScubaConfig $ScubaConfig} |
-                    Should -Throw  'When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization.'
+                    Should -Throw  'Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments'
             }
             It "Only Thumbprint Only"{
                 $ScubaConfig = [PSCustomObject]@{
                     CertificateThumbprint = 'WPOEALFN425A'
                 }
                 {Get-ServicePrincipalParams -ScubaConfig $ScubaConfig} |
-                    Should -Throw  'When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization.'
+                    Should -Throw  'Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments'
             }
             It "Only Organization Only"{
                 $ScubaConfig = [PSCustomObject]@{
                     Organization = 'example.onmicrosoft.com'
                 }
                 {Get-ServicePrincipalParams -ScubaConfig $ScubaConfig} |
-                    Should -Throw  'When authenticating with Service Principal authentication, the following command line parameters must be provided: -AppID, -CertificateThumbprint and -Organization.'
+                    Should -Throw  'Missing parameters required for authentication with Service Principal Auth; Run Get-Help Invoke-Scuba for details on correct arguments'
             }
         }
         Context "No Service Principal provided"{
@@ -56,5 +56,5 @@ Describe -Tag 'Connection' -Name 'Get-ServicePrincipalParams' {
 }
 
 AfterAll {
-    Remove-Module Connection -ErrorAction SilentlyContinue
+    Remove-Module Orchestrator -ErrorAction SilentlyContinue
 }

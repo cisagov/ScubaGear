@@ -45,6 +45,7 @@ Uncomment this section if a screenshot is needed.
 - [ ] All relevant repo and/or project documentation updated to reflect these changes.
 - [ ] Unit tests added/updated to cover PowerShell and Rego changes.
 - [ ] Functional tests added/updated to cover PowerShell and Rego changes.
+- [ ] All relevant functional tests passed.
 - [ ] All automated checks (e.g., linting, static analysis, unit/smoke tests) passed.
 
 ## ✅ Pre-merge checklist ##
@@ -54,7 +55,6 @@ Uncomment this section if a screenshot is needed.
 <!-- approved. -->
 
 - [ ] PR passed smoke test check.
-- [ ] PR/feature branch passes functional tests for relevant products, if applicable.
 - [ ] Feature branch has been rebased against changes from parent branch, as needed.
 
   Use `Update branch` button below or use [this](https://www.digitalocean.com/community/tutorials/how-to-rebase-and-update-a-pull-request) reference to rebase from the command line.
