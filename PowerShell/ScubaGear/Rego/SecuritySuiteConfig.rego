@@ -164,7 +164,7 @@ SecurySuite_1_3_Result := {
         ReportDetailsBoolean(false),
         ". The highest priority safe attachments policy that applies to all users is the ",
         UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
-        "Safe Attachments unknown malware Malware response is set to ",
+        "policy. Safe Attachments unknown malware Malware response is set to ",
         Policy.Action,
         "."
     ])
@@ -179,7 +179,7 @@ tests contains {
     "Commandlet": [
         "Get-SafeAttachmentPolicy",
         "Get-SafeAttachmentRule",
-        "Get-EOPProtectionPolicyRule",
+        "Get-ATPProtectionPolicyRule",
         "Get-ATPBuiltInProtectionRule",
         "Get-AcceptedDomain"
     ],

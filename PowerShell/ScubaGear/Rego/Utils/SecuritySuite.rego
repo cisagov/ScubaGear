@@ -39,9 +39,6 @@ ApplyLicenseWarning(_) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
     input.defender_license == false
 }
 
-#################################################################################
-# Report Detail Functions for check that required Defender license #
-#################################################################################
 # If a defender license is present, don't apply the warning
 # and leave the message unchanged
 ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
@@ -121,7 +118,7 @@ HighestPriorityActiveAntiMalwarePolicyName := PolicyName if {
     EnabledRules := {Rule | some Rule in input.anti_malware_rules; Rule.State == "Enabled"}
     count(EnabledRules) > 0
     # The "highest" priority rules is actually the rule with the lowest "Priority" value
-    MinPriority := min({Rule.Priority | some Rule in input.anti_malware_rules})
+    MinPriority := min({Rule.Priority | some Rule in EnabledRules})
     some Rule in EnabledRules
     Rule.Priority == MinPriority
     CustomRuleCoversAllRecipients(Rule)
@@ -144,13 +141,13 @@ UserFriendlyPolicyName(PolicyName) := Name if {
 ##################################
 
 HighestPriorityActiveSafeAttachmentPolicyName := PolicyName if {
-    PresetPolicyCoversAllRecipients(`(?i)Strict Preset Security Policy`)
-    some Policy in input.safe_attachment_rules
+    PresetPolicyCoversAllRecipientsATP(`(?i)Strict Preset Security Policy`)
+    some Policy in input.safe_attachment_policies
     regex.match(`(?i)Strict Preset Security Policy`, Policy.Identity)
     PolicyName := Policy.Identity
 } else := PolicyName if {
-    PresetPolicyCoversAllRecipients(`(?i)Standard Preset Security Policy`)
-    some Policy in input.safe_attachment_rules
+    PresetPolicyCoversAllRecipientsATP(`(?i)Standard Preset Security Policy`)
+    some Policy in input.safe_attachment_policies
     regex.match(`(?i)Standard Preset Security Policy`, Policy.Identity)
     PolicyName := Policy.Identity
 } else := PolicyName if {
@@ -158,7 +155,7 @@ HighestPriorityActiveSafeAttachmentPolicyName := PolicyName if {
     EnabledRules := {Rule | some Rule in input.safe_attachment_rules; Rule.State == "Enabled"}
     count(EnabledRules) > 0
     # The "highest" priority rules is actually the rule with the lowest "Priority" value
-    MinPriority := min({Rule.Priority | some Rule in input.anti_malware_rules})
+    MinPriority := min({Rule.Priority | some Rule in EnabledRules})
     some Rule in EnabledRules
     Rule.Priority == MinPriority
     CustomRuleCoversAllRecipients(Rule)
@@ -205,6 +202,18 @@ PresetPolicyCoversAllRecipients(Identity) if {
     count([
         Rule |
         some Rule in input.protection_policy_rules
+        regex.match(Identity, Rule.Identity)
+        Rule.State == "Enabled"
+        RuleFieldEmpty(Rule.SentTo)
+        RuleFieldEmpty(Rule.SentToMemberOf)
+        RuleFieldEmpty(Rule.RecipientDomainIs)
+    ]) > 0
+}
+
+PresetPolicyCoversAllRecipientsATP(Identity) if {
+    count([
+        Rule |
+        some Rule in input.atp_policy_rules
         regex.match(Identity, Rule.Identity)
         Rule.State == "Enabled"
         RuleFieldEmpty(Rule.SentTo)
