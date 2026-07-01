@@ -2,7 +2,7 @@ function Export-EXOProvider {
     <#
     .Description
     Gets the Exchange Online (EXO) settings that are relevant
-    to the SCuBA EXO baselines using direct REST API calls.
+    to the SCuBA EXO baselines using the EXO PowerShell Module
     .Functionality
     Internal
     #>
@@ -18,31 +18,25 @@ function Export-EXOProvider {
         [Parameter(Mandatory = $true)]
         [ValidateSet($true, $false)]
         [boolean]
-        $SkipDoH,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $AccessToken,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $ApiEndpoint
+        $SkipDoH
     )
 
-    $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
-    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
-    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")
+    # Manually importing the module name here to bypass cmdlet name conflicts
+    # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
+    Import-Module ExchangeOnlineManagement
+
+    Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
     $Tracker = Get-CommandTracker
 
     <#
     MS.EXO.1.1v2
     #>
-    $RemoteDomains = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-RemoteDomain"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken}))
+    $RemoteDomains = ConvertTo-Json @($Tracker.TryCommand("Get-RemoteDomain"))
 
     <#
     MS.EXO.2.2v3 SPF
     #>
-    $AcceptedDomains = $Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-AcceptedDomain"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken})
+    $AcceptedDomains = $Tracker.TryCommand("Get-AcceptedDomain")
     $SPFRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaSpfRecord", @{
         "Domains"=$AcceptedDomains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
@@ -52,7 +46,7 @@ function Export-EXOProvider {
     <#
     MS.EXO.3.1v1 DKIM
     #>
-    $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-DkimSigningConfig"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken}))
+    $DKIMConfig = ConvertTo-Json @($Tracker.TryCommand("Get-DkimSigningConfig"))
     $DKIMRecords = ConvertTo-Json @($Tracker.TryCommand("Get-ScubaDkimRecord", @{
         "Domains"=$AcceptedDomains;
         "PreferredDnsResolvers"=$PreferredDnsResolvers;
@@ -71,17 +65,17 @@ function Export-EXOProvider {
     <#
     MS.EXO.5.1v1
     #>
-    $TransportConfig = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-TransportConfig"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken}))
+    $TransportConfig = ConvertTo-Json @($Tracker.TryCommand("Get-TransportConfig"))
 
     <#
     MS.EXO.6.1v1
     #>
-    $SharingPolicy = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-SharingPolicy"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken}))
+    $SharingPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SharingPolicy"))
 
     <#
     MS.EXO.7.1v1
     #>
-    $TransportRules = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-TransportRule"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken}))
+    $TransportRules = ConvertTo-Json @($Tracker.TryCommand("Get-TransportRule"))
 
     <#
     MS.EXO.13.1v1
@@ -102,14 +96,14 @@ function Export-EXOProvider {
         "ActivityBasedAuthenticationTimeoutInterval",
         "BookingsEnabled"
     )
-    $Config = $Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-OrganizationConfig"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken}) | Select-Object $OrgConfigProperties
+    $Config = $Tracker.TryCommand("Get-OrganizationConfig") | Select-Object $OrgConfigProperties
     $Config = ConvertTo-Json @($Config)
 
     # Hybrid / connector configuration
-    $InboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-InboundConnector"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken})) -Depth 4
-    $OutboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-OutboundConnector"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken})) -Depth 4
-    $IntraOrgConnectors = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-IntraOrganizationConnector"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken})) -Depth 4
-    $OrgRelationships = ConvertTo-Json @($Tracker.TryCommand("Invoke-EXORestMethod", @{CmdletName = "Get-OrganizationRelationship"; ApiEndpoint = $ApiEndpoint; AccessToken = $AccessToken})) -Depth 4
+    $InboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-InboundConnector")) -Depth 4
+    $OutboundConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-OutboundConnector")) -Depth 4
+    $IntraOrgConnectors = ConvertTo-Json @($Tracker.TryCommand("Get-IntraOrganizationConnector")) -Depth 4
+    $OrgRelationships = ConvertTo-Json @($Tracker.TryCommand("Get-OrganizationRelationship")) -Depth 4
 
     # Convert accepted domains to JSON format AFTER its used in Get-ScubaSpfRecord, Get-ScubaDkimRecord, and Get-ScubaDmarcRecord methods.
     # We want to store the accepted domain values to check for the "IsCoexistenceDomain" property.
@@ -145,7 +139,7 @@ function Export-EXOProvider {
 function Get-EXOTenantDetail {
     <#
     .Description
-    Gets the tenant details using the EXO REST API
+    Gets the tenant details using the EXO PowerShell Module
     .Functionality
     Internal
     #>
@@ -155,23 +149,11 @@ function Get-EXOTenantDetail {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $AccessToken,
-
-        [Parameter(Mandatory = $true)]
-        [string]
-        $ApiEndpoint
+        $M365Environment
     )
     try {
-        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers/EXORestHelper.psm1")
-        $OrgConfig = Invoke-EXORestMethod -CmdletName "Get-OrganizationConfig" -ApiEndpoint $ApiEndpoint -AccessToken $AccessToken
-        # Handle array result from the API
-        if ($OrgConfig -is [array]) {
-            $OrgConfig = $OrgConfig[0]
-        }
+        Import-Module ExchangeOnlineManagement
+        $OrgConfig = Get-OrganizationConfig -ErrorAction "Stop"
         $DomainName = $OrgConfig.Name
         $TenantId = "Error retrieving Tenant ID"
         $Uri = "https://login.microsoftonline.com/$($DomainName)/.well-known/openid-configuration"

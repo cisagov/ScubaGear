@@ -5,9 +5,9 @@ InModuleScope ExportEXOProvider {
     Describe "Get-EXOTenantDetail" {
         BeforeAll {
             # empty stub required for mocked cmdlets called directly in the provider
-            function Invoke-EXORestMethod {}
+            function Get-OrganizationConfig {}
 
-            Mock -ModuleName ExportEXOProvider Invoke-EXORestMethod {
+            Mock -ModuleName ExportEXOProvider Get-OrganizationConfig {
                 return [pscustomobject]@{
                     Name = "name";
                     DisplayName = "DisplayName";
@@ -34,22 +34,22 @@ InModuleScope ExportEXOProvider {
             }
         }
         It "When called with -M365Environment 'commercial', returns valid JSON" {
-            $Json = Get-EXOTenantDetail -M365Environment "commercial" -AccessToken "mock-token" -ApiEndpoint "https://mock.endpoint/InvokeCommand"
+            $Json = Get-EXOTenantDetail -M365Environment "commercial"
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
         It "When called with -M365Environment 'gcc', returns valid JSON" {
-            $Json = Get-EXOTenantDetail -M365Environment "gcc" -AccessToken "mock-token" -ApiEndpoint "https://mock.endpoint/InvokeCommand"
+            $Json = Get-EXOTenantDetail -M365Environment "gcc"
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
         It "When called with -M365Environment 'gcchigh', returns valid JSON" {
-            $Json = Get-EXOTenantDetail -M365Environment "gcchigh" -AccessToken "mock-token" -ApiEndpoint "https://mock.endpoint/InvokeCommand"
+            $Json = Get-EXOTenantDetail -M365Environment "gcchigh"
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }
         It "When called with -M365Environment 'dod', returns valid JSON" {
-            $Json = Get-EXOTenantDetail -M365Environment "dod" -AccessToken "mock-token" -ApiEndpoint "https://mock.endpoint/InvokeCommand"
+            $Json = Get-EXOTenantDetail -M365Environment "dod"
             $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }

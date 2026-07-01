@@ -1,4 +1,4 @@
-Function Set-SettingsDataForGeneralSection {
+﻿Function Set-SettingsDataForGeneralSection {
     <#
     .SYNOPSIS
     Saves general settings from UI controls to data structures.
@@ -97,6 +97,11 @@ Function Set-SettingsDataForAdvancedSection {
                             if (![string]::IsNullOrWhiteSpace($currentValue)) {
                                 # Convert control name to setting name (remove _TextBox suffix)
                                 $settingName = $fieldControlName -replace '_TextBox$', ''
+                                # Resolve OutPath '.' to the user's Documents folder so ScubaGear
+                                # writes reports there regardless of the working directory at run time.
+                                if ($settingName -eq 'OutPath' -and $currentValue.Trim() -eq '.') {
+                                    $currentValue = [Environment]::GetFolderPath('MyDocuments')
+                                }
                                 $syncHash.AdvancedSettingsData[$settingName] = $currentValue.Trim()
                             }
                         }

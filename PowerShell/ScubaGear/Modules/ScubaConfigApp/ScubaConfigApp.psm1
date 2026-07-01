@@ -210,6 +210,13 @@ Function Start-SCuBAConfigApp {
     # Build the syncHash with necessary paths and parameters
     $syncHash.Online = $Online
     $syncHash.GraphConnected = $GraphConnected
+    # Cache mapping object IDs (GUIDs) to their display names.
+    # Populated when the user selects items via Graph queries or when importing YAML with inline comments.
+    # Used to emit friendly-name comments in generated YAML (e.g.  - guid #DisplayName).
+    $syncHash.IdDisplayNameCache = [hashtable]::Synchronized(@{})
+    # Set of object IDs that were sent to Graph during import but not returned (deleted/missing objects).
+    # Items here are flagged visually in the policy card list controls.
+    $syncHash.OrphanedIds = [hashtable]::Synchronized(@{})
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
     $syncHash.ChangelogPath = "$PSScriptRoot\ScubaConfigApp_CHANGELOG.md"
     $syncHash.ImgPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
@@ -220,6 +227,23 @@ Function Start-SCuBAConfigApp {
     $syncHash.GraphEndpoint = $GraphEndpoint
     $syncHash.M365Environment = $M365Environment
     $syncHash.TenantName = $TenantName
+
+    # Resolve ScubaGear module version from the manifest two levels up
+    $scubaGearPsd1 = Join-Path $PSScriptRoot "..\..\ScubaGear.psd1"
+    $syncHash.ScubaGearVersion = if (Test-Path $scubaGearPsd1) {
+        try { (Import-PowerShellDataFile -Path $scubaGearPsd1).ModuleVersion } catch { "unknown" }
+    } else {
+        (Get-Module ScubaGear -ErrorAction SilentlyContinue).Version.ToString()
+    }
+
+    # Store the ScubaGear module root so Build-ScubaGearCommand can import from the correct source.
+    # $PSScriptRoot is the ScubaConfigApp folder; the module root is two levels up.
+    $resolvedScubaRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..") -ErrorAction SilentlyContinue).Path
+    $syncHash.ScubaGearModulePath = if ($resolvedScubaRoot -and (Test-Path (Join-Path $resolvedScubaRoot 'ScubaGear.psd1'))) {
+        $resolvedScubaRoot
+    } else {
+        $null
+    }
 
     # Initialize debug output structures
     $syncHash.DebugLogData = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())  # For debug download
@@ -327,100 +351,59 @@ Function Start-SCuBAConfigApp {
         $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
         Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source $source -Level "Info"
 
-        # Cascading baseline loading strategy
-        $syncHash.Baselines = $null
+        # Base path for all relative paths in the control config (sibling of the JSON itself)
         $ModuleBasePath = Split-Path $syncHash.UIConfigPath -Parent
 
-        # Strategy 0: Published schema baseline JSON (highest priority - pre-generated baseline)
-        try {
-            Write-DebugOutput -Message "Attempting to load pre-generated baseline from schemas folder" -Source $source -Level "Verbose"
-
-            # schemas folder is at: ...\PowerShell\ScubaGear\schemas\ScubaBaselines.json
-            # PSScriptRoot is: ...\PowerShell\ScubaGear\Modules\ScubaConfigApp
-            $SchemaBaselinePath = Join-Path $ModuleBasePath "..\..\schemas\ScubaBaselines.json"
-            $SchemaBaselineResolved = Resolve-Path $SchemaBaselinePath -ErrorAction Stop
-
-            if (Test-Path $SchemaBaselineResolved) {
-                Write-DebugOutput -Message "Found published baseline at: $SchemaBaselineResolved" -Source $source -Level "Verbose"
-
-                $JsonConfigData = (Get-Content -Path $SchemaBaselineResolved -Raw | ConvertFrom-Json)
-                $syncHash.Baselines = $JsonConfigData.baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Published Schema JSON" -Source $source -Level "Info"
-            }
-        }
-        catch {
-            Write-DebugOutput -Message "Failed to load baselines from schemas folder: $($_.Exception.Message)" -Source $source -Level "Verbose"
-            $syncHash.Baselines = $null
+        # Load ScubaGear's own defaults so the app never needs hardcoded values
+        $scubaDefaultsPath = Join-Path $ModuleBasePath $syncHash.UIConfigs.DefaultConfigsSchemaPath
+        $scubaDefaultsResolved = (Resolve-Path $scubaDefaultsPath -ErrorAction SilentlyContinue).Path
+        $scubaDefaultFileName = Split-Path $scubaDefaultsResolved -Leaf
+        if ($scubaDefaultsResolved -and (Test-Path $scubaDefaultsResolved)) {
+            $syncHash.ScubaDefaults = (Get-Content -Path $scubaDefaultsResolved -Raw | ConvertFrom-Json).defaults
+            $syncHash.ScubaDefaultsPath = $scubaDefaultsResolved
+            Write-DebugOutput -Message "$scubaDefaultFileName loaded: $scubaDefaultsResolved" -Source $source -Level "Info"
+        } else {
+            $syncHash.ScubaDefaults = $null
+            $syncHash.ScubaDefaultsPath = $null
+            Write-DebugOutput -Message "$scubaDefaultFileName not found at expected path: $scubaDefaultsPath" -Source $source -Level "Warning"
         }
 
-        # Strategy 1: Local markdown baselines parsing (fallback for development/testing)
-        if (-not $syncHash.Baselines -and -not $syncHash.UIConfigs.PullOnlineBaselines) {
+        # Baseline loading: online (PullOnlineBaselines=true) or local (default)
+        $syncHash.Baselines = $null
+
+        if ($syncHash.UIConfigs.PullOnlineBaselines) {
+            # Online: download ScubaBaselines.json from OnlineBaselineSchemaURL
             try {
-                Write-DebugOutput -Message "Attempting to dynamically parse baselines from local markdown files" -Source $source -Level "Verbose"
+                Write-DebugOutput -Message "PullOnlineBaselines=true. Loading baselines from: $($syncHash.UIConfigs.OnlineBaselineSchemaURL)" -Source $source -Level "Verbose"
 
-                $BaselineDestPath = "$env:Temp\ScubaBaselines.json"
-
-                # Create empty baseline structure to populate
-                $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
-                $emptyBaseline | Out-File -FilePath $BaselineDestPath -Encoding utf8 -Force
-
-                # Use local markdown baselines directory
-                $LocalBaselineMarkdownPath = Join-Path $ModuleBasePath $syncHash.UIConfigs.OfflineBaselineMarkdownPath
-                $LocalBaselineMarkdownResolved = (Resolve-Path $LocalBaselineMarkdownPath).Path
-
-                Write-DebugOutput -Message "Local baseline markdown path: $LocalBaselineMarkdownResolved" -Source $source -Level "Verbose"
-
-                Update-ScubaConfigBaselineWithMarkdown `
-                    -BaselineFilePath $BaselineDestPath `
-                    -BaselineDirectory $LocalBaselineMarkdownResolved
-
-                $JsonConfigData = (Get-Content -Path $BaselineDestPath -Raw | ConvertFrom-Json)
-                $syncHash.Baselines = $JsonConfigData.baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Local Markdown Parsing" -Source $source -Level "Info"
-            }
-            catch {
-                Write-DebugOutput -Message "Failed to load baselines using Local Markdown parsing: $($_.Exception.Message)" -Source $source -Level "Warning"
-                $syncHash.Baselines = $null
-            }
-        }
-
-        # Strategy 2: Online Markdown processing (if online and enabled)
-        if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines) {
-            try {
-                Write-DebugOutput -Message "Attempting to load baselines from online markdown files in this directory: $($syncHash.UIConfigs.OnlineBaselineMarkdownURL)" -Source $source -Level "Verbose"
-
-                $BaselineDestPath = "$env:Temp\ScubaBaselines.json"
-
-                # Create empty baseline structure to populate
-                $emptyBaseline = @{ baselines = @{} } | ConvertTo-Json -Depth 10
-                $emptyBaseline | Out-File -FilePath $BaselineDestPath -Encoding utf8 -Force
-
-                Update-ScubaConfigBaselineWithMarkdown `
-                    -BaselineFilePath $BaselineDestPath `
-                    -GitHubDirectoryUrl $syncHash.UIConfigs.OnlineBaselineMarkdownURL `
-                    -AdditionalFields @('criticality')
-
-                $JsonConfigData = (Get-Content -Path $BaselineDestPath -Raw | ConvertFrom-Json)
-                $syncHash.Baselines = $JsonConfigData.baselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Online Markdown Baseline" -Source $source -Level "Info"
-            }
-            catch {
-                Write-DebugOutput -Message "Failed to load baselines using Online Markdown Baseline: $($_.Exception.Message)" -Source $source -Level "Warning"
-                $syncHash.Baselines = $null
-            }
-        }
-
-        # Strategy 3: Online JSON baseline (if previous strategies failed and online is enabled)
-        if (-not $syncHash.Baselines -and $syncHash.Online -and $syncHash.UIConfigs.PullOnlineBaselines) {
-            try {
-                Write-DebugOutput -Message "Attempting to load baselines from online JSON: $($syncHash.UIConfigs.OnlineBaselineJsonURL)" -Source $source -Level "Verbose"
-
-                $onlineBaselines = (Invoke-RestMethod -Uri $syncHash.UIConfigs.OnlineBaselineJsonURL -ErrorAction Stop).baselines
+                $onlineBaselines = (Invoke-RestMethod -Uri $syncHash.UIConfigs.OnlineBaselineSchemaURL -ErrorAction Stop).baselines
                 $syncHash.Baselines = $onlineBaselines
-                Write-DebugOutput -Message "Successfully loaded baselines using: Online JSON Baseline" -Source $source -Level "Info"
+                Write-DebugOutput -Message "Successfully loaded baselines using: Online Schema JSON" -Source $source -Level "Info"
             }
             catch {
-                Write-DebugOutput -Message "Failed to load baselines using Online JSON Baseline: $($_.Exception.Message)" -Source $source -Level "Warning"
+                Write-DebugOutput -Message "Failed to load baselines using Online Schema JSON: $($_.Exception.Message)" -Source $source -Level "Warning"
+                $syncHash.Baselines = $null
+            }
+        }
+        else {
+            # Local: load ScubaBaselines.json from schemas folder
+            try {
+                Write-DebugOutput -Message "Loading baselines from local schemas folder" -Source $source -Level "Verbose"
+
+                # schemas folder path is configured in LocalBaselineSchemaPath (relative to the module base path)
+                $SchemaBaselinePath = Join-Path $ModuleBasePath $syncHash.UIConfigs.LocalBaselineSchemaPath
+                $SchemaBaselineResolved = Resolve-Path $SchemaBaselinePath -ErrorAction Stop
+
+                if (Test-Path $SchemaBaselineResolved) {
+                    Write-DebugOutput -Message "Found published baseline at: $SchemaBaselineResolved" -Source $source -Level "Verbose"
+
+                    $JsonConfigData = (Get-Content -Path $SchemaBaselineResolved -Raw | ConvertFrom-Json)
+                    $syncHash.Baselines = $JsonConfigData.baselines
+                    Write-DebugOutput -Message "Successfully loaded baselines using: Local Schema JSON" -Source $source -Level "Info"
+                }
+            }
+            catch {
+                Write-DebugOutput -Message "Failed to load baselines from schemas folder: $($_.Exception.Message)" -Source $source -Level "Verbose"
                 $syncHash.Baselines = $null
             }
         }
@@ -433,6 +416,9 @@ Function Start-SCuBAConfigApp {
 
         # Add global event handlers to all UI controls after everything is loaded
         $syncHash.PreviewTab.IsEnabled = $false
+        If($syncHash.UIConfigs.EnableScubaRun){
+            $syncHash.ScubaRunTab.IsEnabled = $false
+        }
 
         # Initialize debug toggle button
         If($syncHash.UIConfigs.DebugMode){
@@ -618,28 +604,7 @@ Function Start-SCuBAConfigApp {
             }.GetNewClosure())
 
         }
-        $ExclusionSupport = $syncHash.UIConfigs.products | Where-Object { $_.supportsExclusions -eq $true } | Select-Object -ExpandProperty id
-        $syncHash.ExclusionsInfo_TextBlock.Text = ($syncHash.UIConfigs.localeContext.ExclusionsInfo_TextBlock -f ($ExclusionSupport -join ', ').ToUpper())
-
-        Foreach($product in $syncHash.UIConfigs.products) {
-            # Initialize the OmissionTab and ExclusionTab for each product
-            $exclusionTabName = "$($product.id)ExclusionsTab"
-            $exclusionTab = $syncHash.$exclusionTabName
-
-            # Only try to set visibility if the exclusion tab actually exists
-            if ($null -ne $exclusionTab) {
-                if ($product.supportsExclusions) {
-                    $exclusionTab.Visibility = "Visible"
-                    Write-DebugOutput -Message "Enabled Exclusion sub tab for: $($product.id)" -Source $source -Level "Info"
-                }else{
-                    # Disable the Exclusions tab if the product does not support exclusions
-                    $exclusionTab.Visibility = "Collapsed"
-                    Write-DebugOutput -Message "Disabled Exclusion sub tab for: $($product.id)" -Source $source -Level "Info"
-                }
-            } else {
-                Write-DebugOutput -Message "Exclusion tab not found for product: $($product.id) (looking for: $exclusionTabName)" -Source $source -Level "Warning"
-            }
-        }
+        Initialize-ProductSubTabs
 
 
         # added events to all tab toggles
@@ -710,13 +675,14 @@ Function Start-SCuBAConfigApp {
 
                 if ($importSuccess) {
                     Write-DebugOutput -Message "YAMLConfigFile processed successfully" -Source $source -Level "Info"
+                    Update-MigrationPendingTabIndicators
                 } else {
                     Write-DebugOutput -Message "YAMLConfigFile processing failed" -Source $source -Level "Error"
                 }
             }
             catch {
                 Write-DebugOutput -Message "Error processing YAMLConfigFile: $($_.Exception.Message)" -Source $source -Level "Error"
-                $syncHash.ShowMessageBox.Invoke("Error importing configuration file: $($_.Exception.Message)", "Import Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localeErrorMessages.ImportConfigFileError -f $_.Exception.Message), $syncHash.UIConfigs.localeTitles.ImportError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
             }
         }
 
@@ -769,7 +735,7 @@ Function Start-SCuBAConfigApp {
             $syncHash.ScubaRunTab.Visibility = "Collapsed"
         }
 
-        $syncHash.ScubaRunPowerShellVersion_TextBlock.Text = "PowerShell $($syncHash.UIConfigs.ScubaRunConfig.powershell.version) required"
+        $syncHash.ScubaRunPowerShellVersion_TextBlock.Text = ($syncHash.UIConfigs.localeInfoMessages.PowerShellVersionRequired -f $syncHash.UIConfigs.ScubaRunConfig.powershell.version)
 
         #===========================================================================
         # Button Event Handlers
@@ -784,7 +750,7 @@ Function Start-SCuBAConfigApp {
         # New Session Button
         $syncHash.NewSessionButton.Add_Click({
             Write-DebugOutput -Message "New Session button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
-            $result = $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.NewSessionConfirmation, "New Session", [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Question)
+            $result = $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.NewSessionConfirmation, $syncHash.UIConfigs.localeTitles.NewSession, [System.Windows.MessageBoxButton]::YesNo, [System.Windows.MessageBoxImage]::Question)
             if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
                 # Reset all form fields
                 Clear-FieldValue
@@ -801,8 +767,8 @@ Function Start-SCuBAConfigApp {
             } catch {
                 Write-DebugOutput -Message "Error during manual session restore: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
                 $syncHash.ShowMessageBox.Invoke(
-                    "An error occurred while restoring the session: $($_.Exception.Message)",
-                    "Restore Error",
+                    ($syncHash.UIConfigs.localeErrorMessages.RestoreSessionError -f $_.Exception.Message),
+                    $syncHash.UIConfigs.localeTitles.RestoreError,
                     "OK",
                     "Error"
                 )
@@ -822,11 +788,15 @@ Function Start-SCuBAConfigApp {
                     $importSuccess = Invoke-YamlImportWithProgress -YamlFilePath $openFileDialog.FileName -WindowTitle "Importing Configuration"
 
                     if ($importSuccess) {
-                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.ImportSuccess, "Import Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        Update-MigrationPendingTabIndicators
+                        If($syncHash.UIConfigs.EnableScubaRun){
+                            $syncHash.ScubaRunTab.IsEnabled = $false
+                        }
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.ImportSuccess, $syncHash.UIConfigs.localeTitles.ImportComplete, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                     }
                 }
                 catch {
-                    $syncHash.ShowMessageBox.Invoke("Error importing configuration: $($_.Exception.Message)", "Import Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localeErrorMessages.ImportConfigError -f $_.Exception.Message), $syncHash.UIConfigs.localeTitles.ImportError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                 }
             }
         })
@@ -848,10 +818,10 @@ Function Start-SCuBAConfigApp {
 
                     # Format and show error messages
                     $formattedErrors = $validationResults.Errors | ForEach-Object { "`n - $_" }
-                    $errorMessage = "The following validation errors occurred: $($formattedErrors -join '')"
+                    $errorMessage = $syncHash.UIConfigs.localeErrorMessages.ValidationErrorsPrefix -f ($formattedErrors -join '')
 
                     Write-DebugOutput -Message "Validation failed with $($validationResults.Errors.Count) errors" -Source $MyInvocation.MyCommand -Level "Info"
-                    $syncHash.ShowMessageBox.Invoke($errorMessage, "Validation Errors", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                    $syncHash.ShowMessageBox.Invoke($errorMessage, $syncHash.UIConfigs.localeTitles.ValidationErrors, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                 } else {
                     # All validations passed
                     $syncHash.PreviewTab.IsEnabled = $true
@@ -870,6 +840,7 @@ Function Start-SCuBAConfigApp {
                     New-YamlPreview
 
                     If($syncHash.UIConfigs.EnableScubaRun){
+                        $syncHash.ScubaRunTab.IsEnabled = $true
                         Test-ScubaRunReadiness
                     }
                 }
@@ -883,16 +854,16 @@ Function Start-SCuBAConfigApp {
                 $syncHash.Window.Dispatcher.Invoke([Action]{
                     if (![string]::IsNullOrWhiteSpace($syncHash.YamlPreview_TextBox.Text)) {
                         [System.Windows.Clipboard]::SetText($syncHash.YamlPreview_TextBox.Text)
-                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardComplete, "Copy Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardComplete, $syncHash.UIConfigs.localeTitles.CopyComplete, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                     } else {
-                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardNoPreview, "Nothing to Copy", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                        $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardNoPreview, $syncHash.UIConfigs.localeTitles.NothingToCopy, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                     }
                 })
             }
             catch {
                 # Even this must go in Dispatcher
                 $syncHash.Window.Dispatcher.Invoke([Action]{
-                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardError -f $_.Exception.Message, "Copy Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localePopupMessages.YamlClipboardError -f $_.Exception.Message, $syncHash.UIConfigs.localeTitles.CopyError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                 })
             }
         })
@@ -902,7 +873,7 @@ Function Start-SCuBAConfigApp {
             Write-DebugOutput -Message "Download YAML button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
             try {
                 if ([string]::IsNullOrWhiteSpace($syncHash.YamlPreview_TextBox.Text)) {
-                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.DownloadNullError, "Nothing to Download", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
+                    $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.DownloadNullError, $syncHash.UIConfigs.localeTitles.NothingToDownload, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                     return
                 }
 
@@ -933,11 +904,11 @@ Function Start-SCuBAConfigApp {
                     #[System.IO.File]::WriteAllText($saveFileDialog.FileName, $yamlContent, $utf8NoBom)
                     #$yamlContent | Out-File -FilePath $saveFileDialog.FileName -Encoding utf8NoBOM
 
-                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.YamlSaveSuccess -f $saveFileDialog.FileName), "Save Complete", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
+                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.YamlSaveSuccess -f $saveFileDialog.FileName), $syncHash.UIConfigs.localeTitles.SaveComplete, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information)
                 }
             }
             catch {
-                $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.YamlSaveError -f $_.Exception.Message), "Save Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localePopupMessages.YamlSaveError -f $_.Exception.Message), $syncHash.UIConfigs.localeTitles.SaveError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
             }
         })
 
@@ -1019,7 +990,7 @@ Function Start-SCuBAConfigApp {
                 }
                 catch {
                     Write-DebugOutput -Message ("Error accessing certificate store: {0}" -f $_.Exception.Message) -Source $Source -Level "Error"
-                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localeErrorMessages.CertificateStoreAccessError -f $_.Exception.Message), "Certificate Store Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+                    $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localeErrorMessages.CertificateStoreAccessError -f $_.Exception.Message), $syncHash.UIConfigs.localeTitles.CertificateStoreError, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
                     return
                 }
 
@@ -1027,7 +998,7 @@ Function Start-SCuBAConfigApp {
 
                 if ($userCerts.Count -eq 0) {
                     $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.CertificateNotFound,
-                                                    "No Certificates",
+                                                    $syncHash.UIConfigs.localeTitles.NoCertificates,
                                                     [System.Windows.MessageBoxButton]::OK,
                                                     [System.Windows.MessageBoxImage]::Information)
                     return
@@ -1071,7 +1042,7 @@ Function Start-SCuBAConfigApp {
             catch {
                 Write-DebugOutput -Message ($syncHash.UIConfigs.localeErrorMessages.CertificateSelectionError -f $_.Exception.Message) -Source $Source -Level "Error"
                 $syncHash.ShowMessageBox.Invoke($syncHash.UIConfigs.localeErrorMessages.WindowError,
-                                                "Error",
+                                                $syncHash.UIConfigs.localeTitles.Error,
                                                 [System.Windows.MessageBoxButton]::OK,
                                                 [System.Windows.MessageBoxImage]::Error)
 
@@ -1192,7 +1163,7 @@ Function Start-SCuBAConfigApp {
             # Show simple confirmation dialog
             $result = $syncHash.ShowMessageBox.Invoke(
                 $syncHash.UIConfigs.localePopupMessages.CloseConfirmation,
-                "Confirm Close",
+                $syncHash.UIConfigs.localeTitles.ConfirmClose,
                 [System.Windows.MessageBoxButton]::YesNo,
                 [System.Windows.MessageBoxImage]::Question
             )
@@ -1421,40 +1392,33 @@ Function Show-SCuBABaselinePolicyViewer {
     }
 
     try {
-        # Strategy 1: Try to use pre-generated baseline from schemas folder (highest priority)
-        $usePublishedBaseline = $false
-        $SchemaBaselinePath = Join-Path $PSScriptRoot "..\..\schemas\ScubaBaselines.json"
+        # Load UI config to honour PullOnlineBaselines and OnlineBaselineSchemaURL
+        $uiConfigPath = Join-Path $PSScriptRoot "ScubaConfigApp_Control_en-US.json"
+        $uiConfig = $null
+        if (Test-Path $uiConfigPath) {
+            $uiConfig = (Get-Content -Path $uiConfigPath -Raw | ConvertFrom-Json)
+        }
+
+        $pullOnline = $uiConfig -and $uiConfig.PullOnlineBaselines
+        $syncHash.UIConfigs.LocalBaselineSchemaPath = if ($uiConfig -and $uiConfig.LocalBaselineSchemaPath) { $uiConfig.LocalBaselineSchemaPath } else { "..\..\schemas\ScubaBaselines.json" }
+        $SchemaBaselinePath = Join-Path $PSScriptRoot $syncHash.UIConfigs.LocalBaselineSchemaPath
 
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
-            # No custom baseline specified, check for published baseline
-            if (Test-Path $SchemaBaselinePath) {
-                Write-Output "Found published baseline in schemas folder. Using pre-generated baseline."
-                # Copy the published baseline to the target location (if different)
-                $resolvedSchemaPath = (Resolve-Path $SchemaBaselinePath -ErrorAction SilentlyContinue).Path
-                $resolvedTargetPath = if (Test-Path $BaselineFilePath) { (Resolve-Path $BaselineFilePath -ErrorAction SilentlyContinue).Path } else { $BaselineFilePath }
-
-                if ($resolvedSchemaPath -ne $resolvedTargetPath) {
-                    Copy-Item -Path $SchemaBaselinePath -Destination $BaselineFilePath -Force
-                }
-                $usePublishedBaseline = $true
+            if ($pullOnline) {
+                # PullOnlineBaselines = true: download from OnlineBaselineSchemaURL, parse into memory
+                Write-Output "PullOnlineBaselines=true. Downloading baseline from: $($uiConfig.OnlineBaselineSchemaURL)"
+                $onlineBaselineData = Invoke-RestMethod -Uri $uiConfig.OnlineBaselineSchemaURL -ErrorAction Stop
+                Write-Output "Online baseline loaded into memory."
+            }
+            else {
+                # PullOnlineBaselines = false (default): load directly from local schemas folder, no copy needed
+                $BaselineFilePath = (Resolve-Path $SchemaBaselinePath -ErrorAction Stop).Path
+                Write-Output "Loading baseline from local schemas folder: $BaselineFilePath"
             }
         }
 
-        # Strategy 2: Generate baseline from markdown (fallback for custom baselines or if published baseline not found)
-        if (-not $usePublishedBaseline) {
-            Write-Output "Generating baseline from markdown files..."
-
-            # Use the same path resolution as Start-SCuBAConfigApp
-            if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
-                # Use the exact same approach as Start-SCuBAConfigApp
-                # PSScriptRoot is: ...\Modules\ScubaConfigApp
-                # We want: ...\ScubaGear\baselines (so go up 2, then down to baselines)
-                $LocalBaselineMarkdownPath = Join-Path $PSScriptRoot "..\\..\\baselines"
-                $BaselineDirectory = (Resolve-Path $LocalBaselineMarkdownPath).Path
-                Write-Output "Using local baselines directory: $BaselineDirectory"
-            }
-
-            # Import the baseline schema helper module (from Support modules)
+        # If $BaselineDirectory is set (caller-supplied or markdown fallback), generate via markdown parser
+        if ($BaselineDirectory -or $GitHubDirectoryUrl) {
             $helperModulePath = Join-Path $PSScriptRoot "..\Support\ScubaBaselineSchemaHelper.psm1"
             if (-not (Test-Path $helperModulePath)) {
                 throw "Baseline schema helper module not found: $helperModulePath"
@@ -1640,7 +1604,7 @@ Function Show-SCuBABaselinePolicyViewer {
             throw "Baseline generation failed: $($progressSync.Error)"
         }
 
-        } # End if (-not $usePublishedBaseline)
+        } # End if ($BaselineDirectory -or $GitHubDirectoryUrl)
 
         Write-Output "Launching baseline policy viewer UI..."
 
@@ -1653,9 +1617,12 @@ Function Show-SCuBABaselinePolicyViewer {
 
         # Call the helper function directly (it handles its own runspace)
         try {
-            # Build parameters hashtable
-            $helperParams = @{
-                BaselineFilePath = $BaselineFilePath
+            # Build parameters hashtable - pass pre-parsed object (online) or file path (local)
+            $helperParams = @{}
+            if ($onlineBaselineData) {
+                $helperParams.BaselineData = $onlineBaselineData
+            } else {
+                $helperParams.BaselineFilePath = $BaselineFilePath
             }
             if (Test-Path $controlConfigPath) {
                 $helperParams.ControlConfigPath = $controlConfigPath

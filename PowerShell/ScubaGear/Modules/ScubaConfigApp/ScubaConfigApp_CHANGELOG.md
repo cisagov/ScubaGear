@@ -1,4 +1,32 @@
 :  # SCUBACONFIGAPPUI CHANGELOG
+## 2.6.1 (build 1400) [06/01/2026] - Security Suite Baseline, Config Externalization, and UX Polish
+
+### Bug Fixes
+- Fixed removing policies from an imported configuration file - data was not actually being removed from the output structure.
+- Fixed online mode incorrectly pulling baselines from GitHub instead of local schema. Online mode controls tenant connectivity only; `PullOnlineBaselines` in the control config governs whether baselines are fetched from GitHub.
+- Fixed policy viewer internal cross-reference links (e.g. "MS.SECURITYSUITE.3.1v1 Instructions") to correctly navigate to the referenced policy in the left nav panel instead of failing silently.
+
+### Enhancements
+- Added SecuritySuite product to replace legacy Defender product in the product list and throughout the configuration.
+- Implemented legacy policy migration system to automatically remap Defender and EXO policy IDs to their SecuritySuite equivalents when importing older YAML configuration files.
+- Migration report popup now displays auto-migrated, split, and removed policies with per-section summaries after import.
+- Import now detects legacy policy IDs and auto-migrates them to current equivalents; a migration report popup summarizes migrated, split, and removed policies.
+- Required input fields that fail validation on save are now highlighted with a red border, which clears automatically as soon as the user interacts with the field.
+- YAML export header now includes the ScubaGear version.
+- Externalized all migration behavior, locale strings, and popup content for the migration report into the JSON control file under `policyMigration` and `localeReportWindow`.
+- Removed `productCodeMap` from the JSON config; the product code map is now derived at runtime from the `products` array so adding new products requires no code changes.
+- Unified log prefix tokens under `localeReportWindow.sections` as the single source of truth, removing the redundant `logPrefixes` block.
+- Renamed `reportWindow` to `localeReportWindow` to align with the existing locale naming convention used throughout the config file.
+- Updated SCuBA detailed walkthrough documentation to cover the policy migration workflow.
+
+### Code Improvements
+- Added `ScubaConfigApp_Control_REFERENCE.md` documenting the full UI architecture, data flow, control configuration schema, and runspace model.
+- Removed `ScubaConfigAppBaselineHelper.psm1` - baseline schema generation is now part of the repo build process, not a runtime app concern.
+- Removed `ConvertTo-MigrationEntry` helper function; CSV parsing logic was consolidated directly into `Get-PolicyMigrationMap`.
+- Policy migration map is cached in `$env:TEMP` to avoid re-parsing the CSV on every import.
+- Updated encoding on several helper modules to UTF-8 with BOM for consistent PowerShell parsing across environments.
+- Added 23 Pester unit tests covering `Get-PolicyMigrationMap`, `Invoke-PolicyMigration` Pass 1 (product exclusion blocks), and Pass 2 (annotation and omission keys).
+
 ## 2.4.13 [4/13/2026] - Extended CAPExclusions Support and UI Enhancements
 
 ### Enhancements

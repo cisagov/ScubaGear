@@ -5,18 +5,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.1.1v2 Non-Compliant case - domains have auto forwarding Enabled
         Preconditions:
-          - Command: Set-ExoRemoteDomainAutoForwardEnabled
-            Splat:
-              CurrentValue: false
-              DesiredValue: true
+          - Command: "Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $false} | Set-RemoteDomain -AutoForwardEnabled $true"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.1.1v2 Compliant case - domains have auto forwarding Disabled
         Preconditions:
-          - Command: Set-ExoRemoteDomainAutoForwardEnabled
-            Splat:
-              CurrentValue: true
-              DesiredValue: false
+          - Command: "Get-RemoteDomain | Where {$_.AutoForwardEnabled -eq $true} | Set-RemoteDomain -AutoForwardEnabled $false"
         Postconditions: []
         ExpectedResult: true
 
@@ -242,14 +236,14 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.5.1v1 Non-Compliant case - SMTP AUTH is Enabled
         Preconditions:
-          - Command: Set-ExoTransportConfigSmtpClientAuthenticationDisabled
+          - Command: Set-TransportConfig
             Splat:
               SmtpClientAuthenticationDisabled: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.5.1v1 Compliant case - SMTP AUTH is Disabled
         Preconditions:
-          - Command: Set-ExoTransportConfigSmtpClientAuthenticationDisabled
+          - Command: Set-TransportConfig
             Splat:
               SmtpClientAuthenticationDisabled: true
         Postconditions: []
@@ -260,25 +254,14 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.6.1v1 Non-Compliant case - Contacts shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
-            Splat:
-              Name: "FunctionalTest ContactSharingAllDomains"
-              Domains: "*:ContactsSharing"
+          - Command: 'New-SharingPolicy -Name "FunctionalTest ContactSharingAllDomains" -Domains "*:ContactsSharing"'
         Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest ContactSharingAllDomains"
+          - Command: 'Remove-SharingPolicy -Identity "FunctionalTest ContactSharingAllDomains" -Confirm:$false'
         ExpectedResult: false
       - TestDescription: MS.EXO.6.1v1 Compliant case - Contacts NOT shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
-            Splat:
-              Name: "FunctionalTest ContactSharingLimitedDomains"
-              Domains: "ted.com:ContactsSharing"
-        Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest ContactSharingLimitedDomains"
+          - Command: 'Get-SharingPolicy | Where {$_.Enabled -eq $true} | Set-SharingPolicy -Domains "ted.com:ContactsSharing"'
+        Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.EXO.6.2v1
@@ -286,25 +269,14 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.6.2v1 Non-Compliant case - Calendar shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
-            Splat:
-              Name: "FunctionalTest CalendarSharingAllDomains"
-              Domains: "*:CalendarSharingFreeBusyReviewer"
+          - Command: 'New-SharingPolicy -Name "FunctionalTest CalendarSharingAllDomains" -Domains "*:CalendarSharingFreeBusyReviewer"'
         Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest CalendarSharingAllDomains"
+          - Command: 'Remove-SharingPolicy -Identity "FunctionalTest CalendarSharingAllDomains" -Confirm:$false'
         ExpectedResult: false
       - TestDescription: MS.EXO.6.2v1 Compliant case - Calendar NOT shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
-            Splat:
-              Name: "FunctionalTest CalendarSharingLimitedDomains"
-              Domains: "ted.com:CalendarSharingFreeBusyReviewer"
-        Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest CalendarSharingLimitedDomains"
+          - Command: 'Get-SharingPolicy | Where {$_.Enabled -eq $true} | Set-SharingPolicy -Domains "ted.com:CalendarSharingFreeBusyReviewer"'
+        Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.EXO.7.1v1
@@ -313,16 +285,16 @@ TestPlan:
       - TestDescription: MS.EXO.7.1v1 Non-Compliant case - External sender warning rules Disabled
         Preconditions:
           ### Disable all rules that match what the policy is checking for
-          - Command: Disable-ExoExternalSenderWarningRules
+          - Command: 'Get-TransportRule | Where {$_.State -eq "Enabled" -AND $_.Mode -eq "Enforce" -AND $_.FromScope -eq "NotInOrganization"} | Disable-TransportRule -Confirm:$false'
         Postconditions:
-          - Command: Enable-ExoExternalSenderWarningRules
+          - Command: 'Get-TransportRule | Where {$_.State -eq "Disabled" -AND $_.Mode -eq "Enforce" -AND $_.FromScope -eq "NotInOrganization"} | Enable-TransportRule -Confirm:$false'
         ExpectedResult: false
       - TestDescription: MS.EXO.7.1v1 Compliant case - External sender warning rule exists
         Preconditions:
           ### By creating a new rule that matches what the policy is checking for, we guarantee that it exists in the tenant
-          - Command: New-ExoExternalSenderWarningRule
+          - Command: 'New-TransportRule "FunctionalTest External sender warning" -FromScope "NotInOrganization" -PrependSubject "[External] "'
         Postconditions:
-          - Command: Remove-ExoExternalSenderWarningRule
+          - Command: 'Get-TransportRule | Where {$_.Identity -eq "FunctionalTest External sender warning"} | Remove-TransportRule -Confirm:$false'
         ExpectedResult: true
 
   - PolicyId: MS.EXO.13.1v1
@@ -330,14 +302,14 @@ TestPlan:
     Tests:
       - TestDescription: MS.EXO.13.1v1 Non-Compliant case - Mailbox auditing is Disabled
         Preconditions:
-          - Command: Set-ExoOrganizationAuditDisabled
+          - Command: Set-OrganizationConfig
             Splat:
               AuditDisabled: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.13.1v1 Compliant case - Mailbox auditing is Enabled
         Preconditions:
-          - Command: Set-ExoOrganizationAuditDisabled
+          - Command: Set-OrganizationConfig
             Splat:
               AuditDisabled: false
         Postconditions: []

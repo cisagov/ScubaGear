@@ -1,8 +1,8 @@
-Description: Test Config for MS.SECURITYSUITE.2.3v1
+Description: Test Config for MS.DEFENDER.2.3v1
 ProductNames:
-  - securitysuite
+  - defender
 LogIn: false
-SecuritySuite:
-  MS.SECURITYSUITE.2.3v1:
+Defender:
+  MS.DEFENDER.2.3v1:
     PartnerDomains:
       - goodparnter.com

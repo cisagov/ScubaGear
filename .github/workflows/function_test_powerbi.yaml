@@ -250,4 +250,3 @@ jobs:
           password: ${{ secrets.NotifierPassword }}
           subject: ScubaGear Functional Test Failure
           to: ${{ steps.extract-email.outputs.emails }}
-          from: ${{ format('ScubaGear Notifier <{0}>', secrets.NotifierUsername) }}

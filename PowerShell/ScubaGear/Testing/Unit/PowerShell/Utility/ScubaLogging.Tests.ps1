@@ -438,7 +438,7 @@ InModuleScope ScubaLogging {
             }
         }
 
-        Context "Write-ScubaRunDetails - ConfiguredOPAPath Parameter" {
+        Context "Get-ScubaRunDetails - ConfiguredOPAPath Parameter" {
 
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
@@ -452,7 +452,7 @@ InModuleScope ScubaLogging {
                 $fakeOpa = Join-Path $script:TestLogPath "opa_windows_amd64.exe"
                 Set-Content $fakeOpa "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa
+                Get-ScubaRunDetails -ConfiguredOPAPath $fakeOpa
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -464,7 +464,7 @@ InModuleScope ScubaLogging {
                 New-Item -ItemType Directory $opaDir -Force | Out-Null
                 Set-Content (Join-Path $opaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir
+                Get-ScubaRunDetails -ConfiguredOPAPath $opaDir
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -475,7 +475,7 @@ InModuleScope ScubaLogging {
                 $emptyDir = Join-Path $script:TestLogPath "emptydir-$(Get-Date -Format 'fff')"
                 New-Item -ItemType Directory $emptyDir -Force | Out-Null
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir
+                Get-ScubaRunDetails -ConfiguredOPAPath $emptyDir
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -486,7 +486,7 @@ InModuleScope ScubaLogging {
             It "Should log Warning 'OPA Executable NOT found at configured path' when path does not exist" {
                 $nonExistent = Join-Path $script:TestLogPath "doesnotexist\opa.exe"
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent
+                Get-ScubaRunDetails -ConfiguredOPAPath $nonExistent
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -495,7 +495,7 @@ InModuleScope ScubaLogging {
             }
 
             It "Should skip ConfiguredOPAPath check when parameter is not provided" {
-                Write-ScubaRunDetails
+                Get-ScubaRunDetails
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Not -Match "OPA Executable at configured path"
@@ -503,7 +503,7 @@ InModuleScope ScubaLogging {
             }
         }
 
-        Context "Write-ScubaRunDetails - Network Connectivity Uses Port 443" {
+        Context "Get-ScubaRunDetails - Network Connectivity Uses Port 443" {
 
             BeforeEach {
                 Initialize-ScubaLogging -LogPath $script:TestLogPath -LogLevel "Debug" -DisableAutoReport
@@ -514,7 +514,7 @@ InModuleScope ScubaLogging {
             It "Should call Test-NetConnection with Port 443 not ICMP" {
                 Mock Test-NetConnection { return $true }
 
-                Write-ScubaRunDetails
+                Get-ScubaRunDetails
 
                 Should -Invoke Test-NetConnection -ParameterFilter { $Port -eq 443 } -Times 1
             }
@@ -522,7 +522,7 @@ InModuleScope ScubaLogging {
             It "Should log InternetConnected true when HTTPS port 443 check succeeds" {
                 Mock Test-NetConnection { return $true }
 
-                Write-ScubaRunDetails
+                Get-ScubaRunDetails
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match '"InternetConnected":true'
@@ -531,7 +531,7 @@ InModuleScope ScubaLogging {
             It "Should log InternetConnected false and InternetError when HTTPS check throws" {
                 Mock Test-NetConnection { throw "Connection refused" }
 
-                Write-ScubaRunDetails
+                Get-ScubaRunDetails
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match '"InternetConnected":false'

@@ -1,642 +1,6 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
 Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom
 
-function Get-FunctionalTestHeaderValue {
-  param(
-    [Parameter(Mandatory = $true)] $Headers,
-    [Parameter(Mandatory = $true)] [string] $Name
-  )
-
-  if ($null -eq $Headers) {
-    return $null
-  }
-
-  if (-not $Response.Headers.ContainsKey($Name)) {
-    return $null
-  }
-
-  $HeadersValue = $Response.Headers[$Name]
-  $HeadersValueType = $Response.Headers[$Name].GetType()
-
-  if ($HeadersValueType -eq [string]) {
-    # Write-Information "PS 5 Header '$Name' value: $HeadersValue" -InformationAction Continue
-    return $HeadersValue
-  } elseif ($HeadersValueType -eq [string[]]) {
-    # Write-Information "PS 7 Header '$Name' values: $($HeadersValue[0])" -InformationAction Continue
-    # Return the first item in array
-    return $HeadersValue[0]
-  } else {
-    throw "Unexpected HTTP header value type: $HeadersValueType"
-  }
-
-  # if ($Headers -is [System.Collections.IDictionary]) {
-  #   foreach ($Key in $Headers.Keys) {
-  #     if ([string]::Equals([string]$Key, $Name, [System.StringComparison]::OrdinalIgnoreCase)) {
-  #       return [string]$Headers[$Key]
-  #     }
-  #   }
-  #   return $null
-  # }
-
-  # $Property = $Headers.PSObject.Properties | Where-Object {
-  #   [string]::Equals($_.Name, $Name, [System.StringComparison]::OrdinalIgnoreCase)
-  # } | Select-Object -First 1
-
-  # if ($null -eq $Property) {
-  #   return $null
-  # }
-
-  # return [string]$Property.Value
-}
-
-function Resolve-FunctionalTestPollingUri {
-  param(
-    [Parameter(Mandatory = $true)] [string] $RequestUri,
-    [Parameter(Mandatory = $true)] [string] $PollingUri
-  )
-
-  return [System.Uri]::new([System.Uri]$RequestUri, $PollingUri).AbsoluteUri
-}
-
-function Invoke-FunctionalTestRestRequest {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)] [string] $Uri,
-    [Parameter(Mandatory = $true)] [string] $Method,
-    [Parameter(Mandatory = $true)] [hashtable] $Headers,
-    [string] $Body,
-    [string] $ContentType,
-    [int] $DefaultRetryAfterSeconds = 5,
-    [int] $MaxPollAttempts = 10
-  )
-
-  $RequestUri = $Uri
-  $RequestMethod = $Method
-  $PollAttempts = 0
-
-  while ($true) {
-    $RequestParams = @{
-      Uri = $RequestUri
-      Method = $RequestMethod
-      Headers = $Headers
-      ErrorAction = 'Stop'
-    }
-
-    # PowerShell 5.1 can throw parser null-reference errors for Invoke-WebRequest
-    # unless -UseBasicParsing is explicitly supplied.
-    if ($null -ne (Get-Command Invoke-WebRequest).Parameters['UseBasicParsing']) {
-      $RequestParams.UseBasicParsing = $true
-    }
-
-    if (-not [string]::IsNullOrWhiteSpace($Body) -and $RequestMethod -ne 'GET') {
-      $RequestParams.Body = $Body
-    }
-
-    if (-not [string]::IsNullOrWhiteSpace($ContentType) -and $RequestMethod -ne 'GET') {
-      $RequestParams.ContentType = $ContentType
-    }
-
-    try {
-      $Response = Invoke-WebRequest @RequestParams
-    }
-    catch {
-      $StatusCode = $null
-      if ($null -ne $_.Exception.Response -and $null -ne $_.Exception.Response.StatusCode) {
-        $StatusCode = [int] $_.Exception.Response.StatusCode
-      }
-
-      if ($null -ne $StatusCode) {
-        throw "Request to $RequestUri failed with HTTP status code $StatusCode. $($_.Exception.Message)"
-      }
-
-      throw
-    }
-
-    $StatusCode = [int] $Response.StatusCode
-    if ($StatusCode -eq 202) {
-      $PollAttempts++
-      if ($PollAttempts -gt $MaxPollAttempts) {
-        throw "Request to $Uri did not complete after $MaxPollAttempts polling attempt(s)."
-      }
-
-      $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Location'
-      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
-        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Operation-Location'
-      }
-      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
-        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Azure-AsyncOperation'
-      }
-      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
-        throw "Request to $RequestUri returned HTTP 202 without a polling location."
-      }
-
-      $RetryAfter = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Retry-After'
-      $RetryAfterSeconds = 0
-      if (-not [int]::TryParse([string] $RetryAfter, [ref] $RetryAfterSeconds) -or $RetryAfterSeconds -lt 1) {
-        $RetryAfterSeconds = $DefaultRetryAfterSeconds
-      }
-
-      Write-Information "Request to $RequestUri is still processing." -InformationAction Continue
-      Write-Information "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)" -InformationAction Continue
-      Start-Sleep -Seconds $RetryAfterSeconds
-      $RequestUri = Resolve-FunctionalTestPollingUri -RequestUri $RequestUri -PollingUri $PollingUri
-      $RequestMethod = 'GET'
-      continue
-    }
-
-    if ($StatusCode -lt 200 -or $StatusCode -ge 300) {
-      throw "Request to $RequestUri returned unexpected HTTP status code $StatusCode."
-    }
-
-    if ([string]::IsNullOrWhiteSpace($Response.Content)) {
-      return $null
-    }
-
-    try {
-      return $Response.Content | ConvertFrom-Json
-    }
-    catch {
-      return $Response.Content
-    }
-  }
-}
-
-# -----------------------------------------------------------------------
-# Exchange Online REST wrappers for functional test pre/postconditions.
-# These replace ExchangeOnlineManagement cmdlets in EXO test plans.
-# $script:EXOApiEndpoint and $script:EXOAccessToken must be set by
-# Products.Tests.ps1 BeforeAll before these functions are called.
-# -----------------------------------------------------------------------
-function Invoke-FunctionalExoCommand {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$CmdletName,
-    [Parameter(Mandatory = $false)]
-    [hashtable]$Parameters = @{}
-  )
-
-  return Invoke-EXORestMethod `
-    -CmdletName $CmdletName `
-    -ApiEndpoint $script:EXOApiEndpoint `
-    -AccessToken $script:EXOAccessToken `
-    -Parameters $Parameters
-}
-
-function Resolve-FunctionalExoIdentity {
-  param(
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [object]$InputObject,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$Identity
-  )
-
-  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
-    return $Identity
-  }
-
-  if ($null -eq $InputObject) {
-    return $null
-  }
-
-  # Prefer Guid: accepted by all EXO REST mutating endpoints in every cloud.
-  # Name alone causes 404 in commercial tenants (e.g. "FederatedSharing" rejected).
-  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Guid)) {
-    return [string]$InputObject.Guid
-  }
-  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.ExchangeObjectId)) {
-    return [string]$InputObject.ExchangeObjectId
-  }
-  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Name)) {
-    return [string]$InputObject.Name
-  }
-  if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Identity)) {
-    return [string]$InputObject.Identity
-  }
-
-  return $null
-}
-
-function ConvertTo-FunctionalExoBoolean {
-  param(
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [object]$Value
-  )
-
-  if ($null -eq $Value) {
-    return $null
-  }
-
-  if ($Value -is [bool]) {
-    return [bool]$Value
-  }
-
-  $AsString = [string]$Value
-  if ([string]::IsNullOrWhiteSpace($AsString)) {
-    return $null
-  }
-
-  $Parsed = $false
-  if ([bool]::TryParse($AsString, [ref]$Parsed)) {
-    return $Parsed
-  }
-
-  return $null
-}
-
-function Wait-FunctionalExoCondition {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [scriptblock]$Condition,
-    [Parameter(Mandatory = $false)]
-    [int]$MaxAttempts = 10,
-    [Parameter(Mandatory = $false)]
-    [int]$DelaySeconds = 2,
-    [Parameter(Mandatory = $false)]
-    [string]$FailureMessage = 'Condition was not met in the expected time window.'
-  )
-
-  for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
-    if (& $Condition) {
-      return
-    }
-
-    if ($Attempt -lt $MaxAttempts) {
-      Start-Sleep -Seconds $DelaySeconds
-    }
-  }
-
-  throw $FailureMessage
-}
-
-function Get-RemoteDomain {
-  [CmdletBinding()]
-  param()
-
-  return Invoke-FunctionalExoCommand -CmdletName 'Get-RemoteDomain'
-}
-
-function Set-RemoteDomain {
-  [CmdletBinding()]
-  param(
-    [Parameter(ValueFromPipeline = $true)]
-    [AllowNull()]
-    [object]$InputObject,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$Identity,
-    [Parameter(Mandatory = $true)]
-    [bool]$AutoForwardEnabled
-  )
-
-  process {
-    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
-    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
-      throw 'Set-RemoteDomain requires an Identity or piped object with Identity.'
-    }
-
-    Invoke-FunctionalExoCommand -CmdletName 'Set-RemoteDomain' -Parameters @{
-      Identity = $ResolvedIdentity
-      AutoForwardEnabled = $AutoForwardEnabled
-    } | Out-Null
-  }
-}
-
-function Set-TransportConfig {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [bool]$SmtpClientAuthenticationDisabled
-  )
-
-  Invoke-FunctionalExoCommand -CmdletName 'Set-TransportConfig' -Parameters @{
-    SmtpClientAuthenticationDisabled = $SmtpClientAuthenticationDisabled
-  } | Out-Null
-}
-
-function Get-TransportConfig {
-  [CmdletBinding()]
-  param()
-
-  return Invoke-FunctionalExoCommand -CmdletName 'Get-TransportConfig'
-}
-
-function Get-SharingPolicy {
-  [CmdletBinding()]
-  param()
-
-  return Invoke-FunctionalExoCommand -CmdletName 'Get-SharingPolicy'
-}
-
-function New-SharingPolicy {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Name,
-    [Parameter(Mandatory = $true)]
-    [string]$Domains
-  )
-
-  # Explicitly enable the policy on creation; the EXO REST endpoint does not
-  # guarantee Enabled=$true by default, and Rego only evaluates enabled policies.
-  return Invoke-FunctionalExoCommand -CmdletName 'New-SharingPolicy' -Parameters @{
-    Name    = $Name
-    Domains = $Domains
-    Enabled = $true
-  }
-}
-
-function Remove-SharingPolicy {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Identity
-  )
-
-  Invoke-FunctionalExoCommand -CmdletName 'Remove-SharingPolicy' -Parameters @{
-    Identity = $Identity
-  } | Out-Null
-}
-
-function Get-TransportRule {
-  [CmdletBinding()]
-  param()
-
-  return Invoke-FunctionalExoCommand -CmdletName 'Get-TransportRule'
-}
-
-function Disable-TransportRule {
-  [CmdletBinding()]
-  param(
-    [Parameter(ValueFromPipeline = $true)]
-    [AllowNull()]
-    [object]$InputObject,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$Identity
-  )
-
-  process {
-    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
-    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
-      throw 'Disable-TransportRule requires an Identity or piped object with Identity.'
-    }
-
-    Invoke-FunctionalExoCommand -CmdletName 'Disable-TransportRule' -Parameters @{
-      Identity = $ResolvedIdentity
-    } | Out-Null
-  }
-}
-
-function Enable-TransportRule {
-  [CmdletBinding()]
-  param(
-    [Parameter(ValueFromPipeline = $true)]
-    [AllowNull()]
-    [object]$InputObject,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$Identity
-  )
-
-  process {
-    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
-    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
-      throw 'Enable-TransportRule requires an Identity or piped object with Identity.'
-    }
-
-    Invoke-FunctionalExoCommand -CmdletName 'Enable-TransportRule' -Parameters @{
-      Identity = $ResolvedIdentity
-    } | Out-Null
-  }
-}
-
-function New-TransportRule {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true, Position = 0)]
-    [string]$Name,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$FromScope,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$PrependSubject
-  )
-
-  $Params = @{
-    Name = $Name
-  }
-  if (-not [string]::IsNullOrWhiteSpace($FromScope)) {
-    $Params.FromScope = $FromScope
-  }
-  if ($null -ne $PrependSubject) {
-    $Params.PrependSubject = $PrependSubject
-  }
-
-  return Invoke-FunctionalExoCommand -CmdletName 'New-TransportRule' -Parameters $Params
-}
-
-function Remove-TransportRule {
-  [CmdletBinding()]
-  param(
-    [Parameter(ValueFromPipeline = $true)]
-    [AllowNull()]
-    [object]$InputObject,
-    [Parameter(Mandatory = $false)]
-    [AllowNull()]
-    [string]$Identity
-  )
-
-  process {
-    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
-    if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
-      throw 'Remove-TransportRule requires an Identity or piped object with Identity.'
-    }
-
-    Invoke-FunctionalExoCommand -CmdletName 'Remove-TransportRule' -Parameters @{
-      Identity = $ResolvedIdentity
-    } | Out-Null
-  }
-}
-
-function Set-OrganizationConfig {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [bool]$AuditDisabled
-  )
-
-  Invoke-FunctionalExoCommand -CmdletName 'Set-OrganizationConfig' -Parameters @{
-    AuditDisabled = $AuditDisabled
-  } | Out-Null
-}
-
-function Set-ExoRemoteDomainAutoForwardEnabled {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [bool]$CurrentValue,
-    [Parameter(Mandatory = $true)]
-    [bool]$DesiredValue
-  )
-
-  $Targets = @(Get-RemoteDomain |
-      Where-Object { (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $CurrentValue })
-
-  if ($Targets.Count -gt 0) {
-    $Targets | Set-RemoteDomain -AutoForwardEnabled $DesiredValue
-  }
-
-  # Direction-aware convergence check:
-  #   Compliant   ($false) => ALL domains must have AutoForwardEnabled=false (zero with true)
-  #   Non-compliant ($true) => AT LEAST ONE domain must have AutoForwardEnabled=true
-  if ($DesiredValue -eq $false) {
-    Wait-FunctionalExoCondition -Condition {
-      @(Get-RemoteDomain | Where-Object {
-          (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $true
-        }).Count -eq 0
-    } -FailureMessage "Failed to observe all remote domains with AutoForwardEnabled=false after update."
-  } else {
-    Wait-FunctionalExoCondition -Condition {
-      @(Get-RemoteDomain | Where-Object {
-          (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $true
-        }).Count -gt 0
-    } -FailureMessage "Failed to observe at least one remote domain with AutoForwardEnabled=true after update."
-  }
-
-  # Allow time for the write to propagate to all EXO backend replicas before
-  # ScubaGear's independent REST session reads tenant state. Without this,
-  # ScubaGear may read a replica that hasn't received the update yet.
-  Start-Sleep -Seconds 60
-}
-
-function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [bool]$SmtpClientAuthenticationDisabled
-  )
-
-  Set-TransportConfig -SmtpClientAuthenticationDisabled $SmtpClientAuthenticationDisabled
-
-  Wait-FunctionalExoCondition -Condition {
-    $Config = Get-TransportConfig | Select-Object -First 1
-    $CurrentValue = ConvertTo-FunctionalExoBoolean -Value $Config.SmtpClientAuthenticationDisabled
-    $CurrentValue -eq $SmtpClientAuthenticationDisabled
-  } -FailureMessage "Failed to observe SmtpClientAuthenticationDisabled=$SmtpClientAuthenticationDisabled after update."
-}
-
-function New-ExoSharingPolicy {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Name,
-    [Parameter(Mandatory = $true)]
-    [string]$Domains
-  )
-
-  New-SharingPolicy -Name $Name -Domains $Domains | Out-Null
-
-  # Wait for the policy to become visible so ScubaGear's provider call sees it.
-  Wait-FunctionalExoCondition -Condition {
-    @(Get-SharingPolicy | Where-Object {
-        [string]$_.Name -eq $Name -or [string]$_.Identity -eq $Name
-      }).Count -gt 0
-  } -FailureMessage "Failed to observe new sharing policy '$Name' after creation."
-}
-
-function Remove-ExoSharingPolicy {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [string]$Identity
-  )
-
-  Remove-SharingPolicy -Identity $Identity
-}
-
-function Disable-ExoExternalSenderWarningRules {
-  [CmdletBinding()]
-  param()
-
-  Get-TransportRule |
-    Where-Object {
-      [string]$_.State -eq 'Enabled' -and
-      [string]$_.Mode -eq 'Enforce' -and
-      [string]$_.FromScope -eq 'NotInOrganization'
-    } |
-    Disable-TransportRule
-}
-
-function Enable-ExoExternalSenderWarningRules {
-  [CmdletBinding()]
-  param()
-
-  Get-TransportRule |
-    Where-Object {
-      [string]$_.State -eq 'Disabled' -and
-      [string]$_.Mode -eq 'Enforce' -and
-      [string]$_.FromScope -eq 'NotInOrganization'
-    } |
-    Enable-TransportRule
-}
-
-function New-ExoExternalSenderWarningRule {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $false)]
-    [string]$Name = 'FunctionalTest External sender warning'
-  )
-
-  New-TransportRule $Name -FromScope 'NotInOrganization' -PrependSubject '[External] ' | Out-Null
-}
-
-function Remove-ExoExternalSenderWarningRule {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $false)]
-    [string]$Identity = 'FunctionalTest External sender warning'
-  )
-
-  Get-TransportRule |
-    Where-Object { $_.Identity -eq $Identity } |
-    Remove-TransportRule
-}
-
-function Set-ExoOrganizationAuditDisabled {
-  [CmdletBinding()]
-  param(
-    [Parameter(Mandatory = $true)]
-    [bool]$AuditDisabled
-  )
-
-  try {
-    Set-OrganizationConfig -AuditDisabled $AuditDisabled
-  }
-  catch {
-    # Some tenants (GCC/GCCH) lock the audit policy and reject this change
-    # via service-principal REST calls. Log a warning and verify actual state.
-    Write-Warning "Set-ExoOrganizationAuditDisabled: Could not set AuditDisabled=$AuditDisabled - $($_.Exception.Message). The tenant may not permit this change."
-  }
-
-  # Wait for the desired value to become visible on a read replica. An immediate
-  # single readback can return a stale value even when the write succeeded.
-  # If the wait times out the tenant likely prohibits this change via service principal.
-  Wait-FunctionalExoCondition -MaxAttempts 12 -DelaySeconds 10 -Condition {
-    $Cfg = Invoke-FunctionalExoCommand -CmdletName 'Get-OrganizationConfig' | Select-Object -First 1
-    (ConvertTo-FunctionalExoBoolean -Value $Cfg.AuditDisabled) -eq $AuditDisabled
-  } -FailureMessage "Set-ExoOrganizationAuditDisabled: Tenant AuditDisabled did not reach '$AuditDisabled' after waiting. Tenant policy prohibits this change - this test cannot complete in this environment."
-
-  # Allow extra time for the write to propagate to all EXO replicas before
-  # ScubaGear's independent REST session reads tenant state.
-  Start-Sleep -Seconds 60
-}
-
 # -----------------------------------------------------------------------
 # Power Platform REST wrappers for functional test preconditions
 # These replace the removed Microsoft.PowerApps.Administration.PowerShell
@@ -644,8 +8,8 @@ function Set-ExoOrganizationAuditDisabled {
 # Products.Tests.ps1 BeforeAll before these functions are called.
 # -----------------------------------------------------------------------
 function Get-TenantSettings {
-  $Response = Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01" `
-    -Method 'POST' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -ContentType 'application/json'
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -ContentType "application/json"
     return $Response
 }
 
@@ -653,14 +17,14 @@ function Set-TenantSettings {
     param([Parameter(Position=0)][object]$Settings, [hashtable]$RequestBody)
     if ($RequestBody) { $Body = $RequestBody | ConvertTo-Json -Depth 10 }
     else              { $Body = $Settings    | ConvertTo-Json -Depth 10 }
-  Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01" `
-    -Method 'POST' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType 'application/json' | Out-Null
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
 }
 
 function Get-AdminPowerAppEnvironment {
     param([switch]$Default)
-  $Response = Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01" `
-    -Method 'GET' -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
     if ($Default) {
         return $Response.value | Where-Object { $_.properties.isDefault -eq $true } | Select-Object -First 1 |
                Select-Object @{ Name="EnvironmentName"; Expression={ $_.name } }
@@ -669,8 +33,8 @@ function Get-AdminPowerAppEnvironment {
 }
 
 function Get-DlpPolicy {
-  $Response = Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
-    -Method 'GET' -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+    $Response = Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+        -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
     # Normalize ARM response: hoist properties.displayName and id to root to
     # match original Get-DlpPolicy cmdlet output expected by test plan filters.
     # id is preserved as the full ARM resource path for use in Remove-DlpPolicy.
@@ -696,8 +60,8 @@ function Remove-DlpPolicy {
         } else {
             "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies/$PolicyName"
         }
-        Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl${Path}?api-version=2016-11-01" `
-          -Method 'DELETE' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
+        Invoke-RestMethod -Uri "$script:PPBaseUrl${Path}?api-version=2016-11-01" `
+            -Method DELETE -Headers @{ Authorization = "Bearer $script:PPAccessToken" } | Out-Null
     }
 }
 
@@ -725,8 +89,8 @@ function New-AdminDlpPolicy {
             }
         }
     } | ConvertTo-Json -Depth 10
-    Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
-      -Method 'POST' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType 'application/json' | Out-Null
+    Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01" `
+        -Method POST -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
 }
 
 function Get-PowerAppTenantIsolationPolicy {
@@ -734,8 +98,8 @@ function Get-PowerAppTenantIsolationPolicy {
     $MaxAttempts = 3
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-        return Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
-          -Method 'GET' -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
+            return Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+                -Method GET -Headers @{ Authorization = "Bearer $script:PPAccessToken" }
         }
         catch {
             if ($Attempt -ge $MaxAttempts) { throw }
@@ -751,8 +115,8 @@ function Set-PowerAppTenantIsolationPolicy {
     $MaxAttempts = 3
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-        Invoke-FunctionalTestRestRequest -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
-          -Method 'PUT' -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType 'application/json' | Out-Null
+            Invoke-RestMethod -Uri "$script:PPBaseUrl/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" `
+                -Method PUT -Headers @{ Authorization = "Bearer $script:PPAccessToken" } -Body $Body -ContentType "application/json" | Out-Null
             return
         }
         catch {
@@ -779,9 +143,9 @@ function Set-PowerBITenantSetting {
     $MaxAttempts = 3
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-        Invoke-FunctionalTestRestRequest -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
-          -Method 'POST' -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
-          -Body $Body -ContentType 'application/json' | Out-Null
+            Invoke-RestMethod -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
+                -Method POST -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
+                -Body $Body -ContentType "application/json" | Out-Null
             return
         }
         catch {

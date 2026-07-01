@@ -10,8 +10,6 @@ body:
       options:
         - label: This issue has an informative and human-readable title.
           required: true
-        - label: Assignee should meet with issue author before starting work.
-          required: false
   - type: textarea
     attributes:
       label: "\U0001F4A1 Summary"

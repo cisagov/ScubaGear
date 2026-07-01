@@ -298,6 +298,7 @@ Domain impersonation protection SHOULD be enabled for domains owned by the agenc
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.2.2v1; Criticality: SHOULD -->
+<!--ExclusionType: AgencyDomains-->
 - _Rationale:_ Configuring domain impersonation protection for agency-owned domains
 reduces the risk of a user being deceived by a look-alike domain.
 - _Last modified:_ March 2026
@@ -408,7 +409,7 @@ then add a name and valid email address for each sensitive account and click **A
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
 8.  Click **Save**.
 9. Click **Edit actions**.
-10. Under **If a message is detected as domain impersonation**, select one of the following:
+10. Under **If a message is detected as user impersonation**, select one of the following:
     - **Redirect the message to other email addresses**
     - **Move the message to the recipients' Junk Email folders**
     - **Quarantine the message**
@@ -429,7 +430,7 @@ then add a name and valid email address for each sensitive account and click **A
 10. Under **Domain**, enter each partner domain, then click **Add domains**.
 11. Click **Done** then **Save**.
 12. Click **Edit actions**.
-13. Under **If a message is detected as domain impersonation**, select one of the following:
+13. Under **If a message is detected as user impersonation**, select one of the following:
     - **Redirect the message to other email addresses**
     - **Move the message to the recipients' Junk Email folders**
     - **Quarantine the message**
@@ -1032,9 +1033,6 @@ For users not added to the standard or strict preset policies:
       - **Redirect message to email address**
       - **Delete message**
       - **Quarantine message**
-
-     Note: **Delete message** is not available for **High confidence phishing**; choose one of the other three options for that classification.
-    
     6. If you selected **Redirect message to email address**, also fill in an appropriate email for
       the **Redirect to this email address** field, such as a mailbox set up for monitoring incoming
       spam and phishing messages.
@@ -1042,7 +1040,7 @@ For users not added to the standard or strict preset policies:
     8. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then
         **Delete** (the trash icon). (_MS.SECURITYSUITE.6.2v1_)
     9. Click **Save**.
-7.  If creating a new policy:
+6.  If creating a new policy:
     1. Click **Create**, then **Inbound**.
     2. After naming the policy, click **Next**.
     3. Add users, groups, and domains as needed. To make the policy apply to all users, under

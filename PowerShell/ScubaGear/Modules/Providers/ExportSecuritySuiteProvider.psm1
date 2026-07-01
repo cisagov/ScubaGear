@@ -53,11 +53,7 @@ function Export-SecuritySuiteProvider {
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
     $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
-    $AntiPhishRule = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishRule"))
-    $AcceptedDomains = ConvertTo-Json @($Tracker.TryCommand("Get-AcceptedDomain"))
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
-    $HostedContentFilterPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
-    $HostedContentFilterRules = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterRule"))
 
     # Test if Defender specific commands are available. If the tenant does
     # not have a defender license (plan 1 or plan 2), the following
@@ -161,16 +157,12 @@ function Export-SecuritySuiteProvider {
     "dlp_compliance_policies": $DLPCompliancePolicy,
     "dlp_compliance_rules": $DLPComplianceRules,
     "anti_phish_policies": $AntiPhishPolicy,
-    "anti_phish_rules": $AntiPhishRule,
-    "accepted_domains": $AcceptedDomains,
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
     "conn_filter": $ConnectionFilter,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
-    "hosted_content_filter_policies": $HostedContentFilterPolicies,
-    "hosted_content_filter_rules": $HostedContentFilterRules,
     "securitysuite_successful_commands": $SuccessfulCommands,
     "securitysuite_unsuccessful_commands": $UnSuccessfulCommands,
 "@

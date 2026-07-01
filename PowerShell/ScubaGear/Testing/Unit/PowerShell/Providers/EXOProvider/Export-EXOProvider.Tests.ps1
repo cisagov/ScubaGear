@@ -19,11 +19,19 @@ InModuleScope -ModuleName ExportEXOProvider {
                     # This is where you decide where you mock functions called by CommandTracker :)
                     try {
                         switch ($Command) {
-                            "Invoke-EXORestMethod" {
+                            "Get-RemoteDomain" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-AcceptedDomain" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
                             "Get-ScubaSpfRecord" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-DkimSigningConfig" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -32,6 +40,42 @@ InModuleScope -ModuleName ExportEXOProvider {
                                 return [pscustomobject]@{}
                             }
                             "Get-ScubaDmarcRecord" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-TransportConfig" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-SharingPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-TransportRule" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-HostedConnectionFilterPolicy" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-OrganizationConfig" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-InboundConnector" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-OutboundConnector" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-IntraOrganizationConnector" {
+                                $this.SuccessfulCommands += $Command
+                                return [pscustomobject]@{}
+                            }
+                            "Get-OrganizationRelationship" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
                             }
@@ -94,7 +138,7 @@ InModuleScope -ModuleName ExportEXOProvider {
             }
         }
         It "When called, returns valid JSON" {
-            $Json = Export-EXOProvider -PreferredDnsResolvers @() -SkipDoH $false -AccessToken "mock-token" -ApiEndpoint "https://mock.endpoint/InvokeCommand"
+            $Json = Export-EXOProvider -PreferredDnsResolvers @() -SkipDoH $false
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
         }

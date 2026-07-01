@@ -22,21 +22,19 @@ function Export-SharePointProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPORestHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    $SPOTenantJson = ConvertTo-Json @()
+    $UsedPnP = ConvertTo-Json $false
 
     # Use access token acquired by Connection.psm1
     $TenantData = $Tracker.TryCommand("Get-SPOTenantRest", @{AdminUrl = $AdminUrl; AccessToken = $AccessToken})
-    # If successfully retrieved the tenant settings
-    if ($TenantData.count -gt 0) {
-        $SPOTenantJson = ConvertTo-Json @($TenantData) -Depth 10
-    }
+    $SPOTenant = ConvertTo-Json @($TenantData) -Depth 10
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
     # Note the spacing and the last comma in the json is important
     $json = @"
-    "SPO_tenant": $SPOTenantJson,
+    "SPO_tenant": $SPOTenant,
+    "OneDrive_PnP_Flag": $UsedPnp,
     "SharePoint_successful_commands": $SuccessfulCommands,
     "SharePoint_unsuccessful_commands": $UnSuccessfulCommands,
 "@
