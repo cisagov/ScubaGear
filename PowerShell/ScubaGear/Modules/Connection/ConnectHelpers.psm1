@@ -44,7 +44,27 @@
             $GraphParams += @{'Environment' = "USGovDoD"; }
         }
     }
-    Connect-MgGraph @GraphParams | Out-Null
+
+    ################### Added by Ted 7/1
+    try {
+        $null = Connect-MgGraph @GraphParams
+    }
+    catch {
+        $ErrorText = $_.Exception.Message
+
+        $IsWrongCloudError =
+            $ErrorText -match "AADSTS900384" -and
+            $ErrorText -match "determine the corresponding service endpoint"
+
+        if (-not $IsWrongCloudError) {
+            throw
+        }
+
+        Write-Information "Detected a tenant that is not Commercial or GCC. Retrying with Microsoft Graph GCC High environment..." -InformationAction Continue
+        $GraphParams += @{'Environment' = "USGov"; }
+        $null = Connect-MgGraph @GraphParams
+    }
+    ###################
 }
 
 function Connect-EXOHelper {

@@ -53,6 +53,8 @@
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
    $InitialDomainPrefix = $null
+   $TenantId = $null
+   $DetectedM365Environment = $null
 
    # Token data for REST-based products (populated during connection)
    $TokenData = @{
@@ -218,6 +220,17 @@
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
                    }
+
+                   ################### Added by Ted 7/1
+                   # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $TenantId) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $DetectedM365Environment = $M365Environment
+                        Write-Information "Automatically determined M365Environment: $M365Environment" -InformationAction Continue
+                    }
+                   ###################
 
                    # Check for Power BI license before attempting token acquisition.
                    # This prevents triggering a second consent/browser window for the
@@ -405,6 +418,7 @@
        PBIBaseUrl      = $TokenData.PBIBaseUrl
        EXOAccessToken  = $TokenData.EXOAccessToken
        EXOApiEndpoint  = $TokenData.EXOApiEndpoint
+       DetectedM365Environment = $DetectedM365Environment
    }
 }
 

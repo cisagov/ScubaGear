@@ -543,6 +543,12 @@ function Invoke-SCuBA {
         }
 
         $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig
+        ################### Added by Ted 7/1
+        # If Connect-Tenant automatically detected the M365Environment during interactive auth, set ScubaConfig to the correct value.
+        if ($ConnectionResult.DetectedM365Environment) {
+            $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
+        }
+        ###################
         $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
         if ($ProdAuthFailed.Count -gt 0) {
             Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
@@ -1812,6 +1818,7 @@ function Invoke-Connection {
             PPBaseUrl       = $null
             PBIAccessToken  = $null
             PBIBaseUrl      = $null
+            DetectedM365Environment = $null
         }
     }
 }
