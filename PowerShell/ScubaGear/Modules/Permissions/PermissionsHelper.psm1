@@ -19,7 +19,7 @@ Function Get-ScubaGearPermissions {
         The switch to indicate that the permissions are to be retrieved for a service principal
 
     .PARAMETER Product
-        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline
+        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline
 
     .PARAMETER Environment
         The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
@@ -45,7 +45,7 @@ Function Get-ScubaGearPermissions {
     .EXAMPLE
         Get-ScubaGearPermissions -Product aad
         Get-ScubaGearPermissions -Product exo
-        Get-ScubaGearPermissions -Product scubatank
+        Get-ScubaGearPermissions -Product securitysuite
 
     .EXAMPLE
         Get-ScubaGearPermissions -CmdletName Get-MgBetaUser -OutAs modules
@@ -82,7 +82,7 @@ Function Get-ScubaGearPermissions {
 
     .NOTES
         NAME: Get-ScubaGearPermissions
-        VERSION: 1.9
+        VERSION: 2.0
 
         USE TO FIND PERMS:
             (Find-MgGraphCommand -Command Get-MgBetaPolicyRoleManagementPolicyAssignment).Permissions | Select Name, IsLeastPrivilege
@@ -95,6 +95,7 @@ Function Get-ScubaGearPermissions {
         2024-11-15 - Removed redundantpermissions and added verbose messages
         2024-12-20 - Added version and changelog. Added support for pipeline and for multiple products. Fixed issue with role output for null values
         2024-12-23 - Adjusted endpoint output based on structure changes in the permissions file
+        2026-06-19 - Added SecuritySuite and removed ScubaTank to product list
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'CmdletName')]
@@ -107,7 +108,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
+        [ValidateSet('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
@@ -134,7 +135,7 @@ Function Get-ScubaGearPermissions {
 
         # If ProductName is * then set Product to all possible values
         if ($Product -contains '*') {
-            $Product = @('aad', 'exo', 'defender', 'teams', 'sharepoint', 'powerplatform')
+            $Product = @('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform')
         }
 
         if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){
@@ -147,8 +148,8 @@ Function Get-ScubaGearPermissions {
 
         [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
 
-        $permissionSet = Get-Content -Path "$ResourceRoot\ScubaGearPermissions.json" | ConvertFrom-Json
-        Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\ScubaGearPermissions.json' | ConvertFrom-Json"
+        $permissionSet = Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json
+        Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json"
 
         $ResourceAPIHash = @{
             'aad'        = '00000003-0000-0000-c000-000000000000'
@@ -156,9 +157,11 @@ Function Get-ScubaGearPermissions {
                 '00000002-0000-0ff1-ce00-000000000000',
                 '00000007-0000-0ff1-ce00-000000000000'
             )
-            'defender'   = '00000002-0000-0ff1-ce00-000000000000'
+            'securitysuite' = @(
+                '00000002-0000-0ff1-ce00-000000000000',
+                '00000007-0000-0ff1-ce00-000000000000'
+            )
             'sharepoint' = '00000003-0000-0ff1-ce00-000000000000'
-            'scubatank'  = '00000003-0000-0000-c000-000000000000'
         }
 
         # Start with an empty array to build the filter
@@ -197,7 +200,7 @@ Function Get-ScubaGearPermissions {
                             # Filter the resourceAPIAppId based on the product
                             $conditions += {$_.resourceAPIAppId -match ($ResourceAPIHash[$ProductItem] -join '|')}
                             $conditionsmsg += '`$_.resourceAPIAppId -match "' + ($ResourceAPIHash[$ProductItem] -Join '|') + '"'
-                        }elseif($ProductItem -match 'exo|sharepoint|defender'){
+                        }elseif($ProductItem -match 'exo|sharepoint|securitysuite'){
                             # If the product is exo or SharePoint, then the resourceAPIAppId should not match the Exchange/SharePoint resourceAPIAppId
                             # This accounts for interactive permissions needed for Exchange when running the SCuBAGear, and doesn't list SharePoint interactive permissions
                             $conditions += {$_.resourceAPIAppId -notmatch ($ResourceAPIHash[$ProductItem] -join '|')}
@@ -311,7 +314,7 @@ Function Get-ScubaGearPermissions {
             }
             'appId'{
                 Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty resourceAPIAppId -Unique"
-                $output += ($collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique).Split('#')[0]
+                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique | ForEach-Object { $_.Split('#')[0] }
             }
             'role' {
                 Try{
@@ -437,7 +440,7 @@ Function Get-ServicePrincipalPermissions {
         [string]$Environment = 'commercial'
     )
 
-    $ProductNames = "aad", "exo", "sharepoint"
+    $ProductNames = "aad", "exo", "sharepoint", "securitysuite"
 
     # Create a list to hold the filtered permissions
     $filteredPermissions = @()

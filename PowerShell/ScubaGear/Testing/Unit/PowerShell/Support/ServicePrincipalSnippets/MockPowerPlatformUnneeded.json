@@ -35,7 +35,7 @@
         "missing": false
     },
     "powerPlatformRegistered": true,
-    "productNames": ["aad", "exo", "defender", "sharepoint", "teams"],
+    "productNames": ["aad", "exo", "securitysuite", "sharepoint", "teams"],
     "expectedResult": {
         "hasFixPermissionIssues": true,
         "statusPattern": "Action needed.*Power Platform registered but not required"
