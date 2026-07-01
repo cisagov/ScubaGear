@@ -16,6 +16,23 @@ const getJsonData = (id) => {
 }
 
 /**
+ * Like getJsonData, but returns null instead of throwing when the element is missing or
+ * contains invalid JSON. One bad data island must not abort the rest of report rendering
+ * (e.g. colorRows), which would leave the report without its pass/fail color coding.
+ *
+ * @param {string} id The ID of the <script> element.
+ * @returns {any} The parsed JSON data, or null if the data could not be parsed.
+ */
+const tryGetJsonData = (id) => {
+    try {
+        return getJsonData(id);
+    } catch (error) {
+        console.error(`Failed to load JSON data for "${id}":`, error);
+        return null;
+    }
+}
+
+/**
  * Ensures the input value is returned as an array.
  * 
  * @param {any} val The value to normalize.
