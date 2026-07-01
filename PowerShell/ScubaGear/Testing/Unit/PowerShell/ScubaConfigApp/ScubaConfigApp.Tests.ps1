@@ -95,18 +95,6 @@ InModuleScope ScubaConfigApp {
                             link = "https://github.com/cisagov/ScubaGear/baselines/powerbi.md"
                         }
                     )
-                    securitysuite = @(
-                        @{
-                            id = "MS.SECURITYSUITE.1.1v1"
-                            name = "Test SecuritySuite Policy 1"
-                            rationale = "Test rationale for SecuritySuite policy"
-                            criticality = "SHALL"
-                            exclusionField = "SensitiveAccounts"
-                            omissionField = "Omissions"
-                            annotationField = "Annotations"
-                            link = "https://github.com/cisagov/ScubaGear/baselines/securitysuite.md"
-                        }
-                    )
                 }
             }
         }
@@ -134,7 +122,6 @@ InModuleScope ScubaConfigApp {
                     'AutoSaveProgress',
                     'EnableSearchAndFilter',
                     'EnableScubaRun',
-                    'AllowScubaRunInteractive',
                     'EnableResultReader',
                     'MinimumProductsRequired',
                     'localeContext',
@@ -506,7 +493,7 @@ InModuleScope ScubaConfigApp {
             }
 
             It 'Should contain main XAML file' {
-                $mainXamlPath = Join-Path -Path $xamlResourcesPath -ChildPath "ScubaConfigAppUI.xaml"
+                $mainXamlPath = Join-Path $xamlResourcesPath "ScubaConfigAppUI.xaml"
                 Test-Path $mainXamlPath | Should -BeTrue -Because "Main XAML file should exist in resources directory"
             }
         }

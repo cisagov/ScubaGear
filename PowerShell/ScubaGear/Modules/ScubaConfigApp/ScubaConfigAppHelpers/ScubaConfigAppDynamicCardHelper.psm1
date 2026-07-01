@@ -104,71 +104,6 @@
     return $missingRequiredFields
 }
 
-Function Set-FieldValidationHighlight {
-    <#
-    .SYNOPSIS
-    Applies or clears a red error border on a field control. When applying, registers a
-    one-shot handler that restores the default style as soon as the user interacts.
-    #>
-    param(
-        [System.Windows.Controls.StackPanel]$detailsPanel,
-        [string]$controlFieldName,
-        [string]$fieldType
-    )
-
-    $redBrush = [System.Windows.Media.Brushes]::Red
-    $thickness = [System.Windows.Thickness]::new(2)
-
-    switch ($fieldType) {
-        "dateString" {
-            $ctrl = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_DatePicker")
-            if ($ctrl) {
-                $ctrl.BorderBrush = $redBrush
-                $ctrl.BorderThickness = $thickness
-                $ctrl.Add_SelectedDateChanged({
-                    $this.ClearValue([System.Windows.Controls.DatePicker]::BorderBrushProperty)
-                    $this.ClearValue([System.Windows.Controls.DatePicker]::BorderThicknessProperty)
-                }.GetNewClosure())
-            }
-        }
-        "boolean" {
-            $ctrl = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_CheckBox")
-            if ($ctrl) {
-                $ctrl.BorderBrush = $redBrush
-                $ctrl.BorderThickness = $thickness
-                $ctrl.Add_Checked({
-                    $this.ClearValue([System.Windows.Controls.CheckBox]::BorderBrushProperty)
-                    $this.ClearValue([System.Windows.Controls.CheckBox]::BorderThicknessProperty)
-                }.GetNewClosure())
-            }
-        }
-        "array" {
-            # Highlight the text input box used to add entries
-            $ctrl = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_TextBox")
-            if ($ctrl) {
-                $ctrl.BorderBrush = $redBrush
-                $ctrl.BorderThickness = $thickness
-                $ctrl.Add_TextChanged({
-                    $this.ClearValue([System.Windows.Controls.TextBox]::BorderBrushProperty)
-                    $this.ClearValue([System.Windows.Controls.TextBox]::BorderThicknessProperty)
-                }.GetNewClosure())
-            }
-        }
-        default {
-            # string, longstring, and everything else use a TextBox
-            $ctrl = Find-UIControlByName -parent $detailsPanel -targetName ($controlFieldName + "_TextBox")
-            if ($ctrl) {
-                $ctrl.BorderBrush = $redBrush
-                $ctrl.BorderThickness = $thickness
-                $ctrl.Add_TextChanged({
-                    $this.ClearValue([System.Windows.Controls.TextBox]::BorderBrushProperty)
-                    $this.ClearValue([System.Windows.Controls.TextBox]::BorderThicknessProperty)
-                }.GetNewClosure())
-            }
-        }
-    }
-}
-
 Function Test-FieldValidation {
     <#
     .SYNOPSIS
@@ -305,7 +240,7 @@ Function Test-FieldValidation {
 
             Write-DebugOutput -Message ("Field '{0}' hasValue: {1}, Value: {2}" -f $field.name, $hasValue, $fieldValue) -Source $MyInvocation.MyCommand -Level "Info"            # Check required field validation
             if ($field.required -and -not $hasValue) {
-                $validationErrors.MissingRequired += @{ FieldName = $field.name; ControlName = $controlFieldName; FieldType = $field.type }
+                $validationErrors.MissingRequired += $field.name
                 Write-DebugOutput -Message ("Required field missing: {0}" -f $field.name) -Source $MyInvocation.MyCommand -Level "Error"
             }
 
@@ -321,8 +256,6 @@ Function Test-FieldValidation {
                             if (-not [string]::IsNullOrWhiteSpace($item) -and $item -notmatch $pattern) {
                                 $validationErrors.FormatErrors += @{
                                     FieldName = $field.name
-                                    ControlName = $controlFieldName
-                                    FieldType = $field.type
                                     Value = $item
                                     ExpectedFormat = $validation.format
                                     Error = "Invalid format for '$($field.name)': '$item'. Expected format: $($validation.format)"
@@ -335,8 +268,6 @@ Function Test-FieldValidation {
                         if (-not [string]::IsNullOrWhiteSpace($fieldValue) -and $fieldValue -notmatch $pattern) {
                             $validationErrors.FormatErrors += @{
                                 FieldName = $field.name
-                                ControlName = $controlFieldName
-                                FieldType = $field.type
                                 Value = $fieldValue
                                 ExpectedFormat = $validation.format
                                 Error = "Invalid format for '$($field.name)': '$fieldValue'. Expected format: $($validation.format)"
@@ -377,8 +308,6 @@ Function Test-FieldValidation {
                         if ($scriptValidationFailed) {
                             $validationErrors.FormatErrors += @{
                                 FieldName = $field.name
-                                ControlName = $controlFieldName
-                                FieldType = $field.type
                                 Value = $fieldValue
                                 ExpectedFormat = $validation.format
                                 Error = $validation.invalidScriptMessage
@@ -844,13 +773,6 @@ Function New-FieldListControl {
                     $itemText.VerticalAlignment = "Center"
                     $itemText.ToolTip = "$($item.($GraphQueryData.tipProperty))"
 
-                    # Cache the display name so YAML generation can emit it as an inline comment
-                    $itemId = $item.($GraphQueryData.outProperty)
-                    $itemDisplayName = $item.($GraphQueryData.tipProperty)
-                    if (-not [string]::IsNullOrWhiteSpace($itemId) -and -not [string]::IsNullOrWhiteSpace($itemDisplayName) -and $syncHash.IdDisplayNameCache) {
-                        $syncHash.IdDisplayNameCache[$itemId] = $itemDisplayName
-                    }
-
                     # Create remove button
                     $removeUserButton = New-Object System.Windows.Controls.Button
                     $removeUserButton.Content = "Remove"
@@ -919,16 +841,6 @@ function Add-FieldListControl {
         $entryText.Text = $value
         $entryText.Width = 250
         $entryText.VerticalAlignment = "Center"
-
-        # Flag IDs that Graph could not resolve — object may have been deleted from the directory.
-        $isOrphaned = $syncHash.OrphanedIds -and $syncHash.OrphanedIds.ContainsKey($value)
-        if ($isOrphaned) {
-            $entryText.Foreground       = [System.Windows.Media.Brushes]::OrangeRed
-            $entryText.TextDecorations  = [System.Windows.TextDecorations]::Strikethrough
-            $entryText.ToolTip          = "Object not found in directory - this ID may have been deleted"
-        } elseif ($syncHash.IdDisplayNameCache -and $syncHash.IdDisplayNameCache[$value]) {
-            $entryText.ToolTip = $syncHash.IdDisplayNameCache[$value]
-        }
 
         # Remove button
         $removeButton = New-Object System.Windows.Controls.Button
@@ -1022,19 +934,6 @@ Function New-FieldListCard {
     $card.Style = $syncHash.Window.FindResource("Card")
     $card.Margin = "0,0,0,12"
 
-    # Resolve controlType for this card so migration keys are scope-specific
-    $controlType   = $syncHash.UIConfigs.baselineControls | Where-Object { $_.cardName -eq $CardName } | Select-Object -First 1 -ExpandProperty controlType
-    $migrationKey  = "$controlType|$PolicyId"
-
-    # Apply migration-pending styling if this policy was auto-migrated and not yet reviewed
-    $isMigrationPending = $syncHash.MigrationPendingReview -and $syncHash.MigrationPendingReview.Contains($migrationKey)
-    if ($isMigrationPending) {
-        $card.BorderBrush     = [System.Windows.Media.Brushes]::Orange
-        $card.BorderThickness = "3,1,1,1"
-        $card.Background      = [System.Windows.Media.SolidColorBrush]::new(
-            [System.Windows.Media.Color]::FromArgb(20, 255, 165, 0))
-    }
-
     # Create main grid for the card
     $cardGrid = New-Object System.Windows.Controls.Grid
     [void]$cardGrid.RowDefinitions.Add((New-Object System.Windows.Controls.RowDefinition -Property @{ Height = "Auto" }))
@@ -1112,24 +1011,6 @@ Function New-FieldListCard {
         $FieldListHeader.Foreground = $syncHash.Window.FindResource("AccentBrush")
         $FieldListHeader.Margin = "0,0,0,4"
         [void]$policyInfoStack.Children.Add($FieldListHeader)
-    }
-
-    # Migration-pending review badge
-    $migrationBadge = $null
-    if ($isMigrationPending) {
-        $migrationBadge = New-Object System.Windows.Controls.TextBlock
-        $migrationBadge.Text       = "[!] Auto-migrated - please review and save"
-        $migrationBadge.Foreground = [System.Windows.Media.Brushes]::DarkOrange
-        $migrationBadge.FontSize   = 10
-        $migrationBadge.FontStyle  = "Italic"
-        $migrationBadge.Margin     = "0,4,0,0"
-        $migrationBadge.Cursor     = [System.Windows.Input.Cursors]::Hand
-        $migrationBadge.Add_MouseLeftButtonDown({
-            $headerGrid = $this.Parent.Parent
-            $cb = $headerGrid.Children[0]
-            if (-not $cb.IsChecked) { $cb.IsChecked = $true }
-        }.GetNewClosure())
-        [void]$policyInfoStack.Children.Add($migrationBadge)
     }
 
     # Add elements to header grid
@@ -1242,26 +1123,6 @@ Function New-FieldListCard {
     [void]$buttonPanel.Children.Add($saveButton)
     [void]$buttonPanel.Children.Add($baselinePolicyButton)
     [void]$buttonPanel.Children.Add($removeButton)
-
-    # Dismiss Review button — only shown on migration-pending cards
-    $dismissButton = $null
-    if ($isMigrationPending) {
-        $dismissButton = New-Object System.Windows.Controls.Button
-        $dismissButton.Content = "Dismiss Review"
-        $dismissButton.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_DismissButton")
-        $dismissButton.Style = $syncHash.Window.FindResource("PrimaryButton")
-        $dismissButton.Width = 120
-        $dismissButton.Height = 28
-        $dismissButton.Margin = "10,0,0,0"
-        $dismissButton.Background = [System.Windows.Media.SolidColorBrush]::new(
-            [System.Windows.Media.Color]::FromRgb(108, 117, 125))  # muted grey
-        $dismissButton.Foreground = [System.Windows.Media.Brushes]::White
-        $dismissButton.BorderThickness = "0"
-        $dismissButton.FontWeight = "SemiBold"
-        $dismissButton.Cursor = [System.Windows.Input.Cursors]::Hand
-        [void]$buttonPanel.Children.Add($dismissButton)
-    }
-
     [void]$detailsPanel.Children.Add($buttonPanel)
 
     # Add elements to main grid
@@ -1272,7 +1133,6 @@ Function New-FieldListCard {
     # PRE-POPULATION LOGIC FOR IMPORT
     if ($OutputData) {
         $hasPrePopulatedData = $false
-        $cardHasOrphans = $false
 
         foreach ($inputData in $validInputFields) {
             $FieldListDef = $syncHash.UIConfigs.inputTypes.$inputData
@@ -1352,15 +1212,6 @@ Function New-FieldListCard {
 
                         if ($listContainer) {
                             Add-FieldListControl -FieldPanel $listContainer -ExistingValues $existingData
-                            # Check whether any item in this list is an orphaned ID
-                            if (-not $cardHasOrphans -and $syncHash.OrphanedIds -and $syncHash.OrphanedIds.Count -gt 0) {
-                                foreach ($item in $existingData) {
-                                    if ($syncHash.OrphanedIds.ContainsKey($item)) {
-                                        $cardHasOrphans = $true
-                                        break
-                                    }
-                                }
-                            }
                         }
                     }
                     elseif ($field.type -eq "multiselect") {
@@ -1477,8 +1328,8 @@ Function New-FieldListCard {
         if ($hasPrePopulatedData) {
             $policyHeader.FontWeight = "Bold"
             $removeButton.Visibility = "Visible"
-            # Set dot color: red when any orphaned ID was found in the lists, green otherwise
-            $checkbox.Tag = if ($cardHasOrphans) { "HasOrphans" } else { "Saved" }
+            # show the save indicator on checkbox
+            $checkbox.Tag = "Saved"
         }
     }
 
@@ -1495,60 +1346,10 @@ Function New-FieldListCard {
         #$this.Content = "▶"  # Right-pointing triangle when collapsed
     }.GetNewClosure())
 
-    # Auto-expand migration-pending cards so users are prompted to review immediately
-    if ($isMigrationPending) {
-        $checkbox.IsChecked = $true
-    }
-
     Add-UIControlEventHandler -Control $saveButton
     Add-UIControlEventHandler -Control $removeButton
     <##>
     Add-UIControlEventHandler -Control $baselinePolicyButton
-
-    # Dismiss Review button click handler — removes migrated data and clears pending state
-    if ($dismissButton) {
-        $dismissButton.Add_Click({
-            # Remove the migrated data from the output structure so it is not written to YAML.
-            # Exclusions:   OutputData[ProductName][PolicyId]
-            # Annotations/Omissions (FlipFieldValueAndPolicyId): OutputData[ProductName][yamlValue][PolicyId]
-            if ($FlipFieldValueAndPolicyId) {
-                # Annotations / Omissions
-                $baselineControl = $syncHash.UIConfigs.baselineControls | Where-Object { $_.cardName -eq $CardName } | Select-Object -First 1
-                $yamlVal = if ($baselineControl) { $baselineControl.yamlValue } else { $null }
-                if ($yamlVal -and $OutputData[$ProductName] -and $OutputData[$ProductName][$yamlVal]) {
-                    [void]$OutputData[$ProductName][$yamlVal].Remove($PolicyId)
-                    if ($OutputData[$ProductName][$yamlVal].Count -eq 0) { [void]$OutputData[$ProductName].Remove($yamlVal) }
-                    if ($OutputData[$ProductName].Count -eq 0) { [void]$OutputData.Remove($ProductName) }
-                }
-            } else {
-                # Exclusions
-                if ($OutputData[$ProductName]) {
-                    [void]$OutputData[$ProductName].Remove($PolicyId)
-                    if ($OutputData[$ProductName].Count -eq 0) { [void]$OutputData.Remove($ProductName) }
-                }
-            }
-
-            # Clear from pending-review set
-            if ($syncHash.MigrationPendingReview) {
-                $cleared = $syncHash.MigrationPendingReview.Remove($migrationKey)
-                if (-not $cleared) {
-                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object { $_ -like "*|$PolicyId" } | Select-Object -First 1
-                    if ($fallbackKey) { [void]$syncHash.MigrationPendingReview.Remove($fallbackKey) }
-                }
-            }
-            # Remove orange styling
-            $card.ClearValue([System.Windows.Controls.Border]::BorderBrushProperty)
-            $card.ClearValue([System.Windows.Controls.Border]::BorderThicknessProperty)
-            $card.ClearValue([System.Windows.Controls.Border]::BackgroundProperty)
-            # Remove badge and dismiss button from UI
-            if ($migrationBadge) { [void]$policyInfoStack.Children.Remove($migrationBadge) }
-            [void]$buttonPanel.Children.Remove($dismissButton)
-            # Update sub-tab asterisk indicators
-            Update-MigrationPendingTabIndicators
-            # Collapse the card
-            $checkbox.IsChecked = $false
-        }.GetNewClosure())
-    }
 
     # Create click event for baseline policy viewer button
     $baselinePolicyButton.Add_Click({
@@ -1586,8 +1387,8 @@ Function New-FieldListCard {
         # Handle missing required fields
         if ($validationResults.MissingRequired.Count -gt 0) {
             $hasValidationErrors = $true
-            foreach ($fieldError in $validationResults.MissingRequired) {
-                $errorMessages += "The '$($fieldError.FieldName)' field is required and cannot be empty."
+            foreach ($fieldName in $validationResults.MissingRequired) {
+                $errorMessages += "The '$fieldName' field is required and cannot be empty."
             }
         }
 
@@ -1599,14 +1400,8 @@ Function New-FieldListCard {
             }
         }
 
-        # If there are validation errors, highlight the offending controls then show the message
+        # If there are validation errors, show them and exit
         if ($hasValidationErrors) {
-            foreach ($fieldError in $validationResults.MissingRequired) {
-                Set-FieldValidationHighlight -detailsPanel $detailsPanel -controlFieldName $fieldError.ControlName -fieldType $fieldError.FieldType
-            }
-            foreach ($formatError in $validationResults.FormatErrors) {
-                Set-FieldValidationHighlight -detailsPanel $detailsPanel -controlFieldName $formatError.ControlName -fieldType $formatError.FieldType
-            }
             $combinedErrorMessage = $errorMessages -join "`n`n"
             $title = if ($validationResults.MissingRequired.Count -gt 0) {
                 $syncHash.UIConfigs.localeTitles.RequiredFieldsMissing
@@ -1896,25 +1691,6 @@ Function New-FieldListCard {
             $checkbox = $headerGrid.Children | Where-Object { $_.GetType().Name -eq "CheckBox" }
             $checkbox.Tag = "Saved"
             $checkbox.IsChecked = $false
-
-            # Clear migration-pending state on successful save.
-            # Use the pre-captured $migrationKey; fall back to a suffix scan in case of any
-            # format mismatch (e.g. card was rendered before migration populated the HashSet).
-            if ($syncHash.MigrationPendingReview -and $syncHash.MigrationPendingReview.Count -gt 0) {
-                $cleared = $syncHash.MigrationPendingReview.Remove($migrationKey)
-                if (-not $cleared) {
-                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object { $_ -like "*|$policyId" } | Select-Object -First 1
-                    if ($fallbackKey) { $cleared = $syncHash.MigrationPendingReview.Remove($fallbackKey) }
-                }
-                if ($cleared) {
-                    $card.ClearValue([System.Windows.Controls.Border]::BorderBrushProperty)
-                    $card.ClearValue([System.Windows.Controls.Border]::BorderThicknessProperty)
-                    $card.ClearValue([System.Windows.Controls.Border]::BackgroundProperty)
-                    if ($migrationBadge) { [void]$policyInfoStack.Children.Remove($migrationBadge) }
-                    if ($dismissButton) { [void]$buttonPanel.Children.Remove($dismissButton) }
-                    Update-MigrationPendingTabIndicators
-                }
-            }
         } else {
             # Remove save indicator if no data was saved
             $headerGrid = $detailsPanel.Parent.Children | Where-Object { $_.GetType().Name -eq "Grid" }
@@ -1997,27 +1773,71 @@ Function New-FieldListCard {
                 if ($FieldListDef) {
                     foreach ($field in $FieldListDef.fields)
                     {
-                        # Control names are built by New-FieldListControl as:
-                        #   {policyId}_{CardName}_{field.value}_{suffix}
-                        # Must match exactly — use $CardName + $field.value, not $inputData + $field.name.
-                        $fieldName = ($policyId.replace('.', '_') + "_" + $CardName + "_" + $field.value)
+                        $fieldName = ($policyId.replace('.', '_') + "_" + $inputData + "_" + $field.name)
 
                         if ($field.type -eq "array") {
                             # Clear list containers
                             $listContainerName = ($fieldName + "_List")
-                            $listContainer = Find-UIControlByName -parent $detailsPanel -targetName $listContainerName
+                            $listContainer = $detailsPanel.Children | ForEach-Object {
+                                if ($_ -is [System.Windows.Controls.StackPanel]) {
+                                    $arrayContainer = $_.Children | Where-Object { $_.Name -eq ($fieldName + "_" + $CardName + "_Container") }
+                                    if ($arrayContainer) {
+                                        return $arrayContainer.Children | Where-Object { $_.Name -eq $listContainerName }
+                                    }
+                                } elseif ($_ -is [System.Windows.Controls.TabControl]) {
+                                    # Search within tab control
+                                    foreach ($tabItem in $_.Items) {
+                                        if ($tabItem.Header -eq $FieldListDef.name) {
+                                            $tabContent = $tabItem.Content
+                                            $arrayContainer = $tabContent.Children | Where-Object { $_.Name -eq ($fieldName + "_" + $CardName + "_Container") }
+                                            if ($arrayContainer) {
+                                                return $arrayContainer.Children | Where-Object { $_.Name -eq $listContainerName }
+                                            }
+                                        }
+                                    }
+                                }
+                            } | Select-Object -First 1
+
                             if ($listContainer) {
                                 $listContainer.Children.Clear()
                             }
                         } elseif ($field.type -eq "boolean") {
                             # Reset checkbox
-                            $booleanCheckBox = Find-UIControlByName -parent $detailsPanel -targetName ($fieldName + "_CheckBox")
+                            $booleanFieldName = ($fieldName + "_" + $CardName + "_CheckBox")
+                            $booleanCheckBox = $detailsPanel.Children | ForEach-Object {
+                                if ($_ -is [System.Windows.Controls.StackPanel]) {
+                                    return $_.Children | Where-Object { $_.Name -eq $booleanFieldName -and $_ -is [System.Windows.Controls.CheckBox] }
+                                } elseif ($_ -is [System.Windows.Controls.TabControl]) {
+                                    # Search within tab control
+                                    foreach ($tabItem in $_.Items) {
+                                        if ($tabItem.Header -eq $FieldListDef.name) {
+                                            $tabContent = $tabItem.Content
+                                            return $tabContent.Children | Where-Object { $_.Name -eq $booleanFieldName -and $_ -is [System.Windows.Controls.CheckBox] }
+                                        }
+                                    }
+                                }
+                            } | Select-Object -First 1
+
                             if ($booleanCheckBox) {
                                 $booleanCheckBox.IsChecked = $false
                             }
                         } elseif ($field.type -eq "string") {
                             # Clear text boxes
-                            $stringTextBox = Find-UIControlByName -parent $detailsPanel -targetName ($fieldName + "_TextBox")
+                            $stringFieldName = ($fieldName + "_" + $CardName + "_TextBox")
+                            $stringTextBox = $detailsPanel.Children | ForEach-Object {
+                                if ($_ -is [System.Windows.Controls.StackPanel]) {
+                                    return $_.Children | Where-Object { $_.Name -eq $stringFieldName -and $_ -is [System.Windows.Controls.TextBox] }
+                                } elseif ($_ -is [System.Windows.Controls.TabControl]) {
+                                    # Search within tab control
+                                    foreach ($tabItem in $_.Items) {
+                                        if ($tabItem.Header -eq $FieldListDef.name) {
+                                            $tabContent = $tabItem.Content
+                                            return $tabContent.Children | Where-Object { $_.Name -eq $stringFieldName -and $_ -is [System.Windows.Controls.TextBox] }
+                                        }
+                                    }
+                                }
+                            } | Select-Object -First 1
+
                             if ($stringTextBox) {
                                 $stringTextBox.Text = ""
                             }
@@ -2035,27 +1855,6 @@ Function New-FieldListCard {
                 # For regular policies: Remove the specific policy AutoSave file
                 Remove-AutoSavePolicy -CardName $CardName -PolicyId $policyId
             }
-
-            # If this policy was migration-pending, clear that state now that it has been removed.
-            if ($syncHash.MigrationPendingReview) {
-                $cleared = $syncHash.MigrationPendingReview.Remove($migrationKey)
-                if (-not $cleared) {
-                    $fallbackKey = @($syncHash.MigrationPendingReview) | Where-Object { $_ -like "*|$policyId" } | Select-Object -First 1
-                    if ($fallbackKey) { [void]$syncHash.MigrationPendingReview.Remove($fallbackKey) }
-                }
-            }
-            # Remove orange migration styling from the card border
-            $card.ClearValue([System.Windows.Controls.Border]::BorderBrushProperty)
-            $card.ClearValue([System.Windows.Controls.Border]::BorderThicknessProperty)
-            $card.ClearValue([System.Windows.Controls.Border]::BackgroundProperty)
-            # Remove the migration badge and dismiss button if present
-            if ($migrationBadge -and $policyInfoStack -and $policyInfoStack.Children.Contains($migrationBadge)) {
-                [void]$policyInfoStack.Children.Remove($migrationBadge)
-            }
-            if ($dismissButton -and $buttonPanel -and $buttonPanel.Children.Contains($dismissButton)) {
-                [void]$buttonPanel.Children.Remove($dismissButton)
-            }
-            Update-MigrationPendingTabIndicators
 
             # Show success message
             $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.LocalePopupMessages.RemoveCardEntrySuccess -f $CardName, $policyId), $syncHash.UIConfigs.localeTitles.Success, "OK", "Information")

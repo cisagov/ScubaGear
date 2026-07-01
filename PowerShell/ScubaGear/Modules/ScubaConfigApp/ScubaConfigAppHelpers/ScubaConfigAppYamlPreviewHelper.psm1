@@ -1,4 +1,4 @@
-﻿Function Format-YamlMultilineString {
+Function Format-YamlMultilineString {
     <#
     .SYNOPSIS
     Formats a string value for YAML output, using pipe syntax for multiline strings.
@@ -51,7 +51,6 @@ Function New-YamlPreviewConvert {
     $yamlPreview = @()
     $yamlPreview += $syncHash.UIConfigs.localeYamlComments.ConfigurationFile
     $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.GeneratedOn -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
-    $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.GeneratedFor -f $syncHash.ScubaGearVersion)
     $yamlPreview += "`r"
     $yamlPreview += "`n" + $syncHash.UIConfigs.localeYamlComments.OrganizationConfiguration
     $yamlPreview += "`r"
@@ -172,7 +171,6 @@ Function New-YamlPreview {
     $yamlPreview = @()
     $yamlPreview += $syncHash.UIConfigs.localeYamlComments.ConfigurationFile
     $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.GeneratedOn -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'))
-    $yamlPreview += "`n" + ($syncHash.UIConfigs.localeYamlComments.GeneratedFor -f $syncHash.ScubaGearVersion)
     $yamlPreview += "`n`n" + $syncHash.UIConfigs.localeYamlComments.OrganizationConfiguration
 
     # Process main settings from GeneralSettings data structure instead of UI controls
@@ -363,8 +361,7 @@ Function New-YamlPreview {
                             elseif (($fieldValue -is [array] -or $fieldValue -is [System.Collections.IEnumerable]) -and $fieldValue -isnot [string] -and $fieldValue -isnot [hashtable] -and $fieldValue.Count -gt 0) {
                                 $yamlPreview += "`n    $fieldKey`:"
                                 foreach ($item in $fieldValue) {
-                                    $itemComment = if ($syncHash.IdDisplayNameCache -and $syncHash.IdDisplayNameCache[$item]) { " #$($syncHash.IdDisplayNameCache[$item])" } else { "" }
-                                    $yamlPreview += "`n      - $item$itemComment"
+                                    $yamlPreview += "`n      - $item"
                                 }
                             }
 
@@ -408,8 +405,7 @@ Function New-YamlPreview {
                                 elseif (($fieldValue -is [array] -or $fieldValue -is [System.Collections.IEnumerable]) -and $fieldValue -isnot [string] -and $fieldValue -isnot [hashtable] -and $fieldValue.Count -gt 0) {
                                     $yamlPreview += "`n    $fieldKey`:"
                                     foreach ($item in $fieldValue) {
-                                        $itemComment = if ($syncHash.IdDisplayNameCache -and $syncHash.IdDisplayNameCache[$item]) { " #$($syncHash.IdDisplayNameCache[$item])" } else { "" }
-                                        $yamlPreview += "`n      - $item$itemComment"
+                                        $yamlPreview += "`n      - $item"
                                     }
                                 }
 

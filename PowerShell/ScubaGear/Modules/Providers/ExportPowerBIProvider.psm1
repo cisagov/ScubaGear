@@ -24,7 +24,7 @@ function Export-PowerBIProvider {
     )
 
     # Initialize the tenant settings to create an empty JSON if there was an error or no license.
-    $TenantSettings = $null
+    $TenantSettingsJson = ConvertTo-Json @()
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
@@ -54,17 +54,16 @@ function Export-PowerBIProvider {
         # If successfully retrieved the tenant settings
         if ($AdminSettings.count -gt 0) {
             $TenantSettings = $AdminSettings[0].tenantSettings
+            $TenantSettingsJson = ConvertTo-Json @($TenantSettings) -Depth 10
         }
         # If there was an error retrieving the tenant settings, TryCommand already handles it so we don't need to do anything additional.
     }
     # License not found. We must mark Invoke-RestMethod as successful even if we don't call it.
     # The absence of a license is not an error and the Rego displays a no license message.
     else {
-        # $TenantSettingsJson = ConvertTo-Json @()
         $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
     }
 
-    $TenantSettingsJson = ConvertTo-Json @($TenantSettings) -Depth 10
     $LicenseFoundJson = ConvertTo-Json $LicenseFound
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
