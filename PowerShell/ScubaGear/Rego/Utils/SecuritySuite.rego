@@ -103,6 +103,8 @@ ListConfigValues(PolicyID, ListKey) := Values if {
 # Anti-malware policy helpers #
 ###############################
 
+default HighestPriorityActiveAntiMalwarePolicyName := "Default"
+
 HighestPriorityActiveAntiMalwarePolicyName := PolicyName if {
     PresetPolicyCoversAllRecipients(`(?i)Strict Preset Security Policy`)
     some Policy in input.anti_malware_policies
@@ -123,7 +125,7 @@ HighestPriorityActiveAntiMalwarePolicyName := PolicyName if {
     Rule.Priority == MinPriority
     CustomRuleCoversAllRecipients(Rule)
     PolicyName := Rule.MalwareFilterPolicy
-} else := "Default"
+}
 
 UserFriendlyPolicyName(PolicyName) := Name if {
     regex.match(`(?i)Strict Preset Security Policy`, PolicyName)
@@ -139,6 +141,8 @@ UserFriendlyPolicyName(PolicyName) := Name if {
 ##################################
 # Safe attachment policy helpers #
 ##################################
+
+default HighestPriorityActiveSafeAttachmentPolicyName := null
 
 HighestPriorityActiveSafeAttachmentPolicyName := PolicyName if {
     PresetPolicyCoversAllRecipientsATP(`(?i)Strict Preset Security Policy`)
@@ -165,7 +169,7 @@ HighestPriorityActiveSafeAttachmentPolicyName := PolicyName if {
     RuleFieldEmpty(Rule.ExceptIfSentTo)
     RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
     RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
-} else := null
+}
 
 ##############################################
 # Impersonation protection — shared helpers

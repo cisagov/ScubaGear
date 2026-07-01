@@ -39,17 +39,16 @@ PolicyCompliantForBlockClickToRun(Policy) := true if {
     count(MissingTypes) == 0
 } else := false
 
-PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
+PolicyBlockClickToRunNoncomplianceReasons contains "The common attachments filter is disabled." if {
     some Policy in input.anti_malware_policies
     Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
     Policy.EnableFileFilter != true
-    Reason := "The common attachments filter is disabled."
 }
 
 PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
+    RequiredTypes := {"exe", "cmd", "vbe"}
     some Policy in input.anti_malware_policies
     Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
-    RequiredTypes := {"exe", "cmd", "vbe"}
     MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
     count(MissingTypes) > 0
     Reason := concat("", [
@@ -97,11 +96,10 @@ if {
 # MS.SECURITYSUITE.1.2v1
 #--
 
-PolicyZAPNoncomplianceReasons contains Reason if {
+PolicyZAPNoncomplianceReasons contains "Zero-hour auto purge is disabled." if {
     some Policy in input.anti_malware_policies
     Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
     Policy.ZapEnabled != true
-    Reason := "Zero-hour auto purge is disabled."
 }
 
 SecuritySuite_1_2_Details(Status) := {
