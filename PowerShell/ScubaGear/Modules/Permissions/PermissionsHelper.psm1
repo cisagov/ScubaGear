@@ -108,7 +108,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
+        [ValidateSet('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
