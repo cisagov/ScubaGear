@@ -1,58 +1,16 @@
 {
-  "Version": "2.6.1 (build 1400)",
+  "Version": "2.4.13 (build 1205)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
   "EnableScubaRun": true,
-  "AllowScubaRunInteractive": false,
   "EnableResultReader": true,
   "MinimumProductsRequired": 1,
   "MaximumResults": 10,
   "PullOnlineBaselines": false,
   "EnablePolicyViewer": true,
-  "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json",
-  "LocalBaselineSchemaPath": "..\\..\\schemas\\ScubaBaselines.json",
-  "DefaultConfigsSchemaPath": "..\\ScubaConfig\\ScubaConfigDefaults.json",
-  "PolicyMigrationsCSVPath": "..\\..\\mappings\\scuba-baseline-policy-migrations.csv",
-  "policyMigration": {
-    "cacheFileName": "ScubaConfigApp_PolicyMigrationMap.json",
-    "csvColumns": {
-      "oldId":      "Old ID",
-      "newId":      "New ID",
-      "rationale":  "Removal Rationale"
-    },
-    "migrationTypes": {
-      "removed":    "Removed",
-      "decoupled":  "Decoupled",
-      "direct":     "Direct",
-      "versionBump":"VersionBump"
-    },
-    "versionBumpPattern": "^(?<stem>MS\\.[A-Z]+\\.\\d+\\.\\d+)v(?<ver>\\d+)$",
-    "reportMaxLinesPerSection": 15,
-    "localeReportWindow": {
-      "title":   "Legacy Policy Migration Applied",
-      "intro":   "This configuration file contained {0} legacy policy setting(s).",
-      "outro":   "Please review the updated settings before saving.",
-      "sections": {
-        "migrated": {
-          "prefix":  "MIGRATED",
-          "heading": "AUTO-MIGRATED ({0}):"
-        },
-        "decoupled": {
-          "prefix":  "DECOUPLED",
-          "heading": "NEEDS REVIEW - POLICY SPLIT ({0}):",
-          "body":    "These policies were decoupled into multiple new policies. Settings were applied to the first listed target only.\nReview and configure the remaining new policies manually in the app."
-        },
-        "dropped": {
-          "prefix":  "DROPPED",
-          "heading": "REMOVED - NO REPLACEMENT ({0}):"
-        },
-        "skipped": {
-          "prefix":  "SKIPPED"
-        }
-      }
-    }
-  },
+  "OnlineBaselineMarkdownURL": "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines",
+  "OfflineBaselineMarkdownPath": "..\\..\\baselines",
   "localeContext": {
     "Title_TextBlock": "SCuBAGear Configuration Editor",
     "SubTitle_TextBlock": "Create a configuration file for SCuBAGear exclusions, annotations, and omissions baseline controls",
@@ -102,21 +60,7 @@
     "ConfigurationViewerError": "Configuration Viewer Error",
     "ConnectionError": "Connection Error",
     "NoSelection": "No Selection",
-    "DebugWindowError": "Debug Window Error",
-    "NewSession": "New Session",
-    "ImportComplete": "Import Complete",
-    "ImportError": "Import Error",
-    "ValidationErrors": "Validation Errors",
-    "CopyComplete": "Copy Complete",
-    "NothingToCopy": "Nothing to Copy",
-    "CopyError": "Copy Error",
-    "NothingToDownload": "Nothing to Download",
-    "SaveComplete": "Save Complete",
-    "SaveError": "Save Error",
-    "CertificateStoreError": "Certificate Store Error",
-    "NoCertificates": "No Certificates",
-    "RestoreError": "Restore Error",
-    "ConfirmClose": "Confirm Close"
+    "DebugWindowError": "Debug Window Error"
   },
   "localeInfoMessages": {
     "NoPoliciesAvailable": "No policies available for this product.",
@@ -128,8 +72,7 @@
     "SelectedCertificateThumbprint": "Selected certificate thumbprint: {0}",
     "FilterApplied": "Filter applied: {0} policies visible",
     "SearchCleared": "Search criteria cleared",
-    "ScubaRunReady": "Ready to run ScubaGear {0}",
-    "PowerShellVersionRequired": "PowerShell {0} required"
+    "ScubaRunReady": "Ready to run ScubaGear {0}"
   },
   "localeErrorMessages": {
     "CertificateNotFound": "No suitable certificates found in the current user's personal certificate store.",
@@ -158,7 +101,6 @@
     "ProductSelection": "At least {0} product(s) must be selected for the configuration to be valid.",
     "ScubRunIncomplete": "Configuration incomplete - check Main tab",
     "ScubRunConfigFailed": "Failed to generate temporary configuration",
-    "ScubRunInteractiveNotAllowed": "ScubaGear cannot run interactively. Enable Application Settings in the Advanced tab and provide an App ID and Certificate Thumbprint.",
     "GraphConnectionError": "Microsoft Graph is not connected. Please check your connection and try again.",
     "PleaseSelectItem": "Please select an item.",
     "ConfigurationFileNotFound": "Configuration file not found: {0}",
@@ -168,11 +110,7 @@
     "HtmlReportNotFound": "HTML report not found in folder.",
     "FailedToOpenDebugWindow": "Failed to open debug window: {0}",
     "ConfigurationCopiedToClipboard": "Configuration copied to clipboard",
-    "FailedToCopyToClipboard": "Failed to copy to clipboard: {0}",
-    "ImportConfigFileError": "Error importing configuration file: {0}",
-    "ImportConfigError": "Error importing configuration: {0}",
-    "RestoreSessionError": "An error occurred while restoring the session: {0}",
-    "ValidationErrorsPrefix": "The following validation errors occurred: {0}"
+    "FailedToCopyToClipboard": "Failed to copy to clipboard: {0}"
   },
   "localePopupMessages": {
     "NewSessionConfirmation": "Are you sure you want to reset the session? This will clear all current selections and configurations.",
@@ -221,7 +159,6 @@
   "localeYamlComments": {
     "ConfigurationFile": "# ScubaGear Configuration File",
     "GeneratedOn": "# Generated on: {0}",
-    "GeneratedFor": "# Generated for: ScubaGear {0}",
     "OrganizationConfiguration": "# Organization Configuration",
     "ConfigurationDetails": "# Configuration Details",
     "AdvancedSettings": "# Advanced Settings",
@@ -302,9 +239,9 @@
       "showInViewer": true
     },
     {
-      "id": "SecuritySuite",
-      "name": "SecuritySuite",
-      "displayName": "Security Suite (defender)",
+      "id": "Defender",
+      "name": "Defender",
+      "displayName": "Defender (defender)",
       "supportsExclusions": true,
       "showInApp": true,
       "showInViewer": true
@@ -770,11 +707,11 @@
     },
     "SensitiveUsers": {
       "name": "Defender's Sensitive Users",
-      "value": "",
+      "value": "SensitiveUsers",
       "description": "Defines sensitive user accounts by display name and email address",
       "fields": [
         {
-          "type": "array",
+          "type": "string",
           "name": "Sensitive Users",
           "value": "SensitiveUsers",
           "description": "Each value should be a string in the form of the display name and email address separated by a semicolon.",
@@ -785,7 +722,7 @@
     },
     "PartnerDomains": {
       "name": "Partner Domains",
-      "value": "",
+      "value": "PartnerDomains",
       "description": "Defines a list of frequent partner domain names",
       "fields": [
         {
@@ -815,7 +752,7 @@
     },
     "AgencyDomains": {
       "name": "Agency Domains",
-      "value": "",
+      "value": "AgencyDomains",
       "description": "Defines a list of agency domain names that should be specified",
       "fields": [
         {
@@ -985,7 +922,7 @@
       "sensitive": false
     },
     "semicolonList": {
-      "pattern": "^[^;@]+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "pattern": "^([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,};?)+$",
       "sample": "John Doe;jdoe@example.com",
       "format": "John Doe;jdoe@example.com",
       "invalidScriptMessage": "",
@@ -1110,7 +1047,6 @@
       "windowTitle": "Select user id(s) to include:",
       "name": "Users",
       "endpoint": "/v1.0/users",
-      "directoryObjectType": "user",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
@@ -1150,7 +1086,6 @@
       "windowTitle": "Select group id(s) to include:",
       "name": "Groups",
       "endpoint": "/v1.0/groups",
-      "directoryObjectType": "group",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
@@ -1190,7 +1125,6 @@
       "windowTitle": "Select user names(s) to include:",
       "name": "Users",
       "endpoint": "/v1.0/users",
-      "directoryObjectType": "user",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
@@ -1230,7 +1164,6 @@
       "windowTitle": "Select group names(s) to include:",
       "name": "Groups",
       "endpoint": "/v1.0/groups",
-      "directoryObjectType": "group",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
@@ -1270,7 +1203,6 @@
       "windowTitle": "Select user names(s) to exclude:",
       "name": "Users",
       "endpoint": "/v1.0/users",
-      "directoryObjectType": "user",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
@@ -1310,7 +1242,6 @@
       "windowTitle": "Select group names(s) to exclude:",
       "name": "Groups",
       "endpoint": "/v1.0/groups",
-      "directoryObjectType": "group",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
@@ -1351,7 +1282,6 @@
       "windowTitle": "Select a registered Scuba service principal application:",
       "name": "Applications",
       "endpoint": "/v1.0/applications",
-      "directoryObjectType": "application",
       "queryfilterProperty": "displayName",
       "queryParameters": {
         "$select": "id,appId,displayName"

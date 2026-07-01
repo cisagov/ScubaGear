@@ -471,7 +471,16 @@ function Get-OPAFile {
 
 function Get-ExeHash {
     <#
-        .SYNOPSIS Internal
+    .SYNOPSIS
+    Computes and validates the hash of an executable file.
+    .DESCRIPTION
+    Calculates the SHA256 hash of an executable file and compares it with an expected version string.
+    .PARAMETER Filename
+    The name of the executable file to hash.
+    .PARAMETER ExpectedVersion
+    The expected version or hash value to validate against.
+    .FUNCTIONALITY
+    Internal
     #>
     param (
         [Parameter(Mandatory)]
@@ -675,8 +684,8 @@ function New-SCuBAConfig {
     This parameter is used to authenticate to the different commercial/government environments.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
-    - For M365 Government Commercial Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
-    - For M365 Government Commercial Cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Government community cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government community cloud High tenants enter the value **"gcchigh"**.
     - For M365 Department of Defense tenants enter the value **"dod"**.
     Default value is 'commercial'.
     .Parameter OPAPath

@@ -14,6 +14,7 @@
                 'ScubaConfigAppScubaRunHelper.psm1',
                 'ScubaConfigAppDynamicCardHelper.psm1',
                 'ScubaConfigAppResetHelper.psm1',
+                'ScubaConfigAppBaselineHelper.psm1',
                 'ScubaConfigAppGlobalSettingsHelper.psm1',
                 'ScubaConfigAppGraphHelper.psm1',
                 'ScubaConfigAppImportHelper.psm1',
@@ -23,8 +24,7 @@
                 'ScubaConfigAppToolTipHelper.psm1',
                 'ScubaConfigAppCommonUIHelper.psm1',
                 'ScubaConfigAppUpdateUIHelper.psm1',
-                'ScubaConfigAppYamlPreviewHelper.psm1',
-                'ScubaConfigAppSubTabHelper.psm1'
+                'ScubaConfigAppYamlPreviewHelper.psm1'
             )
 
             foreach ($helper in $expectedHelpers) {
@@ -162,6 +162,12 @@
                     'Restore-AutoSaveSettings',
                     'Clear-AutoSaveData'
                 )
+                'ScubaConfigAppBaselineHelper.psm1' = @(
+                    'Get-ScubaConfigExclusionMappingsFromMarkdown',
+                    'Update-ScubaConfigBaselineWithMarkdown',
+                    'Get-ScubaBaselinePolicy',
+                    'Get-ScubaPolicyContent'
+                )
                 'ScubaConfigAppChangeLogHelper.psm1' = @(
                     'Show-ChangelogWindow'
                 )
@@ -200,9 +206,7 @@
                 'ScubaConfigAppImportHelper.psm1' = @(
                     'Show-YamlImportProgress',
                     'Invoke-YamlImportWithProgress',
-                    'Import-YamlToDataStructures',
-                    'Get-PolicyMigrationMap',
-                    'Invoke-PolicyMigration'
+                    'Import-YamlToDataStructures'
                 )
                 'ScubaConfigAppSettingsDataHelper.psm1' = @(
                     'Set-SettingsDataForGeneralSection',
@@ -284,9 +288,6 @@
                     'Format-YamlMultilineString',
                     'New-YamlPreviewConvert',
                     'New-YamlPreview'
-                )
-                'ScubaConfigAppSubTabHelper.psm1' = @(
-                    'Initialize-ProductSubTabs'
                 )
             }
 
@@ -377,283 +378,6 @@
                 if ($content -match 'Function\s+[\w-]+') {
                     $content | Should -Match '\.SYNOPSIS|\.DESCRIPTION' -Because "Helper module '$($helperFile.Name)' should contain function documentation with SYNOPSIS or DESCRIPTION"
                 }
-            }
-        }
-    }
-
-    Context 'Policy Migration Functions' {
-        BeforeAll {
-            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'uiCfgPath')]
-            $uiCfgPath = (Resolve-Path (Join-Path $helpersPath '..\ScubaConfigApp_Control_en-US.json')).Path
-
-            Import-Module (Join-Path $helpersPath 'ScubaConfigAppDebugHelper.psm1')  -Force
-            Import-Module (Join-Path $helpersPath 'ScubaConfigAppImportHelper.psm1') -Force
-
-        }
-
-        AfterAll {
-            Remove-Module ScubaConfigAppImportHelper -Force -ErrorAction SilentlyContinue
-            Remove-Module ScubaConfigAppDebugHelper  -Force -ErrorAction SilentlyContinue
-        }
-
-        Context 'Invoke-PolicyMigration - product exclusion blocks (Pass 1)' {
-            BeforeEach {
-                InModuleScope ScubaConfigAppImportHelper -Parameters @{ cfg = $uiCfgPath } {
-                    param($cfg)
-                    $script:syncHash = [hashtable]::Synchronized(@{
-                        UIConfigPath = $cfg
-                        UIConfigs    = @{
-                            OfflineBaselineMarkdownPath = '..\..\baselines'
-                            baselineControls = @(
-                                [PSCustomObject]@{ supportsAllProducts = $true; yamlValue = 'OmitPolicy' }
-                                [PSCustomObject]@{ supportsAllProducts = $true; yamlValue = 'AnnotatePolicy' }
-                            )
-                            policyMigration = @{
-                                cacheFileName            = 'ScubaConfigApp_PolicyMigrationMap.json'
-                                csvColumns               = [PSCustomObject]@{ oldId = 'Old ID'; newId = 'New ID'; rationale = 'Removal Rationale' }
-                                migrationTypes           = [PSCustomObject]@{ removed = 'Removed'; decoupled = 'Decoupled'; direct = 'Direct'; versionBump = 'VersionBump' }
-                                reportMaxLinesPerSection = 15
-                                localeReportWindow       = [PSCustomObject]@{
-                                    title    = 'Legacy Policy Migration Applied'
-                                    intro    = 'This configuration file contained {0} legacy policy setting(s).'
-                                    outro    = 'Please review the updated settings before saving.'
-                                    sections = [PSCustomObject]@{
-                                        migrated  = [PSCustomObject]@{ prefix = 'MIGRATED';  heading = 'AUTO-MIGRATED ({0}):' }
-                                        decoupled = [PSCustomObject]@{ prefix = 'DECOUPLED'; heading = 'NEEDS REVIEW - POLICY SPLIT ({0}):'; body = 'These policies were decoupled into multiple new policies.' }
-                                        dropped   = [PSCustomObject]@{ prefix = 'DROPPED';   heading = 'REMOVED - NO REPLACEMENT ({0}):' }
-                                        skipped   = [PSCustomObject]@{ prefix = 'SKIPPED' }
-                                    }
-                                }
-                            }
-                        }
-                    })
-                }
-                Mock -ModuleName ScubaConfigAppImportHelper Get-PolicyMigrationMap {
-                    return @{
-                        'MS.DEFENDER.1.1v1' = [PSCustomObject]@{
-                            oldPolicyId = 'MS.DEFENDER.1.1v1'; oldProduct = 'Defender'
-                            newPolicyId = 'MS.SECURITYSUITE.1.1v1'; newProduct = 'SecuritySuite'
-                            allNewPolicyIds = @('MS.SECURITYSUITE.1.1v1'); migrationNote = 'Moved to SecuritySuite'
-                        }
-                        'MS.DEFENDER.1.4v1' = [PSCustomObject]@{
-                            oldPolicyId = 'MS.DEFENDER.1.4v1'; oldProduct = 'Defender'
-                            newPolicyId = 'MS.SECURITYSUITE.1.4v1'; newProduct = 'SecuritySuite'
-                            allNewPolicyIds = @('MS.SECURITYSUITE.1.4v1'); migrationNote = 'Moved to SecuritySuite'
-                        }
-                        'MS.DEFENDER.4.5v1' = [PSCustomObject]@{
-                            oldPolicyId = 'MS.DEFENDER.4.5v1'; oldProduct = 'Defender'
-                            newPolicyId = $null; newProduct = $null
-                            allNewPolicyIds = @(); migrationNote = 'Deprecated, no equivalent'
-                        }
-                    }
-                }
-            }
-
-            It 'Should migrate a Defender exclusion key to the SecuritySuite product key' {
-                $config = [ordered]@{
-                    'Defender' = [ordered]@{ 'MS.DEFENDER.1.1v1' = @{ Rationale = 'test' } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result.Keys -contains 'SecuritySuite'                             | Should -BeTrue
-                $result['SecuritySuite'].Keys -contains 'MS.SECURITYSUITE.1.1v1'  | Should -BeTrue
-                $result.Keys -contains 'Defender'                                 | Should -BeFalse
-            }
-
-            It 'Should remove the old product key when all its policies have been migrated' {
-                $config = [ordered]@{
-                    'Defender' = [ordered]@{
-                        'MS.DEFENDER.1.1v1' = @{ Rationale = 'test' }
-                        'MS.DEFENDER.1.4v1' = @{ SensitiveAccounts = @{} }
-                    }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result.Keys -contains 'Defender' | Should -BeFalse
-            }
-
-            It 'Should populate MigrationLog with a MIGRATED entry' {
-                $config = [ordered]@{
-                    'Defender' = [ordered]@{ 'MS.DEFENDER.1.1v1' = @{ Rationale = 'test' } }
-                }
-                $null = Invoke-PolicyMigration -Config $config
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog.Count | Should -BeGreaterThan 0
-                    $script:syncHash.MigrationLog[0]    | Should -Match 'MIGRATED exclusion'
-                }
-            }
-
-            It 'Should drop a Defender policy that has no migration target and log DROPPED' {
-                $config = [ordered]@{
-                    'Defender' = [ordered]@{ 'MS.DEFENDER.4.5v1' = @{ Data = 'irrelevant' } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result.Keys -contains 'SecuritySuite' | Should -BeFalse
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog[0] | Should -Match 'DROPPED'
-                }
-            }
-
-            It 'Should not overwrite an existing SecuritySuite target and log SKIPPED' {
-                $config = [ordered]@{
-                    'Defender'      = [ordered]@{ 'MS.DEFENDER.1.1v1'      = @{ Rationale = 'old value' } }
-                    'SecuritySuite' = [ordered]@{ 'MS.SECURITYSUITE.1.1v1' = @{ Rationale = 'already set' } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result['SecuritySuite']['MS.SECURITYSUITE.1.1v1']['Rationale'] | Should -Be 'already set'
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog[0] | Should -Match 'SKIPPED'
-                }
-            }
-
-            It 'Should leave non-legacy product keys untouched' {
-                $config = [ordered]@{
-                    'Aad' = [ordered]@{ 'MS.AAD.3.1v1' = @{ CapExclusions = @{} } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result.Keys -contains 'Aad'                  | Should -BeTrue
-                $result['Aad'].Keys -contains 'MS.AAD.3.1v1'  | Should -BeTrue
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog.Count | Should -Be 0
-                }
-            }
-        }
-
-        Context 'Invoke-PolicyMigration - annotation and omission keys (Pass 2)' {
-            BeforeEach {
-                InModuleScope ScubaConfigAppImportHelper -Parameters @{ cfg = $uiCfgPath } {
-                    param($cfg)
-                    $script:syncHash = [hashtable]::Synchronized(@{
-                        UIConfigPath = $cfg
-                        UIConfigs    = @{
-                            OfflineBaselineMarkdownPath = '..\..\baselines'
-                            baselineControls = @(
-                                [PSCustomObject]@{ supportsAllProducts = $true; yamlValue = 'OmitPolicy' }
-                                [PSCustomObject]@{ supportsAllProducts = $true; yamlValue = 'AnnotatePolicy' }
-                            )
-                            policyMigration = @{
-                                cacheFileName            = 'ScubaConfigApp_PolicyMigrationMap.json'
-                                csvColumns               = [PSCustomObject]@{ oldId = 'Old ID'; newId = 'New ID'; rationale = 'Removal Rationale' }
-                                migrationTypes           = [PSCustomObject]@{ removed = 'Removed'; decoupled = 'Decoupled'; direct = 'Direct'; versionBump = 'VersionBump' }
-                                reportMaxLinesPerSection = 15
-                                localeReportWindow       = [PSCustomObject]@{
-                                    title    = 'Legacy Policy Migration Applied'
-                                    intro    = 'This configuration file contained {0} legacy policy setting(s).'
-                                    outro    = 'Please review the updated settings before saving.'
-                                    sections = [PSCustomObject]@{
-                                        migrated  = [PSCustomObject]@{ prefix = 'MIGRATED';  heading = 'AUTO-MIGRATED ({0}):' }
-                                        decoupled = [PSCustomObject]@{ prefix = 'DECOUPLED'; heading = 'NEEDS REVIEW - POLICY SPLIT ({0}):'; body = 'These policies were decoupled into multiple new policies.' }
-                                        dropped   = [PSCustomObject]@{ prefix = 'DROPPED';   heading = 'REMOVED - NO REPLACEMENT ({0}):' }
-                                        skipped   = [PSCustomObject]@{ prefix = 'SKIPPED' }
-                                    }
-                                }
-                            }
-                        }
-                    })
-                }
-                Mock -ModuleName ScubaConfigAppImportHelper Get-PolicyMigrationMap {
-                    return @{
-                        'MS.DEFENDER.1.1v1' = [PSCustomObject]@{
-                            oldPolicyId = 'MS.DEFENDER.1.1v1'; oldProduct = 'Defender'
-                            newPolicyId = 'MS.SECURITYSUITE.1.1v1'; newProduct = 'SecuritySuite'
-                            allNewPolicyIds = @('MS.SECURITYSUITE.1.1v1'); migrationNote = 'Moved'
-                        }
-                        'MS.DEFENDER.6.2v1' = [PSCustomObject]@{
-                            oldPolicyId = 'MS.DEFENDER.6.2v1'; oldProduct = 'Defender'
-                            newPolicyId = $null; newProduct = $null
-                            allNewPolicyIds = @(); migrationNote = 'No replacement'
-                        }
-                    }
-                }
-            }
-
-            It 'Should remap an OmitPolicy entry from Defender to SecuritySuite' {
-                $config = [ordered]@{
-                    'OmitPolicy' = [ordered]@{ 'MS.DEFENDER.1.1v1' = @{ Rationale = 'omit' } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result['OmitPolicy'].Keys -contains 'MS.SECURITYSUITE.1.1v1' | Should -BeTrue
-                $result['OmitPolicy'].Keys -contains 'MS.DEFENDER.1.1v1'      | Should -BeFalse
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog[0] | Should -Match 'MIGRATED OmitPolicy'
-                }
-            }
-
-            It 'Should drop an OmitPolicy entry that has no migration target and log DROPPED OmitPolicy' {
-                $config = [ordered]@{
-                    'OmitPolicy' = [ordered]@{ 'MS.DEFENDER.6.2v1' = @{ Rationale = 'gone' } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result['OmitPolicy'].Count | Should -Be 0
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog[0] | Should -Match 'DROPPED OmitPolicy'
-                }
-            }
-
-            It 'Should leave AnnotatePolicy entries for non-legacy policies unchanged' {
-                $config = [ordered]@{
-                    'AnnotatePolicy' = [ordered]@{ 'MS.AAD.3.6v1' = @{ Comment = 'stays' } }
-                }
-                $result = Invoke-PolicyMigration -Config $config
-                $result['AnnotatePolicy'].Keys -contains 'MS.AAD.3.6v1' | Should -BeTrue
-                InModuleScope ScubaConfigAppImportHelper {
-                    $script:syncHash.MigrationLog.Count | Should -Be 0
-                }
-            }
-        }
-
-        Context 'Get-PolicyMigrationMap - live removedpolicies.md' {
-            BeforeEach {
-                InModuleScope ScubaConfigAppImportHelper -Parameters @{ cfg = $uiCfgPath } {
-                    param($cfg)
-                    $script:syncHash = [hashtable]::Synchronized(@{
-                        UIConfigPath = $cfg
-                        UIConfigs    = @{
-                            OfflineBaselineMarkdownPath = '..\..\baselines'
-                            PolicyMigrationsCSVPath     = '..\..\mappings\scuba-baseline-policy-migrations.csv'
-                            policyMigration             = @{
-                                cacheFileName  = 'ScubaConfigApp_PolicyMigrationMap.json'
-                                csvColumns     = [PSCustomObject]@{ oldId = 'Old ID'; newId = 'New ID'; rationale = 'Removal Rationale' }
-                                migrationTypes = [PSCustomObject]@{ removed = 'Removed'; decoupled = 'Decoupled'; direct = 'Direct'; versionBump = 'VersionBump' }
-                                reportMaxLinesPerSection = 15
-                            }
-                            products = @(
-                                [PSCustomObject]@{ id = 'Aad' }
-                                [PSCustomObject]@{ id = 'SecuritySuite' }
-                                [PSCustomObject]@{ id = 'Exo' }
-                                [PSCustomObject]@{ id = 'PowerBI' }
-                                [PSCustomObject]@{ id = 'PowerPlatform' }
-                                [PSCustomObject]@{ id = 'Sharepoint' }
-                                [PSCustomObject]@{ id = 'Teams' }
-                            )
-                        }
-                    })
-                }
-                # Remove any cache so each test reads the CSV fresh
-                $cacheFile = Join-Path $env:TEMP 'ScubaConfigApp_PolicyMigrationMap.json'
-                if (Test-Path $cacheFile) { Remove-Item $cacheFile -Force }
-            }
-
-            It 'Should return a non-empty hashtable with more than 10 entries' {
-                $map = Get-PolicyMigrationMap
-                $map       | Should -Not -BeNullOrEmpty
-                $map.Count | Should -BeGreaterThan 10
-            }
-
-            It 'Should map MS.DEFENDER.1.1v1 to MS.SECURITYSUITE.1.1v1' {
-                $map = Get-PolicyMigrationMap
-                $map.ContainsKey('MS.DEFENDER.1.1v1')  | Should -BeTrue
-                $map['MS.DEFENDER.1.1v1'].newPolicyId  | Should -Be 'MS.SECURITYSUITE.1.1v1'
-            }
-
-            It 'Should map MS.DEFENDER.4.5v1 to None (null newPolicyId)' {
-                $map = Get-PolicyMigrationMap
-                $map.ContainsKey('MS.DEFENDER.4.5v1') | Should -BeTrue
-                $map['MS.DEFENDER.4.5v1'].newPolicyId | Should -BeNullOrEmpty
-            }
-
-            It 'Should include the MS.EXO.2.2v2 to MS.EXO.2.2v3 version-bump entry' {
-                $map = Get-PolicyMigrationMap
-                $map.ContainsKey('MS.EXO.2.2v2')  | Should -BeTrue
-                $map['MS.EXO.2.2v2'].newPolicyId  | Should -Be 'MS.EXO.2.2v3'
             }
         }
     }

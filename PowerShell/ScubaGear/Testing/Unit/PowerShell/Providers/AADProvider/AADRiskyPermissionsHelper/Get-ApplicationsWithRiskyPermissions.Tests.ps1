@@ -95,7 +95,7 @@ InModuleScope AADRiskyPermissionsHelper {
         }
 
         It "excludes applications without risky permissions" {
-            # Reset to some arbitrary Id not included in RiskyPermissions.json mapping
+            # Reset to some arbitrary Id not included in RiskyAppPermissions.json mapping
             $MockApplications[1].RequiredResourceAccess[0].ResourceAccess = @(
                 [PSCustomObject]@{
                     Id = "00000000-0000-0000-0000-000000000000"
