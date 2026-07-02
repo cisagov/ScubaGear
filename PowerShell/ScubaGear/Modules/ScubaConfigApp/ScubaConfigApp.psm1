@@ -1399,9 +1399,12 @@ Function Show-SCuBABaselinePolicyViewer {
             $uiConfig = (Get-Content -Path $uiConfigPath -Raw | ConvertFrom-Json)
         }
 
-        $pullOnline = $uiConfig -and $uiConfig.PullOnlineBaselines
-        $syncHash.UIConfigs.LocalBaselineSchemaPath = if ($uiConfig -and $uiConfig.LocalBaselineSchemaPath) { $uiConfig.LocalBaselineSchemaPath } else { "..\..\schemas\ScubaBaselines.json" }
-        $SchemaBaselinePath = Join-Path $PSScriptRoot $syncHash.UIConfigs.LocalBaselineSchemaPath
+        $pullOnline = $uiConfig -and ($uiConfig.PSObject.Properties.Name -contains 'PullOnlineBaselines') -and $uiConfig.PullOnlineBaselines
+        $hasLocalSchemaPath = $uiConfig -and ($uiConfig.PSObject.Properties.Name -contains 'LocalBaselineSchemaPath') -and $uiConfig.LocalBaselineSchemaPath
+        # Use a local variable - $syncHash.UIConfigs is a PSCustomObject and assigning a new
+        # property onto it throws under StrictMode ("...cannot be found... and can be set").
+        $localSchemaPath = if ($hasLocalSchemaPath) { $uiConfig.LocalBaselineSchemaPath } else { "..\..\schemas\ScubaBaselines.json" }
+        $SchemaBaselinePath = Join-Path $PSScriptRoot $localSchemaPath
 
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
             if ($pullOnline) {

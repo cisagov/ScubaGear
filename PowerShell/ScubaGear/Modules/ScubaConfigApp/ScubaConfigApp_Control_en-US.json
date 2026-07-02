@@ -1026,6 +1026,11 @@
     }
   },
   "policyViewerSettings": {
+    "windowHeader": {
+      "windowTitle": "CISA M365 Secure Configuration Baseline Viewer",
+      "headerTitle": "CISA M365 Secure Configuration Baseline",
+      "headerSubtitle": "Security baseline policies and implementation guidance for Microsoft 365"
+    },
     "defaultContentHeaders": {
       "title": "CISA M365 Secure Configuration Baseline",
       "description": "Introduction and Key Terminology"

@@ -173,8 +173,8 @@ Function Show-ScubaBaselinePolicyHelper {
         <!-- Header -->
         <Border Grid.Row="0" Background="#2C5282" CornerRadius="8" Margin="0,0,0,16" Padding="20">
             <StackPanel Orientation="Vertical">
-                <TextBlock Text="ScubaGear Baseline Policies" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,8"/>
-                <TextBlock Text="Security baseline policies and implementation guidance for Microsoft 365"
+                <TextBlock x:Name="HeaderTitle" Text="ScubaGear Baseline Policies" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,8"/>
+                <TextBlock x:Name="HeaderSubtitle" Text="Security baseline policies and implementation guidance for Microsoft 365"
                            FontSize="14" Foreground="#E0E7FF" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
@@ -396,6 +396,16 @@ Function Show-ScubaBaselinePolicyHelper {
                 $policyDescription = $window.FindName("PolicyDescription")
                 $badgesPanel = $window.FindName("BadgesPanel")
                 $policyContent = $window.FindName("PolicyContent")
+
+                # Apply configurable window/header text from the control config (falls back to XAML defaults).
+                $windowHeaderCfg = if ($policyViewerSettings -and ($policyViewerSettings.PSObject.Properties.Name -contains 'windowHeader')) { $policyViewerSettings.windowHeader } else { $null }
+                if ($windowHeaderCfg) {
+                    $headerTitleControl    = $window.FindName("HeaderTitle")
+                    $headerSubtitleControl = $window.FindName("HeaderSubtitle")
+                    if ($windowHeaderCfg.windowTitle) { $window.Title = $windowHeaderCfg.windowTitle }
+                    if ($headerTitleControl -and $windowHeaderCfg.headerTitle) { $headerTitleControl.Text = $windowHeaderCfg.headerTitle }
+                    if ($headerSubtitleControl -and $windowHeaderCfg.headerSubtitle) { $headerSubtitleControl.Text = $windowHeaderCfg.headerSubtitle }
+                }
 
                 # Dynamic expander storage
                 $dynamicExpanders = @{}
