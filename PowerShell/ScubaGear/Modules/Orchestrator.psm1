@@ -1050,7 +1050,11 @@ function Invoke-RunRego {
                 }
             }
 
-            $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            if ($null -eq $RegoOutput -or $RegoOutput.Count -eq 0) {
+                $RegoOutputJson = '[]'
+            } else {
+                $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            }
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
             $RegoOutputJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
