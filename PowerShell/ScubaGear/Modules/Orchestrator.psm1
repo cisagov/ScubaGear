@@ -321,6 +321,15 @@ function Invoke-SCuBA {
             Write-Debug "Setting ProductName to all products because of wildcard"
         }
 
+        # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
+        if ($ProductNames.Contains('defender')){
+            if (-not $ProductNames.Contains('securitysuite')) {
+                $ProductNames = $PSBoundParameters['ProductNames'] = $ProductNames + "securitysuite"
+            }
+            $ProductNames = $PSBoundParameters['ProductNames'] = @($ProductNames | Where-Object {$_ -ne "defender" })
+            Write-Debug "Substituting defender with securitysuite in ProductNames"
+        }
+
         # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
 
@@ -725,8 +734,7 @@ function Invoke-SCuBA {
 $ArgToProd = @{
     teams = "Teams";
     exo = "EXO";
-    defender = "Defender";
-    securitysuite = "Defender";
+    securitysuite = "SecuritySuite";
     aad = "AAD";
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
@@ -736,7 +744,7 @@ $ArgToProd = @{
 $ProdToFullName = @{
     Teams = "Microsoft Teams";
     EXO = "Exchange Online";
-    Defender = "Microsoft 365 Defender";
+    SecuritySuite = "Security Suite";
     AAD = "Azure Active Directory";
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
@@ -855,7 +863,7 @@ function Invoke-ProviderList {
                             }
                             $RetVal = Export-EXOProvider @EXOProviderParams | Select-Object -Last 1
                         }
-                        {($_ -eq "defender") -or ($_ -eq "securitysuite")} {
+                        "securitysuite" {
                             if ([string]::IsNullOrEmpty($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrEmpty($ConnectionResult.EXOApiEndpoint)) {
                                 throw "Missing EXO token or endpoint for SecuritySuite provider. Re-run with -LogIn or check authentication."
                             }
@@ -1015,11 +1023,10 @@ function Invoke-RunRego {
                 $RegoFile = Join-Path -Path $ParentPath -ChildPath "Rego" -ErrorAction 'Stop'
                 $RegoFile = Join-Path -Path $RegoFile -ChildPath "$($BaselineName)Config.rego" -ErrorAction 'Stop'
                 $resolvedOPAPath = if ($ScubaConfig.OPAPath) { $ScubaConfig.OPAPath } else { [ScubaConfig]::ScubaDefault('DefaultOPAPath') }
-                $RegoPackageName = if ($Product -eq "securitysuite") { "defender" } else { $Product }
                 $params = @{
                     'InputFile' = $InputFile;
                     'RegoFile' = $RegoFile;
-                    'PackageName' = $RegoPackageName;
+                    'PackageName' = $Product;
                     'OPAPath' = $resolvedOPAPath
                 }
                 Write-ScubaLog -Message "Starting Rego evaluation: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{
@@ -1799,7 +1806,7 @@ function Get-TenantDetail {
             -AccessToken $ConnectionResult.EXOAccessToken `
             -ApiEndpoint $ConnectionResult.EXOApiEndpoint
     }
-    elseif ($ProductNames.Contains("defender") -or $ProductNames.Contains("securitysuite")) {
+    elseif ($ProductNames.Contains("securitysuite")) {
         Get-EXOTenantDetail -M365Environment $M365Environment `
             -AccessToken $ConnectionResult.EXOAccessToken `
             -ApiEndpoint $ConnectionResult.EXOApiEndpoint

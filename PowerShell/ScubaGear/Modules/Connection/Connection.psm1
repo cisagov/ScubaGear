@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -95,7 +95,7 @@ function Connect-Tenant {
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
-               {($_ -eq "exo") -or ($_ -eq "defender") -or ($_ -eq "securitysuite")} {
+               {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
                        if ($AADAuthRequired) {
                            $LimitedGraphParams = @{
@@ -416,10 +416,10 @@ function Disconnect-SCuBATenant {
    #>
    [CmdletBinding()]
    param(
-    [ValidateSet("aad", "defender", "securitysuite", "exo","powerplatform", "sharepoint", "teams", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("aad", "securitysuite", "exo","powerplatform", "sharepoint", "teams", "powerbi", IgnoreCase = $false)]
        [ValidateNotNullOrEmpty()]
        [string[]]
-    $ProductNames = @("aad", "defender", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi")
+    $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi")
    )
    $ErrorActionPreference = "SilentlyContinue"
 

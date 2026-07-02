@@ -68,6 +68,11 @@ function Export-SecuritySuiteProvider {
     $AdminAuditLogConfig = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
     $ProtectionPolicyRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
     $AntiPhishPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishPolicy")
+    $AntiPhishRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishRule")
+    $AcceptedDomains = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AcceptedDomain")
+    $ConnectionFilter = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedConnectionFilterPolicy")
+    $HostedContentFilterPolicies = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterPolicy")
+    $HostedContentFilterRules = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterRule")
 
     $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
     $ATPProtectionPolicyRuleResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
@@ -126,13 +131,18 @@ function Export-SecuritySuiteProvider {
     "dlp_compliance_policies": $DLPCompliancePolicy,
     "dlp_compliance_rules": $DLPComplianceRules,
     "anti_phish_policies": $AntiPhishPolicy,
+    "anti_phish_rules": $AntiPhishRule,
+    "accepted_domains": $AcceptedDomains,
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "conn_filter": $ConnectionFilter,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
-    "defender_successful_commands": $SuccessfulCommands,
-    "defender_unsuccessful_commands": $UnSuccessfulCommands,
+    "hosted_content_filter_policies": $HostedContentFilterPolicies,
+    "hosted_content_filter_rules": $HostedContentFilterRules,
+    "securitysuite_successful_commands": $SuccessfulCommands,
+    "securitysuite_unsuccessful_commands": $UnSuccessfulCommands,
 "@
 
     $json
