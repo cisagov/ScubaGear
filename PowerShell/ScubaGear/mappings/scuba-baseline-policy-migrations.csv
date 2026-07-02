@@ -1,4 +1,6 @@
 Old ID,Old Description,New ID,Shall or Should,Removal Rationale
+MS.AAD.3.2v1,All users SHALL be required to use multi-factor authentication (MFA) for all access to Microsoft 365 services.,MS.AAD.3.2v2,Shall,N/A
+MS.AAD.3.5v1,All users SHALL be required to use multi-factor authentication (MFA) for all access to Microsoft 365 services.,MS.AAD.3.5v2,Shall,N/A
 MS.EXO.2.2v2,An SPF policy SHALL be published for each domain that fails all non-approved senders.,MS.EXO.2.2v3,SHALL,Currently requires SPF policies to include a hard fail -all not a soft fail ~all. Relax that requirement to accept both hard and soft fails. Bumped to v3
 MS.EXO.8.1v2,A DLP solution SHALL be used.,MS.SECURITYSUITE.3.1v1,Shall,N/A
 MS.EXO.8.2v2,"The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.",MS.SECURITYSUITE.3.1v1,Shall,N/A
