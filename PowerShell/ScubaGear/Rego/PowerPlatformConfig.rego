@@ -439,17 +439,17 @@ tests contains {
     count(input.tenant_isolation) <= 0
 }
 
-# Edge case where tenant isolation has never been configured (returns null)
+# When tenant isolation has never been configured (returns null)
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.1v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-PowerPlatformTenantIsolationRest"],
-    "ActualValue": "Tenant isolation policy has never been configured",
-    "ReportDetails": ReportDetailsBoolean(false),
+    "ActualValue": "null",
+    "ReportDetails": "Tenant isolation policy has never been configured in this tenant",
     "RequirementMet": false
 } if {
     some TenantIsolation in input.tenant_isolation
-    TenantIsolation == null
+    TenantIsolation == "null"
 }
 
 #--

@@ -176,7 +176,7 @@ function Export-AADProvider {
         $PrivilegedRoles = ConvertTo-Json @()
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedRole")
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
-        $PrivilegedServicePrincipals = ConvertTo-Json @()
+        $PrivilegedServicePrincipals = @{}
     }
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
@@ -259,9 +259,8 @@ function Export-AADProvider {
     #####
     ##### End slowest functions block
 
-    # PrivilegedServicePrincipals is converted to JSON here because earlier it is used as a PowerShell object.
-    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+    # PrivilegedServicePrincipals is converted to JSON here because it is a PowerShell Hashtable.
+    $PrivilegedServicePrincipalsJson = ConvertTo-Json $PrivilegedServicePrincipals -Depth 5
 
     # This conversion to JSON needs to be last because other blocks above here rely on the $ServicePlans object in its PowerShell form.
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
@@ -275,7 +274,7 @@ function Export-AADProvider {
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
     "privileged_users": $PrivilegedUsers,
-    "privileged_service_principals": $PrivilegedServicePrincipals,
+    "privileged_service_principals": $PrivilegedServicePrincipalsJson,
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,
