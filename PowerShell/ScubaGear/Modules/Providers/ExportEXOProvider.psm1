@@ -741,14 +741,36 @@ function Get-ScubaDmarcRecord {
             -SkipDoH $SkipDoH
         $LogEntries += $Response.LogEntries
         if ($Response.Answers.Length -eq 0) {
-            # The domain does not exist. If the record is not available at the full domain
-            # level, we need to check at the organizational domain level.
-            $Labels = $d.DomainName.Split(".")
-            $Labels = $d.DomainName.Split(".")
-            $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-            $Response = Invoke-RobustDnsTxt "_dmarc.$OrgDomain" -PreferredDnsResolvers $PreferredDnsResolvers `
-                -SkipDoH $SkipDoH
-            $LogEntries += $Response.LogEntries
+            # RFC 9989 replaces Public Suffix List organizational-domain discovery with
+            # a bounded DNS Tree Walk. Keep the author-domain query above, then walk
+            # parent domains without exceeding eight total DNS queries.
+            $Labels = @($d.DomainName.Split(".") | Where-Object { $_ -ne "" })
+            $Queries = 1
+            $CandidateResponse = $null
+
+            while ($Labels.Length -gt 1 -and $Queries -lt 8) {
+                if ($Labels.Length -ge 8) {
+                    $Labels = @($Labels[($Labels.Length - 7)..($Labels.Length - 1)])
+                }
+                else {
+                    $Labels = @($Labels[1..($Labels.Length - 1)])
+                }
+
+                $TreeWalkDomain = $Labels -join "."
+                $CandidateResponse = Invoke-RobustDnsTxt "_dmarc.$TreeWalkDomain" `
+                    -PreferredDnsResolvers $PreferredDnsResolvers `
+                    -SkipDoH $SkipDoH
+                $Queries += 1
+                $LogEntries += $CandidateResponse.LogEntries
+
+                if ($CandidateResponse.Answers.Length -gt 0) {
+                    $Response = $CandidateResponse
+                }
+            }
+
+            if ($Response.Answers.Length -eq 0 -and $null -ne $CandidateResponse) {
+                $Response = $CandidateResponse
+            }
         }
 
         $DomainName = $d.DomainName

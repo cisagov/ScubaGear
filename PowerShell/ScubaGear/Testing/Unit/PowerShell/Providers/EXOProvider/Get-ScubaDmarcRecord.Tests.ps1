@@ -62,35 +62,71 @@ InModuleScope 'ExportEXOProvider' {
         }
 
         Context "When the DMARC record is unavailable at the full domain" {
-            BeforeAll {
+            BeforeEach {
+                $script:DmarcQueries = @()
+                $script:DmarcAnswerName = "_dmarc.example.com"
                 Mock -CommandName Invoke-RobustDnsTxt {
-                    Mock -CommandName Invoke-RobustDnsTxt {
-                        if ($Qname -eq "_dmarc.example.com") {
-                            @{
-                                "Answers" = @("v=DMARC1...");
-                                "Errors" = @();
-                                "NXDomain" = $false;
-                                "LogEntries" = @("some text")
-                            }
+                    $script:DmarcQueries += $Qname
+                    if ($Qname -eq $script:DmarcAnswerName) {
+                        @{
+                            "Answers" = @("v=DMARC1...");
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("some text")
                         }
-                        else {
-                            @{
-                                "Answers" = @();
-                                "Errors" = @();
-                                "NXDomain" = $false;
-                                "LogEntries" = @("Query returned NXDomain")
-                            }
+                    }
+                    else {
+                        @{
+                            "Answers" = @();
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("Query returned NXDomain")
                         }
                     }
                 }
             }
             It "Checks at the organization level" {
-                # There are two locations where DMARC records can be found. If it's not available at the
-                # full domain level, GetScubaDmarcRecord should try again at the organization domain level
+                # If no policy is available at the author domain, use the RFC 9989
+                # DNS Tree Walk to find the applicable policy.
                 $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
                     -PreferredDnsResolvers @() -SkipDoH $false
-                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 4
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+
+            It "Checks the correct policy domain for a multi-label public suffix" {
+                $script:DmarcAnswerName = "_dmarc.example.fed.us"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "subdomain.example.fed.us"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $script:DmarcQueries | Should -Contain "_dmarc.example.fed.us"
+            }
+
+            It "Limits RFC 9989 tree-walk lookups to eight total DNS queries" {
+                $script:DmarcAnswerName = "_dmarc.not-a-query.example"
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{"DomainName" = "a.b.c.d.e.f.g.h.i.j.mail.example.com"}
+                ) -PreferredDnsResolvers @() -SkipDoH $false
+
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 8
+                $Response.rdata.Length | Should -Be 0
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.c.d.e.f.g.h.i.j.mail.example.com",
+                    "_dmarc.g.h.i.j.mail.example.com",
+                    "_dmarc.h.i.j.mail.example.com",
+                    "_dmarc.i.j.mail.example.com",
+                    "_dmarc.j.mail.example.com",
+                    "_dmarc.mail.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
             }
         }
     }
