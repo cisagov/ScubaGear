@@ -87,9 +87,9 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
         It "When called with -M365Environment '<_>', records expected command names" {
             $Json = Export-SecuritySuiteProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
             $Parsed = ('{' + $Json.TrimEnd(',') + '}') | ConvertFrom-Json
-            $Parsed.defender_successful_commands | Should -Contain 'Get-AdminAuditLogConfig'
-            $Parsed.defender_successful_commands | Should -Contain 'Get-EOPProtectionPolicyRule'
-            $Parsed.defender_successful_commands | Should -Contain 'Get-AntiPhishPolicy'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AdminAuditLogConfig'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-EOPProtectionPolicyRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AntiPhishPolicy'
         }
     }
 }

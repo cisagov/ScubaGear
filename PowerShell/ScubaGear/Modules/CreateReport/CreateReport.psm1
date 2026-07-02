@@ -149,7 +149,7 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "Defender", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
+        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
@@ -820,10 +820,9 @@ function Import-SecureBaseline{
 
     foreach ($Product in $ProductNames) {
         try {
-            $BaselineProduct = if ($Product -eq "securitysuite") { "defender" } else { $Product }
             Write-Debug "Processing secure baseline markdown for $Product"
-            $Output[$BaselineProduct] = @()
-            $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$BaselineProduct.md"
+            $Output[$Product] = @()
+            $ProductPath = Join-Path -Path $BaselinePath -ChildPath "$Product.md"
             $MdLines = Get-Content -Path $ProductPath
 
             # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
@@ -837,7 +836,7 @@ function Import-SecureBaseline{
                 $Group.GroupName = $GroupName.Split(".")[1].Trim() # 1 to remove the leading space
                 $Group.Controls = @()
 
-                $IdRegex =  "#### MS\.[$($BaselineProduct.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
+                $IdRegex =  "#### MS\.[$($Product.ToUpper())]+\.$($Group.GroupNumber)\.\d+v\d+\s*$"
                 # Select-String line numbers aren't 0-indexed, hence the "-1" on the next line
                 $LineNumbers = Select-String $IdRegex $ProductPath | ForEach-Object {$_."LineNumber"-1}
 
@@ -957,7 +956,7 @@ function Import-SecureBaseline{
                     }
                 }
 
-                $Output[$BaselineProduct] += $Group
+                $Output[$Product] += $Group
             }
         }
         catch {
