@@ -18,7 +18,7 @@ jobs:
         shell: powershell
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Invoke workflow Pester tests
         run: |
           . utils/workflow/Invoke-PesterTests.ps1
@@ -33,7 +33,7 @@ jobs:
         shell: powershell
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Invoke action Pester tests
         run: |
           . utils/workflow/Invoke-PesterTests.ps1

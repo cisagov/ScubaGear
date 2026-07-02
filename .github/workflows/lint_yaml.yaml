@@ -20,10 +20,10 @@ jobs:
         shell: bash
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Config File
         run: cp Testing/Linting/MegaLinter/.mega-linter-yaml.yml .mega-linter.yml
       - name: Setup Lint File
         run: cp Testing/Linting/MegaLinter/.yamllint.yml .yamllint.yml
       - name: Lint YAML
-        uses: oxsecurity/megalinter/flavors/ci_light@v9.5.0
+        uses: oxsecurity/megalinter/flavors/ci_light@v9.6.0
