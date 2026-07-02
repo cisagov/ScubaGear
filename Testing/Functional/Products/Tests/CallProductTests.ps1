@@ -11,15 +11,23 @@ param(
     [ValidateNotNullOrEmpty()]
     [hashtable]$params,
     # The thumbprint of the cert used to access the product.
-    [Parameter(Mandatory)]
-    [ValidateNotNullOrEmpty()]
-    [string]$thumbprint
+    [Parameter(Mandatory = $false)]
+    [string]$thumbprint,
+    # Use interactive authentication instead of certificate
+    [Parameter(Mandatory = $false)]
+    [switch]$interactive
 )
 
 $testScriptDir = 'Testing/Functional/Products'
 
-# Add thumbprint to hashtable
-$params["Thumbprint"] = $thumbprint
+# Add thumbprint to hashtable only if provided
+if ($thumbprint) {
+    $params["Thumbprint"] = $thumbprint
+}
+
+if ($interactive) {
+    $params["Interactive"] = $true
+}
 
 # Create an array of test containers
 $testContainers = @()

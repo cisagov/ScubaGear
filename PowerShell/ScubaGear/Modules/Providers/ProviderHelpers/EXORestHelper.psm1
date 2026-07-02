@@ -90,6 +90,7 @@ function Get-ExchangeOnlineApiEndpoint {
 
     try {
         $FrontDoorEndpoint = "$AdminApiFrontDoorBaseUri/AdminApi/v1.0/$TenantId/EXOModuleFile"
+
         $Handler = [System.Net.Http.HttpClientHandler]::new()
         $Handler.AllowAutoRedirect = $false
         $HttpClient = [System.Net.Http.HttpClient]::new($Handler)
@@ -112,9 +113,8 @@ function Get-ExchangeOnlineApiEndpoint {
             $Prefix = $RedirectUri.Host.Split('.')[0]
             return "https://$Prefix$BackendSuffix/adminapi/beta/$TenantId/InvokeCommand"
         }
-        else {
-            return $DefaultInvokeEndpoint
-        }
+
+        return $DefaultInvokeEndpoint
     }
     catch {
         throw "Failed to resolve Exchange Online API endpoint: $($_.Exception.Message)"

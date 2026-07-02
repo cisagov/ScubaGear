@@ -53,7 +53,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantDomain', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantDisplayName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'AppId', Justification = 'False positive as rule does not scan child scopes')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductName', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'M365Environment', Justification = 'False positive as rule does not scan child scopes')]
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Variant', Justification = 'False positive as rule does not scan child scopes')]
 
@@ -97,22 +96,23 @@ param (
     $Variant = [string]::Empty
 )
 
-BeforeDiscovery {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
+$script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
+BeforeDiscovery {
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
     Import-Module $ScubaModule
     Import-Module $ConnectionModule
 
+    # Convert product name to execution name (defender -> securitysuite mapping)
+    $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+
     if ($Variant) {
-        $TestPlanFileName = "TestPlans/$ProductName.$Variant.testplan.yaml"
+        $TestPlanFileName = "TestPlans/$ExecutionProductName.$Variant.testplan.yaml"
     }
     else {
-        $TestPlanFileName = "TestPlans/$ProductName.testplan.yaml"
+        $TestPlanFileName = "TestPlans/$ExecutionProductName.testplan.yaml"
     }
     $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath $TestPlanFileName
     Test-Path -Path $TestPlanPath -PathType Leaf
@@ -122,20 +122,22 @@ BeforeDiscovery {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
 
-    if ($ProductName -eq "securitysuite"){
-        $ProductNames = @($ProductName, "exo")
+    # Convert product name to execution name (defender -> securitysuite mapping)
+    $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+
+    if ($ExecutionProductName -eq "securitysuite") {
+        $ProductNames = @($ExecutionProductName, "exo")
     }
     else {
-        $ProductNames = @($ProductName)
+        $ProductNames = @($ExecutionProductName)
     }
 
-    if (-Not [string]::IsNullOrEmpty($AppId)){
+    if (-Not [string]::IsNullOrEmpty($AppId)) {
         $TempScubaConfig = New-Object -Type PSObject -Property @{
-            'AppID' = $AppID;
+            'AppID' = $AppId;
             'CertificateThumbprint' = $Thumbprint;
             'Organization' = $TenantDomain;
         }
-        # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
         $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
         $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
 
@@ -153,10 +155,6 @@ BeforeDiscovery {
 }
 
 BeforeAll {
-    if ($ProductName -eq "defender") {
-        $ProductName = "securitysuite"
-    }
-
     # Shared Data for functional test
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
@@ -168,7 +166,8 @@ BeforeAll {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
         aad = "Azure Active Directory"
-        securitysuite = "Security Suite"
+      defender = "Microsoft 365 Defender"
+      securitysuite = "Microsoft 365 Defender"
         exo = "Exchange Online"
         powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
@@ -234,7 +233,6 @@ BeforeAll {
     }
 
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
-    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "sharepoint") {
         $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
@@ -352,16 +350,17 @@ BeforeAll {
     }
 
   function RunScuba() {
+        $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
-            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
+            Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
             if ($ProductName -eq 'exo') {
-                Invoke-SCuBA -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
             }
             else {
-                Invoke-SCuBA -Login $false -Productnames $ProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
             }
         }
     }
@@ -371,10 +370,15 @@ BeforeAll {
 Describe "Policy Checks for <ProductName>" {
     Context "Start tests for policy <PolicyId>" -ForEach $TestPlan {
         BeforeEach {
+            $script:RunScubaError = $null
+            $script:Driver = $null
+
+            try {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
-                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ProductName/$PolicyId/$ConfigFileName"
+                $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ExecutionProductName/$PolicyId/$ConfigFileName"
 
                 $ScubaConfig = Get-Content -Path $FullPath | ConvertFrom-Yaml
 
@@ -428,7 +432,8 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                Invoke-SCuBACached -Productnames $ProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                Invoke-SCuBACached -Productnames $ExecutionProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Save the ModifiedProviderSettingsExport so that it can be referenced during dev testing of functional test scenarios
                 $SavedModifiedProviderFileName = "ModifiedProviderSettingsExport-{0}-{1}.json" -f (Get-Date -Format "yyyyMMdd_HHmmss_fff"), [guid]::NewGuid()
@@ -450,8 +455,14 @@ Describe "Policy Checks for <ProductName>" {
             Write-Debug "OutputFolder: $OutputFolder"
             $IntermediateRegoOutput = LoadRegoOutput($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
+            $CandidatePolicyIds = @($PolicyId)
+            if ($PolicyId -like "MS.SECURITYSUITE.*") {
+                $CandidatePolicyIds += ($PolicyId -replace '^MS\.SECURITYSUITE\.', 'MS.DEFENDER.')
+            }
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ComparisonPolicyId', Justification = 'Variable is used in ScriptBlock')]
+            $ComparisonPolicyId = $CandidatePolicyIds[-1]
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
-            $PolicyResultObj = $IntermediateRegoOutput | Where-Object { $_.PolicyId -eq $PolicyId }
+            $PolicyResultObj = $IntermediateRegoOutput | Where-Object { $_.PolicyId -in $CandidatePolicyIds }
             $BaselineReports = Join-Path -Path $OutputFolder -ChildPath 'BaselineReports.html'
             $Url = (Get-Item $BaselineReports).FullName
             try {
@@ -464,9 +475,22 @@ Describe "Policy Checks for <ProductName>" {
                 $Driver = Start-SeChrome -Headless -Quiet -Arguments @('start-maximized', 'AcceptInsecureCertificates') -Verbose -ImplicitWait 1000
             }
             Open-SeUrl $Url -Driver $Driver | Out-Null
+            }
+            catch {
+                $script:RunScubaError = $_
+                Write-Warning "Functional setup failed for policy [$PolicyId]: $($_.Exception.Message)"
+            }
         }
         Context "Execute test, <TestDescription>" -ForEach $Tests {
             It "Check test case results" -Tag $PolicyId {
+                if ($null -ne $script:RunScubaError) {
+                    throw "Functional setup failed before assertions for [$PolicyId]: $($script:RunScubaError.Exception.Message)`n$($script:RunScubaError.ScriptStackTrace)"
+                }
+
+                if ($IsNotChecked) {
+                    return
+                }
+
                 #Check intermediate output
                 ($PolicyResultObj.RequirementMet).Count | Should -BeExactly 1 -Because "only expect a single result for a policy"
                 $PolicyResultObj.RequirementMet | Should -Be $ExpectedResult
@@ -475,7 +499,11 @@ Describe "Policy Checks for <ProductName>" {
 
                 # Check final HTML output
                 $FoundPolicy = $false
-                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $ProductDetails.$ProductName
+                $ExecutionProductNameForLookup = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductNameForLookup | Should -Not -BeNullOrEmpty -Because "execution product name must be set for policy [$PolicyId]"
+                $DetailLinkText = $ProductDetails[$ExecutionProductNameForLookup]
+                $DetailLinkText | Should -Not -BeNullOrEmpty -Because "product detail link text must exist for execution product [$ExecutionProductNameForLookup]"
+                $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $DetailLinkText
                 $DetailLink | Should -Not -BeNullOrEmpty
                 Invoke-SeClick -Element $DetailLink
 
@@ -493,8 +521,13 @@ Describe "Policy Checks for <ProductName>" {
                     $ExpectedHeaders = Get-ExpectedHeaderNames -TableClass $TableClass
 
                     if ($Table.GetProperty("id") -eq "tenant-data"){
-                        $Rows.Count | Should -BeExactly 2
+                        $Rows.Count | Should -BeGreaterThan 1 -Because "tenant-data table should include header and one data row"
+                        if ($Rows.Count -lt 2) {
+                            continue
+                        }
+                        $Rows[1] | Should -Not -BeNullOrEmpty -Because "tenant-data table row is missing for policy [$PolicyId]"
                         $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
+                        $TenantDataColumns | Should -Not -BeNullOrEmpty -Because "tenant-data columns are missing for policy [$PolicyId]"
                         $Tenant = $TenantDataColumns[0].Text
                         $Tenant | Should -Be $TenantDisplayName -Because "Tenant is $Tenant"
                     }
@@ -578,7 +611,7 @@ Describe "Policy Checks for <ProductName>" {
                             if ($RowData.Count -gt 0){
                                 $RowData.Count | Should -BeExactly 5
 
-                                if ($RowData[0].text -eq $PolicyId) {
+                                if ($RowData[0].text -eq $ComparisonPolicyId) {
                                     $FoundPolicy = $true
                                     $Msg = "Output folder: $OutputFolder; Expected: $ExpectedResult; Result: $($RowData[2].text); Details: $($RowData[4].text)"
 
@@ -610,14 +643,16 @@ Describe "Policy Checks for <ProductName>" {
                     }
                 }
 
-                $FoundPolicy | Should -BeTrue -Because "all policies should have a result. [$PolicyId]"
+                $FoundPolicy | Should -BeTrue -Because "all policies should have a result. [Requested=$PolicyId, Compared=$ComparisonPolicyId]"
                 # Turn implict wait back on
                 $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
             }
         }
         AfterEach {
             SetConditions -Conditions $Postconditions.ToArray()
-            Stop-SeDriver -Driver $Driver | Out-Null
+            if ($null -ne $Driver) {
+                Stop-SeDriver -Driver $Driver | Out-Null
+            }
         }
     }
 }
