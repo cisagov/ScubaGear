@@ -40,6 +40,28 @@ and wait for us to make the necessary corrections to ensure your code
 passes the CI checks. If you would rather make the changes yourself
 to pass the CI checks, please feel free to do so.
 
+### PR assignee responsibilities ##
+
+When you are assigned to a PR, you are responsible for moving it
+through the review lifecycle. This applies whether you are an external
+contributor who opened the PR or an internal developer shepherding the
+work.
+
+PR assignees should:
+
+1. Provide a clear, complete PR description that explains what changed,
+   which issue(s) will be closed when the PR is merged, and which
+   testing steps reviewers should follow.
+1. Assign, request, or coordinate with the appropriate reviewers for
+   the PR.
+1. Collaborate with reviewers to address feedback and resolve review
+   comments.
+1. Complete all required pre-approval, pre-merge, and post-merge
+   checklist items.
+1. After receiving approval from two reviewers, merge their own PR when
+   they have permission to do so. If you do not have merge permission,
+   coordinate with a maintainer to complete the merge.
+
 ### Quality assurance and code reviews ##
 
 All PRs will be tested, vetted, and reviewed by our team before being
