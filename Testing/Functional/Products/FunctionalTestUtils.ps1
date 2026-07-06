@@ -1105,31 +1105,31 @@ function New-HostedContentFilterRule {
 }
 
 function Remove-HostedContentFilterRule {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterRule' -Parameters @{
-    Identity = $Identity
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-HostedContentFilterRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterRule' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
 }
 
 function Remove-HostedContentFilterPolicy {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterPolicy' -Parameters @{
-    Identity = $Identity
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-HostedContentFilterPolicy')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterPolicy' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
 }
 
 function Get-HostedContentFilterRule {
@@ -1147,17 +1147,17 @@ function Get-HostedContentFilterRule {
 }
 
 function Disable-HostedContentFilterRule {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Disable-HostedContentFilterRule' -Parameters @{
-    Identity = $Identity
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Disable-HostedContentFilterRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-HostedContentFilterRule' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
 }
 
 function Enable-HostedContentFilterRule {
@@ -1187,17 +1187,17 @@ function Get-EOPProtectionPolicyRule {
 }
 
 function Disable-EOPProtectionPolicyRule {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Disable-EOPProtectionPolicyRule' -Parameters @{
-    Identity = $Identity
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Disable-EOPProtectionPolicyRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-EOPProtectionPolicyRule' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
 }
 
 function Enable-EOPProtectionPolicyRule {
@@ -1820,7 +1820,6 @@ function RemoveConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is removed.
   #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
@@ -1849,7 +1848,6 @@ function UpdateConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is updated.
   #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
