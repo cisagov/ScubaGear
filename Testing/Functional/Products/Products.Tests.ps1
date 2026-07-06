@@ -456,9 +456,6 @@ Describe "Policy Checks for <ProductName>" {
             $IntermediateRegoOutput = LoadRegoOutput($OutputFolder)
             # Search the results object for the specific requirement we are validating and ensure the results are what we expect
             $CandidatePolicyIds = @($PolicyId)
-            if ($PolicyId -like "MS.SECURITYSUITE.*") {
-                $CandidatePolicyIds += ($PolicyId -replace '^MS\.SECURITYSUITE\.', 'MS.DEFENDER.')
-            }
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ComparisonPolicyId', Justification = 'Variable is used in ScriptBlock')]
             $ComparisonPolicyId = $CandidatePolicyIds[-1]
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'PolicyResultObj', Justification = 'Variable is used in ScriptBlock')]
