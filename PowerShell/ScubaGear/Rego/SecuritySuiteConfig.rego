@@ -437,7 +437,6 @@ AppliedPolicy := CustomPolicy if {
 
 default CustomPolicySafeLinksEnabled := false
 CustomPolicySafeLinksEnabled if {
-    print(AppliedPolicy)
     some Policy in input.safe_links_policies
     Policy.Identity == AppliedPolicy
     Policy.EnableSafeLinksForEmail == true
