@@ -176,21 +176,31 @@ function Invoke-FunctionalExoCommand {
     [hashtable]$Parameters = @{}
   )
 
-  try {
-    return Invoke-EXORestMethod `
-      -CmdletName $CmdletName `
-      -ApiEndpoint $script:EXOApiEndpoint `
-      -AccessToken $script:EXOAccessToken `
-      -Parameters $Parameters
-  }
-  catch {
-    # 404 means the resource doesn't exist. For Get/Remove/Disable operations
-    # this is expected (e.g., removing a rule that was never created, or
-    # querying a preset policy that doesn't exist in the tenant).
-    if ($_.Exception.Message -match '\(404\)') {
-      return $null
+  $MaxRetries = 3
+  $RetryDelay = 5
+
+  for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+    try {
+      return Invoke-EXORestMethod `
+        -CmdletName $CmdletName `
+        -ApiEndpoint $script:EXOApiEndpoint `
+        -AccessToken $script:EXOAccessToken `
+        -Parameters $Parameters
     }
-    throw
+    catch {
+      # 404 means the resource doesn't exist - return null silently.
+      if ($_.Exception.Message -match '\(404\)') {
+        return $null
+      }
+      # 500 errors are transient EXO service issues - retry with backoff.
+      if ($_.Exception.Message -match '\(500\)' -and $Attempt -lt $MaxRetries) {
+        Write-Warning "EXO REST '$CmdletName' returned 500 (attempt $Attempt/$MaxRetries). Retrying in ${RetryDelay}s..."
+        Start-Sleep -Seconds $RetryDelay
+        $RetryDelay *= 2
+        continue
+      }
+      throw
+    }
   }
 }
 
@@ -1612,13 +1622,22 @@ function Set-NestedMemberValue {
     if ($Part -match '^(.+)\[(\d+)\]$') {
       $CollectionName = $Matches[1]
       $Index = [int]$Matches[2]
-      $Current = $Current.$CollectionName[$Index]
+      $Collection = $Current.$CollectionName
+      if ($null -eq $Collection -or $Index -ge @($Collection).Count) {
+        Write-Warning "Set-NestedMemberValue: '$CollectionName[$Index]' is out of range or null in path '$MemberPath'. Skipping update."
+        return
+      }
+      $Current = $Collection[$Index]
     }
     elseif ($null -ne (Get-Member -InputObject $Current -Name $Part -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
       $Current = $Current.$Part
     }
     else {
       throw "Member '$Part' not found while resolving path '$MemberPath'."
+    }
+    if ($null -eq $Current) {
+      Write-Warning "Set-NestedMemberValue: Resolved to null at '$Part' in path '$MemberPath'. Skipping update."
+      return
     }
   }
 
