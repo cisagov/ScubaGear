@@ -2,7 +2,7 @@ function Export-SecuritySuiteProvider {
     <#
     .Description
     Gets the Microsoft 365 Security Suite settings that are relevant
-    to the SCuBA Microsoft 365 Defender baselines using direct EXO Admin API calls.
+    to the SCuBA Security Suite baselines using direct EXO Admin API calls.
     .Functionality
     Internal
     #>
