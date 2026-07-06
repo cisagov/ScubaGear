@@ -680,10 +680,10 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.2.2v1 Compliant case - include domains I own is enabled
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllAntiPhishPolicyProperty
             Splat:
-              Updates:
-                anti_phish_policies[0].EnableOrganizationDomainsProtection: true
+              PropertyName: EnableOrganizationDomainsProtection
+              Value: true
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.2.3v1
