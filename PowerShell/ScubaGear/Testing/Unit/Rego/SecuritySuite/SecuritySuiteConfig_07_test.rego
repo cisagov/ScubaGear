@@ -18,9 +18,14 @@ test_StandardPresetPolicy_Correct if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, PASS, true) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, PASS, true) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, PASS, true) == true
+    ReportDetails7_1 := "URL comparison with a block-list is enabled via the standard or strict preset security policies."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, true) == true
+
+    ReportDetails7_2 := "Direct download links are scanned for malware via the standard or strict preset security policies."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, true) == true
+
+    ReportDetails7_3 := "User click tracking is enabled via the standard or strict preset security policies."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, true) == true
 }
 
 # Strict Preset Policy is enabled
@@ -30,9 +35,14 @@ test_StrictPresetPolicy_Correct if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, PASS, true) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, PASS, true) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, PASS, true) == true
+    ReportDetails7_1 := "URL comparison with a block-list is enabled via the standard or strict preset security policies."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, true) == true
+
+    ReportDetails7_2 := "Direct download links are scanned for malware via the standard or strict preset security policies."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, true) == true
+
+    ReportDetails7_3 := "User click tracking is enabled via the standard or strict preset security policies."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, true) == true
 }
 
 # Standard Preset Policy is enabled but SentTo field is not empty
@@ -43,9 +53,14 @@ test_StandardPresetPolicy_Incorrect_V1 if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Standard Preset Policy is enabled  but SentToMemberOf is not empty
@@ -56,9 +71,14 @@ test_StandardPresetPolicy_Incorrect_V2 if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Standard Preset Policy is enabled  but RecipientDomainIs is not empty
@@ -69,9 +89,14 @@ test_StandardPresetPolicy_Incorrect_V3 if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Strict Preset Policy is enabled but SentTo field is not empty
@@ -82,9 +107,14 @@ test_StrictPresetPolicy_Incorrect_V1 if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Strict Preset Policy is enabled but SentToMemberOf is not empty
@@ -95,9 +125,14 @@ test_StrictPresetPolicy_Incorrect_V2 if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Strict Preset Policy is enabled but RecipientDomainIs is not empty
@@ -108,20 +143,33 @@ test_StrictPresetPolicy_Incorrect_V3 if {
                                     with input.safe_links_policies as []
                                     with input.safe_links_rules as []
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Compliant Custom Policy is enabled
 test_CustomPolicy_Correct if {
-    Output := securitysuite.tests with input.protection_policy_rules as ProtectionPolicyRules
+    PresetPoliciesDisabled := json.patch(ProtectionPolicyRules, 
+                            [{"op": "replace", "path": "0/State", "value": false}, 
+                            {"op": "replace", "path": "1/State", "value": false}])
+    Output := securitysuite.tests with input.protection_policy_rules as PresetPoliciesDisabled
                                         with input.safe_links_policies as SafeLinksPolicies
                                         with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, PASS, true) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, PASS, true) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, PASS, true) == true
+    ReportDetails7_1 := "URL comparison with a block-list is enabled via policy Compliant Custom Policy."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, true) == true
+
+    ReportDetails7_2 := "Direct download links are scanned for malware via policy Compliant Custom Policy."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, true) == true
+
+    ReportDetails7_3 := "User click tracking is enabled via policy Compliant Custom Policy."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, true) == true
 }
 
 # Compliant custom policy exists but is not enabled, non-compliant custom policy is applied
@@ -134,9 +182,14 @@ test_CustomPolicy_Incorrect_V1 if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as RuleDisabled
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Compliant custom policy exists but is not the highest priority (lowest priority number) policy, non-compliant custom policy is applied
@@ -150,9 +203,14 @@ test_CustomPolicy_Incorrect_V2 if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as IncorrectRulePriority
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 
@@ -166,9 +224,14 @@ test_CustomPolicy_Incorrect_V3 if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as ModifiedRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Compliant custom policy is enabled but SentToMemberOf is not empty, non-compliant custom policy is applied
@@ -181,9 +244,14 @@ test_CustomPolicy_Incorrect_V4 if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as ModifiedRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # Compliant custom policy is enabled but RecipientDomainIs is not empty, non-compliant custom policy is applied
@@ -196,9 +264,14 @@ test_CustomPolicy_Incorrect_V5 if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as ModifiedRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
+
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
+
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 #--
 
@@ -216,7 +289,8 @@ test_SafeLinks_CustomPolicy_Incorrect_V1 if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
 }
 
 # Custom policy does not have EnableSafeLinksforTeams enabled
@@ -229,7 +303,8 @@ test_SafeLinks_CustomPolicy_Incorrect_V2 if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
 }
 
 # Custom policy does not have EnableSafeLinksforOffice enabled
@@ -242,7 +317,8 @@ test_SafeLinks_CustomPolicy_Incorrect_V3 if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
 }
 
 # Custom policy does not have EnableforInternalSenders enabled
@@ -255,7 +331,8 @@ test_SafeLinks_CustomPolicy_Incorrect_V4 if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
 }
 
 # All custom policies are disabled, built-in protection policy is applied
@@ -269,7 +346,8 @@ test_SafeLinks_BuiltInPoilicy_Incorrect if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as RuleDisabled
 
-    TestResult("MS.SECURITYSUITE.7.1v1", Output, FAIL, false) == true
+    ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+    TestResult("MS.SECURITYSUITE.7.1v1", Output, ReportDetails7_1, false) == true
 }
 #--
 
@@ -287,7 +365,8 @@ test_CheckUrls_CustomPolicy_Incorrect_V1 if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
 }
 
 # Custom policy does not have DeliverMessageAfterScan enabled
@@ -300,7 +379,8 @@ test_CheckUrls_CustomPolicy_Incorrect_V2 if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, FAIL, false) == true
+    ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, false) == true
 }
 
 # All custom policies are disabled, built-in protection policy is applied
@@ -314,7 +394,8 @@ test_CheckUrls_BuiltInPoilicy_Correct if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as RuleDisabled
 
-    TestResult("MS.SECURITYSUITE.7.2v1", Output, PASS, true) == true
+    ReportDetails7_2 := "Direct download links are scanned for malware via policy Built-In Protection Policy."
+    TestResult("MS.SECURITYSUITE.7.2v1", Output, ReportDetails7_2, true) == true
 }
 #--
 
@@ -332,7 +413,8 @@ test_TrackChecks_CustomPolicy_Incorrect if {
                                     with input.safe_links_policies as IncorrectPolicy
                                     with input.safe_links_rules as SafeLinksRules
 
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, FAIL, false) == true
+    ReportDetails7_3 := "User click tracking is NOT enabled."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, false) == true
 }
 
 # All custom policies are disabled, built-in protection policy is applied
@@ -346,6 +428,7 @@ test_TrackChecks_BuiltInPoilicy_Incorrect if {
                                     with input.safe_links_policies as SafeLinksPolicies
                                     with input.safe_links_rules as RuleDisabled
 
-    TestResult("MS.SECURITYSUITE.7.3v1", Output, PASS, true) == true
+    ReportDetails7_3 := "User click tracking is enabled via policy Built-In Protection Policy."
+    TestResult("MS.SECURITYSUITE.7.3v1", Output, ReportDetails7_3, true) == true
 }
 #--
