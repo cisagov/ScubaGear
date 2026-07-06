@@ -1709,6 +1709,37 @@ function Set-AllHostedContentFilterPolicyProperty {
   PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
 }
 
+function Set-AllProtectionPolicyRuleProperty {
+  <#
+    .SYNOPSIS
+      Sets a property on every protection policy rule in the cached provider export.
+      Handles tenants with varying numbers of rules without index errors.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $PropertyName,
+
+    [Parameter(Mandatory = $true)]
+    $Value,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  foreach ($Rule in $ProviderExport.protection_policy_rules) {
+    if ($null -ne (Get-Member -InputObject $Rule -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $Rule.$PropertyName = $Value
+    }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
 function Set-DefaultAntiPhishSensitiveUsers {
   <#
     .SYNOPSIS

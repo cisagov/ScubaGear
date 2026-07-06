@@ -1588,37 +1588,43 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.6.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have SpamAction set to AddXHeader
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].SpamAction: "AddXHeader"
-                protection_policy_rules[0].State: "Disabled"
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: SpamAction
+              Value: "AddXHeader"
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: State
+              Value: "Disabled"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy HighConfidenceSpamAction set to AddXHeader
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have HighConfidenceSpamAction set to AddXHeader
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].HighConfidenceSpamAction: "AddXHeader"
-                protection_policy_rules[0].State: "Disabled"
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: HighConfidenceSpamAction
+              Value: "AddXHeader"
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: State
+              Value: "Disabled"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy PhishSpamAction set to AddXHeader
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have PhishSpamAction set to AddXHeader
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].PhishSpamAction: "AddXHeader"
-                protection_policy_rules[0].State: "Disabled"
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: PhishSpamAction
+              Value: "AddXHeader"
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: State
+              Value: "Disabled"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default policy spam actions set to compliant values
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - All policies have compliant spam actions
         Preconditions:
           - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
@@ -1638,32 +1644,39 @@ TestPlan:
               Value: "Quarantine"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Preset scoped to single recipient does not override default
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Preset scoped to single recipient does not override non-compliant policies
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].SpamAction: "AddXHeader"
-                protection_policy_rules[0].State: "Enabled"
-                protection_policy_rules[0].SentTo: ["user@example.com"]
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: SpamAction
+              Value: "AddXHeader"
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: State
+              Value: "Enabled"
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: SentTo
+              Value: ["user@example.com"]
         Postconditions: []
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.6.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - All policies have allowed sender domains configured
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].AllowedSenderDomains: ["example.com"]
-                protection_policy_rules[0].State: "Disabled"
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: AllowedSenderDomains
+              Value: ["example.com"]
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: State
+              Value: "Disabled"
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default policy has no allowed sender domains
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - All policies have no allowed sender domains
         Preconditions:
           - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
@@ -1671,15 +1684,20 @@ TestPlan:
               Value: []
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Preset scoped to single recipient does not override default
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Preset scoped to single recipient does not override non-compliant policies
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].AllowedSenderDomains: ["example.com"]
-                protection_policy_rules[0].State: "Enabled"
-                protection_policy_rules[0].SentTo: ["user@example.com"]
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: AllowedSenderDomains
+              Value: ["example.com"]
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: State
+              Value: "Enabled"
+          - Command: Set-AllProtectionPolicyRuleProperty
+            Splat:
+              PropertyName: SentTo
+              Value: ["user@example.com"]
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.7.1v1
