@@ -1679,6 +1679,36 @@ function Set-AllAntiPhishPolicyProperty {
   PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
 }
 
+function Set-AllHostedContentFilterPolicyProperty {
+  <#
+    .SYNOPSIS
+      Sets a property on every hosted content filter policy in the cached provider export.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $PropertyName,
+
+    [Parameter(Mandatory = $true)]
+    $Value,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  foreach ($Policy in $ProviderExport.hosted_content_filter_policies) {
+    if ($null -ne (Get-Member -InputObject $Policy -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $Policy.$PropertyName = $Value
+    }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
 function Set-DefaultAntiPhishSensitiveUsers {
   <#
     .SYNOPSIS

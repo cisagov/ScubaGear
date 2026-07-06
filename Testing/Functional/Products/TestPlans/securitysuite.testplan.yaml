@@ -1616,15 +1616,22 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default policy spam actions set to compliant values
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].SpamAction: "MoveToJmf"
-                hosted_content_filter_policies[0].HighConfidenceSpamAction: "MoveToJmf"
-                hosted_content_filter_policies[0].PhishSpamAction: "Quarantine"
-                hosted_content_filter_policies[0].HighConfidencePhishAction: "Quarantine"
-                protection_policy_rules[0].State: "Disabled"
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: SpamAction
+              Value: "MoveToJmf"
+          - Command: Set-AllHostedContentFilterPolicyProperty
+            Splat:
+              PropertyName: HighConfidenceSpamAction
+              Value: "MoveToJmf"
+          - Command: Set-AllHostedContentFilterPolicyProperty
+            Splat:
+              PropertyName: PhishSpamAction
+              Value: "Quarantine"
+          - Command: Set-AllHostedContentFilterPolicyProperty
+            Splat:
+              PropertyName: HighConfidencePhishAction
+              Value: "Quarantine"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Preset scoped to single recipient does not override default
@@ -1654,12 +1661,10 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default policy has no allowed sender domains
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllHostedContentFilterPolicyProperty
             Splat:
-              Updates:
-                hosted_content_filter_policies[0].AllowedSenderDomains: []
-                protection_policy_rules[0].State: "Disabled"
-                protection_policy_rules[1].State: "Disabled"
+              PropertyName: AllowedSenderDomains
+              Value: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Preset scoped to single recipient does not override default
