@@ -445,13 +445,19 @@ CustomPolicySafeLinksEnabled if {
     Policy.EnableForInternalSenders == true
 }
 
-default SafeLinksCompliant := false
-SafeLinksCompliant if {
+default ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+ReportDetails7_1 := "URL comparison with a block-list is enabled via the standard or strict preset security policies." if {
     PresetRecipientsCovered
 }
 
-SafeLinksCompliant if {
+ReportDetails7_1 := concat("", ["URL comparison with a block-list is enabled via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
     CustomPolicySafeLinksEnabled
+}
+
+default SafeLinksCompliant := false
+SafeLinksCompliant if {
+    ReportDetails7_1 != "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
 }
 
 tests contains {
@@ -459,10 +465,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
     "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
-    "ReportDetails": ReportDetailsBoolean(SafeLinksCompliant),
-    "RequirementMet": SafeLinksCompliant 
+    "ReportDetails": ReportDetails7_1,
+    "RequirementMet": SafeLinksCompliant
 }
-#--
+#-- 
 
 #
 # MS.SECURITYSUITE.7.2v1
@@ -476,13 +482,19 @@ CustomPolicyScanURLsEnabled := true if {
     Policy.DeliverMessageAfterScan == true
 }
 
-default ScanURLsCompliant := false
-ScanURLsCompliant if {
+default ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+ReportDetails7_2 := "Direct download links are scanned for malware via the standard or strict preset security policies." if {
     PresetRecipientsCovered
 }
 
-ScanURLsCompliant if {
+ReportDetails7_2 := concat("", ["Direct download links are scanned for malware via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
     CustomPolicyScanURLsEnabled
+}
+
+default ScanURLsCompliant := false
+ScanURLsCompliant if {
+    ReportDetails7_2 != "Direct download links are NOT scanned for malware."
 }
 
 tests contains {
@@ -490,7 +502,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
     "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
-    "ReportDetails": ReportDetailsBoolean(ScanURLsCompliant),
+    "ReportDetails": ReportDetails7_2,
     "RequirementMet": ScanURLsCompliant 
 }
 #--
@@ -506,13 +518,19 @@ CustomPolicyTrackClicksEnabled := true if {
     Policy.TrackClicks == true
 }
 
-default TrackClicksCompliant := false
-TrackClicksCompliant if {
+default ReportDetails7_3 := "User click tracking is NOT enabled."
+ReportDetails7_3 := "User click tracking is enabled via the standard or strict preset security policies." if {
     PresetRecipientsCovered
 }
 
-TrackClicksCompliant if {
+ReportDetails7_3 := concat("", ["User click tracking is enabled via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
     CustomPolicyTrackClicksEnabled
+}
+
+default TrackClicksCompliant := false
+TrackClicksCompliant if {
+    ReportDetails7_3 != "User click tracking is NOT enabled."
 }
 
 tests contains {
@@ -520,7 +538,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
     "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
-    "ReportDetails": ReportDetailsBoolean(TrackClicksCompliant),
+    "ReportDetails": ReportDetails7_3,
     "RequirementMet": TrackClicksCompliant
 }
 
