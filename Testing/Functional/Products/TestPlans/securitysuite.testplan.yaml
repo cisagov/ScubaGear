@@ -2051,10 +2051,12 @@ TestPlan:
       - TestDescription: MS.SECURITYSUITE.8.1v1 Non-Compliant case - IP allow list is created
         Preconditions: []
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.8.1v1 Compliant case - IP allow list is empty
         Preconditions: []
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.8.2v1
@@ -2063,8 +2065,10 @@ TestPlan:
       - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Enabled
         Preconditions: []
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Disabled
         Preconditions: []
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: true

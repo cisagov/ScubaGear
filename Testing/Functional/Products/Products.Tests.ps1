@@ -180,7 +180,8 @@ BeforeAll {
 
     # EXO functional tests use REST-backed helper wrappers from FunctionalTestUtils.
     # Initialize EXO REST auth context for test pre/postconditions.
-    if ($ProductName -eq "exo") {
+    # SecuritySuite/Defender tests also need EXO REST for live preconditions (6.x tests).
+    if ($ProductName -in @("exo", "securitysuite", "defender")) {
         $EXOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/EXORestHelper.psm1"
         Import-Module $EXOHelperPath -Force
         $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"

@@ -1007,6 +1007,276 @@ function Set-ExoOrganizationAuditDisabled {
 }
 
 # -----------------------------------------------------------------------
+# Security Suite / Defender REST wrappers for functional test preconditions.
+# These replace ExchangeOnlineManagement cmdlets used in SecuritySuite test
+# plans (6.x, 8.x). $script:EXOApiEndpoint and $script:EXOAccessToken must
+# be set by Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+
+function Get-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-HostedContentFilterPolicy' -Parameters $Params
+}
+
+function Set-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [string]$SpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidenceSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$PhishSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidencePhishAction,
+    [Parameter(Mandatory = $false)]
+    [string]$AddXHeaderValue,
+    [Parameter(Mandatory = $false)]
+    $AllowedSenderDomains
+  )
+
+  $Params = @{ Identity = $Identity }
+  if ($PSBoundParameters.ContainsKey('SpamAction')) { $Params['SpamAction'] = $SpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidenceSpamAction')) { $Params['HighConfidenceSpamAction'] = $HighConfidenceSpamAction }
+  if ($PSBoundParameters.ContainsKey('PhishSpamAction')) { $Params['PhishSpamAction'] = $PhishSpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidencePhishAction')) { $Params['HighConfidencePhishAction'] = $HighConfidencePhishAction }
+  if ($PSBoundParameters.ContainsKey('AddXHeaderValue')) { $Params['AddXHeaderValue'] = $AddXHeaderValue }
+  if ($PSBoundParameters.ContainsKey('AllowedSenderDomains')) {
+    if ($AllowedSenderDomains -is [hashtable] -and $AllowedSenderDomains.Count -eq 0) {
+      $Params['AllowedSenderDomains'] = @()
+    } else {
+      $Params['AllowedSenderDomains'] = $AllowedSenderDomains
+    }
+  }
+  Invoke-FunctionalExoCommand -CmdletName 'Set-HostedContentFilterPolicy' -Parameters $Params | Out-Null
+}
+
+function New-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $false)]
+    [string]$SpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidenceSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$PhishSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidencePhishAction
+  )
+
+  $Params = @{ Name = $Name }
+  if ($PSBoundParameters.ContainsKey('SpamAction')) { $Params['SpamAction'] = $SpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidenceSpamAction')) { $Params['HighConfidenceSpamAction'] = $HighConfidenceSpamAction }
+  if ($PSBoundParameters.ContainsKey('PhishSpamAction')) { $Params['PhishSpamAction'] = $PhishSpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidencePhishAction')) { $Params['HighConfidencePhishAction'] = $HighConfidencePhishAction }
+  return Invoke-FunctionalExoCommand -CmdletName 'New-HostedContentFilterPolicy' -Parameters $Params
+}
+
+function New-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $true)]
+    [string]$HostedContentFilterPolicy,
+    [Parameter(Mandatory = $false)]
+    $RecipientDomainIs,
+    [Parameter(Mandatory = $false)]
+    $SentTo
+  )
+
+  $Params = @{ Name = $Name; HostedContentFilterPolicy = $HostedContentFilterPolicy }
+  if ($PSBoundParameters.ContainsKey('RecipientDomainIs')) { $Params['RecipientDomainIs'] = $RecipientDomainIs }
+  if ($PSBoundParameters.ContainsKey('SentTo')) { $Params['SentTo'] = $SentTo }
+  return Invoke-FunctionalExoCommand -CmdletName 'New-HostedContentFilterRule' -Parameters $Params
+}
+
+function Remove-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterRule' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Remove-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterPolicy' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Get-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-HostedContentFilterRule' -Parameters $Params
+}
+
+function Disable-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Disable-HostedContentFilterRule' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Enable-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Enable-HostedContentFilterRule' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Get-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-EOPProtectionPolicyRule' -Parameters $Params
+}
+
+function Disable-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Disable-EOPProtectionPolicyRule' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Enable-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Enable-EOPProtectionPolicyRule' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Set-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    $SentTo
+  )
+
+  $Params = @{ Identity = $Identity }
+  if ($PSBoundParameters.ContainsKey('SentTo')) { $Params['SentTo'] = $SentTo }
+  Invoke-FunctionalExoCommand -CmdletName 'Set-EOPProtectionPolicyRule' -Parameters $Params | Out-Null
+}
+
+function Get-Mailbox {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [int]$ResultSize
+  )
+
+  $Params = @{}
+  if ($PSBoundParameters.ContainsKey('ResultSize')) { $Params['ResultSize'] = $ResultSize }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-Mailbox' -Parameters $Params
+}
+
+function Get-AcceptedDomain {
+  [CmdletBinding()]
+  param()
+
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-AcceptedDomain'
+}
+
+function Get-HostedConnectionFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-HostedConnectionFilterPolicy' -Parameters $Params
+}
+
+function Set-HostedConnectionFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    $IPAllowList,
+    [Parameter(Mandatory = $false)]
+    $EnableSafeList
+  )
+
+  $Params = @{ Identity = $Identity }
+  if ($PSBoundParameters.ContainsKey('IPAllowList')) { $Params['IPAllowList'] = $IPAllowList }
+  if ($PSBoundParameters.ContainsKey('EnableSafeList')) { $Params['EnableSafeList'] = $EnableSafeList }
+  Invoke-FunctionalExoCommand -CmdletName 'Set-HostedConnectionFilterPolicy' -Parameters $Params | Out-Null
+}
+
+# -----------------------------------------------------------------------
 # Power Platform REST wrappers for functional test preconditions
 # These replace the removed Microsoft.PowerApps.Administration.PowerShell
 # cmdlets. $script:PPBaseUrl and $script:PPAccessToken must be set by
