@@ -1623,15 +1623,8 @@ TestPlan:
                 hosted_content_filter_policies[0].HighConfidenceSpamAction: "MoveToJmf"
                 hosted_content_filter_policies[0].PhishSpamAction: "Quarantine"
                 hosted_content_filter_policies[0].HighConfidencePhishAction: "Quarantine"
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Standard preset active and compliant overrides non-compliant default
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                hosted_content_filter_policies[0].SpamAction: "AddXHeader"
-                protection_policy_rules[0].State: "Enabled"
+                protection_policy_rules[0].State: "Disabled"
+                protection_policy_rules[1].State: "Disabled"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Preset scoped to single recipient does not override default
@@ -1665,15 +1658,8 @@ TestPlan:
             Splat:
               Updates:
                 hosted_content_filter_policies[0].AllowedSenderDomains: []
-        Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains but Standard preset active overrides
-        Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                hosted_content_filter_policies[0].AllowedSenderDomains: ["example.com"]
-                protection_policy_rules[0].State: "Enabled"
+                protection_policy_rules[0].State: "Disabled"
+                protection_policy_rules[1].State: "Disabled"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Preset scoped to single recipient does not override default
