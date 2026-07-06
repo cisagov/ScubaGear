@@ -176,11 +176,22 @@ function Invoke-FunctionalExoCommand {
     [hashtable]$Parameters = @{}
   )
 
-  return Invoke-EXORestMethod `
-    -CmdletName $CmdletName `
-    -ApiEndpoint $script:EXOApiEndpoint `
-    -AccessToken $script:EXOAccessToken `
-    -Parameters $Parameters
+  try {
+    return Invoke-EXORestMethod `
+      -CmdletName $CmdletName `
+      -ApiEndpoint $script:EXOApiEndpoint `
+      -AccessToken $script:EXOAccessToken `
+      -Parameters $Parameters
+  }
+  catch {
+    # 404 means the resource doesn't exist. For Get/Remove/Disable operations
+    # this is expected (e.g., removing a rule that was never created, or
+    # querying a preset policy that doesn't exist in the tenant).
+    if ($_.Exception.Message -match '\(404\)') {
+      return $null
+    }
+    throw
+  }
 }
 
 function Resolve-FunctionalExoIdentity {
