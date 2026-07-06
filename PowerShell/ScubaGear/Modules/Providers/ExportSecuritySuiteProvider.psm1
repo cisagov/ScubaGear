@@ -58,8 +58,6 @@ function Export-SecuritySuiteProvider {
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
     $HostedContentFilterPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
     $HostedContentFilterRules = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterRule"))
-    $AntiMalwarePolicy = ConvertTo-Json @$Tracker.TryCommand("Get-MalwareFilterPolicy")
-    $AntiMalwareRule = ConvertTo-Json @$Tracker.TryCommand("Get-MalwareFilterRule")
     $AntiMalwarePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterPolicy"))
     $AntiMalwareRule = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterRule"))
     $SafeAttachmentPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentPolicy"))
