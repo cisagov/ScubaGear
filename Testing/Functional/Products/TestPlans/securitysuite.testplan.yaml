@@ -684,6 +684,10 @@ TestPlan:
             Splat:
               PropertyName: EnableOrganizationDomainsProtection
               Value: true
+          - Command: Set-AllAntiPhishPolicyProperty
+            Splat:
+              PropertyName: TargetedDomainProtectionAction
+              Value: "Quarantine"
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.2.3v1
