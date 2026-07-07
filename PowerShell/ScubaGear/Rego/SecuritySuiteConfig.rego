@@ -432,9 +432,7 @@ LowerPriorityEnabledRuleExists(Rule) if {
 }
 
 default AppliedPolicy := "Built-In Protection Policy"
-AppliedPolicy := HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy if {
-    HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
-} 
+AppliedPolicy := HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
 
 default CustomPolicySafeLinksEnabled := false
 CustomPolicySafeLinksEnabled if {
