@@ -246,5 +246,5 @@ DlpCompliancePolicies := {
 }
 
 EndpointDlpGlobalSettings := [
-    {"Setting": "IncludePredefinedUnallowedBluetoothApps", "Value": "true"}
+    {"value": true}
 ]

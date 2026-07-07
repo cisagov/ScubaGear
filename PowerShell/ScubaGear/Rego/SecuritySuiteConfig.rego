@@ -585,13 +585,11 @@ RulesBlockingUnallowedAppsAndBluetooth contains Rule.Name if {
 }
 
 # Check tenant-level setting: Include Bluetooth apps recommended by Microsoft.
-# This is retrieved from Get-PolicyConfig via endpoint_dlp_global_settings.
+# This is retrieved from Get-PolicyConfig via endpoint_dlp_global_settings[0].value.
 default BluetoothRecommendedAppsEnabled := false
 
 BluetoothRecommendedAppsEnabled if {
-    some Setting in input.endpoint_dlp_global_settings
-    lower(Setting.Setting) == "includepredefinedunallowedbluetoothapps"
-    lower(Setting.Value) == "true"
+    lower(sprintf("%v", [input.endpoint_dlp_global_settings[0].value])) == "true"
 }
 
 # Each case is mutually exclusive by RulesBlocking/BluetoothOK boolean arguments.

@@ -81,7 +81,7 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                             "Get-PolicyConfig" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{
-                                    EndpointDlpGlobalSettings = @()
+                                    IncludePredefinedUnallowedBluetoothApps = $false
                                 }
                             }
                             "Get-ProtectionAlert" {

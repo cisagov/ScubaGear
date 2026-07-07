@@ -591,8 +591,7 @@ TestPlan:
                 defender_dlp_license: true
                 defender_license: true
                 endpoint_dlp_global_settings:
-                  - Setting: "IncludePredefinedUnallowedBluetoothApps"
-                    Value: "true"
+                  - value: true
                 dlp_compliance_policies:
                   - ExchangeLocation:
                       - All
@@ -637,8 +636,7 @@ TestPlan:
                 defender_dlp_license: true
                 defender_license: true
                 endpoint_dlp_global_settings:
-                  - Setting: "IncludePredefinedUnallowedBluetoothApps"
-                    Value: "true"
+                  - value: true
                 dlp_compliance_policies:
                   - ExchangeLocation:
                       - All

@@ -122,11 +122,15 @@ function Export-SecuritySuiteProvider {
                 }
             }
 
-            # Get-PolicyConfig returns tenant-level endpoint DLP global settings,
-            # including the Bluetooth recommended apps setting (IncludePredefinedUnallowedBluetoothApps).
+            # Get-PolicyConfig returns tenant-level endpoint DLP settings. Export the
+            # IncludePredefinedUnallowedBluetoothApps value directly because it is not
+            # always present in EndpointDlpGlobalSettings when no unallowed Bluetooth
+            # apps are defined.
             $PolicyConfigResult = @($Tracker.TryCommand("Get-PolicyConfig"))
             if ($PolicyConfigResult.Count -gt 0) {
-                $EndpointDlpGlobalSettings = ConvertTo-Json -Depth 3 @($PolicyConfigResult[0].EndpointDlpGlobalSettings | ConvertFrom-Json)
+                $EndpointDlpGlobalSettings = ConvertTo-Json @(
+                    @{ value = $PolicyConfigResult[0].IncludePredefinedUnallowedBluetoothApps }
+                )
             }
             else {
                 $EndpointDlpGlobalSettings = ConvertTo-Json @()
