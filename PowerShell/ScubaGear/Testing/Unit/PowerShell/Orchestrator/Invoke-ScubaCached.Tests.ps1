@@ -45,7 +45,8 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParams')]
                 $SplatParams = @{
-                    M365Environment = 'commercial'
+                    M365Environment    = 'commercial'
+                    SilenceBODWarnings = $true
                 }
             }
             It 'Given -ProductNames aad should not throw' {
@@ -89,8 +90,9 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParams')]
                 $SplatParams = @{
-                    M365Environment = 'commercial'
-                    ExportProvider = $false
+                    M365Environment    = 'commercial'
+                    ExportProvider     = $false
+                    SilenceBODWarnings = $true
                 }
             }
             It 'Given -ProductNames aad should not throw' {
@@ -150,6 +152,12 @@ InModuleScope Orchestrator {
             }
         }
         Context 'When modifying the CSV output files names' {
+            BeforeAll {
+                $SplatParams = @{
+                    M365Environment    = 'commercial'
+                    SilenceBODWarnings = $true
+                }
+            }
             It 'Given -OutCsvFileName should not throw' {
                 $SplatParams += @{
                     OutCsvFileName = "a"
@@ -181,6 +189,12 @@ InModuleScope Orchestrator {
         # It's possible (but not expected) that there are multiple files matching
         # "ScubaResults*.json". In this case, ScubaGear should choose the file
         # created most recently.
+            BeforeAll {
+                $SplatParams = @{
+                    M365Environment    = 'commercial'
+                    SilenceBODWarnings = $true
+                }
+            }
             It 'Should select the most recently created' {
                 Mock -CommandName Get-ChildItem { @(
                     [pscustomobject]@{"FullName"="ScubaResultsOld.json"; "CreationTime"=[DateTime]"2023-01-01"},
