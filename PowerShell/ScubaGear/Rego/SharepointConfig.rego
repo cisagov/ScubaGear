@@ -392,22 +392,26 @@ FolderAnonymousLinkTypeSetting := object.get(SPOTenant, "FolderAnonymousLinkType
 # Create Report Details string based on File link type & Folder link type
 PERMISSION_STRING := "are not limited to view for Anyone"
 
-FileAndFolderLinkPermission(1, 1) := PASS
-
-FileAndFolderLinkPermission(2, 2) := concat(": ", [
+FileAndFolderLinkPermission(FileLinkType, FolderLinkType) := PASS if {
+    FileLinkType == 1
+    FolderLinkType == 1
+} else := concat(": ", [
     FAIL,
     concat(" ", ["both files and folders", PERMISSION_STRING])
-])
-
-FileAndFolderLinkPermission(1, 2) := concat(": ", [
-    FAIL,
-    concat(" ", ["folders", PERMISSION_STRING])
-])
-
-FileAndFolderLinkPermission(2, 1) := concat(": ", [
+]) if {
+    FileLinkType != 1
+    FolderLinkType != 1
+} else := concat(": ", [
     FAIL,
     concat(" ", ["files", PERMISSION_STRING])
-])
+]) if {
+    FileLinkType != 1
+} else := concat(": ", [
+    FAIL,
+    concat(" ", ["folders", PERMISSION_STRING])
+]) if {
+    FolderLinkType != 1
+}
 
 # This policy is only applicable if external sharing is set to "Anyone"
 # Both link types must be 1 for policy to pass

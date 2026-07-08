@@ -26,7 +26,7 @@ The benefits of using the ScubaGear Service Principal module include:
 > [!IMPORTANT]
 > **This module is designed exclusively for ScubaGear.**
  - ✅ Creates a service principal for ScubaGear assessments
- - ✅ Manages ScubaGear product permissions (Entra, Exchange, SharePoint, Teams, Defender, Power Platform)
+ - ✅ Manages ScubaGear product permissions (Entra, Exchange, SharePoint, Teams, SecuritySuite, Power Platform)
  - ✅ Handles certificate management
  - ✅ Audits and fixes ScubaGear Service Principal permission issues
  - ❌ NOT for general service principal management
@@ -60,7 +60,7 @@ Before using the Service Principal module, ensure you have:
 ### Step 1: Plan Your Configuration
 
 Before creating the service principal, determine:
-- **Products to assess:** Choose from aad, exo, sharepoint, teams, defender, powerPlatform, or use `*` for all products
+- **Products to assess:** Choose from aad, exo, sharepoint, teams, securitysuite, powerplatform, or use `*` for all products
 - **Environment:** commercial, gcc, gcchigh, or dod
 - **Certificate validity:** Default 6 months, customizable up to 12 months maximum
 
@@ -71,7 +71,7 @@ Test the creation without making changes:
 ```powershell
 New-ScubaGearServicePrincipal `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerplatform', 'powerbi' `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform' `
     -WhatIf
 ```
 
@@ -88,7 +88,7 @@ Create the Service Principal:
 ```powershell
 $NewSP = New-ScubaGearServicePrincipal `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerplatform', 'powerbi' `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform' `
     -ServicePrincipalName "ScubaGear-Production"
 ```
 
@@ -141,7 +141,7 @@ Invoke-Scuba `
 $Audit = Get-ScubaGearAppPermission `
     -AppID "your-app-id-here" `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerPlatform'
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform'
 ```
 
 ### Step 2: Review Audit Results
@@ -209,7 +209,7 @@ Confirm all issues were resolved:
 Get-ScubaGearAppPermission `
     -AppID $Audit.AppID `
     -M365Environment $Audit.M365Environment `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'defender', 'powerPlatform'
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform'
 ```
 
 **Expected result:** Status should now show "No action needed."
@@ -313,7 +313,7 @@ $Audit | Set-ScubaGearAppPermission
 
 ### Scenario 2: Remove Unused Products
 
-**Example:** You no longer need Teams and Defender permissions.
+**Example:** You no longer need Teams and SecuritySuite permissions.
 
 #### Step 1: Audit with Reduced Products
 
@@ -324,7 +324,7 @@ $Audit = Get-ScubaGearAppPermission `
     -ProductNames 'aad', 'exo', 'sharepoint'
 ```
 
-**Expected result:** Shows extra permissions for Teams and Defender.
+**Expected result:** Shows extra permissions for Teams and SecuritySuite.
 
 #### Step 2: Remove Extra Permissions
 

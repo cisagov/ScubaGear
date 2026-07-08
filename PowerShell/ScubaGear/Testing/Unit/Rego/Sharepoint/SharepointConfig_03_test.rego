@@ -352,6 +352,35 @@ test_Folder_AnonymousLinkType_UsingServicePrincipal_Incorrect if {
     TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
 }
 
+test_Folder_AnonymousLinkType_ViewAndUpload_Incorrect if {
+    # FolderAnonymousLinkType value of 3 equals "View and upload"
+    Tenant := json.patch(SPOTenant, [
+        {"op": "add", "path": "SharingCapability", "value": 2},
+        {"op": "add", "path": "FileAnonymousLinkType", "value": 1},
+        {"op": "add", "path": "FolderAnonymousLinkType", "value": 3}
+    ])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := "Requirement not met: folders are not limited to view for Anyone"
+    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
+}
+
+test_File_Folder_AnonymousLinkType_ViewAndUpload_Incorrect if {
+    # FileAnonymousLinkType value of 2 equals "View, edit, and upload"
+    # FolderAnonymousLinkType value of 3 equals "View and upload"
+    Tenant := json.patch(SPOTenant, [
+        {"op": "add", "path": "SharingCapability", "value": 2},
+        {"op": "add", "path": "FileAnonymousLinkType", "value": 2},
+        {"op": "add", "path": "FolderAnonymousLinkType", "value": 3}
+    ])
+
+    Output := sharepoint.tests with input.SPO_tenant as [Tenant]
+
+    ReportDetailsString := "Requirement not met: both files and folders are not limited to view for Anyone"
+    TestResult("MS.SHAREPOINT.3.2v1", Output, ReportDetailsString, false) == true
+}
+
 test_File_Folder_AnonymousLinkType_SharingCapability_OnlyPeopleInOrg_NotApplicable if {
     PolicyId := "MS.SHAREPOINT.3.2v1"
 

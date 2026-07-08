@@ -5,4 +5,4 @@ LogIn: false
 SecuritySuite:
   MS.SECURITYSUITE.2.3v1:
     PartnerDomains:
-      - goodparnter.com
+      - not-in-tenant.example.com

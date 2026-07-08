@@ -44,7 +44,11 @@ TestPlan:
                 scuba_config.SecuritySuite:
                   MS.SECURITYSUITE.2.1v1:
                     SensitiveUsers:
-                      - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
+                      - AgencyUserGlobalReader;agencyuserglobalreader@tqhjy.onmicrosoft.com
+          - Command: Set-DefaultAntiPhishSensitiveUsers
+            Splat:
+              SensitiveUsers:
+                - AgencyUserGlobalReader;agencyuserglobalreader@tqhjy.onmicrosoft.com
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.2.1v1 Compliant case - sensitive user specified as email only
@@ -55,7 +59,11 @@ TestPlan:
                 scuba_config.SecuritySuite:
                   MS.SECURITYSUITE.2.1v1:
                     SensitiveUsers:
-                      - agencyuserglobalreader@y2zj1.onmicrosoft.com
+                      - agencyuserglobalreader@tqhjy.onmicrosoft.com
+          - Command: Set-DefaultAntiPhishSensitiveUsers
+            Splat:
+              SensitiveUsers:
+                - agencyuserglobalreader@tqhjy.onmicrosoft.com
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.2.1v1 Non-Compliant case - sensitive user not in tenant policy
@@ -83,11 +91,10 @@ TestPlan:
     Tests:
       - TestDescription: MS.SECURITYSUITE.2.2v1 Non-Compliant case - include domains I own is disabled
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllAntiPhishPolicyProperty
             Splat:
-              Updates:
-                anti_phish_policies[0].EnableOrganizationDomainsProtection: false
-                anti_phish_policies[1].EnableOrganizationDomainsProtection: false
+              PropertyName: EnableOrganizationDomainsProtection
+              Value: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.2.2v1 Compliant case - include domains I own is enabled
@@ -116,11 +123,10 @@ TestPlan:
     Tests:
       - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - partner domains removed from anti-phish policy
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-AllAntiPhishPolicyProperty
             Splat:
-              Updates:
-                anti_phish_policies[0].TargetedDomainsToProtect: []
-                anti_phish_policies[1].TargetedDomainsToProtect: []
+              PropertyName: TargetedDomainsToProtect
+              Value: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.2.3v1 Non-Compliant case - preset policy does not apply to all recipients
@@ -137,28 +143,19 @@ TestPlan:
     Tests:
       - TestDescription: MS.SECURITYSUITE.2.4v1 Compliant case - default policy has all safety tips enabled
         Preconditions:
-          - Command: UpdateProviderExport
+          - Command: Set-DefaultAntiPhishSafetyTips
             Splat:
-              Updates:
-                anti_phish_policies[0].EnableFirstContactSafetyTips: true
-                anti_phish_policies[0].EnableSimilarUsersSafetyTips: true
-                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: true
-                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: true
-                anti_phish_policies[0].EnableViaTag: true
-                anti_phish_policies[0].EnableSuspiciousSafetyTip: true
+              Enabled: true
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.2.4v1 Non-Compliant case - safety tips disabled on default policy
         Preconditions:
+          - Command: Set-DefaultAntiPhishSafetyTips
+            Splat:
+              Enabled: false
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                anti_phish_policies[0].EnableFirstContactSafetyTips: false
-                anti_phish_policies[0].EnableSimilarUsersSafetyTips: false
-                anti_phish_policies[0].EnableSimilarDomainsSafetyTips: false
-                anti_phish_policies[0].EnableUnusualCharactersSafetyTips: false
-                anti_phish_policies[0].EnableViaTag: false
-                anti_phish_policies[0].EnableSuspiciousSafetyTip: false
                 protection_policy_rules[0].SentTo: ["user@example.com"]
                 protection_policy_rules[1].SentTo: ["user@example.com"]
         Postconditions: []
@@ -286,21 +283,269 @@ TestPlan:
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.6.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy HighConfidenceSpamAction set to AddXHeader
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy PhishSpamAction set to AddXHeader
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction Quarantine"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader, Strict preset scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Strict preset scoped to a single recipient (not evaluated), Standard preset active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null -SentToMemberOf $null -RecipientDomainIs $null"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader, Standard preset scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Standard preset scoped to a single recipient (not evaluated), custom policy active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader, custom policy scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Standard preset active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Strict preset active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, custom policy active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default policy spam actions set to compliant values
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default compliant, Standard preset active and compliant
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default compliant, custom policy active and compliant
+        Preconditions:
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.6.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured, Strict preset scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Strict preset scoped to a single recipient (not evaluated), Standard preset active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured, Standard preset scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Standard preset scoped to a single recipient (not evaluated), custom policy active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured, custom policy scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Standard preset active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Strict preset active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, custom policy active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default policy has no allowed sender domains
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default and custom policy both have no allowed sender domains
+        Preconditions:
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+        ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.7.1v1
     TestDriver: RunScuba

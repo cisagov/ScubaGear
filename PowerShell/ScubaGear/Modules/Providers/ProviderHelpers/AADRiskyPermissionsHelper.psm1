@@ -1,5 +1,9 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 
+# Module-scoped cache for RiskyAppPermissions.json - loaded once, reused across all function calls
+$script:CachedRiskyAppPermissionsJson = $null
+$script:CachedPermissionLookup = $null
+
 function Get-ResourcePermissions {
     param(
         [ValidateNotNullOrEmpty()]
@@ -40,28 +44,339 @@ function Get-ResourcePermissions {
     }
 }
 
-function Get-RiskyPermissionsJson {
+function Get-RiskyAppPermissionsJson {
+    <#
+    .Description
+    Returns the parsed RiskyAppPermissions.json data. Uses a module-scoped cache to avoid
+    redundant file reads and JSON parsing on subsequent calls.
+    .Functionality
+    Internal
+    #>
     process {
-        try {
-            $PermissionsPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.FullName) -ChildPath "Permissions"
-            $PermissionsJson = Get-Content -Path (
-                Join-Path -Path (Get-Item -Path $PermissionsPath) -ChildPath "RiskyPermissions.json"
-            ) | ConvertFrom-Json
+        if ($null -eq $script:CachedRiskyAppPermissionsJson) {
+            try {
+                $SchemasPath = Join-Path -Path ((Get-Item -Path $PSScriptRoot).Parent.Parent.Parent.FullName) -ChildPath "schemas"
+                $script:CachedRiskyAppPermissionsJson = Get-Content -Path (
+                    Join-Path -Path (Get-Item -Path $SchemasPath) -ChildPath "RiskyAppPermissions.json"
+                ) -Raw | ConvertFrom-Json
+                # Build the hashtable lookup on first load
+                $script:CachedPermissionLookup = New-PermissionLookup -Json $script:CachedRiskyAppPermissionsJson
+            }
+            catch {
+                Write-Warning "An error occurred in Get-RiskyAppPermissionsJson: $($_.Exception.Message)"
+                Write-Warning "Stack trace: $($_.ScriptStackTrace)"
+                throw $_
+            }
         }
-        catch {
-            Write-Warning "An error occurred in Get-RiskyPermissionsJson: $($_.Exception.Message)"
-            Write-Warning "Stack trace: $($_.ScriptStackTrace)"
-            throw $_
-        }
-        return $PermissionsJson
+        return $script:CachedRiskyAppPermissionsJson
     }
+}
+
+function New-PermissionLookup {
+    <#
+    .Description
+    Builds a nested hashtable from the RiskyAppPermissions.json PSObject for O(1) permission lookups.
+    Structure: $Lookup[$ResourceDisplayName][$RoleType][$Guid] = @{ Name; RiskLevel }
+    .Functionality
+    Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $Json
+    )
+
+    $Lookup = @{}
+    foreach ($Resource in $Json.permissions.PSObject.Properties) {
+        $ResourceName = $Resource.Name
+        $Lookup[$ResourceName] = @{}
+        foreach ($RoleType in $Resource.Value.PSObject.Properties) {
+            # Skip internal keys like _excludedDelegated
+            if ($RoleType.Name.StartsWith("_")) { continue }
+            $RoleTypeName = $RoleType.Name
+            $Lookup[$ResourceName][$RoleTypeName] = @{}
+            foreach ($Perm in $RoleType.Value.PSObject.Properties) {
+                $Lookup[$ResourceName][$RoleTypeName][$Perm.Name] = @{
+                    Name = $Perm.Value.Name
+                    RiskLevel = $Perm.Value.RiskLevel
+                }
+            }
+        }
+    }
+    return $Lookup
+}
+
+function Get-PermissionLookup {
+    <#
+    .Description
+    Returns the cached hashtable lookup for risky permissions. Builds it if not yet initialized.
+    .Functionality
+    Internal
+    #>
+    param (
+        [PSCustomObject]
+        $RiskyAppPermissionsJson
+    )
+
+    if ($null -ne $script:CachedPermissionLookup) {
+        return $script:CachedPermissionLookup
+    }
+
+    if ($null -eq $RiskyAppPermissionsJson) {
+        $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
+    }
+
+    $script:CachedPermissionLookup = New-PermissionLookup -Json $RiskyAppPermissionsJson
+    return $script:CachedPermissionLookup
+}
+
+function New-RiskyAppResourceLookup {
+    <#
+    .Description
+    Builds a pair of hashtable lookups for risky resource mappings.
+    .Functionality
+    Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [PSCustomObject]
+        $RiskyAppPermissionsJson
+    )
+
+    $Lookup = @{
+        AppIdToName = @{}
+        NameToAppId = @{}
+    }
+
+    foreach ($Property in $RiskyAppPermissionsJson.resources.PSObject.Properties) {
+        $Lookup.AppIdToName[$Property.Name] = $Property.Value
+        $Lookup.NameToAppId[$Property.Value] = $Property.Name
+    }
+
+    return $Lookup
+}
+
+function Get-PermissionTypeDetails {
+    <#
+    .Description
+    Resolves role type, display name, and consent requirements using cached per-resource lookups.
+    .Functionality
+    Internal
+    #>
+    param (
+        [ValidateNotNullOrEmpty()]
+        [object]
+        $ResourceAppPermissions,
+
+        [ValidateNotNull()]
+        [hashtable]
+        $ResourcePermissionTypeCache,
+
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ResourceAppId,
+
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $RoleId,
+
+        [string]
+        $DeclaredRoleType
+    )
+
+    if (-not $ResourcePermissionTypeCache.ContainsKey($ResourceAppId)) {
+        $RoleLookup = @{}
+        foreach ($Role in @($ResourceAppPermissions.appRoles)) {
+            if ($null -ne $Role -and $null -ne $Role.id) {
+                $RoleLookup[[string]$Role.id] = $Role
+            }
+        }
+
+        $ScopeLookup = @{}
+        foreach ($Scope in @($ResourceAppPermissions.oauth2PermissionScopes)) {
+            if ($null -ne $Scope -and $null -ne $Scope.id) {
+                $ScopeLookup[[string]$Scope.id] = $Scope
+            }
+        }
+
+        $ResourcePermissionTypeCache[$ResourceAppId] = @{
+            AppRoles = $RoleLookup
+            Scopes   = $ScopeLookup
+        }
+    }
+
+    $PermissionTypeLookup = $ResourcePermissionTypeCache[$ResourceAppId]
+    $Role = $PermissionTypeLookup.AppRoles[$RoleId]
+    if ($null -ne $Role) {
+        return @{
+            ReadableRoleType     = "Application"
+            RoleDisplayName      = $Role.value
+            RequiresAdminConsent = $true
+        }
+    }
+
+    $Scope = $PermissionTypeLookup.Scopes[$RoleId]
+    if ($null -ne $Scope) {
+        return @{
+            ReadableRoleType     = "Delegated"
+            RoleDisplayName      = $Scope.value
+            RequiresAdminConsent = $Scope.type -eq "Admin"
+        }
+    }
+
+    # Preserve role type semantics when the caller explicitly declared delegated/role and Graph object is missing.
+    if ($DeclaredRoleType -eq "Role") {
+        return @{
+            ReadableRoleType     = "Application"
+            RoleDisplayName      = $null
+            RequiresAdminConsent = $true
+        }
+    }
+
+    return @{
+        ReadableRoleType     = "Delegated"
+        RoleDisplayName      = $null
+        RequiresAdminConsent = $false
+    }
+}
+
+function Invoke-GraphBatchRequestsWithRetry {
+    <#
+    .Description
+    Executes Graph batch requests with bounded retry/backoff for transient failures (including HTTP 429).
+    .Functionality
+    Internal
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]
+        $Requests,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
+        [string]
+        $M365Environment,
+
+        [ValidateSet("v1.0", "beta", IgnoreCase = $true)]
+        [string]
+        $ApiVersion = "beta",
+
+        [ValidateRange(0, 10)]
+        [int]
+        $MaxRetries = 6,
+
+        [ValidateRange(1, 30)]
+        [int]
+        $BaseDelaySeconds = 1
+    )
+
+    if ($null -eq $Requests -or $Requests.Count -eq 0) {
+        return @{}
+    }
+
+    $GetScubaGearPermissionsCommand = Get-Command -Name Get-ScubaGearPermissions -ErrorAction SilentlyContinue
+    $IsFallbackMode = $null -eq $GetScubaGearPermissionsCommand
+    if ($IsFallbackMode) {
+        # Unit tests can mock Invoke-MgGraphRequest without loading the permissions helper.
+        $BatchEndpoint = "/$ApiVersion/`$batch"
+        $MaxRetries = 0
+    }
+    else {
+        $EndpointRoot = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
+        $BatchEndpoint = "$EndpointRoot/$ApiVersion/`$batch"
+    }
+
+    $Completed = @{}
+    $PendingRequests = @($Requests)
+    $BatchSize = 20
+
+    for ($Attempt = 0; $Attempt -le $MaxRetries; $Attempt++) {
+        $BatchResponses = @{}
+
+        for ($Offset = 0; $Offset -lt $PendingRequests.Count; $Offset += $BatchSize) {
+            $RequestChunk = $PendingRequests[$Offset..([Math]::Min($Offset + $BatchSize - 1, $PendingRequests.Count - 1))]
+            $BatchBody = @{ requests = @($RequestChunk) }
+            $BatchResponse = Invoke-MgGraphRequest -Method POST -Uri $BatchEndpoint -Body ($BatchBody | ConvertTo-Json -Depth 10)
+
+            foreach ($Response in @($BatchResponse.responses)) {
+                $BatchResponses[[string]$Response.id] = $Response
+            }
+        }
+
+        $RetryRequests = [System.Collections.Generic.List[object]]::new()
+        $MaxRetryAfterSeconds = 0
+
+        foreach ($Request in $PendingRequests) {
+            $Response = $BatchResponses[[string]$Request.id]
+
+            if ($null -eq $Response) {
+                [void]$RetryRequests.Add($Request)
+                continue
+            }
+
+            $StatusCode = 0
+            if ($null -ne $Response.status) {
+                $StatusCode = [int]$Response.status
+            }
+
+            $IsRetriableStatus = $StatusCode -in @(429, 500, 502, 503, 504)
+
+            if ($IsRetriableStatus -and $Attempt -lt $MaxRetries) {
+                [void]$RetryRequests.Add($Request)
+
+                if ($null -ne $Response.headers) {
+                    $RetryAfterValue = $Response.headers.'Retry-After'
+                    if ($null -eq $RetryAfterValue) {
+                        $RetryAfterValue = $Response.headers.'retry-after'
+                    }
+
+                    $ParsedRetryAfter = 0
+                    if ($null -ne $RetryAfterValue -and [int]::TryParse([string]$RetryAfterValue, [ref]$ParsedRetryAfter)) {
+                        if ($ParsedRetryAfter -gt $MaxRetryAfterSeconds) {
+                            $MaxRetryAfterSeconds = $ParsedRetryAfter
+                        }
+                    }
+                }
+            }
+            else {
+                $Completed[[string]$Request.id] = $Response
+            }
+        }
+
+        if ($RetryRequests.Count -eq 0) {
+            break
+        }
+
+        $BackoffSeconds = [Math]::Pow(2, $Attempt) * $BaseDelaySeconds
+        $DelaySeconds = [Math]::Max([int][Math]::Ceiling($BackoffSeconds), $MaxRetryAfterSeconds)
+        $JitterMs = Get-Random -Minimum 100 -Maximum 900
+
+        Write-Verbose "Retrying $($RetryRequests.Count) Graph batch requests in $DelaySeconds second(s) (attempt $($Attempt + 1) of $MaxRetries)."
+        Start-Sleep -Seconds $DelaySeconds
+        Start-Sleep -Milliseconds $JitterMs
+
+        $PendingRequests = $RetryRequests.ToArray()
+    }
+
+    # Preserve non-transient failed responses so callers can log status.
+    foreach ($Request in $PendingRequests) {
+        if (-not $Completed.ContainsKey([string]$Request.id)) {
+            $Completed[[string]$Request.id] = @{
+                id = [string]$Request.id
+                status = 599
+                body = @{}
+            }
+        }
+    }
+
+    return $Completed
 }
 
 function Format-Permission {
     <#
     .Description
     Returns an API permission from either application/service principal which maps
-    to the list of permissions declared in RiskyPermissions.json
+    to the list of permissions declared in RiskyAppPermissions.json
     .Functionality
     #Internal
     ##>
@@ -94,9 +409,16 @@ function Format-Permission {
     )
     $Map = @()
     if ($null -ne $RoleType) {
-        $RiskyPermissions = $Json.permissions.$AppDisplayName.$RoleType.PSObject.Properties.Name
-        $IsRisky = $RiskyPermissions -contains $Id
-        $RiskLevel = $Json.permissions.$AppDisplayName.$RoleType.$Id.RiskLevel
+        $Lookup = Get-PermissionLookup -RiskyAppPermissionsJson $Json
+        $IsRisky = $false
+        $RiskLevel = $null
+
+        if ($Lookup.ContainsKey($AppDisplayName) -and
+            $Lookup[$AppDisplayName].ContainsKey($RoleType) -and
+            $Lookup[$AppDisplayName][$RoleType].ContainsKey($Id)) {
+            $IsRisky = $true
+            $RiskLevel = $Lookup[$AppDisplayName][$RoleType][$Id].RiskLevel
+        }
 
         $Map += [PSCustomObject]@{
             RoleId                 = $Id
@@ -221,25 +543,46 @@ function Get-ApplicationsWithRiskyPermissions {
         $M365Environment,
 
         [hashtable]
-        $ResourcePermissionCache
+        $ResourcePermissionCache,
+
+        [PSCustomObject]
+        $RiskyAppPermissionsJson
     )
     process {
         try {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
-            # Get all applications in the tenant
-            $Applications = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplication" -M365Environment $M365Environment).Value
-            $ApplicationResults = @()
+            if ($null -eq $RiskyAppPermissionsJson) {
+                $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
+            }
+            $ResourceLookup = New-RiskyAppResourceLookup -RiskyAppPermissionsJson $RiskyAppPermissionsJson
+            $ResourcePermissionTypeCache = @{}
+
+            # Get all applications in the tenant with only required fields to reduce payload size.
+            $Applications = (
+                Invoke-GraphDirectly `
+                    -commandlet "Get-MgBetaApplication" `
+                    -M365Environment $M365Environment `
+                    -QueryParams @{
+                        '$select' = "id,appId,displayName,signInAudience,requiredResourceAccess,keyCredentials,passwordCredentials"
+                    }
+            ).Value
+            $ApplicationResults = [System.Collections.Generic.List[object]]::new()
+
             foreach ($App in $Applications) {
                 # `AzureADMyOrg` = single tenant; `AzureADMultipleOrgs` = multi tenant
                 $IsMultiTenantEnabled = $false
                 if ($App.SignInAudience -eq "AzureADMultipleOrgs") { $IsMultiTenantEnabled = $true }
 
-                # Map application permissions against RiskyPermissions.json
-                $MappedPermissions = @()
+                # Map application permissions against RiskyAppPermissions.json
+                $MappedPermissions = [System.Collections.Generic.List[object]]::new()
                 foreach ($Resource in $App.RequiredResourceAccess) {
                     # Returns both application and delegated permissions
                     $Roles = $Resource.ResourceAccess
                     $ResourceAppId = $Resource.ResourceAppId
+
+                    if (-not $ResourceLookup.AppIdToName.ContainsKey($ResourceAppId)) {
+                        continue
+                    }
+                    $ResourceDisplayName = $ResourceLookup.AppIdToName[$ResourceAppId]
 
                     $ResourceAppPermissions = Get-ResourcePermissions `
                         -M365Environment $M365Environment `
@@ -256,63 +599,53 @@ function Get-ApplicationsWithRiskyPermissions {
                     # then update the value later when its compared to service principal permissions.
                     $IsAdminConsented = $false
 
-                    # Only map on resources stored in RiskyPermissions.json file
-                    if ($RiskyPermissionsJson.resources.PSObject.Properties.Name -contains $ResourceAppId) {
-                        foreach ($Role in $Roles) {
-                            $ResourceDisplayName = $RiskyPermissionsJson.resources.$ResourceAppId
-                            $RoleId = $Role.Id
+                    foreach ($Role in $Roles) {
+                        $RoleId = [string]$Role.Id
+                        $PermissionTypeDetails = Get-PermissionTypeDetails `
+                            -ResourceAppPermissions $ResourceAppPermissions `
+                            -ResourcePermissionTypeCache $ResourcePermissionTypeCache `
+                            -ResourceAppId $ResourceAppId `
+                            -RoleId $RoleId `
+                            -DeclaredRoleType $Role.Type
 
-                            if ($Role.Type -eq "Role") {
-                                $ReadableRoleType = "Application"
-                                $RoleDisplayName = ($ResourceAppPermissions.appRoles | Where-Object { $_.id -eq $RoleId }).value
-                                # Application permissions always require admin consent
-                                $RequiresAdminConsent = $true
-                            }
-                            else {
-                                $ReadableRoleType = "Delegated"
-                                $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
-                                $RoleDisplayName = $OauthScope.value
-                                # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
-                                $RequiresAdminConsent = $OauthScope.type -eq "Admin"
-                            }
-
-                            $MappedPermissions += Format-Permission `
-                                -Json $RiskyPermissionsJson `
+                        [void]$MappedPermissions.AddRange(@(
+                            Format-Permission `
+                                -Json $RiskyAppPermissionsJson `
                                 -AppDisplayName $ResourceDisplayName `
                                 -Id $RoleId `
-                                -RoleType $ReadableRoleType `
-                                -RoleDisplayName $RoleDisplayName `
+                                -RoleType $PermissionTypeDetails.ReadableRoleType `
+                                -RoleDisplayName $PermissionTypeDetails.RoleDisplayName `
                                 -IsAdminConsented $IsAdminConsented `
-                                -RequiresAdminConsent $RequiresAdminConsent
-                        }
+                                -RequiresAdminConsent $PermissionTypeDetails.RequiresAdminConsent
+                        ))
                     }
-                }
-
-                # Get the application credentials via Invoke-GraphDirectly
-                $FederatedCredentials = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplicationFederatedIdentityCredential" -M365Environment $M365Environment -Id $App.Id).Value
-                $FederatedCredentialsResults = @()
-
-                if ($FederatedCredentials -is [System.Collections.IEnumerable] -and $FederatedCredentials.Count -gt 0) {
-                    foreach ($FederatedCredential in $FederatedCredentials) {
-                        $FederatedCredentialsResults += [PSCustomObject]@{
-                            Id          = $FederatedCredential.Id
-                            Name        = $FederatedCredential.Name
-                            Description = $FederatedCredential.Description
-                            Issuer      = $FederatedCredential.Issuer
-                            Subject     = $FederatedCredential.Subject
-                            Audiences   = $FederatedCredential.Audiences | Out-String
-                        }
-                    }
-                }
-                else {
-                    $FederatedCredentialsResults = $null
                 }
 
                 $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
 
                 # Exclude applications without risky permissions
                 if ($RiskyPermissions.Count -gt 0) {
-                    $ApplicationResults += [PSCustomObject]@{
+                    # Fetch federated credentials only for applications that are confirmed risky.
+                    $FederatedCredentials = (Invoke-GraphDirectly -commandlet "Get-MgBetaApplicationFederatedIdentityCredential" -M365Environment $M365Environment -Id $App.Id).Value
+                    $FederatedCredentialsResults = @()
+
+                    if ($FederatedCredentials -is [System.Collections.IEnumerable] -and $FederatedCredentials.Count -gt 0) {
+                        foreach ($FederatedCredential in $FederatedCredentials) {
+                            $FederatedCredentialsResults += [PSCustomObject]@{
+                                Id          = $FederatedCredential.Id
+                                Name        = $FederatedCredential.Name
+                                Description = $FederatedCredential.Description
+                                Issuer      = $FederatedCredential.Issuer
+                                Subject     = $FederatedCredential.Subject
+                                Audiences   = $FederatedCredential.Audiences | Out-String
+                            }
+                        }
+                    }
+                    else {
+                        $FederatedCredentialsResults = $null
+                    }
+
+                    [void]$ApplicationResults.Add([PSCustomObject]@{
                         ObjectId             = $App.Id
                         AppId                = $App.AppId
                         DisplayName          = $App.DisplayName
@@ -322,8 +655,8 @@ function Get-ApplicationsWithRiskyPermissions {
                         KeyCredentials       = Format-Credentials -AccessKeys $App.KeyCredentials -IsFromApplication $true
                         PasswordCredentials  = Format-Credentials -AccessKeys $App.PasswordCredentials -IsFromApplication $true
                         FederatedCredentials = Format-Credentials -AccessKeys $FederatedCredentialsResults -IsFromApplication $true -IsFederated
-                        Permissions          = $MappedPermissions
-                    }
+                        Permissions          = $MappedPermissions.ToArray()
+                    })
                 }
             }
         } catch {
@@ -331,7 +664,7 @@ function Get-ApplicationsWithRiskyPermissions {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        return $ApplicationResults
+        return $ApplicationResults.ToArray()
     }
 }
 
@@ -349,139 +682,118 @@ function Get-ServicePrincipalsWithRiskyPermissions {
         $M365Environment,
 
         [hashtable]
-        $ResourcePermissionCache
+        $ResourcePermissionCache,
+
+        [PSCustomObject]
+        $RiskyAppPermissionsJson
     )
     process {
         try {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
-            $ServicePrincipalResults = @()
-            # Get all service principals
-            $ServicePrincipals = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipal" -M365Environment $M365Environment).Value
+            if ($null -eq $RiskyAppPermissionsJson) {
+                $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
+            }
+            $ServicePrincipalResults = [System.Collections.Generic.List[object]]::new()
+            $ResourceLookup = New-RiskyAppResourceLookup -RiskyAppPermissionsJson $RiskyAppPermissionsJson
+            $ResourcePermissionTypeCache = @{}
 
-            # Prepare service principal IDs for batch processing
-            $ServicePrincipalIds = $ServicePrincipals.Id
+            # Get all service principals with only required fields to reduce payload size.
+            $ServicePrincipals = (
+                Invoke-GraphDirectly `
+                    -commandlet "Get-MgBetaServicePrincipal" `
+                    -M365Environment $M365Environment `
+                    -QueryParams @{
+                        '$select' = "id,appId,displayName,signInAudience,keyCredentials,passwordCredentials,federatedIdentityCredentials,appOwnerOrganizationId"
+                    }
+            ).Value
 
-            # Split the service principal IDs into chunks of 20
-            $Chunks = [System.Collections.Generic.List[System.Object]]::new()
-            $ChunkSize = 20
-            for ($i = 0; $i -lt $ServicePrincipalIds.Count; $i += $ChunkSize) {
-                $Chunks.Add($ServicePrincipalIds[$i..([math]::Min($i + $ChunkSize - 1, $ServicePrincipalIds.Count - 1))])
+            $ServicePrincipalById = @{}
+            foreach ($ServicePrincipal in @($ServicePrincipals)) {
+                $ServicePrincipalById[[string]$ServicePrincipal.Id] = $ServicePrincipal
             }
 
-            $endpoint = '/beta/$batch'
-            $endpoint = (Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint) + $endpoint
-
-            # Process each chunk
-            foreach ($Chunk in $Chunks) {
-                $BatchBody = @{
-                    Requests = @()
-                }
-
-                foreach ($ServicePrincipalId in $Chunk) {
-                    $BatchBody.Requests += @{
-                        id     = $ServicePrincipalId
+            $BatchRequests = @(
+                foreach ($ServicePrincipalId in @($ServicePrincipals.Id)) {
+                    @{
+                        id = [string]$ServicePrincipalId
                         method = "GET"
-                        url    = "/servicePrincipals/$ServicePrincipalId/appRoleAssignments"
+                        url = "/servicePrincipals/$ServicePrincipalId/appRoleAssignments?`$select=appRoleId,resourceDisplayName"
                     }
                 }
+            )
+            $BatchResponses = Invoke-GraphBatchRequestsWithRetry -Requests $BatchRequests -M365Environment $M365Environment -ApiVersion "beta"
 
-                # Send the batch request
-                $Response = Invoke-MgGraphRequest -Method POST -Uri $endpoint -Body (
-                    $BatchBody | ConvertTo-Json -Depth 5
-                )
+            foreach ($ServicePrincipalId in @($ServicePrincipals.Id)) {
+                $Result = $BatchResponses[[string]$ServicePrincipalId]
+                $ServicePrincipal = $ServicePrincipalById[[string]$ServicePrincipalId]
+                if ($null -eq $ServicePrincipal) {
+                    continue
+                }
 
-                # Check the response
-                if ($Response.responses) {
-                    foreach ($Result in $Response.responses) {
-                        $ServicePrincipalId = $Result.id
-                        $ServicePrincipal = $ServicePrincipals | Where-Object { $_.Id -eq $ServicePrincipalId }
-                        $MappedPermissions = @()
+                $MappedPermissions = [System.Collections.Generic.List[object]]::new()
+                if ($null -ne $Result -and [int]$Result.status -eq 200 -and $null -ne $Result.body) {
+                    $AppRoleAssignments = @($Result.body.value)
+                    foreach ($Role in $AppRoleAssignments) {
+                        $ResourceDisplayName = [string]$Role.ResourceDisplayName
+                        $RoleId = [string]$Role.AppRoleId
 
-                        if ($Result.status -eq 200) {
-                            $AppRoleAssignments = $Result.body.value
-                            if ($AppRoleAssignments.Count -gt 0) {
-                                foreach ($Role in $AppRoleAssignments) {
-                                    $ResourceDisplayName = $Role.ResourceDisplayName
-                                    $RoleId = $Role.AppRoleId
-
-                                    # Default to true,
-                                    # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
-                                    $IsAdminConsented = $true
-
-                                    # Only map on resources stored in RiskyPermissions.json file
-                                    if ($RiskyPermissionsJson.permissions.PSObject.Properties.Name -contains $ResourceDisplayName) {
-                                        $ResourceAppId = $RiskyPermissionsJson.resources.PSObject.Properties | Where-Object {
-                                            $_.Value -eq $ResourceDisplayName
-                                        } | Select-Object -ExpandProperty Name
-
-                                        $ResourceAppPermissions = Get-ResourcePermissions `
-                                            -M365Environment $M365Environment `
-                                            -ResourcePermissionCache $ResourcePermissionCache `
-                                            -ResourceAppId $ResourceAppId
-
-                                        if ($null -eq $ResourceAppPermissions) {
-                                            Write-Warning "No permissions found for resource app ID: $ResourceAppId"
-                                            continue
-                                        }
-
-                                        $ReadableRoleType = $null
-                                        $RoleDisplayName = $null
-
-                                        $AppRole = $ResourceAppPermissions.appRoles | Where-Object { $_.id -eq $RoleId }
-                                        if ($null -ne $AppRole) {
-                                            $ReadableRoleType = "Application"
-                                            $RoleDisplayName = $AppRole.value
-                                            # Application permissions always require admin consent
-                                            $RequiresAdminConsent = $true
-                                        }
-                                        else {
-                                            $OauthScope = $ResourceAppPermissions.oauth2PermissionScopes | Where-Object { $_.id -eq $RoleId }
-                                            if ($null -ne $OauthScope) {
-                                                $ReadableRoleType = "Delegated"
-                                                $RoleDisplayName = $OauthScope.value
-                                                # Delegated permissions require admin consent if oauth2PermissionScopes.type equals "Admin"
-                                                $RequiresAdminConsent = $OauthScope.type -eq "Admin"
-                                            }
-                                            else {
-                                                # RoleId not found in either appRoles or oauth2PermissionScopes, skip permission
-                                                continue
-                                            }
-                                        }
-
-                                        $MappedPermissions += Format-Permission `
-                                            -Json $RiskyPermissionsJson `
-                                            -AppDisplayName $ResourceDisplayName `
-                                            -Id $RoleId `
-                                            -RoleType $ReadableRoleType `
-                                            -RoleDisplayName $RoleDisplayName `
-                                            -IsAdminConsented $IsAdminConsented `
-                                            -RequiresAdminConsent $RequiresAdminConsent
-                                    }
-                                }
-                            }
-                        } else {
-                            Write-Warning "Error for service principal $($Result.id): $($Result.status)"
+                        if (-not $ResourceLookup.NameToAppId.ContainsKey($ResourceDisplayName)) {
+                            continue
                         }
 
-                        $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+                        # Default to true,
+                        # `Get-MgBetaServicePrincipalAppRoleAssignment` only returns admin consented permissions
+                        $IsAdminConsented = $true
+                        $ResourceAppId = $ResourceLookup.NameToAppId[$ResourceDisplayName]
 
-                        # Exclude service principals without risky permissions
-                        if ($RiskyPermissions.Count -gt 0) {
-                            $ServicePrincipalResults += [PSCustomObject]@{
-                                ObjectId                = $ServicePrincipal.Id
-                                AppId                   = $ServicePrincipal.AppId
-                                DisplayName             = $ServicePrincipal.DisplayName
-                                SignInAudience          = $ServicePrincipal.SignInAudience
-                                # Credentials from application and service principal objects may get merged in other cmdlets.
-                                # Differentiate between the two by setting IsFromApplication=$false
-                                KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
-                                PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
-                                FederatedCredentials    = Format-Credentials -AccessKeys $ServicePrincipal.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
-                                Permissions             = $MappedPermissions
-                                AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
-                            }
+                        $ResourceAppPermissions = Get-ResourcePermissions `
+                            -M365Environment $M365Environment `
+                            -ResourcePermissionCache $ResourcePermissionCache `
+                            -ResourceAppId $ResourceAppId
+
+                        if ($null -eq $ResourceAppPermissions) {
+                            Write-Warning "No permissions found for resource app ID: $ResourceAppId"
+                            continue
                         }
+
+                        $PermissionTypeDetails = Get-PermissionTypeDetails `
+                            -ResourceAppPermissions $ResourceAppPermissions `
+                            -ResourcePermissionTypeCache $ResourcePermissionTypeCache `
+                            -ResourceAppId $ResourceAppId `
+                            -RoleId $RoleId
+
+                        [void]$MappedPermissions.AddRange(@(
+                            Format-Permission `
+                                -Json $RiskyAppPermissionsJson `
+                                -AppDisplayName $ResourceDisplayName `
+                                -Id $RoleId `
+                                -RoleType $PermissionTypeDetails.ReadableRoleType `
+                                -RoleDisplayName $PermissionTypeDetails.RoleDisplayName `
+                                -IsAdminConsented $IsAdminConsented `
+                                -RequiresAdminConsent $PermissionTypeDetails.RequiresAdminConsent
+                        ))
                     }
+                }
+                elseif ($null -ne $Result) {
+                    Write-Warning "Error for service principal ${ServicePrincipalId}: $($Result.status)"
+                }
+
+                $RiskyPermissions = @($MappedPermissions | Where-Object { $_.IsRisky -eq $true })
+
+                # Exclude service principals without risky permissions
+                if ($RiskyPermissions.Count -gt 0) {
+                    [void]$ServicePrincipalResults.Add([PSCustomObject]@{
+                        ObjectId                = $ServicePrincipal.Id
+                        AppId                   = $ServicePrincipal.AppId
+                        DisplayName             = $ServicePrincipal.DisplayName
+                        SignInAudience          = $ServicePrincipal.SignInAudience
+                        # Credentials from application and service principal objects may get merged in other cmdlets.
+                        # Differentiate between the two by setting IsFromApplication=$false
+                        KeyCredentials          = Format-Credentials -AccessKeys $ServicePrincipal.KeyCredentials -IsFromApplication $false
+                        PasswordCredentials     = Format-Credentials -AccessKeys $ServicePrincipal.PasswordCredentials -IsFromApplication $false
+                        FederatedCredentials    = Format-Credentials -AccessKeys $ServicePrincipal.FederatedIdentityCredentials -IsFromApplication $false -IsFederated
+                        Permissions             = $MappedPermissions.ToArray()
+                        AppOwnerOrganizationId  = $ServicePrincipal.AppOwnerOrganizationId
+                    })
                 }
             }
         } catch {
@@ -489,7 +801,7 @@ function Get-ServicePrincipalsWithRiskyPermissions {
             Write-Warning "Stack trace: $($_.ScriptStackTrace)"
             throw $_
         }
-        return $ServicePrincipalResults
+        return $ServicePrincipalResults.ToArray()
     }
 }
 
@@ -504,33 +816,86 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
     param (
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [PSCustomObject]
+        $RiskyAppPermissionsJson
     )
     process {
         try {
-            $RiskyPermissionsJson = Get-RiskyPermissionsJson
-            $Resources = $RiskyPermissionsJson.resources.PSObject.Properties
+            if ($null -eq $RiskyAppPermissionsJson) {
+                $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
+            }
+            $Resources = $RiskyAppPermissionsJson.resources.PSObject.Properties
+            $ResourceIds = @($Resources | ForEach-Object { [string]$_.Name })
 
+            # Resolve all risky resource service principals in one filtered query instead of per-resource lookups.
+            $ServicePrincipalByAppId = @{}
+            if ($ResourceIds.Count -gt 0) {
+                $FilterValues = @($ResourceIds | ForEach-Object { "appId eq '$_'" })
+                $FilterClause = $FilterValues -join " or "
 
-            $RiskyDelegatedPermissionClassificationResults = @()
-            foreach ($Resource in $Resources) {
-                $ResourceId = $Resource.Name
-                $ResourceName = $Resource.Value
-
-                $ServicePrincipal = (
+                $ResolvedServicePrincipals = (
                     Invoke-GraphDirectly `
                         -Commandlet "Get-MgServicePrincipal" `
                         -M365Environment $M365Environment `
                         -QueryParams @{
-                            '$filter' = "appId eq '$ResourceId'"
+                            '$filter' = $FilterClause
+                            '$select' = "id,appId,displayName"
                         }
-                    ).Value
+                ).Value
 
-                $ServicePrincipalId = $ServicePrincipal.id
+                foreach ($ResolvedServicePrincipal in @($ResolvedServicePrincipals)) {
+                    $ServicePrincipalByAppId[[string]$ResolvedServicePrincipal.appId] = $ResolvedServicePrincipal
+                }
+            }
 
-                $RiskyDelegatedPermissions = $RiskyPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties
+            $ResourceByServicePrincipalId = @{}
+            foreach ($Resource in $Resources) {
+                $ResourceId = $Resource.Name
+                $ResourceName = $Resource.Value
 
-                $PermClassifications = (Invoke-GraphDirectly -commandlet "Get-MgBetaServicePrincipalDelagatedPermissionClassifications" -M365Environment $M365Environment -ID $ServicePrincipalId).Value
+                $ServicePrincipal = $ServicePrincipalByAppId[$ResourceId]
+                if ($null -eq $ServicePrincipal -or $null -eq $ServicePrincipal.id) {
+                    continue
+                }
+
+                $ResourceByServicePrincipalId[[string]$ServicePrincipal.id] = [PSCustomObject]@{
+                    ResourceId = $ResourceId
+                    ResourceName = $ResourceName
+                    ServicePrincipal = $ServicePrincipal
+                }
+            }
+
+            $BatchRequests = @(
+                foreach ($ServicePrincipalId in @($ResourceByServicePrincipalId.Keys)) {
+                    @{
+                        id = [string]$ServicePrincipalId
+                        method = "GET"
+                        url = "/servicePrincipals/$ServicePrincipalId/delegatedPermissionClassifications?`$select=id,permissionId,permissionName,classification"
+                    }
+                }
+            )
+            $BatchResponses = Invoke-GraphBatchRequestsWithRetry -Requests $BatchRequests -M365Environment $M365Environment -ApiVersion "beta"
+
+
+            $RiskyDelegatedPermissionClassificationResults = @()
+            foreach ($ServicePrincipalId in @($ResourceByServicePrincipalId.Keys)) {
+                $ResourceContext = $ResourceByServicePrincipalId[$ServicePrincipalId]
+                $ResourceId = $ResourceContext.ResourceId
+                $ResourceName = $ResourceContext.ResourceName
+                $ServicePrincipal = $ResourceContext.ServicePrincipal
+
+                $RiskyDelegatedPermissions = $RiskyAppPermissionsJson.permissions.$ResourceName.Delegated.PSObject.Properties
+                $Result = $BatchResponses[[string]$ServicePrincipalId]
+                if ($null -eq $Result -or [int]$Result.status -ne 200 -or $null -eq $Result.body) {
+                    if ($null -ne $Result) {
+                        Write-Warning "Error for service principal ${ServicePrincipalId}: $($Result.status)"
+                    }
+                    continue
+                }
+
+                $PermClassifications = @($Result.body.value)
 
                 $RiskyPermClassifications = @()
                 foreach ($PermClassification in $PermClassifications) {
@@ -589,9 +954,10 @@ function Format-RiskyApplications {
                 # Merge objects if an application and service principal exist with the same AppId
                 $MergedObject = @{}
                 if ($MatchedServicePrincipal) {
+                    $ServicePrincipalRoleIds = @($MatchedServicePrincipal.Permissions | Select-Object -ExpandProperty RoleId)
+
                     # Determine if each risky permission was admin consented or not
                     foreach ($Permission in $App.Permissions) {
-                        $ServicePrincipalRoleIds = $MatchedServicePrincipal.Permissions | Select-Object -ExpandProperty RoleId
                         if ($ServicePrincipalRoleIds -contains $Permission.RoleId) {
                             $Permission.IsAdminConsented = $true
                         }
@@ -831,7 +1197,7 @@ function ConvertFrom-DotNetDate {
     if ([string]::IsNullOrEmpty($DateString)) {
         return $null
     }
-    
+
     # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
     if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
         $EpochMs = $Matches[1]
@@ -963,7 +1329,7 @@ function Set-SeverityScore {
         $AdminConsentedPoints = ($AdminConsentedRiskyPermissions | ForEach-Object {
             $Weights.PermissionRiskLevelWeights[$_.RiskLevel]
         } | Measure-Object -Sum).Sum
-        
+
         $Score += $AdminConsentedPoints
         $ScoreBreakdown.AdminConsentedRiskyPermissions = [PSCustomObject]@{
             PermissionCount = $AdminConsentedRiskyPermissions.Count
@@ -1123,8 +1489,9 @@ function Set-SeverityScore {
     }
 }
 
+# Keep Get-RiskyAppPermissionsJson exported for cross-module usage in AADHybridExchangeHelper.
 Export-ModuleMember -Function @(
-    "Get-RiskyPermissionsJson",
+    "Get-RiskyAppPermissionsJson",
     "Format-Credentials",
     "Get-ApplicationsWithRiskyPermissions",
     "Get-ServicePrincipalsWithRiskyPermissions",
