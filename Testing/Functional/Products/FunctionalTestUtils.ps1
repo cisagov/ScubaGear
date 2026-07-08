@@ -940,7 +940,7 @@ function Set-NestedMemberValue {
     [object]$InputObject,
 
     [Parameter(Mandatory = $true)]
-    [string[]]$MemberPath,
+    [string]$MemberPath,
 
     [Parameter(Mandatory = $true)]
     $Value,
@@ -950,32 +950,136 @@ function Set-NestedMemberValue {
     [string]$Delimiter = '.'
   )
 
-  begin {
-    $MemberPath = $MemberPath.Split([string[]]@($Delimiter))
-    $leaf = $MemberPath | Select-Object -Last 1
-    $MemberPath = $MemberPath | Select-Object -SkipLast 1
+  $PathParts = $MemberPath.Split([string[]]@($Delimiter), [System.StringSplitOptions]::None)
+  $Leaf = $PathParts[-1]
+  $ParentParts = @()
+  if ($PathParts.Count -gt 1) {
+    $ParentParts = $PathParts[0..($PathParts.Count - 2)]
   }
 
-  process {
-
-    foreach($m in $MemberPath){
-        $IndexedMember = $m.Split([regex]::escape('[]'))
-
-        if ($IndexedMember -eq 1){
-            $InputObject = $InputObject.$m
-        }
-        elseif ($IndexedMember -gt 1){
-            $InputObject = $InputObject.$($IndexedMember[0])
-            $InputObject = $InputObject[[int]($IndexedMember[1])]
-        }
-        else {
-            Write-Error "Failed to Set-NestedMemberValue"
-        }
-
+  $Current = $InputObject
+  foreach ($Part in $ParentParts) {
+    if ($Part -match '^(.+)\[(\d+)\]$') {
+      $CollectionName = $Matches[1]
+      $Index = [int]$Matches[2]
+      $Current = $Current.$CollectionName[$Index]
     }
-
-    $InputObject.$leaf = $Value
+    elseif ($null -ne (Get-Member -InputObject $Current -Name $Part -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $Current = $Current.$Part
+    }
+    else {
+      throw "Member '$Part' not found while resolving path '$MemberPath'."
+    }
   }
+
+  if ($null -ne (Get-Member -InputObject $Current -Name $Leaf -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+    $Current.$Leaf = $Value
+  }
+  else {
+    $Current | Add-Member -NotePropertyName $Leaf -NotePropertyValue $Value -Force
+  }
+}
+
+function Set-AllAntiPhishPolicyProperty {
+  <#
+    .SYNOPSIS
+      Sets a property on every anti-phish policy in the cached provider export.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $PropertyName,
+
+    [Parameter(Mandatory = $true)]
+    $Value,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  foreach ($Policy in $ProviderExport.anti_phish_policies) {
+    if ($null -ne (Get-Member -InputObject $Policy -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $Policy.$PropertyName = $Value
+    }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
+function Set-DefaultAntiPhishSensitiveUsers {
+  <#
+    .SYNOPSIS
+      Configures the default anti-phish policy to protect the supplied sensitive users.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [AllowEmptyCollection()]
+    [string[]]
+    $SensitiveUsers,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  $DefaultPolicy = $ProviderExport.anti_phish_policies | Where-Object { $_.IsDefault -eq $true } | Select-Object -First 1
+  if ($null -eq $DefaultPolicy) {
+    $DefaultPolicy = $ProviderExport.anti_phish_policies[0]
+  }
+
+  $DefaultPolicy.EnableTargetedUserProtection = $true
+  $DefaultPolicy.TargetedUsersToProtect = @($SensitiveUsers)
+  if ($null -ne (Get-Member -InputObject $DefaultPolicy -Name 'TargetedUserProtectionAction' -ErrorAction SilentlyContinue)) {
+    $DefaultPolicy.TargetedUserProtectionAction = 'Quarantine'
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
+function Set-DefaultAntiPhishSafetyTips {
+  <#
+    .SYNOPSIS
+      Enables or disables all safety-tip settings on the default anti-phish policy.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [bool]
+    $Enabled,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $SafetyTipProperties = @(
+    'EnableFirstContactSafetyTips',
+    'EnableSimilarUsersSafetyTips',
+    'EnableSimilarDomainsSafetyTips',
+    'EnableUnusualCharactersSafetyTips',
+    'EnableViaTag',
+    'EnableUnauthenticatedSender'
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  $DefaultPolicy = $ProviderExport.anti_phish_policies | Where-Object { $_.IsDefault -eq $true } | Select-Object -First 1
+  if ($null -eq $DefaultPolicy) {
+    $DefaultPolicy = $ProviderExport.anti_phish_policies[0]
+  }
+
+  foreach ($PropertyName in $SafetyTipProperties) {
+    if ($null -ne (Get-Member -InputObject $DefaultPolicy -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $DefaultPolicy.$PropertyName = $Enabled
+    }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
 }
 
 function LoadProviderExport() {
@@ -989,8 +1093,8 @@ function LoadProviderExport() {
       [string]
       $OutputFolder
   )
-    # Create new settings file to use for modifications if one does not already exist
-    # If modified settings file already exists, use as is.
+  # Create new settings file to use for modifications if one does not already exist
+  # If modified settings file already exists, use as is.
   if (-not (Test-Path -Path "$OutputFolder/ModifiedProviderSettingsExport.json" -PathType Leaf)){
       Copy-Item -Path "$OutputFolder/ProviderSettingsExport.json" -Destination "$OutputFolder/ModifiedProviderSettingsExport.json"
   }
@@ -1060,13 +1164,8 @@ function UpdateProviderExport{
   $ProviderExport = LoadProviderExport($OutputFolder)
 
   $Updates.Keys | ForEach-Object{
-      try {
-          $Update = $Updates.Item($_)
-          Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_  -Value $Update
-      }
-      catch {
-          Write-Error "Exception: UpdateProviderExport failed"
-      }
+      $Update = $Updates.Item($_)
+      Set-NestedMemberValue -InputObject $ProviderExport -MemberPath $_ -Value $Update
   }
 
   PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport

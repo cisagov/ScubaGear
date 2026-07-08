@@ -9,7 +9,7 @@ ScubaGear queries various M365 APIs to gather information about their security s
 | Product                 | Role                                                                    |
 | ----------------------- | ----------------------------------------------------------------------- |
 | Entra ID                | Global Reader                                                           |
-| Defender for Office 365 | Global Reader (or Exchange Administrator)                               |
+| Security Suite          | Global Reader (or Exchange Administrator)                               |
 | Exchange Online         | Global Reader (or Exchange Administrator)                               |
 | Power BI                | Fabric Administrator (or Global Administrator) with a Power BI or Fabric license <sup>1</sup> |
 | Power Platform          | Power Platform Administrator with a "Power Apps for Office 365" license |

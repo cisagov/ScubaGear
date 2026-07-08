@@ -106,7 +106,9 @@ $SCuBAUI.Omissions | ConvertTo-Json -Depth 4
 
 ## Usage Workflow
 
-Follow this step-by-step guide to use the ScubaConfigApp for configuration creation, ScubaGear execution, and report review:
+For a detailed step-by-step walkthrough — including how to save exclusions, look for the green/yellow save indicators, navigate between tabs, and generate your final YAML — see the **[Step-by-Step Walkthrough Guide](scubaconfigapp-walkthrough.md)**.
+
+The summary below covers the high-level flow:
 
 ### Step 1. Launch the Application
 ```powershell

@@ -1,4 +1,4 @@
-Function Get-DebugSanitizedValue{
+﻿Function Get-DebugSanitizedValue{
     <#
     .SYNOPSIS
     Creates a consistent fake replacement for sensitive values.

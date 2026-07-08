@@ -125,7 +125,7 @@
         "missing": false
     },
     "powerPlatformRegistered": true,
-    "productNames": ["aad", "exo", "defender", "sharepoint", "teams", "powerplatform"],
+    "productNames": ["aad", "exo", "securitysuite", "sharepoint", "teams", "powerplatform"],
     "expectedResult": {
         "hasFixPermissionIssues": false,
         "statusPattern": "No action needed"

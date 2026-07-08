@@ -1,6 +1,6 @@
-# Run functional tests for Defender
+# Run functional tests for Security Suite
 
-name: Functional Tests Defender
+name: Functional Tests Security Suite
 
 # This is a reusable workflow called by the pipeline.
 on:
@@ -46,15 +46,15 @@ permissions:
   contents: write
 
 jobs:
-  Def_Tenant1:
-    name: Def_Tenant1
+  Sec_Tenant1:
+    name: Sec_Tenant1
     runs-on: windows-latest
     environment: Development
     permissions:
       id-token: write
       contents: write
     concurrency:
-      group: Defender_Tenant1
+      group: SecuritySuite_Tenant1
       cancel-in-progress: false
     outputs:
       passed: ${{ steps.run-tests.outputs.passed }}
@@ -96,117 +96,10 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant1
+          Alias: Sec_Tenant1
           TestParams: ${{ secrets.TestParams }}
-  Def_Tenant1_G5:
-    name: Def_Tenant1_G5
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    if: ${{ always() }}
-    needs:
-      - Def_Tenant1
-    concurrency:
-      group: Defender_Tenant1
-      cancel-in-progress: false
-    outputs:
-      passed: ${{ steps.run-tests.outputs.passed }}
-      failed: ${{ steps.run-tests.outputs.failed }}
-      skipped: ${{ steps.run-tests.outputs.skipped }}
-      total: ${{ steps.run-tests.outputs.total }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v6
-        with:
-          path: repo
-      - name: Import PFX
-        uses: ./repo/.github/actions/import-pfx
-        with:
-          PfxBase64: ${{ secrets.PfxBase64 }}
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./repo/.github/actions/get-thumbprint
-        with:
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: scubagear-directory-
-      - name: Restore Dependencies
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: powershell-directory-
-      - name: Restore OPA
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\.scubagear\Tools
-          key: opa-directory-
-      - name: Test
-        id: run-tests
-        uses: ./repo/.github/actions/test-product
-        with:
-          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant1_G5
-          TestParams: ${{ secrets.TestParams }}
-  Def_Tenant2:
-    name: Def_Tenant2
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    concurrency:
-      group: Defender_Tenant2
-      cancel-in-progress: false
-    outputs:
-      passed: ${{ steps.run-tests.outputs.passed }}
-      failed: ${{ steps.run-tests.outputs.failed }}
-      skipped: ${{ steps.run-tests.outputs.skipped }}
-      total: ${{ steps.run-tests.outputs.total }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v6
-        with:
-          path: repo
-      - name: Import PFX
-        uses: ./repo/.github/actions/import-pfx
-        with:
-          PfxBase64: ${{ secrets.PfxBase64 }}
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./repo/.github/actions/get-thumbprint
-        with:
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: scubagear-directory-
-      - name: Restore Dependencies
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: powershell-directory-
-      - name: Restore OPA
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\.scubagear\Tools
-          key: opa-directory-
-      - name: Test
-        id: run-tests
-        uses: ./repo/.github/actions/test-product
-        with:
-          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant2
-          TestParams: ${{ secrets.TestParams }}
-  Def_Tenant2_G3:
-    name: Def_Tenant2_G3
+  Sec_Tenant1_G5:
+    name: Sec_Tenant1_G5
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -214,9 +107,9 @@ jobs:
       contents: write
     if: ${{ always() }}
     needs:
-      - Def_Tenant2
+      - Sec_Tenant1
     concurrency:
-      group: Defender_Tenant2
+      group: SecuritySuite_Tenant1
       cancel-in-progress: false
     outputs:
       passed: ${{ steps.run-tests.outputs.passed }}
@@ -258,17 +151,17 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant2_G3
+          Alias: Sec_Tenant1_G5
           TestParams: ${{ secrets.TestParams }}
-  Def_Tenant6:
-    name: Def_Tenant6
+  Sec_Tenant2:
+    name: Sec_Tenant2
     runs-on: windows-latest
     environment: Development
     permissions:
       id-token: write
       contents: write
     concurrency:
-      group: Defender_Tenant6
+      group: SecuritySuite_Tenant2
       cancel-in-progress: false
     outputs:
       passed: ${{ steps.run-tests.outputs.passed }}
@@ -310,117 +203,10 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant6
+          Alias: Sec_Tenant2
           TestParams: ${{ secrets.TestParams }}
-  Def_Tenant6_G5:
-    name: Def_Tenant6_G5
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    if: ${{ always() }}
-    needs:
-      - Def_Tenant6
-    concurrency:
-      group: Defender_Tenant6
-      cancel-in-progress: false
-    outputs:
-      passed: ${{ steps.run-tests.outputs.passed }}
-      failed: ${{ steps.run-tests.outputs.failed }}
-      skipped: ${{ steps.run-tests.outputs.skipped }}
-      total: ${{ steps.run-tests.outputs.total }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v6
-        with:
-          path: repo
-      - name: Import PFX
-        uses: ./repo/.github/actions/import-pfx
-        with:
-          PfxBase64: ${{ secrets.PfxBase64 }}
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./repo/.github/actions/get-thumbprint
-        with:
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: scubagear-directory-
-      - name: Restore Dependencies
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: powershell-directory-
-      - name: Restore OPA
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\.scubagear\Tools
-          key: opa-directory-
-      - name: Test
-        id: run-tests
-        uses: ./repo/.github/actions/test-product
-        with:
-          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant6_G5
-          TestParams: ${{ secrets.TestParams }}
-  Def_Tenant7:
-    name: Def_Tenant7
-    runs-on: windows-latest
-    environment: Development
-    permissions:
-      id-token: write
-      contents: write
-    concurrency:
-      group: Defender_Tenant7
-      cancel-in-progress: false
-    outputs:
-      passed: ${{ steps.run-tests.outputs.passed }}
-      failed: ${{ steps.run-tests.outputs.failed }}
-      skipped: ${{ steps.run-tests.outputs.skipped }}
-      total: ${{ steps.run-tests.outputs.total }}
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v6
-        with:
-          path: repo
-      - name: Import PFX
-        uses: ./repo/.github/actions/import-pfx
-        with:
-          PfxBase64: ${{ secrets.PfxBase64 }}
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Get Thumbprint
-        id: get-thumbprint
-        uses: ./repo/.github/actions/get-thumbprint
-        with:
-          PfxPassword: ${{ secrets.PfxPassword }}
-      - name: Restore ScubaGear
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
-          key: scubagear-directory-
-      - name: Restore Dependencies
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
-          key: powershell-directory-
-      - name: Restore OPA
-        uses: actions/cache/restore@v5
-        with:
-          path: C:\Users\runneradmin\.scubagear\Tools
-          key: opa-directory-
-      - name: Test
-        id: run-tests
-        uses: ./repo/.github/actions/test-product
-        with:
-          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant7
-          TestParams: ${{ secrets.TestParams }}
-  Def_Tenant7_G5:
-    name: Def_Tenant7_G5
+  Sec_Tenant2_G3:
+    name: Sec_Tenant2_G3
     runs-on: windows-latest
     environment: Development
     permissions:
@@ -428,9 +214,9 @@ jobs:
       contents: write
     if: ${{ always() }}
     needs:
-      - Def_Tenant7
+      - Sec_Tenant2
     concurrency:
-      group: Defender_Tenant7
+      group: SecuritySuite_Tenant2
       cancel-in-progress: false
     outputs:
       passed: ${{ steps.run-tests.outputs.passed }}
@@ -472,20 +258,234 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Def_Tenant7_G5
+          Alias: Sec_Tenant2_G3
           TestParams: ${{ secrets.TestParams }}
+  Sec_Tenant6:
+    name: Sec_Tenant6
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: SecuritySuite_Tenant6
+      cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        id: run-tests
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Sec_Tenant6
+          TestParams: ${{ secrets.TestParams }}
+  Sec_Tenant6_G5:
+    name: Sec_Tenant6_G5
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    if: ${{ always() }}
+    needs:
+      - Sec_Tenant6
+    concurrency:
+      group: SecuritySuite_Tenant6
+      cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        id: run-tests
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Sec_Tenant6_G5
+          TestParams: ${{ secrets.TestParams }}
+  Sec_Tenant7:
+    name: Sec_Tenant7
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    concurrency:
+      group: SecuritySuite_Tenant7
+      cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        id: run-tests
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Sec_Tenant7
+          TestParams: ${{ secrets.TestParams }}
+  Sec_Tenant7_G5:
+    name: Sec_Tenant7_G5
+    runs-on: windows-latest
+    environment: Development
+    permissions:
+      id-token: write
+      contents: write
+    if: ${{ always() }}
+    needs:
+      - Sec_Tenant7
+    concurrency:
+      group: SecuritySuite_Tenant7
+      cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v6
+        with:
+          path: repo
+      - name: Import PFX
+        uses: ./repo/.github/actions/import-pfx
+        with:
+          PfxBase64: ${{ secrets.PfxBase64 }}
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Get Thumbprint
+        id: get-thumbprint
+        uses: ./repo/.github/actions/get-thumbprint
+        with:
+          PfxPassword: ${{ secrets.PfxPassword }}
+      - name: Restore ScubaGear
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
+          key: scubagear-directory-
+      - name: Restore Dependencies
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
+          key: powershell-directory-
+      - name: Restore OPA
+        uses: actions/cache/restore@v5
+        with:
+          path: C:\Users\runneradmin\.scubagear\Tools
+          key: opa-directory-
+      - name: Test
+        id: run-tests
+        uses: ./repo/.github/actions/test-product
+        with:
+          Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
+          Alias: Sec_Tenant7_G5
+          TestParams: ${{ secrets.TestParams  }}
   email:
     name: Email
     runs-on: windows-latest
     needs:
-      - Def_Tenant1
-      - Def_Tenant1_G5
-      - Def_Tenant2
-      - Def_Tenant2_G3
-      - Def_Tenant6
-      - Def_Tenant6_G5
-      - Def_Tenant7
-      - Def_Tenant7_G5
+      - Sec_Tenant1
+      - Sec_Tenant1_G5
+      - Sec_Tenant2
+      - Sec_Tenant2_G3
+      - Sec_Tenant6
+      - Sec_Tenant6_G5
+      - Sec_Tenant7
+      - Sec_Tenant7_G5
     if: ${{ failure() && (inputs.EmailOnFailure || inputs.GitHubEventName == 'schedule') }}
     steps:
       - name: Checkout Repo
@@ -495,7 +495,7 @@ jobs:
         uses: ./.github/actions/extract-email
         env:
           # Could use any of previous jobs as the alias
-          Alias: Def_Tenant1
+          Alias: Sec_Tenant1
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
         uses: dawidd6/action-send-mail@v17
@@ -504,22 +504,22 @@ jobs:
           server_port: 465
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
-          subject: "ScubaGear Functional Test Failure - Defender - branch: ${{ inputs.RefName || github.ref_name }}"
+          subject: "ScubaGear Functional Test Failure - Security Suite - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
           from: ${{ format('ScubaGear Notifier <{0}>', secrets.NotifierUsername) }}
           body: |
             ScubaGear Functional Test Failure
 
-            Product: Defender
+            Product: Security Suite
             Branch: ${{ inputs.RefName || github.ref_name }}
             Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             Tenant Job Results:
-              Def_Tenant1: ${{ needs.Def_Tenant1.result }} (${{ needs.Def_Tenant1.outputs.passed }}/${{ needs.Def_Tenant1.outputs.total }} passing, ${{ needs.Def_Tenant1.outputs.failed }} failed)
-              Def_Tenant1_G5: ${{ needs.Def_Tenant1_G5.result }} (${{ needs.Def_Tenant1_G5.outputs.passed }}/${{ needs.Def_Tenant1_G5.outputs.total }} passing, ${{ needs.Def_Tenant1_G5.outputs.failed }} failed)
-              Def_Tenant2: ${{ needs.Def_Tenant2.result }} (${{ needs.Def_Tenant2.outputs.passed }}/${{ needs.Def_Tenant2.outputs.total }} passing, ${{ needs.Def_Tenant2.outputs.failed }} failed)
-              Def_Tenant2_G3: ${{ needs.Def_Tenant2_G3.result }} (${{ needs.Def_Tenant2_G3.outputs.passed }}/${{ needs.Def_Tenant2_G3.outputs.total }} passing, ${{ needs.Def_Tenant2_G3.outputs.failed }} failed)
-              Def_Tenant6: ${{ needs.Def_Tenant6.result }} (${{ needs.Def_Tenant6.outputs.passed }}/${{ needs.Def_Tenant6.outputs.total }} passing, ${{ needs.Def_Tenant6.outputs.failed }} failed)
-              Def_Tenant6_G5: ${{ needs.Def_Tenant6_G5.result }} (${{ needs.Def_Tenant6_G5.outputs.passed }}/${{ needs.Def_Tenant6_G5.outputs.total }} passing, ${{ needs.Def_Tenant6_G5.outputs.failed }} failed)
-              Def_Tenant7: ${{ needs.Def_Tenant7.result }} (${{ needs.Def_Tenant7.outputs.passed }}/${{ needs.Def_Tenant7.outputs.total }} passing, ${{ needs.Def_Tenant7.outputs.failed }} failed)
-              Def_Tenant7_G5: ${{ needs.Def_Tenant7_G5.result }} (${{ needs.Def_Tenant7_G5.outputs.passed }}/${{ needs.Def_Tenant7_G5.outputs.total }} passing, ${{ needs.Def_Tenant7_G5.outputs.failed }} failed)
+              Sec_Tenant1: ${{ needs.Sec_Tenant1.result }} (${{ needs.Sec_Tenant1.outputs.passed }}/${{ needs.Sec_Tenant1.outputs.total }} passing, ${{ needs.Sec_Tenant1.outputs.failed }} failed)
+              Sec_Tenant1_G5: ${{ needs.Sec_Tenant1_G5.result }} (${{ needs.Sec_Tenant1_G5.outputs.passed }}/${{ needs.Sec_Tenant1_G5.outputs.total }} passing, ${{ needs.Sec_Tenant1_G5.outputs.failed }} failed)
+              Sec_Tenant2: ${{ needs.Sec_Tenant2.result }} (${{ needs.Sec_Tenant2.outputs.passed }}/${{ needs.Sec_Tenant2.outputs.total }} passing, ${{ needs.Sec_Tenant2.outputs.failed }} failed)
+              Sec_Tenant2_G3: ${{ needs.Sec_Tenant2_G3.result }} (${{ needs.Sec_Tenant2_G3.outputs.passed }}/${{ needs.Sec_Tenant2_G3.outputs.total }} passing, ${{ needs.Sec_Tenant2_G3.outputs.failed }} failed)
+              Sec_Tenant6: ${{ needs.Sec_Tenant6.result }} (${{ needs.Sec_Tenant6.outputs.passed }}/${{ needs.Sec_Tenant6.outputs.total }} passing, ${{ needs.Sec_Tenant6.outputs.failed }} failed)
+              Sec_Tenant6_G5: ${{ needs.Sec_Tenant6_G5.result }} (${{ needs.Sec_Tenant6_G5.outputs.passed }}/${{ needs.Sec_Tenant6_G5.outputs.total }} passing, ${{ needs.Sec_Tenant6_G5.outputs.failed }} failed)
+              Sec_Tenant7: ${{ needs.Sec_Tenant7.result }} (${{ needs.Sec_Tenant7.outputs.passed }}/${{ needs.Sec_Tenant7.outputs.total }} passing, ${{ needs.Sec_Tenant7.outputs.failed }} failed)
+              Sec_Tenant7_G5: ${{ needs.Sec_Tenant7_G5.result }} (${{ needs.Sec_Tenant7_G5.outputs.passed }}/${{ needs.Sec_Tenant7_G5.outputs.total }} passing, ${{ needs.Sec_Tenant7_G5.outputs.failed }} failed)
