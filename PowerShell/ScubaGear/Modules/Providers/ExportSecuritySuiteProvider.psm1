@@ -56,6 +56,8 @@ function Export-SecuritySuiteProvider {
     $AntiPhishRule = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishRule"))
     $AcceptedDomains = ConvertTo-Json @($Tracker.TryCommand("Get-AcceptedDomain"))
     $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
+    $SafeLinksPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksPolicy"))
+    $SafeLinksRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksRule"))
     $HostedContentFilterPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
     $HostedContentFilterRules = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterRule"))
 
@@ -167,6 +169,8 @@ function Export-SecuritySuiteProvider {
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
     "conn_filter": $ConnectionFilter,
+    "safe_links_policies": $SafeLinksPolicy,
+    "safe_links_rules": $SafeLinksRule,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
     "hosted_content_filter_policies": $HostedContentFilterPolicies,
