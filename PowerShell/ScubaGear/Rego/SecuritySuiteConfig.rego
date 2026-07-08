@@ -35,6 +35,11 @@ import data.utils.key.Count
 # MS.SECURITYSUITE.1.1v1
 #--
 
+# Legend that explains each of the JSON nodes for the anti-malware policies 1.1 and 1.2
+# anti_malware_rules = Contains only the custom policies. State = "Enabled"/"Disabled", Identity = Name of the policy
+# anti_malware_policies = Contains all the policies (custom, standard preset, strict preset, default)
+#
+
 PolicyCompliantForBlockClickToRun(Policy) := true if {
     Policy.EnableFileFilter == true
     RequiredTypes := {"exe", "cmd", "vbe"}
