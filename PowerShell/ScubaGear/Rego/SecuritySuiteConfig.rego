@@ -13,6 +13,8 @@ import data.utils.securitysuite.PartnerDomainConfig
 import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
+import data.utils.securitysuite.PresetRecipientsCovered
+import data.utils.securitysuite.RuleFieldEmpty
 import data.utils.securitysuite.PresetPolicyCoversAllRecipients
 import data.utils.securitysuite.CustomRuleCoversAllRecipients
 import data.utils.report.ReportDetailsArray
@@ -696,40 +698,136 @@ tests contains {
 #
 # MS.SECURITYSUITE.7.1v1
 #--
+
+# Highest priority corresponds to the lowest priority number
+HighestPriorityEnabledRuleCoversAllRecipients := Rule if {
+    some Rule in input.safe_links_rules
+    Rule.State == "Enabled"
+    RuleFieldEmpty(Rule.SentTo)
+    RuleFieldEmpty(Rule.SentToMemberOf)
+    RuleFieldEmpty(Rule.RecipientDomainIs)
+    not LowerPriorityEnabledRuleExists(Rule)
+}
+
+LowerPriorityEnabledRuleExists(Rule) if {
+    some OtherRule in input.safe_links_rules
+    OtherRule.State == "Enabled"
+    RuleFieldEmpty(OtherRule.SentTo)
+    RuleFieldEmpty(OtherRule.SentToMemberOf)
+    RuleFieldEmpty(OtherRule.RecipientDomainIs)
+    OtherRule.Priority < Rule.Priority
+}
+
+default AppliedPolicy := "Built-In Protection Policy"
+AppliedPolicy := HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+
+default CustomPolicySafeLinksEnabled := false
+CustomPolicySafeLinksEnabled if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == AppliedPolicy
+    Policy.EnableSafeLinksForEmail == true
+    Policy.EnableSafeLinksForTeams == true
+    Policy.EnableSafeLinksForOffice == true
+    Policy.EnableForInternalSenders == true
+}
+
+default ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+ReportDetails7_1 := "URL comparison with a block-list is enabled via the standard or strict preset security policies." if {
+    PresetRecipientsCovered
+}
+
+ReportDetails7_1 := concat("", ["URL comparison with a block-list is enabled via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
+    CustomPolicySafeLinksEnabled
+}
+
+default SafeLinksCompliant := false
+SafeLinksCompliant if {
+    ReportDetails7_1 != "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.1v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.1v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
+    "ReportDetails": ReportDetails7_1,
+    "RequirementMet": SafeLinksCompliant
 }
-#--
+#-- 
 
 #
 # MS.SECURITYSUITE.7.2v1
 #--
+
+default CustomPolicyScanURLsEnabled := false
+CustomPolicyScanURLsEnabled := true if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == AppliedPolicy
+    Policy.ScanUrls == true
+    Policy.DeliverMessageAfterScan == true
+}
+
+default ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+ReportDetails7_2 := "Direct download links are scanned for malware via the standard or strict preset security policies." if {
+    PresetRecipientsCovered
+}
+
+ReportDetails7_2 := concat("", ["Direct download links are scanned for malware via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
+    CustomPolicyScanURLsEnabled
+}
+
+default ScanURLsCompliant := false
+ScanURLsCompliant if {
+    ReportDetails7_2 != "Direct download links are NOT scanned for malware."
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.2v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.2v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
+    "ReportDetails": ReportDetails7_2,
+    "RequirementMet": ScanURLsCompliant 
 }
 #--
 
 #
 # MS.SECURITYSUITE.7.3v1
 #--
+
+default CustomPolicyTrackClicksEnabled := false
+CustomPolicyTrackClicksEnabled := true if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == AppliedPolicy
+    Policy.TrackClicks == true
+}
+
+default ReportDetails7_3 := "User click tracking is NOT enabled."
+ReportDetails7_3 := "User click tracking is enabled via the standard or strict preset security policies." if {
+    PresetRecipientsCovered
+}
+
+ReportDetails7_3 := concat("", ["User click tracking is enabled via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
+    CustomPolicyTrackClicksEnabled
+}
+
+default TrackClicksCompliant := false
+TrackClicksCompliant if {
+    ReportDetails7_3 != "User click tracking is NOT enabled."
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.3v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.3v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
+    "ReportDetails": ReportDetails7_3,
+    "RequirementMet": TrackClicksCompliant
 }
+
 #--
 
 
