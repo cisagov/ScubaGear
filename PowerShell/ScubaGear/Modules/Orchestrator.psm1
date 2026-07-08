@@ -535,7 +535,7 @@ function Invoke-SCuBA {
             $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
         }
         else {
-            Write-Information "`nIf you are running release 2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the -M365Environment parameter. Starting in the next release this won't be necessary anymore because ScubaGear will autodetect the environment.`n" -InformationAction Continue
+            Write-Information "`nIf you are running v2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the -M365Environment parameter. In a future release ScubaGear will auto-detect the M365 environment and this won't be necessary.`n" -InformationAction Continue
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
