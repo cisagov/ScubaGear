@@ -118,7 +118,7 @@ Invoke-SCuBA -Version
 ### 4. Run Your First Assessment
 
 > [!IMPORTANT]
-> If you are running release 2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include [the -M365Environment parameter](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/parameters.md#m365environment). Starting in the next release this won't be necessary anymore because ScubaGear will auto-detect the environment.
+> If you are running v2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the [-M365Environment parameter](https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/parameters.md#m365environment). In a future release ScubaGear will auto-detect the M365 environment and this won't be necessary.
 
 ```powershell
 # Assess all products (basic command)
