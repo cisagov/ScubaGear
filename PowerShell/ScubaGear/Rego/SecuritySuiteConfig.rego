@@ -5,6 +5,7 @@ import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsBooleanWarning
 import data.utils.securitysuite.ImpersonationProtectionReportDetails
 import data.utils.securitysuite.ImpersonationProtectionRequirementMet
 import data.utils.securitysuite.ListConfigValues
@@ -13,6 +14,8 @@ import data.utils.securitysuite.PartnerDomainConfig
 import data.utils.securitysuite.PartnerDomainImpersonationCompliant
 import data.utils.securitysuite.UserImpersonationCompliant
 import data.utils.securitysuite.UserWarningsCompliant
+import data.utils.securitysuite.PresetRecipientsCovered
+import data.utils.securitysuite.RuleFieldEmpty
 import data.utils.securitysuite.PresetPolicyCoversAllRecipients
 import data.utils.securitysuite.CustomRuleCoversAllRecipients
 import data.utils.securitysuite.HighestPriorityActiveAntiMalwarePolicyName
@@ -510,13 +513,60 @@ tests contains {
 #
 # MS.SECURITYSUITE.5.2v1
 #--
+# Retention durations that satisfy the 12 month minimum retention requirement.
+# Get-UnifiedAuditLogRetentionPolicy reports duration as one of: SevenDays,
+# OneMonth, ThreeMonths, SixMonths, NineMonths, TwelveMonths, ThreeYears,
+# FiveYears, SevenYears, TenYears. Anything 12 months or longer is compliant.
+CompliantRetentionDurations := {"TwelveMonths", "ThreeYears", "FiveYears", "SevenYears", "TenYears"}
+
+# Note appended to the report details to clarify the license dependency of
+# audit log retention in M365.
+RetentionLicenseNote := concat(" ", [
+    "Note that the data retention policy only applies to users with an Office 365 E5",
+    "or Microsoft 365 E5 license or a Microsoft Purview Suite",
+    "(formerly known as Microsoft 365 E5 Compliance) or E5 eDiscovery and Audit add-on license."
+])
+
+# Service plans that grant the advanced (premium) audit capability required to
+# retain audit logs beyond 180 days on a per-user basis. M365_ADVANCED_AUDITING
+# is included with Office 365/Microsoft 365 E5, the Microsoft Purview Suite (E5
+# Compliance), and the E5 eDiscovery and Audit add-on, but not with E3/G3.
+AdvancedAuditingLicenses contains ServicePlan.ServicePlanId if {
+    some ServicePlan in input.service_plans
+    ServicePlan.ServicePlanName == "M365_ADVANCED_AUDITING"
+}
+
+# Save audit log retention policies that retain logs for at least 12 months
+# and are not disabled.
+CompliantRetentionPolicies contains {
+    "Name": Policy.Name,
+    "RetentionDuration": Policy.RetentionDuration
+} if {
+    some Policy in input.unified_audit_log_retention_policies
+    Policy.RetentionDuration in CompliantRetentionDurations
+    not Policy.Enabled == false
+}
+
+# The requirement is met only when the tenant has the per-user license needed to
+# retain logs beyond 180 days AND at least one retention policy keeps logs for 12
+# months or longer. Tenants at the E3/G3 license level fail regardless of any
+# configured retention policy because the retention capability is not licensed.
+# Get-MgBetaSubscribedSku is intentionally omitted from the Commandlet list: when
+# the license data is unavailable the policy must report non-compliant rather
+# than a "command did not execute" dependency error.
+default AuditRetentionRequirementMet := false
+AuditRetentionRequirementMet if {
+    count(AdvancedAuditingLicenses) > 0
+    count(CompliantRetentionPolicies) >= 1
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.5.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy"],
+    "ActualValue": CompliantRetentionPolicies,
+    "ReportDetails": ReportDetailsBooleanWarning(AuditRetentionRequirementMet, RetentionLicenseNote),
+    "RequirementMet": AuditRetentionRequirementMet
 }
 #--
 
@@ -843,40 +893,136 @@ tests contains {
 #
 # MS.SECURITYSUITE.7.1v1
 #--
+
+# Highest priority corresponds to the lowest priority number
+HighestPriorityEnabledRuleCoversAllRecipients := Rule if {
+    some Rule in input.safe_links_rules
+    Rule.State == "Enabled"
+    RuleFieldEmpty(Rule.SentTo)
+    RuleFieldEmpty(Rule.SentToMemberOf)
+    RuleFieldEmpty(Rule.RecipientDomainIs)
+    not LowerPriorityEnabledRuleExists(Rule)
+}
+
+LowerPriorityEnabledRuleExists(Rule) if {
+    some OtherRule in input.safe_links_rules
+    OtherRule.State == "Enabled"
+    RuleFieldEmpty(OtherRule.SentTo)
+    RuleFieldEmpty(OtherRule.SentToMemberOf)
+    RuleFieldEmpty(OtherRule.RecipientDomainIs)
+    OtherRule.Priority < Rule.Priority
+}
+
+default AppliedPolicy := "Built-In Protection Policy"
+AppliedPolicy := HighestPriorityEnabledRuleCoversAllRecipients.SafeLinksPolicy
+
+default CustomPolicySafeLinksEnabled := false
+CustomPolicySafeLinksEnabled if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == AppliedPolicy
+    Policy.EnableSafeLinksForEmail == true
+    Policy.EnableSafeLinksForTeams == true
+    Policy.EnableSafeLinksForOffice == true
+    Policy.EnableForInternalSenders == true
+}
+
+default ReportDetails7_1 := "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+ReportDetails7_1 := "URL comparison with a block-list is enabled via the standard or strict preset security policies." if {
+    PresetRecipientsCovered
+}
+
+ReportDetails7_1 := concat("", ["URL comparison with a block-list is enabled via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
+    CustomPolicySafeLinksEnabled
+}
+
+default SafeLinksCompliant := false
+SafeLinksCompliant if {
+    ReportDetails7_1 != "URL comparison with a block-list is NOT enabled for URLs in emails, Teams messages, and Office documents."
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.1v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.1v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
+    "ReportDetails": ReportDetails7_1,
+    "RequirementMet": SafeLinksCompliant
 }
-#--
+#-- 
 
 #
 # MS.SECURITYSUITE.7.2v1
 #--
+
+default CustomPolicyScanURLsEnabled := false
+CustomPolicyScanURLsEnabled := true if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == AppliedPolicy
+    Policy.ScanUrls == true
+    Policy.DeliverMessageAfterScan == true
+}
+
+default ReportDetails7_2 := "Direct download links are NOT scanned for malware."
+ReportDetails7_2 := "Direct download links are scanned for malware via the standard or strict preset security policies." if {
+    PresetRecipientsCovered
+}
+
+ReportDetails7_2 := concat("", ["Direct download links are scanned for malware via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
+    CustomPolicyScanURLsEnabled
+}
+
+default ScanURLsCompliant := false
+ScanURLsCompliant if {
+    ReportDetails7_2 != "Direct download links are NOT scanned for malware."
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.2v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.2v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
+    "ReportDetails": ReportDetails7_2,
+    "RequirementMet": ScanURLsCompliant 
 }
 #--
 
 #
 # MS.SECURITYSUITE.7.3v1
 #--
+
+default CustomPolicyTrackClicksEnabled := false
+CustomPolicyTrackClicksEnabled := true if {
+    some Policy in input.safe_links_policies
+    Policy.Identity == AppliedPolicy
+    Policy.TrackClicks == true
+}
+
+default ReportDetails7_3 := "User click tracking is NOT enabled."
+ReportDetails7_3 := "User click tracking is enabled via the standard or strict preset security policies." if {
+    PresetRecipientsCovered
+}
+
+ReportDetails7_3 := concat("", ["User click tracking is enabled via policy ", AppliedPolicy, "."]) if {
+    not PresetRecipientsCovered
+    CustomPolicyTrackClicksEnabled
+}
+
+default TrackClicksCompliant := false
+TrackClicksCompliant if {
+    ReportDetails7_3 != "User click tracking is NOT enabled."
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.7.3v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.7.3v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-SafeLinksPolicy", "Get-SafeLinksRule", "Get-EOPProtectionPolicyRule"],
+    "ActualValue": {"SafeLinks_Rules": input.safe_links_rules, "SafeLinks_Policies": input.safe_links_policies},
+    "ReportDetails": ReportDetails7_3,
+    "RequirementMet": TrackClicksCompliant
 }
+
 #--
 
 

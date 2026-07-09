@@ -25,9 +25,11 @@ test_isDisabled_Incorrect if {
 }
 
 test_isDisabled_NullIsolationPolicy if {
-    Output := powerplatform.tests with input.tenant_isolation as [null]
+    Output := powerplatform.tests with input.tenant_isolation as ["null"]
 
-    TestResult("MS.POWERPLATFORM.3.1v1", Output, FAIL, false) == true
+    NeverConfiguredError := "Tenant isolation policy has never been configured in this tenant"
+
+    TestResult("MS.POWERPLATFORM.3.1v1", Output, NeverConfiguredError, false) == true
 }
 #--
 
