@@ -52,6 +52,7 @@ PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
     RequiredTypes := {"exe", "cmd", "vbe"}
     some Policy in input.anti_malware_policies
     Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Policy.EnableFileFilter == true
     MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
     count(MissingTypes) > 0
     Reason := concat("", [
@@ -61,15 +62,13 @@ PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
     ])
 }
 
-SecuritySuite_1_1_Details(Status) := {
-    concat("", [
-        ReportDetailsBoolean(Status),
-        ". The highest priority anti-malware policy that applies to all users is the ",
-        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
-        " policy. ",
-        concat(" ", PolicyBlockClickToRunNoncomplianceReasons)
-    ])
-}
+SecuritySuite_1_1_Details(Status) := concat("", [
+    ReportDetailsBoolean(Status),
+    ". The highest priority anti-malware policy that applies to all users is the ",
+    UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
+    " policy. ",
+    concat(" ", PolicyBlockClickToRunNoncomplianceReasons),
+])
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.1v1",
@@ -105,15 +104,13 @@ PolicyZAPNoncomplianceReasons contains "Zero-hour auto purge is disabled." if {
     Policy.ZapEnabled != true
 }
 
-SecuritySuite_1_2_Details(Status) := {
-    concat("", [
-        ReportDetailsBoolean(Status),
-        ". The highest priority anti-malware policy that applies to all users is the ",
-        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
-        " policy. ",
-        concat(" ", PolicyZAPNoncomplianceReasons)
-    ])
-}
+SecuritySuite_1_2_Details(Status) := concat("", [
+    ReportDetailsBoolean(Status),
+    ". The highest priority anti-malware policy that applies to all users is the ",
+    UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
+    " policy. ",
+    concat(" ", PolicyZAPNoncomplianceReasons),
+])
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.2v1",
