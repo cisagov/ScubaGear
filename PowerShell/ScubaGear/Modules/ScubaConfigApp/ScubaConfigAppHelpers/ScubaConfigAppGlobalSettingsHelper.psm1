@@ -1,4 +1,4 @@
-Function New-GlobalSettingsControls {
+﻿Function New-GlobalSettingsControls {
     <#\s+$compte
     .SYNOPSIS
     Creates UI controls for global settings using New-FieldListCard with direct save to GlobalSettingsData.

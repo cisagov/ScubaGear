@@ -7,7 +7,7 @@
                          "sharepoint",
                          "teams",
                          "powerplatform",
-                         "defender"
+                         "securitysuite"
                      ],
     "ServicePrincipalID":  "00000000-0000-0000-0000-000000000002",
     "MissingPermissions":  [
@@ -207,5 +207,5 @@
                        }
                    ],
     "Status":  "Action needed: you have permissions [User.Read.All, Exchange.ManageAsApp] (in manifest, just need admin consent). See FixPermissionIssues for resolution.",
-    "FixPermissionIssues":  "Get-ScubaGearAppPermission -AppID 00000000-0000-0000-0000-000000000001 -M365Environment commercial -ProductNames \u0027aad\u0027, \u0027exo\u0027, \u0027sharepoint\u0027, \u0027teams\u0027, \u0027powerplatform\u0027, \u0027defender\u0027 | Set-ScubaGearAppPermission"
+    "FixPermissionIssues":  "Get-ScubaGearAppPermission -AppID 00000000-0000-0000-0000-000000000001 -M365Environment commercial -ProductNames \u0027aad\u0027, \u0027exo\u0027, \u0027sharepoint\u0027, \u0027teams\u0027, \u0027powerplatform\u0027, \u0027securitysuite\u0027 | Set-ScubaGearAppPermission"
 }

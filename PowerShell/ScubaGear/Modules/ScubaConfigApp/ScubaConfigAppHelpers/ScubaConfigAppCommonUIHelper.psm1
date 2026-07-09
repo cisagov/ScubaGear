@@ -1,4 +1,4 @@
-
+﻿
 # Add these Functions after the existing UI helper Function
 Function Get-UIConfigCriticalValues {
     <#
@@ -874,6 +874,30 @@ Function Invoke-RequiredFieldValidation {
             if ($tabToNavigate -and $tabToNavigate -notin $validationResults.TabsToNavigate) {
                 $validationResults.TabsToNavigate += $tabToNavigate
             }
+        }
+
+        # Migration-pending review check: block generate until all auto-migrated cards are reviewed and saved
+        if ($syncHash.MigrationPendingReview -and $syncHash.MigrationPendingReview.Count -gt 0) {
+            $validationResults.IsValid = $false
+            $pendingList = ($syncHash.MigrationPendingReview | Sort-Object | ForEach-Object { ($_ -split '\|', 2)[-1] }) -join ", "
+            $validationResults.Errors += "$($syncHash.MigrationPendingReview.Count) auto-migrated polic$(if($syncHash.MigrationPendingReview.Count -eq 1){'y has'}else{'ies have'}) not been reviewed. Open each orange card, verify the values, then click Save to confirm: $pendingList"
+
+            # Navigate to the tab(s) that actually contain pending policies. Each pending
+            # key is "{controlType}|{policyId}", and every control type has a matching
+            # "{controlType}PolicyTab" element (Exclusions/Annotations/Omissions), so the
+            # correct tab is resolved dynamically from the pending items - nothing is hardcoded.
+            $pendingControlTypes = @(
+                $syncHash.MigrationPendingReview |
+                ForEach-Object { ($_ -split '\|', 2)[0] } |
+                Sort-Object -Unique
+            )
+            foreach ($pendingControlType in $pendingControlTypes) {
+                $migrationTab = $syncHash."$($pendingControlType)PolicyTab"
+                if ($migrationTab -and $migrationTab -notin $validationResults.TabsToNavigate) {
+                    $validationResults.TabsToNavigate += $migrationTab
+                }
+            }
+            Write-DebugOutput -Message "Migration pending review blocks generate: $pendingList" -Source $MyInvocation.MyCommand -Level "Info"
         }
 
         Write-DebugOutput -Message "Validation completed. Valid: $($validationResults.IsValid), Errors: $($validationResults.Errors.Count)" -Source $MyInvocation.MyCommand -Level "Info"

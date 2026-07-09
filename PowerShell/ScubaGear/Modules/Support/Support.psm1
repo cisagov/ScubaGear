@@ -471,7 +471,16 @@ function Get-OPAFile {
 
 function Get-ExeHash {
     <#
-        .SYNOPSIS Internal
+    .SYNOPSIS
+    Computes and validates the hash of an executable file.
+    .DESCRIPTION
+    Calculates the SHA256 hash of an executable file and compares it with an expected version string.
+    .PARAMETER Filename
+    The name of the executable file to hash.
+    .PARAMETER ExpectedVersion
+    The expected version or hash value to validate against.
+    .FUNCTIONALITY
+    Internal
     #>
     param (
         [Parameter(Mandatory)]

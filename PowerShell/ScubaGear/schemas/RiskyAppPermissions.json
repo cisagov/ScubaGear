@@ -1,0 +1,2025 @@
+{
+  "resources": {
+    "00000003-0000-0000-c000-000000000000": "Microsoft Graph",
+    "00000002-0000-0ff1-ce00-000000000000": "Office 365 Exchange Online",
+    "00000003-0000-0ff1-ce00-000000000000": "Office 365 SharePoint Online",
+    "c5393580-f805-4401-95e8-94b7a6ef2fc2": "Office 365 Management APIs",
+    "00000009-0000-0000-c000-000000000000": "Power BI Service",
+    "00000007-0000-0000-c000-000000000000": "Dataverse",
+    "475226c6-020e-4fb2-8a90-7a972cbfc1d4": "PowerApps Service",
+    "7df0a125-d3be-4c96-aa54-591f83ff541c": "Microsoft Flow Service"
+  },
+  "permissions": {
+    "Microsoft Graph": {
+      "Application": {
+        "9769393e-5a9f-4302-9e3d-7e018ecb64a7": {
+          "Name": "BookingsAppointment.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "0c4b2d20-7919-468d-8668-c54b09d4dee8": {
+          "Name": "Bookings.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "6b22000a-1228-42ec-88db-b8c00399aecb": {
+          "Name": "Bookings.Manage.All",
+          "RiskLevel": "High"
+        },
+        "bebd0841-a3d8-4313-a51d-731112c8ee41": {
+          "Name": "BackupRestore-Restore.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "fb240865-88f8-4a1d-923f-98dbc7920860": {
+          "Name": "BackupRestore-Control.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "18133149-5489-40ac-80f0-4b6fa85f6cdc": {
+          "Name": "BackupRestore-Configuration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "a88eef72-fed0-4bf7-a2a9-f19df33f8b83": {
+          "Name": "AuthenticationContext.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "45583558-1113-4d06-8969-e79a28edc9ad": {
+          "Name": "ApprovalSolution.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "3be0012a-cc4e-426b-895b-f9c836bf6381": {
+          "Name": "Application-RemoteDesktopConfig.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "dc149144-f292-421e-b185-5953f2e98d7f": {
+          "Name": "AppCatalog.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "1dfe531a-24a6-4f1b-80f4-7a0dc5a0a171": {
+          "Name": "APIConnectors.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ef5f7d5c-338f-44b0-86c3-351f46c8bb5f": {
+          "Name": "AccessReview.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "18228521-a591-40f1-b215-5fad4488c117": {
+          "Name": "AccessReview.ReadWrite.Membership",
+          "RiskLevel": "High"
+        },
+        "5eb59dd3-1da2-4329-8733-9dabdc435916": {
+          "Name": "AdministrativeUnit.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "c9090d00-6101-42f0-a729-c41074260d47": {
+          "Name": "Agreement.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9": {
+          "Name": "Application.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "06b708a9-e830-4db3-a914-8e69da51d44f": {
+          "Name": "AppRoleAssignment.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "7ab1d382-f21e-4acd-a863-ba3e13f7da61": {
+          "Name": "Directory.Read.All",
+          "RiskLevel": "High"
+        },
+        "19dbc75e-c2e2-444c-a770-ec69d8559fc7": {
+          "Name": "Directory.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8": {
+          "Name": "RoleManagement.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "025d3225-3f02-4882-b4c0-cd5b541a4e80": {
+          "Name": "RoleManagement.ReadWrite.Exchange",
+          "RiskLevel": "Critical"
+        },
+        "274d0592-d1b6-44bd-af1d-26d259bcb43a": {
+          "Name": "RoleManagement.ReadWrite.CloudPC",
+          "RiskLevel": "High"
+        },
+        "8b7e8c0a-7e9d-4049-97ec-04b5e1bcaf05": {
+          "Name": "RoleManagement.ReadWrite.Defender",
+          "RiskLevel": "Critical"
+        },
+        "c7fbd983-d9aa-4fa7-84b8-17382c103bc4": {
+          "Name": "RoleManagement.Read.All",
+          "RiskLevel": "High"
+        },
+        "18a4783c-866b-4cc7-a460-3d5e5662c884": {
+          "Name": "Application.ReadWrite.OwnedBy",
+          "RiskLevel": "High"
+        },
+        "741f803b-c850-494e-b5df-cde7c675a1ca": {
+          "Name": "User.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "df021288-bdef-4463-88db-98f22de89214": {
+          "Name": "User.Read.All",
+          "RiskLevel": "High"
+        },
+        "405a51b5-8d8d-430b-9842-8be4b0e9f324": {
+          "Name": "User.Export.All",
+          "RiskLevel": "High"
+        },
+        "5b567255-7703-4780-807c-7be8301ae99b": {
+          "Name": "Group.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "62a82d76-70ea-41e2-9197-370581804d09": {
+          "Name": "Group.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "98830695-27a2-44f7-8c18-0c3ebc9698f6": {
+          "Name": "GroupMember.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "dbaae8cf-10b5-4b86-a4a1-f871c94c6695": {
+          "Name": "GroupMember.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "658aa5d8-239f-45c4-aa12-864f4fc7e490": {
+          "Name": "Member.Read.Hidden",
+          "RiskLevel": "Medium"
+        },
+        "89c8469c-83ad-45f7-8ff2-6e3d4285709e": {
+          "Name": "ServicePrincipalEndpoint.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "810c84a8-4a9e-49e6-bf7d-12d183f40d01": {
+          "Name": "Mail.Read",
+          "RiskLevel": "High"
+        },
+        "6be147d2-ea4f-4b5a-a3fa-3eab6f3c140a": {
+          "Name": "Mail.ReadBasic",
+          "RiskLevel": "Medium"
+        },
+        "693c5e45-0940-467d-9b8a-1022fb9d42ef": {
+          "Name": "Mail.ReadBasic.All",
+          "RiskLevel": "Medium"
+        },
+        "e2a3a72e-5f79-4c64-b1b1-878b674786c9": {
+          "Name": "Mail.ReadWrite",
+          "RiskLevel": "Critical"
+        },
+        "b633e1c5-b582-4048-a93e-9f11b44c7e96": {
+          "Name": "Mail.Send",
+          "RiskLevel": "High"
+        },
+        "40f97065-369a-49f4-947c-6a255697ae91": {
+          "Name": "MailboxSettings.Read",
+          "RiskLevel": "Low"
+        },
+        "6931bccd-447a-43d1-b442-00a195474933": {
+          "Name": "MailboxSettings.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "7d9f353d-a7bd-4fbb-822a-26d5dd39a3ce": {
+          "Name": "MailboxItem.Read.All",
+          "RiskLevel": "High"
+        },
+        "99280d24-a782-4793-93cc-0888549957f6": {
+          "Name": "MailboxFolder.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "fef87b92-8391-4589-9da7-eb93dab7dc8a": {
+          "Name": "MailboxFolder.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "798ee544-9d2d-430c-a058-570e29e34338": {
+          "Name": "Calendars.Read",
+          "RiskLevel": "Medium"
+        },
+        "ef54d2bf-783f-4e0f-bca1-3210c0444d99": {
+          "Name": "Calendars.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "8ba4a692-bc31-4128-9094-475872af8a53": {
+          "Name": "Calendars.ReadBasic.All",
+          "RiskLevel": "Low"
+        },
+        "089fe4d0-434a-44c5-8827-41ba8a0b17f5": {
+          "Name": "Contacts.Read",
+          "RiskLevel": "Medium"
+        },
+        "6918b873-d17a-4dc1-b314-35f528134491": {
+          "Name": "Contacts.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "45bbb07e-7321-4fd7-a8f6-3ff27e6a81c8": {
+          "Name": "CallRecords.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "a2611786-80b3-417e-adaa-707d4261a5f0": {
+          "Name": "CallRecord-PstnCalls.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "01d4889c-1287-42c6-ac1f-5d1e02578ef6": {
+          "Name": "Files.Read.All",
+          "RiskLevel": "High"
+        },
+        "75359482-378d-4052-8f01-80520e7db3cd": {
+          "Name": "Files.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "9492366f-7969-46a4-8d15-ed1a20078fff": {
+          "Name": "Sites.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "332a536c-c7ef-4017-ab91-336970924f0d": {
+          "Name": "Sites.Read.All",
+          "RiskLevel": "High"
+        },
+        "a82116e5-55eb-4c41-a434-62fe8a61c773": {
+          "Name": "Sites.FullControl.All",
+          "RiskLevel": "Critical"
+        },
+        "01c0a623-fc9b-48e9-b794-0756f8e8f067": {
+          "Name": "Policy.ReadWrite.ConditionalAccess",
+          "RiskLevel": "Critical"
+        },
+        "246dd0d5-5bd0-4def-940b-0421030a5b68": {
+          "Name": "Policy.Read.All",
+          "RiskLevel": "High"
+        },
+        "e125258e-8c8a-42a8-8f55-ab502afa52f3": {
+          "Name": "AttackSimulation.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "59a6b24b-4225-4393-8165-ebaec5f55d7a": {
+          "Name": "Channel.ReadBasic.All",
+          "RiskLevel": "Low"
+        },
+        "d9c48af6-9ad9-47ad-82c3-63757137b9af": {
+          "Name": "Chat.Create",
+          "RiskLevel": "Medium"
+        },
+        "6b7d71aa-70aa-4810-a8d9-5d9fb2830017": {
+          "Name": "Chat.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "294ce7c9-31ba-490a-ad7d-97a7d075e4ed": {
+          "Name": "Chat.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b8bb2037-6e08-44ac-a4ea-4674e010e2a4": {
+          "Name": "OnlineMeetings.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "c1684f21-1984-47fa-9d61-2dc8c296bb70": {
+          "Name": "OnlineMeetings.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "50483e42-d915-4231-9639-7fdb7fd190e5": {
+          "Name": "UserAuthenticationMethod.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "29c18626-4985-4dcd-85c0-193eef327366": {
+          "Name": "Policy.ReadWrite.AuthenticationMethod",
+          "RiskLevel": "Critical"
+        },
+        "8e8e4742-1d95-4f68-9d56-6ee75648c72a": {
+          "Name": "DelegatedPermissionGrant.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "a402ca1c-2696-4531-972d-6e5ee4aa11ea": {
+          "Name": "Policy.ReadWrite.PermissionGrant",
+          "RiskLevel": "Critical"
+        },
+        "7e05723c-0bb0-42da-be95-ae9f08a6e53c": {
+          "Name": "Domain.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "90db2b9a-d928-4d33-a4dd-8442ae3d41e4": {
+          "Name": "IdentityProvider.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "292d869f-3427-49a8-9dab-8c70152b74e9": {
+          "Name": "Organization.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "fb221be6-99f2-473f-bd32-01c6a0e9ca3b": {
+          "Name": "Policy.ReadWrite.Authorization",
+          "RiskLevel": "Critical"
+        },
+        "b0afded3-3588-46d8-8b3d-9842eff778da": {
+          "Name": "AuditLog.Read.All",
+          "RiskLevel": "High"
+        },
+        "656f6061-f9fe-4807-9708-6a2e0934df76": {
+          "Name": "IdentityRiskyUser.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "d903a879-88e0-4c09-b0c9-82f6a1333f84": {
+          "Name": "SecurityEvents.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "0c458cef-11f3-48c2-a568-c66751c238c0": {
+          "Name": "Notes.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "19b94e34-907c-4f43-bde9-38b1909ed408": {
+          "Name": "SharePointTenantSettings.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9acd699f-1e81-4958-b001-93b1d2506e19": {
+          "Name": "EntitlementManagement.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9241abd9-d0e6-425a-bd4f-47ba86e767a4": {
+          "Name": "DeviceManagementConfiguration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "243333ab-4d21-40cb-a475-36241daa0842": {
+          "Name": "DeviceManagementManagedDevices.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "e330c4f0-4170-414e-a55a-2f022ec2b57b": {
+          "Name": "DeviceManagementRBAC.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "0121dc95-1b9f-4aed-8bac-58c5ac466691": {
+          "Name": "TeamMember.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "7b2449af-6ccd-4f4d-9f78-e550c193f0d1": {
+          "Name": "ChannelMessage.Read.All",
+          "RiskLevel": "High"
+        },
+        "9f1b81a7-0223-4428-bfa4-0bcb5535f27d": {
+          "Name": "ConsentRequest.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "338163d7-f101-4c92-94ba-ca46fe52447c": {
+          "Name": "Policy.ReadWrite.CrossTenantAccess",
+          "RiskLevel": "High"
+        },
+        "9b50c33d-700f-43b1-b2eb-87e89b703581": {
+          "Name": "Synchronization.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "5ac13192-7ace-4fcf-b828-1a26f28068ee": {
+          "Name": "DeviceManagementServiceConfig.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "1138cb37-bd11-4084-a2b7-9f71582aeddb": {
+          "Name": "Device.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "cb8d6980-6bcb-4507-afec-ed6de3a2d798": {
+          "Name": "IdentityRiskyServicePrincipal.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f2bf083f-0179-402a-bedb-b2784de8a49b": {
+          "Name": "SecurityActions.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "34bf0e97-1971-4929-b999-9e2442d941d7": {
+          "Name": "SecurityIncident.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b2620db1-3bf7-4c5b-9cb9-576d29eac736": {
+          "Name": "eDiscovery.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "124325f3-0c46-4c57-a050-d6d1a82510f6": {
+          "Name": "PrivilegedAccess-CustomExt.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "920def01-ca61-4d2d-b3df-105b46046a70": {
+          "Name": "MultiTenantOrganization.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "79a677f7-b79d-40d0-a36a-3e6f8688dd7a": {
+          "Name": "Policy.ReadWrite.TrustFramework",
+          "RiskLevel": "Critical"
+        },
+        "4a771c9a-1cf2-4609-b88e-3d3e02d539cd": {
+          "Name": "TrustFrameworkKeySet.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "1c6e93a6-28e2-4cbb-9f64-1a46a821124d": {
+          "Name": "Policy.ReadWrite.SecurityDefaults",
+          "RiskLevel": "Critical"
+        },
+        "dd199f4a-f148-40a4-a2ec-f0069cc799ec": {
+          "Name": "RoleAssignmentSchedule.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "fee28b28-e1f3-4841-818e-2704dc62245f": {
+          "Name": "RoleEligibilitySchedule.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "31e08e0a-d3f7-4ca2-ac39-7343fb83e8ad": {
+          "Name": "RoleManagementPolicy.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "c2667967-7050-4e7e-b059-4cbbb3811d03": {
+          "Name": "CustomAuthenticationExtension.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "65319a09-a2be-469d-8782-f6b07debf789": {
+          "Name": "IdentityUserFlow.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "c22a92cc-79bf-4bb1-8b6c-e0a05d3d80ce": {
+          "Name": "OnPremDirectorySynchronization.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "cc117bb9-00cf-4eb8-b580-ea2a878fe8f7": {
+          "Name": "User-PasswordProfile.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "e118f1da-5c1c-46cf-bff6-8858d786f46f": {
+          "Name": "Mail-Advanced.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "bf394140-e372-4bf9-a898-299cfc7564e5": {
+          "Name": "SecurityEvents.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "dc5007c0-2d7d-4c42-879c-2dab87571379": {
+          "Name": "IdentityRiskyUser.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "6e472fd1-ad78-48da-a0f0-97ab2c6b769e": {
+          "Name": "IdentityRiskEvent.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "3aeca27b-ee3a-4c2b-8ded-80376e2134a4": {
+          "Name": "Notes.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "230c1aed-a721-4c5d-9cb4-a90514e508ef": {
+          "Name": "Reports.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "b528084d-ad10-4598-8b93-929746b4d7d6": {
+          "Name": "People.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "57f1cf28-c0c4-4ec3-9a30-19a2eaaf2f6e": {
+          "Name": "BitlockerKey.Read.All",
+          "RiskLevel": "High"
+        },
+        "38d9df27-64da-44fd-b7c5-a6fbac20248f": {
+          "Name": "UserAuthenticationMethod.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "fff194f1-7dce-4428-8301-1badb5518201": {
+          "Name": "TrustFrameworkKeySet.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "9a5d68dd-52b0-4cc2-bd40-abcf44ac3a30": {
+          "Name": "Application.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "472e4a4d-bb4a-4026-98d1-0b0d74cb74a5": {
+          "Name": "SecurityAlert.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "5ba43d2f-fa88-4db2-bd1c-a67c5f0fb1ce": {
+          "Name": "Synchronization.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "3b37c5a4-1226-493d-bec3-5d6c6b866f3f": {
+          "Name": "CustomSecAttributeAssignment.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "b185aa14-d8d2-42c1-a685-0f5596613624": {
+          "Name": "CustomSecAttributeDefinition.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "dc377aa6-52d8-4e23-b271-2a7ae04cedf3": {
+          "Name": "DeviceManagementConfiguration.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "06a5fe6d-c49d-46a7-b082-56b1b14103c7": {
+          "Name": "DeviceManagementServiceConfig.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "c74fd47d-ed3c-45c3-9a9e-b8676de685d2": {
+          "Name": "EntitlementManagement.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "83d4163d-a2d8-4d3b-9695-4ae3ca98f888": {
+          "Name": "SharePointTenantSettings.Read.All",
+          "RiskLevel": "Low"
+        },
+        "498476ce-e0fe-48b0-b801-37ba7e2685c6": {
+          "Name": "Organization.Read.All",
+          "RiskLevel": "Low"
+        },
+        "dbb9058a-0e50-45d7-ae91-66909b5d4664": {
+          "Name": "Domain.Read.All",
+          "RiskLevel": "Low"
+        },
+        "a7a681dc-756e-4909-b988-f160edc6655f": {
+          "Name": "Calls.AccessMedia.All",
+          "RiskLevel": "High"
+        },
+        "284383ee-7f6e-4e40-a2a8-e85dcb029101": {
+          "Name": "Calls.Initiate.All",
+          "RiskLevel": "Medium"
+        },
+        "4c277553-8a09-487b-8023-29ee378d8324": {
+          "Name": "Calls.InitiateGroupCall.All",
+          "RiskLevel": "Medium"
+        },
+        "f6b49018-60ab-4f81-83bd-22caeabfed2d": {
+          "Name": "Calls.JoinGroupCall.All",
+          "RiskLevel": "High"
+        },
+        "23fc2474-f741-46ce-8465-674744c5c361": {
+          "Name": "Team.Create",
+          "RiskLevel": "Medium"
+        },
+        "2280dda6-0bfd-44ee-a2f4-cb867cfc4c1e": {
+          "Name": "Team.ReadBasic.All",
+          "RiskLevel": "Low"
+        },
+        "660b7406-55f1-41ca-a0ed-0b035e182f3e": {
+          "Name": "TeamMember.Read.All",
+          "RiskLevel": "Low"
+        },
+        "242607bd-1d2c-432c-82eb-bdb27baa23ab": {
+          "Name": "TeamSettings.Read.All",
+          "RiskLevel": "Low"
+        },
+        "bdd80a03-d9bc-451d-b7c4-ce7c63fe3c8f": {
+          "Name": "TeamSettings.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "a3410be2-8e48-4f32-8454-c29a7465209d": {
+          "Name": "ChatMember.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "49981c42-fd7b-4530-be03-e77b21aed25e": {
+          "Name": "TeamsTab.Create",
+          "RiskLevel": "Medium"
+        },
+        "46890524-499a-4bb2-ad64-1476b4f3e1cf": {
+          "Name": "TeamsTab.Read.All",
+          "RiskLevel": "Low"
+        },
+        "a96d855f-016b-47d7-b51c-1218a98d791c": {
+          "Name": "TeamsTab.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9e19bae1-2623-4c4f-ab6e-2664615ff9a0": {
+          "Name": "TeamsAppInstallation.ReadWriteForChat.All",
+          "RiskLevel": "High"
+        },
+        "5dad17ba-f6cc-4954-a5a2-a0dcc95154f0": {
+          "Name": "TeamsAppInstallation.ReadWriteForTeam.All",
+          "RiskLevel": "High"
+        },
+        "74ef0291-ca83-4d02-8c7e-d2391e6a444f": {
+          "Name": "TeamsAppInstallation.ReadWriteForUser.All",
+          "RiskLevel": "High"
+        },
+        "dfb0dd15-61de-45b2-be36-d6a69fba3c79": {
+          "Name": "Teamwork.Migrate.All",
+          "RiskLevel": "Critical"
+        },
+        "79c02f5b-bd4f-4713-bc2c-a8a4a66e127b": {
+          "Name": "TeamworkDevice.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "a267235f-af13-44dc-8385-c1dc93023186": {
+          "Name": "TeamsActivity.Send",
+          "RiskLevel": "Medium"
+        },
+        "70dec828-f620-4914-aa83-a29117306807": {
+          "Name": "TeamsActivity.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "a70e0c2d-e793-494c-94c4-118fa0a67f42": {
+          "Name": "Presence.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "ed4fca05-be46-441f-9803-1873825f8fdb": {
+          "Name": "SecurityAlert.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "dd98c7f5-2d42-42d3-a0e4-633161547251": {
+          "Name": "ThreatHunting.Read.All",
+          "RiskLevel": "High"
+        },
+        "197ee4e9-b993-4066-898f-d6aecc55125b": {
+          "Name": "ThreatIndicators.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "21792b6c-c986-4ffc-85de-df9da54b52fa": {
+          "Name": "ThreatIndicators.ReadWrite.OwnedBy",
+          "RiskLevel": "High"
+        },
+        "e0b77adb-e790-44a3-b0a0-257d06303687": {
+          "Name": "ThreatIntelligence.Read.All",
+          "RiskLevel": "High"
+        },
+        "d72bdbf4-a59b-405c-8b04-5995895819ac": {
+          "Name": "ThreatSubmission.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "86632667-cd15-4845-ad89-48a88e8412e1": {
+          "Name": "ThreatSubmission.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "926a6798-b100-4a20-a22f-a4918f13951d": {
+          "Name": "ThreatSubmissionPolicy.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "e0fd9c8d-a12e-4cc9-9827-20c8c3cd6fb8": {
+          "Name": "CustomDetection.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "673a007a-9e0f-4c97-b066-3c0164486909": {
+          "Name": "CustomDetection.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "d4dcee6d-0774-412a-b06c-aeabbd99e816": {
+          "Name": "SecurityIdentitiesSensors.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f1df927b-cfd3-4681-bff2-a111410e6db3": {
+          "Name": "BackupRestore-Restore.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9b305210-e32e-4a8d-a9b6-221c2a61e4cb": {
+          "Name": "BackupRestore-Configuration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "faef97a4-c26a-4146-a81b-dd11b0037c9b": {
+          "Name": "Application-RemoteDesktopConfig.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "1574bc29-e3f3-4c30-b2b4-bdcd166729e3": {
+          "Name": "AppCatalog.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b0a39d8e-3025-45c8-bba4-272d070d9b78": {
+          "Name": "Agreement.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9ec3ab20-236b-450e-be94-4c17b7948618": {
+          "Name": "ServicePrincipalEndpoint.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "3a673978-9df8-4c1a-a994-a4414f7ce387": {
+          "Name": "SharePointTenantSettings.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b11b5083-c2df-4dbf-823b-e7146200a3ba": {
+          "Name": "ConsentRequest.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "fee6283f-d06e-48c1-b824-b335a5d92ba1": {
+          "Name": "Policy.ReadWrite.CrossTenantAccess",
+          "RiskLevel": "High"
+        },
+        "7b34580a-e1eb-4327-aa30-0e48cd4ae5ac": {
+          "Name": "Synchronization.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "abab1d20-e7bc-4aa0-ae69-6e12e2db858e": {
+          "Name": "IdentityRiskyServicePrincipal.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "82c6edcf-5a3a-4b6a-9212-f96ea2c855fb": {
+          "Name": "SecurityIncident.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "66510d13-93d3-4077-b9e2-83bb78d8facd": {
+          "Name": "eDiscovery.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ced1311f-4766-4c29-9141-545cf2525f0f": {
+          "Name": "MultiTenantOrganization.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f0060247-9e6b-4299-9094-858a175d488b": {
+          "Name": "RoleAssignmentSchedule.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "aaddf15b-d1a9-4fd7-bd46-cbb2ae85162e": {
+          "Name": "RoleEligibilitySchedule.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "6e7a5640-116b-45cb-a24a-1b9e9921fbbd": {
+          "Name": "RoleManagementPolicy.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "b2b5a384-949a-4ef5-b775-19f15cf00f4f": {
+          "Name": "CustomAuthenticationExtension.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "b615aeec-938d-425a-95ed-ce1044f25e6f": {
+          "Name": "OnPremDirectorySynchronization.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "64c33fcb-e6aa-490d-bed5-6016a9ef8f6d": {
+          "Name": "SecurityAlert.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "8c0a7004-4562-43d5-bf3c-e6526d63f3e4": {
+          "Name": "Synchronization.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "eb3fd861-60df-440a-a09a-e71f7d968b6d": {
+          "Name": "CustomSecAttributeAssignment.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "f3566c47-d25d-4a6d-bf9d-3f109c1c693d": {
+          "Name": "CustomSecAttributeDefinition.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "ecd0c692-8a5a-49fc-9e89-ecbbb58b04a9": {
+          "Name": "SharePointTenantSettings.Read.All",
+          "RiskLevel": "Low",
+          "Clouds": ["GCCHigh"]
+        },
+        "70549927-dd38-44e4-a76f-e91b5ec6acc4": {
+          "Name": "TeamworkDevice.ReadWrite.All",
+          "RiskLevel": "High",
+          "Clouds": ["GCCHigh"]
+        },
+        "8cbe86c1-747b-4599-a1bc-f872f7f221f0": {
+          "Name": "Presence.Read.All",
+          "RiskLevel": "Medium",
+          "Clouds": ["GCCHigh"]
+        },
+        "a76e26a7-ad88-4264-bb86-01a1e214c175": {
+          "Name": "SecurityAlert.ReadWrite.All",
+          "RiskLevel": "High",
+          "Clouds": ["GCCHigh"]
+        },
+        "5f804853-e3b1-447b-9a8b-6d3e1257c72a": {
+          "Name": "ThreatHunting.Read.All",
+          "RiskLevel": "High"
+        },
+        "db15c1d9-e426-4f6c-b43d-1ab784f2bf88": {
+          "Name": "ThreatIntelligence.Read.All",
+          "RiskLevel": "High"
+        },
+        "62876521-0b77-4cb5-b86e-6018cb1a6a7e": {
+          "Name": "CustomDetection.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "256643b7-3571-443a-950b-7a55da1e8285": {
+          "Name": "CustomDetection.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "3011c876-62b7-4ada-afa2-506cbbecc68c": {
+          "Name": "User.EnableDisableAccount.All",
+          "RiskLevel": "Critical"
+        },
+        "c529cfca-c91b-489c-af2b-d92990b66ce6": {
+          "Name": "User.ManageIdentities.All",
+          "RiskLevel": "Critical"
+        },
+        "3b4349e1-8cf5-45a3-95b7-69d1751d3e6a": {
+          "Name": "CloudPC.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "45cc0394-e837-488b-a098-1918f48d186c": {
+          "Name": "SecurityIncident.Read.All",
+          "RiskLevel": "High"
+        },
+        "5652f862-b626-407b-a3e6-248aeb95763c": {
+          "Name": "User.ReadWrite.CrossCloud",
+          "RiskLevel": "High"
+        },
+        "09850681-111b-4a89-9bed-3f2cae46d706": {
+          "Name": "User.Invite.All",
+          "RiskLevel": "High"
+        },
+        "93283d0a-6322-4fa8-966b-8c121624760d": {
+          "Name": "AttackSimulation.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "d1808e82-ce13-47af-ae0d-f9b254e6d58a": {
+          "Name": "EduRoster.ReadWrite.All",
+          "RiskLevel": "Medium"
+        },
+        "01e37dc9-c035-40bd-b438-b2879c4870a6": {
+          "Name": "PrivilegedAccess.Read.AzureADGroup",
+          "RiskLevel": "Medium"
+        },
+        "5df6fe86-1be0-44eb-b916-7bd443a71236": {
+          "Name": "PrivilegedAccess.Read.AzureResources",
+          "RiskLevel": "Medium"
+        },
+        "edb419d6-7edc-42a3-9345-509bfdf5d87c": {
+          "Name": "PrivilegedEligibilitySchedule.Read.AzureADGroup",
+          "RiskLevel": "Medium"
+        },
+        "483bed4a-2ad3-4361-a73b-c83ccdbdc53c": {
+          "Name": "RoleManagement.Read.Directory",
+          "RiskLevel": "Medium"
+        },
+        "69e67828-780e-47fd-b28c-7b27d14864e6": {
+          "Name": "RoleManagementPolicy.Read.AzureADGroup",
+          "RiskLevel": "Low"
+        },
+        "c766cb16-acc4-4663-ba09-6eedef5876c5": {
+          "Name": "ServiceActivity-Microsoft365Web.Read.All",
+          "RiskLevel": "Low"
+        },
+        "79c261e0-fe76-4144-aad5-bdc68fbe4037": {
+          "Name": "ServiceHealth.Read.All",
+          "RiskLevel": "Low"
+        },
+        "1b620472-6534-4fe6-9df2-4680e8aa28ec": {
+          "Name": "ServiceMessage.Read.All",
+          "RiskLevel": "Low"
+        },
+        "f6d38dfd-ec08-4995-8f07-23e929df0936": {
+          "Name": "UserAuthMethod-Password.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "6e85d483-7092-4375-babe-0a94a8213a58": {
+          "Name": "UserAuthMethod-Phone.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "e8ecb853-1435-4a49-95ba-ec5b31b11672": {
+          "Name": "UserAuthMethod-Email.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "627169a8-8c15-451c-861a-5b80e383de5c": {
+          "Name": "UserAuthMethod-TAP.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "0400e371-7db1-4338-a269-96069eb65227": {
+          "Name": "UserAuthMethod-Passkey.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "c833c349-a1ab-4b6d-94a2-fa9a8674420c": {
+          "Name": "UserAuthMethod-MicrosoftAuthApp.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "c7a22c2e-5b01-4129-8159-6c8be2c78f16": {
+          "Name": "UserAuthMethod-External.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "7e9ebcc1-90aa-4471-8051-e68d6b4e9c89": {
+          "Name": "UserAuthMethod-HardwareOATH.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "787442d4-3c6e-4e99-aa95-8ccca20a48ff": {
+          "Name": "UserAuthMethod-SoftwareOATH.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "1a87acf4-a9ca-4576-a974-452ea265d5f6": {
+          "Name": "UserAuthMethod-PlatformCred.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "4869299f-18c3-40c8-98f2-222657e67db1": {
+          "Name": "UserAuthMethod-QR.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "f14eee8a-713e-45aa-8223-2ab74632db1a": {
+          "Name": "UserAuthMethod-WindowsHello.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "7fc588a2-ea2d-4d1f-bcf7-33c324b149b8": {
+          "Name": "SignInIdentifier.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "9d952b72-f741-4b40-9185-8c53076c2339": {
+          "Name": "User-ConvertToInternal.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "cc13eba4-8cd8-44c6-b4d4-f93237adce58": {
+          "Name": "DelegatedAdminRelationship.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "5facf0c1-8979-4e95-abcf-ff3d079771c0": {
+          "Name": "LicenseAssignment.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "78145de6-330d-4800-a6ce-494ff2d33d07": {
+          "Name": "DeviceManagementApps.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9255e99d-faf5-445e-bbf7-cb71482737c4": {
+          "Name": "DeviceManagementScripts.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f15eb2ba-ef8a-4f70-991d-da5d045154e2": {
+          "Name": "DeviceManagementCloudCA.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "884b599e-4d48-43a5-ba94-15c414d00588": {
+          "Name": "DeviceLocalCredential.Read.All",
+          "RiskLevel": "High"
+        },
+        "db51be59-e728-414b-b800-e0f010df1a79": {
+          "Name": "DeviceLocalCredential.ReadBasic.All",
+          "RiskLevel": "High"
+        },
+        "64d40371-8d58-4270-bc8a-b4a66de36b9a": {
+          "Name": "Domain-InternalFederation.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "0edf5e9e-4ce8-468a-8432-d08631d18c43": {
+          "Name": "EventListener.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "88bb2658-5d9e-454f-aacd-a3933e079526": {
+          "Name": "CustomAuthenticationExtension.Read.All",
+          "RiskLevel": "High"
+        },
+        "214e810f-fda8-4fd7-a475-29461495eb00": {
+          "Name": "CustomAuthenticationExtension.Receive.Payload",
+          "RiskLevel": "High"
+        },
+        "04c55753-2244-4c25-87fc-704ab82a4f69": {
+          "Name": "SecurityAnalyzedMessage.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "af2bf46f-7bf1-4be3-8bad-e17e279e8462": {
+          "Name": "SecurityIdentitiesActions.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "4f1f0deb-08d1-4ffb-8cca-21dfc362b7c0": {
+          "Name": "SecurityIdentitiesAutoConfig.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ab03ddd5-7ae4-4f2e-8af8-86654f7e0a27": {
+          "Name": "SecurityIdentitiesHealth.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b4146a3a-dd4f-4af4-8d91-7cc0eef3d041": {
+          "Name": "SecurityIdentitiesUserActions.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b10642fc-a6cf-4c46-87f9-e1f96c2a18aa": {
+          "Name": "NetworkAccess.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "8137102d-ec16-4191-aaf8-7aeda8026183": {
+          "Name": "NetworkAccessBranch.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f0c341be-8348-4989-8e43-660324294538": {
+          "Name": "NetworkAccessPolicy.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "0b57845e-aa49-4e6f-8109-ce654fffa618": {
+          "Name": "OnPremisesPublishingProfiles.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "287bd98c-e865-4e8c-bade-1a85523195b9": {
+          "Name": "InformationProtectionContent.Write.All",
+          "RiskLevel": "High"
+        },
+        "eb158f57-df43-4751-8b21-b8932adb3d34": {
+          "Name": "RecordsManagement.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "5c505cf4-8424-4b8e-aa14-ee06e3bb23e3": {
+          "Name": "LifecycleWorkflows.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "94c88098-1d9d-4c42-a356-4d5a95312554": {
+          "Name": "LifecycleWorkflows-Workflow.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "3351c766-bacc-4d93-94fa-f2c8b1986ee7": {
+          "Name": "LifecycleWorkflows-CustomExt.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "306785c5-c09b-4ba0-a4ee-023f3da165cb": {
+          "Name": "CrossTenantUserProfileSharing.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "7a6ee1e7-141e-4cec-ae74-d9db155731ff": {
+          "Name": "DeviceManagementApps.Read.All",
+          "RiskLevel": "Low"
+        },
+        "c7a5be92-2b3d-4540-8a67-c96dcaae8b43": {
+          "Name": "DeviceManagementScripts.Read.All",
+          "RiskLevel": "Low"
+        },
+        "315b6e8c-d92a-4691-919d-00ce76d1344a": {
+          "Name": "DeviceManagementCloudCA.Read.All",
+          "RiskLevel": "Low"
+        },
+        "2f51be20-0bb4-4fed-bf7b-db946066c75e": {
+          "Name": "DeviceManagementManagedDevices.Read.All",
+          "RiskLevel": "Low"
+        },
+        "58ca0d9a-1575-47e1-a3cb-007ef2e4583b": {
+          "Name": "DeviceManagementRBAC.Read.All",
+          "RiskLevel": "Low"
+        },
+        "607c7344-0eed-41e5-823a-9695ebe1b7b0": {
+          "Name": "IdentityRiskyServicePrincipal.Read.All",
+          "RiskLevel": "Low"
+        },
+        "db06fb33-1953-4b7b-a2ac-f1e2c854f7ae": {
+          "Name": "IdentityRiskEvent.ReadWrite.All",
+          "RiskLevel": "Low"
+        },
+        "1260ad83-98fb-4785-abbb-d6cc1806fd41": {
+          "Name": "ConsentRequest.Read.All",
+          "RiskLevel": "Low"
+        },
+        "81b4724a-58aa-41c1-8a55-84ef97466587": {
+          "Name": "DelegatedPermissionGrant.Read.All",
+          "RiskLevel": "Low"
+        },
+        "f6e9e124-4586-492f-adc0-c6f96e4823fd": {
+          "Name": "DelegatedAdminRelationship.Read.All",
+          "RiskLevel": "Low"
+        },
+        "5e1e9171-754d-478c-812c-f1755a9a4c2d": {
+          "Name": "AuditLogsQuery.Read.All",
+          "RiskLevel": "Low"
+        },
+        "64a59178-dad3-4673-89db-84fdcd622fec": {
+          "Name": "CloudApp-Discovery.Read.All",
+          "RiskLevel": "Low"
+        },
+        "091937d3-3e38-47a1-8649-b2f99d3035f1": {
+          "Name": "ProvisioningLog.Read.All",
+          "RiskLevel": "Low"
+        },
+        "ae73097b-cb2a-4447-b064-5d80f6093921": {
+          "Name": "DirectoryRecommendations.Read.All",
+          "RiskLevel": "Low"
+        },
+        "bb70e231-92dc-4729-aff5-697b3f04be95": {
+          "Name": "OnPremDirectorySynchronization.Read.All",
+          "RiskLevel": "Low"
+        },
+        "e321f0bb-e7f7-481e-bb28-e3b0b32d4bd0": {
+          "Name": "IdentityProvider.Read.All",
+          "RiskLevel": "Low"
+        },
+        "1b0c317f-dd31-4305-9932-259a8b6e8099": {
+          "Name": "IdentityUserFlow.Read.All",
+          "RiskLevel": "Low"
+        },
+        "7c67316a-232a-4b84-be22-cea2c0906404": {
+          "Name": "LifecycleWorkflows.Read.All",
+          "RiskLevel": "Low"
+        },
+        "e30060de-caa5-4331-99d3-6ac6c966a9a4": {
+          "Name": "NetworkAccess.Read.All",
+          "RiskLevel": "Low"
+        },
+        "39ae4a24-1ef0-49e8-9d63-2a66f5c39edd": {
+          "Name": "NetworkAccessBranch.Read.All",
+          "RiskLevel": "Low"
+        },
+        "8a3d36bf-cb46-4bcc-bec9-8d92829dab84": {
+          "Name": "NetworkAccessPolicy.Read.All",
+          "RiskLevel": "Low"
+        },
+        "f8dcd971-5d83-4e1e-aa95-ef44611ad351": {
+          "Name": "SecurityIdentitiesHealth.Read.All",
+          "RiskLevel": "Low"
+        },
+        "3e5d0bee-973f-4736-a123-4e1ab146f3a8": {
+          "Name": "SecurityIdentitiesUserActions.Read.All",
+          "RiskLevel": "Low"
+        },
+        "ac3a2b8e-03a3-4da9-9ce0-cbe28bf1accd": {
+          "Name": "RecordsManagement.Read.All",
+          "RiskLevel": "Low"
+        },
+        "8b919d44-6192-4f3d-8a3b-f86f8069ae3c": {
+          "Name": "CrossTenantUserProfileSharing.Read.All",
+          "RiskLevel": "Low"
+        },
+        "b7f6385c-6ce6-4639-a480-e23c42ed9784": {
+          "Name": "EventListener.Read.All",
+          "RiskLevel": "Low"
+        },
+        "b48f7ac2-044d-4281-b02f-75db744d6f5f": {
+          "Name": "SecurityAnalyzedMessage.Read.All",
+          "RiskLevel": "Low"
+        }
+      },
+      "Delegated": {
+        "e4aa47b9-9a69-4109-82ed-36ec70d85ff1": {
+          "Name": "AccessReview.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "5af8c3f5-baca-439a-97b0-ea58a435e269": {
+          "Name": "AccessReview.ReadWrite.Membership",
+          "RiskLevel": "High"
+        },
+        "7b8a2d34-6b3f-4542-a343-54651608ad81": {
+          "Name": "AdministrativeUnit.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ef4b5d93-3104-4664-9053-a5c49ab44218": {
+          "Name": "Agreement.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "c67b52c5-7c69-48b6-9d48-7b3af3ded914": {
+          "Name": "APIConnectors.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "1ca167d5-1655-44a1-8adf-1414072e1ef9": {
+          "Name": "AppCatalog.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "4bae2ed4-473e-4841-a493-9829cfd51d48": {
+          "Name": "AppCertTrustConfiguration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ffa91d43-2ad8-45cc-b592-09caddeb24bb": {
+          "Name": "Application-RemoteDesktopConfig.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "bdfbf15f-ee85-4955-8675-146e8e5296b5": {
+          "Name": "Application.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "84bccea3-f856-4a8a-967b-dbe0a3d53a64": {
+          "Name": "AppRoleAssignment.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "6768d3af-4562-48ff-82d2-c5e19eb21b9c": {
+          "Name": "ApprovalSolution.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "89d944f2-2011-44ad-830c-aa9bf5ef2319": {
+          "Name": "ApprovalSolutionResponse.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "ba6d575a-1344-4516-b777-1404f5593057": {
+          "Name": "AuthenticationContext.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "a0244d16-171c-4496-8ffb-7b9b6954d339": {
+          "Name": "BackupRestore-Configuration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "96d46335-d92d-41b8-bc9f-273a692381ea": {
+          "Name": "BackupRestore-Control.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9f89e109-94b9-4c9b-b4fc-98cdaa54f574": {
+          "Name": "BackupRestore-Restore.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "7f36b48e-542f-4d3b-9bcb-8406f0ab9fdb": {
+          "Name": "Bookings.Manage.All",
+          "RiskLevel": "Medium"
+        },
+        "948eb538-f19d-4ec5-9ccc-f059e1ea4c72": {
+          "Name": "Bookings.ReadWrite.All",
+          "RiskLevel": "Medium"
+        },
+        "02a5a114-36a6-46ff-a102-954d89d9ab02": {
+          "Name": "BookingsAppointment.ReadWrite.All",
+          "RiskLevel": "Medium"
+        },
+        "465a38f9-76ea-45b9-9f34-9e8b0d4b0b42": {
+          "Name": "Calendars.Read",
+          "RiskLevel": "Low"
+        },
+        "1ec239c2-d7c9-4623-a91a-a9775856bb36": {
+          "Name": "Calendars.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "2b9c4092-424d-4249-948d-b43879977640": {
+          "Name": "Calendars.Read.Shared",
+          "RiskLevel": "Low"
+        },
+        "ff74d97f-43af-4b68-9f2a-b77ee6968c5d": {
+          "Name": "Contacts.Read",
+          "RiskLevel": "Low"
+        },
+        "d56682ec-c09e-4743-aaf4-1a3aac4caa21": {
+          "Name": "Contacts.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "570282fd-fa5c-430d-a7fd-fc8dc98a9dca": {
+          "Name": "Mail.Read",
+          "RiskLevel": "Medium"
+        },
+        "7b9103a5-4610-446b-9670-80643382c1fa": {
+          "Name": "Mail.Read.Shared",
+          "RiskLevel": "Medium"
+        },
+        "b11fa0e7-fdb7-4dc9-b1f1-59facd463480": {
+          "Name": "Mail.ReadBasic.Shared",
+          "RiskLevel": "Low"
+        },
+        "5df07973-7d5d-46ed-9847-1271055cbd51": {
+          "Name": "Mail.ReadWrite.Shared",
+          "RiskLevel": "Medium"
+        },
+        "a4b8392a-d8d1-4954-a029-8e668a39a170": {
+          "Name": "Mail.ReadBasic",
+          "RiskLevel": "Low"
+        },
+        "024d486e-b451-40bb-833d-3e66d98c5c73": {
+          "Name": "Mail.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "e383f46e-2787-4529-855e-0e479a3ffac0": {
+          "Name": "Mail.Send",
+          "RiskLevel": "High"
+        },
+        "a367ab51-6b49-43bf-a716-a1fb06d2a174": {
+          "Name": "Mail.Send.Shared",
+          "RiskLevel": "Medium"
+        },
+        "87f447af-9fa4-4c32-9dfa-4a57a73d18ce": {
+          "Name": "MailboxSettings.Read",
+          "RiskLevel": "Low"
+        },
+        "82305458-296d-4edd-8b0b-74dd74c34526": {
+          "Name": "MailboxItem.Read",
+          "RiskLevel": "Medium"
+        },
+        "a154be20-db9c-4678-8ab7-66f6cc099a59": {
+          "Name": "User.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "204e0828-b5ca-4ad8-b9f3-f32a958e7cc4": {
+          "Name": "User.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "405a51b5-8d8d-430b-9842-8be4b0e9f324": {
+          "Name": "User.Export.All",
+          "RiskLevel": "High"
+        },
+        "205e70e5-aba6-4c52-a976-6d2d46c48043": {
+          "Name": "Sites.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "89fe6a52-be36-487e-b7d8-d061c450a026": {
+          "Name": "Sites.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "27608d7c-2c66-4cad-a657-951d575f5a60": {
+          "Name": "AttackSimulation.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "9d8982ae-4365-4f57-95e9-d6032a4c0b87": {
+          "Name": "Channel.ReadBasic.All",
+          "RiskLevel": "Low"
+        },
+        "2b61aa8a-6d36-4b2f-ac7b-f29867937c53": {
+          "Name": "ChannelMessage.Edit",
+          "RiskLevel": "Low"
+        },
+        "ebf0f66e-9fb1-49e4-a278-222f76911cf4": {
+          "Name": "ChannelMessage.Send",
+          "RiskLevel": "Low"
+        },
+        "38826093-1258-4dea-98f0-00003be2b8d0": {
+          "Name": "Chat.Create",
+          "RiskLevel": "Low"
+        },
+        "f501c180-9344-439a-bca0-6cbf209fd270": {
+          "Name": "Chat.Read",
+          "RiskLevel": "Low"
+        },
+        "9ff7295e-131b-4d94-90e1-69fde507ac11": {
+          "Name": "Chat.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "cdcdac3a-fd45-410d-83ef-554db620e5c7": {
+          "Name": "ChatMessage.Read",
+          "RiskLevel": "Low"
+        },
+        "116b7235-7cc6-461e-b163-8e55691d839e": {
+          "Name": "ChatMessage.Send",
+          "RiskLevel": "Low"
+        },
+        "bac3b9c2-b516-4ef4-bd3b-c2ef73d8d804": {
+          "Name": "Device.Command",
+          "RiskLevel": "High"
+        },
+        "ff91d191-45a0-43fd-b837-bd682c4a0b0f": {
+          "Name": "EAS.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "9769c687-087d-48ac-9cb3-c37dde652038": {
+          "Name": "EWS.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "652390e4-393a-48de-9484-05f9b1212954": {
+          "Name": "IMAP.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "d7b7f2d9-0f45-4ea1-9d42-e50810c06991": {
+          "Name": "POP.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "10465720-29dd-4523-a11a-6a75c743c9d9": {
+          "Name": "Files.Read",
+          "RiskLevel": "Low"
+        },
+        "df85f4d6-205c-4ac5-a5ea-6bf408dba283": {
+          "Name": "Files.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "5c28f0bf-8a70-41f1-8ab2-9032436ddb65": {
+          "Name": "Files.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "863451e7-0667-486c-a5d6-d135439485f0": {
+          "Name": "Files.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f534bf13-55d4-45a9-8f3c-c92fe64d6131": {
+          "Name": "Financials.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "52dc2051-4958-4636-8f2a-281d39c6981c": {
+          "Name": "MailboxFolder.Read",
+          "RiskLevel": "Low"
+        },
+        "077fde41-7e0b-4c5b-bcd1-e9d743a30c80": {
+          "Name": "MailboxFolder.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "818c620a-27a9-40bd-a6a5-d96f7d610b4b": {
+          "Name": "MailboxSettings.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "258f6531-6087-4cc4-bb90-092c5fb3ed3f": {
+          "Name": "SMTP.Send",
+          "RiskLevel": "High"
+        },
+        "d01b97e9-cbc0-49fe-810a-750afd5527a3": {
+          "Name": "RoleManagement.ReadWrite.Directory",
+          "RiskLevel": "Critical"
+        },
+        "c1499fe0-52b1-4b22-bed2-7a244e0e879f": {
+          "Name": "RoleManagement.ReadWrite.Exchange",
+          "RiskLevel": "Critical"
+        },
+        "501d06f8-07b8-4f18-b5c6-c191a4af7a82": {
+          "Name": "RoleManagement.ReadWrite.CloudPC",
+          "RiskLevel": "High"
+        },
+        "d8914f8f-9f64-4bd1-b4d3-f5a701ed8457": {
+          "Name": "RoleManagement.ReadWrite.Defender",
+          "RiskLevel": "Critical"
+        },
+        "48fec646-b2ba-4019-8681-8eb31435aded": {
+          "Name": "RoleManagement.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "9be106e1-f4e3-4df5-bdff-e4bc531cbe43": {
+          "Name": "OnlineMeetings.Read",
+          "RiskLevel": "Low"
+        },
+        "a65f2972-a4f8-4f5e-afd7-69ccb046d5dc": {
+          "Name": "OnlineMeetings.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "c5366453-9fb0-48a5-a156-24f0c49a4b84": {
+          "Name": "Directory.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "ad902697-1014-4ef5-81ef-2b4301988e8c": {
+          "Name": "Policy.ReadWrite.ConditionalAccess",
+          "RiskLevel": "Critical"
+        },
+        "7e823077-d88e-468f-a337-e18f1f0e6c7c": {
+          "Name": "Policy.ReadWrite.AuthenticationMethod",
+          "RiskLevel": "Critical"
+        },
+        "b7887744-6746-4312-813d-72daeaee7e2d": {
+          "Name": "UserAuthenticationMethod.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "0b5d694c-a244-4bde-86e6-eb5cd07730fe": {
+          "Name": "Domain.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "06da0dbc-49e2-44d2-8312-53f166ab848a": {
+          "Name": "Directory.Read.All",
+          "RiskLevel": "High"
+        },
+        "5f8c59db-677d-491f-a6b8-5f174b11ec1d": {
+          "Name": "Group.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "4e46008b-f24c-477d-8fff-7bb4ec7aafe0": {
+          "Name": "Group.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "41ce6ca6-6826-4807-84f1-1c82854f7ee5": {
+          "Name": "DelegatedPermissionGrant.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "e0a7cdbb-08b0-4697-8264-0069786e9674": {
+          "Name": "IdentityRiskyUser.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "6aedf524-7e1c-45a7-bd76-ded8cab8d0fc": {
+          "Name": "SecurityEvents.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "572fea84-0151-49b2-9301-11cb16974376": {
+          "Name": "Policy.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "e4c9e354-4dc5-45b8-9e7c-e1393b0b1a20": {
+          "Name": "AuditLog.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "0e263e50-5827-48a4-b97c-d940288653c7": {
+          "Name": "Directory.AccessAsUser.All",
+          "RiskLevel": "Critical"
+        },
+        "39d65650-9d3e-4223-80db-a335590d027e": {
+          "Name": "TeamSettings.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b98bfd41-87c6-45cc-b104-e2de4f0dafb9": {
+          "Name": "TeamsTab.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "2e25a044-2580-450d-8859-42eeb6e996c0": {
+          "Name": "TeamsAppInstallation.ReadWriteForTeam",
+          "RiskLevel": "Medium"
+        },
+        "2497278c-d82d-46a2-b1ce-39d4cdde5570": {
+          "Name": "TeamMember.Read.All",
+          "RiskLevel": "Low"
+        },
+        "7ab1d787-bae7-4d5d-8db6-37ea32df9186": {
+          "Name": "TeamsActivity.Send",
+          "RiskLevel": "Low"
+        },
+        "471f2a7f-2a42-4d45-a2bf-594d0838070d": {
+          "Name": "SecurityAlert.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b152eca8-ea73-4a48-8c98-1a6742673d99": {
+          "Name": "ThreatHunting.Read.All",
+          "RiskLevel": "High"
+        },
+        "91e7d36d-022a-490f-a748-f8e011357b42": {
+          "Name": "ThreatIndicators.ReadWrite.OwnedBy",
+          "RiskLevel": "High"
+        },
+        "f266d9c0-ccb9-4fb8-a228-01ac0d8d6627": {
+          "Name": "ThreatIntelligence.Read.All",
+          "RiskLevel": "High"
+        },
+        "8458e264-4eb9-4922-abe9-768d58f13c7f": {
+          "Name": "ThreatSubmission.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "c34088fb-0649-4714-af0b-bcbfec155897": {
+          "Name": "CustomDetection.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "3d728bf5-2e5b-4ea2-8c8a-dcf9711e1208": {
+          "Name": "AppCertTrustConfiguration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "1b8ff426-c49e-4985-a589-956c1a33c510": {
+          "Name": "Application-RemoteDesktopConfig.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "cd1cb034-c558-413b-b2ad-17bb007192da": {
+          "Name": "BackupRestore-Configuration.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "518528c3-6969-4554-b49e-73f7f0227e7e": {
+          "Name": "BackupRestore-Restore.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "c0bdd4d3-3be2-4b90-8f94-aba44d5552eb": {
+          "Name": "SecurityAlert.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f7cd536d-e34c-4fb9-bc7f-2a2c30d7de9f": {
+          "Name": "ThreatHunting.Read.All",
+          "RiskLevel": "High"
+        },
+        "b3fa7c4c-aab5-4f0c-8311-a36528f007b6": {
+          "Name": "ThreatIntelligence.Read.All",
+          "RiskLevel": "High"
+        },
+        "d8d0355c-460d-46fd-bc17-af170848113d": {
+          "Name": "CustomDetection.ReadWrite.All",
+          "RiskLevel": "High"
+        }
+      },
+      "_excludedDelegated": {
+        "3a1e4806-a744-4c70-80fc-223bf8582c46": {
+          "Name": "Family.Read",
+          "RiskLevel": "Low",
+          "Reason": "Consumer-only feature (Microsoft Family Safety), not relevant to enterprise security"
+        },
+        "11d4cd79-5ba5-460f-803f-e22c8ab85ccd": {
+          "Name": "Device.Read",
+          "RiskLevel": "Low",
+          "Reason": "Reads only signed-in users own device registration info, negligible attack value"
+        },
+        "e03cf23f-8056-446a-8994-7d93dfc8b50e": {
+          "Name": "Analytics.Read",
+          "RiskLevel": "Low",
+          "Reason": "Users own productivity analytics only, no cross-user data exposure"
+        },
+        "662d75ba-a364-42ad-adee-f5f880ea4878": {
+          "Name": "Calendars.ReadBasic",
+          "RiskLevel": "Low",
+          "Reason": "Free/busy info only, no subjects, attendees, or body content"
+        },
+        "9547fcb5-d03f-419d-9948-5928bbf71b0f": {
+          "Name": "Chat.ReadBasic",
+          "RiskLevel": "Low",
+          "Reason": "Basic chat metadata only (title, participants list), no message content"
+        }
+      }
+    },
+    "Office 365 Management APIs": {
+      "Application": {
+        "594c1fb6-4f81-4475-ae41-0c394909246c": {
+          "Name": "ActivityFeed.Read",
+          "RiskLevel": "Medium"
+        },
+        "4807a72c-ad38-4250-94c9-4eabfe26cd55": {
+          "Name": "ActivityFeed.ReadDlp",
+          "RiskLevel": "High"
+        }
+      },
+      "Delegated": {}
+    },
+    "Office 365 Exchange Online": {
+      "Application": {
+        "dc890d15-9560-4a4c-9b7f-a736ec74ec40": {
+          "Name": "full_access_as_app",
+          "RiskLevel": "Critical"
+        },
+        "798ee544-9d2d-430c-a058-570e29e34338": {
+          "Name": "Calendars.Read",
+          "RiskLevel": "Medium"
+        },
+        "2dfdc6dc-2fa7-4a2c-a922-dbd4f85d17be": {
+          "Name": "Calendars.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "ef54d2bf-783f-4e0f-bca1-3210c0444d99": {
+          "Name": "Calendars.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "089fe4d0-434a-44c5-8827-41ba8a0b17f5": {
+          "Name": "Contacts.Read",
+          "RiskLevel": "Medium"
+        },
+        "6918b873-d17a-4dc1-b314-35f528134491": {
+          "Name": "Contacts.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "e2a3a72e-5f79-4c64-b1b1-878b674786c9": {
+          "Name": "Mail.ReadWrite",
+          "RiskLevel": "Critical"
+        },
+        "810c84a8-4a9e-49e6-bf7d-12d183f40d01": {
+          "Name": "Mail.Read",
+          "RiskLevel": "High"
+        },
+        "b633e1c5-b582-4048-a93e-9f11b44c7e96": {
+          "Name": "Mail.Send",
+          "RiskLevel": "High"
+        },
+        "d45fa9f8-36e5-4cd2-b601-b063c7cf9ac2": {
+          "Name": "MailboxSettings.Read",
+          "RiskLevel": "Low"
+        },
+        "f9156939-25cd-4ba8-abfe-7fabcf003749": {
+          "Name": "MailboxSettings.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "bf24470f-10c1-436d-8d53-7b997eb473be": {
+          "Name": "User.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "77e65b5a-ceae-48b3-9490-50a86a038a48": {
+          "Name": "User.ReadBasic.All",
+          "RiskLevel": "Low"
+        },
+        "5e5addcd-3e8d-4e90-baf5-964efab2b20a": {
+          "Name": "IMAP.AccessAsApp",
+          "RiskLevel": "High"
+        },
+        "cb842b43-da6e-4506-86fe-bb12199c656d": {
+          "Name": "POP.AccessAsApp",
+          "RiskLevel": "High"
+        },
+        "7146a1f0-8703-45b3-9eae-527a64c00995": {
+          "Name": "SMTP.SendAsApp",
+          "RiskLevel": "High"
+        },
+        "c976971c-a54d-4835-a240-2479e3dac74a": {
+          "Name": "Organization.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f7264778-fba9-422d-8e9e-2675a2c4b513": {
+          "Name": "Mailbox.Migration",
+          "RiskLevel": "High"
+        },
+        "dc50a0fb-09a3-484d-be87-e023b12c6440": {
+          "Name": "Exchange.ManageAsApp",
+          "RiskLevel": "Critical"
+        },
+        "ea3d980d-ebc7-4be4-8298-a167e5b8797c": {
+          "Name": "Exchange.ManageAsAppV2",
+          "RiskLevel": "Critical"
+        },
+        "28b54159-e98b-4a00-9d52-10c8c7cbd7f3": {
+          "Name": "IMAP.AccessAsApp",
+          "RiskLevel": "High"
+        },
+        "de49976f-4890-467b-967d-b3847b062f21": {
+          "Name": "POP.AccessAsApp",
+          "RiskLevel": "High"
+        },
+        "ce81e10f-fda1-4348-8947-f7fdb6c649ad": {
+          "Name": "SMTP.SendAsApp",
+          "RiskLevel": "High"
+        }
+      },
+      "Delegated": {
+        "765f423e-b55d-412e-97e3-13a800c3a537": {
+          "Name": "Calendars.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "bbd1ca91-75e0-4814-ad94-9c5dbbae3415": {
+          "Name": "Calendars.ReadWrite.All",
+          "RiskLevel": "Medium"
+        },
+        "4585ecca-5b47-432f-ac70-e1391e4951ed": {
+          "Name": "Calendars.ReadWrite.Shared",
+          "RiskLevel": "Medium"
+        },
+        "5b9be81f-2977-4d27-8faf-bb43af8fc705": {
+          "Name": "Calendars.Read",
+          "RiskLevel": "Low"
+        },
+        "181aac24-028a-486e-a649-b3742c74ec71": {
+          "Name": "Contacts.Read",
+          "RiskLevel": "Low"
+        },
+        "32253599-e142-4cf0-810d-4827eedd1cfa": {
+          "Name": "Contacts.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "185758ba-798d-4b72-9e54-429a413a2510": {
+          "Name": "Mail.Read",
+          "RiskLevel": "Medium"
+        },
+        "75767999-c7a8-481e-a6b4-19458e0b30a5": {
+          "Name": "Mail.ReadWrite",
+          "RiskLevel": "High"
+        },
+        "5eb43c10-865a-4259-960a-83946678f8dd": {
+          "Name": "Mail.Send",
+          "RiskLevel": "High"
+        },
+        "d36ad51d-15a2-458d-9b3a-16dbe4c51c30": {
+          "Name": "MailboxSettings.Read",
+          "RiskLevel": "Low"
+        },
+        "2e83d72d-8895-4b66-9eea-abb43449ab8b": {
+          "Name": "MailboxSettings.ReadWrite",
+          "RiskLevel": "Medium"
+        },
+        "1d894596-c906-42b1-8422-9360440c1c0c": {
+          "Name": "Mail.Read.Shared",
+          "RiskLevel": "Medium"
+        },
+        "b09ec548-3f99-4d0a-859c-c9b7ff53b7a9": {
+          "Name": "Mail.ReadWrite.Shared",
+          "RiskLevel": "Medium"
+        },
+        "dab085de-3e14-432f-a47f-84b6457059c4": {
+          "Name": "Mail.ReadBasic",
+          "RiskLevel": "Low"
+        },
+        "eb665d05-7f76-4d1b-b176-1cfc814e668d": {
+          "Name": "User.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "6222dbab-a24c-4210-9d91-2f47cf565614": {
+          "Name": "User.ReadBasic.All",
+          "RiskLevel": "Low"
+        },
+        "266d2589-20b5-4f91-9a03-89247d1be8da": {
+          "Name": "EAS.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "3b5f3d61-589b-4a3c-a359-5dd4b5ee5bd5": {
+          "Name": "EWS.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "ab4f2b77-0b06-4fc1-a9de-02113fc2ab7c": {
+          "Name": "Exchange.Manage",
+          "RiskLevel": "High"
+        },
+        "44d6b5f2-d42b-4fa7-b999-1c5fcab98e4d": {
+          "Name": "Exchange.ManageV2",
+          "RiskLevel": "High"
+        },
+        "ad13ac2e-ad46-4dc0-b7da-249c94395a6d": {
+          "Name": "Mail.Read.All",
+          "RiskLevel": "High"
+        },
+        "140e747e-90d3-4de0-8618-85a0cc7a1129": {
+          "Name": "Mail.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "e843bc88-e493-446d-a73c-0ded7ff1913f": {
+          "Name": "Mail.Send.All",
+          "RiskLevel": "High"
+        },
+        "17f07f5d-fb80-4278-ba37-70ae04d476a3": {
+          "Name": "Organization.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "195adc35-e27b-454b-a7ed-1ecdffa1c09f": {
+          "Name": "IMAP.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "76faac2a-0f20-42f1-928a-50de5b9dbe52": {
+          "Name": "SMTP.Send",
+          "RiskLevel": "High"
+        },
+        "fb698133-92fa-453e-a9ed-688e10f2e5ac": {
+          "Name": "POP.AccessAsUser.All",
+          "RiskLevel": "High"
+        },
+        "da710fc9-1e83-407b-8c5c-09d225031769": {
+          "Name": "Calendars.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "d660a04c-7b62-4b4c-bea3-89226df00142": {
+          "Name": "Contacts.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "44882612-f346-430a-b938-4f00ee1c77a7": {
+          "Name": "Contacts.ReadWrite.All",
+          "RiskLevel": "Medium"
+        },
+        "27235839-268c-4d68-a668-351401ff623a": {
+          "Name": "Group.ReadWrite.All",
+          "RiskLevel": "Medium"
+        }
+      }
+    },
+    "Office 365 SharePoint Online": {
+      "Application": {
+        "fbcd29d2-fcca-4405-aded-518d457caae4": {
+          "Name": "Sites.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "d13f72ca-a275-4b96-b789-48ebcc4da984": {
+          "Name": "Sites.Read.All",
+          "RiskLevel": "High"
+        },
+        "678536fe-1083-478a-9c59-b99265e6b0d3": {
+          "Name": "Sites.FullControl.All",
+          "RiskLevel": "Critical"
+        },
+        "741f803b-c850-494e-b5df-cde7c675a1ca": {
+          "Name": "User.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "df021288-bdef-4463-88db-98f22de89214": {
+          "Name": "User.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "9bff6588-13f2-4c48-bbf2-ddab62256b36": {
+          "Name": "Sites.Manage.All",
+          "RiskLevel": "High"
+        }
+      },
+      "Delegated": {
+        "4e0d77b0-96ba-4398-af14-3baa780278f4": {
+          "Name": "AllSites.Read",
+          "RiskLevel": "Medium"
+        },
+        "640ddd16-e5b7-4d71-9690-3f4022699ee7": {
+          "Name": "AllSites.Write",
+          "RiskLevel": "Critical"
+        },
+        "56680e0d-d2a3-4ae1-80d8-3c4f2100e3d0": {
+          "Name": "AllSites.FullControl",
+          "RiskLevel": "Critical"
+        },
+        "b3f70a70-8a4b-4f95-9573-d71c496a53f4": {
+          "Name": "AllSites.Manage",
+          "RiskLevel": "High"
+        },
+        "82866913-39a9-4be7-8091-f4fa781088ae": {
+          "Name": "User.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "0cea5a30-f6f8-42b5-87a0-84cc26822e02": {
+          "Name": "User.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "e7e732bd-932b-45c4-8ce5-40d60a7daad9": {
+          "Name": "ProjectWebApp.FullControl",
+          "RiskLevel": "High"
+        },
+        "5b625b3d-65b6-4fb0-85d9-8a5aa26bdf36": {
+          "Name": "SharePointCrossTenantMigration.Manage.All",
+          "RiskLevel": "High"
+        },
+        "9aaa3660-6678-4cb8-b4b5-be92b6f4fbf0": {
+          "Name": "SitesMetadataAdmin.ReadWrite.All",
+          "RiskLevel": "Medium"
+        },
+        "1a50df37-8278-4139-9af3-3b60d57dd007": {
+          "Name": "Migration.ReadWrite.All",
+          "RiskLevel": "Medium"
+        }
+      }
+    },
+    "Power BI Service": {
+      "Application": {
+        "654b31ae-d941-4e22-8798-7add8fdf049f": {
+          "Name": "Tenant.Read.All",
+          "RiskLevel": "High"
+        },
+        "28379fa9-8596-4fd9-869e-cb60a93b5d84": {
+          "Name": "Tenant.ReadWrite.All",
+          "RiskLevel": "Critical"
+        }
+      },
+      "Delegated": {
+        "d594897b-76e7-4b2b-984b-b4adff35e109": {
+          "Name": "Tenant.ReadWrite.All",
+          "RiskLevel": "Critical"
+        },
+        "01944dba-21df-426f-bb8c-796488be96ad": {
+          "Name": "Tenant.Read.All",
+          "RiskLevel": "High"
+        },
+        "7a27a256-301d-4359-b77b-c2b759d2e362": {
+          "Name": "Item.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ddb3ca45-a192-477d-acb2-46bf9dc586de": {
+          "Name": "Gateway.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "27789c5b-aca8-4cb6-94b8-bcc8964dd8ad": {
+          "Name": "StorageAccount.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "3be8fe94-2189-4d8b-89c6-dd35c5cea6ef": {
+          "Name": "Connection.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b43e1ada-25ee-416f-bd5c-512976ddc74b": {
+          "Name": "UserState.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "322b68b2-0804-416e-86a5-d772c567b6e6": {
+          "Name": "Dataset.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "7504609f-c495-4c64-8542-686125a5a36f": {
+          "Name": "Report.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "b271f05e-8329-4b97-baa4-91cf15b99cf1": {
+          "Name": "Dashboard.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "ddd37690-e119-40c5-a821-3746ea6125c4": {
+          "Name": "Dataflow.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "199f155b-cccd-4be4-bbe6-ca9a867b24b4": {
+          "Name": "Pipeline.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "652d7d02-6ff0-4cf7-9516-cf77d33a3ae4": {
+          "Name": "Pipeline.Deploy",
+          "RiskLevel": "High"
+        },
+        "445002fb-a6f2-4dc1-a81e-4254a111cd29": {
+          "Name": "Workspace.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "d2bc95fc-440e-4b0e-bafd-97182de7aef5": {
+          "Name": "Item.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "d2e42f6b-2baf-4ff4-83ef-51e66321516e": {
+          "Name": "Gateway.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "e677843f-76d8-44d3-bcdb-ec40dea919e7": {
+          "Name": "StorageAccount.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "9ff18859-b8d5-4a89-9912-448b84dfb097": {
+          "Name": "Connection.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "7f33e027-4039-419b-938e-2f8ca153e68e": {
+          "Name": "Dataset.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "4ae1bf56-f562-4747-b7bc-2fa0874ed46f": {
+          "Name": "Report.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "2448370f-f988-42cd-909c-6528efd67c1a": {
+          "Name": "Dashboard.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "f9759906-80a4-4f4a-b010-24b832bc6a30": {
+          "Name": "Dataflow.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "dbe6434c-63f0-42bb-be8e-122ec1bad4d2": {
+          "Name": "Pipeline.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "b2f1b2fa-f35c-407c-979c-a858a808ba85": {
+          "Name": "Workspace.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "4eabc3d1-b762-40ff-9da5-0e18fdf11230": {
+          "Name": "Capacity.ReadWrite.All",
+          "RiskLevel": "High"
+        },
+        "f3076109-ca66-412a-be10-d4ee1be95d47": {
+          "Name": "Content.Create",
+          "RiskLevel": "High"
+        },
+        "76e2ebd5-0dfb-4a5b-93c7-ed89e0362834": {
+          "Name": "Capacity.Read.All",
+          "RiskLevel": "Low"
+        },
+        "8b01a991-5a5a-47f8-91a2-84d6bfd72c02": {
+          "Name": "App.Read.All",
+          "RiskLevel": "Low"
+        }
+      }
+    },
+    "Dataverse": {
+      "Application": {},
+      "Delegated": {
+        "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4": {
+          "Name": "user_impersonation",
+          "RiskLevel": "Critical"
+        }
+      }
+    },
+    "PowerApps Service": {
+      "Application": {},
+      "Delegated": {
+        "0eb56b90-a7b5-43b5-9402-8137a8083e90": {
+          "Name": "User",
+          "RiskLevel": "Medium"
+        }
+      }
+    },
+    "Microsoft Flow Service": {
+      "Application": {},
+      "Delegated": {
+        "30b2d850-00c3-4802-b7ae-ece9af9de5c6": {
+          "Name": "Flows.Manage.All",
+          "RiskLevel": "High"
+        },
+        "27c61d54-eb42-4315-8793-6e5715a19746": {
+          "Name": "Flows.Write.Plans",
+          "RiskLevel": "Medium"
+        },
+        "0b575251-2c95-46df-bc75-c8c43e6b7116": {
+          "Name": "Flows.Read.Plans",
+          "RiskLevel": "Medium"
+        },
+        "e45c5562-459d-4d1b-8148-83eb1b6dcf83": {
+          "Name": "Flows.Read.All",
+          "RiskLevel": "Medium"
+        },
+        "d05743e4-fb24-4dff-8a33-0f6c73c964bd": {
+          "Name": "Approvals.Manage.All",
+          "RiskLevel": "Medium"
+        },
+        "e9cbd5de-0031-493e-8fb1-60712d03cc8b": {
+          "Name": "Approvals.Read.All",
+          "RiskLevel": "Low"
+        }
+      }
+    }
+  }
+}

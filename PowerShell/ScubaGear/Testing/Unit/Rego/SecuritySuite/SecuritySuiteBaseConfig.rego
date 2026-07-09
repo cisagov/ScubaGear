@@ -64,6 +64,58 @@ ProtectionPolicyRules := [
     }
 ]
 
+SafeLinksPolicies := [
+    {
+        "EnableSafeLinksForEmail":  true,
+        "EnableSafeLinksForTeams":  true,
+        "EnableSafeLinksForOffice":  true,
+        "EnableForInternalSenders":  true,
+        "ScanUrls":  true,
+        "DeliverMessageAfterScan":  true,
+        "TrackClicks":  true,
+        "Identity":  "Compliant Custom Policy"
+    },
+    {
+        "EnableSafeLinksForEmail":  false,
+        "EnableSafeLinksForTeams":  false,
+        "EnableSafeLinksForOffice":  false,
+        "EnableForInternalSenders":  false,
+        "ScanUrls":  false,
+        "DeliverMessageAfterScan":  false,
+        "TrackClicks":  false,
+        "Identity":  "Non-Compliant Custom Policy"
+    },
+    {
+        "EnableSafeLinksForEmail":  true,
+        "EnableSafeLinksForTeams":  true,
+        "EnableSafeLinksForOffice":  true,
+        "EnableForInternalSenders":  false,
+        "ScanUrls":  true,
+        "DeliverMessageAfterScan":  true,
+        "TrackClicks":  true,
+        "Identity":  "Built-In Protection Policy"
+    }]
+
+SafeLinksRules := [
+    {
+        "SafeLinksPolicy":  "Compliant Custom Policy",
+        "State":  "Enabled",
+        "Priority":  0,
+        "Identity":  "Compliant Custom Policy",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null
+    },
+    {
+        "SafeLinksPolicy":  "Non-Compliant Custom Policy",
+        "State":  "Enabled",
+        "Priority":  1,
+        "Identity":  "Non-Compliant Custom Policy",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": null
+    }]
+
 AntiPhishPolicies := [
     {
         "Identity": "Standard Preset Security Policy1659535429826",

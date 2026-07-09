@@ -5,4 +5,4 @@ LogIn: false
 SecuritySuite:
   MS.SECURITYSUITE.2.1v1:
     SensitiveUsers:
-      - AgencyUserGlobalReader;agencyuserglobalreader@y2zj1.onmicrosoft.com
+      - AgencyUserGlobalReader;agencyuserglobalreader@tqhjy.onmicrosoft.com
