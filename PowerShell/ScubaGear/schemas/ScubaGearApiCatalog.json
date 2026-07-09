@@ -1638,13 +1638,15 @@
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
-        "leastPermissions": [],
+        "leastPermissions": [
+            "Exchange.ManageAsApp"
+        ],
         "higherPermissions": [],
         "spRolePermissions": [
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "defender"
+            "securitysuite"
         ],
         "supportedEnv": [
             "commercial",
@@ -1668,13 +1670,15 @@
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
-        "leastPermissions": [],
+        "leastPermissions": [
+            "Exchange.ManageAsApp"
+        ],
         "higherPermissions": [],
         "spRolePermissions": [
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "defender"
+            "securitysuite"
         ],
         "supportedEnv": [
             "gcchigh"
@@ -1697,13 +1701,15 @@
         "poshModule": [
             "ExchangeOnlineManagement"
         ],
-        "leastPermissions": [],
+        "leastPermissions": [
+            "Exchange.ManageAsApp"
+        ],
         "higherPermissions": [],
         "spRolePermissions": [
             "Global Reader"
         ],
         "scubaGearProduct": [
-            "defender"
+            "securitysuite"
         ],
         "supportedEnv": [
             "dod"
@@ -1713,6 +1719,38 @@
             "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-ippssession?view=exchange-ps"
         ],
         "notes": "",
+        "oauthScope": ""
+    },
+
+    {
+        "moduleCmdlet": "Connect-IPPSSession",
+        "apiResource": "https://ps.compliance.protection.office365.us/powershell-liveid/",
+        "apiFilter": "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "ExchangeOnlineManagement"
+        ],
+        "leastPermissions": [
+            "Exchange.ManageAsApp"
+        ],
+        "higherPermissions": [],
+        "spRolePermissions": [
+            "Global Reader"
+        ],
+        "scubaGearProduct": [
+            "securitysuite"
+        ],
+        "supportedEnv": [
+            "gcchigh",
+            "dod"
+        ],
+        "resourceAPIAppId": "00000007-0000-0ff1-ce00-000000000000",
+        "supportLinks": [
+            "https://learn.microsoft.com/en-us/powershell/module/exchange/connect-ippssession?view=exchange-ps"
+        ],
+        "notes": "Microsoft Exchange Online Protection app id is required for gcchigh/DoD environments.",
         "oauthScope": ""
     },
 

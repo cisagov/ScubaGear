@@ -19,6 +19,35 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
+            # Create mock RiskyAppPermissions.json structure with test data
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockRiskyAppPermissionsJson')]
+            $MockRiskyAppPermissionsJson = @{
+                permissions = @{
+                    "Microsoft Graph" = @{
+                        "Application" = @{
+                            "1bfefb4e-e0b5-418b-a88f-73c46d2cc8e9" = @{ Name = "Application.ReadWrite.All"; RiskLevel = "High" }
+                            "e2a3a72e-5f79-4c64-b1b1-878b674786c9" = @{ Name = "Mail.ReadWrite"; RiskLevel = "High" }
+                            "9e3f62cf-ca93-4989-b6ce-bf83c28f9fe8" = @{ Name = "RoleManagement.ReadWrite.Directory"; RiskLevel = "Critical" }
+                            "df021288-bdef-4463-88db-98f22de89214" = @{ Name = "User.Read.All"; RiskLevel = "Medium" }
+                            "dbaae8cf-10b5-4b86-a4a1-f871c94c6695" = @{ Name = "GroupMember.ReadWrite.All"; RiskLevel = "High" }
+                            "75359482-378d-4052-8f01-80520e7db3cd" = @{ Name = "Files.ReadWrite.All"; RiskLevel = "High" }
+                        }
+                    }
+                    "Office 365 Exchange Online" = @{
+                        "Application" = @{
+                            "dc890d15-9560-4a4c-9b7f-a736ec74ec40" = @{ Name = "full_access_as_app"; RiskLevel = "Critical" }
+                            "e2a3a72e-5f79-4c64-b1b1-878b674786c9" = @{ Name = "Mail.ReadWrite"; RiskLevel = "Critical" }
+                        }
+                    }
+                }
+                resources = @{
+                    "00000003-0000-0000-c000-000000000000" = "Microsoft Graph"
+                    "00000002-0000-0ff1-ce00-000000000000" = "Office 365 Exchange Online"
+                }
+            }
+            # Convert nested hashtables to PSCustomObject so PSObject.Properties enumerates JSON keys as expected.
+            $MockRiskyAppPermissionsJson = $MockRiskyAppPermissionsJson | ConvertTo-Json -Depth 20 | ConvertFrom-Json
+
             function New-MockMgGraphResponseAppRoleAssignments {
                 param (
                     [int] $Size,
@@ -73,19 +102,66 @@ InModuleScope AADRiskyPermissionsHelper {
 
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
-            }
+            } -ParameterFilter { $commandlet -eq "Get-MgServicePrincipal" } -ModuleName AADRiskyPermissionsHelper
+
+            Mock Get-ScubaGearPermissions {
+                return "https://graph.microsoft.com"
+            } -ParameterFilter { $CmdletName -eq "Connect-MgGraph" -and $OutAs -eq "endpoint" } -ModuleName AADRiskyPermissionsHelper
+
+            Mock Get-RiskyAppPermissionsJson {
+                return $MockRiskyAppPermissionsJson
+            } -ModuleName AADRiskyPermissionsHelper
+
+            # Mock Get-PermissionLookup to return the proper nested hashtable structure
+            Mock Get-PermissionLookup {
+                param([PSCustomObject] $RiskyAppPermissionsJson)
+                $Lookup = @{}
+                foreach ($Resource in $RiskyAppPermissionsJson.permissions.PSObject.Properties) {
+                    $ResourceName = $Resource.Name
+                    $Lookup[$ResourceName] = @{}
+                    foreach ($RoleType in $Resource.Value.PSObject.Properties) {
+                        if ($RoleType.Name.StartsWith("_")) { continue }
+                        $RoleTypeName = $RoleType.Name
+                        $Lookup[$ResourceName][$RoleTypeName] = @{}
+                        foreach ($Perm in $RoleType.Value.PSObject.Properties) {
+                            $Lookup[$ResourceName][$RoleTypeName][$Perm.Name] = @{
+                                Name = $Perm.Value.Name
+                                RiskLevel = $Perm.Value.RiskLevel
+                            }
+                        }
+                    }
+                }
+                return $Lookup
+            } -ModuleName AADRiskyPermissionsHelper
+
+            # Mock New-RiskyAppResourceLookup to return AppId/Name mappings
+            Mock New-RiskyAppResourceLookup {
+                param([PSCustomObject] $RiskyAppPermissionsJson)
+                $Lookup = @{
+                    AppIdToName = @{}
+                    NameToAppId = @{}
+                }
+                foreach ($Property in $RiskyAppPermissionsJson.resources.PSObject.Properties) {
+                    $Lookup.AppIdToName[$Property.Name] = $Property.Value
+                    $Lookup.NameToAppId[$Property.Value] = $Property.Name
+                }
+                return $Lookup
+            } -ModuleName AADRiskyPermissionsHelper
         }
 
         It "returns a list of service principals with valid properties" {
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
 
-            Mock Invoke-MgGraphRequest {
-                return @{
-                    responses = $MockAppRoleAssignmentResponses
+            Mock Invoke-GraphBatchRequestsWithRetry {
+                $responses = @{}
+                foreach ($response in $MockAppRoleAssignmentResponses) {
+                    $responses[[string]$response.id] = $response
                 }
-            }
+                return $responses
+            } -ModuleName AADRiskyPermissionsHelper
 
-            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache
+            # Pass explicit JSON instead of relying on Get-RiskyAppPermissionsJson to avoid cache issues
+            $RiskySPs = Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache -RiskyAppPermissionsJson $MockRiskyAppPermissionsJson
             $RiskySPs | Should -HaveCount 5
 
             $RiskySPs[0].DisplayName | Should -Match "Test SP 1"
@@ -133,14 +209,16 @@ InModuleScope AADRiskyPermissionsHelper {
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockSafePermissions
-            Mock Invoke-MgGraphRequest {
-                return @{
-                    responses = $MockAppRoleAssignmentResponses
+            Mock Invoke-GraphBatchRequestsWithRetry {
+                $responses = @{}
+                foreach ($response in $MockAppRoleAssignmentResponses) {
+                    $responses[[string]$response.id] = $response
                 }
-            }
+                return $responses
+            } -ModuleName AADRiskyPermissionsHelper
 
             $RiskySPs = @()
-            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
+            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache -RiskyAppPermissionsJson $MockRiskyAppPermissionsJson) {
                 $RiskyPerms = $SP.Permissions | Where-Object { $_.IsRisky }
                 if ($RiskyPerms.Count -gt 0) {
                     $RiskySPs += $SP
@@ -149,19 +227,21 @@ InModuleScope AADRiskyPermissionsHelper {
             $RiskySPs | Should -BeNullOrEmpty
         }
 
-        It "excludes permissions not included in the RiskyPermissions.json mapping" {
+        It "excludes permissions not included in the RiskyAppPermissions.json mapping" {
             $MockServicePrincipalAppRoleAssignments += $MockSafePermissions
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
-            Mock Invoke-MgGraphRequest {
-                return @{
-                    responses = $MockAppRoleAssignmentResponses
+            Mock Invoke-GraphBatchRequestsWithRetry {
+                $responses = @{}
+                foreach ($response in $MockAppRoleAssignmentResponses) {
+                    $responses[[string]$response.id] = $response
                 }
-            }
+                return $responses
+            } -ModuleName AADRiskyPermissionsHelper
 
             $RiskySPs = @()
-            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache) {
+            foreach ($SP in Get-ServicePrincipalsWithRiskyPermissions -M365Environment "gcc" -ResourcePermissionCache $MockResourcePermissionCache -RiskyAppPermissionsJson $MockRiskyAppPermissionsJson) {
                 $RiskyPerms = $SP.Permissions | Where-Object { $_.IsRisky }
                 if ($RiskyPerms.Count -gt 0) {
                     $RiskySPs += $SP

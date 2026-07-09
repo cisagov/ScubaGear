@@ -63,7 +63,7 @@ function Export-PowerBIProvider {
     else {
         $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
     }
-    
+
     $LicenseFoundJson = ConvertTo-Json $LicenseFound
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())

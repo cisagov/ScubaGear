@@ -17,8 +17,11 @@ Function Show-ScubaBaselinePolicyHelper {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $false)]
         [string]$BaselineFilePath,
+
+        [Parameter(Mandatory = $false)]
+        [object]$BaselineData,
 
         [Parameter(Mandatory = $false)]
         [string]$NavigateToPolicyId,
@@ -31,8 +34,8 @@ Function Show-ScubaBaselinePolicyHelper {
     )
 
     try {
-        # Validate that the configuration file exists
-        if (-not (Test-Path $BaselineFilePath)) {
+        # Require either a file path or pre-parsed data
+        if (-not $BaselineData -and (-not $BaselineFilePath -or -not (Test-Path $BaselineFilePath))) {
             Write-Error "Baseline configuration file not found: $BaselineFilePath"
             return
         }
@@ -45,6 +48,7 @@ Function Show-ScubaBaselinePolicyHelper {
 
         # Pass required variables to the runspace
         $viewerRunspace.SessionStateProxy.SetVariable("BaselineFilePath", $BaselineFilePath)
+        $viewerRunspace.SessionStateProxy.SetVariable("BaselineData", $BaselineData)
         $viewerRunspace.SessionStateProxy.SetVariable("NavigateToPolicyId", $NavigateToPolicyId)
         $viewerRunspace.SessionStateProxy.SetVariable("ControlConfigPath", $ControlConfigPath)
 
@@ -103,13 +107,18 @@ Function Show-ScubaBaselinePolicyHelper {
                     Write-ViewerLog "Baseline Policy Viewer started" -Level "Info"
                 }
 
-                # Load baseline data
-                $jsonData = Get-Content $BaselineFilePath -Raw | ConvertFrom-Json
+                # Load baseline data — use pre-parsed object if provided, otherwise read from file
+                if ($BaselineData) {
+                    $jsonData = $BaselineData
+                } else {
+                    $jsonData = Get-Content $BaselineFilePath -Raw | ConvertFrom-Json
+                }
 
                 # Load control configuration if provided
                 $controlConfig = $null
                 $policyViewerSettings = $null
                 $productNames = @{}
+                $allowedProductIds = @{}
 
                 if ($ControlConfigPath -and (Test-Path $ControlConfigPath)) {
                     $controlConfig = Get-Content $ControlConfigPath -Raw | ConvertFrom-Json
@@ -131,10 +140,13 @@ Function Show-ScubaBaselinePolicyHelper {
                 if ($controlConfig) {
                     $policyViewerSettings = $controlConfig.policyViewerSettings
 
-                    # Build product names mapping from control config
+                    # Build product names mapping and allowed product id set from control config
                     if ($controlConfig.products) {
                         foreach ($product in $controlConfig.products) {
                             $productNames[$product.id.ToLower()] = $product.name
+                            if ($product.showInViewer) {
+                                $allowedProductIds[$product.id.ToLower()] = $true
+                            }
                         }
                     }
                 }
@@ -161,8 +173,8 @@ Function Show-ScubaBaselinePolicyHelper {
         <!-- Header -->
         <Border Grid.Row="0" Background="#2C5282" CornerRadius="8" Margin="0,0,0,16" Padding="20">
             <StackPanel Orientation="Vertical">
-                <TextBlock Text="ScubaGear Baseline Policies" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,8"/>
-                <TextBlock Text="Security baseline policies and implementation guidance for Microsoft 365"
+                <TextBlock x:Name="HeaderTitle" Text="ScubaGear Baseline Policies" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,8"/>
+                <TextBlock x:Name="HeaderSubtitle" Text="Security baseline policies and implementation guidance for Microsoft 365"
                            FontSize="14" Foreground="#E0E7FF" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>
@@ -385,6 +397,16 @@ Function Show-ScubaBaselinePolicyHelper {
                 $badgesPanel = $window.FindName("BadgesPanel")
                 $policyContent = $window.FindName("PolicyContent")
 
+                # Apply configurable window/header text from the control config (falls back to XAML defaults).
+                $windowHeaderCfg = if ($policyViewerSettings -and ($policyViewerSettings.PSObject.Properties.Name -contains 'windowHeader')) { $policyViewerSettings.windowHeader } else { $null }
+                if ($windowHeaderCfg) {
+                    $headerTitleControl    = $window.FindName("HeaderTitle")
+                    $headerSubtitleControl = $window.FindName("HeaderSubtitle")
+                    if ($windowHeaderCfg.windowTitle) { $window.Title = $windowHeaderCfg.windowTitle }
+                    if ($headerTitleControl -and $windowHeaderCfg.headerTitle) { $headerTitleControl.Text = $windowHeaderCfg.headerTitle }
+                    if ($headerSubtitleControl -and $windowHeaderCfg.headerSubtitle) { $headerSubtitleControl.Text = $windowHeaderCfg.headerSubtitle }
+                }
+
                 # Dynamic expander storage
                 $dynamicExpanders = @{}
                 $dynamicContentPanels = @{}
@@ -453,6 +475,9 @@ Function Show-ScubaBaselinePolicyHelper {
                 foreach ($productKey in ($jsonData.baselines | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name | Sort-Object)) {
                     $policies = $jsonData.baselines.$productKey
                     if (-not $policies -or $policies.Count -eq 0) { continue }
+
+                    # Skip products not in the allowed list (showInViewer = true in control config)
+                    if ($allowedProductIds.Count -gt 0 -and -not $allowedProductIds[$productKey.ToLower()]) { continue }
 
                     $productDisplayName = if ($productNames[$productKey]) { $productNames[$productKey] } else { $productKey.ToUpper() }
 
@@ -881,43 +906,52 @@ Function Show-ScubaBaselinePolicyHelper {
                                         $null = $eventSender
                                         $url = $eventData.Uri.AbsoluteUri
 
-                                        # Check if this is a relative policy link (e.g., ./defender.md#msdefender61v1-instructions)
-                                        if ($url -match '\./(.*?)\.md#([a-zA-Z]+)([0-9]+)v([0-9]+)') {
-                                            $product = $matches[1].ToUpper()
-                                            #$section = $matches[2].ToUpper()
-                                            $majorVer = $matches[3]
-                                            $minorVer = $matches[4]
+                                        # Detect internal policy cross-reference links by extracting the policy ID
+                                        # directly from the link text (e.g. "MS.SECURITYSUITE.3.1v1 Instructions").
+                                        # This is more reliable than parsing the markdown anchor in the URL.
+                                        $internalPolicyId = $null
+                                        if ($linkText -match '(MS\.[A-Z0-9]+\.\d+\.\d+v\d+)') {
+                                            $internalPolicyId = $matches[1]
+                                        }
 
-                                            # Convert to policy ID format (e.g., MS.DEFENDER.6.1v1)
-                                            $policyId = "MS.$product.$majorVer.$($minorVer)v1"
+                                        if ($internalPolicyId) {
+                                            # Find the product that owns this policy
+                                            $targetProductKey = $null
+                                            foreach ($productKey in $allPolicyData.Keys) {
+                                                foreach ($policy in $allPolicyData[$productKey]) {
+                                                    if ($policy.id -eq $internalPolicyId) {
+                                                        $targetProductKey = $productKey
+                                                        break
+                                                    }
+                                                }
+                                                if ($targetProductKey) { break }
+                                            }
 
-                                            # Find and select the policy in the current viewer
-                                            $targetProduct = $product.ToLower()
-                                            if ($productTabs.ContainsKey($targetProduct)) {
-                                                # Switch to the target product tab
-                                                $productTabs[$targetProduct].IsSelected = $true
+                                            if ($targetProductKey) {
+                                                # Ensure the product group is expanded so the policy is in the ListBox
+                                                $productHeader = $navigationItems | Where-Object { $_.Type -eq "ProductHeader" -and $_.ProductKey -eq $targetProductKey }
+                                                if ($productHeader -and -not $productHeader.IsExpanded) {
+                                                    $productHeader.IsExpanded = $true
+                                                }
+                                                & $updateNavigationDisplay
 
-                                                # Find the policy in the list
-                                                $policySelector = $productTabs[$targetProduct].Content.FindName("PolicySelector_ListBox")
-                                                if ($policySelector) {
-                                                    foreach ($item in $policySelector.Items) {
-                                                        if ($item.Policy -and $item.Policy.id -eq $policyId) {
-                                                            $policySelector.SelectedItem = $item
-                                                            $policySelector.ScrollIntoView($item)
-                                                            break
-                                                        }
+                                                # Select the policy and scroll it into view
+                                                foreach ($item in $policySelector.Items) {
+                                                    if ($item.Type -eq "Policy" -and $item.Policy -and $item.Policy.id -eq $internalPolicyId) {
+                                                        $policySelector.SelectedItem = $item
+                                                        $policySelector.ScrollIntoView($item)
+                                                        break
                                                     }
                                                 }
                                             }
-
                                             $eventData.Handled = $true
                                         } else {
                                             # Regular external link - open in browser
                                             [System.Diagnostics.Process]::Start($url)
                                             $eventData.Handled = $true
                                         }
-                                    } catch { $null}
-                                })
+                                    } catch { $null }
+                                }.GetNewClosure())
 
                                 [void]$textBlock.Inlines.Add($hyperlink)
                             } catch {

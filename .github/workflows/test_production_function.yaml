@@ -21,7 +21,7 @@ on:
         default: all
         options:
           - all
-          - defender
+          - securitysuite
           - entra
           - exchange
           - powerplatform
@@ -38,7 +38,7 @@ on:
   #     - ".github/workflows/test_production_function.yaml"
   #     - ".github/workflows/function_test_teams.yaml"
   #     - ".github/workflows/publish_private_package.yaml"
-  #     - ".github/workflows/function_test_defender.yaml"
+  #     - ".github/workflows/function_test_securitysuite.yaml"
   #     - ".github/workflows/function_test_entra.yaml"
   #     - ".github/workflows/function_test_exchange.yaml"
   #     - ".github/workflows/function_test_powerplatform.yaml"
@@ -68,10 +68,10 @@ jobs:
       SubscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       KeyVaultInfo: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
 
-  test_defender:
-    name: Test Defender
-    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'defender' }}
-    uses: ./.github/workflows/function_test_defender.yaml
+  test_security_suite:
+    name: Test Security Suite
+    if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'securitysuite' }}
+    uses: ./.github/workflows/function_test_securitysuite.yaml
     permissions:
       contents: write
       id-token: write

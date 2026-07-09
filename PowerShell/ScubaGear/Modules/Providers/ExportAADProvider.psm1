@@ -102,8 +102,12 @@ function Export-AADProvider {
     # Provides data on the password expiration policy
     $DomainSettings = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaDomain", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
+    # Load the risky permissions module and JSON once for reuse by multiple functions below
+    Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
+    $RiskyAppPermissionsJson = Get-RiskyAppPermissionsJson
+
     # The RiskyDelegatedPermissionClassifications is for user consent policy 5.2 to determine if any delegated permission classifications considered risky by Scuba are classified as low risk in the tenant
-    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment}))
+    $RiskyDelegatedPermissionClassifications = ConvertTo-Json @($Tracker.TryCommand("Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications", @{"M365Environment"=$M365Environment; "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson}))
 
     ##### Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
@@ -172,11 +176,10 @@ function Export-AADProvider {
         $PrivilegedRoles = ConvertTo-Json @()
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedRole")
         $Tracker.AddUnSuccessfulCommand("Get-PrivilegedUser")
-        $PrivilegedServicePrincipals = ConvertTo-Json @()
+        $PrivilegedServicePrincipals = @{}
     }
 
     ##### This block gathers information on risky API permissions related to application/service principal objects
-    Import-Module $PSScriptRoot/ProviderHelpers/AADRiskyPermissionsHelper.psm1
 
     # Export severity score weights at the provider level so the data can be used for processing in the Entra ID HTML report.
     $SeverityScoreWeights = ConvertTo-Json -Depth 5 (Get-SeverityScoreWeights)
@@ -188,11 +191,13 @@ function Export-AADProvider {
 
     $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
-        "ResourcePermissionCache"=$ResourcePermissionCache
+        "ResourcePermissionCache"=$ResourcePermissionCache;
+        "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
     })
     $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
         "M365Environment"=$M365Environment;
-        "ResourcePermissionCache"=$ResourcePermissionCache
+        "ResourcePermissionCache"=$ResourcePermissionCache;
+        "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
     })
 
     $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }
@@ -254,9 +259,8 @@ function Export-AADProvider {
     #####
     ##### End slowest functions block
 
-    # PrivilegedServicePrincipals is converted to JSON here because earlier it is used as a PowerShell object.
-    $PrivilegedServicePrincipals = ConvertTo-Json $PrivilegedServicePrincipals
-    $PrivilegedServicePrincipals = if ($null -eq $PrivilegedServicePrincipals) {"{}"} else {$PrivilegedServicePrincipals}
+    # PrivilegedServicePrincipals is converted to JSON here because it is a PowerShell Hashtable.
+    $PrivilegedServicePrincipalsJson = ConvertTo-Json $PrivilegedServicePrincipals -Depth 5
 
     # This conversion to JSON needs to be last because other blocks above here rely on the $ServicePlans object in its PowerShell form.
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
@@ -270,7 +274,7 @@ function Export-AADProvider {
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
     "privileged_users": $PrivilegedUsers,
-    "privileged_service_principals": $PrivilegedServicePrincipals,
+    "privileged_service_principals": $PrivilegedServicePrincipalsJson,
     "privileged_roles": $PrivilegedRoles,
     "service_plans": $ServicePlans,
     "directory_settings": $DirectorySettings,

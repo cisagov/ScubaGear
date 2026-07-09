@@ -733,7 +733,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 6. Click on the **Low** tab.
 
-7. [Add a list of low risk application permissions that users will be able to consent to](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-permission-classifications). We recommend only including permissions that provide minimal access to a user's data. For a reference of permissions that are considered risky and should be avoided [go to this JSON file and examine the permissions listed](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/Permissions/RiskyPermissions.json) in the **Delegated** sections under Microsoft Graph and other apps.
+7. [Add a list of low risk application permissions that users will be able to consent to](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/configure-permission-classifications). We recommend only including permissions that provide minimal access to a user's data. For a reference of permissions that are considered risky and should be avoided [go to this JSON file and examine the permissions listed](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/schemas/RiskyAppPermissions.json) in the **Delegated** sections under Microsoft Graph and other apps.
 
 #### MS.AAD.5.3v1 Instructions
 
