@@ -22,7 +22,15 @@ function Export-SecuritySuiteProvider {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $ApiEndpoint
+        $ApiEndpoint,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ComplianceAccessToken,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ComplianceApiEndpoint
     )
 
         Write-Verbose "Running SecuritySuite provider export for environment '$M365Environment'."
@@ -65,12 +73,66 @@ function Export-SecuritySuiteProvider {
         }
     }
 
+    # IPPS/Compliance cmdlets require the Security & Compliance endpoint.
+    # These include DLP, ProtectionAlert, and audit log retention policies.
+    $HasComplianceEndpoint = (-not [string]::IsNullOrWhiteSpace($ComplianceAccessToken)) -and (-not [string]::IsNullOrWhiteSpace($ComplianceApiEndpoint))
+
+    function Invoke-ComplianceTrackedCommand {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$CmdletName,
+            [Parameter(Mandatory = $false)]
+            [bool]$SuppressWarning = $false
+        )
+
+        # Try compliance endpoint first, then fall back to EXO endpoint.
+        # GCCHigh: compliance endpoint works (EXO returns 403 for IPPS cmdlets)
+        # Commercial/GCC: EXO endpoint works (compliance rejects EXO-scoped tokens)
+        $Endpoints = @()
+        if ($HasComplianceEndpoint) {
+            $Endpoints += @{ Token = $ComplianceAccessToken; Endpoint = $ComplianceApiEndpoint }
+        }
+        $Endpoints += @{ Token = $AccessToken; Endpoint = $ApiEndpoint }
+
+        foreach ($ep in $Endpoints) {
+            try {
+                $Result = Trace-ScubaFunction -FunctionName $CmdletName -LogErrors $false -ScriptBlock {
+                    Invoke-EXORestMethod -CmdletName $CmdletName -ApiEndpoint $ep.Endpoint -AccessToken $ep.Token
+                }
+                $Tracker.AddSuccessfulCommand($CmdletName)
+                return @($Result)
+            }
+            catch {
+                # Try next endpoint
+                continue
+            }
+        }
+
+        # All endpoints failed
+        if (-not $SuppressWarning) {
+            Write-Warning "Error running ${CmdletName}: all endpoints failed."
+        }
+        $Tracker.AddUnSuccessfulCommand($CmdletName)
+        return @()
+    }
+
+
+    # Get the tenant's provisioned service plans via Graph. These are used to
+    # determine whether the tenant has the per-user license (E5 / E5 Compliance /
+    # E5 eDiscovery and Audit add-on) required to retain audit logs beyond 180
+    # days for MS.SECURITYSUITE.5.2v1. The Rego looks at the service_plans list.
+    $SubscribedSku = $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
+
     $AdminAuditLogConfig = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
     $ProtectionPolicyRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
     $AntiPhishPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishPolicy")
     $AntiPhishRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishRule")
     $AcceptedDomains = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AcceptedDomain")
     $ConnectionFilter = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedConnectionFilterPolicy")
+    $SafeLinksPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksPolicy")
+    $SafeLinksRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksRule")
     $HostedContentFilterPolicies = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterPolicy")
     $HostedContentFilterRules = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterRule")
 
@@ -93,9 +155,9 @@ function Export-SecuritySuiteProvider {
     $ATPPolicy = ConvertTo-Json @($ATPPolicyResult)
     $ATPProtectionPolicyRule = ConvertTo-Json @($ATPProtectionPolicyRuleResult)
 
-    $DLPCompliancePolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-DlpCompliancePolicy" -SuppressWarning $true)
-    $DLPComplianceRulesResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
-    $ProtectionAlertResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ProtectionAlert" -SuppressWarning $true)
+    $DLPCompliancePolicyResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpCompliancePolicy" -SuppressWarning $true)
+    $DLPComplianceRulesResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
+    $ProtectionAlertResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-ProtectionAlert" -SuppressWarning $true)
 
     if (($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpCompliancePolicy") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpComplianceRule") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ProtectionAlert")) {
         $DLPCompliancePolicyResult = @()
@@ -122,6 +184,10 @@ function Export-SecuritySuiteProvider {
     $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRulesResult
     $ProtectionAlert = ConvertTo-Json @($ProtectionAlertResult)
 
+
+    # Audit log retention policies are needed to evaluate MS.SECURITYSUITE.5.2v1.
+    $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @(Invoke-ComplianceTrackedCommand -CmdletName "Get-UnifiedAuditLogRetentionPolicy" -SuppressWarning $true)
+
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -136,7 +202,11 @@ function Export-SecuritySuiteProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "service_plans": $ServicePlans,
+    "unified_audit_log_retention_policies": $UnifiedAuditLogRetentionPolicy,
     "conn_filter": $ConnectionFilter,
+    "safe_links_policies": $SafeLinksPolicy,
+    "safe_links_rules": $SafeLinksRule,
     "defender_license": $DefenderLicense,
     "defender_dlp_license": $DLPLicense,
     "hosted_content_filter_policies": $HostedContentFilterPolicies,
