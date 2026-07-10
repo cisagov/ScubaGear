@@ -307,5 +307,24 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false

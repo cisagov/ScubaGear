@@ -176,8 +176,8 @@ function Invoke-FunctionalExoCommand {
     [hashtable]$Parameters = @{}
   )
 
-  $MaxRetries = 3
-  $RetryDelay = 5
+  $MaxRetries = 5
+  $RetryDelay = 10
 
   for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
     try {
@@ -192,9 +192,16 @@ function Invoke-FunctionalExoCommand {
       if ($_.Exception.Message -match '\(404\)') {
         return $null
       }
-      # 500 errors are transient EXO service issues - retry with backoff.
-      if ($_.Exception.Message -match '\(500\)' -and $Attempt -lt $MaxRetries) {
-        Write-Warning "EXO REST '$CmdletName' returned 500 (attempt $Attempt/$MaxRetries). Retrying in ${RetryDelay}s..."
+      # 429 rate limiting - back off and retry.
+      if ($_.Exception.Message -match '\(429\)' -and $Attempt -lt $MaxRetries) {
+        $Delay = $RetryDelay * $Attempt
+        Write-Warning "EXO REST '$CmdletName' throttled (429, attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..."
+        Start-Sleep -Seconds $Delay
+        continue
+      }
+      # 500/503 transient errors - retry with backoff.
+      if ($_.Exception.Message -match '\(50[03]\)' -and $Attempt -lt $MaxRetries) {
+        Write-Warning "EXO REST '$CmdletName' returned server error (attempt $Attempt/$MaxRetries). Retrying in ${RetryDelay}s..."
         Start-Sleep -Seconds $RetryDelay
         $RetryDelay *= 2
         continue

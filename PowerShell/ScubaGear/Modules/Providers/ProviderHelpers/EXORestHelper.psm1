@@ -184,12 +184,46 @@ function Invoke-EXORestMethod {
         }
     } | ConvertTo-Json -Depth 5
 
-    try {
-        $Response = Invoke-RestMethod -Method POST -Uri $ApiEndpoint -Headers $Headers -Body $Body -ContentType "application/json"
-        return $Response.value
-    }
-    catch {
-        throw "Exchange Online API call '$CmdletName' failed: $($_.Exception.Message)"
+    $MaxRetries = 3
+    $RetryDelay = 5
+
+    for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+        try {
+            $Response = Invoke-WebRequest -Method POST -Uri $ApiEndpoint -Headers $Headers -Body $Body -ContentType "application/json" -UseBasicParsing
+            $Parsed = $Response.Content | ConvertFrom-Json
+            return $Parsed.value
+        }
+        catch {
+            $StatusCode = 0
+            if ($_.Exception.Response) {
+                $StatusCode = [int]$_.Exception.Response.StatusCode
+            }
+
+            # Rate limited (429) - respect Retry-After header
+            if ($StatusCode -eq 429 -and $Attempt -lt $MaxRetries) {
+                $RetryAfter = $RetryDelay
+                try {
+                    $RaHeader = $_.Exception.Response.Headers | Where-Object { $_.Key -eq 'Retry-After' } | Select-Object -ExpandProperty Value -First 1
+                    if ($RaHeader -and [int]::TryParse($RaHeader, [ref]$null)) {
+                        $RetryAfter = [int]$RaHeader
+                    }
+                }
+                catch { }
+                Write-Warning "EXO REST '$CmdletName' throttled (429). Retrying in ${RetryAfter}s (attempt $Attempt/$MaxRetries)..."
+                Start-Sleep -Seconds $RetryAfter
+                continue
+            }
+
+            # Transient server errors (500, 503) - retry with backoff
+            if ($StatusCode -in @(500, 503) -and $Attempt -lt $MaxRetries) {
+                Write-Warning "EXO REST '$CmdletName' returned $StatusCode. Retrying in ${RetryDelay}s (attempt $Attempt/$MaxRetries)..."
+                Start-Sleep -Seconds $RetryDelay
+                $RetryDelay *= 2
+                continue
+            }
+
+            throw "Exchange Online API call '$CmdletName' failed: $($_.Exception.Message)"
+        }
     }
 }
 
