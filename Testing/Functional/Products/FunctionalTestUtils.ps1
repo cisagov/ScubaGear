@@ -1230,6 +1230,7 @@ function Enable-EOPProtectionPolicyRule {
 
   Invoke-FunctionalExoCommand -CmdletName 'Enable-EOPProtectionPolicyRule' -Parameters @{
     Identity = $Identity
+    Confirm = $false
   } | Out-Null
 }
 
