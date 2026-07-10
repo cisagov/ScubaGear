@@ -276,11 +276,216 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - No audit log retention policies exist
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies: []
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is seven days
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Seven day retention
+                    RetentionDuration: SevenDays
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is one month
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: One month retention
+                    RetentionDuration: OneMonth
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is three months
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Three month retention
+                    RetentionDuration: ThreeMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is six months
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Six month retention
+                    RetentionDuration: SixMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is nine months
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Nine month retention
+                    RetentionDuration: NineMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - A 12 month policy exists but is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - E3/G3 license level lacks the advanced auditing service plan
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: EXCHANGE_S_ENTERPRISE
+                    ServicePlanId: efb87545-963c-4e0d-99df-69c6916d9eb0
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 3 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 3 year retention
+                    RetentionDuration: ThreeYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 5 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 5 year retention
+                    RetentionDuration: FiveYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 7 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 7 year retention
+                    RetentionDuration: SevenYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 10 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 10 year retention
+                    RetentionDuration: TenYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month policy exists alongside shorter policies
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Six month retention
+                    RetentionDuration: SixMonths
+                    Enabled: true
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.6.1v1
     TestDriver: RunScuba
@@ -548,29 +753,203 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.7.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.7.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Compliant case - Standard Preset Policy is enabled
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Compliant case - Strict Preset Policy is enabled
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Compliant case - Custom Policy
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $true -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableSafeLinksForEmail is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $false -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $true -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableSafeLinksForTeams is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $false -EnableSafeLinksForOffice $true -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableSafeLinksForOffice is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $false -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableForInternalSenders is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $true -EnableForInternalSenders $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - Built-in Protection Policy
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.7.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.7.2v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Standard Preset Policy is enabled
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Strict Preset Policy is enabled
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $true -DeliverMessageAfterScan $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Non-Compliant case - ScanUrls is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $false -DeliverMessageAfterScan $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Non-Compliant case - DeliverMessageAfterScan is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $true -DeliverMessageAfterScan $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Built-in Protection Policy
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.7.3v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.7.3v1 Not Checked # TODO update once implemented
-        Preconditions: []
-        Postconditions: []
-        IsNotChecked: true
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case - Standard Preset Policy is enabled
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case - Strict Preset Policy is enabled
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -TrackClicks $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Non-Compliant case - TrackClicks is false
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -TrackClicks $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.7.3v1 Non-Compliant case - Built-in Protection Policy
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.8.1v1
     TestDriver: RunScuba

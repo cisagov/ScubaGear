@@ -1,4 +1,4 @@
-Function Export-ConfigurationToResultsFolder {
+﻿Function Export-ConfigurationToResultsFolder {
     <#
     .SYNOPSIS
     Exports the current configuration YAML to the ScubaGear results folder.
@@ -404,9 +404,22 @@ Function Test-ScubaRunReadiness {
 
     # Determine run mode based on AppId and CertificateThumbprint
     # If both AppId and CertificateThumbprint have values, it's non-interactive mode
-    if (![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.AppId) -and ![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.CertificateThumbprint)) {
+    $hasNonInteractiveCreds = (![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.AppId) -and
+                               ![string]::IsNullOrWhiteSpace($syncHash.AdvancedSettingsData.CertificateThumbprint))
+
+    # Block interactive runs unless the override flag is set (testing only).
+    # WAM-based Graph authentication no longer works interactively inside a runspace.
+    $allowInteractive = $syncHash.UIConfigs.PSObject.Properties['AllowScubaRunInteractive'] -and
+                        $syncHash.UIConfigs.AllowScubaRunInteractive -eq $true
+
+    if (-not $hasNonInteractiveCreds -and -not $allowInteractive) {
+        $hasValidConfig = $false
+        Write-DebugOutput -Message "ScubaRun not allowed. Application authentication (AppId + CertificateThumbprint) is required. Enable Application Settings in the Advanced tab." -Source $MyInvocation.MyCommand -Level "Error"
+    }
+
+    if ($hasNonInteractiveCreds) {
         $runMode = "[non-interactive mode]"
-    }else{
+    } else {
         $runMode = "[interactive mode]"
     }
 
@@ -417,6 +430,8 @@ Function Test-ScubaRunReadiness {
     if (-not $syncHash.JustCompletedExecution) {
         if ($hasValidConfig) {
             Update-ScubaRunStatus -Message ($syncHash.UIConfigs.localeInfoMessages.ScubaRunReady -f $runMode) -Level "Success"
+        } elseif (-not $hasNonInteractiveCreds -and -not $allowInteractive) {
+            Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubRunInteractiveNotAllowed -Level "Error"
         } else {
             Update-ScubaRunStatus -Message $syncHash.UIConfigs.localeErrorMessages.ScubaRunIncomplete -Level "Error"
         }
@@ -527,11 +542,21 @@ Function Build-ScubaGearCommand {
     $cmdParts = @()
 
     # Add pre-commands from configuration (but skip module installation)
+    # Dynamically detect the ScubaGear module source: use the local path captured at startup
+    # if it resolves to a valid .psd1 (local branch), otherwise fall back to gallery import.
+    $localModulePath = $syncHash.ScubaGearModulePath
     if ($scubaConfig.powershell.PreCommands) {
         foreach ($preCommand in $scubaConfig.powershell.preCommands) {
             # Skip any Install-Module commands as they're likely to fail
             if ($preCommand -notlike "*Install-Module*") {
-                $cmdParts += "$preCommand"
+                # If running from a local path, override the gallery Import-Module with the local .psd1
+                if (![string]::IsNullOrWhiteSpace($localModulePath) -and $preCommand -like "*Import-Module ScubaGear*") {
+                    $psdPath = Join-Path $localModulePath 'ScubaGear.psd1'
+                    $cmdParts += "Import-Module '$psdPath' -Force -Verbose"
+                    Write-DebugOutput -Message "Using local ScubaGear module: $psdPath" -Source $MyInvocation.MyCommand -Level "Info"
+                } else {
+                    $cmdParts += "$preCommand"
+                }
             }
         }
     }
@@ -720,12 +745,22 @@ Function Find-ScubaGearResultFolder {
     param([datetime]$StartTime)
 
     try {
-        # Common locations where ScubaGear creates output folders
-        $searchPaths = @(
-            "$env:USERPROFILE\Documents",
-            ".",
-            "$env:USERPROFILE\Desktop"
-        )
+        # Common locations where ScubaGear creates output folders.
+        # Use the shell-resolved Documents path so OneDrive-redirected folders are found.
+        $docsPath = [Environment]::GetFolderPath('MyDocuments')
+        $searchPaths = [System.Collections.Generic.List[string]]::new()
+        $searchPaths.Add($docsPath)
+        # Add any additional OneDrive-variant Documents folders
+        Get-Item (Join-Path $env:USERPROFILE 'OneDrive*') -ErrorAction SilentlyContinue | ForEach-Object {
+            $odvDocs = Join-Path $_.FullName 'Documents'
+            if ((Test-Path $odvDocs) -and $searchPaths -notcontains $odvDocs) {
+                $searchPaths.Add($odvDocs)
+            }
+        }
+        # Local Documents and home dir as fallbacks
+        foreach ($fb in @((Join-Path $env:USERPROFILE 'Documents'), $env:USERPROFILE)) {
+            if ((Test-Path $fb) -and $searchPaths -notcontains $fb) { $searchPaths.Add($fb) }
+        }
 
         # Get the folder base name - check UI controls first, then fall back to defaults
         $baseName = "M365BaselineConformance"
@@ -734,16 +769,14 @@ Function Find-ScubaGearResultFolder {
         # Try to get values from UI controls if they exist and have actual values
         $ReportPathValue = $syncHash.OutFolderName_TextBox.Text
         if (![string]::IsNullOrWhiteSpace($ReportPathValue)) {
-            $baseName = $syncHash.UIConfigs.localePlaceholder.OutFolderName_TextBox
-            Write-DebugOutput -Message "Folder placeholder value: '$baseName'" -Source $MyInvocation -Level "Debug"
+            $baseName = $ReportPathValue
+            Write-DebugOutput -Message "Folder base name from TextBox: '$baseName'" -Source $MyInvocation.MyCommand -Level "Debug"
         }
 
         $reportNameValue = $syncHash.OutReportName_TextBox.Text
         if (![string]::IsNullOrWhiteSpace($reportNameValue)) {
-            if ($syncHash.UIConfigs.localePlaceholder.OutReportName_TextBox) {
-                $reportName = $syncHash.UIConfigs.localePlaceholder.OutReportName_TextBox
-                Write-DebugOutput -Message "Report placeholder value: '$reportName'" -Source $MyInvocation.MyCommand -Level "Debug"
-            }
+            $reportName = $reportNameValue
+            Write-DebugOutput -Message "Report name from TextBox: '$reportName'" -Source $MyInvocation.MyCommand -Level "Debug"
         }
 
         Write-DebugOutput -Message "Looking for folders with base name: '$baseName' and report name: '$reportName'" -Source $MyInvocation.MyCommand -Level "Info"

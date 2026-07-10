@@ -1,4 +1,4 @@
-Function Update-GraphStatusIndicator {
+﻿Function Update-GraphStatusIndicator {
     <#
     .SYNOPSIS
     Updates the Graph connection status indicator in the UI.
@@ -855,4 +855,57 @@ Function Add-GraphButtonToTextBox {
     catch {
         Write-DebugOutput -Message "Failed to add Graph button to container for '$TextBoxName': $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
     }
+}
+
+Function Resolve-GraphIdsBatch {
+    <#
+    .SYNOPSIS
+    Batch-resolves directory object IDs to display names via Microsoft Graph.
+    .DESCRIPTION
+    Uses POST /v1.0/directoryObjects/getByIds to resolve a list of object IDs in a single
+    Graph call.  The object types to request are derived entirely from the graphQueries
+    configuration - specifically, every entry whose outProperty is "id".  The Graph API
+    endpoint for each such entry is mapped to the corresponding directoryObject type name.
+    Returns a hashtable mapping each resolved ID to its display name.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [string[]]$Ids
+    )
+
+    $resolved = @{}
+    if (-not $Ids -or $Ids.Count -eq 0) { return $resolved }
+
+    # Derive which directoryObject types to include from graphQueries entries where outProperty == "id".
+    # The directoryObjectType field in each graphQueries entry holds the Graph API type string.
+    $types = @(
+        $syncHash.UIConfigs.graphQueries.PSObject.Properties |
+            Where-Object { $_.Value.outProperty -eq 'id' -and $_.Value.directoryObjectType } |
+            ForEach-Object { $_.Value.directoryObjectType } |
+            Sort-Object -Unique
+    )
+
+    if ($types.Count -eq 0) {
+        Write-DebugOutput -Message "Resolve-GraphIdsBatch: no graphQueries entries with outProperty=id found; skipping" -Source $MyInvocation.MyCommand -Level "Warning"
+        return $resolved
+    }
+
+    try {
+        $uri  = "$($syncHash.GraphEndpoint)/v1.0/directoryObjects/getByIds?`$select=id,displayName"
+        $body = @{ ids = @($Ids); types = $types } | ConvertTo-Json -Compress -Depth 3
+        $response = Invoke-MgGraphRequest -Method POST -Uri $uri -Body $body -ContentType "application/json" -OutputType PSObject
+
+        foreach ($obj in $response.value) {
+            if ($obj.id -and $obj.displayName) {
+                $resolved[$obj.id] = $obj.displayName
+            }
+        }
+
+        Write-DebugOutput -Message "Resolve-GraphIdsBatch: resolved $($resolved.Count) of $($Ids.Count) IDs" -Source $MyInvocation.MyCommand -Level "Info"
+    }
+    catch {
+        Write-DebugOutput -Message "Resolve-GraphIdsBatch error: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Warning"
+    }
+
+    return $resolved
 }

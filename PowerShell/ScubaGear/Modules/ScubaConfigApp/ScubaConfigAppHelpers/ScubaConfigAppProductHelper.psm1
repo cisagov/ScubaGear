@@ -1,4 +1,4 @@
-# Function to collect ProductNames from UI checkboxes and update GeneralSettings
+﻿# Function to collect ProductNames from UI checkboxes and update GeneralSettings
 Function Update-ProductNames {
     <#
     .SYNOPSIS
