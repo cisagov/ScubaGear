@@ -2097,3 +2097,115 @@ function Get-ExpectedColumnSize {
         default { return 0 }
     }
 }
+
+# SafeLinks REST wrappers for functional test preconditions
+function New-SafeLinksPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableSafeLinksForEmail = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableSafeLinksForTeams = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableSafeLinksForOffice = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableForInternalSenders = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$ScanUrls = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$DeliverMessageAfterScan = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$TrackClicks = $false
+  )
+
+  $Params = @{ Name = $Name }
+  if ($PSBoundParameters.ContainsKey('EnableSafeLinksForEmail')) { $Params['EnableSafeLinksForEmail'] = $EnableSafeLinksForEmail }
+  if ($PSBoundParameters.ContainsKey('EnableSafeLinksForTeams')) { $Params['EnableSafeLinksForTeams'] = $EnableSafeLinksForTeams }
+  if ($PSBoundParameters.ContainsKey('EnableSafeLinksForOffice')) { $Params['EnableSafeLinksForOffice'] = $EnableSafeLinksForOffice }
+  if ($PSBoundParameters.ContainsKey('EnableForInternalSenders')) { $Params['EnableForInternalSenders'] = $EnableForInternalSenders }
+  if ($PSBoundParameters.ContainsKey('ScanUrls')) { $Params['ScanUrls'] = $ScanUrls }
+  if ($PSBoundParameters.ContainsKey('DeliverMessageAfterScan')) { $Params['DeliverMessageAfterScan'] = $DeliverMessageAfterScan }
+  if ($PSBoundParameters.ContainsKey('TrackClicks')) { $Params['TrackClicks'] = $TrackClicks }
+
+  Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksPolicy' -Parameters $Params
+}
+
+function New-SafeLinksRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $true)]
+    [string]$SafeLinksPolicy,
+    [Parameter(Mandatory = $false)]
+    [bool]$Enabled = $true,
+    [Parameter(Mandatory = $false)]
+    [int]$Priority = 0
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksRule' -Parameters @{
+    Name = $Name
+    SafeLinksPolicy = $SafeLinksPolicy
+    Enabled = $Enabled
+    Priority = $Priority
+  }
+}
+
+function Remove-SafeLinksRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksRule' -Parameters @{
+    Identity = $Identity
+    Confirm = $false
+  } | Out-Null
+}
+
+function Remove-SafeLinksPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksPolicy' -Parameters @{
+    Identity = $Identity
+    Confirm = $false
+  } | Out-Null
+}
+
+function Get-SafeLinksRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if ($Identity) { $Params['Identity'] = $Identity }
+  Invoke-FunctionalExoCommand -CmdletName 'Get-SafeLinksRule' -Parameters $Params
+}
+
+function Disable-SafeLinksRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [switch]$Confirm
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Disable-SafeLinksRule' -Parameters @{
+    Identity = $Identity
+    Confirm = $false
+  } | Out-Null
+}
