@@ -37,7 +37,7 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
-   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint, Get-ComplianceScope, Get-ComplianceApiEndpoint
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -64,6 +64,8 @@ function Connect-Tenant {
        PBIBaseUrl         = $null
        EXOAccessToken     = $null
        EXOApiEndpoint     = $null
+       ComplianceAccessToken = $null
+       ComplianceApiEndpoint = $null
    }
    $N = 0
    $Len = $ProductNames.Length
@@ -146,6 +148,41 @@ function Connect-Tenant {
                            -AccessToken $TokenData.EXOAccessToken
 
                        Write-Verbose "Exchange Online token and endpoint acquired successfully"
+
+                       # Acquire Security & Compliance token for IPPS cmdlets
+                       $ComplianceScope = Get-ComplianceScope -M365Environment $M365Environment
+                       try {
+                           if ($ServicePrincipalParams.CertThumbprintParams) {
+                               $TokenData.ComplianceAccessToken = Get-MsalAccessToken `
+                                   -Scope $ComplianceScope `
+                                   -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                                   -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                                   -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                                   -M365Environment $M365Environment
+                           }
+                           else {
+                               $TokenData.ComplianceAccessToken = Get-MsalAccessToken `
+                                   -Scope $ComplianceScope `
+                                   -ClientId $EXOClientId `
+                                   -Tenant $TenantName `
+                                   -M365Environment $M365Environment
+                           }
+                           $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
+                               -TenantId $TenantId `
+                               -M365Environment $M365Environment
+                           Write-Verbose "Compliance token and endpoint acquired successfully"
+                       }
+                       catch {
+                           Write-Warning "Failed to acquire dedicated Security & Compliance token: $($_.Exception.Message). Falling back to EXO token for compliance endpoint."
+                           # Fallback: use EXO token against compliance endpoint.
+                           # ExchangeOnlineManagement uses Exchange.ManageAsApp for both EXO and IPPS,
+                           # and the compliance endpoint may accept EXO-scoped tokens for service principals.
+                           $TokenData.ComplianceAccessToken = $TokenData.EXOAccessToken
+                           $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
+                               -TenantId $TenantId `
+                               -M365Environment $M365Environment
+                       }
+
                        $EXOAuthRequired = $false
                    }
                }
@@ -390,6 +427,8 @@ function Connect-Tenant {
        PBIAccessToken   = $TokenData.PBIAccessToken
        PBIBaseUrl       = $TokenData.PBIBaseUrl
        EXOAccessToken   = $TokenData.EXOAccessToken
+       ComplianceAccessToken = $TokenData.ComplianceAccessToken
+       ComplianceApiEndpoint = $TokenData.ComplianceApiEndpoint
        EXOApiEndpoint   = $TokenData.EXOApiEndpoint
    }
 }
