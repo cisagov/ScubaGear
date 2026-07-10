@@ -208,7 +208,9 @@ function Invoke-EXORestMethod {
                         $RetryAfter = [int]$RaHeader
                     }
                 }
-                catch { }
+                catch {
+                    Write-Verbose "Could not parse Retry-After header: $($_.Exception.Message)"
+                }
                 Write-Warning "EXO REST '$CmdletName' throttled (429). Retrying in ${RetryAfter}s (attempt $Attempt/$MaxRetries)..."
                 Start-Sleep -Seconds $RetryAfter
                 continue
