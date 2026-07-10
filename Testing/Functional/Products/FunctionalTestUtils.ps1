@@ -2155,31 +2155,33 @@ function New-SafeLinksRule {
 }
 
 function Remove-SafeLinksRule {
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
   [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
     [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksRule' -Parameters @{
-    Identity = $Identity
-    Confirm = $false
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-SafeLinksRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksRule' -Parameters @{
+      Identity = $Identity
+      Confirm = $false
+    } | Out-Null
+  }
 }
 
 function Remove-SafeLinksPolicy {
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
   [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
     [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksPolicy' -Parameters @{
-    Identity = $Identity
-    Confirm = $false
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-SafeLinksPolicy')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksPolicy' -Parameters @{
+      Identity = $Identity
+      Confirm = $false
+    } | Out-Null
+  }
 }
 
 function Get-SafeLinksRule {
@@ -2195,15 +2197,16 @@ function Get-SafeLinksRule {
 }
 
 function Disable-SafeLinksRule {
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
   [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
     [string]$Identity
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'Disable-SafeLinksRule' -Parameters @{
-    Identity = $Identity
-    Confirm = $false
-  } | Out-Null
+  if ($PSCmdlet.ShouldProcess($Identity, 'Disable-SafeLinksRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-SafeLinksRule' -Parameters @{
+      Identity = $Identity
+      Confirm = $false
+    } | Out-Null
+  }
 }
