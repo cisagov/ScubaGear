@@ -1408,7 +1408,11 @@ TestPlan:
             Splat:
               Updates:
                 protection_policy_rules: *id001
-                safe_links_policies: []
+                safe_links_policies:
+                  - Identity: Built-In Protection Policy
+                    Name: Built-In Protection Policy
+                    ScanUrls: true
+                    DeliverMessageAfterScan: true
                 safe_links_rules: *id004
                 securitysuite_successful_commands:
                   - Get-MgBetaSubscribedSku
