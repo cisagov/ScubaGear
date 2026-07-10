@@ -2154,12 +2154,11 @@ function New-SafeLinksRule {
 }
 
 function Remove-SafeLinksRule {
-  [CmdletBinding()]
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
   Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksRule' -Parameters @{
@@ -2169,12 +2168,11 @@ function Remove-SafeLinksRule {
 }
 
 function Remove-SafeLinksPolicy {
-  [CmdletBinding()]
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
   Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksPolicy' -Parameters @{
@@ -2196,12 +2194,11 @@ function Get-SafeLinksRule {
 }
 
 function Disable-SafeLinksRule {
-  [CmdletBinding()]
+  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
-    [string]$Identity,
-    [Parameter(Mandatory = $false)]
-    [switch]$Confirm
+    [string]$Identity
   )
 
   Invoke-FunctionalExoCommand -CmdletName 'Disable-SafeLinksRule' -Parameters @{
