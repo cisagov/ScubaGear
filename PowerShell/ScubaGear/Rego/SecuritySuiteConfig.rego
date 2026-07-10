@@ -22,7 +22,7 @@ import data.utils.securitysuite.HighestPriorityActiveAntiMalwarePolicyName
 import data.utils.securitysuite.HighestPriorityActiveSafeAttachmentPolicyName
 import data.utils.securitysuite.UserFriendlyPolicyName
 import data.utils.securitysuite.ApplyLicenseWarning
-import data.utils.securitysuite.ApplyLicenseWarningString
+import data.utils.securitysuite.ApplyLicenseWarningStringCustom
 import data.utils.report.ReportDetailsArray
 import data.utils.key.Count
 
@@ -67,13 +67,15 @@ PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
     ])
 }
 
-SecuritySuite_1_1_Details(Status) := concat("", [
-    ReportDetailsBoolean(Status),
-    ". The highest priority anti-malware policy that applies to all users is the ",
-    UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
-    " policy. ",
-    concat(" ", PolicyBlockClickToRunNoncomplianceReasons),
-])
+AntiMalwarePolicyMessage := ". The highest priority anti-malware policy that applies to all users is: "
+
+SecuritySuite_1_1_Details(Status) := 
+    concat("", [
+        ReportDetailsBoolean(Status),
+        AntiMalwarePolicyMessage,
+        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName), ". ",
+        concat(" ", PolicyBlockClickToRunNoncomplianceReasons)
+    ])
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.1v1",
@@ -85,11 +87,11 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": [{
-        "ActivePolicy": HighestPriorityActiveAntiMalwarePolicyName,
+        "Policy Name": HighestPriorityActiveAntiMalwarePolicyName,
         "EnableFileFilter": Policy.EnableFileFilter,
         "FileTypes": Policy.FileTypes
     }],
-    "ReportDetails": ApplyLicenseWarningString(Status, SecuritySuite_1_1_Details(Status)),
+    "ReportDetails": SecuritySuite_1_1_Details(Status),
     "RequirementMet": Status
 }
 if {
@@ -109,13 +111,13 @@ PolicyZAPNoncomplianceReasons contains "Zero-hour auto purge is disabled." if {
     Policy.ZapEnabled != true
 }
 
-SecuritySuite_1_2_Details(Status) := concat("", [
-    ReportDetailsBoolean(Status),
-    ". The highest priority anti-malware policy that applies to all users is the ",
-    UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName),
-    " policy. ",
-    concat(" ", PolicyZAPNoncomplianceReasons),
-])
+SecuritySuite_1_2_Details(Status) := 
+    concat("", [
+        ReportDetailsBoolean(Status),
+        ". The highest priority anti-malware policy that applies to all users is: ",
+        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName), ". ",
+        concat(" ", PolicyZAPNoncomplianceReasons)
+    ])
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.2v1",
@@ -127,10 +129,10 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": [{
-        "ActivePolicy": HighestPriorityActiveAntiMalwarePolicyName,
+        "Policy Name": HighestPriorityActiveAntiMalwarePolicyName,
         "EnableFileFilter": Policy.ZapEnabled
     }],
-    "ReportDetails": ApplyLicenseWarningString(Status, SecuritySuite_1_2_Details(Status)),
+    "ReportDetails": SecuritySuite_1_2_Details(Status),
     "RequirementMet": Status
 }
 if {
@@ -156,9 +158,8 @@ SecurySuite_1_3_Result := {
     "Status": true,
     "Description": concat("", [
         ReportDetailsBoolean(true),
-        ". The highest priority safe attachments policy that applies to all users is the ",
-        UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
-        " policy. "
+        ". The highest priority safe attachments policy that applies to all users is: ",
+        UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName), "."
     ])
 } if {
     some Policy in input.safe_attachment_policies
@@ -168,9 +169,9 @@ SecurySuite_1_3_Result := {
     "Status": false,
     "Description": concat("", [
         ReportDetailsBoolean(false),
-        ". The highest priority safe attachments policy that applies to all users is the ",
+        ". The highest priority safe attachments policy that applies to all users is: ",
         UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
-        "policy. Safe Attachments unknown malware Malware response is set to ",
+        ". Safe Attachments unknown malware Malware response is set to ",
         Policy.Action,
         "."
     ])
@@ -190,9 +191,9 @@ tests contains {
         "Get-AcceptedDomain"
     ],
     "ActualValue": [{
-        "ActivePolicy": HighestPriorityActiveSafeAttachmentPolicyName
+        "Policy Name": HighestPriorityActiveSafeAttachmentPolicyName
     }],
-    "ReportDetails": ApplyLicenseWarningString(Status, Description),
+    "ReportDetails": ApplyLicenseWarningStringCustom(Status, Description),
     "RequirementMet": Status
 }
 if {

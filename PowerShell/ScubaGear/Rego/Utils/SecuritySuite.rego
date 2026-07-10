@@ -35,17 +35,29 @@ ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
 
 # If a defender license is not present, assume failure and
 # replace the message with the warning
-ApplyLicenseWarning(_) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
+ApplyLicenseWarning(_) := DEFLICENSEWARNSTR if {
     input.defender_license == false
 }
 
-# If a defender license is present, don't apply the warning
-# and leave the message unchanged
+# If a defender license is not present, return a defender license warning
+# If a defender license is present and Status is true, return the standard success message and nothing else
+# If a defender license is present and Status is false, return the the custom provided message
 ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.defender_license == true
 }
 
-ApplyLicenseWarningString(_, _) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
+ApplyLicenseWarningString(_, _) := DEFLICENSEWARNSTR if {
+    input.defender_license == false
+}
+
+# If a defender license is not present, return a defender license warning
+# If a defender license is present, return the custom provided message
+# This ruleset differs from ApplyLicenseWarningString because it always returns the custom message regardless of whether Status is true or false
+ApplyLicenseWarningStringCustom(Status, String) := String if {
+    input.defender_license == true
+}
+
+ApplyLicenseWarningStringCustom(_, _) := DEFLICENSEWARNSTR if {
     input.defender_license == false
 }
 
@@ -129,13 +141,13 @@ HighestPriorityActiveAntiMalwarePolicyName := PolicyName if {
 
 UserFriendlyPolicyName(PolicyName) := Name if {
     regex.match(`(?i)Strict Preset Security Policy`, PolicyName)
-    Name := "strict preset"
+    Name := "Strict Preset"
 } else := Name if {
     regex.match(`(?i)Standard Preset Security Policy`, PolicyName)
-    Name := "standard preset"
+    Name := "Standard Preset"
 } else := Name if {
     PolicyName == "Default"
-    Name := "default"
+    Name := "Default"
 } else := PolicyName
 
 ##################################

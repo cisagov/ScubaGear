@@ -143,7 +143,7 @@ AcceptedDomains := [
 
 ProtectionPolicyRules := [
     {
-        "Identity": "Standard Preset Security Policy",
+        "Identity": "Standard Preset Security Policy1764024331779",
         "State": "Enabled",
         "SentTo": null,
         "SentToMemberOf": null,
@@ -153,7 +153,7 @@ ProtectionPolicyRules := [
         "ExceptIfRecipientDomainIs": null
     },
     {
-        "Identity": "Strict Preset Security Policy",
+        "Identity": "Strict Preset Security Policy1764024331779",
         "State": "Enabled",
         "SentTo": null,
         "SentToMemberOf": null,
@@ -215,6 +215,99 @@ SafeLinksRules := [
         "SentToMemberOf": null,
         "RecipientDomainIs": null
     }]
+
+AntiMalwarePolicies := [
+    {
+        "Identity": "Strict Preset Security Policy1764024331779",
+        "EnableFileFilter": true,
+        "FileTypes": ["exe", "cmd", "vbe"],
+        "ZapEnabled": true
+    },
+    {
+        "Identity": "Standard Preset Security Policy1764024331779",
+        "EnableFileFilter": true,
+        "FileTypes": ["exe", "cmd", "vbe"],
+        "ZapEnabled": true
+    },
+    {
+        "Identity": "Custom antimalware policy 1",
+        "EnableFileFilter": true,
+        "FileTypes": ["exe", "cmd", "vbe"],
+        "ZapEnabled": true
+    },
+    {
+        "Identity": "Custom antimalware policy 2",
+        "EnableFileFilter": true,
+        "FileTypes": ["exe", "cmd", "vbe"],
+        "ZapEnabled": true
+    },
+    {
+        "Identity": "Default",
+        "EnableFileFilter": true,
+        "FileTypes": ["exe", "cmd", "vbe"],
+        "ZapEnabled": true
+    }
+]
+
+AntiMalwareRules := [
+    {
+        "MalwareFilterPolicy": "Custom antimalware policy 1",
+        "Priority": 0,
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": ["example.com","example.mail.onmicrosoft.com"],
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
+    },
+    {
+        "MalwareFilterPolicy": "Custom antimalware policy 2",
+        "Priority": 1,
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": ["example.com","example.mail.onmicrosoft.com"],
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
+    }
+]
+
+SafeAttachmentPolicies := [
+    {"Identity": "Strict Preset Security Policy1234567890", "Action": "Block"},
+    {"Identity": "Standard Preset Security Policy1234567890", "Action": "Block"},
+    {"Identity": "Custom Safe Attachment Policy 1", "Action": "DynamicDelivery"},
+    {"Identity": "Built-In Protection Policy", "Action": "Block"}
+]
+
+SafeAttachmentRules := [
+    {
+        "SafeAttachmentPolicy": "Custom Safe Attachment Policy 1",
+        "Priority": 0,
+        "State": "Enabled",
+        "SentTo": null,
+        "SentToMemberOf": null,
+        "RecipientDomainIs": ["example.com", "example.mail.onmicrosoft.com"],
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
+    }
+]
+
+BuiltInProtectionRules := [
+    {
+        "Identity": "ATP Built-In Protection Rule",
+        "ExceptIfSentTo": null,
+        "ExceptIfSentToMemberOf": null,
+        "ExceptIfRecipientDomainIs": null
+    }
+]
+
+# Real tenants only ever have a single "Default" entry here.
+AtpPolicyForO365 := [
+    {"Identity": "Default", "EnableATPForSPOTeamsODB": true}
+]
 
 AntiPhishPolicies := [
     {
