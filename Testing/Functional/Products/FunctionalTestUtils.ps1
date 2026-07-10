@@ -2108,7 +2108,7 @@ function Get-ExpectedColumnSize {
 
 # SafeLinks REST wrappers for functional test preconditions
 function New-SafeLinksPolicy {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
     [string]$Name,
@@ -2137,11 +2137,13 @@ function New-SafeLinksPolicy {
   if ($PSBoundParameters.ContainsKey('DeliverMessageAfterScan')) { $Params['DeliverMessageAfterScan'] = $DeliverMessageAfterScan }
   if ($PSBoundParameters.ContainsKey('TrackClicks')) { $Params['TrackClicks'] = $TrackClicks }
 
-  Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksPolicy' -Parameters $Params
+  if ($PSCmdlet.ShouldProcess($Name, 'New-SafeLinksPolicy')) {
+    Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksPolicy' -Parameters $Params
+  }
 }
 
 function New-SafeLinksRule {
-  [CmdletBinding()]
+  [CmdletBinding(SupportsShouldProcess)]
   param(
     [Parameter(Mandatory = $true)]
     [string]$Name,
@@ -2153,11 +2155,13 @@ function New-SafeLinksRule {
     [int]$Priority = 0
   )
 
-  Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksRule' -Parameters @{
-    Name = $Name
-    SafeLinksPolicy = $SafeLinksPolicy
-    Enabled = $Enabled
-    Priority = $Priority
+  if ($PSCmdlet.ShouldProcess($Name, 'New-SafeLinksRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksRule' -Parameters @{
+      Name = $Name
+      SafeLinksPolicy = $SafeLinksPolicy
+      Enabled = $Enabled
+      Priority = $Priority
+    }
   }
 }
 
