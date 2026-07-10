@@ -189,18 +189,18 @@ function Invoke-FunctionalExoCommand {
     }
     catch {
       # 404 means the resource doesn't exist - return null silently.
-      if ($_.Exception.Message -match '\(404\)') {
+      if ($_.Exception.Message -match '\b404\b') {
         return $null
       }
       # 429 rate limiting - back off and retry.
-      if ($_.Exception.Message -match '\(429\)' -and $Attempt -lt $MaxRetries) {
+      if ($_.Exception.Message -match '\b429\b' -and $Attempt -lt $MaxRetries) {
         $Delay = $RetryDelay * $Attempt
         Write-Warning "EXO REST '$CmdletName' throttled (429, attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..."
         Start-Sleep -Seconds $Delay
         continue
       }
       # 500/503 transient errors - retry with backoff.
-      if ($_.Exception.Message -match '\(50[03]\)' -and $Attempt -lt $MaxRetries) {
+      if ($_.Exception.Message -match '\b50[03]\b' -and $Attempt -lt $MaxRetries) {
         Write-Warning "EXO REST '$CmdletName' returned server error (attempt $Attempt/$MaxRetries). Retrying in ${RetryDelay}s..."
         Start-Sleep -Seconds $RetryDelay
         $RetryDelay *= 2
