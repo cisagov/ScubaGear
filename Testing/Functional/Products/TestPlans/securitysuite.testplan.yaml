@@ -1384,6 +1384,25 @@ TestPlan:
                     ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
                     ProvisioningStatus: Success
                 unified_audit_log_retention_policies: []
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is seven days
@@ -1399,6 +1418,25 @@ TestPlan:
                   - Name: Seven day retention
                     RetentionDuration: SevenDays
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is one month
@@ -1414,6 +1452,25 @@ TestPlan:
                   - Name: One month retention
                     RetentionDuration: OneMonth
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is three months
@@ -1429,6 +1486,25 @@ TestPlan:
                   - Name: Three month retention
                     RetentionDuration: ThreeMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is six months
@@ -1444,6 +1520,25 @@ TestPlan:
                   - Name: Six month retention
                     RetentionDuration: SixMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is nine months
@@ -1459,6 +1554,25 @@ TestPlan:
                   - Name: Nine month retention
                     RetentionDuration: NineMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - A 12 month policy exists but is disabled
@@ -1474,6 +1588,25 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: false
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - E3/G3 license level lacks the advanced auditing service plan
@@ -1489,6 +1622,25 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month audit log retention policy exists
@@ -1504,6 +1656,25 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 3 year audit log retention policy exists
@@ -1519,6 +1690,25 @@ TestPlan:
                   - Name: 3 year retention
                     RetentionDuration: ThreeYears
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 5 year audit log retention policy exists
@@ -1534,6 +1724,25 @@ TestPlan:
                   - Name: 5 year retention
                     RetentionDuration: FiveYears
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 7 year audit log retention policy exists
@@ -1549,6 +1758,25 @@ TestPlan:
                   - Name: 7 year retention
                     RetentionDuration: SevenYears
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 10 year audit log retention policy exists
@@ -1564,6 +1792,25 @@ TestPlan:
                   - Name: 10 year retention
                     RetentionDuration: TenYears
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month policy exists alongside shorter policies
@@ -1582,6 +1829,25 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
 
@@ -1598,6 +1864,25 @@ TestPlan:
             Splat:
               PropertyName: State
               Value: "Disabled"
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have HighConfidenceSpamAction set to AddXHeader
@@ -1610,6 +1895,25 @@ TestPlan:
             Splat:
               PropertyName: State
               Value: "Disabled"
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have PhishSpamAction set to AddXHeader
