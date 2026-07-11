@@ -57,11 +57,11 @@ Describe "Smoke Test: Generate Output" {
     Context "Invoke Scuba for $Alias" {
         BeforeAll {
             if ($PSCmdlet.ParameterSetName -eq 'Manual'){
-                { Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON} |
+                { Invoke-SCuBA -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings} |
                 Should -Not -Throw
             }
             else {
-                { Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON} |
+                { Invoke-SCuBA -CertificateThumbprint $Thumbprint -AppID $AppId -Organization $Organization -ProductNames "*" -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings} |
                 Should -Not -Throw
             }
             $ReportFolders = Get-ChildItem . -directory -Filter "M365BaselineConformance*" | Sort-Object -Property LastWriteTime -Descending

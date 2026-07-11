@@ -70,6 +70,7 @@ InModuleScope Orchestrator {
                 $SplatParams = @{
                     M365Environment = 'commercial';
                     KeepIndividualJSON = $true;
+                    SilenceBODWarnings = $true;
                 }
             }
             It 'Do it quietly (Do not automatically show report)' {
