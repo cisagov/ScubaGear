@@ -1,0 +1,41 @@
+﻿{
+    "MetaData": {
+        "Tool": "ScubaGear",
+        "ToolVersion": "1.8.0",
+        "TimestampZulu": "2026-01-01T00:00:00.000Z",
+        "ReportUUID": "aaaaaaaa-0000-0000-0000-000000000001",
+        "ProductsAssessed": [ "Azure Active Directory" ],
+        "ProductAbbreviationMapping": { "Azure Active Directory": "AAD" }
+    },
+    "Summary": {
+        "AAD": { "Manual": 0, "Failures": 0, "Warnings": 0, "Errors": 0, "Passes": 0, "Omits": 0, "IncorrectResults": 0 }
+    },
+    "AnnotatedFailedPolicies": {
+        "MS.AAD.13.1v1": { "Comment": "Working on it", "RemediationDate": "2026-06-01", "IncorrectResult": false }
+    },
+    "Results": {
+        "AAD": [
+            {
+                "GroupName": "Transitions",
+                "GroupNumber": "1",
+                "GroupReferenceURL": "https://example.com/aad#1",
+                "Controls": [
+                    { "Control ID": "MS.AAD.1.1v1", "Requirement": "Regression control.<div class='policy-indicators'><a href='x'>Automated Check</a></div>", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." },
+                    { "Control ID": "MS.AAD.2.1v1", "Requirement": "Remediated control.", "Result": "Fail", "Criticality": "Shall", "Details": "Failing before." },
+                    { "Control ID": "MS.AAD.3.1v1", "Requirement": "WarningResolved control.", "Result": "Warning", "Criticality": "Should", "Details": "Warning before." },
+                    { "Control ID": "MS.AAD.4.1v1", "Requirement": "WarningEscalated control.", "Result": "Warning", "Criticality": "Should", "Details": "Warning before." },
+                    { "Control ID": "MS.AAD.5.1v1", "Requirement": "NewWarning control.", "Result": "Pass", "Criticality": "Should", "Details": "Passing before." },
+                    { "Control ID": "MS.AAD.6.1v1", "Requirement": "NewlyAutomated control.", "Result": "N/A", "Criticality": "Shall/Not-Implemented", "Details": "Manual before." },
+                    { "Control ID": "MS.AAD.7.1v1", "Requirement": "NewlyManual control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." },
+                    { "Control ID": "MS.AAD.8.1v1", "Requirement": "OmissionChanged control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." },
+                    { "Control ID": "MS.AAD.9.1v1", "Requirement": "Retired control.", "Result": "Pass", "Criticality": "Shall", "Details": "Present before, gone after." },
+                    { "Control ID": "MS.AAD.11.1v1", "Requirement": "Errored control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." },
+                    { "Control ID": "MS.AAD.12.1v1", "Requirement": "Other control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." },
+                    { "Control ID": "MS.AAD.13.1v1", "Requirement": "Annotation control.", "Result": "Fail", "Criticality": "Shall", "Details": "Failing before." },
+                    { "Control ID": "MS.AAD.14.1v1", "Requirement": "Unchanged control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." }
+                ]
+            }
+        ]
+    },
+    "Raw": { "baseline_version": "1" }
+}

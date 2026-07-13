@@ -1,0 +1,146 @@
+/*
+ * Styling for the ScubaGear diff report (Invoke-SCuBADiff).
+ * The color palette mirrors the CISA CreateReport palette (Main.css) so that
+ * the diff report reads as part of the same family of reports and honors the
+ * viewer's light/dark theme selection.
+ */
+:root {
+    --background-primary: white;
+    --background-secondary: #f2f4f6;
+    --text-color: #1a1a1a;
+    --header-color: #005288;
+    --border-color: #c2c8cc;
+    --uuid-color: #424242;
+    --link-color: #006086;
+    /* Row state colors, matching Main.css --test-* variables. */
+    --diff-red: #E5C7C7;
+    --diff-green: #d5ebd5;
+    --diff-yellow: #fff7d6;
+    --diff-neutral: #dce8f8;
+    --diff-unchanged: #ebebf2;
+}
+
+html[data-theme='dark'] {
+    --background-primary: #10171D;
+    --background-secondary: #1b242c;
+    --text-color: #e6e6e6;
+    --header-color: #b7c8d2;
+    --border-color: #3a444c;
+    --uuid-color: #b0b0b0;
+    --link-color: #6fb7e6;
+    --diff-red: #381919;
+    --diff-green: #1C361C;
+    --diff-yellow: #524100;
+    --diff-neutral: #1e2f45;
+    --diff-unchanged: #2a2a2a;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--background-primary);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0 2em 4em 2em;
+}
+
+h1, h2, h3 {
+    color: var(--header-color);
+}
+
+a { color: var(--link-color); }
+
+.report-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding: 1em 0;
+}
+
+.source-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2em;
+    margin: 1em 0;
+}
+
+.source-card {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75em 1.25em;
+}
+
+.source-card .uuid { color: var(--uuid-color); font-size: 0.85em; }
+
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    align-items: center;
+    margin: 1em 0;
+}
+
+.controls-bar label { cursor: pointer; user-select: none; }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0 2em 0;
+    overflow-x: auto;
+    display: block;
+}
+
+th, td {
+    border: 1px solid var(--border-color);
+    padding: 0.5em 0.75em;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.9em;
+}
+
+th {
+    background-color: var(--background-secondary);
+    position: sticky;
+    top: 0;
+}
+
+/* Row state coloring. */
+tr.diff-red    { background-color: var(--diff-red); }
+tr.diff-green  { background-color: var(--diff-green); }
+tr.diff-yellow { background-color: var(--diff-yellow); }
+tr.diff-neutral { background-color: var(--diff-neutral); }
+tr.diff-unchanged { background-color: var(--diff-unchanged); }
+
+/* Unchanged rows are hidden by default; the "Show unchanged" toggle reveals them. */
+tr.diff-unchanged-row { display: none; }
+body.show-unchanged tr.diff-unchanged-row { display: table-row; }
+
+.summary-table td.count-zero { color: var(--uuid-color); }
+
+.bucket-label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.annotation-flag {
+    font-style: italic;
+    color: var(--header-color);
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin: 1em 0;
+    font-size: 0.85em;
+}
+.legend .swatch {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 1px solid var(--border-color);
+    margin-right: 0.35em;
+    vertical-align: middle;
+}

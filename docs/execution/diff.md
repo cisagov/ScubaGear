@@ -1,0 +1,158 @@
+# Comparing Two ScubaGear Results (Invoke-SCuBADiff)
+
+## Overview
+
+`Invoke-SCuBADiff` compares two `ScubaResults.json` files produced by earlier
+ScubaGear runs — a **before** file and an **after** file — and reports how each
+policy's result changed between them. It is an offline, post-hoc analysis
+command: it performs no authentication, makes no `Connect-*` calls, and never
+contacts a tenant. In that respect it works like cached execution
+([`Invoke-SCuBACached`](./scubacached.md)) — you point it at existing JSON on
+disk — except that instead of a single output path it takes the two source files
+directly.
+
+It produces two artifacts:
+
+1. **`DiffResults.json`** — a machine-readable delta describing every policy's
+   transition, carrying a top-level `SchemaVersion` for downstream consumers.
+2. **`DiffReport.html`** — a self-contained HTML report that highlights the
+   transitions with color-coded rows and hides unchanged rows behind a toggle.
+
+The `DiffResults.json` schema is kept intentionally parallel to the
+`scubagoggles diff` (ScubaGoggles / Google Workspace) output so that downstream
+tools can process both: both share the top-level `SchemaVersion`, `MetaData`,
+`Summary`, and `Diff` shapes.
+
+## Usage
+
+Provide the path to the first (earlier) `ScubaResults.json` and the path to the
+second (later) `ScubaResults.json`:
+
+```powershell
+Invoke-SCuBADiff -BeforePath "C:\Runs\Q1\ScubaResults_abc123.json" `
+                 -AfterPath  "C:\Runs\Q2\ScubaResults_def456.json"
+```
+
+By default the two artifacts are written to the current directory as
+`DiffResults.json` and `DiffReport.html`. Use `-OutPath` to choose a folder
+(it is created if it does not exist) and `-DarkMode` to default the report to a
+dark theme:
+
+```powershell
+Invoke-SCuBADiff -BeforePath .\before\ScubaResults.json `
+                 -AfterPath  .\after\ScubaResults.json `
+                 -OutPath    .\diff `
+                 -DarkMode
+```
+
+### Parameters
+
+| Parameter | Required | Default | Description |
+|---|---|---|---|
+| `-BeforePath` | Yes | — | Path to the earlier ("before") `ScubaResults.json`. |
+| `-AfterPath` | Yes | — | Path to the later ("after") `ScubaResults.json`. |
+| `-OutPath` | No | Current directory | Folder to write the two artifacts to. Created if missing. |
+| `-OutJsonFileName` | No | `DiffResults` | Base name (no extension) of the diff JSON. |
+| `-OutReportFileName` | No | `DiffReport` | Base name (no extension) of the diff HTML report. |
+| `-DarkMode` | No | Off | Default the HTML report to dark theme. |
+
+The command returns an object with `JsonPath` and `ReportPath` pointing at the
+two artifacts.
+
+## How controls are matched
+
+M365 policy IDs carry a per-policy version suffix, e.g. `MS.AAD.1.1v1`. That
+suffix increments (`v1` → `v2`) when the *meaning* of the policy changes.
+`Invoke-SCuBADiff` matches controls on their **base ID** — the ID with the
+trailing version suffix removed (`MS.AAD.1.1v1` → `MS.AAD.1.1`):
+
+- **Same base ID, same version** → the results are compared directly.
+- **Same base ID, different version** → the change is bucketed as
+  `VersionChanged`. Because the policy's meaning changed between the two runs,
+  the before/after result comparison is **informational only**, not an
+  authoritative pass/fail delta. Both results are still reported and labeled as
+  such.
+- **Base ID present in only one file** → `New` (only in *after*) or `Retired`
+  (only in *before*).
+
+## Product renames (Defender → Security Suite)
+
+ScubaGear is consolidating the `Defender` product into the `Security Suite`. A
+diff that spans that transition sees `Defender` in the before file and
+`SecuritySuite` in the after file. `Invoke-SCuBADiff` maintains an explicit
+product-alias map and **joins** the renamed products rather than reporting one as
+retired and the other as new. Records for a renamed product carry
+`"ProductRenamed": true`, and the joined product appears under its after-file
+name. Policy IDs under the renamed product still follow the base-ID / version
+rules above.
+
+## Transition taxonomy
+
+Every base control ID present in either file is classified into exactly one
+bucket. Precedence, highest to lowest:
+`Errored` > `VersionChanged` > `OmissionChanged` > specific transitions >
+`Other` > `Unchanged`. `New` / `Retired` are determined by presence.
+
+| Before → After | Bucket | Report color |
+|---|---|---|
+| Pass → Fail | `Regression` | red |
+| Fail → Pass | `Remediated` | green |
+| Warning → Pass | `WarningResolved` | green |
+| Warning → Fail | `WarningEscalated` | red |
+| Pass/Fail → Warning | `NewWarning` | yellow |
+| N/A → Pass/Fail/Warning | `NewlyAutomated` | neutral |
+| Pass/Fail/Warning → N/A | `NewlyManual` | neutral |
+| any ↔ Omitted (non-identical) | `OmissionChanged` | yellow |
+| Same base ID, different version | `VersionChanged` | yellow |
+| Base ID absent → present | `New` | neutral |
+| Base ID present → absent | `Retired` | neutral |
+| any ↔ Error | `Errored` | red |
+| X → X (identical result and version) | `Unchanged` | none (hidden) |
+| Anything else | `Other` (both literal values preserved) | yellow |
+
+`Result` is treated as an **open string set**: any value the tool does not
+recognize (e.g. a future status) classifies as `Other` with both literal values
+preserved — it never crashes the diff.
+
+## Annotations (Fail → Fail)
+
+For controls that fail in both runs, `Invoke-SCuBADiff` compares the
+`AnnotatedFailedPolicies` entries between the two files and adds three fields to
+the record:
+
+- `AnnotationChanged` — `true` if the comment or remediation date differs.
+- `Comment` — the after-file comment.
+- `RemediationDate` — the after-file anticipated remediation date.
+
+This is intentionally narrow in v1: annotation change detection is only applied
+to `Fail → Fail` records, and only the top-level `AnnotatedFailedPolicies` data
+is consulted.
+
+## The HTML report
+
+- **Unchanged rows are hidden by default.** Use the **"Show unchanged rows"**
+  checkbox at the top of the report to reveal them.
+- **Dark mode** can be toggled with the **"Dark Mode"** checkbox; `-DarkMode`
+  sets its default.
+- Rows are color-coded per the taxonomy table above, and a per-product summary
+  table shows the count of each bucket.
+- All policy text is HTML-escaped. The `Requirement` field, which embeds HTML
+  indicator markup in `ScubaResults.json`, is stripped to plain text before it
+  is stored in `DiffResults.json` or rendered.
+
+## Example workflow
+
+```powershell
+# 1. Run ScubaGear at two points in time (or on two tenants).
+Invoke-SCuBA -ProductNames * -OutPath C:\Runs\Baseline
+# ... later ...
+Invoke-SCuBA -ProductNames * -OutPath C:\Runs\Current
+
+# 2. Diff the two ScubaResults.json files.
+Invoke-SCuBADiff `
+    -BeforePath (Get-ChildItem C:\Runs\Baseline -Recurse -Filter ScubaResults_*.json).FullName `
+    -AfterPath  (Get-ChildItem C:\Runs\Current  -Recurse -Filter ScubaResults_*.json).FullName `
+    -OutPath    C:\Runs\Diff
+
+# 3. Open C:\Runs\Diff\DiffReport.html and/or consume DiffResults.json.
+```

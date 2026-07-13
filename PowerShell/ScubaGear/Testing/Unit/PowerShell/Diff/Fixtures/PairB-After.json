@@ -1,0 +1,29 @@
+﻿{
+    "MetaData": {
+        "Tool": "ScubaGear",
+        "ToolVersion": "1.9.0",
+        "TimestampZulu": "2026-04-01T00:00:00.000Z",
+        "ReportUUID": "bbbbbbbb-0000-0000-0000-000000000002",
+        "ProductsAssessed": [ "Security Suite" ],
+        "ProductAbbreviationMapping": { "Security Suite": "SecuritySuite" }
+    },
+    "Summary": {
+        "SecuritySuite": { "Manual": 0, "Failures": 0, "Warnings": 0, "Errors": 0, "Passes": 0, "Omits": 0, "IncorrectResults": 0 }
+    },
+    "AnnotatedFailedPolicies": {},
+    "Results": {
+        "SecuritySuite": [
+            {
+                "GroupName": "Preset Policies",
+                "GroupNumber": "1",
+                "GroupReferenceURL": "https://example.com/securitysuite#1",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.1.1v2", "Requirement": "Version drift control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing after at v2." },
+                    { "Control ID": "MS.DEFENDER.2.1v1", "Requirement": "Renamed product transition control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing after." },
+                    { "Control ID": "MS.DEFENDER.3.1v1", "Requirement": "Configure A & B properly.<div class='policy-indicators'><a href='https://example.com' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>", "Result": "Pass", "Criticality": "Shall", "Details": "Passing after." }
+                ]
+            }
+        ]
+    },
+    "Raw": { "baseline_version": "1" }
+}
