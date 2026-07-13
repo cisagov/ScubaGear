@@ -66,6 +66,15 @@ InModuleScope Diff {
             }
         }
 
+        Context 'Get-ScubaBucketLabel' {
+            It 'Displays PolicyRemoved as "Policy Removed"' {
+                Get-ScubaBucketLabel 'PolicyRemoved' | Should -Be 'Policy Removed'
+            }
+            It 'Returns the raw token for buckets without a friendly label' {
+                Get-ScubaBucketLabel 'Regression' | Should -Be 'Regression'
+            }
+        }
+
         Context 'ConvertTo-ScubaHtmlEncoded' {
             It 'Encodes HTML metacharacters' {
                 ConvertTo-ScubaHtmlEncoded '<script>&' | Should -Be '&lt;script&gt;&amp;'
@@ -100,7 +109,7 @@ InModuleScope Diff {
             }
             It 'Classifies presence-only cases' {
                 (Get-ScubaDiffBucket -BeforeResult $null -AfterResult 'Pass' -BeforePresent $false -AfterPresent $true -BeforeVersion $null -AfterVersion 'v1') | Should -Be 'New'
-                (Get-ScubaDiffBucket -BeforeResult 'Pass' -AfterResult $null -BeforePresent $true -AfterPresent $false -BeforeVersion 'v1' -AfterVersion $null) | Should -Be 'Retired'
+                (Get-ScubaDiffBucket -BeforeResult 'Pass' -AfterResult $null -BeforePresent $true -AfterPresent $false -BeforeVersion 'v1' -AfterVersion $null) | Should -Be 'PolicyRemoved'
             }
             It 'Prefers Errored over VersionChanged (precedence)' {
                 (Get-ScubaDiffBucket -BeforeResult 'Error' -AfterResult 'Pass' -BeforePresent $true -AfterPresent $true -BeforeVersion 'v1' -AfterVersion 'v2') | Should -Be 'Errored'
@@ -171,7 +180,7 @@ InModuleScope Diff {
             @{ Base = 'MS.AAD.6.1';  Bucket = 'NewlyAutomated' }
             @{ Base = 'MS.AAD.7.1';  Bucket = 'NewlyManual' }
             @{ Base = 'MS.AAD.8.1';  Bucket = 'OmissionChanged' }
-            @{ Base = 'MS.AAD.9.1';  Bucket = 'Retired' }
+            @{ Base = 'MS.AAD.9.1';  Bucket = 'PolicyRemoved' }
             @{ Base = 'MS.AAD.10.1'; Bucket = 'New' }
             @{ Base = 'MS.AAD.11.1'; Bucket = 'Errored' }
             @{ Base = 'MS.AAD.12.1'; Bucket = 'Other' }
@@ -197,13 +206,13 @@ InModuleScope Diff {
             $ByBase['MS.AAD.10.1'].ResultBefore | Should -BeNullOrEmpty
         }
 
-        It 'Omits after-only fields for Retired controls' {
+        It 'Omits after-only fields for PolicyRemoved controls' {
             $ByBase['MS.AAD.9.1'].'Control ID (After)' | Should -BeNullOrEmpty
             $ByBase['MS.AAD.9.1'].ResultAfter | Should -BeNullOrEmpty
         }
 
         It 'Reports every taxonomy bucket in the Summary' {
-            foreach ($e in @('Regression','Remediated','WarningResolved','WarningEscalated','NewWarning','NewlyAutomated','NewlyManual','OmissionChanged','Retired','New','Errored','Other','Unchanged')) {
+            foreach ($e in @('Regression','Remediated','WarningResolved','WarningEscalated','NewWarning','NewlyAutomated','NewlyManual','OmissionChanged','PolicyRemoved','New','Errored','Other','Unchanged')) {
                 $DiffA.Summary.AAD.Contains($e) | Should -BeTrue -Because "bucket $e should appear in the summary"
             }
         }
@@ -270,7 +279,7 @@ InModuleScope Diff {
                 $rec.ProductRenamed | Should -BeTrue
             }
         }
-        It 'Classifies a base ID at v1 vs v2 as VersionChanged (never New/Retired)' {
+        It 'Classifies a base ID at v1 vs v2 as VersionChanged (never New/PolicyRemoved)' {
             $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.DEFENDER.1.1' }
             $rec.Bucket | Should -Be 'VersionChanged'
             $rec.'Control ID (Before)' | Should -Be 'MS.DEFENDER.1.1v1'
@@ -316,6 +325,9 @@ InModuleScope Diff {
         }
         It 'Marks unchanged rows with the hide-by-default class' {
             $Html | Should -Match 'diff-unchanged-row'
+        }
+        It 'Displays the PolicyRemoved bucket as "Policy Removed"' {
+            $Html | Should -Match 'Policy Removed'
         }
         It 'HTML-escapes user content and never emits the raw indicator markup' {
             $HtmlB | Should -Match 'Configure A &amp; B properly'

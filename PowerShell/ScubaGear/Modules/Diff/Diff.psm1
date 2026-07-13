@@ -30,8 +30,14 @@ $script:BucketColorMap = [ordered]@{
     'NewlyAutomated'   = 'neutral'
     'NewlyManual'      = 'neutral'
     'New'              = 'neutral'
-    'Retired'          = 'neutral'
+    'PolicyRemoved'    = 'neutral'
     'Unchanged'        = 'unchanged'
+}
+
+# Bucket -> human-friendly label for HTML display. Buckets not listed here are
+# displayed using their raw (camelCase) token.
+$script:BucketLabelMap = @{
+    'PolicyRemoved' = 'Policy Removed'
 }
 
 function Get-ScubaBaseControlId {
@@ -168,8 +174,10 @@ function Get-ScubaDiffBucket {
     .Description
     Classifies a single base control ID into exactly one transition bucket,
     honoring the precedence: Errored > VersionChanged > OmissionChanged >
-    specific transitions > Other > Unchanged. New/Retired are determined by
-    presence and take precedence over everything else.
+    specific transitions > Other > Unchanged. New/PolicyRemoved are determined by
+    presence and take precedence over everything else. PolicyRemoved (base ID
+    present in the before file but absent from the after file) aligns with the
+    baselines' removedpolicies.md tracking.
     .Functionality
     Internal
     #>
@@ -184,7 +192,7 @@ function Get-ScubaDiffBucket {
     )
 
     if (-not $BeforePresent) { return 'New' }
-    if (-not $AfterPresent) { return 'Retired' }
+    if (-not $AfterPresent) { return 'PolicyRemoved' }
 
     $bCat = Get-ScubaResultCategory $BeforeResult
     $aCat = Get-ScubaResultCategory $AfterResult
@@ -241,6 +249,26 @@ function Get-ScubaBucketColor {
         return $script:BucketColorMap[$Bucket]
     }
     return 'yellow'
+}
+
+function Get-ScubaBucketLabel {
+    <#
+    .Description
+    Maps a transition bucket to its human-friendly display label for the HTML
+    report. Buckets without an explicit label are shown using their raw token.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Bucket
+    )
+    if ($script:BucketLabelMap.ContainsKey($Bucket)) {
+        return $script:BucketLabelMap[$Bucket]
+    }
+    return $Bucket
 }
 
 function Get-ScubaCanonicalProduct {
@@ -592,7 +620,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine("<p>Diff generated $(& $enc $meta.TimestampZulu) by ScubaGear $(& $enc $meta.ToolVersion).</p>")
 
     if (@($meta.ProductsOnlyInBefore).Count -gt 0) {
-        [void]$sb.AppendLine("<p><strong>Products only in Before (all controls Retired):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")
+        [void]$sb.AppendLine("<p><strong>Products only in Before (all controls Policy Removed):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")
     }
     if (@($meta.ProductsOnlyInAfter).Count -gt 0) {
         [void]$sb.AppendLine("<p><strong>Products only in After (all controls New):</strong> $(& $enc ((@($meta.ProductsOnlyInAfter)) -join ', '))</p>")
@@ -603,7 +631,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span><span class="swatch diff-red"></span>Regression / Errored</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Remediated</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning / Version / Omission / Other</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-neutral"></span>New / Retired / Automated / Manual</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-neutral"></span>New / Policy Removed / Automated / Manual</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-unchanged"></span>Unchanged (hidden by default)</span>')
     [void]$sb.AppendLine('</div>')
 
@@ -679,7 +707,7 @@ function New-ScubaDiffReport {
             [void]$sb.AppendLine("<tr class=""$rowClass"">")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
-            [void]$sb.AppendLine("  <td class=""bucket-label"">$(& $enc $bucket)</td>")
+            [void]$sb.AppendLine("  <td class=""bucket-label"">$(& $enc (Get-ScubaBucketLabel $bucket))</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.ResultBefore)</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.ResultAfter)</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.Requirement)</td>")
@@ -857,6 +885,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaResultCategory',
     'Get-ScubaDiffBucket',
     'Get-ScubaBucketColor',
+    'Get-ScubaBucketLabel',
     'Get-ScubaCanonicalProduct',
     'Get-ScubaControlMap',
     'Get-ScubaAnnotationEntry',

@@ -43,11 +43,13 @@ trailing `v<N>` suffix stripped. Same base ID + same version → direct comparis
 Same base ID + different version → a dedicated `VersionChanged` bucket in which
 the before/after result comparison is reported but labeled *informational*,
 because the policy's meaning changed between runs. Base ID present in only one
-file → `New` / `Retired`.
+file → `New` / `PolicyRemoved`. The `PolicyRemoved` bucket (base ID present in
+the before file but absent from the after file) is named to align with the
+baselines' `removedpolicies.md`, which tracks policies removed from the SCBs.
 
 **Alternative considered — exact full-ID matching:** treating `MS.AAD.1.1v1` and
 `MS.AAD.1.1v2` as unrelated IDs. Rejected because it would report every
-version-bumped policy as a simultaneous `Retired` (`v1`) + `New` (`v2`),
+version-bumped policy as a simultaneous `PolicyRemoved` (`v1`) + `New` (`v2`),
 drowning the real signal in noise and losing the connection between the old and
 new form of the same policy. Base-ID matching preserves the connection while the
 `VersionChanged` bucket honestly signals that the comparison is not an
@@ -64,7 +66,7 @@ reporting the joined product under its after-file name with `ProductRenamed: tru
 on each record. Policy IDs under the renamed product still follow decision 1.
 
 **Alternative considered — treat the rename as retire + new:** report all
-`Defender` controls as `Retired` and all `SecuritySuite` controls as `New`.
+`Defender` controls as `PolicyRemoved` and all `SecuritySuite` controls as `New`.
 Rejected for the same reason as exact-ID matching: it manufactures a wall of
 false churn across a pure rename and hides the actual per-policy transitions. An
 explicit, small alias map is easy to audit and extend if future renames occur.

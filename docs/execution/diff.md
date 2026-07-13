@@ -72,8 +72,19 @@ trailing version suffix removed (`MS.AAD.1.1v1` → `MS.AAD.1.1`):
   the before/after result comparison is **informational only**, not an
   authoritative pass/fail delta. Both results are still reported and labeled as
   such.
-- **Base ID present in only one file** → `New` (only in *after*) or `Retired`
-  (only in *before*).
+- **Base ID present in only one file** → `New` (only in *after*) or
+  `PolicyRemoved` (only in *before*). A base ID present in the before file but
+  absent from the after file corresponds to a policy that was removed from the
+  baseline — see the baselines'
+  [removedpolicies.md](../../PowerShell/ScubaGear/baselines/removedpolicies.md).
+
+  > **Note:** `PolicyRemoved` is inferred purely from presence — a base ID that
+  > appears in the before file but not the after file. That usually means the
+  > policy was removed from the baseline, but it can also occur when the after
+  > run simply did not assess that control or product (for example, comparing two
+  > runs with different `-ProductNames`). Cross-reference `removedpolicies.md`
+  > when you need to distinguish a genuine baseline removal from a control that
+  > was merely not evaluated.
 
 ## Product renames (Defender → Security Suite)
 
@@ -91,7 +102,7 @@ rules above.
 Every base control ID present in either file is classified into exactly one
 bucket. Precedence, highest to lowest:
 `Errored` > `VersionChanged` > `OmissionChanged` > specific transitions >
-`Other` > `Unchanged`. `New` / `Retired` are determined by presence.
+`Other` > `Unchanged`. `New` / `PolicyRemoved` are determined by presence.
 
 | Before → After | Bucket | Report color |
 |---|---|---|
@@ -105,7 +116,7 @@ bucket. Precedence, highest to lowest:
 | any ↔ Omitted (non-identical) | `OmissionChanged` | yellow |
 | Same base ID, different version | `VersionChanged` | yellow |
 | Base ID absent → present | `New` | neutral |
-| Base ID present → absent | `Retired` | neutral |
+| Base ID present → absent (removed from baseline) | `PolicyRemoved` | neutral |
 | any ↔ Error | `Errored` | red |
 | X → X (identical result and version) | `Unchanged` | none (hidden) |
 | Anything else | `Other` (both literal values preserved) | yellow |
