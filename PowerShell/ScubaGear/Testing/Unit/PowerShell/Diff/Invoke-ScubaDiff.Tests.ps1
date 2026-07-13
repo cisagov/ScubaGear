@@ -92,13 +92,6 @@ InModuleScope Diff {
             }
         }
 
-        Context 'Get-ScubaMarkdownAnchor' {
-            It 'Generates GitHub-style anchors for control IDs' {
-                Get-ScubaMarkdownAnchor 'MS.EXO.8.1v2' | Should -Be 'msexo81v2'
-                Get-ScubaMarkdownAnchor 'MS.AAD.5.4v1' | Should -Be 'msaad54v1'
-            }
-        }
-
         Context 'ConvertTo-ScubaHtmlEncoded' {
             It 'Encodes HTML metacharacters' {
                 ConvertTo-ScubaHtmlEncoded '<script>&' | Should -Be '&lt;script&gt;&amp;'
@@ -365,40 +358,6 @@ InModuleScope Diff {
         It 'HTML-escapes user content and never emits the raw indicator markup' {
             $HtmlB | Should -Match 'Configure A &amp; B properly'
             $HtmlB | Should -Not -Match "policy-indicators"
-        }
-    }
-    Describe -Tag 'Diff' -Name 'Removed-policy metadata (removedpolicies.md)' {
-        It 'Parses removal dates and anchors from the shipped removedpolicies.md' {
-            $map = Get-ScubaRemovedPolicyMap
-            $map.ContainsKey('MS.EXO.8.1v2') | Should -BeTrue
-            $map['MS.EXO.8.1v2'].Date | Should -Be 'April 2026'
-            $map['MS.EXO.8.1v2'].Anchor | Should -Be 'msexo81v2'
-            $map['MS.AAD.5.4v1'].Date | Should -Be 'March 2025'
-        }
-
-        It 'Adds the removal date and a baseline link to a removed-policy Note' {
-            function New-RemovedResults {
-                param([switch]$IncludeControl)
-                $controls = @()
-                if ($IncludeControl) {
-                    $controls += @{ 'Control ID' = 'MS.EXO.8.1v2'; Requirement = 'A DLP solution SHALL be used.'; Result = 'Pass'; Criticality = 'Shall'; Details = 'd' }
-                }
-                $obj = @{
-                    MetaData = @{ ReportUUID = 'x'; TimestampZulu = 't'; ToolVersion = '1' }
-                    Summary = @{ EXO = @{} }
-                    AnnotatedFailedPolicies = @{}
-                    Results = @{ EXO = @( @{ GroupName = 'DLP'; GroupNumber = '8'; Controls = $controls } ) }
-                }
-                return $obj | ConvertTo-Json -Depth 10 | ConvertFrom-Json
-            }
-            $before = New-RemovedResults -IncludeControl
-            $after = New-RemovedResults
-            $diff = Compare-ScubaResults -Before $before -After $after
-            $diff.Diff.EXO[0].Bucket | Should -Be 'PolicyRemoved'
-            $html = New-ScubaDiffReport -DiffResults $diff
-            $html | Should -Match 'Removed from baseline'
-            $html | Should -Match 'last updated: April 2026'
-            $html | Should -Match 'removedpolicies\.md#msexo81v2'
         }
     }
 }

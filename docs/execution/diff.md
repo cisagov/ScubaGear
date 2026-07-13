@@ -140,10 +140,9 @@ Transition column):
 | N/A (manual) / Omitted / other | grey |
 | Removed from baseline (`PolicyRemoved`) | grey (matches manual checks) |
 
-Removed-policy rows are greyed out like manual checks, and their **Notes** column
-shows the last-updated (removal) date and a link to the policy's entry in
-[removedpolicies.md](../../PowerShell/ScubaGear/baselines/removedpolicies.md)
-(when the policy is documented there).
+Removed-policy rows are greyed out like manual checks. Policies removed from the
+baselines are tracked in
+[removedpolicies.md](../../PowerShell/ScubaGear/baselines/removedpolicies.md).
 
 ## Annotations (Fail → Fail)
 

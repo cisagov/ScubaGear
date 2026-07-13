@@ -7,14 +7,6 @@
 #
 # See docs/execution/diff.md for usage and the ADR for design rationale.
 
-# Base URL for linking removed-policy notes to the baselines' removedpolicies.md.
-# Removed policies accumulate over time, so the note links to the 'main' branch
-# rather than a specific tagged version.
-$script:RemovedPoliciesUrl = 'https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/removedpolicies.md'
-
-# Cache for the parsed removedpolicies.md map (populated lazily).
-$script:RemovedPolicyCache = $null
-
 $script:ProductAliasMap = @{
     # Defender was consolidated into the Security Suite product. When a diff spans
     # that transition, one file names the product "Defender" and the other names it
@@ -304,57 +296,6 @@ function Get-ScubaRowColorClass {
         'Pass'    { return 'green' }
         default   { return 'grey' }
     }
-}
-
-function Get-ScubaMarkdownAnchor {
-    <#
-    .Description
-    Generates the GitHub-style anchor slug for a markdown header, matching the
-    anchors GitHub auto-generates for the '#### <Control ID>' headers in
-    removedpolicies.md (e.g. "MS.EXO.8.1v2" -> "msexo81v2").
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]
-        $Header
-    )
-    return (($Header.ToLowerInvariant() -replace '[^a-z0-9 -]', '') -replace '\s+', '-')
-}
-
-function Get-ScubaRemovedPolicyMap {
-    <#
-    .Description
-    Parses the baselines' removedpolicies.md into a map of full Control ID ->
-    @{ Date; Anchor }, where Date is the documented removal date and Anchor is the
-    GitHub anchor for the policy's entry. Cached after the first read. Returns an
-    empty map if the file cannot be found, so report generation degrades cleanly.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param()
-    if ($null -ne $script:RemovedPolicyCache) {
-        return $script:RemovedPolicyCache
-    }
-    $map = @{}
-    $path = Join-Path -Path $PSScriptRoot -ChildPath '..\..\baselines\removedpolicies.md'
-    if (Test-Path -LiteralPath $path) {
-        $current = $null
-        foreach ($line in (Get-Content -LiteralPath $path)) {
-            if ($line -match '^\s*#{2,6}\s+(MS\.[A-Za-z0-9.]+v\d+)') {
-                $current = $Matches[1]
-                $map[$current] = @{ Date = $null; Anchor = (Get-ScubaMarkdownAnchor $current) }
-            }
-            elseif ($current -and (-not $map[$current].Date) -and ($line -match '_Removal date:_\s*(.+?)\s*$')) {
-                $map[$current].Date = ($Matches[1] -replace '[*_`]', '').Trim()
-            }
-        }
-    }
-    $script:RemovedPolicyCache = $map
-    return $map
 }
 
 function Get-ScubaCanonicalProduct {
@@ -750,15 +691,12 @@ function New-ScubaDiffReport {
     }
     [void]$sb.AppendLine('</table>')
 
-    # Removed-policy metadata (removal date + baseline anchor) for the Notes column.
-    $removedMap = Get-ScubaRemovedPolicyMap
-
     # Per-product transition tables.
     foreach ($product in $DiffResults.Diff.Keys) {
         $records = @($DiffResults.Diff.$product)
         [void]$sb.AppendLine("<h2>$(& $enc $product)</h2>")
         [void]$sb.AppendLine('<table class="policy-diff">')
-        [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Transition</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th><th>Notes</th></tr>')
+        [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Transition</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>')
         foreach ($r in $records) {
             $bucket = $r.Bucket
             # Row color follows the Result (After) value (Fail/Error=red,
@@ -778,33 +716,6 @@ function New-ScubaDiffReport {
 
             $groupDisplay = & $enc (("$($r.GroupNumber) $($r.GroupName)").Trim())
 
-            # Notes.
-            $notes = @()
-            if ($bucket -eq 'PolicyRemoved') {
-                $info = $removedMap[$beforeId]
-                $note = 'Removed from baseline'
-                if ($info -and $info.Date) { $note += " (last updated: $(& $enc $info.Date))" }
-                if ($info) {
-                    $note += " &mdash; <a href=""$($script:RemovedPoliciesUrl)#$($info.Anchor)"" target=""_blank"">baseline policy</a>"
-                }
-                $notes += $note
-            }
-            if ($r.PSObject.Properties['ProductRenamed'] -and $r.ProductRenamed) {
-                $notes += 'Product renamed (alias-joined)'
-            }
-            if ($bucket -eq 'VersionChanged') {
-                $notes += 'Policy meaning changed; result comparison is informational'
-            }
-            if ($r.PSObject.Properties['AnnotationChanged']) {
-                if ($r.AnnotationChanged) {
-                    $annText = 'Annotation changed'
-                    if ($r.Comment) { $annText += ": $(& $enc $r.Comment)" }
-                    if ($r.RemediationDate) { $annText += " (remediation date: $(& $enc $r.RemediationDate))" }
-                    $notes += "<span class=""annotation-flag"">$annText</span>"
-                }
-            }
-            $notesHtml = $notes -join '<br/>'
-
             [void]$sb.AppendLine("<tr class=""$rowClass"">")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
@@ -813,7 +724,6 @@ function New-ScubaDiffReport {
             [void]$sb.AppendLine("  <td>$(& $enc $r.ResultAfter)</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.Requirement)</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.DetailsAfter)</td>")
-            [void]$sb.AppendLine("  <td>$notesHtml</td>")
             [void]$sb.AppendLine('</tr>')
         }
         [void]$sb.AppendLine('</table>')
@@ -988,8 +898,6 @@ Export-ModuleMember -Function @(
     'Get-ScubaBucketColor',
     'Get-ScubaBucketLabel',
     'Get-ScubaRowColorClass',
-    'Get-ScubaMarkdownAnchor',
-    'Get-ScubaRemovedPolicyMap',
     'Get-ScubaCanonicalProduct',
     'Get-ScubaControlMap',
     'Get-ScubaAnnotationEntry',

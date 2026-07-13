@@ -123,11 +123,6 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
     white-space: nowrap;
 }
 
-.annotation-flag {
-    font-style: italic;
-    color: var(--header-color);
-}
-
 .legend {
     display: flex;
     flex-wrap: wrap;
