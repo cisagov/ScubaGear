@@ -75,6 +75,26 @@ InModuleScope Diff {
             }
         }
 
+        Context 'Get-ScubaProductDisplayName' {
+            $productTitles = @(
+                @{ Key = 'AAD';           Title = 'Microsoft Entra ID / Azure Active Directory' }
+                @{ Key = 'Defender';      Title = 'Microsoft 365 Defender' }
+                @{ Key = 'EXO';           Title = 'Exchange Online' }
+                @{ Key = 'PowerPlatform'; Title = 'Microsoft Power Platform' }
+                @{ Key = 'PowerBI';       Title = 'Microsoft Power BI' }
+                @{ Key = 'SharePoint';    Title = 'SharePoint Online' }
+                @{ Key = 'Teams';         Title = 'Microsoft Teams' }
+                @{ Key = 'SecuritySuite'; Title = 'Security Suite' }
+            )
+            It 'Maps <Key> to "<Title>"' -TestCases $productTitles {
+                param($Key, $Title)
+                Get-ScubaProductDisplayName $Key | Should -Be $Title
+            }
+            It 'Returns the raw abbreviation for unmapped products' {
+                Get-ScubaProductDisplayName 'SomeUnknownProduct' | Should -Be 'SomeUnknownProduct'
+            }
+        }
+
         Context 'Get-ScubaRowColorClass' {
             It 'Greys out removed policies regardless of before result' {
                 Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'PolicyRemoved'; ResultAfter = $null }) | Should -Be 'grey'
@@ -354,6 +374,9 @@ InModuleScope Diff {
         }
         It 'Displays the PolicyRemoved bucket as "Policy Removed"' {
             $Html | Should -Match 'Policy Removed'
+        }
+        It 'Uses the friendly product title for the AAD heading' {
+            $Html | Should -Match '<h2>Microsoft Entra ID / Azure Active Directory</h2>'
         }
         It 'HTML-escapes user content and never emits the raw indicator markup' {
             $HtmlB | Should -Match 'Configure A &amp; B properly'

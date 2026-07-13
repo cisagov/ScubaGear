@@ -15,6 +15,21 @@ $script:ProductAliasMap = @{
     'Defender' = 'SecuritySuite'
 }
 
+# Product abbreviation -> display title used for the HTML report headings and
+# summary table. The DiffResults.json keys remain the canonical abbreviations;
+# only the report display uses these friendlier names. Products not listed here
+# are shown using their raw abbreviation.
+$script:ProductDisplayNameMap = @{
+    'AAD'            = 'Microsoft Entra ID / Azure Active Directory'
+    'Defender'       = 'Microsoft 365 Defender'
+    'EXO'            = 'Exchange Online'
+    'PowerPlatform'  = 'Microsoft Power Platform'
+    'PowerBI'        = 'Microsoft Power BI'
+    'SharePoint'     = 'SharePoint Online'
+    'Teams'          = 'Microsoft Teams'
+    'SecuritySuite'  = 'Security Suite'
+}
+
 # Bucket -> row color class used by the HTML report. Keep in sync with the
 # transition taxonomy in the ADR / usage doc.
 $script:BucketColorMap = [ordered]@{
@@ -269,6 +284,26 @@ function Get-ScubaBucketLabel {
         return $script:BucketLabelMap[$Bucket]
     }
     return $Bucket
+}
+
+function Get-ScubaProductDisplayName {
+    <#
+    .Description
+    Maps a product abbreviation to its display title for the HTML report. Products
+    without an explicit mapping are shown using their raw abbreviation.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $ProductKey
+    )
+    if ($script:ProductDisplayNameMap.ContainsKey($ProductKey)) {
+        return $script:ProductDisplayNameMap[$ProductKey]
+    }
+    return $ProductKey
 }
 
 function Get-ScubaRowColorClass {
@@ -679,7 +714,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('<th>Total</th></tr>')
     foreach ($product in $DiffResults.Summary.Keys) {
         $counts = $DiffResults.Summary.$product
-        [void]$sb.Append("<tr><td>$(& $enc $product)</td>")
+        [void]$sb.Append("<tr><td>$(& $enc (Get-ScubaProductDisplayName $product))</td>")
         $total = 0
         foreach ($col in $summaryColumns) {
             if ($counts.Contains($col)) { $val = $counts[$col] } else { $val = 0 }
@@ -694,7 +729,7 @@ function New-ScubaDiffReport {
     # Per-product transition tables.
     foreach ($product in $DiffResults.Diff.Keys) {
         $records = @($DiffResults.Diff.$product)
-        [void]$sb.AppendLine("<h2>$(& $enc $product)</h2>")
+        [void]$sb.AppendLine("<h2>$(& $enc (Get-ScubaProductDisplayName $product))</h2>")
         [void]$sb.AppendLine('<table class="policy-diff">')
         [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Transition</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>')
         foreach ($r in $records) {
@@ -898,6 +933,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaBucketColor',
     'Get-ScubaBucketLabel',
     'Get-ScubaRowColorClass',
+    'Get-ScubaProductDisplayName',
     'Get-ScubaCanonicalProduct',
     'Get-ScubaControlMap',
     'Get-ScubaAnnotationEntry',
