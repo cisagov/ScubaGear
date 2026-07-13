@@ -4,8 +4,7 @@ function Export-PowerBIProvider {
     <#
     .Description
     Gets the Power BI settings that are relevant
-    to the SCuBA Power BI baselines using the Microsoft.PowerBI.Mgmt
-    PowerShell Module
+    to the SCuBA Power BI baselines using the Power BI Admin REST API.
     .Functionality
     Internal
     #>
@@ -30,36 +29,28 @@ function Export-PowerBIProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     $Tracker = Get-CommandTracker
 
-    # If there is a license we need to make sure the AccessToken and BaseUrl are not null or empty
     if ($LicenseFound) {
         if ([string]::IsNullOrEmpty($AccessToken) -or [string]::IsNullOrEmpty($BaseUrl)) {
             throw "AccessToken and BaseUrl must be provided when LicenseFound is true."
         }
 
-        $EnvironmentUrl = $BaseUrl
-
-        $headers = @{
+        $Headers = @{
             Authorization  = "Bearer $AccessToken"
             "Content-Type" = "application/json"
         }
 
-        # Get tenant settings - covers all PowerBI baseline controls
-        $URI = "$EnvironmentUrl/v1/admin/tenantsettings"
+        $Uri = "$BaseUrl/v1/admin/tenantsettings"
         $AdminSettings = $Tracker.TryCommand("Invoke-RestMethod", @{
-            "Uri" = $URI
+            "Uri" = $Uri
             "Method" = "Get"
-            "Headers" = $headers
+            "Headers" = $Headers
         })
 
-        # If successfully retrieved the tenant settings
-        if ($AdminSettings.count -gt 0) {
+        if ($AdminSettings.Count -gt 0) {
             $TenantSettings = $AdminSettings[0].tenantSettings
             $TenantSettingsJson = ConvertTo-Json @($TenantSettings) -Depth 10
         }
-        # If there was an error retrieving the tenant settings, TryCommand already handles it so we don't need to do anything additional.
     }
-    # License not found. We must mark Invoke-RestMethod as successful even if we don't call it.
-    # The absence of a license is not an error and the Rego displays a no license message.
     else {
         $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
     }
@@ -68,8 +59,6 @@ function Export-PowerBIProvider {
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
-    # "publish_to_web_setting": $PublishToWebJson,
-    # Note the spacing and the last comma in the json is important
     $json = @"
     "powerbi_tenant_settings": $TenantSettingsJson,
     "powerbi_successful_commands": $PowerBISuccessfulCommands,
