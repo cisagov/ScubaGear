@@ -5,6 +5,7 @@ import data.utils.report.ArraySizeStr
 import data.utils.report.Description
 import data.utils.report.ReportDetailsString
 import data.utils.report.ReportDetailsBoolean
+import data.utils.report.ReportDetailsBooleanWarning
 import data.utils.securitysuite.ImpersonationProtectionReportDetails
 import data.utils.securitysuite.ImpersonationProtectionRequirementMet
 import data.utils.securitysuite.ListConfigValues
@@ -669,13 +670,60 @@ tests contains {
 #
 # MS.SECURITYSUITE.5.2v1
 #--
+# Retention durations that satisfy the 12 month minimum retention requirement.
+# Get-UnifiedAuditLogRetentionPolicy reports duration as one of: SevenDays,
+# OneMonth, ThreeMonths, SixMonths, NineMonths, TwelveMonths, ThreeYears,
+# FiveYears, SevenYears, TenYears. Anything 12 months or longer is compliant.
+CompliantRetentionDurations := {"TwelveMonths", "ThreeYears", "FiveYears", "SevenYears", "TenYears"}
+
+# Note appended to the report details to clarify the license dependency of
+# audit log retention in M365.
+RetentionLicenseNote := concat(" ", [
+    "Note that the data retention policy only applies to users with an Office 365 E5",
+    "or Microsoft 365 E5 license or a Microsoft Purview Suite",
+    "(formerly known as Microsoft 365 E5 Compliance) or E5 eDiscovery and Audit add-on license."
+])
+
+# Service plans that grant the advanced (premium) audit capability required to
+# retain audit logs beyond 180 days on a per-user basis. M365_ADVANCED_AUDITING
+# is included with Office 365/Microsoft 365 E5, the Microsoft Purview Suite (E5
+# Compliance), and the E5 eDiscovery and Audit add-on, but not with E3/G3.
+AdvancedAuditingLicenses contains ServicePlan.ServicePlanId if {
+    some ServicePlan in input.service_plans
+    ServicePlan.ServicePlanName == "M365_ADVANCED_AUDITING"
+}
+
+# Save audit log retention policies that retain logs for at least 12 months
+# and are not disabled.
+CompliantRetentionPolicies contains {
+    "Name": Policy.Name,
+    "RetentionDuration": Policy.RetentionDuration
+} if {
+    some Policy in input.unified_audit_log_retention_policies
+    Policy.RetentionDuration in CompliantRetentionDurations
+    not Policy.Enabled == false
+}
+
+# The requirement is met only when the tenant has the per-user license needed to
+# retain logs beyond 180 days AND at least one retention policy keeps logs for 12
+# months or longer. Tenants at the E3/G3 license level fail regardless of any
+# configured retention policy because the retention capability is not licensed.
+# Get-MgBetaSubscribedSku is intentionally omitted from the Commandlet list: when
+# the license data is unavailable the policy must report non-compliant rather
+# than a "command did not execute" dependency error.
+default AuditRetentionRequirementMet := false
+AuditRetentionRequirementMet if {
+    count(AdvancedAuditingLicenses) > 0
+    count(CompliantRetentionPolicies) >= 1
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.5.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": ["Get-UnifiedAuditLogRetentionPolicy"],
+    "ActualValue": CompliantRetentionPolicies,
+    "ReportDetails": ReportDetailsBooleanWarning(AuditRetentionRequirementMet, RetentionLicenseNote),
+    "RequirementMet": AuditRetentionRequirementMet
 }
 #--
 

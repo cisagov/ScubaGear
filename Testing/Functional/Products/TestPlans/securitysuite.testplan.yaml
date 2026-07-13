@@ -789,11 +789,216 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.5.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - No audit log retention policies exist
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies: []
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is seven days
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Seven day retention
+                    RetentionDuration: SevenDays
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is one month
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: One month retention
+                    RetentionDuration: OneMonth
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is three months
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Three month retention
+                    RetentionDuration: ThreeMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is six months
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Six month retention
+                    RetentionDuration: SixMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is nine months
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Nine month retention
+                    RetentionDuration: NineMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - A 12 month policy exists but is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: false
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - E3/G3 license level lacks the advanced auditing service plan
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: EXCHANGE_S_ENTERPRISE
+                    ServicePlanId: efb87545-963c-4e0d-99df-69c6916d9eb0
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 3 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 3 year retention
+                    RetentionDuration: ThreeYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 5 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 5 year retention
+                    RetentionDuration: FiveYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 7 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 7 year retention
+                    RetentionDuration: SevenYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 10 year audit log retention policy exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: 10 year retention
+                    RetentionDuration: TenYears
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month policy exists alongside shorter policies
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                service_plans:
+                  - ServicePlanName: M365_ADVANCED_AUDITING
+                    ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
+                    ProvisioningStatus: Success
+                unified_audit_log_retention_policies:
+                  - Name: Six month retention
+                    RetentionDuration: SixMonths
+                    Enabled: true
+                  - Name: 12 month retention
+                    RetentionDuration: TwelveMonths
+                    Enabled: true
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.SECURITYSUITE.6.1v1
     TestDriver: RunScuba
