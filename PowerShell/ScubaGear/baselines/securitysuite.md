@@ -534,7 +534,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 The DLP policy SHOULD include an action to block access to sensitive information by restricted apps
 and unwanted Bluetooth applications.
 
-[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite35v1-instructions)
 
 <!--Policy: MS.SECURITYSUITE.3.5v1; Criticality: SHOULD -->
 - _Rationale:_ Some apps may inappropriately share accessed files or not conform to agency policies

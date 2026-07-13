@@ -425,7 +425,3 @@ DlpCompliancePolicies := {
     "Mode": "Enable",
     "Enabled": true
 }
-
-EndpointDlpGlobalSettings := [
-    {"value": true}
-]

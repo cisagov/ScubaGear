@@ -125,35 +125,18 @@ function Export-SecuritySuiteProvider {
                     $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
                 }
             }
-
-            # Get-PolicyConfig returns tenant-level endpoint DLP settings. Export the
-            # IncludePredefinedUnallowedBluetoothApps value directly because it is not
-            # always present in EndpointDlpGlobalSettings when no unallowed Bluetooth
-            # apps are defined.
-            $PolicyConfigResult = @($Tracker.TryCommand("Get-PolicyConfig"))
-            if ($PolicyConfigResult.Count -gt 0) {
-                $EndpointDlpGlobalSettings = ConvertTo-Json @(
-                    @{ value = $PolicyConfigResult[0].IncludePredefinedUnallowedBluetoothApps }
-                )
-            }
-            else {
-                $EndpointDlpGlobalSettings = ConvertTo-Json @()
-            }
         }
         else {
-            Write-Warning "Defender for DLP license not available in tenant. Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, Get-PolicyConfig, and Get-ProtectionAlert."
+            Write-Warning "Defender for DLP license not available in tenant. Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
             $DLPCompliancePolicy = ConvertTo-Json @()
             $DLPComplianceRules = ConvertTo-Json @()
             $ProtectionAlert = ConvertTo-Json @()
             $DLPComplianceRules = ConvertTo-Json @()
-            $EndpointDlpGlobalSettings = ConvertTo-Json @()
             $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
             $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
-            $Tracker.AddUnSuccessfulCommand("Get-PolicyConfig")
             $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
             $Tracker.AddSuccessfulCommand("Get-DlpCompliancePolicy")
             $Tracker.AddSuccessfulCommand("Get-DlpComplianceRule")
-            $Tracker.AddSuccessfulCommand("Get-PolicyConfig")
             $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
             $DLPLicense = ConvertTo-Json $false
         }
@@ -167,7 +150,6 @@ function Export-SecuritySuiteProvider {
         $DLPComplianceRules = ConvertTo-Json @()
         $ProtectionAlert = ConvertTo-Json @()
         $DLPComplianceRules = ConvertTo-Json @()
-        $EndpointDlpGlobalSettings = ConvertTo-Json @()
         $DLPLicense = ConvertTo-Json $false
     }
 
@@ -180,7 +162,6 @@ function Export-SecuritySuiteProvider {
     "atp_policy_rules": $ATPProtectionPolicyRule,
     "dlp_compliance_policies": $DLPCompliancePolicy,
     "dlp_compliance_rules": $DLPComplianceRules,
-    "endpoint_dlp_global_settings": $EndpointDlpGlobalSettings,
     "anti_phish_policies": $AntiPhishPolicy,
     "anti_phish_rules": $AntiPhishRule,
     "accepted_domains": $AcceptedDomains,

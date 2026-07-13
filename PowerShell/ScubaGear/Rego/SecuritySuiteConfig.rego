@@ -571,59 +571,13 @@ tests contains {
 #
 # MS.SECURITYSUITE.3.5v1
 #--
-
-# Return true when a DLP rule has the requested endpoint restriction set to Block.
-EndpointRestrictionBlocks(Rule, Setting) if {
-    some Restriction in object.get(Rule, "EndpointDlpRestrictions", [])
-
-    Restriction.setting == Setting
-    Restriction.value == "Block"
-}
-
-# Save the rule name if a single DLP Endpoint restriction rule blocks
-# both restricted apps and unwanted Bluetooth transfer apps.
-RulesBlockingUnallowedAppsAndBluetooth contains Rule.Name if {
-    some Rule in input.dlp_compliance_rules
-
-    EndpointRestrictionBlocks(Rule, "UnallowedApps")
-    EndpointRestrictionBlocks(Rule, "UnallowedBluetoothTransferApps")
-}
-
-# Check tenant-level setting: Include Bluetooth apps recommended by Microsoft.
-# This is retrieved from Get-PolicyConfig via endpoint_dlp_global_settings[0].value.
-default BluetoothRecommendedAppsEnabled := false
-
-BluetoothRecommendedAppsEnabled if {
-    lower(sprintf("%v", [input.endpoint_dlp_global_settings[0].value])) == "true"
-}
-
-# Each case is mutually exclusive by RulesBlocking/BluetoothOK boolean arguments.
-ErrorMessage3_5(false, false) := concat(" ", [
-    "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps.",
-    "Tenant-level 'Include Bluetooth apps recommended by Microsoft' is not enabled in DLP settings."
-])
-
-ErrorMessage3_5(false, true) := "No DLP rule(s) found that block both unallowed apps and unallowed Bluetooth transfer apps."
-
-ErrorMessage3_5(true, false) := "Tenant-level 'Include Bluetooth apps recommended by Microsoft' is not enabled in DLP settings."
-
-ErrorMessage3_5(true, true) := ""
-
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.3.5v1",
-    "Criticality": "Should",
-    "Commandlet": ["Get-DLPComplianceRule", "Get-PolicyConfig"],
-    "ActualValue": {
-        "RulesBlockingEndpointApps": RulesBlockingUnallowedAppsAndBluetooth,
-        "BluetoothRecommendedAppsEnabled": BluetoothRecommendedAppsEnabled
-    },
-    "ReportDetails": DLPLicenseWarningString(Status, ErrorMsg),
-    "RequirementMet": Status
-} if {
-    RulesBlocking := count(RulesBlockingUnallowedAppsAndBluetooth) > 0
-    Conditions := [RulesBlocking, BluetoothRecommendedAppsEnabled]
-    Status := count(FilterArray(Conditions, false)) == 0
-    ErrorMsg := ErrorMessage3_5(RulesBlocking, BluetoothRecommendedAppsEnabled)
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.3.5v1"),
+    "RequirementMet": false
 }
 #--
 
