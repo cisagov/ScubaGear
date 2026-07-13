@@ -7,6 +7,14 @@
 #
 # See docs/execution/diff.md for usage and the ADR for design rationale.
 
+# Base URL for linking removed-policy notes to the baselines' removedpolicies.md.
+# Removed policies accumulate over time, so the note links to the 'main' branch
+# rather than a specific tagged version.
+$script:RemovedPoliciesUrl = 'https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/removedpolicies.md'
+
+# Cache for the parsed removedpolicies.md map (populated lazily).
+$script:RemovedPolicyCache = $null
+
 $script:ProductAliasMap = @{
     # Defender was consolidated into the Security Suite product. When a diff spans
     # that transition, one file names the product "Defender" and the other names it
@@ -269,6 +277,84 @@ function Get-ScubaBucketLabel {
         return $script:BucketLabelMap[$Bucket]
     }
     return $Bucket
+}
+
+function Get-ScubaRowColorClass {
+    <#
+    .Description
+    Determines the HTML row color for a diff record. Removed policies are greyed
+    out to match the manual-check styling; every other row is colored by its
+    Result (After) value: Fail/Error -> red, Warning -> yellow, Pass -> green, and
+    manual (N/A) / Omitted / anything else -> grey.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [object]
+        $Record
+    )
+    if ($Record.Bucket -eq 'PolicyRemoved') { return 'grey' }
+    switch (Get-ScubaResultCategory $Record.ResultAfter) {
+        'Fail'    { return 'red' }
+        'Error'   { return 'red' }
+        'Warning' { return 'yellow' }
+        'Pass'    { return 'green' }
+        default   { return 'grey' }
+    }
+}
+
+function Get-ScubaMarkdownAnchor {
+    <#
+    .Description
+    Generates the GitHub-style anchor slug for a markdown header, matching the
+    anchors GitHub auto-generates for the '#### <Control ID>' headers in
+    removedpolicies.md (e.g. "MS.EXO.8.1v2" -> "msexo81v2").
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]
+        $Header
+    )
+    return (($Header.ToLowerInvariant() -replace '[^a-z0-9 -]', '') -replace '\s+', '-')
+}
+
+function Get-ScubaRemovedPolicyMap {
+    <#
+    .Description
+    Parses the baselines' removedpolicies.md into a map of full Control ID ->
+    @{ Date; Anchor }, where Date is the documented removal date and Anchor is the
+    GitHub anchor for the policy's entry. Cached after the first read. Returns an
+    empty map if the file cannot be found, so report generation degrades cleanly.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param()
+    if ($null -ne $script:RemovedPolicyCache) {
+        return $script:RemovedPolicyCache
+    }
+    $map = @{}
+    $path = Join-Path -Path $PSScriptRoot -ChildPath '..\..\baselines\removedpolicies.md'
+    if (Test-Path -LiteralPath $path) {
+        $current = $null
+        foreach ($line in (Get-Content -LiteralPath $path)) {
+            if ($line -match '^\s*#{2,6}\s+(MS\.[A-Za-z0-9.]+v\d+)') {
+                $current = $Matches[1]
+                $map[$current] = @{ Date = $null; Anchor = (Get-ScubaMarkdownAnchor $current) }
+            }
+            elseif ($current -and (-not $map[$current].Date) -and ($line -match '_Removal date:_\s*(.+?)\s*$')) {
+                $map[$current].Date = ($Matches[1] -replace '[*_`]', '').Trim()
+            }
+        }
+    }
+    $script:RemovedPolicyCache = $map
+    return $map
 }
 
 function Get-ScubaCanonicalProduct {
@@ -626,13 +712,14 @@ function New-ScubaDiffReport {
         [void]$sb.AppendLine("<p><strong>Products only in After (all controls New):</strong> $(& $enc ((@($meta.ProductsOnlyInAfter)) -join ', '))</p>")
     }
 
-    # Legend.
+    # Legend. Rows are colored by their Result (After) value; removed policies are
+    # greyed out like manual checks.
     [void]$sb.AppendLine('<div class="legend">')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-red"></span>Regression / Errored</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Remediated</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning / Version / Omission / Other</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-neutral"></span>New / Policy Removed / Automated / Manual</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-unchanged"></span>Unchanged (hidden by default)</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-red"></span>Fail (Result After)</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning (Result After)</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Pass (Result After)</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Policy Removed</span>')
+    [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
     # Per-product summary table.
@@ -663,6 +750,9 @@ function New-ScubaDiffReport {
     }
     [void]$sb.AppendLine('</table>')
 
+    # Removed-policy metadata (removal date + baseline anchor) for the Notes column.
+    $removedMap = Get-ScubaRemovedPolicyMap
+
     # Per-product transition tables.
     foreach ($product in $DiffResults.Diff.Keys) {
         $records = @($DiffResults.Diff.$product)
@@ -671,7 +761,9 @@ function New-ScubaDiffReport {
         [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Transition</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th><th>Notes</th></tr>')
         foreach ($r in $records) {
             $bucket = $r.Bucket
-            $color = Get-ScubaBucketColor $bucket
+            # Row color follows the Result (After) value (Fail/Error=red,
+            # Warning=yellow, Pass=green, manual/removed/other=grey).
+            $color = Get-ScubaRowColorClass $r
             $rowClass = "diff-row diff-$color"
             if ($bucket -eq 'Unchanged') { $rowClass += ' diff-unchanged-row' }
 
@@ -688,6 +780,15 @@ function New-ScubaDiffReport {
 
             # Notes.
             $notes = @()
+            if ($bucket -eq 'PolicyRemoved') {
+                $info = $removedMap[$beforeId]
+                $note = 'Removed from baseline'
+                if ($info -and $info.Date) { $note += " (last updated: $(& $enc $info.Date))" }
+                if ($info) {
+                    $note += " &mdash; <a href=""$($script:RemovedPoliciesUrl)#$($info.Anchor)"" target=""_blank"">baseline policy</a>"
+                }
+                $notes += $note
+            }
             if ($r.PSObject.Properties['ProductRenamed'] -and $r.ProductRenamed) {
                 $notes += 'Product renamed (alias-joined)'
             }
@@ -886,6 +987,9 @@ Export-ModuleMember -Function @(
     'Get-ScubaDiffBucket',
     'Get-ScubaBucketColor',
     'Get-ScubaBucketLabel',
+    'Get-ScubaRowColorClass',
+    'Get-ScubaMarkdownAnchor',
+    'Get-ScubaRemovedPolicyMap',
     'Get-ScubaCanonicalProduct',
     'Get-ScubaControlMap',
     'Get-ScubaAnnotationEntry',

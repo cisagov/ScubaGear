@@ -104,26 +104,46 @@ bucket. Precedence, highest to lowest:
 `Errored` > `VersionChanged` > `OmissionChanged` > specific transitions >
 `Other` > `Unchanged`. `New` / `PolicyRemoved` are determined by presence.
 
-| Before → After | Bucket | Report color |
-|---|---|---|
-| Pass → Fail | `Regression` | red |
-| Fail → Pass | `Remediated` | green |
-| Warning → Pass | `WarningResolved` | green |
-| Warning → Fail | `WarningEscalated` | red |
-| Pass/Fail → Warning | `NewWarning` | yellow |
-| N/A → Pass/Fail/Warning | `NewlyAutomated` | neutral |
-| Pass/Fail/Warning → N/A | `NewlyManual` | neutral |
-| any ↔ Omitted (non-identical) | `OmissionChanged` | yellow |
-| Same base ID, different version | `VersionChanged` | yellow |
-| Base ID absent → present | `New` | neutral |
-| Base ID present → absent (removed from baseline) | `PolicyRemoved` | neutral |
-| any ↔ Error | `Errored` | red |
-| X → X (identical result and version) | `Unchanged` | none (hidden) |
-| Anything else | `Other` (both literal values preserved) | yellow |
+| Before → After | Bucket |
+|---|---|
+| Pass → Fail | `Regression` |
+| Fail → Pass | `Remediated` |
+| Warning → Pass | `WarningResolved` |
+| Warning → Fail | `WarningEscalated` |
+| Pass/Fail → Warning | `NewWarning` |
+| N/A → Pass/Fail/Warning | `NewlyAutomated` |
+| Pass/Fail/Warning → N/A | `NewlyManual` |
+| any ↔ Omitted (non-identical) | `OmissionChanged` |
+| Same base ID, different version | `VersionChanged` |
+| Base ID absent → present | `New` |
+| Base ID present → absent (removed from baseline) | `PolicyRemoved` |
+| any ↔ Error | `Errored` |
+| X → X (identical result and version) | `Unchanged` (hidden by default) |
+| Anything else | `Other` (both literal values preserved) |
 
-`Result` is treated as an **open string set**: any value the tool does not
-recognize (e.g. a future status) classifies as `Other` with both literal values
-preserved — it never crashes the diff.
+The bucket appears in the report's **Transition** column. `Result` is treated as
+an **open string set**: any value the tool does not recognize (e.g. a future
+status) classifies as `Other` with both literal values preserved — it never
+crashes the diff.
+
+## Row coloring
+
+Report rows are colored by the **Result (After)** value, so the color reflects
+the control's *current* state (not the transition type, which is shown in the
+Transition column):
+
+| Result (After) | Row color |
+|---|---|
+| Fail (or Error) | red |
+| Warning | yellow |
+| Pass | green |
+| N/A (manual) / Omitted / other | grey |
+| Removed from baseline (`PolicyRemoved`) | grey (matches manual checks) |
+
+Removed-policy rows are greyed out like manual checks, and their **Notes** column
+shows the last-updated (removal) date and a link to the policy's entry in
+[removedpolicies.md](../../PowerShell/ScubaGear/baselines/removedpolicies.md)
+(when the policy is documented there).
 
 ## Annotations (Fail → Fail)
 
@@ -145,8 +165,8 @@ is consulted.
   checkbox at the top of the report to reveal them.
 - **Dark mode** can be toggled with the **"Dark Mode"** checkbox; `-DarkMode`
   sets its default.
-- Rows are color-coded per the taxonomy table above, and a per-product summary
-  table shows the count of each bucket.
+- Rows are color-coded by their Result (After) value (see [Row coloring](#row-coloring)),
+  and a per-product summary table shows the count of each bucket.
 - All policy text is HTML-escaped. The `Requirement` field, which embeds HTML
   indicator markup in `ScubaResults.json`, is stripped to plain text before it
   is stored in `DiffResults.json` or rendered.

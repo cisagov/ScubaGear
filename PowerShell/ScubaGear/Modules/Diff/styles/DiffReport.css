@@ -12,12 +12,13 @@
     --border-color: #c2c8cc;
     --uuid-color: #424242;
     --link-color: #006086;
-    /* Row state colors, matching Main.css --test-* variables. */
+    /* Row state colors, matching Main.css --test-* variables. Rows are colored by
+       their Result (After) value; grey (matching manual checks / --test-other) is
+       used for manual, omitted, and removed policies. */
     --diff-red: #E5C7C7;
     --diff-green: #d5ebd5;
     --diff-yellow: #fff7d6;
-    --diff-neutral: #dce8f8;
-    --diff-unchanged: #ebebf2;
+    --diff-grey: #ebebf2;
 }
 
 html[data-theme='dark'] {
@@ -31,8 +32,7 @@ html[data-theme='dark'] {
     --diff-red: #381919;
     --diff-green: #1C361C;
     --diff-yellow: #524100;
-    --diff-neutral: #1e2f45;
-    --diff-unchanged: #2a2a2a;
+    --diff-grey: #414141;
 }
 
 body {
@@ -106,12 +106,11 @@ th {
     top: 0;
 }
 
-/* Row state coloring. */
+/* Row state coloring (driven by the Result (After) value). */
 tr.diff-red    { background-color: var(--diff-red); }
 tr.diff-green  { background-color: var(--diff-green); }
 tr.diff-yellow { background-color: var(--diff-yellow); }
-tr.diff-neutral { background-color: var(--diff-neutral); }
-tr.diff-unchanged { background-color: var(--diff-unchanged); }
+tr.diff-grey   { background-color: var(--diff-grey); }
 
 /* Unchanged rows are hidden by default; the "Show unchanged" toggle reveals them. */
 tr.diff-unchanged-row { display: none; }
@@ -144,3 +143,7 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
     margin-right: 0.35em;
     vertical-align: middle;
 }
+.legend .swatch.diff-red    { background-color: var(--diff-red); }
+.legend .swatch.diff-green  { background-color: var(--diff-green); }
+.legend .swatch.diff-yellow { background-color: var(--diff-yellow); }
+.legend .swatch.diff-grey   { background-color: var(--diff-grey); }
