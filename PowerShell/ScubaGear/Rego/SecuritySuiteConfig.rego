@@ -57,7 +57,6 @@ PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
     RequiredTypes := {"exe", "cmd", "vbe"}
     some Policy in input.anti_malware_policies
     Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
-    Policy.EnableFileFilter == true
     MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
     count(MissingTypes) > 0
     Reason := concat("", [
