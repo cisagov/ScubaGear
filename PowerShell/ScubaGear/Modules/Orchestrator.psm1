@@ -900,7 +900,6 @@ function Invoke-ProviderList {
                                 'AccessToken'       = $ConnectionResult.PBIAccessToken
                                 'BaseUrl'           = $ConnectionResult.PBIBaseUrl
                                 'LicenseFound'      = $ConnectionResult.PBILicenseFound
-                                'LicenseReason'     = $ConnectionResult.PBILicenseReason
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
