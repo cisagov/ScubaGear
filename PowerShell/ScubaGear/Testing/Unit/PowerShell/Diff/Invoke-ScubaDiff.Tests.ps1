@@ -307,7 +307,7 @@ InModuleScope Diff {
         }
     }
 
-    Describe -Tag 'Diff' -Name 'Fixture pair B: Security Suite consolidation (standalone, no rename)' {
+    Describe -Tag 'Diff' -Name 'Fixture pair B: products present in only one file (standalone)' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-Before.json')

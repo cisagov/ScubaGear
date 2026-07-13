@@ -18,9 +18,6 @@ Several properties of M365 `ScubaResults.json` shape the design:
 
 - Policy IDs carry a per-policy version suffix (`MS.AAD.1.1v1`) that increments
   when the policy's *meaning* changes.
-- ScubaGear is mid-flight consolidating many `Defender` / `EXO` / `Teams`
-  policies into a new `SecuritySuite` product, reworking the policies and their
-  assessments; a diff can span that consolidation.
 - The `Requirement` field embeds HTML indicator markup.
 - `Result` is effectively an open string set (`Pass`, `Fail`, `Warning`, `N/A`,
   plus `Error`/`Omitted` from report post-processing, and potentially new values
@@ -35,7 +32,7 @@ Add an exported, fully-offline cmdlet `Invoke-SCuBADiff` in a new, dependency-fr
 `MetaData`, `Summary`, `Diff`) is kept parallel to the ScubaGoggles `diff` output
 so downstream consumers can process both.
 
-The three substantive decisions below were the ones with real alternatives.
+The two substantive decisions below were the ones with real alternatives.
 
 ### 1. Base-ID matching with a `VersionChanged` bucket (vs. exact full-ID matching)
 
@@ -59,26 +56,7 @@ authoritative pass→fail delta.
 The base-ID regex tolerates both `v1` and a hypothetical `v1.2` form, even though
 versions are currently expected to increment only by whole numbers.
 
-### 2. Security Suite consolidation treated as standalone policies (vs. product-alias join)
-
-**Decision:** Match products by name only, with **no** alias/rename joining. The
-consolidation of `Defender` / `EXO` / `Teams` policies into the new
-`SecuritySuite` product is reported as standalone `PolicyRemoved` (old policies)
-plus `New` (Security Suite policies).
-
-**Alternative considered — an explicit product-alias map** (`Defender` ↔
-`SecuritySuite`) that joins the products and marks records `ProductRenamed: true`.
-This was initially implemented and then removed. It is the wrong model here
-because the consolidation is not a rename: the policies were reworked and their
-assessments changed (a single old policy may map to several new ones, to a
-`None`, or to a materially different check — see
-`mappings/scuba-baseline-policy-migrations.csv`). Joining them would imply a 1:1
-equivalence that does not hold and would mask the fact that the new controls are
-genuinely new. Reporting the old policies as `PolicyRemoved` and the new ones as
-`New` states the change honestly; the migration CSV remains available for anyone
-who wants to trace an old policy to its Security Suite successor(s) out of band.
-
-### 3. Narrow `Fail → Fail` annotation scope (vs. broad annotation diffing)
+### 2. Narrow `Fail → Fail` annotation scope (vs. broad annotation diffing)
 
 **Decision:** Compare annotations only for `Fail → Fail` records, and only from
 the top-level `AnnotatedFailedPolicies` dictionary, surfacing

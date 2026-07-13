@@ -510,11 +510,9 @@ function Compare-ScubaResults {
     $beforeProducts = @($Before.Results.PSObject.Properties.Name)
     $afterProducts = @($After.Results.PSObject.Properties.Name)
 
-    # Each product is compared independently. Products are matched by name only;
-    # there is no alias/rename joining. The Defender/EXO/Teams -> Security Suite
-    # consolidation reworked the policies and their assessments, so consolidated
-    # controls are reported as standalone PolicyRemoved (old) and New (Security
-    # Suite) rather than as a rename.
+    # Each product is compared independently and matched by name only. A product
+    # present in only one file has all of its controls reported as New (only in
+    # after) or PolicyRemoved (only in before).
     $allProducts = @(@($beforeProducts) + @($afterProducts) | Select-Object -Unique | Sort-Object)
 
     $beforeAnnot = $Before.AnnotatedFailedPolicies
@@ -845,10 +843,8 @@ function Invoke-SCuBADiff {
     suffix removed, e.g. MS.AAD.1.1v1 -> MS.AAD.1.1). When the same base ID appears
     with different version suffixes, the change is classified as VersionChanged and
     the result comparison is treated as informational. Products are matched by name
-    only. The Defender/EXO/Teams -> Security Suite consolidation reworked those
-    policies and their assessments, so consolidated controls are reported as
-    standalone PolicyRemoved (old product) and New (Security Suite) rather than as a
-    rename.
+    only; a product present in only one file has all of its controls reported as
+    New or PolicyRemoved.
 
     The HTML report hides Unchanged rows by default; a client-side toggle reveals
     them. Use -DarkMode to default the report to dark theme.

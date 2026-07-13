@@ -86,19 +86,9 @@ trailing version suffix removed (`MS.AAD.1.1v1` → `MS.AAD.1.1`):
   > when you need to distinguish a genuine baseline removal from a control that
   > was merely not evaluated.
 
-## The Security Suite consolidation (standalone, not a rename)
-
-ScubaGear is consolidating many `Defender`, `Exchange Online`, and `Teams`
-policies into the new `Security Suite` product. `Invoke-SCuBADiff` does **not**
-treat this as a product rename or join the products. Products are matched by name
-only, so a diff that spans the consolidation reports the old policies (in
-`Defender` / `EXO` / `Teams`) as standalone `PolicyRemoved` and the new
-`SecuritySuite` policies as standalone `New`.
-
-This is deliberate: the consolidation reworked the policies and their assessments,
-so the new `MS.SECURITYSUITE.*` controls are genuinely new policies, not renamed
-copies of the old ones. Treating them as standalone keeps the comparison honest
-rather than implying a 1:1 equivalence that no longer holds.
+Products are matched by name only. A product present in only one file has all of
+its controls reported as `New` (only in *after*) or `PolicyRemoved` (only in
+*before*).
 
 ## Transition taxonomy
 
