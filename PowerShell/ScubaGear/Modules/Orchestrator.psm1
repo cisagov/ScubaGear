@@ -883,9 +883,6 @@ function Invoke-ProviderList {
                                 'AccessToken'     = $ConnectionResult.PPAccessToken
                                 'BaseUrl'         = $ConnectionResult.PPBaseUrl
                             }
-                            if ($ServicePrincipalParams) {
-                                $PPProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                            }
                             $RetVal = Export-PowerPlatformProvider @PPProviderParams | Select-Object -Last 1
                         }
                         "sharepoint" {
