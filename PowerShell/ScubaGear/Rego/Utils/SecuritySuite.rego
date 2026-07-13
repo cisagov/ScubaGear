@@ -52,12 +52,13 @@ ApplyLicenseWarningString(_, _) := DEFLICENSEWARNSTR if {
 
 # If a defender license is not present, return a defender license warning
 # If a defender license is present, return the custom provided message
-# This ruleset differs from ApplyLicenseWarningString because it always returns the custom message regardless of whether Status is true or false
-ApplyLicenseWarningStringCustom(_, String) := String if {
+# This differs from ApplyLicenseWarningString because it always returns the custom
+# message when licensed (Status is not needed).
+ApplyLicenseWarningStringCustom(String) := String if {
     input.defender_license == true
 }
 
-ApplyLicenseWarningStringCustom(_, _) := DEFLICENSEWARNSTR if {
+ApplyLicenseWarningStringCustom(_) := DEFLICENSEWARNSTR if {
     input.defender_license == false
 }
 

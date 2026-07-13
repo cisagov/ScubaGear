@@ -192,7 +192,7 @@ tests contains {
     "ActualValue": [{
         "Policy Name": HighestPriorityActiveSafeAttachmentPolicyName
     }],
-    "ReportDetails": ApplyLicenseWarningStringCustom(Status, Description),
+    "ReportDetails": ApplyLicenseWarningStringCustom(Description),
     "RequirementMet": Status
 }
 if {
