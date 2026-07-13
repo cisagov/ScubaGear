@@ -95,6 +95,17 @@ InModuleScope Diff {
             }
         }
 
+        Context 'Get-ScubaOrderedProducts' {
+            It 'Orders products by the fixed report order regardless of input order' {
+                $ordered = Get-ScubaOrderedProducts @('Teams','SecuritySuite','AAD','SharePoint','PowerPlatform','PowerBI','EXO','Defender')
+                $ordered -join ',' | Should -Be 'AAD,Defender,EXO,PowerBI,PowerPlatform,SharePoint,SecuritySuite,Teams'
+            }
+            It 'Appends unknown products alphabetically after the known ones' {
+                $ordered = Get-ScubaOrderedProducts @('Zebra','Teams','AAD','Alpha')
+                $ordered -join ',' | Should -Be 'AAD,Teams,Alpha,Zebra'
+            }
+        }
+
         Context 'Get-ScubaRowColorClass' {
             It 'Greys out removed policies regardless of before result' {
                 Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'PolicyRemoved'; ResultAfter = $null }) | Should -Be 'grey'
@@ -377,6 +388,28 @@ InModuleScope Diff {
         }
         It 'Uses the friendly product title for the AAD heading' {
             $Html | Should -Match '<h2>Microsoft Entra ID / Azure Active Directory</h2>'
+        }
+        It 'Renders product sections in the fixed report order' {
+            # Build a diff whose products are supplied in a scrambled order.
+            function New-MultiProductSide {
+                $products = [ordered]@{}
+                foreach ($p in @('Teams','AAD','EXO')) {
+                    $products[$p] = @( @{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        @{ 'Control ID' = "MS.$p.1.1v1"; Requirement = 'R'; Result = 'Pass'; Criticality = 'Shall'; Details = 'd' }
+                    ) } )
+                }
+                $obj = @{
+                    MetaData = @{ ReportUUID = 'x'; TimestampZulu = 't'; ToolVersion = '1' }
+                    Summary = @{}
+                    AnnotatedFailedPolicies = @{}
+                    Results = $products
+                }
+                return $obj | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+            }
+            $diff = Compare-ScubaResults -Before (New-MultiProductSide) -After (New-MultiProductSide)
+            $multiHtml = New-ScubaDiffReport -DiffResults $diff
+            $order = [regex]::Matches($multiHtml, '<h2>([^<]+)</h2>') | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -ne 'Summary' }
+            ($order -join ',') | Should -Be 'Microsoft Entra ID / Azure Active Directory,Exchange Online,Microsoft Teams'
         }
         It 'HTML-escapes user content and never emits the raw indicator markup' {
             $HtmlB | Should -Match 'Configure A &amp; B properly'

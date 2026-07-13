@@ -30,6 +30,19 @@ $script:ProductDisplayNameMap = @{
     'SecuritySuite'  = 'Security Suite'
 }
 
+# Fixed display order for products in the HTML report (summary table and section
+# tables). Products not listed here are appended, ordered alphabetically.
+$script:ProductOrder = @(
+    'AAD'
+    'Defender'
+    'EXO'
+    'PowerBI'
+    'PowerPlatform'
+    'SharePoint'
+    'SecuritySuite'
+    'Teams'
+)
+
 # Bucket -> row color class used by the HTML report. Keep in sync with the
 # transition taxonomy in the ADR / usage doc.
 $script:BucketColorMap = [ordered]@{
@@ -304,6 +317,29 @@ function Get-ScubaProductDisplayName {
         return $script:ProductDisplayNameMap[$ProductKey]
     }
     return $ProductKey
+}
+
+function Get-ScubaOrderedProducts {
+    <#
+    .Description
+    Orders a set of product abbreviations by the fixed report display order
+    ($script:ProductOrder). Products not in that list are appended alphabetically.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $Products
+    )
+    return @($Products | Sort-Object -Property `
+        @{ Expression = {
+                $i = [Array]::IndexOf($script:ProductOrder, $_)
+                if ($i -ge 0) { $i } else { [int]::MaxValue }
+            } }, `
+        @{ Expression = { $_ } })
 }
 
 function Get-ScubaRowColorClass {
@@ -712,7 +748,7 @@ function New-ScubaDiffReport {
     [void]$sb.Append('<tr><th>Product</th>')
     foreach ($col in $summaryColumns) { [void]$sb.Append("<th>$(& $enc $col)</th>") }
     [void]$sb.AppendLine('<th>Total</th></tr>')
-    foreach ($product in $DiffResults.Summary.Keys) {
+    foreach ($product in (Get-ScubaOrderedProducts @($DiffResults.Summary.Keys))) {
         $counts = $DiffResults.Summary.$product
         [void]$sb.Append("<tr><td>$(& $enc (Get-ScubaProductDisplayName $product))</td>")
         $total = 0
@@ -727,7 +763,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('</table>')
 
     # Per-product transition tables.
-    foreach ($product in $DiffResults.Diff.Keys) {
+    foreach ($product in (Get-ScubaOrderedProducts @($DiffResults.Diff.Keys))) {
         $records = @($DiffResults.Diff.$product)
         [void]$sb.AppendLine("<h2>$(& $enc (Get-ScubaProductDisplayName $product))</h2>")
         [void]$sb.AppendLine('<table class="policy-diff">')
@@ -934,6 +970,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaBucketLabel',
     'Get-ScubaRowColorClass',
     'Get-ScubaProductDisplayName',
+    'Get-ScubaOrderedProducts',
     'Get-ScubaCanonicalProduct',
     'Get-ScubaControlMap',
     'Get-ScubaAnnotationEntry',
