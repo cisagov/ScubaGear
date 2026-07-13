@@ -18,8 +18,9 @@ Several properties of M365 `ScubaResults.json` shape the design:
 
 - Policy IDs carry a per-policy version suffix (`MS.AAD.1.1v1`) that increments
   when the policy's *meaning* changes.
-- ScubaGear is mid-flight consolidating the `Defender` product into
-  `SecuritySuite`; a diff can span that rename.
+- ScubaGear is mid-flight consolidating many `Defender` / `EXO` / `Teams`
+  policies into a new `SecuritySuite` product, reworking the policies and their
+  assessments; a diff can span that consolidation.
 - The `Requirement` field embeds HTML indicator markup.
 - `Result` is effectively an open string set (`Pass`, `Fail`, `Warning`, `N/A`,
   plus `Error`/`Omitted` from report post-processing, and potentially new values
@@ -58,18 +59,24 @@ authoritative pass→fail delta.
 The base-ID regex tolerates both `v1` and a hypothetical `v1.2` form, even though
 versions are currently expected to increment only by whole numbers.
 
-### 2. Product-alias map for Defender → Security Suite (vs. retire + new)
+### 2. Security Suite consolidation treated as standalone policies (vs. product-alias join)
 
-**Decision:** Maintain an explicit product-alias map (`Defender` ↔
-`SecuritySuite`, the only known entry) and **join** the renamed products,
-reporting the joined product under its after-file name with `ProductRenamed: true`
-on each record. Policy IDs under the renamed product still follow decision 1.
+**Decision:** Match products by name only, with **no** alias/rename joining. The
+consolidation of `Defender` / `EXO` / `Teams` policies into the new
+`SecuritySuite` product is reported as standalone `PolicyRemoved` (old policies)
+plus `New` (Security Suite policies).
 
-**Alternative considered — treat the rename as retire + new:** report all
-`Defender` controls as `PolicyRemoved` and all `SecuritySuite` controls as `New`.
-Rejected for the same reason as exact-ID matching: it manufactures a wall of
-false churn across a pure rename and hides the actual per-policy transitions. An
-explicit, small alias map is easy to audit and extend if future renames occur.
+**Alternative considered — an explicit product-alias map** (`Defender` ↔
+`SecuritySuite`) that joins the products and marks records `ProductRenamed: true`.
+This was initially implemented and then removed. It is the wrong model here
+because the consolidation is not a rename: the policies were reworked and their
+assessments changed (a single old policy may map to several new ones, to a
+`None`, or to a materially different check — see
+`mappings/scuba-baseline-policy-migrations.csv`). Joining them would imply a 1:1
+equivalence that does not hold and would mask the fact that the new controls are
+genuinely new. Reporting the old policies as `PolicyRemoved` and the new ones as
+`New` states the change honestly; the migration CSV remains available for anyone
+who wants to trace an old policy to its Security Suite successor(s) out of band.
 
 ### 3. Narrow `Fail → Fail` annotation scope (vs. broad annotation diffing)
 
@@ -107,8 +114,8 @@ operator-relevant change the diff exists to surface.
   `New-Report`, which requires live-run artifacts (provider/Rego JSON, parsed
   baselines) that do not exist in a post-hoc context.
 - `DiffResults.json` commits to `SchemaVersion: "1.0"` from day one. The
-  `Fail → Fail`-only annotation scope and the single-entry alias map are the most
-  likely areas to grow; both can expand additively.
+  `Fail → Fail`-only annotation scope is the most likely area to grow; it can
+  expand additively.
 - Unknown `Result` values are handled as `Other` with both literals preserved,
   so new status strings never crash the diff.
 

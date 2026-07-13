@@ -18,9 +18,9 @@
                 "GroupNumber": "1",
                 "GroupReferenceURL": "https://example.com/defender#1",
                 "Controls": [
-                    { "Control ID": "MS.DEFENDER.1.1v1", "Requirement": "Version drift control.", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before at v1." },
-                    { "Control ID": "MS.DEFENDER.2.1v1", "Requirement": "Renamed product transition control.", "Result": "Fail", "Criticality": "Shall", "Details": "Failing before." },
-                    { "Control ID": "MS.DEFENDER.3.1v1", "Requirement": "Configure A & B properly.<div class='policy-indicators'><a href='https://example.com' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>", "Result": "Pass", "Criticality": "Shall", "Details": "Passing before." }
+                    { "Control ID": "MS.DEFENDER.1.1v1", "Requirement": "Consolidated into Security Suite control.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Shall", "Details": "Passing before." },
+                    { "Control ID": "MS.DEFENDER.2.1v1", "Requirement": "Consolidated into Security Suite control 2.", "Result": "Fail", "OriginalResult": "Fail", "Criticality": "Shall", "Details": "Failing before." },
+                    { "Control ID": "MS.DEFENDER.3.1v1", "Requirement": "Configure A & B properly.<div class='policy-indicators'><a href='https://example.com' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Shall", "Details": "Passing before." }
                 ]
             }
         ]

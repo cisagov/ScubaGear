@@ -42,16 +42,6 @@ InModuleScope Diff {
             }
         }
 
-        Context 'Get-ScubaCanonicalProduct' {
-            It 'Maps Defender to SecuritySuite' {
-                Get-ScubaCanonicalProduct 'Defender' | Should -Be 'SecuritySuite'
-            }
-            It 'Leaves other products unchanged' {
-                Get-ScubaCanonicalProduct 'AAD' | Should -Be 'AAD'
-                Get-ScubaCanonicalProduct 'SecuritySuite' | Should -Be 'SecuritySuite'
-            }
-        }
-
         Context 'ConvertTo-ScubaPlainText' {
             It 'Removes the policy-indicators block' {
                 $out = ConvertTo-ScubaPlainText "Do the thing.<div class='policy-indicators'><a href='x'>Automated</a></div>"
@@ -317,35 +307,61 @@ InModuleScope Diff {
         }
     }
 
-    Describe -Tag 'Diff' -Name 'Fixture pair B: version + product drift' {
+    Describe -Tag 'Diff' -Name 'Fixture pair B: Security Suite consolidation (standalone, no rename)' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-Before.json')
             $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-After.json')
             $script:DiffB = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
         }
-        It 'Alias-joins Defender/SecuritySuite under the after-file product name' {
+        It 'Treats Defender and SecuritySuite as separate standalone products' {
+            @($DiffB.Diff.Keys) | Should -Contain 'Defender'
             @($DiffB.Diff.Keys) | Should -Contain 'SecuritySuite'
-            @($DiffB.Diff.Keys) | Should -Not -Contain 'Defender'
         }
-        It 'Does not report the renamed product as retired or new' {
-            $DiffB.MetaData.ProductsOnlyInBefore | Should -BeNullOrEmpty
-            $DiffB.MetaData.ProductsOnlyInAfter | Should -BeNullOrEmpty
-        }
-        It 'Marks alias-joined records with ProductRenamed = true' {
-            foreach ($rec in $DiffB.Diff.SecuritySuite) {
-                $rec.ProductRenamed | Should -BeTrue
+        It 'Reports every before-only (Defender) control as PolicyRemoved' {
+            $DiffB.MetaData.ProductsOnlyInBefore | Should -Contain 'Defender'
+            foreach ($rec in $DiffB.Diff.Defender) {
+                $rec.Bucket | Should -Be 'PolicyRemoved'
             }
         }
-        It 'Classifies a base ID at v1 vs v2 as VersionChanged (never New/PolicyRemoved)' {
-            $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.DEFENDER.1.1' }
-            $rec.Bucket | Should -Be 'VersionChanged'
-            $rec.'Control ID (Before)' | Should -Be 'MS.DEFENDER.1.1v1'
-            $rec.'Control ID (After)'  | Should -Be 'MS.DEFENDER.1.1v2'
+        It 'Reports every after-only (SecuritySuite) control as New' {
+            $DiffB.MetaData.ProductsOnlyInAfter | Should -Contain 'SecuritySuite'
+            foreach ($rec in $DiffB.Diff.SecuritySuite) {
+                $rec.Bucket | Should -Be 'New'
+            }
+        }
+        It 'Never emits a ProductRenamed field' {
+            foreach ($product in @($DiffB.Diff.Keys)) {
+                foreach ($rec in $DiffB.Diff.$product) {
+                    $rec.PSObject.Properties['ProductRenamed'] | Should -BeNullOrEmpty
+                }
+            }
         }
         It 'Strips embedded HTML from the Requirement field' {
-            $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.DEFENDER.3.1' }
+            $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.SECURITYSUITE.3.1' }
             $rec.Requirement | Should -Be 'Configure A & B properly.'
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'Version drift within a product' {
+        It 'Classifies a base ID at v1 vs v2 as VersionChanged (never New/PolicyRemoved)' {
+            function New-VerResults {
+                param($FullId)
+                $obj = @{
+                    MetaData = @{ ReportUUID = 'x'; TimestampZulu = 't'; ToolVersion = '1' }
+                    Summary = @{ Teams = @{} }
+                    AnnotatedFailedPolicies = @{}
+                    Results = @{ Teams = @( @{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        @{ 'Control ID' = $FullId; Requirement = 'R'; Result = 'Pass'; OriginalResult = 'Pass'; Criticality = 'Shall'; Details = 'd' }
+                    ) } ) }
+                }
+                return $obj | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+            }
+            $diff = Compare-ScubaResults -Before (New-VerResults 'MS.TEAMS.1.2v1') -After (New-VerResults 'MS.TEAMS.1.2v2')
+            $rec = $diff.Diff.Teams[0]
+            $rec.Bucket | Should -Be 'VersionChanged'
+            $rec.'Control ID (Before)' | Should -Be 'MS.TEAMS.1.2v1'
+            $rec.'Control ID (After)'  | Should -Be 'MS.TEAMS.1.2v2'
         }
     }
 

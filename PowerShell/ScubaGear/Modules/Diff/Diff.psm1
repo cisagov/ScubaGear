@@ -7,14 +7,6 @@
 #
 # See docs/execution/diff.md for usage and the ADR for design rationale.
 
-$script:ProductAliasMap = @{
-    # Defender was consolidated into the Security Suite product. When a diff spans
-    # that transition, one file names the product "Defender" and the other names it
-    # "SecuritySuite"; they refer to the same set of controls and must be joined
-    # rather than reported as one retired + one new product.
-    'Defender' = 'SecuritySuite'
-}
-
 # Product abbreviation -> display title used for the HTML report headings and
 # summary table. The DiffResults.json keys remain the canonical abbreviations;
 # only the report display uses these friendlier names. Products not listed here
@@ -381,26 +373,6 @@ function Get-ScubaRowColorClass {
     }
 }
 
-function Get-ScubaCanonicalProduct {
-    <#
-    .Description
-    Returns the canonical product name for alias-joining. Applies the product
-    alias map (Defender -> SecuritySuite); all other names map to themselves.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]
-        $ProductName
-    )
-    if ($script:ProductAliasMap.ContainsKey($ProductName)) {
-        return $script:ProductAliasMap[$ProductName]
-    }
-    return $ProductName
-}
-
 function Get-ScubaControlMap {
     <#
     .Description
@@ -513,8 +485,8 @@ function Compare-ScubaResults {
     .Description
     Pure comparison of two parsed ScubaResults objects. Returns the full
     DiffResults object (SchemaVersion / MetaData / Summary / Diff). Performs
-    base-ID matching, product-alias joining, transition classification, and
-    Fail->Fail annotation comparison.
+    base-ID matching (per product, matched by name only), transition
+    classification, and Fail->Fail annotation comparison.
     .Functionality
     Internal
     #>
@@ -538,18 +510,12 @@ function Compare-ScubaResults {
     $beforeProducts = @($Before.Results.PSObject.Properties.Name)
     $afterProducts = @($After.Results.PSObject.Properties.Name)
 
-    # Group before/after product names by canonical (alias-joined) name.
-    $groups = [ordered]@{}
-    foreach ($p in $beforeProducts) {
-        $c = Get-ScubaCanonicalProduct $p
-        if (-not $groups.Contains($c)) { $groups[$c] = @{ Before = $null; After = $null } }
-        $groups[$c].Before = $p
-    }
-    foreach ($p in $afterProducts) {
-        $c = Get-ScubaCanonicalProduct $p
-        if (-not $groups.Contains($c)) { $groups[$c] = @{ Before = $null; After = $null } }
-        $groups[$c].After = $p
-    }
+    # Each product is compared independently. Products are matched by name only;
+    # there is no alias/rename joining. The Defender/EXO/Teams -> Security Suite
+    # consolidation reworked the policies and their assessments, so consolidated
+    # controls are reported as standalone PolicyRemoved (old) and New (Security
+    # Suite) rather than as a rename.
+    $allProducts = @(@($beforeProducts) + @($afterProducts) | Select-Object -Unique | Sort-Object)
 
     $beforeAnnot = $Before.AnnotatedFailedPolicies
     $afterAnnot = $After.AnnotatedFailedPolicies
@@ -559,17 +525,15 @@ function Compare-ScubaResults {
     $productsOnlyBefore = @()
     $productsOnlyAfter = @()
 
-    foreach ($canonical in ($groups.Keys | Sort-Object)) {
-        $beforeName = $groups[$canonical].Before
-        $afterName = $groups[$canonical].After
-        if ($afterName) { $outputKey = $afterName } else { $outputKey = $beforeName }
-        $renamed = [bool]($beforeName -and $afterName -and ($beforeName -ne $afterName))
+    foreach ($product in $allProducts) {
+        $inBefore = $beforeProducts -contains $product
+        $inAfter = $afterProducts -contains $product
 
-        if ($beforeName -and -not $afterName) { $productsOnlyBefore += $outputKey }
-        if ($afterName -and -not $beforeName) { $productsOnlyAfter += $outputKey }
+        if ($inBefore -and -not $inAfter) { $productsOnlyBefore += $product }
+        if ($inAfter -and -not $inBefore) { $productsOnlyAfter += $product }
 
-        if ($beforeName) { $beforeMap = Get-ScubaControlMap $Before.Results.$beforeName } else { $beforeMap = [ordered]@{} }
-        if ($afterName) { $afterMap = Get-ScubaControlMap $After.Results.$afterName } else { $afterMap = [ordered]@{} }
+        if ($inBefore) { $beforeMap = Get-ScubaControlMap $Before.Results.$product } else { $beforeMap = [ordered]@{} }
+        if ($inAfter) { $afterMap = Get-ScubaControlMap $After.Results.$product } else { $afterMap = [ordered]@{} }
 
         $allBase = @(@($beforeMap.Keys) + @($afterMap.Keys) | Select-Object -Unique | Sort-Object)
 
@@ -607,8 +571,6 @@ function Compare-ScubaResults {
                 'DetailsAfter'        = $detailsAfter
             }
 
-            if ($renamed) { $record['ProductRenamed'] = $true }
-
             # False-positive (marked incorrect) metadata. When either side carries
             # the "Incorrect result" marking, record the marking state and the
             # underlying (tool-computed) result on each side so consumers compare
@@ -641,8 +603,8 @@ function Compare-ScubaResults {
             $bucketCounts[$bucket] += 1
         }
 
-        $diff[$outputKey] = $records
-        $summary[$outputKey] = $bucketCounts
+        $diff[$product] = $records
+        $summary[$product] = $bucketCounts
     }
 
     $timestampZulu = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
@@ -882,9 +844,11 @@ function Invoke-SCuBADiff {
     Controls are matched on their base ID (the Control ID with the trailing version
     suffix removed, e.g. MS.AAD.1.1v1 -> MS.AAD.1.1). When the same base ID appears
     with different version suffixes, the change is classified as VersionChanged and
-    the result comparison is treated as informational. Renamed products (currently
-    only Defender -> SecuritySuite) are alias-joined rather than reported as a
-    retired + a new product.
+    the result comparison is treated as informational. Products are matched by name
+    only. The Defender/EXO/Teams -> Security Suite consolidation reworked those
+    policies and their assessments, so consolidated controls are reported as
+    standalone PolicyRemoved (old product) and New (Security Suite) rather than as a
+    rename.
 
     The HTML report hides Unchanged rows by default; a client-side toggle reveals
     them. Use -DarkMode to default the report to dark theme.
@@ -1011,7 +975,6 @@ Export-ModuleMember -Function @(
     'Get-ScubaRowColorClass',
     'Get-ScubaProductDisplayName',
     'Get-ScubaOrderedProducts',
-    'Get-ScubaCanonicalProduct',
     'Get-ScubaControlMap',
     'Get-ScubaAnnotationEntry',
     'Get-ScubaDiffFileEncoding'
