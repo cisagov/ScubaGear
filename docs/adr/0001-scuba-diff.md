@@ -85,6 +85,19 @@ redundant, and annotation changes are only meaningful for policies that remain
 failing. Keeping the scope narrow avoids speculative logic and keeps the record
 schema small. This can be widened later without breaking the schema.
 
+**Extension — false positives (results marked incorrect).** A separate but
+related annotation is the "marked incorrect" flag, which ScubaGear surfaces by
+rewriting the control's `Result` to the literal `"Incorrect result"`. Rather than
+letting that placeholder fall through to `Other`, the diff recognizes it as its
+own category and reports the change in the marking: `MarkedIncorrect` (a result
+became a false positive) and `IncorrectResolved` (a false positive was removed),
+with a stable marking staying `Unchanged`. For these records the diff also carries
+`MarkedIncorrect{Before,After}` and `UnderlyingResult{Before,After}` (from
+`OriginalResult`) so consumers compare the real evaluated result, not the
+placeholder. This was chosen over treating `"Incorrect result"` as an opaque
+`Other` string because false positives moving between runs is exactly the kind of
+operator-relevant change the diff exists to surface.
+
 ## Consequences
 
 - A new `Modules/Diff` module and one new exported function

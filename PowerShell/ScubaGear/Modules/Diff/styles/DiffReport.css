@@ -123,6 +123,12 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
     white-space: nowrap;
 }
 
+.underlying {
+    color: var(--uuid-color);
+    font-size: 0.85em;
+    font-style: italic;
+}
+
 .legend {
     display: flex;
     flex-wrap: wrap;

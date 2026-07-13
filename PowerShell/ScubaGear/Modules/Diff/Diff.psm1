@@ -53,6 +53,8 @@ $script:BucketColorMap = [ordered]@{
     'WarningResolved'  = 'green'
     'NewWarning'       = 'yellow'
     'OmissionChanged'  = 'yellow'
+    'MarkedIncorrect'  = 'grey'
+    'IncorrectResolved' = 'green'
     'VersionChanged'   = 'yellow'
     'Other'            = 'yellow'
     'NewlyAutomated'   = 'neutral'
@@ -65,7 +67,9 @@ $script:BucketColorMap = [ordered]@{
 # Bucket -> human-friendly label for HTML display. Buckets not listed here are
 # displayed using their raw (camelCase) token.
 $script:BucketLabelMap = @{
-    'PolicyRemoved' = 'Policy Removed'
+    'PolicyRemoved'     = 'Policy Removed'
+    'MarkedIncorrect'   = 'Marked Incorrect (false positive)'
+    'IncorrectResolved' = 'Incorrect Result Resolved'
 }
 
 function Get-ScubaBaseControlId {
@@ -187,13 +191,14 @@ function Get-ScubaResultCategory {
         return 'Other'
     }
     switch ($Result.Trim().ToLowerInvariant()) {
-        'pass'    { return 'Pass' }
-        'fail'    { return 'Fail' }
-        'warning' { return 'Warning' }
-        'n/a'     { return 'NA' }
-        'omitted' { return 'Omitted' }
-        'error'   { return 'Error' }
-        default   { return 'Other' }
+        'pass'              { return 'Pass' }
+        'fail'              { return 'Fail' }
+        'warning'           { return 'Warning' }
+        'n/a'               { return 'NA' }
+        'omitted'           { return 'Omitted' }
+        'error'             { return 'Error' }
+        'incorrect result'  { return 'Incorrect' }
+        default             { return 'Other' }
     }
 }
 
@@ -202,10 +207,10 @@ function Get-ScubaDiffBucket {
     .Description
     Classifies a single base control ID into exactly one transition bucket,
     honoring the precedence: Errored > VersionChanged > OmissionChanged >
-    specific transitions > Other > Unchanged. New/PolicyRemoved are determined by
-    presence and take precedence over everything else. PolicyRemoved (base ID
-    present in the before file but absent from the after file) aligns with the
-    baselines' removedpolicies.md tracking.
+    MarkedIncorrect/IncorrectResolved > specific transitions > Other > Unchanged.
+    New/PolicyRemoved are determined by presence and take precedence over
+    everything else. PolicyRemoved (base ID present in the before file but absent
+    from the after file) aligns with the baselines' removedpolicies.md tracking.
     .Functionality
     Internal
     #>
@@ -237,6 +242,13 @@ function Get-ScubaDiffBucket {
         if ($bCat -eq $aCat -and $BeforeResult -eq $AfterResult) { return 'Unchanged' }
         return 'OmissionChanged'
     }
+
+    # False-positive marking changes. A control marked incorrect by the user
+    # carries the literal Result "Incorrect result" (category 'Incorrect'). A
+    # flip in that marking is its own transition; both-incorrect falls through to
+    # the Unchanged check below.
+    if ($aCat -eq 'Incorrect' -and $bCat -ne 'Incorrect') { return 'MarkedIncorrect' }
+    if ($bCat -eq 'Incorrect' -and $aCat -ne 'Incorrect') { return 'IncorrectResolved' }
 
     switch ("$bCat->$aCat") {
         'Pass->Fail'      { return 'Regression' }
@@ -416,15 +428,19 @@ function Get-ScubaControlMap {
             if ([string]::IsNullOrEmpty($fullId)) { continue }
             $base = Get-ScubaBaseControlId $fullId
             $map[$base] = [pscustomobject]@{
-                FullId      = $fullId
-                BaseId      = $base
-                Version     = Get-ScubaControlVersion $fullId
-                Result      = $control.Result
-                Criticality = $control.Criticality
-                Requirement = $control.Requirement
-                Details     = $control.Details
-                GroupName   = $group.GroupName
-                GroupNumber = $group.GroupNumber
+                FullId         = $fullId
+                BaseId         = $base
+                Version        = Get-ScubaControlVersion $fullId
+                Result         = $control.Result
+                # OriginalResult is the tool-computed result before annotation /
+                # omission processing; for a control marked incorrect (Result =
+                # "Incorrect result") it holds the underlying evaluated result.
+                OriginalResult = $control.OriginalResult
+                Criticality    = $control.Criticality
+                Requirement    = $control.Requirement
+                Details        = $control.Details
+                GroupName      = $group.GroupName
+                GroupNumber    = $group.GroupNumber
             }
         }
     }
@@ -592,6 +608,19 @@ function Compare-ScubaResults {
             }
 
             if ($renamed) { $record['ProductRenamed'] = $true }
+
+            # False-positive (marked incorrect) metadata. When either side carries
+            # the "Incorrect result" marking, record the marking state and the
+            # underlying (tool-computed) result on each side so consumers compare
+            # the real result rather than the placeholder.
+            $bIncorrect = ($bPresent -and (Get-ScubaResultCategory $bResult) -eq 'Incorrect')
+            $aIncorrect = ($aPresent -and (Get-ScubaResultCategory $aResult) -eq 'Incorrect')
+            if ($bIncorrect -or $aIncorrect) {
+                $record['MarkedIncorrectBefore'] = [bool]$bIncorrect
+                $record['MarkedIncorrectAfter'] = [bool]$aIncorrect
+                $record['UnderlyingResultBefore'] = if ($bPresent) { $b.OriginalResult } else { $null }
+                $record['UnderlyingResultAfter'] = if ($aPresent) { $a.OriginalResult } else { $null }
+            }
 
             # Fail -> Fail annotation comparison (narrow v1 scope).
             if ($bPresent -and $aPresent -and
@@ -787,12 +816,23 @@ function New-ScubaDiffReport {
 
             $groupDisplay = & $enc (("$($r.GroupNumber) $($r.GroupName)").Trim())
 
+            # Result cells. For a side marked incorrect (false positive), surface
+            # the underlying tool-computed result inline.
+            $resultBeforeCell = & $enc $r.ResultBefore
+            if ($r.PSObject.Properties['MarkedIncorrectBefore'] -and $r.MarkedIncorrectBefore -and $r.UnderlyingResultBefore) {
+                $resultBeforeCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultBefore))</span>"
+            }
+            $resultAfterCell = & $enc $r.ResultAfter
+            if ($r.PSObject.Properties['MarkedIncorrectAfter'] -and $r.MarkedIncorrectAfter -and $r.UnderlyingResultAfter) {
+                $resultAfterCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultAfter))</span>"
+            }
+
             [void]$sb.AppendLine("<tr class=""$rowClass"">")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
             [void]$sb.AppendLine("  <td class=""bucket-label"">$(& $enc (Get-ScubaBucketLabel $bucket))</td>")
-            [void]$sb.AppendLine("  <td>$(& $enc $r.ResultBefore)</td>")
-            [void]$sb.AppendLine("  <td>$(& $enc $r.ResultAfter)</td>")
+            [void]$sb.AppendLine("  <td>$resultBeforeCell</td>")
+            [void]$sb.AppendLine("  <td>$resultAfterCell</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.Requirement)</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.DetailsAfter)</td>")
             [void]$sb.AppendLine('</tr>')

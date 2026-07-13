@@ -27,12 +27,13 @@ InModuleScope Diff {
 
         Context 'Get-ScubaResultCategory' {
             It 'Classifies known results' {
-                Get-ScubaResultCategory 'Pass'    | Should -Be 'Pass'
-                Get-ScubaResultCategory 'Fail'    | Should -Be 'Fail'
-                Get-ScubaResultCategory 'Warning' | Should -Be 'Warning'
-                Get-ScubaResultCategory 'N/A'     | Should -Be 'NA'
-                Get-ScubaResultCategory 'Omitted' | Should -Be 'Omitted'
-                Get-ScubaResultCategory 'Error'   | Should -Be 'Error'
+                Get-ScubaResultCategory 'Pass'             | Should -Be 'Pass'
+                Get-ScubaResultCategory 'Fail'             | Should -Be 'Fail'
+                Get-ScubaResultCategory 'Warning'          | Should -Be 'Warning'
+                Get-ScubaResultCategory 'N/A'              | Should -Be 'NA'
+                Get-ScubaResultCategory 'Omitted'          | Should -Be 'Omitted'
+                Get-ScubaResultCategory 'Error'            | Should -Be 'Error'
+                Get-ScubaResultCategory 'Incorrect result' | Should -Be 'Incorrect'
             }
             It 'Classifies unknown results as Other' {
                 Get-ScubaResultCategory 'Bug'   | Should -Be 'Other'
@@ -72,6 +73,10 @@ InModuleScope Diff {
             }
             It 'Returns the raw token for buckets without a friendly label' {
                 Get-ScubaBucketLabel 'Regression' | Should -Be 'Regression'
+            }
+            It 'Gives the false-positive buckets friendly labels' {
+                Get-ScubaBucketLabel 'MarkedIncorrect'   | Should -Be 'Marked Incorrect (false positive)'
+                Get-ScubaBucketLabel 'IncorrectResolved' | Should -Be 'Incorrect Result Resolved'
             }
         }
 
@@ -145,6 +150,11 @@ InModuleScope Diff {
                 @{ B = 'Pass';    A = 'Error';   Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
                 @{ B = 'Error';   A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
                 @{ B = 'Pass';    A = 'Bug';     Bv = 'v1'; Av = 'v1'; Expected = 'Other' }
+                @{ B = 'Fail';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'MarkedIncorrect' }
+                @{ B = 'Pass';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'MarkedIncorrect' }
+                @{ B = 'Incorrect result'; A = 'Pass'; Bv = 'v1'; Av = 'v1'; Expected = 'IncorrectResolved' }
+                @{ B = 'Incorrect result'; A = 'Fail'; Bv = 'v1'; Av = 'v1'; Expected = 'IncorrectResolved' }
+                @{ B = 'Incorrect result'; A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
                 @{ B = 'Pass';    A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
                 @{ B = 'Fail';    A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
                 @{ B = 'Omitted'; A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
@@ -336,6 +346,52 @@ InModuleScope Diff {
         It 'Strips embedded HTML from the Requirement field' {
             $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.DEFENDER.3.1' }
             $rec.Requirement | Should -Be 'Configure A & B properly.'
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'False-positive (marked incorrect) handling' {
+        BeforeAll {
+            function New-FpResults {
+                param($Result, $OriginalResult)
+                $obj = @{
+                    MetaData = @{ ReportUUID = 'x'; TimestampZulu = 't'; ToolVersion = '1' }
+                    Summary = @{ AAD = @{} }
+                    AnnotatedFailedPolicies = @{}
+                    Results = @{ AAD = @( @{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        @{ 'Control ID' = 'MS.AAD.1.1v1'; Requirement = 'R'; Result = $Result; OriginalResult = $OriginalResult; Criticality = 'Shall'; Details = 'd' }
+                    ) } ) }
+                }
+                return $obj | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+            }
+        }
+
+        It 'Buckets a newly marked false positive as MarkedIncorrect and records the underlying result' {
+            $diff = Compare-ScubaResults -Before (New-FpResults 'Fail' 'Fail') -After (New-FpResults 'Incorrect result' 'Fail')
+            $rec = $diff.Diff.AAD[0]
+            $rec.Bucket | Should -Be 'MarkedIncorrect'
+            $rec.MarkedIncorrectBefore | Should -BeFalse
+            $rec.MarkedIncorrectAfter | Should -BeTrue
+            $rec.UnderlyingResultAfter | Should -Be 'Fail'
+        }
+
+        It 'Buckets a removed false positive as IncorrectResolved with the underlying transition' {
+            $diff = Compare-ScubaResults -Before (New-FpResults 'Incorrect result' 'Fail') -After (New-FpResults 'Pass' 'Pass')
+            $rec = $diff.Diff.AAD[0]
+            $rec.Bucket | Should -Be 'IncorrectResolved'
+            $rec.UnderlyingResultBefore | Should -Be 'Fail'
+            $rec.UnderlyingResultAfter | Should -Be 'Pass'
+        }
+
+        It 'Treats a stable false-positive marking as Unchanged' {
+            $diff = Compare-ScubaResults -Before (New-FpResults 'Incorrect result' 'Fail') -After (New-FpResults 'Incorrect result' 'Fail')
+            $diff.Diff.AAD[0].Bucket | Should -Be 'Unchanged'
+        }
+
+        It 'Surfaces the underlying result and transition label in the HTML' {
+            $diff = Compare-ScubaResults -Before (New-FpResults 'Fail' 'Fail') -After (New-FpResults 'Incorrect result' 'Fail')
+            $html = New-ScubaDiffReport -DiffResults $diff
+            $html | Should -Match 'Marked Incorrect \(false positive\)'
+            $html | Should -Match 'underlying: Fail'
         }
     }
 

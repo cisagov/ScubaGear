@@ -101,7 +101,8 @@ rules above.
 
 Every base control ID present in either file is classified into exactly one
 bucket. Precedence, highest to lowest:
-`Errored` > `VersionChanged` > `OmissionChanged` > specific transitions >
+`Errored` > `VersionChanged` > `OmissionChanged` >
+`MarkedIncorrect` / `IncorrectResolved` > specific transitions >
 `Other` > `Unchanged`. `New` / `PolicyRemoved` are determined by presence.
 
 | Before → After | Bucket |
@@ -114,6 +115,8 @@ bucket. Precedence, highest to lowest:
 | N/A → Pass/Fail/Warning | `NewlyAutomated` |
 | Pass/Fail/Warning → N/A | `NewlyManual` |
 | any ↔ Omitted (non-identical) | `OmissionChanged` |
+| (not incorrect) → Incorrect result | `MarkedIncorrect` |
+| Incorrect result → (not incorrect) | `IncorrectResolved` |
 | Same base ID, different version | `VersionChanged` |
 | Base ID absent → present | `New` |
 | Base ID present → absent (removed from baseline) | `PolicyRemoved` |
@@ -157,6 +160,30 @@ the record:
 This is intentionally narrow in v1: annotation change detection is only applied
 to `Fail → Fail` records, and only the top-level `AnnotatedFailedPolicies` data
 is consulted.
+
+## False positives (results marked incorrect)
+
+When an operator marks a policy result as incorrect (a false positive), ScubaGear
+rewrites that control's `Result` to the literal `"Incorrect result"`. The diff
+recognizes this marking and reports the change in the marking itself:
+
+- A result becoming a false positive is bucketed `MarkedIncorrect`.
+- A false positive being removed is bucketed `IncorrectResolved`.
+- A stable false-positive marking (marked in both runs) is `Unchanged`.
+
+For any record where either side is marked incorrect, four fields are added:
+
+- `MarkedIncorrectBefore` / `MarkedIncorrectAfter` — whether each side was marked
+  a false positive.
+- `UnderlyingResultBefore` / `UnderlyingResultAfter` — the tool-computed result
+  (`OriginalResult`) on each side, so consumers compare the *real* evaluated
+  result rather than the `"Incorrect result"` placeholder.
+
+In the report, the **Transition** column shows the marking change and the
+**Result** columns show the underlying result inline (e.g. `Incorrect result
+(underlying: Fail)`). `MarkedIncorrect` rows are greyed out; `IncorrectResolved`
+rows are colored by the now-visible result (green if passing, red if still
+failing).
 
 ## The HTML report
 
