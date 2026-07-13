@@ -880,6 +880,8 @@ function Invoke-ProviderList {
                         "powerplatform" {
                             $PPProviderParams = @{
                                 'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken'     = $ConnectionResult.PPAccessToken
+                                'BaseUrl'         = $ConnectionResult.PPBaseUrl
                             }
                             if ($ServicePrincipalParams) {
                                 $PPProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams}
@@ -887,11 +889,18 @@ function Invoke-ProviderList {
                             $RetVal = Export-PowerPlatformProvider @PPProviderParams | Select-Object -Last 1
                         }
                         "sharepoint" {
+                            $SPOProviderParams = @{
+                                'AccessToken'     = $ConnectionResult.SPOAccessToken
+                                'AdminUrl'        = $ConnectionResult.SPOAdminUrl
+                            }
                             $RetVal = Export-SharePointProvider @SPOProviderParams | Select-Object -Last 1
                         }
                         "powerbi" {
                             $PBIProviderParams = @{
-                                'LicenseFound' = $false
+                                'AccessToken'       = $ConnectionResult.PBIAccessToken
+                                'BaseUrl'           = $ConnectionResult.PBIBaseUrl
+                                'LicenseFound'      = $ConnectionResult.PBILicenseFound
+                                'LicenseReason'     = $ConnectionResult.PBILicenseReason
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
