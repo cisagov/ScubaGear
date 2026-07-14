@@ -642,10 +642,12 @@ function New-Report {
 
         $SensitiveUsersJson = ConvertTo-Json @($SensitiveUsers)
         $PartnerDomainsJson = ConvertTo-Json @($PartnerDomains)
+        $AntiPhishPoliciesJson = ConvertTo-Json @($SettingsExport.anti_phish_policies) -Depth 5
     }
     else {
         $SensitiveUsersJson = "null"
         $PartnerDomainsJson = "null"
+        $AntiPhishPoliciesJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -706,6 +708,7 @@ function New-Report {
         "<script type='application/json' id='severity-score-weights-json'> $($SeverityScoreWeightsJson) </script>"
         "<script type='application/json' id='securitysuite-sensitive-users-json'> $($SensitiveUsersJson) </script>"
         "<script type='application/json' id='securitysuite-partner-domains-json'> $($PartnerDomainsJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-phish-policies-json'> $($AntiPhishPoliciesJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
