@@ -105,9 +105,11 @@ InModuleScope CreateReport {
                 $ReportContent = Get-Content -Path $ReportPath -Raw
                 $ReportContent | Should -Match "id='securitysuite-sensitive-users-json'"
                 $ReportContent | Should -Match "id='securitysuite-partner-domains-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-phish-policies-json'"
                 $ReportContent | Should -Match "jdoe@first.example.com"
                 $ReportContent | Should -Match "John Doe;jdoe@second.example.com"
                 $ReportContent | Should -Match "random.mail.example.com"
+                $ReportContent | Should -Match '"EnableFirstContactSafetyTips"'
                 $ReportContent | Should -Match "buildSecuritySuiteConfigTables"
             }
         }

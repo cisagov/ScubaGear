@@ -41,6 +41,53 @@ const getPartnerDomainRows = (partnerDomains) => {
         .map(domain => ({ "Partner Domain": domain }));
 };
 
+const SAFETY_TIP_FIELDS = [
+    ["First contact", "EnableFirstContactSafetyTips"],
+    ["Similar users", "EnableSimilarUsersSafetyTips"],
+    ["Similar domains", "EnableSimilarDomainsSafetyTips"],
+    ["Unusual characters", "EnableUnusualCharactersSafetyTips"],
+    ["Via tag", "EnableViaTag"],
+    ["Unauthenticated sender", "EnableUnauthenticatedSender"]
+];
+
+const formatProtectedValues = (values) => {
+    const normalizedValues = normalizeToArray(values)
+        .map(value => String(value ?? "").trim())
+        .filter(value => value.length > 0);
+    return normalizedValues.length > 0 ? normalizedValues.join("\n") : "None";
+};
+
+const isEnabled = (value) => value === true || String(value).toLowerCase() === "true";
+
+/**
+ * Converts anti-phish policy settings into rows for the protection-policy table.
+ *
+ * @param {Array<Object>|null} antiPhishPolicies The exported anti-phish policies.
+ * @returns {Array<Object>} Unique policy rows.
+ */
+const getAntiPhishPolicyRows = (antiPhishPolicies) => {
+    const seenPolicies = new Set();
+
+    return normalizeToArray(antiPhishPolicies).reduce((rows, policy) => {
+        if (!policy || typeof policy !== "object") return rows;
+
+        const policyName = String(policy.Name ?? policy.Identity ?? "Unnamed policy").trim() || "Unnamed policy";
+        const policyKey = String(policy.Identity ?? policyName).trim().toLowerCase();
+        if (seenPolicies.has(policyKey)) return rows;
+        seenPolicies.add(policyKey);
+
+        rows.push({
+            "Policy": policyName,
+            "Users Protected": formatProtectedValues(policy.TargetedUsersToProtect),
+            "Partner Domains Protected": formatProtectedValues(policy.TargetedDomainsToProtect),
+            "Safety Indicators": SAFETY_TIP_FIELDS
+                .map(([label, field]) => `${label}: ${isEnabled(policy[field]) ? "Enabled" : "Disabled"}`)
+                .join("\n")
+        });
+        return rows;
+    }, []);
+};
+
 /**
  * Creates a simple report table that matches the static ConvertTo-Html shape
  * expected by applyScopeAttributes.
@@ -68,6 +115,7 @@ const createSecuritySuiteTable = (columns, rows, tableClass) => {
         columns.forEach(column => {
             const td = document.createElement("td");
             td.textContent = row[column] ?? "N/A";
+            td.style.whiteSpace = "pre-line";
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -107,8 +155,9 @@ const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClas
  *
  * @param {Array|string|null} sensitiveUsers The configured SensitiveUsers values.
  * @param {Array|string|null} partnerDomains The configured PartnerDomains values.
+ * @param {Array<Object>|null} antiPhishPolicies The exported anti-phish policies.
  */
-const buildSecuritySuiteConfigTables = (sensitiveUsers, partnerDomains) => {
+const buildSecuritySuiteConfigTables = (sensitiveUsers, partnerDomains, antiPhishPolicies) => {
     if (sensitiveUsers === undefined || sensitiveUsers === null ||
         partnerDomains === undefined || partnerDomains === null) {
         return;
@@ -139,5 +188,14 @@ const buildSecuritySuiteConfigTables = (sensitiveUsers, partnerDomains) => {
         getPartnerDomainRows(partnerDomains),
         "securitysuite-partner-domains-table",
         "No partner domains defined in the config file."
+    );
+
+    appendSecuritySuiteTableSection(
+        section,
+        "Anti-Phish Protection Policies",
+        ["Policy", "Users Protected", "Partner Domains Protected", "Safety Indicators"],
+        getAntiPhishPolicyRows(antiPhishPolicies),
+        "securitysuite-anti-phish-policies-table",
+        "No anti-phish policies were exported."
     );
 };
