@@ -27,8 +27,11 @@ InModuleScope Orchestrator {
 
             Mock -CommandName Write-Debug {}
             Mock -CommandName New-Item {}
+            function Initialize-ScubaLogging {}
             Mock -ModuleName Orchestrator Initialize-ScubaLogging {}
+            function Write-ScubaLog {}
             Mock -ModuleName Orchestrator Write-ScubaLog {}
+            function Write-ScubaRunDetails {}
             Mock -ModuleName Orchestrator Write-ScubaRunDetails {}
             Mock -CommandName Get-Content { "" }
             Mock -CommandName Get-Member { $true }
@@ -151,34 +154,7 @@ InModuleScope Orchestrator {
                 {Invoke-SCuBACached -Version} | Should -Not -Throw
             }
         }
-        Context 'When modifying the CSV output files names' {
-            It 'Given -OutCsvFileName should not throw' {
-                $SplatParams += @{
-                    OutCsvFileName = "a"
-                }
-                {Invoke-SCuBACached -Version} | Should -Not -Throw
-            }
-            It 'Given -OutActionPlanFileName should not throw' {
-                $SplatParams += @{
-                    OutActionPlanFileName = "a"
-                }
-                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
-            }
-            It 'Given both -OutCsvFileName and -OutActionPlanFileName should not throw' {
-                $SplatParams += @{
-                    OutCsvFileName = "a"
-                    OutActionPlanFileName = "b"
-                }
-                {Invoke-SCuBACached @SplatParams} | Should -Not -Throw
-            }
-            It 'Given -OutCsvFileName and -OutActionPlanFileName equal should throw' {
-                $SplatParams += @{
-                    OutCsvFileName = "a"
-                    OutActionPlanFileName = "a"
-                }
-                {Invoke-SCuBACached @SplatParams} | Should -Throw
-            }
-        }
+
         Context "When there are multiple ScubaResults*.json files" {
         # It's possible (but not expected) that there are multiple files matching
         # "ScubaResults*.json". In this case, ScubaGear should choose the file

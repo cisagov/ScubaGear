@@ -534,6 +534,9 @@ function Invoke-SCuBA {
             $null = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
             $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
         }
+        else {
+            Write-Information "`nIf you are running v2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the -M365Environment parameter. In a future release ScubaGear will auto-detect the M365 environment and this won't be necessary.`n" -InformationAction Continue
+        }
 
         # Product Authentication - parameters consolidated into ScubaConfig
         Write-ScubaLog -Message "Starting product authentication..." -Level "Info" -Source "InvokeScuba" -Data @{
@@ -942,11 +945,36 @@ function Invoke-ProviderList {
         }
 "@
 
+            # If any of the providers produced JSON data, we check it for invalid JSON and try to repair it if necessary.
+            if ($ProviderJSON.Length -gt 0) {
+                # Parse the JSON string and repair it if invalid JSON was found.
+                $ReturnObject = Repair-ScubaGearJson -JsonInputString $BaselineSettingsExport
+
+                $BaselineSettingsExportFinal = $null
+                # If we performed a repair.
+                if ($ReturnObject.RepairedJson) {
+                    # Make sure ScubaGear references the repaired ScubaResults JSON string.
+                    $BaselineSettingsExportFinal = $ReturnObject.JsonString
+                    # Save a backup of the invalid JSON file in case the user wants to report it to the ScubaGear dev team.
+                    $InvalidJSONLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
+                        -Location $OutFolderPath -FileName "Invalid-$($ScubaConfig.OutProviderFileName).json"
+                    Write-Warning "Saved the invalid JSON file to the following location so you can provide it to the ScubaGear team for debugging: $InvalidJSONLocation"
+                }
+                # Repair was not needed so use the ScubaResults JSON as-is
+                else {
+                    $BaselineSettingsExportFinal = $BaselineSettingsExport
+                }
+            }
+            # If providers didn't produce any JSON data, there is nothing to repair, so use the ScubaResults JSON as-is
+            else {
+                $BaselineSettingsExportFinal = $BaselineSettingsExport
+            }
+
             # PowerShell 5 includes the "byte-order mark" (BOM) when it writes UTF-8 files. However, OPA (as of 0.68) appears to not
             # be able to handle the "\/" character sequence if the input json is UTF-8 encoded with the BOM, resulting
             # in the "unable to parse input: yaml" error message. As such, we need to save the provider output without
             # the BOM
-            $ActualSavedLocation = Set-Utf8NoBom -Content $BaselineSettingsExport `
+            $ActualSavedLocation = Set-Utf8NoBom -Content $BaselineSettingsExportFinal `
                 -Location $OutFolderPath -FileName "$($ScubaConfig.OutProviderFileName).json"
             Write-Debug $ActualSavedLocation
 
@@ -1933,13 +1961,24 @@ function Remove-Resources {
 function Invoke-SCuBACached {
     <#
     .SYNOPSIS
-    Specially execute the SCuBAGear tool security baselines for specified M365 products.
-    Can be executed on static provider JSON.
+    "ScubaCached" mode executes SCuBAGear against a local provider JSON file or ScubaResults JSON file instead of downloading the configurations.
     .Description
-    This is the function for running the tool provider JSON that has already been extracted.
-    This functions comes with the extra ExportProvider parameter to omit exporting the provider
-    if set to $false.
-    The rego will be run on a static provider JSON in the specified OutPath.
+    The term "cached" means that ScubaGear refers to a local cached copy of the tenant settings, which is the JSON file.
+    This mode bypasses authenticating to M365 to download the configurations. Everything executes locally.
+    Instead the mode takes the configurations in the local JSON file and sends them through the Rego and create HTML report workflows.
+    This mode is used by:
+    1) Developers to test their Rego code with various simulated tenant configurations by modifying the configurations in the local JSON file.
+    2) Users to create a report if ScubaGear crashed but still produced a provider JSON file.
+    3) ScubaGear's automated functional tests use this mode to test many different simulated tenant configuration scenarios without actually modifying the tenant.
+    ScubaCached mode behaves using the following rules and precedence which describe its execution:
+    1) It looks for files in the -OutPath folder.
+    2) It looks for a provider export file with the name "ProviderSettingsExport.json" or if -OutProviderFileName was passed it will look for a .json file with that name.
+    3) If the provider export exists, ScubaCached will pull the configuration settings from that file and then send them to the Rego and report creation modules.
+    4) If a provider file does not exist, ScubaCached will look for a ScubaResults*.json file. If it finds one it will pull the configuration settings from that file and then send them to the Rego.
+    5) If -KeepIndividualJSON is NOT passed, ScubaCached will create a new ScubaResults file containing the output from the Rego evaluations and the tenant configurations.
+    6) If -KeepIndividualJSON is passed, ScubaCached does NOT create a ScubaResults file but it still creates a new HTML report.
+    Based on this execution flow, ScubaCached expects either a provider settings JSON file or a ScubaResults JSON file to be present in -OutPath.
+    Ideally you should have only one of those two files in -OutPath but if you have both, ScubaCached will use the provider settings file and ignore the ScubaResults file.
     <#
     .Parameter ExportProvider
     This parameter will when set to $true export the provider and act like Invoke-Scuba.
@@ -2005,7 +2044,6 @@ function Invoke-SCuBACached {
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
     .Parameter KeepIndividualJSON
-
     Keeps ScubaGear legacy output where files are not merged into an all in one JSON.
     This parameter is for backwards compatibility for those working with the older ScubaGear output files.
     .Parameter OutJsonFileName
@@ -2369,51 +2407,73 @@ function Invoke-SCuBACached {
                 Write-ScubaLog -Message "ExportProvider disabled - using cached provider data" -Level "Info" -Source "ScubaCached"
             }
 
-            $ProviderJSONFilePath = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
-            if (-not (Test-Path $ProviderJSONFilePath)) {
-                Write-ScubaLog -Message "Provider JSON not found as standalone file, extracting from ScubaResults" -Level "Info" -Source "ScubaCached"
-                # When running Invoke-ScubaCached, the provider output might not exist as a stand-alone
-                # file depending on what version of ScubaGear created the output. If the provider output
-                # does not exist as a stand-alone file, create it from the ScubaResults file so the other functions
-                # can execute as normal.
-                $ScubaResultsFileName = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName)*.json"
-                # As there is the possibility that the wildcard will match multiple files,
-                # select the one that was created last if there are multiple.
-                # By default ScubaGear will output the files into their own folder.
-                # The only case this will happen is when someone personally moves multiple files into the
-                # same folder.
-                $SettingsExport = $(Get-Content -Encoding UTF8 (Get-ChildItem $ScubaResultsFileName | Sort-Object CreationTime -Descending | Select-Object -First 1).FullName | ConvertFrom-Json).Raw
+            #####################################
+            # If a ScubaResults file exists we grab its System.IO.FileInfo object which is referenced further down.
+            #####################################
+            $ScubaResultsFileNameWildcard = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName)*.json"
+            $ScubaResultsFileFound = $false
+            $ScubaResultsFileObject = $null
+            if (Test-Path $ScubaResultsFileNameWildcard) {
+                $ScubaResultsFilesArray = @(Get-ChildItem $ScubaResultsFileNameWildcard)
+                if ($ScubaResultsFilesArray.Count -gt 1) {
+                    throw "You must only have a single ScubaResults file in this folder: $OutPath"
+                }
+                $ScubaResultsFileObject = $ScubaResultsFilesArray[0]
+                $ScubaResultsFileFound = $true
+            }
+            #####################################
 
-                # FIX for Issue #1543: ScubaCached out of memory / exponential file growth
-                # The Raw property is a PSCustomObject after ConvertFrom-Json, not a raw JSON string.
-                # It needs to be converted back to JSON to write to file.
-                # Using -Depth 20 prevents truncation of deeply nested Defender objects.
-                $RawJsonString = $SettingsExport | ConvertTo-Json -Depth 20 -Compress
-                $ActualSavedLocation = Set-Utf8NoBom -Content $RawJsonString -Location $OutPath -FileName "$OutProviderFileName.json"
+            #####################################
+            # In this section we load the Provider file into an object and repair it from invalid JSON if necessary.
+            #####################################
+            $ProviderJSONFilePath = Join-Path -Path $OutPath -ChildPath "$OutProviderFileName.json"
+            # ProjectSettingsObject keeps a PowerShell object of the provider JSON in memory so we can reference its properties such as tenant_details further down.
+            $ProviderSettingsObject = $null
+            # If the provider output does not exist as a file, extract it from the ScubaResults file .Raw section so downstream functions that rely on it can execute.
+            if (-not (Test-Path $ProviderJSONFilePath)) {
+                Write-ScubaLog -Message "Provider JSON file not found so extracting from ScubaResults" -Level "Info" -Source "ScubaCached"
+                if (-not $ScubaResultsFileFound) {
+                    throw "No provider JSON or ScubaResults JSON file was found in folder: $OutPath. Double check the values you passed for -OutPath or -OutProviderFileName to ensure one of those file exists in that folder."
+                }
+                # Import the full ScubaResults file into a PowerShell object and fix any invalid JSON
+                $ImportedObject = Repair-ScubaGearJson -FilePath $ScubaResultsFileObject.FullName
+                $ScubaResultsObject = $ImportedObject.JsonObject
+
+                # The provider settings are inside the ScubaResults object in the "Raw": { } property
+                $ProviderSettingsObject = $ScubaResultsObject.Raw
+
+                # The provider JSON is already repaired earlier when ScubaResults was loaded so just save to disk so downstream functions can use it.
+                $ProviderSettingsString = $ProviderSettingsObject | ConvertTo-Json -Depth 20
+                $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderSettingsString -Location $OutPath -FileName "$OutProviderFileName.json"
                 Write-Debug $ActualSavedLocation
             }
-            $SettingsExport = Get-Content $ProviderJSONFilePath -Encoding UTF8 | ConvertFrom-Json
-
-            # Generate a new UUID if the original data doesn't have one
-            if (-not (Get-Member -InputObject $SettingsExport -Name "report_uuid" -MemberType Properties)) {
-                $Guid = New-Guid -ErrorAction 'Stop'
-                $SettingsExport | Add-Member -Name 'report_uuid' -Value $Guid -Type NoteProperty
-            }
+            # The provider file already exists so load its contents into the ProjectSettingsObject object and repair invalid JSON fields and save it back to disk for downstream use.
             else {
-                # Otherwise grab the UUID from the JSON itself
-                $Guid = $SettingsExport.report_uuid
+                $ImportedObject = Repair-ScubaGearJson -FilePath $ProviderJSONFilePath
+                $ProviderSettingsObject = $ImportedObject.JsonObject
+                # If the JSON was repaired as it loaded, save the repaired version back to disk so downstream functions won't crash from invalid JSON.
+                if ($ImportedObject.RepairedJson) {
+                    $ProviderSettingsString = $ProviderSettingsObject | ConvertTo-Json -Depth 20
+                    $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderSettingsString -Location $OutPath -FileName "$OutProviderFileName.json"
+                    Write-Debug $ActualSavedLocation
+                }
             }
+            #####################################
 
-            # FIX for Issue #1543: Ensure provider JSON is always written with sufficient depth
-            # This write operation ensures the UUID is persisted back to the provider file.
-            # Truncation causes data corruption that compounds on subsequent cached runs.
-            # Using -Depth 20 -Compress prevents truncation and reduces file size.
-            $ProviderContent = $SettingsExport | ConvertTo-Json -Depth 20
-            $ActualSavedLocation = Set-Utf8NoBom -Content $ProviderContent `
-            -Location $OutPath -FileName "$OutProviderFileName.json"
-            Write-Debug $ActualSavedLocation
-
-            $TenantDetails = $SettingsExport.tenant_details
+            #####################################
+            # If ScubaResults file exists and KeepIndividualJSON then rename ScubaResults file so it is ignored by functions that look for it; Otherwise it can cause conflicts.
+            # If the user passes KeepIndividualJSON it signals that they do not want a ScubaResults file generated or processed by ScubaCached.
+            if ($ScubaResultsFileFound -and $KeepIndividualJSON) {
+                $NewScubaResultsName = "Unused-$($ScubaResultsFileObject.Name)"
+                $NewScubaResultsPath = Join-Path $ScubaResultsFileObject.DirectoryName $NewScubaResultsName
+                if (Test-Path $NewScubaResultsPath) {
+                    Remove-Item $NewScubaResultsPath -Force
+                }
+                Rename-Item -Path $ScubaResultsFileObject.FullName -NewName $NewScubaResultsName
+                Write-Warning "Detected a ScubaResults file along with a ProviderSettingsExport file when calling with the -KeepIndividualJSON parameter."
+                Write-Warning "Renamed the ScubaResults to $NewScubaResultsName to avoid ambiguous results. ScubaCached will use the ProviderSettingsExport file since that takes priority."
+            }
+            #####################################
 
             Write-ScubaLog -Message "Starting Rego verification" -Level "Info" -Source "ScubaCached" -Data @{
                 ProductNames = ($TempScubaConfig.ProductNames -join ', ')
@@ -2422,27 +2482,29 @@ function Invoke-SCuBACached {
             Write-ScubaLog -Message "Rego verification completed" -Level "Info" -Source "ScubaCached"
 
             Write-ScubaLog -Message "Starting report creation" -Level "Info" -Source "ScubaCached"
-            Invoke-ReportCreation -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet
+            Invoke-ReportCreation -ScubaConfig $TempScubaConfig -TenantDetails $ProviderSettingsObject.tenant_details -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet
 
             $FullNameParams = @{
                 'OutJsonFileName'                  = $TempScubaConfig.OutJsonFileName;
-                'Guid'                             = $Guid;
+                'Guid'                             = $ProviderSettingsObject.report_uuid;
                 'NumberOfUUIDCharactersToTruncate' = $TempScubaConfig.NumberOfUUIDCharactersToTruncate;
             }
             $FullScubaResultsName = Get-FullOutJsonName @FullNameParams
 
+            # If KeepIndividualJSON is NOT passed, Merge-JsonOutput will create a fresh ScubaResults file.
             if (-not $KeepIndividualJSON) {
                 # Craft the complete json version of the output
                 $JsonParams = @{
                     'ProductNames'         = $TempScubaConfig.ProductNames;
                     'OutFolderPath'        = $OutFolderPath;
                     'OutProviderFileName'  = $TempScubaConfig.OutProviderFileName;
-                    'TenantDetails'        = $TenantDetails;
+                    'TenantDetails'        = $ProviderSettingsObject.tenant_details;
                     'ModuleVersion'        = $ModuleVersion;
                     'FullScubaResultsName' = $FullScubaResultsName;
-                    'Guid'                 = $Guid;
+                    'Guid'                 = $ProviderSettingsObject.report_uuid;
                     'SilenceBODWarnings'   = $SilenceBODWarnings;
                 }
+                # Create a fresh copy of the ScubaResults file with the results and provider settings merged
                 Merge-JsonOutput @JsonParams
             }
             # Craft the csv version of just the results
@@ -2468,6 +2530,187 @@ function Invoke-SCuBACached {
                 }
                 $Script:ScubaLoggingEnabled = $false
             }
+        }
+    }
+}
+
+function Repair-ScubaGearJson {
+    <#
+    .SYNOPSIS
+    Imports a Provider or ScubaResults JSON file and returns a PowerShell object of the JSON along with metadata indicating whether the JSON required automatic repair.
+
+    .DESCRIPTION
+    If the JSON parser detects a known malformed JSON pattern where a property has a
+    colon but no value, the function attempts to repair the JSON by treating the missing
+    value as an empty array. For example:
+
+        "privileged_service_principals": ,
+
+    is repaired as:
+
+        "privileged_service_principals": []
+
+    If the repaired JSON still cannot be parsed, the function throws a detailed error
+    message containing the original parser error, the parser error after repair, and
+    manual troubleshooting instructions.
+
+    .PARAMETER Path
+    The full path to the provider JSON or ScubaResults file to import.
+
+    .OUTPUTS
+    The function returns a PSCustomObject with the following properties:
+
+    - JsonObject (PSCustomObject)
+        The PowerShell object created from the provider JSON.
+
+    - RepairedJson (System.Boolean)
+        A Boolean indicating whether the JSON file required automatic repair before
+        it could be successfully parsed.
+
+    .EXAMPLE
+    $ReturnObject = Repair-ScubaGearJson -FilePath $ProviderJSONFilePath
+
+    if ($ReturnObject.RepairedJson) {
+        Write-Warning "The provider JSON file required automatic repair."
+    }
+    
+    $ProviderJsonObject = $ProviderSettingsObject.JsonObject
+
+    .EXAMPLE
+    $ProviderJSONString = "{ JSON STRING IS HERE }"
+    $ReturnObject = Repair-ScubaGearJson -JsonInputString $ProviderJSONString
+
+    if ($ProviderSettingsObject.RepairedJson) {
+        Write-Warning "The JSON string required automatic repair."
+        $RepairedJSONString = $ProviderSettingsObject.JsonString
+    }
+    else {
+        Write-Warning "The JSON string did not require repair."
+    }
+
+    .FUNCTIONALITY
+    Private
+    #>
+    param(
+        [Parameter(Mandatory = $false)]
+        [string] $FilePath = $null,
+
+        [Parameter(Mandatory = $false)]
+        [string] $JsonInputString = $null
+    )
+
+    if ((-not $FilePath -and -not $JsonInputString) -or ($FilePath -and $JsonInputString)) {
+        throw "Repair-ScubaGearJson: You must specify exactly one of -FilePath or JsonInputString."
+    }
+
+    $ReturnObject = [PSCustomObject]@{
+        RepairedJson = $false
+        JsonObject   = $null
+        JsonString = $null
+    }
+
+    # We are parsing a JSON file
+    if ($FilePath) {
+        # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
+        $JsonString = Get-Content $FilePath -Encoding UTF8 -Raw
+    }
+    # We are parsing a JSON string
+    else {
+        $JsonString = $JsonInputString
+    }
+
+    try {
+        # In this block is Attempt number 1 to parse the JSON string
+
+        $JsonReturnObject = $JsonString | ConvertFrom-Json -ErrorAction Stop
+        # We are parsing a JSON file so return the JSON converted into a PS Object
+        if ($FilePath) {
+             $ReturnObject.JsonObject = $JsonReturnObject
+        }
+        # We are parsing a JSON string so return the string as-is since we didn't need to repair it
+        else {
+            $ReturnObject.JsonString = $JsonInputString
+        }
+       
+        return $ReturnObject
+    }
+    catch {
+        # If attempt 1 fails, we see if the error is a known message which indicates an invalid JSON string that we have seen before from the export providers.
+        # If the error is the known JSON primitive problem then we try to repair it, otherwise we throw the error since it may be some other problem that cannot be auto repaired.
+        $OriginalErrorText = $_.Exception.Message
+
+        if ($OriginalErrorText -notmatch 'Invalid JSON primitive') {
+            throw
+        }
+
+        if ($FilePath) {
+        # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
+            Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object at the file: $FilePath"
+        }
+        else {
+            Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object"
+        }
+        
+        Write-Warning "Please report this to the ScubaGear team as a bug report either by GitHub or the Scuba mailbox."
+        Write-Warning "Attempting to auto repair the JSON..."
+
+        # Fix any quoted JSON property that has a colon but no value:
+        #   "some_property": ,      becomes     "some_property": [],
+        #   "some_property": }      becomes     "some_property": []
+        $RepairedJsonString = [regex]::Replace(
+            $JsonString,
+            '("[^"]+"\s*:\s*)(?=,|\})',
+            '$1[]'
+        )
+
+        try {
+            # In this block is Attempt 2. We try to parse the repaired JSON. If it works we return the fixed PS object or the fixed string, depending on what the caller needs.
+            if ($FilePath) {
+                $RepairedJsonObject = $RepairedJsonString | ConvertFrom-Json -ErrorAction Stop
+                Write-Warning "Auto repair of invalid JSON succeeded."
+                $ReturnObject.RepairedJson = $true
+                $ReturnObject.JsonObject = $RepairedJsonObject
+                return $ReturnObject
+            }
+            else {
+                Write-Warning "Auto repair of invalid JSON succeeded."
+                $ReturnObject.RepairedJson = $true
+                $ReturnObject.JsonString = $RepairedJsonString
+                return $ReturnObject
+            }
+        }
+        catch {
+            $RepairErrorText = $_.Exception.Message
+
+            throw @"
+ScubaGear created an invalid JSON export string, and the automatic repair attempt did not resolve it.
+
+Original JSON parser error:
+$OriginalErrorText
+
+Parser error after automatic repair:
+$RepairErrorText
+
+What the automatic repair attempted:
+The importer looked for JSON properties with a missing value, such as:
+
+    "privileged_service_principals": ,
+
+and temporarily treated them as empty arrays:
+
+    "privileged_service_principals": []
+
+You can attempt to fix the JSON file manually before contacting the Scuba team:
+1. Open the JSON file listed above.
+2. Search for properties that have a colon but no value.
+3. Empty arrays should use [].
+4. Empty objects should use {}.
+5. Strings should be quoted.
+6. Boolean values should be true or false.
+7. Null values should be null.
+
+After correcting the JSON file, rerun ScubaGear but use Invoke-ScubaCached since that can create a report from a local JSON file.
+"@
         }
     }
 }
