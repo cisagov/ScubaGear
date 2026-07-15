@@ -92,34 +92,79 @@ Function Update-ResultsTab {
         Write-DebugOutput -Message "Error creating loading content: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Warning"
     }
 
-    # Get configuration values for the background job
+    # Get configuration values for the background job.
+    # Resolution order: AdvancedSettingsData (user-configured) → TextBox.Text (UI default)
+    # → ScubaDefaults (ScubaConfigDefaults.json) → UIConfigs.defaultAdvancedSettings (app JSON)
     $folderName = $syncHash.AdvancedSettingsData["OutFolderName"]
-    if (-not $folderName) {
-        $folderName = $syncHash.UIConfigs.defaultAdvancedSettings.OutFolderName_TextBox
-    }
+    if (-not $folderName) { $folderName = $syncHash.OutFolderName_TextBox.Text }
+    if (-not $folderName) { $folderName = $syncHash.ScubaDefaults.OutFolderName }
+    if (-not $folderName) { $folderName = $syncHash.UIConfigs.defaultAdvancedSettings.OutFolderName_TextBox }
 
     $jsonfilename = $syncHash.AdvancedSettingsData["OutJsonFileName"]
-    if (-not $jsonfilename) {
-        $jsonfilename = $syncHash.UIConfigs.defaultAdvancedSettings.OutJsonFileName_TextBox
-    }
+    if (-not $jsonfilename) { $jsonfilename = $syncHash.OutJsonFileName_TextBox.Text }
+    if (-not $jsonfilename) { $jsonfilename = $syncHash.ScubaDefaults.OutJsonFileName }
+    if (-not $jsonfilename) { $jsonfilename = $syncHash.UIConfigs.defaultAdvancedSettings.OutJsonFileName_TextBox }
 
     $configuredPath = $syncHash.AdvancedSettingsData["OutPath"]
-    $defaultPath = Join-Path $env:USERPROFILE "Documents"
+    if ([string]::IsNullOrEmpty($configuredPath)) { $configuredPath = $syncHash.OutPath_TextBox.Text }
+    if ([string]::IsNullOrEmpty($configuredPath)) { $configuredPath = $syncHash.ScubaDefaults.OutPath }
 
-    # Create list of paths to search
-    $searchPaths = @()
-    if (![string]::IsNullOrEmpty($configuredPath) -and $configuredPath -ne "." -and (Test-Path $configuredPath)) {
-        $searchPaths += $configuredPath
+    # Resolve "." to the user's Documents folder - matches how the settings helper resolves it
+    # so the Results Reader always searches the same location ScubaGear wrote to.
+    if ([string]::IsNullOrEmpty($configuredPath) -or $configuredPath.Trim() -eq ".") {
+        $configuredPath = [Environment]::GetFolderPath('MyDocuments')
     }
-    if ($searchPaths -notcontains $defaultPath) {
-        $searchPaths += $defaultPath
+
+    Write-DebugOutput -Message "Results scan: folder='$folderName', json='$jsonfilename', outPath='$configuredPath'" -Source $MyInvocation.MyCommand -Level "Info"
+
+    # Build a deduplicated list of paths to search:
+    #   1. The configured/resolved OutPath (highest priority - where the last run saved)
+    #   2. Shell-resolved Documents (handles OneDrive redirection automatically)
+    #   3. Any additional OneDrive\Documents variants found under USERPROFILE
+    #   4. $env:USERPROFILE home dir (PSGallery default CWD when run standalone)
+    $searchPaths = [System.Collections.Generic.List[string]]::new()
+
+    if (![string]::IsNullOrEmpty($configuredPath) -and (Test-Path $configuredPath)) {
+        $searchPaths.Add($configuredPath)
     }
+
+    $fallbacks = [System.Collections.Generic.List[string]]::new()
+    # Shell-resolved Documents - always correct even with OneDrive redirection
+    $fallbacks.Add([Environment]::GetFolderPath('MyDocuments'))
+    # Enumerate every OneDrive-variant Documents folder (personal, corporate, named accounts)
+    Get-Item (Join-Path $env:USERPROFILE 'OneDrive*') -ErrorAction SilentlyContinue | ForEach-Object {
+        $fallbacks.Add((Join-Path $_.FullName 'Documents'))
+    }
+    # Plain local Documents and home dir as final catch-all
+    $fallbacks.Add((Join-Path $env:USERPROFILE 'Documents'))
+    $fallbacks.Add($env:USERPROFILE)
+
+    foreach ($fb in $fallbacks) {
+        if (![string]::IsNullOrEmpty($fb) -and (Test-Path $fb) -and !$searchPaths.Contains($fb)) {
+            $searchPaths.Add($fb)
+        }
+    }
+
+    # Convert to plain string[] - List[string] doesn't survive Start-Job serialization reliably
+    $searchPathsArray = [string[]]$searchPaths
+
+    Write-DebugOutput -Message "Results search paths ($($searchPathsArray.Count)): $($searchPathsArray -join '; ')" -Source $MyInvocation.MyCommand -Level "Info"
 
     $maximumResults = $syncHash.UIConfigs.MaximumResults
 
+    # Join paths with | delimiter - [string[]] arrays don't survive Start-Job CLIXML serialization
+    $searchPathsPiped = $searchPathsArray -join '|'
+
     # Start background job with simple script block
     $job = Start-Job -ScriptBlock {
-        param($SearchPaths, $FolderName, $JsonFileName, $MaxResults)
+        param([string]$SearchPathsPiped, [string]$FolderName, [string]$JsonFileName, [int]$MaxResults)
+
+        # Split the delimiter-joined string back into an array
+        $SearchPaths = $SearchPathsPiped -split '\|' | Where-Object { $_ -ne '' }
+
+        # Diagnostic log accumulates inside the job and is returned alongside results
+        $diagLog = [System.Collections.Generic.List[string]]::new()
+        $diagLog.Add("Job started. FolderName='$FolderName' JsonFileName='$JsonFileName' MaxResults=$MaxResults SearchPaths=$($SearchPaths.Count)")
 
         function Get-ResultsReportTimeStamp {
             param([string]$Name, [string]$SearchPrefix)
@@ -129,7 +174,6 @@ Function Update-ResultsTab {
                 $timestamp = Get-Date -Year $year -Month $month -Day $day -Hour $hour -Minute $minute -Second $second
                 $tabHeader = "$year-$month-$day ($hour`:$minute`:$second)"
 
-                # Calculate relative time
                 $now = Get-Date
                 $timespan = $now - $timestamp
                 if ($timespan.TotalDays -lt 1) {
@@ -164,13 +208,23 @@ Function Update-ResultsTab {
 
         $resultsData = @()
         foreach ($searchPath in $SearchPaths) {
+            $diagLog.Add("Checking path: '$searchPath' (exists=$(Test-Path $searchPath))")
             if (Test-Path $searchPath) {
-                $foldersInPath = Get-ChildItem -Path $searchPath -Directory -Filter "${FolderName}_*" -ErrorAction SilentlyContinue |
+                $filter = "${FolderName}_*"
+                $diagLog.Add("  Searching with filter: '$filter'")
+                $allDirs = Get-ChildItem -Path $searchPath -Directory -Filter $filter -ErrorAction SilentlyContinue
+                $diagLog.Add("  Raw match count: $($allDirs.Count)")
+                if ($allDirs.Count -gt 0) {
+                    $diagLog.Add("  Matched folders: $($allDirs.Name -join ', ')")
+                }
+
+                $foldersInPath = $allDirs |
                     Sort-Object -Property LastWriteTime -Descending |
                     Select-Object -First $MaxResults |
                     ForEach-Object {
                         $jsonFile = Get-ChildItem -Path $_.FullName -Filter "${JsonFileName}*.json" -ErrorAction SilentlyContinue |
                             Select-Object -First 1 -ExpandProperty FullName
+                        $diagLog.Add("  Folder '$($_.Name)': json='$jsonFile'")
                         $timeNameInfo = Get-ResultsReportTimeStamp -SearchPrefix $FolderName -Name $_.BaseName
                         [PSCustomObject]@{
                             ReportName = $_.BaseName
@@ -185,9 +239,10 @@ Function Update-ResultsTab {
             }
         }
 
-        return $resultsData
+        $diagLog.Add("Job complete. Total results: $($resultsData.Count)")
+        return [PSCustomObject]@{ Results = $resultsData; DiagLog = $diagLog }
 
-    } -ArgumentList $searchPaths, $folderName, $jsonfilename, $maximumResults
+    } -ArgumentList $searchPathsPiped, $folderName, $jsonfilename, $maximumResults
 
     # Use a timer to poll job status instead of events
     $timer = New-Object System.Windows.Threading.DispatcherTimer
@@ -199,9 +254,20 @@ Function Update-ResultsTab {
 
             try {
                 if ($job.State -eq 'Completed') {
-                    $resultsData = Receive-Job -Job $job -ErrorAction Stop
+                    $jobOutput = Receive-Job -Job $job -ErrorAction Stop
 
-                    Write-DebugOutput -Message "Job completed successfully. Results count: $($resultsData.Count)" -Source "Update-ResultsTab" -Level "Info"
+                    # Job now returns a PSCustomObject with Results + DiagLog
+                    if ($jobOutput -is [PSCustomObject] -and $jobOutput.PSObject.Properties['DiagLog']) {
+                        foreach ($line in $jobOutput.DiagLog) {
+                            Write-DebugOutput -Message "[Job] $line" -Source "Update-ResultsTab" -Level "Info"
+                        }
+                        $resultsData = @($jobOutput.Results)
+                    } else {
+                        # Fallback for legacy format
+                        $resultsData = @($jobOutput)
+                    }
+
+                    Write-DebugOutput -Message "Job completed. Results count: $($resultsData.Count)" -Source "Update-ResultsTab" -Level "Info"
 
                     # Hide progress indicator
                     $syncHash.ResultsScanProgress.Visibility = "Collapsed"
@@ -606,7 +672,7 @@ Function New-ResultsContent {
                                     </Grid.ColumnDefinitions>
 
                                     <TextBlock Grid.Column="0" FontSize="12" Text="{Binding Product}" FontWeight="SemiBold"
-                                            Foreground="Blue" TextDecorations="Underline"
+                                            Foreground="Blue" TextDecorations="Underline" Cursor="Hand"
                                             VerticalAlignment="Center"/>
 
                                     <ItemsControl Grid.Column="1" ItemsSource="{Binding StatusItems}"
@@ -897,12 +963,49 @@ Function New-ResultsContent {
                 $statusItems += [PSCustomObject]@{ Text = "ERROR: $errors error$(if([int]$errors -gt 1){'s'})"; Color = "#fd7e14"; TextColor = "White" }
             }
 
-            $summaryItems += [PSCustomObject]@{ Product = $displayName; StatusItems = $statusItems }
+            $summaryItems += [PSCustomObject]@{ Product = $displayName; ProductAbbr = $productAbbr; StatusItems = $statusItems }
         }
 
         $summaryItemsControl = $reportControl.FindName("SummaryItemsControl")
         if ($summaryItemsControl) {
             $summaryItemsControl.ItemsSource = $summaryItems
+
+            # Wire up click handlers on the product-name TextBlocks after the items are rendered
+            $productTabControl = $reportControl.FindName("ProductTabControl")
+            $summaryItemsControl.Add_Loaded({
+                # Walk each generated item container and find the blue product TextBlock
+                foreach ($item in $summaryItemsControl.Items) {
+                    $container = $summaryItemsControl.ItemContainerGenerator.ContainerFromItem($item)
+                    if (-not $container) { continue }
+                    # FindVisualChild helper: first TextBlock with TextDecorations
+                    $queue = [System.Collections.Generic.Queue[System.Windows.DependencyObject]]::new()
+                    $queue.Enqueue($container)
+                    while ($queue.Count -gt 0) {
+                        $node = $queue.Dequeue()
+                        if ($node -is [System.Windows.Controls.TextBlock] -and
+                            $node.TextDecorations -and $node.TextDecorations.Count -gt 0) {
+                            $capturedItem  = $item
+                            $capturedTabs  = $productTabControl
+                            $node.Add_MouseLeftButtonUp({
+                                if (-not $capturedTabs) { return }
+                                for ($i = 0; $i -lt $capturedTabs.Items.Count; $i++) {
+                                    $tab = $capturedTabs.Items[$i]
+                                    if ($tab.Header -eq $capturedItem.Product) {
+                                        $capturedTabs.SelectedIndex = $i
+                                        $tab.BringIntoView()
+                                        break
+                                    }
+                                }
+                            }.GetNewClosure())
+                            break
+                        }
+                        $childCount = [System.Windows.Media.VisualTreeHelper]::GetChildrenCount($node)
+                        for ($ci = 0; $ci -lt $childCount; $ci++) {
+                            $queue.Enqueue([System.Windows.Media.VisualTreeHelper]::GetChild($node, $ci))
+                        }
+                    }
+                }
+            }.GetNewClosure())
         }
 
         return $reportControl
@@ -1149,8 +1252,8 @@ Function Open-ResultsFolder {
     #>
 
     $outputPath = $syncHash.AdvancedSettingsData["OutPath"]
-    if ([string]::IsNullOrEmpty($outputPath)) {
-        $outputPath = Join-Path $env:USERPROFILE "Documents"
+    if ([string]::IsNullOrEmpty($outputPath) -or $outputPath.Trim() -eq ".") {
+        $outputPath = [Environment]::GetFolderPath('MyDocuments')
     }
 
     if (Test-Path $outputPath) {

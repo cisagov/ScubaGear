@@ -1,4 +1,4 @@
-Function Clear-FieldValue {
+﻿Function Clear-FieldValue {
     <#
     .SYNOPSIS
     Clears all field values and resets the UI to default state.
@@ -6,13 +6,13 @@ Function Clear-FieldValue {
     This Function resets all configuration data structures and UI controls to their initial empty state for starting a new session.
     #>
 
-    # Clear core data structures
-    $syncHash.ExclusionData = [ordered]@{}
-    $syncHash.OmissionData = [ordered]@{}
-    $syncHash.AnnotationData = [ordered]@{}
-    $syncHash.GeneralSettingsData = [ordered]@{}
-    $syncHash.AdvancedSettingsData = [ordered]@{}
-    $syncHash.GlobalSettingsData = [ordered]@{}
+    # Clear core data structures in-place so existing card closures keep their object references.
+    $syncHash.ExclusionData.Clear()
+    $syncHash.OmissionData.Clear()
+    $syncHash.AnnotationData.Clear()
+    $syncHash.GeneralSettingsData.Clear()
+    $syncHash.AdvancedSettingsData.Clear()
+    $syncHash.GlobalSettingsData.Clear()
 
     # Dynamically reset all controls using configuration
     $syncHash.GetEnumerator() | ForEach-Object {

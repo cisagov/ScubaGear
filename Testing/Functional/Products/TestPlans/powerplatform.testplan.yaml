@@ -293,7 +293,7 @@ TestPlan:
             Splat:
               updates:
                 tenant_isolation:
-                  - null
+                  - "null"
         Postconditions: []
         ExpectedResult: false
 

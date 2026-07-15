@@ -1,4 +1,4 @@
-Function Show-SearchAndFilterControl{
+﻿Function Show-SearchAndFilterControl{
     <#
     .SYNOPSIS
     Initializes search and filter controls for all tabs.
