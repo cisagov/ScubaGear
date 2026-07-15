@@ -78,6 +78,7 @@ const getAntiPhishPolicyRows = (antiPhishPolicies) => {
 
         rows.push({
             "Policy": policyName,
+            "Enabled": isEnabled(policy.Enabled),
             "Users Protected": formatProtectedValues(policy.TargetedUsersToProtect),
             "Partner Domains Protected": formatProtectedValues(policy.TargetedDomainsToProtect),
             "Safety Indicators": SAFETY_TIP_FIELDS
@@ -193,7 +194,7 @@ const buildSecuritySuiteConfigTables = (sensitiveUsers, partnerDomains, antiPhis
     appendSecuritySuiteTableSection(
         section,
         "Anti-Phish Protection Policies",
-        ["Policy", "Users Protected", "Partner Domains Protected", "Safety Indicators"],
+        ["Policy", "Enabled", "Users Protected", "Partner Domains Protected", "Safety Indicators"],
         getAntiPhishPolicyRows(antiPhishPolicies),
         "securitysuite-anti-phish-policies-table",
         "No anti-phish policies were exported."
