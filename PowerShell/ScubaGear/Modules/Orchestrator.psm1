@@ -820,7 +820,7 @@ function Invoke-ProviderList {
             $ProviderJSON = @"
 "@
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             $ProdProviderFailed = @()
             $ConnectTenantParams = @{
                 'M365Environment' = $ScubaConfig.M365Environment
