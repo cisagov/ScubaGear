@@ -4,6 +4,7 @@ import data.utils.key.FAIL
 import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
 import data.utils.key.ConvertToSet
+import data.utils.report.ReportDetailsString
 import rego.v1
 
 #############
@@ -69,7 +70,6 @@ DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) i
 DLPLicenseWarningString(_, _) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
     input.defender_dlp_license == false
 }
-
 
 #############################
 # Config (SecuritySuite + Defender alias)
