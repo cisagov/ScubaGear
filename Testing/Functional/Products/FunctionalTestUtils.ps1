@@ -671,20 +671,8 @@ function Set-ExoOrganizationAuditDisabled {
 # $script:EXOApiEndpoint and $script:EXOAccessToken must be set by
 # Products.Tests.ps1 BeforeAll before these functions are called.
 # -----------------------------------------------------------------------
-function Invoke-FunctionalExoCommand {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$CmdletName,
-        [Parameter(Mandatory = $false)]
-        [hashtable]$Parameters = @{}
-    )
-    return Invoke-EXORestMethod `
-        -CmdletName $CmdletName `
-        -ApiEndpoint $script:EXOApiEndpoint `
-        -AccessToken $script:EXOAccessToken `
-        -Parameters $Parameters
-}
+# NOTE: Invoke-FunctionalExoCommand is defined earlier in this file
+# (with 404/429/500 retry logic). Do NOT redefine it here.
 
 function Resolve-FunctionalExoIdentity {
     param(
@@ -1247,11 +1235,17 @@ function Set-EOPProtectionPolicyRule {
     [Parameter(Mandatory = $true)]
     [string]$Identity,
     [Parameter(Mandatory = $false)]
-    $SentTo
+    $SentTo,
+    [Parameter(Mandatory = $false)]
+    $SentToMemberOf,
+    [Parameter(Mandatory = $false)]
+    $RecipientDomainIs
   )
 
   $Params = @{ Identity = $Identity }
   if ($PSBoundParameters.ContainsKey('SentTo')) { $Params['SentTo'] = $SentTo }
+  if ($PSBoundParameters.ContainsKey('SentToMemberOf')) { $Params['SentToMemberOf'] = $SentToMemberOf }
+  if ($PSBoundParameters.ContainsKey('RecipientDomainIs')) { $Params['RecipientDomainIs'] = $RecipientDomainIs }
   Invoke-FunctionalExoCommand -CmdletName 'Set-EOPProtectionPolicyRule' -Parameters $Params | Out-Null
 }
 

@@ -3,7 +3,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.1.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.1.1v1 Not Checked
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -11,7 +11,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.1.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.1.2v1 Not Checked
+      - TestDescription: MS.SECURITYSUITE.1.2v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -19,7 +19,7 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.1.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.1.3v1 Not Checked
+      - TestDescription: MS.SECURITYSUITE.1.3v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
@@ -27,11 +27,12 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.1.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.1.4v1 Not Checked
+      - TestDescription: MS.SECURITYSUITE.1.4v1 Not Checked # TODO update once implemented
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
   - PolicyId: MS.SECURITYSUITE.2.1v1
     TestDriver: ScubaCached
     Tests:
@@ -98,14 +99,10 @@ TestPlan:
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.2.2v1 Compliant case - include domains I own is enabled
         Preconditions:
-          - Command: Set-AllAntiPhishPolicyProperty
+          - Command: UpdateProviderExport
             Splat:
-              PropertyName: EnableOrganizationDomainsProtection
-              Value: true
-          - Command: Set-AllAntiPhishPolicyProperty
-            Splat:
-              PropertyName: TargetedDomainProtectionAction
-              Value: Quarantine
+              Updates:
+                anti_phish_policies[0].EnableOrganizationDomainsProtection: true
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.2.3v1
@@ -137,10 +134,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                protection_policy_rules[0].SentTo:
-                  - user@example.com
-                protection_policy_rules[1].SentTo:
-                  - user@example.com
+                protection_policy_rules[0].SentTo: ["user@example.com"]
+                protection_policy_rules[1].SentTo: ["user@example.com"]
         Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.2.4v1
@@ -161,52 +156,568 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
-                protection_policy_rules[0].SentTo:
-                  - user@example.com
-                protection_policy_rules[1].SentTo:
-                  - user@example.com
+                protection_policy_rules[0].SentTo: ["user@example.com"]
+                protection_policy_rules[1].SentTo: ["user@example.com"]
         Postconditions: []
         ExpectedResult: false
+
   - PolicyId: MS.SECURITYSUITE.3.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.1v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.1v1 Compliant case - DLP policy covers all three required sensitive info types
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.1v1 Non-Compliant case - DLP rule is missing Credit Card Number protection
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.2v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Compliant case - DLP policy applied to all five required locations
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Non-Compliant case - DLP policy missing Exchange location
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - ""
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Non-Compliant case - DLP policy missing Devices location
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - ""
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Compliant case - DLP rule blocks access to everyone
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Non-Compliant case - DLP rule does not block access
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: false
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Non-Compliant case - DLP rule blocks only external users, not everyone
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "PerUser"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.4v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Compliant case - DLP rule notifies at least one user
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Non-Compliant case - DLP rule has no user notifications configured
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: []
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.5v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.5v1 Not Checked
-        Preconditions: []
-        Postconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Compliant case - DLP rule blocks both unallowed apps and Bluetooth, and Bluetooth recommended apps is enabled
         IsNotChecked: true
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                endpoint_dlp_global_settings:
+                  - value: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Non-Compliant case - DLP rule audits instead of blocks unallowed apps
+        IsNotChecked: true
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                endpoint_dlp_global_settings:
+                  - value: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Audit"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
+        Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Non-Compliant case - Bluetooth recommended apps not enabled in tenant DLP settings
+        IsNotChecked: true
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                endpoint_dlp_global_settings: []
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
+        Postconditions: []
+        ExpectedResult: false
+
   - PolicyId: MS.SECURITYSUITE.4.1v1
     TestDriver: ScubaCached
     Tests:
@@ -258,6 +769,7 @@ TestPlan:
         Postconditions: []
         IsNotChecked: true
         ExpectedResult: false
+
   - PolicyId: MS.SECURITYSUITE.5.1v1
     TestDriver: ScubaCached
     Tests:
@@ -290,25 +802,6 @@ TestPlan:
                     ServicePlanId: 2f442157-a11c-46b9-ae5b-6e39ff4e5849
                     ProvisioningStatus: Success
                 unified_audit_log_retention_policies: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is seven days
@@ -324,25 +817,6 @@ TestPlan:
                   - Name: Seven day retention
                     RetentionDuration: SevenDays
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is one month
@@ -358,25 +832,6 @@ TestPlan:
                   - Name: One month retention
                     RetentionDuration: OneMonth
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is three months
@@ -392,25 +847,6 @@ TestPlan:
                   - Name: Three month retention
                     RetentionDuration: ThreeMonths
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is six months
@@ -426,25 +862,6 @@ TestPlan:
                   - Name: Six month retention
                     RetentionDuration: SixMonths
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - Retention duration is nine months
@@ -460,25 +877,6 @@ TestPlan:
                   - Name: Nine month retention
                     RetentionDuration: NineMonths
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - A 12 month policy exists but is disabled
@@ -494,25 +892,6 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: false
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Non-Compliant case - E3/G3 license level lacks the advanced auditing service plan
@@ -528,25 +907,6 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month audit log retention policy exists
@@ -562,25 +922,6 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 3 year audit log retention policy exists
@@ -596,25 +937,6 @@ TestPlan:
                   - Name: 3 year retention
                     RetentionDuration: ThreeYears
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 5 year audit log retention policy exists
@@ -630,25 +952,6 @@ TestPlan:
                   - Name: 5 year retention
                     RetentionDuration: FiveYears
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 7 year audit log retention policy exists
@@ -664,25 +967,6 @@ TestPlan:
                   - Name: 7 year retention
                     RetentionDuration: SevenYears
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 10 year audit log retention policy exists
@@ -698,25 +982,6 @@ TestPlan:
                   - Name: 10 year retention
                     RetentionDuration: TenYears
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.5.2v1 Compliant case - A 12 month policy exists alongside shorter policies
@@ -735,899 +1000,497 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.SECURITYSUITE.6.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have SpamAction set to AddXHeader
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: SpamAction
-              Value: AddXHeader
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: State
-              Value: Disabled
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have HighConfidenceSpamAction set to AddXHeader
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy HighConfidenceSpamAction set to AddXHeader
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: HighConfidenceSpamAction
-              Value: AddXHeader
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: State
-              Value: Disabled
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -HighConfidenceSpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - All policies have PhishSpamAction set to AddXHeader
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy PhishSpamAction set to AddXHeader
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: PhishSpamAction
-              Value: AddXHeader
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: State
-              Value: Disabled
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -PhishSpamAction Quarantine"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - All policies have compliant spam actions
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader, Strict preset scoped to a single recipient (not evaluated)
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: SpamAction
-              Value: MoveToJmf
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: HighConfidenceSpamAction
-              Value: MoveToJmf
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: PhishSpamAction
-              Value: Quarantine
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: HighConfidencePhishAction
-              Value: Quarantine
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Strict preset scoped to a single recipient (not evaluated), Standard preset active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null -SentToMemberOf $null -RecipientDomainIs $null"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader, Standard preset scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Standard preset scoped to a single recipient (not evaluated), custom policy active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Default policy SpamAction set to AddXHeader, custom policy scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Standard preset active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, Strict preset active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default SpamAction non-compliant, custom policy active and compliant (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction AddXHeader -AddXHeaderValue ScubaFunctionalTest"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default policy spam actions set to compliant values
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.6.1v1 Non-Compliant case - Preset scoped to single recipient does not override non-compliant policies
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default compliant, Standard preset active and compliant
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: SpamAction
-              Value: AddXHeader
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: State
-              Value: Enabled
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: SentTo
-              Value:
-                - user@example.com
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
         Postconditions: []
-        ExpectedResult: false
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.1v1 Compliant case - Default compliant, custom policy active and compliant
+        Preconditions:
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy' -SpamAction MoveToJmf -HighConfidenceSpamAction MoveToJmf -PhishSpamAction Quarantine -HighConfidencePhishAction Quarantine"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.6.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - All policies have allowed sender domains configured
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: AllowedSenderDomains
-              Value:
-                - example.com
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: State
-              Value: Disabled
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - All policies have no allowed sender domains
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured, Strict preset scoped to a single recipient (not evaluated)
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: AllowedSenderDomains
-              Value: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Strict preset scoped to a single recipient (not evaluated), Standard preset active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured, Standard preset scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Standard preset scoped to a single recipient (not evaluated), custom policy active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -SentTo $null"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Default policy has allowed sender domains configured, custom policy scoped to a single recipient (not evaluated)
+        Preconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Enabled' } | ForEach-Object { Disable-HostedContentFilterRule -Identity $_.Identity -Confirm:$false }"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -SentTo (Get-Mailbox -ResultSize 1).PrimarySmtpAddress"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Get-HostedContentFilterRule | Where-Object { $_.State -eq 'Disabled' } | ForEach-Object { Enable-HostedContentFilterRule -Identity $_.Identity }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Standard preset active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, Strict preset active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        Postconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default has allowed domains, custom policy active with none (Default not evaluated)
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains example.com"
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default policy has no allowed sender domains
+        Preconditions:
+          - Command: "Set-HostedContentFilterPolicy -Identity Default -AllowedSenderDomains @{}"
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SECURITYSUITE.6.2v1 Non-Compliant case - Preset scoped to single recipient does not override non-compliant policies
+      - TestDescription: MS.SECURITYSUITE.6.2v1 Compliant case - Default and custom policy both have no allowed sender domains
         Preconditions:
-          - Command: Set-AllHostedContentFilterPolicyProperty
-            Splat:
-              PropertyName: AllowedSenderDomains
-              Value:
-                - example.com
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: State
-              Value: Enabled
-          - Command: Set-AllProtectionPolicyRuleProperty
-            Splat:
-              PropertyName: SentTo
-              Value:
-                - user@example.com
-        Postconditions: []
-        ExpectedResult: false
+          - Command: "New-HostedContentFilterPolicy -Name 'FunctionalTest SpamPolicy'"
+          - Command: "New-HostedContentFilterRule -Name 'FunctionalTest SpamRule' -HostedContentFilterPolicy 'FunctionalTest SpamPolicy' -RecipientDomainIs (Get-AcceptedDomain).DomainName"
+        Postconditions:
+          - Command: "Remove-HostedContentFilterRule -Identity 'FunctionalTest SpamRule' -Confirm:$false"
+          - Command: "Remove-HostedContentFilterPolicy -Identity 'FunctionalTest SpamPolicy' -Confirm:$false"
+        ExpectedResult: true
+
   - PolicyId: MS.SECURITYSUITE.7.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.7.1v1 Compliant case - Standard Preset Policy is enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: &id002
-                  - Identity: Standard Preset Security Policy
-                    State: Enabled
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                    Priority: 1
-                  - Identity: Strict Preset Security Policy
-                    State: Disabled
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                    Priority: 0
-                safe_links_policies: []
-                safe_links_rules: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.1v1 Compliant case - Strict Preset Policy is enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: &id003
-                  - Identity: Standard Preset Security Policy
-                    State: Disabled
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                    Priority: 1
-                  - Identity: Strict Preset Security Policy
-                    State: Enabled
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                    Priority: 0
-                safe_links_policies: []
-                safe_links_rules: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.1v1 Compliant case - Custom Policy
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: &id001
-                  - Identity: Standard Preset Security Policy
-                    State: Disabled
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                    Priority: 1
-                  - Identity: Strict Preset Security Policy
-                    State: Disabled
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                    Priority: 0
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    EnableSafeLinksForTeams: true
-                    EnableSafeLinksForOffice: true
-                    EnableForInternalSenders: true
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $true -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableSafeLinksForEmail is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: false
-                    EnableSafeLinksForTeams: true
-                    EnableSafeLinksForOffice: true
-                    EnableForInternalSenders: true
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $false -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $true -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableSafeLinksForTeams is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    EnableSafeLinksForTeams: false
-                    EnableSafeLinksForOffice: true
-                    EnableForInternalSenders: true
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $false -EnableSafeLinksForOffice $true -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableSafeLinksForOffice is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    EnableSafeLinksForTeams: true
-                    EnableSafeLinksForOffice: false
-                    EnableForInternalSenders: true
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $false -EnableForInternalSenders $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - EnableForInternalSenders is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    EnableSafeLinksForTeams: true
-                    EnableSafeLinksForOffice: true
-                    EnableForInternalSenders: false
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -EnableSafeLinksForTeams $true -EnableSafeLinksForOffice $true -EnableForInternalSenders $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.1v1 Non-Compliant case - Built-in Protection Policy
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies: []
-                safe_links_rules: &id004 []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.7.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Standard Preset Policy is enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id002
-                safe_links_policies: []
-                safe_links_rules: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Strict Preset Policy is enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id003
-                safe_links_policies: []
-                safe_links_rules: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    ScanUrls: true
-                    DeliverMessageAfterScan: true
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $true -DeliverMessageAfterScan $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.2v1 Non-Compliant case - ScanUrls is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    ScanUrls: false
-                    DeliverMessageAfterScan: false
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $false -DeliverMessageAfterScan $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.2v1 Non-Compliant case - DeliverMessageAfterScan is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    EnableSafeLinksForEmail: true
-                    ScanUrls: true
-                    DeliverMessageAfterScan: false
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -EnableSafeLinksForEmail $true -ScanUrls $true -DeliverMessageAfterScan $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.2v1 Compliant case - Built-in Protection Policy
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: Built-In Protection Policy
-                    Name: Built-In Protection Policy
-                    ScanUrls: true
-                    DeliverMessageAfterScan: true
-                safe_links_rules: *id004
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.7.3v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case - Standard Preset Policy is enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id002
-                safe_links_policies: []
-                safe_links_rules: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case - Strict Preset Policy is enabled
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id003
-                safe_links_policies: []
-                safe_links_rules: []
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.3v1 Compliant case
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    TrackClicks: true
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -TrackClicks $true"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: true
       - TestDescription: MS.SECURITYSUITE.7.3v1 Non-Compliant case - TrackClicks is false
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies:
-                  - Identity: RunScuba SafeLinks Policy
-                    Name: RunScuba SafeLinks Policy
-                    TrackClicks: false
-                safe_links_rules:
-                  - Identity: RunScuba SafeLinks Rule
-                    Name: RunScuba SafeLinks Rule
-                    SafeLinksPolicy: RunScuba SafeLinks Policy
-                    State: Enabled
-                    Priority: 0
-                    SentTo: null
-                    SentToMemberOf: null
-                    RecipientDomainIs: null
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "New-SafeLinksPolicy -Name 'RunScuba SafeLinks Policy' -TrackClicks $false"
+          - Command: "New-SafeLinksRule -Name 'RunScuba SafeLinks Rule' -SafeLinksPolicy 'RunScuba SafeLinks Policy' -Enabled $true -Priority 0"
+        Postconditions:
+          - Command: "Remove-SafeLinksRule -Identity 'RunScuba SafeLinks Rule' -Confirm:$false"
+          - Command: "Remove-SafeLinksPolicy -Identity 'RunScuba SafeLinks Policy' -Confirm:$false"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.7.3v1 Non-Compliant case - Built-in Protection Policy
         Preconditions:
-          - Command: UpdateProviderExport
-            Splat:
-              Updates:
-                protection_policy_rules: *id001
-                safe_links_policies: []
-                safe_links_rules: *id004
-                securitysuite_successful_commands:
-                  - Get-MgBetaSubscribedSku
-                  - Get-AdminAuditLogConfig
-                  - Get-EOPProtectionPolicyRule
-                  - Get-AntiPhishPolicy
-                  - Get-AntiPhishRule
-                  - Get-AcceptedDomain
-                  - Get-HostedConnectionFilterPolicy
-                  - Get-SafeLinksPolicy
-                  - Get-SafeLinksRule
-                  - Get-HostedContentFilterPolicy
-                  - Get-HostedContentFilterRule
-                  - Get-AtpPolicyForO365
-                  - Get-ATPProtectionPolicyRule
-                  - Get-DlpCompliancePolicy
-                  - Get-DlpComplianceRule
-                  - Get-ProtectionAlert
-                  - Get-UnifiedAuditLogRetentionPolicy
-                securitysuite_unsuccessful_commands: []
-        Postconditions: []
-        ExpectedResult: false
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' -Confirm:$false }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -eq 'Enabled') { Disable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' -Confirm:$false }"
+          - Command: "Get-SafeLinksRule | Where-Object State -eq 'Enabled' | ForEach-Object {Disable-SafeLinksRule -Identity $_.Identity -Confirm:$false}"
+        Postconditions:
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Standard Preset Security Policy' }"
+          - Command: "if ((Get-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy').State -ne 'Enabled') { Enable-EOPProtectionPolicyRule -Identity 'Strict Preset Security Policy' }"
+        ExpectedResult: true
+
   - PolicyId: MS.SECURITYSUITE.8.1v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.8.1v1 Non-Compliant case - IP allow list is created
-        Preconditions: []
+        Preconditions:
+          - Command: "Set-HostedConnectionFilterPolicy -Identity Default -IPAllowList 192.168.1.10,192.168.1.23"
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.8.1v1 Compliant case - IP allow list is empty
-        Preconditions: []
+        Preconditions:
+          - Command: "Set-HostedConnectionFilterPolicy -Identity Default -IPAllowList @{}"
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: true
+
   - PolicyId: MS.SECURITYSUITE.8.2v1
-    TestDriver: ScubaCached
+    TestDriver: RunScuba
     Tests:
       - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Enabled
-        Preconditions: []
+        Preconditions:
+          - Command: "Set-HostedConnectionFilterPolicy -Identity Default -EnableSafeList $true"
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.8.2v1 Non-Compliant case - Safe lists are Disabled
-        Preconditions: []
+        Preconditions:
+          - Command: "Set-HostedConnectionFilterPolicy -Identity Default -EnableSafeList $false"
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: true
