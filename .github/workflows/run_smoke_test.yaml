@@ -36,7 +36,7 @@ jobs:
             contents: read
         steps:
             - name: Checkout repo code
-              uses: actions/checkout@v6
+              uses: actions/checkout@v7
             - name: Execute tests
               run: |
                 $AutomationCredentials = $env:SCUBA_GITHUB_AUTOMATION_CREDS | ConvertFrom-Json
