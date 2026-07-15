@@ -1238,6 +1238,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                accepted_domains:
+                  - DomainName: "example.com"
                 hosted_content_filter_policies:
                   - Identity: "Default"
                     IsDefault: true
@@ -1420,6 +1422,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                accepted_domains:
+                  - DomainName: "example.com"
                 hosted_content_filter_policies:
                   - Identity: "Default"
                     IsDefault: true
@@ -1537,6 +1541,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                accepted_domains:
+                  - DomainName: "example.com"
                 hosted_content_filter_policies:
                   - Identity: "Default"
                     IsDefault: true
@@ -1748,6 +1754,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                accepted_domains:
+                  - DomainName: "example.com"
                 hosted_content_filter_policies:
                   - Identity: "Default"
                     IsDefault: true
@@ -1934,6 +1942,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                accepted_domains:
+                  - DomainName: "example.com"
                 hosted_content_filter_policies:
                   - Identity: "Default"
                     IsDefault: true
@@ -2014,6 +2024,8 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               Updates:
+                accepted_domains:
+                  - DomainName: "example.com"
                 hosted_content_filter_policies:
                   - Identity: "Default"
                     IsDefault: true
