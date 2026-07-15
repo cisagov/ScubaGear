@@ -149,13 +149,11 @@ function Connect-Tenant {
 
                        Write-Verbose "Exchange Online token and endpoint acquired successfully"
 
-                       # Acquire Security & Compliance token for IPPS cmdlets
+                       # Acquire Security & Compliance token and resolve the
+                       # tenant-specific regional compliance endpoint for all environments.
                        $ComplianceScope = Get-ComplianceScope -M365Environment $M365Environment
-                       Write-Information "INFO: Acquiring compliance token..." -InformationAction Continue
-                       Write-Information "INFO: Compliance scope: $ComplianceScope" -InformationAction Continue
                        try {
                            if ($ServicePrincipalParams.CertThumbprintParams) {
-                               Write-Information "INFO: Using service principal for compliance token" -InformationAction Continue
                                $TokenData.ComplianceAccessToken = Get-MsalAccessToken `
                                    -Scope $ComplianceScope `
                                    -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
@@ -164,7 +162,6 @@ function Connect-Tenant {
                                    -M365Environment $M365Environment
                            }
                            else {
-                               Write-Information "INFO: Using interactive auth for compliance token" -InformationAction Continue
                                $TokenData.ComplianceAccessToken = Get-MsalAccessToken `
                                    -Scope $ComplianceScope `
                                    -ClientId $EXOClientId `
@@ -173,19 +170,13 @@ function Connect-Tenant {
                            }
                            $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
                                -TenantId $TenantId `
-                               -M365Environment $M365Environment
-                           Write-Information "INFO: Compliance token acquired. Endpoint: $($TokenData.ComplianceApiEndpoint)" -InformationAction Continue
+                               -TenantDomain $TenantName `
+                               -M365Environment $M365Environment `
+                               -AccessToken $TokenData.ComplianceAccessToken
+                           Write-Verbose "Compliance token acquired. Endpoint: $($TokenData.ComplianceApiEndpoint)"
                        }
                        catch {
-                           Write-Warning "Failed to acquire dedicated Security & Compliance token: $($_.Exception.Message)"
-                           Write-Information "INFO: Falling back to EXO token for compliance endpoint" -InformationAction Continue
-                           # Fallback: use EXO token against compliance endpoint.
-                           # ExchangeOnlineManagement uses Exchange.ManageAsApp for both EXO and IPPS,
-                           # and the compliance endpoint may accept EXO-scoped tokens for service principals.
-                           $TokenData.ComplianceAccessToken = $TokenData.EXOAccessToken
-                           $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
-                               -TenantId $TenantId `
-                               -M365Environment $M365Environment
+                           Write-Warning "Failed to acquire compliance token: $($_.Exception.Message). Compliance cmdlets will use EXO endpoint."
                        }
 
                        $EXOAuthRequired = $false

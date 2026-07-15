@@ -26,6 +26,145 @@ function Get-ExchangeOnlineScope {
     return $Scope
 }
 
+function Get-ComplianceScope {
+    <#
+    .SYNOPSIS
+        Returns the OAuth2 scope for Security & Compliance based on M365 environment.
+    .PARAMETER M365Environment
+        The M365 environment (commercial, gcc, gcchigh, dod).
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [string]$M365Environment
+    )
+
+    $Scope = switch ($M365Environment.ToLower()) {
+        "commercial" { "https://ps.compliance.protection.outlook.com/.default" }
+        "gcc"        { "https://ps.compliance.protection.outlook.com/.default" }
+        "gcchigh"    { "https://ps.compliance.protection.office365.us/.default" }
+        "dod"        { "https://ps.compliance.protection.office365.us/.default" }
+    }
+
+    return $Scope
+}
+
+function Get-ComplianceApiEndpoint {
+    <#
+    .SYNOPSIS
+        Dynamically resolves the Security & Compliance Admin API endpoint URI.
+    .DESCRIPTION
+        Probes the compliance front-door to discover the tenant-specific regional
+        backend (e.g., gcc02b, nam13b).  The front-door redirects to the regional
+        host on the admin.protection domain; the actual REST API is served from
+        the corresponding ps.compliance.protection host on port 443.
+        Returns a URI in the format:
+        https://<prefix>.ps.compliance.protection.outlook.com/adminapi/beta/<TenantId>/InvokeCommand
+    .PARAMETER TenantId
+        The Azure AD tenant ID.
+    .PARAMETER TenantDomain
+        The tenant domain (e.g., contoso.onmicrosoft.com).
+    .PARAMETER M365Environment
+        The M365 environment (commercial, gcc, gcchigh, dod).
+    .PARAMETER AccessToken
+        An OAuth2 access token (EXO or compliance-scoped) used for the discovery call.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $true)]
+        [string]$TenantDomain,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $true)]
+        [string]$AccessToken
+    )
+
+    $FrontDoorBaseUri = switch ($M365Environment.ToLower()) {
+        "commercial" { "https://ps.compliance.protection.outlook.com" }
+        "gcc"        { "https://ps.compliance.protection.outlook.com" }
+        "gcchigh"    { "https://ps.compliance.protection.office365.us" }
+        "dod"        { "https://ps.compliance.protection.office365.us" }
+    }
+
+    $BackendSuffix = switch ($M365Environment.ToLower()) {
+        "commercial" { ".ps.compliance.protection.outlook.com" }
+        "gcc"        { ".ps.compliance.protection.outlook.com" }
+        "gcchigh"    { ".ps.compliance.protection.office365.us" }
+        "dod"        { ".ps.compliance.protection.office365.us" }
+    }
+
+    $DefaultEndpoint = "$FrontDoorBaseUri/adminapi/beta/$TenantId/InvokeCommand"
+
+    $Headers = @{
+        "Authorization"   = "Bearer $AccessToken"
+        "X-AnchorMailbox" = "UPN:SystemMailbox{bb558c35-97f1-4cb9-8ff7-d53741dc928c}@$TenantDomain"
+    }
+
+    $Handler = $null
+    $HttpClient = $null
+    $Request = $null
+    $Response = $null
+
+    try {
+        # Probe the front-door with the same EXOModuleFile discovery path used
+        # for EXO endpoint resolution.  The front-door returns a 302 redirect
+        # whose Location header contains the regional prefix (e.g., gcc02b, nam13b).
+        $DiscoveryUrl = "$FrontDoorBaseUri/AdminApi/v1.0/$TenantId/EXOModuleFile"
+
+        $Handler = [System.Net.Http.HttpClientHandler]::new()
+        $Handler.AllowAutoRedirect = $false
+        $HttpClient = [System.Net.Http.HttpClient]::new($Handler)
+        $HttpClient.Timeout = [TimeSpan]::FromSeconds(15)
+        $Request = [System.Net.Http.HttpRequestMessage]::new([System.Net.Http.HttpMethod]::Get, $DiscoveryUrl)
+
+        foreach ($Header in $Headers.GetEnumerator()) {
+            $null = $Request.Headers.TryAddWithoutValidation($Header.Key, $Header.Value)
+        }
+
+        $Response = $HttpClient.SendAsync(
+            $Request,
+            [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead
+        ).GetAwaiter().GetResult()
+
+        if ((([int]$Response.StatusCode) -ge 300) -and (([int]$Response.StatusCode) -lt 400) -and $Response.Headers.Location) {
+            $RedirectUri = $Response.Headers.Location
+            if (-not $RedirectUri.IsAbsoluteUri) {
+                $RedirectUri = [Uri]::new([Uri]$FrontDoorBaseUri, $RedirectUri)
+            }
+            # The redirect points to <prefix>.admin.protection.outlook.com:446
+            # but the REST API is served from <prefix>.ps.compliance.protection.outlook.com:443
+            $Prefix = $RedirectUri.Host.Split('.')[0]
+            $ResolvedEndpoint = "https://$Prefix$BackendSuffix/adminapi/beta/$TenantId/InvokeCommand"
+            Write-Verbose "Compliance endpoint resolved: $ResolvedEndpoint"
+            return $ResolvedEndpoint
+        }
+
+        Write-Verbose "Compliance front-door did not redirect (status $([int]$Response.StatusCode)). Using default endpoint."
+        return $DefaultEndpoint
+    }
+    catch {
+        Write-Warning "Failed to resolve compliance endpoint: $($_.Exception.Message). Using default."
+        return $DefaultEndpoint
+    }
+    finally {
+        if ($Response) { $Response.Dispose() }
+        if ($Request) { $Request.Dispose() }
+        if ($HttpClient) { $HttpClient.Dispose() }
+        if ($Handler) { $Handler.Dispose() }
+    }
+}
+
 function Get-ExchangeOnlineApiEndpoint {
     <#
     .SYNOPSIS
@@ -186,10 +325,11 @@ function Invoke-EXORestMethod {
 
     $MaxRetries = 3
     $RetryDelay = 5
+    $TimeoutSec = 30
 
     for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
         try {
-            $Response = Invoke-WebRequest -Method POST -Uri $ApiEndpoint -Headers $Headers -Body $Body -ContentType "application/json" -UseBasicParsing
+            $Response = Invoke-WebRequest -Method POST -Uri $ApiEndpoint -Headers $Headers -Body $Body -ContentType "application/json" -UseBasicParsing -TimeoutSec $TimeoutSec
             $Parsed = $Response.Content | ConvertFrom-Json
             return $Parsed.value
         }
@@ -232,5 +372,7 @@ function Invoke-EXORestMethod {
 Export-ModuleMember -Function @(
     'Get-ExchangeOnlineScope',
     'Get-ExchangeOnlineApiEndpoint',
+    'Get-ComplianceScope',
+    'Get-ComplianceApiEndpoint',
     'Invoke-EXORestMethod'
 )
