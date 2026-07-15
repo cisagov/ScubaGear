@@ -560,6 +560,39 @@ Describe "Policy Checks for <ProductName>" {
                             }
                         }
                     }
+                    # Security Suite configuration tables are appended to the Security Suite report.
+                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
+                        $ExpectedHeaders = if ($TableClass -match "securitysuite-sensitive-users-table") {
+                            @("Username", "Email")
+                        }
+                        elseif ($TableClass -match "securitysuite-partner-domains-table") {
+                            @("Partner Domain")
+                        }
+                        else {
+                            @("Policy", "Enabled", "Users Protected", "Partner Domains Protected", "Safety Indicators")
+                        }
+
+                        foreach ($Row in $Rows) {
+                            $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
+                            $RowData = Get-SeElement -Element $Row -By TagName 'td'
+
+                            ($RowHeaders.Count -eq 0) -xor ($RowData.Count -eq 0) | Should -BeTrue -Because "Any given row should be homogenious"
+
+                            if ($RowHeaders.Count -gt 0) {
+                                $RowHeaders.Count | Should -BeExactly $ExpectedHeaders.Count
+                                for ($i = 0; $i -lt $RowHeaders.Count; $i++) {
+                                    $RowHeaders[$i].Text | Should -BeLikeExactly $ExpectedHeaders[$i] -Because "Table header column $i should match $($ExpectedHeaders[$i])"
+                                }
+                            }
+
+                            if ($RowData.Count -gt 0) {
+                                $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
+                                if ($TableClass -match "securitysuite-anti-phish-policies-table") {
+                                    $RowData[1].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
+                                }
+                            }
+                        }
+                    }
                     else {
                         $Rows.Count | Should -BeGreaterThan 0
 
