@@ -20,7 +20,7 @@ jobs:
         shell: pwsh
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Run PSScriptAnalyzer
         run: |
           # Source the function
