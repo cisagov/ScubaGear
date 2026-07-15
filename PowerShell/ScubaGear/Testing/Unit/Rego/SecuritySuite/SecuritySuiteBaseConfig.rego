@@ -12,7 +12,109 @@ AdminAuditLogConfig := {
     "UnifiedAuditLogIngestionEnabled": true
 }
 
+# Compliant: 12 month (1 year) retention, enabled
+UnifiedAuditLogRetentionPolicy := {
+    "Name": "12 month retention",
+    "RetentionDuration": "TwelveMonths",
+    "Enabled": true
+}
+
+# Compliant: 3 year retention, enabled
+ThreeYearRetentionPolicy := {
+    "Name": "3 year retention",
+    "RetentionDuration": "ThreeYears",
+    "Enabled": true
+}
+
+# Compliant: 5 year retention, enabled
+FiveYearRetentionPolicy := {
+    "Name": "5 year retention",
+    "RetentionDuration": "FiveYears",
+    "Enabled": true
+}
+
+# Compliant: 7 year retention, enabled
+SevenYearRetentionPolicy := {
+    "Name": "7 year retention",
+    "RetentionDuration": "SevenYears",
+    "Enabled": true
+}
+
+# Compliant: 10 year retention, enabled
+TenYearRetentionPolicy := {
+    "Name": "10 year retention",
+    "RetentionDuration": "TenYears",
+    "Enabled": true
+}
+
+# Non-compliant: 7 day retention (Purview portal "7 Days" option)
+SevenDayRetentionPolicy := {
+    "Name": "Seven day retention",
+    "RetentionDuration": "SevenDays",
+    "Enabled": true
+}
+
+# Non-compliant: 30 day (1 month) retention (Purview portal "30 Days" option)
+OneMonthRetentionPolicy := {
+    "Name": "One month retention",
+    "RetentionDuration": "OneMonth",
+    "Enabled": true
+}
+
+# Non-compliant: 90 day (3 month) retention (Purview portal "90 Days" option)
+ThreeMonthRetentionPolicy := {
+    "Name": "Three month retention",
+    "RetentionDuration": "ThreeMonths",
+    "Enabled": true
+}
+
+# Non-compliant: 6 month retention
+SixMonthRetentionPolicy := {
+    "Name": "Six month retention",
+    "RetentionDuration": "SixMonths",
+    "Enabled": true
+}
+
+# Non-compliant: 9 month retention
+NineMonthRetentionPolicy := {
+    "Name": "Nine month retention",
+    "RetentionDuration": "NineMonths",
+    "Enabled": true
+}
+
+# Non-compliant: 12 month retention but disabled
+DisabledRetentionPolicy := {
+    "Name": "12 month retention",
+    "RetentionDuration": "TwelveMonths",
+    "Enabled": false
+}
+
+# E5-level service plans, includes the advanced auditing plan required to
+# retain audit logs beyond 180 days (E5 / E5 Compliance / E5 eDiscovery and Audit)
+ServicePlansWithAdvancedAuditing := [
+    {
+        "ServicePlanName": "M365_ADVANCED_AUDITING",
+        "ServicePlanId": "2f442157-a11c-46b9-ae5b-6e39ff4e5849",
+        "ProvisioningStatus": "Success"
+    },
+    {
+        "ServicePlanName": "EXCHANGE_S_ENTERPRISE",
+        "ServicePlanId": "efb87545-963c-4e0d-99df-69c6916d9eb0",
+        "ProvisioningStatus": "Success"
+    }
+]
+
+# E3/G3-level service plans, does not include the advanced auditing plan
+ServicePlansWithoutAdvancedAuditing := [
+    {
+        "ServicePlanName": "EXCHANGE_S_ENTERPRISE",
+        "ServicePlanId": "efb87545-963c-4e0d-99df-69c6916d9eb0",
+        "ProvisioningStatus": "Success"
+    }
+]
+
 ScubaConfig := {
+    "OutRegoFileName": "TestResults",
     "SecuritySuite": {
         "MS.SECURITYSUITE.2.1v1": {
             "SensitiveUsers": [
@@ -393,3 +495,34 @@ ProtectionPolicyRulesStrictPartialRecipients := [
     }
 ]
 
+DlpComplianceRules := {
+    "ContentContainsSensitiveInformation": [
+        {"name": "U.S. Social Security Number (SSN)"},
+        {"name": "U.S. Individual Taxpayer Identification Number (ITIN)"},
+        {"name": "Credit Card Number"}
+    ],
+    "Name": "Baseline Rule",
+    "Disabled": false,
+    "ParentPolicyName": "Default Office 365 DLP policy",
+    "BlockAccess": true,
+    "BlockAccessScope": "All",
+    "NotifyUser": [
+        "SiteAdmin",
+        "LastModifier",
+        "Owner"
+    ],
+    "NotifyUserType": "NotSet",
+    "IsAdvancedRule": false
+}
+
+DlpCompliancePolicies := {
+    "ExchangeLocation": ["All"],
+    "SharePointLocation": ["All"],
+    "TeamsLocation": ["All"],
+    "EndpointDlpLocation": ["All"],
+    "OneDriveLocation": ["All"],
+    "Workload": "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices",
+    "Name": "Default Office 365 DLP policy",
+    "Mode": "Enable",
+    "Enabled": true
+}

@@ -49,6 +49,14 @@ function Export-SecuritySuiteProvider {
         }
     }
 
+    # Get the tenant's provisioned service plans via Graph. These are used to
+    # determine whether the tenant has the per-user license (E5 / E5 Compliance /
+    # E5 eDiscovery and Audit add-on) required to retain audit logs beyond 180
+    # days for MS.SECURITYSUITE.5.2v1. The Rego looks at the service_plans list.
+    $SubscribedSku = $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+    $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
+
     # Regular Exchange i.e non IPPSSession cmdlets
     $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
     $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
@@ -104,10 +112,11 @@ function Export-SecuritySuiteProvider {
     }
     catch {
         Write-Warning "Error running Connect-IPPSSession: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-        Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
+        Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, Get-ProtectionAlert, and Get-UnifiedAuditLogRetentionPolicy."
         $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
         $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
         $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
+        $Tracker.AddUnSuccessfulCommand("Get-UnifiedAuditLogRetentionPolicy")
     }
     if ($IPPSConnected) {
         if (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue) {
@@ -144,6 +153,10 @@ function Export-SecuritySuiteProvider {
         # We need to specify the depth because the data contains some
         # nested tables.
         $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRules
+
+        # Audit log retention policies are managed through the Security &
+        # Compliance session and are needed to evaluate MS.SECURITYSUITE.5.2v1.
+        $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-UnifiedAuditLogRetentionPolicy"))
     }
     else {
         $DLPCompliancePolicy = ConvertTo-Json @()
@@ -151,6 +164,7 @@ function Export-SecuritySuiteProvider {
         $ProtectionAlert = ConvertTo-Json @()
         $DLPComplianceRules = ConvertTo-Json @()
         $DLPLicense = ConvertTo-Json $false
+        $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @()
     }
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -168,6 +182,8 @@ function Export-SecuritySuiteProvider {
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
     "atp_policy_for_o365": $ATPPolicy,
+    "service_plans": $ServicePlans,
+    "unified_audit_log_retention_policies": $UnifiedAuditLogRetentionPolicy,
     "conn_filter": $ConnectionFilter,
     "safe_links_policies": $SafeLinksPolicy,
     "safe_links_rules": $SafeLinksRule,
