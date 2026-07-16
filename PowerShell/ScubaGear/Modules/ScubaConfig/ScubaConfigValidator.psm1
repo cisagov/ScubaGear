@@ -307,7 +307,7 @@ class ScubaConfigValidator {
             return $AnchorProperties
         }
 
-        $AnchorKeyPattern = '(?m)^([A-Za-z_][A-Za-z0-9_]*)\s*:\s*&[A-Za-z0-9_]+'
+        $AnchorKeyPattern = '(?m)^([A-Za-z_][\w-]*)\s*:\s*&[\w-]+'
         foreach ($Match in [regex]::Matches($YamlContent, $AnchorKeyPattern)) {
             $AnchorProperties += $Match.Groups[1].Value
         }
