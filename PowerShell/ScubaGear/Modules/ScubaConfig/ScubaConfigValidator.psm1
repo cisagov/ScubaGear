@@ -592,10 +592,10 @@ class ScubaConfigValidator {
                     $ReportedIds[$Key] = $true
                     $NewId = $Migrations[$Key].NewId
                     if ([string]::IsNullOrWhiteSpace($NewId) -or $NewId -eq 'None') {
-                        [void]$Validation.Warnings.Add("Defender migration warning: Policy ID '$ConfigId' has been removed and is no longer assessed by ScubaGear. Remove it from your configuration. $DocRef")
+                        [void]$Validation.Warnings.Add("Policy migration warning: Policy ID '$ConfigId' has been removed and is no longer assessed by ScubaGear. Remove it from your configuration. $DocRef")
                     }
                     else {
-                        [void]$Validation.Warnings.Add("Defender migration warning: Policy ID '$ConfigId' has been migrated to '$NewId'. Update your configuration to use the new policy ID. $DocRef")
+                        [void]$Validation.Warnings.Add("Policy migration warning: Policy ID '$ConfigId' has been migrated to '$NewId'. Update your configuration to use the new policy ID. $DocRef")
                     }
                 }
             }
