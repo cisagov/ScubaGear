@@ -79,8 +79,15 @@ Describe "ScubaConfig YAML Anchor Definition Validation" {
         }
     }
 
+    BeforeEach {
+        $script:TempFile = $null
+    }
+
     AfterEach {
         [ScubaConfig]::ResetInstance()
+        if ($script:TempFile -and (Test-Path $script:TempFile)) {
+            Remove-Item -Path $script:TempFile -Force -ErrorAction SilentlyContinue
+        }
     }
 
     AfterAll {
@@ -101,14 +108,12 @@ M365Environment: commercial
 SensitiveUsers: &CommonSensitiveUsers
   - Example User;exampleuser@example.onmicrosoft.com
 "@
-            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            $Yaml | Set-Content -Path $TempFile
+            $script:TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            $Yaml | Set-Content -Path $script:TempFile
 
-            $Result = [ScubaConfig]::ValidateConfigFile($TempFile)
+            $Result = [ScubaConfig]::ValidateConfigFile($script:TempFile)
 
             $Result.Warnings | Where-Object { $_ -match "Unknown property 'SensitiveUsers'" } | Should -BeNullOrEmpty
-
-            Remove-Item -Path $TempFile -Force
         }
 
         It "Should NOT flag an unknown property warning regardless of the anchor host key's name" {
@@ -120,14 +125,12 @@ M365Environment: commercial
 CommonExclusions: &CommonExclusions
   - someone@example.onmicrosoft.com
 "@
-            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            $Yaml | Set-Content -Path $TempFile
+            $script:TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            $Yaml | Set-Content -Path $script:TempFile
 
-            $Result = [ScubaConfig]::ValidateConfigFile($TempFile)
+            $Result = [ScubaConfig]::ValidateConfigFile($script:TempFile)
 
             $Result.Warnings | Where-Object { $_ -match "Unknown property 'CommonExclusions'" } | Should -BeNullOrEmpty
-
-            Remove-Item -Path $TempFile -Force
         }
 
         It "Should still flag an unknown property warning for the same key name when it has no anchor" {
@@ -138,14 +141,12 @@ ProductNames:
 M365Environment: commercial
 SensitiveUsers: SomeGenericValue
 "@
-            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            $Yaml | Set-Content -Path $TempFile
+            $script:TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            $Yaml | Set-Content -Path $script:TempFile
 
-            $Result = [ScubaConfig]::ValidateConfigFile($TempFile)
+            $Result = [ScubaConfig]::ValidateConfigFile($script:TempFile)
 
             $Result.Warnings | Where-Object { $_ -match "Unknown property 'SensitiveUsers'" } | Should -Not -BeNullOrEmpty
-
-            Remove-Item -Path $TempFile -Force
         }
 
         It "Should still flag unrelated unknown properties that don't carry an anchor" {
@@ -158,15 +159,13 @@ SensitiveUsers: &CommonSensitiveUsers
   - Example User;exampleuser@example.onmicrosoft.com
 TotallyMadeUpProperty: SomeValue
 "@
-            $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
-            $Yaml | Set-Content -Path $TempFile
+            $script:TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
+            $Yaml | Set-Content -Path $script:TempFile
 
-            $Result = [ScubaConfig]::ValidateConfigFile($TempFile)
+            $Result = [ScubaConfig]::ValidateConfigFile($script:TempFile)
 
             $Result.Warnings | Where-Object { $_ -match "Unknown property 'SensitiveUsers'" } | Should -BeNullOrEmpty
             $Result.Warnings | Where-Object { $_ -match "Unknown property 'TotallyMadeUpProperty'" } | Should -Not -BeNullOrEmpty
-
-            Remove-Item -Path $TempFile -Force
         }
     }
 }
