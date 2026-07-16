@@ -125,10 +125,10 @@ Re-run ScubaGear (or the configuration validator) against your updated file to c
 
 When ScubaGear loads a configuration file, the built-in configuration validator checks for deprecated Defender usage and prints warnings to the console. You will see a `Defender migration warning` for each of the following situations:
 
-- **Deprecated product name** — `ProductNames` still contains `defender`. ScubaGear runs `securitysuite` in its place and recommends updating the configuration.
-- **Deprecated `Defender` section** — the configuration still contains a top-level `Defender:` section. Move the settings under `SecuritySuite:`.
-- **Migrated policy ID** — a policy ID referenced in the configuration (in an exclusion, annotation, or omission) has been migrated. The warning names the new `MS.SECURITYSUITE.*` policy ID to use.
-- **Removed policy ID** — a policy ID referenced in the configuration has been removed and should be deleted.
+- **Deprecated product name** - `ProductNames` still contains `defender`. ScubaGear runs `securitysuite` in its place and recommends updating the configuration.
+- **Deprecated `Defender` section** - the configuration still contains a top-level `Defender:` section. Move the settings under `SecuritySuite:`.
+- **Migrated policy ID** - a policy ID referenced in the configuration (in an exclusion, annotation, or omission) has been migrated. The warning names the new `MS.SECURITYSUITE.*` policy ID to use.
+- **Removed policy ID** - a policy ID referenced in the configuration has been removed and should be deleted.
 
 Example console output:
 
