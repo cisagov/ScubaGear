@@ -104,6 +104,49 @@ function Get-ScubaControlVersion {
     return $null
 }
 
+function Get-ScubaControlSortKey {
+    <#
+    .Description
+    Builds a sort key that orders control IDs numerically rather than
+    lexicographically, so that e.g. MS.EXO.9.5 precedes MS.EXO.10.1 instead of
+    following it. Every run of digits is zero-padded to a fixed width, leaving a
+    string whose ordinal comparison matches the intended numeric order.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string]
+        $ControlId
+    )
+    if ([string]::IsNullOrEmpty($ControlId)) {
+        return ''
+    }
+    return [regex]::Replace($ControlId, '\d+', { param($m) $m.Value.PadLeft(10, '0') })
+}
+
+function Get-ScubaOrderedControlIds {
+    <#
+    .Description
+    Orders control IDs by their numeric segments (see Get-ScubaControlSortKey),
+    keeping each product's policy groups in baseline order (1, 2, ... 9, 10, 11)
+    in both the JSON output and the HTML report.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
+        [string[]]
+        $ControlIds
+    )
+    return @($ControlIds | Sort-Object -Property @{ Expression = { Get-ScubaControlSortKey $_ } })
+}
+
 function ConvertTo-ScubaPlainText {
     <#
     .Description
@@ -533,7 +576,7 @@ function Compare-ScubaResults {
         if ($inBefore) { $beforeMap = Get-ScubaControlMap $Before.Results.$product } else { $beforeMap = [ordered]@{} }
         if ($inAfter) { $afterMap = Get-ScubaControlMap $After.Results.$product } else { $afterMap = [ordered]@{} }
 
-        $allBase = @(@($beforeMap.Keys) + @($afterMap.Keys) | Select-Object -Unique | Sort-Object)
+        $allBase = Get-ScubaOrderedControlIds @(@($beforeMap.Keys) + @($afterMap.Keys) | Select-Object -Unique)
 
         $records = @()
         $bucketCounts = [ordered]@{}
@@ -962,6 +1005,8 @@ Export-ModuleMember -Function @(
     'New-ScubaDiffReport',
     'Get-ScubaBaseControlId',
     'Get-ScubaControlVersion',
+    'Get-ScubaControlSortKey',
+    'Get-ScubaOrderedControlIds',
     'ConvertTo-ScubaPlainText',
     'ConvertTo-ScubaHtmlEncoded',
     'Get-ScubaResultCategory',

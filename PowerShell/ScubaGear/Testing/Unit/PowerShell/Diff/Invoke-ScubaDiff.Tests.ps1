@@ -101,6 +101,21 @@ InModuleScope Diff {
             }
         }
 
+        Context 'Get-ScubaOrderedControlIds' {
+            It 'Orders group numbers numerically, not lexicographically' {
+                $ordered = Get-ScubaOrderedControlIds @('MS.EXO.10.1','MS.EXO.1.1','MS.EXO.17.3','MS.EXO.9.5','MS.EXO.2.2')
+                $ordered -join ',' | Should -Be 'MS.EXO.1.1,MS.EXO.2.2,MS.EXO.9.5,MS.EXO.10.1,MS.EXO.17.3'
+            }
+            It 'Orders policy numbers within a group numerically' {
+                $ordered = Get-ScubaOrderedControlIds @('MS.AAD.3.10','MS.AAD.3.2','MS.AAD.3.1')
+                $ordered -join ',' | Should -Be 'MS.AAD.3.1,MS.AAD.3.2,MS.AAD.3.10'
+            }
+            It 'Groups IDs by product prefix' {
+                $ordered = Get-ScubaOrderedControlIds @('MS.TEAMS.1.1','MS.AAD.10.1','MS.AAD.2.1')
+                $ordered -join ',' | Should -Be 'MS.AAD.2.1,MS.AAD.10.1,MS.TEAMS.1.1'
+            }
+        }
+
         Context 'Get-ScubaRowColorClass' {
             It 'Greys out removed policies regardless of before result' {
                 Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'PolicyRemoved'; ResultAfter = $null }) | Should -Be 'grey'
@@ -237,6 +252,15 @@ InModuleScope Diff {
         It '<Base> is classified as <Bucket>' -TestCases $expected {
             param($Base, $Bucket)
             $ByBase[$Base].Bucket | Should -Be $Bucket
+        }
+
+        It 'Emits records ordered by group and policy number, not lexicographically' {
+            $bases = @($DiffA.Diff.AAD | ForEach-Object {
+                $id = if ($_.'Control ID (After)') { $_.'Control ID (After)' } else { $_.'Control ID (Before)' }
+                Get-ScubaBaseControlId $id
+            })
+            $bases -join ',' | Should -Be ('MS.AAD.1.1,MS.AAD.2.1,MS.AAD.3.1,MS.AAD.4.1,MS.AAD.5.1,MS.AAD.6.1,' +
+                'MS.AAD.7.1,MS.AAD.8.1,MS.AAD.9.1,MS.AAD.10.1,MS.AAD.11.1,MS.AAD.12.1,MS.AAD.13.1,MS.AAD.14.1')
         }
 
         It 'Preserves both literal Result values for Other' {
