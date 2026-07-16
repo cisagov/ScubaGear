@@ -50,6 +50,7 @@ class ScubaConfigValidator {
         [ScubaConfigValidator]::_Cache['ModulePath'] = $ModulePath
         [ScubaConfigValidator]::LoadSchema()
         [ScubaConfigValidator]::LoadDefaults()
+        [ScubaConfigValidator]::LoadPolicyMigrations()
     }
 
     # Loads and caches JSON schema file for configuration validation
@@ -86,6 +87,50 @@ class ScubaConfigValidator {
         catch {
             throw "Failed to load defaults file: $($_.Exception.Message)"
         }
+    }
+
+    # Loads and caches the baseline policy migration mappings (Old ID -> New ID).
+    # These mappings drive the Defender-to-Security Suite transition warnings so that
+    # users configuring deprecated policy IDs are guided to the replacement policy IDs.
+    hidden static [void] LoadPolicyMigrations() {
+        $Migrations = @{}
+
+        $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
+        # Module path is ...\Modules\ScubaConfig; the mappings live in ...\mappings
+        $MigrationsPath = Join-Path -Path $ModulePath -ChildPath "..\..\mappings\scuba-baseline-policy-migrations.csv"
+
+        if (Test-Path -LiteralPath $MigrationsPath) {
+            try {
+                $Rows = Import-Csv -LiteralPath $MigrationsPath -ErrorAction Stop
+                foreach ($Row in $Rows) {
+                    $OldId = ($Row.'Old ID').Trim()
+                    $NewId = ($Row.'New ID').Trim()
+                    if ($OldId) {
+                        $Migrations[$OldId.ToUpper()] = [PSCustomObject]@{
+                            OldId = $OldId
+                            NewId = $NewId
+                        }
+                    }
+                }
+            }
+            catch {
+                # Migration data is advisory only; never fail validation if it cannot be read
+                Write-Debug "Failed to load policy migrations file: $($_.Exception.Message)"
+            }
+        }
+        else {
+            Write-Debug "Policy migrations file not found: $MigrationsPath"
+        }
+
+        [ScubaConfigValidator]::_Cache['PolicyMigrations'] = $Migrations
+    }
+
+    # Returns cached policy migration mappings (keyed by upper-cased Old ID)
+    static [hashtable] GetPolicyMigrations() {
+        if (-not [ScubaConfigValidator]::_Cache.ContainsKey('PolicyMigrations')) {
+            [ScubaConfigValidator]::LoadPolicyMigrations()
+        }
+        return [ScubaConfigValidator]::_Cache['PolicyMigrations']
     }
 
     # Returns cached configuration defaults object
@@ -475,6 +520,9 @@ class ScubaConfigValidator {
         # Check for product exclusions on products that don't support them
         [ScubaConfigValidator]::ValidateUnsupportedProductExclusions($ConfigObject, $Validation)
 
+        # Warn when deprecated Defender product name or migrated Defender policy IDs are used
+        [ScubaConfigValidator]::ValidateDefenderMigration($ConfigObject, $Validation)
+
         return [PSCustomObject]$Validation
     }
 
@@ -505,6 +553,89 @@ class ScubaConfigValidator {
                 }
             }
         }
+    }
+
+    # Warns when a configuration still references the deprecated Defender product name
+    # or contains policy IDs that have migrated to the Security Suite baseline.
+    # The Defender product has been renamed to "securitysuite" and many of its policies
+    # (along with several EXO and Teams policies) were decoupled and migrated into the
+    # MS.SECURITYSUITE.* baseline. See mappings\scuba-baseline-policy-migrations.csv.
+    hidden static [void] ValidateDefenderMigration([object]$ConfigObject, [hashtable]$Validation) {
+        $DocRef = "See docs\configuration\defender-to-securitysuite-transition.md and mappings\scuba-baseline-policy-migrations.csv for the full list of migrated policies."
+
+        # 1. Deprecated 'defender' value in ProductNames
+        if ($ConfigObject.ProductNames) {
+            foreach ($Product in $ConfigObject.ProductNames) {
+                if ($Product -is [string] -and $Product.Trim().ToLower() -eq 'defender') {
+                    [void]$Validation.Warnings.Add("Defender migration warning: The product name 'defender' is deprecated and has been renamed to 'securitysuite'. ScubaGear will run 'securitysuite' in its place. Update ProductNames to use 'securitysuite'. $DocRef")
+                    break
+                }
+            }
+        }
+
+        # 2. Deprecated top-level 'Defender' product section (exclusions/config)
+        foreach ($PropertyName in $ConfigObject.PSObject.Properties.Name) {
+            if ($PropertyName -eq 'Defender') {
+                [void]$Validation.Warnings.Add("Defender migration warning: The 'Defender' configuration section is deprecated. Defender policies have been migrated to the Security Suite baseline; move applicable settings under the 'SecuritySuite' section. $DocRef")
+                break
+            }
+        }
+
+        # 3. Migrated policy IDs referenced anywhere in the configuration
+        $Migrations = [ScubaConfigValidator]::GetPolicyMigrations()
+        if ($Migrations -and $Migrations.Count -gt 0) {
+            $ReportedIds = @{}
+
+            foreach ($ConfigId in [ScubaConfigValidator]::GetConfiguredPolicyIds($ConfigObject)) {
+                $Key = $ConfigId.ToUpper()
+                if ($Migrations.ContainsKey($Key) -and -not $ReportedIds.ContainsKey($Key)) {
+                    $ReportedIds[$Key] = $true
+                    $NewId = $Migrations[$Key].NewId
+                    if ([string]::IsNullOrWhiteSpace($NewId) -or $NewId -eq 'None') {
+                        [void]$Validation.Warnings.Add("Defender migration warning: Policy ID '$ConfigId' has been removed and is no longer assessed by ScubaGear. Remove it from your configuration. $DocRef")
+                    }
+                    else {
+                        [void]$Validation.Warnings.Add("Defender migration warning: Policy ID '$ConfigId' has been migrated to '$NewId'. Update your configuration to use the new policy ID. $DocRef")
+                    }
+                }
+            }
+        }
+    }
+
+    # Collects all policy IDs referenced in a configuration object across product exclusion
+    # sections (e.g. Defender/SecuritySuite/Exo/Aad) and policy-type sections
+    # (AnnotatePolicy, OmitPolicy). Returns a flat array of policy ID strings.
+    hidden static [array] GetConfiguredPolicyIds([object]$ConfigObject) {
+        $PolicyIdPattern = '^MS\.[A-Za-z]+\.[0-9]+\.[0-9]+[Vv][0-9]+$'
+        $Ids = [System.Collections.ArrayList]::new()
+
+        if (-not $ConfigObject) {
+            return $Ids.ToArray()
+        }
+
+        foreach ($Property in $ConfigObject.PSObject.Properties) {
+            $Value = $Property.Value
+            if ($null -eq $Value) {
+                continue
+            }
+
+            # Top-level key that is itself a policy ID (defensive; not expected)
+            if ($Property.Name -match $PolicyIdPattern) {
+                [void]$Ids.Add($Property.Name)
+            }
+
+            # Nested keys (product exclusion sections, AnnotatePolicy, OmitPolicy)
+            if ($Value -is [System.Management.Automation.PSCustomObject] -or $Value -is [hashtable]) {
+                $NestedNames = if ($Value -is [hashtable]) { $Value.Keys } else { $Value.PSObject.Properties.Name }
+                foreach ($NestedName in $NestedNames) {
+                    if ($NestedName -match $PolicyIdPattern) {
+                        [void]$Ids.Add($NestedName)
+                    }
+                }
+            }
+        }
+
+        return $Ids.ToArray()
     }
 
     # Dynamically validates all properties against their schema definitions
