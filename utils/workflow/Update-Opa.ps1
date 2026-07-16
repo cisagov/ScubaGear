@@ -124,9 +124,20 @@ function Update-OpaVersion {
     $PreviousDefault = $CurrentOpaVersion
     $NewDefault = $LatestOpaVersion
 
+    $PreviousVersion   = [System.Version]::Parse($PreviousDefault)
+    $LatestVersion = [System.Version]::Parse($LatestOpaVersion)
+    $IsPreviousPatchVersion = (
+        $PreviousVersion.Major -eq $LatestVersion.Major -and
+        $PreviousVersion.Minor -eq $LatestVersion.Minor -and
+        $PreviousVersion.Build -lt $LatestVersion.Build
+    )
+
     # Move the previous default to the end of compatibleOpaVersions
     $Versions = @($ConfigDefaults.metadata.compatibleOpaVersions) | Where-Object { $_ -ne $PreviousDefault }
-    $Versions += $PreviousDefault
+    # Check to prevent outdated patch versions from being listed as ScubaGear compatible
+    if (-not $IsPreviousPatchVersion) {
+        $Versions += $PreviousDefault
+    }
 
     # Creates the expected format for ScubaConfigDefaults.json, e.g. ["1.1.0","1.2.0",...]
     $CompatibleOpaVersions = ($Versions | ConvertTo-Json -Compress)
