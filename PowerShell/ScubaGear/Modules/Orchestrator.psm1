@@ -2619,7 +2619,7 @@ function Repair-ScubaGearJson {
     if ($ReturnObject.RepairedJson) {
         Write-Warning "The provider JSON file required automatic repair."
     }
-    
+
     $ProviderJsonObject = $ProviderSettingsObject.JsonObject
 
     .EXAMPLE
@@ -2677,7 +2677,7 @@ function Repair-ScubaGearJson {
         else {
             $ReturnObject.JsonString = $JsonInputString
         }
-       
+
         return $ReturnObject
     }
     catch {
@@ -2696,7 +2696,7 @@ function Repair-ScubaGearJson {
         else {
             Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object"
         }
-        
+
         Write-Warning "Please report this to the ScubaGear team as a bug report either by GitHub or the Scuba mailbox."
         Write-Warning "Attempting to auto repair the JSON..."
 
