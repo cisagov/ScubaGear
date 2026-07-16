@@ -38,30 +38,34 @@ $script:ProductOrder = @(
 # Bucket -> row color class used by the HTML report. Keep in sync with the
 # transition taxonomy in the ADR / usage doc.
 $script:BucketColorMap = [ordered]@{
-    'Errored'          = 'red'
-    'Regression'       = 'red'
-    'WarningEscalated' = 'red'
-    'Remediated'       = 'green'
-    'WarningResolved'  = 'green'
-    'NewWarning'       = 'yellow'
-    'OmissionChanged'  = 'yellow'
-    'MarkedIncorrect'  = 'grey'
-    'IncorrectResolved' = 'green'
-    'VersionChanged'   = 'yellow'
-    'Other'            = 'yellow'
-    'NewlyAutomated'   = 'neutral'
-    'NewlyManual'      = 'neutral'
-    'New'              = 'neutral'
-    'PolicyRemoved'    = 'neutral'
-    'Unchanged'        = 'unchanged'
+    'Errored'             = 'red'
+    'NewFail'             = 'red'
+    'NewPass'             = 'green'
+    'NewWarning'          = 'yellow'
+    'NewOmission'         = 'yellow'
+    'NewIncorrectResult'  = 'grey'
+    'PolicyVersionUpdate' = 'yellow'
+    'Other'               = 'yellow'
+    'NewAutomatedCheck'   = 'neutral'
+    'NewManualCheck'      = 'neutral'
+    'NewPolicy'           = 'neutral'
+    'RemovedPolicy'       = 'neutral'
+    'Unchanged'           = 'unchanged'
 }
 
 # Bucket -> human-friendly label for HTML display. Buckets not listed here are
 # displayed using their raw (camelCase) token.
 $script:BucketLabelMap = @{
-    'PolicyRemoved'     = 'Policy Removed'
-    'MarkedIncorrect'   = 'Marked Incorrect (false positive)'
-    'IncorrectResolved' = 'Incorrect Result Resolved'
+    'NewFail'             = 'New Fail'
+    'NewPass'             = 'New Pass'
+    'NewWarning'          = 'New Warning'
+    'NewOmission'         = 'New Omission'
+    'NewAutomatedCheck'   = 'New Automated Check'
+    'NewManualCheck'      = 'New Manual Check'
+    'NewIncorrectResult'  = 'New Incorrect Result (false positive)'
+    'NewPolicy'           = 'New Policy'
+    'RemovedPolicy'       = 'Removed Policy'
+    'PolicyVersionUpdate' = 'Policy Version Update'
 }
 
 function Get-ScubaBaseControlId {
@@ -241,11 +245,17 @@ function Get-ScubaDiffBucket {
     <#
     .Description
     Classifies a single base control ID into exactly one transition bucket,
-    honoring the precedence: Errored > VersionChanged > OmissionChanged >
-    MarkedIncorrect/IncorrectResolved > specific transitions > Other > Unchanged.
-    New/PolicyRemoved are determined by presence and take precedence over
-    everything else. PolicyRemoved (base ID present in the before file but absent
+    honoring the precedence: Errored > PolicyVersionUpdate > Unchanged >
+    NewIncorrectResult > specific transitions > NewOmission > Other.
+    NewPolicy/RemovedPolicy are determined by presence and take precedence over
+    everything else. RemovedPolicy (base ID present in the before file but absent
     from the after file) aligns with the baselines' removedpolicies.md tracking.
+
+    Buckets are named for the state the control lands in, so a transition into
+    Pass/Fail/Warning from any evaluated state -- including Omitted or a cleared
+    "Incorrect result" marking -- reports as NewPass/NewFail/NewWarning. Only the
+    Omitted transitions that have no such landing state (e.g. Pass -> Omitted,
+    N/A <-> Omitted) report as NewOmission.
     .Functionality
     Internal
     #>
@@ -259,8 +269,8 @@ function Get-ScubaDiffBucket {
         [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $AfterVersion
     )
 
-    if (-not $BeforePresent) { return 'New' }
-    if (-not $AfterPresent) { return 'PolicyRemoved' }
+    if (-not $BeforePresent) { return 'NewPolicy' }
+    if (-not $AfterPresent) { return 'RemovedPolicy' }
 
     $bCat = Get-ScubaResultCategory $BeforeResult
     $aCat = Get-ScubaResultCategory $AfterResult
@@ -270,38 +280,44 @@ function Get-ScubaDiffBucket {
 
     # A changed version suffix means the policy's meaning changed; the Result
     # comparison is informational, so this outranks the specific transitions.
-    if ($BeforeVersion -ne $AfterVersion) { return 'VersionChanged' }
+    if ($BeforeVersion -ne $AfterVersion) { return 'PolicyVersionUpdate' }
 
-    # Omission changes (non-identical involving Omitted).
-    if ($bCat -eq 'Omitted' -or $aCat -eq 'Omitted') {
-        if ($bCat -eq $aCat -and $BeforeResult -eq $AfterResult) { return 'Unchanged' }
-        return 'OmissionChanged'
-    }
+    # Identical Result and version. Checked before the transitions below so a
+    # stable state -- including a stable "Incorrect result" marking or a control
+    # omitted in both runs -- is never mistaken for a transition.
+    if ($bCat -eq $aCat -and $BeforeResult -eq $AfterResult) { return 'Unchanged' }
 
-    # False-positive marking changes. A control marked incorrect by the user
-    # carries the literal Result "Incorrect result" (category 'Incorrect'). A
-    # flip in that marking is its own transition; both-incorrect falls through to
-    # the Unchanged check below.
-    if ($aCat -eq 'Incorrect' -and $bCat -ne 'Incorrect') { return 'MarkedIncorrect' }
-    if ($bCat -eq 'Incorrect' -and $aCat -ne 'Incorrect') { return 'IncorrectResolved' }
+    # A control the user marked incorrect (a false positive) carries the literal
+    # Result "Incorrect result" (category 'Incorrect'). Newly acquiring that
+    # marking is its own bucket; losing it is bucketed by the result it reveals
+    # via the transitions below.
+    if ($aCat -eq 'Incorrect') { return 'NewIncorrectResult' }
 
     switch ("$bCat->$aCat") {
-        'Pass->Fail'      { return 'Regression' }
-        'Fail->Pass'      { return 'Remediated' }
-        'Warning->Pass'   { return 'WarningResolved' }
-        'Warning->Fail'   { return 'WarningEscalated' }
-        'Pass->Warning'   { return 'NewWarning' }
-        'Fail->Warning'   { return 'NewWarning' }
-        'NA->Pass'        { return 'NewlyAutomated' }
-        'NA->Fail'        { return 'NewlyAutomated' }
-        'NA->Warning'     { return 'NewlyAutomated' }
-        'Pass->NA'        { return 'NewlyManual' }
-        'Fail->NA'        { return 'NewlyManual' }
-        'Warning->NA'     { return 'NewlyManual' }
+        'Pass->Fail'         { return 'NewFail' }
+        'Warning->Fail'      { return 'NewFail' }
+        'Omitted->Fail'      { return 'NewFail' }
+        'Incorrect->Fail'    { return 'NewFail' }
+        'Fail->Pass'         { return 'NewPass' }
+        'Warning->Pass'      { return 'NewPass' }
+        'Omitted->Pass'      { return 'NewPass' }
+        'Incorrect->Pass'    { return 'NewPass' }
+        'Pass->Warning'      { return 'NewWarning' }
+        'Fail->Warning'      { return 'NewWarning' }
+        'Omitted->Warning'   { return 'NewWarning' }
+        'Incorrect->Warning' { return 'NewWarning' }
+        'NA->Pass'           { return 'NewAutomatedCheck' }
+        'NA->Fail'           { return 'NewAutomatedCheck' }
+        'NA->Warning'        { return 'NewAutomatedCheck' }
+        'Pass->NA'           { return 'NewManualCheck' }
+        'Fail->NA'           { return 'NewManualCheck' }
+        'Warning->NA'        { return 'NewManualCheck' }
+        'Incorrect->NA'      { return 'NewManualCheck' }
     }
 
-    # Identical Result and version.
-    if ($bCat -eq $aCat -and $BeforeResult -eq $AfterResult) { return 'Unchanged' }
+    # Any remaining non-identical transition involving Omitted (e.g. Pass ->
+    # Omitted, N/A <-> Omitted, Incorrect result -> Omitted).
+    if ($bCat -eq 'Omitted' -or $aCat -eq 'Omitted') { return 'NewOmission' }
 
     return 'Other'
 }
@@ -406,7 +422,7 @@ function Get-ScubaRowColorClass {
         [object]
         $Record
     )
-    if ($Record.Bucket -eq 'PolicyRemoved') { return 'grey' }
+    if ($Record.Bucket -eq 'RemovedPolicy') { return 'grey' }
     switch (Get-ScubaResultCategory $Record.ResultAfter) {
         'Fail'    { return 'red' }
         'Error'   { return 'red' }
@@ -554,8 +570,8 @@ function Compare-ScubaResults {
     $afterProducts = @($After.Results.PSObject.Properties.Name)
 
     # Each product is compared independently and matched by name only. A product
-    # present in only one file has all of its controls reported as New (only in
-    # after) or PolicyRemoved (only in before).
+    # present in only one file has all of its controls reported as NewPolicy (only
+    # in after) or RemovedPolicy (only in before).
     $allProducts = @(@($beforeProducts) + @($afterProducts) | Select-Object -Unique | Sort-Object)
 
     $beforeAnnot = $Before.AnnotatedFailedPolicies
@@ -750,10 +766,10 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine("<p>Diff generated $(& $enc $meta.TimestampZulu) by ScubaGear $(& $enc $meta.ToolVersion).</p>")
 
     if (@($meta.ProductsOnlyInBefore).Count -gt 0) {
-        [void]$sb.AppendLine("<p><strong>Products only in Before (all controls Policy Removed):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")
+        [void]$sb.AppendLine("<p><strong>Products only in Before (all controls Removed Policy):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")
     }
     if (@($meta.ProductsOnlyInAfter).Count -gt 0) {
-        [void]$sb.AppendLine("<p><strong>Products only in After (all controls New):</strong> $(& $enc ((@($meta.ProductsOnlyInAfter)) -join ', '))</p>")
+        [void]$sb.AppendLine("<p><strong>Products only in After (all controls New Policy):</strong> $(& $enc ((@($meta.ProductsOnlyInAfter)) -join ', '))</p>")
     }
 
     # Legend. Rows are colored by their Result (After) value; removed policies are
@@ -762,7 +778,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span><span class="swatch diff-red"></span>Fail (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Pass (Result After)</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Policy Removed</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Removed Policy</span>')
     [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
@@ -884,10 +900,10 @@ function Invoke-SCuBADiff {
 
     Controls are matched on their base ID (the Control ID with the trailing version
     suffix removed, e.g. MS.AAD.1.1v1 -> MS.AAD.1.1). When the same base ID appears
-    with different version suffixes, the change is classified as VersionChanged and
-    the result comparison is treated as informational. Products are matched by name
-    only; a product present in only one file has all of its controls reported as
-    New or PolicyRemoved.
+    with different version suffixes, the change is classified as PolicyVersionUpdate
+    and the result comparison is treated as informational. Products are matched by
+    name only; a product present in only one file has all of its controls reported
+    as NewPolicy or RemovedPolicy.
 
     The HTML report hides Unchanged rows by default; a client-side toggle reveals
     them. Use -DarkMode to default the report to dark theme.

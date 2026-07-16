@@ -68,17 +68,17 @@ trailing version suffix removed (`MS.AAD.1.1v1` → `MS.AAD.1.1`):
 
 - **Same base ID, same version** → the results are compared directly.
 - **Same base ID, different version** → the change is bucketed as
-  `VersionChanged`. Because the policy's meaning changed between the two runs,
-  the before/after result comparison is **informational only**, not an
+  `PolicyVersionUpdate`. Because the policy's meaning changed between the two
+  runs, the before/after result comparison is **informational only**, not an
   authoritative pass/fail delta. Both results are still reported and labeled as
   such.
-- **Base ID present in only one file** → `New` (only in *after*) or
-  `PolicyRemoved` (only in *before*). A base ID present in the before file but
+- **Base ID present in only one file** → `NewPolicy` (only in *after*) or
+  `RemovedPolicy` (only in *before*). A base ID present in the before file but
   absent from the after file corresponds to a policy that was removed from the
   baseline — see the baselines'
   [removedpolicies.md](../../PowerShell/ScubaGear/baselines/removedpolicies.md).
 
-  > **Note:** `PolicyRemoved` is inferred purely from presence — a base ID that
+  > **Note:** `RemovedPolicy` is inferred purely from presence — a base ID that
   > appears in the before file but not the after file. That usually means the
   > policy was removed from the baseline, but it can also occur when the after
   > run simply did not assess that control or product (for example, comparing two
@@ -87,34 +87,38 @@ trailing version suffix removed (`MS.AAD.1.1v1` → `MS.AAD.1.1`):
   > was merely not evaluated.
 
 Products are matched by name only. A product present in only one file has all of
-its controls reported as `New` (only in *after*) or `PolicyRemoved` (only in
-*before*).
+its controls reported as `NewPolicy` (only in *after*) or `RemovedPolicy` (only
+in *before*).
 
 ## Transition taxonomy
 
 Every base control ID present in either file is classified into exactly one
-bucket. Precedence, highest to lowest:
-`Errored` > `VersionChanged` > `OmissionChanged` >
-`MarkedIncorrect` / `IncorrectResolved` > specific transitions >
-`Other` > `Unchanged`. `New` / `PolicyRemoved` are determined by presence.
+bucket. Buckets are named for the state the control **lands in**, so any
+transition that ends in Pass, Fail, or Warning reports as `NewPass`, `NewFail`,
+or `NewWarning` — including transitions out of `Omitted` or out of an
+`Incorrect result` marking. Precedence, highest to lowest:
+`Errored` > `PolicyVersionUpdate` > `Unchanged` > `NewIncorrectResult` >
+specific transitions > `NewOmission` > `Other`. `NewPolicy` / `RemovedPolicy`
+are determined by presence.
 
 | Before → After | Bucket |
 |---|---|
-| Pass → Fail | `Regression` |
-| Fail → Pass | `Remediated` |
-| Warning → Pass | `WarningResolved` |
-| Warning → Fail | `WarningEscalated` |
+| Pass → Fail | `NewFail` |
+| Fail → Pass | `NewPass` |
+| Warning → Pass | `NewPass` |
+| Warning → Fail | `NewFail` |
 | Pass/Fail → Warning | `NewWarning` |
-| N/A → Pass/Fail/Warning | `NewlyAutomated` |
-| Pass/Fail/Warning → N/A | `NewlyManual` |
-| any ↔ Omitted (non-identical) | `OmissionChanged` |
-| (not incorrect) → Incorrect result | `MarkedIncorrect` |
-| Incorrect result → (not incorrect) | `IncorrectResolved` |
-| Same base ID, different version | `VersionChanged` |
-| Base ID absent → present | `New` |
-| Base ID present → absent (removed from baseline) | `PolicyRemoved` |
+| N/A → Pass/Fail/Warning | `NewAutomatedCheck` |
+| Pass/Fail/Warning → N/A | `NewManualCheck` |
+| any ↔ Omitted (non-identical, not covered below) | `NewOmission` |
+| Any → Incorrect result | `NewIncorrectResult` |
+| Omitted → Pass / Fail / Warning | `NewPass` / `NewFail` / `NewWarning` |
+| Incorrect result → Pass / Fail / Warning | `NewPass` / `NewFail` / `NewWarning` |
+| MS.PRODUCT.X.XvX → MS.PRODUCT.X.XvX+1 | `PolicyVersionUpdate` |
+| No prior policy → New Policy | `NewPolicy` |
+| MS.PRODUCT.X.XvX → Null (removed from baseline) | `RemovedPolicy` |
 | any ↔ Error | `Errored` |
-| X → X (identical result and version) | `Unchanged` (hidden by default) |
+| Any → Any (identical result and version) | `Unchanged` (hidden by default) |
 | Anything else | `Other` (both literal values preserved) |
 
 The bucket appears in the report's **Transition** column. `Result` is treated as
@@ -134,7 +138,7 @@ Transition column):
 | Warning | yellow |
 | Pass | green |
 | N/A (manual) / Omitted / other | grey |
-| Removed from baseline (`PolicyRemoved`) | grey (matches manual checks) |
+| Removed from baseline (`RemovedPolicy`) | grey (matches manual checks) |
 
 Removed-policy rows are greyed out like manual checks. Policies removed from the
 baselines are tracked in
@@ -160,8 +164,10 @@ When an operator marks a policy result as incorrect (a false positive), ScubaGea
 rewrites that control's `Result` to the literal `"Incorrect result"`. The diff
 recognizes this marking and reports the change in the marking itself:
 
-- A result becoming a false positive is bucketed `MarkedIncorrect`.
-- A false positive being removed is bucketed `IncorrectResolved`.
+- A result becoming a false positive is bucketed `NewIncorrectResult`.
+- A false positive being removed is bucketed by the result it reveals:
+  `NewPass`, `NewFail`, or `NewWarning` (and `NewManualCheck` / `NewOmission`
+  when the marking clears to N/A or Omitted).
 - A stable false-positive marking (marked in both runs) is `Unchanged`.
 
 For any record where either side is marked incorrect, four fields are added:
@@ -174,9 +180,9 @@ For any record where either side is marked incorrect, four fields are added:
 
 In the report, the **Transition** column shows the marking change and the
 **Result** columns show the underlying result inline (e.g. `Incorrect result
-(underlying: Fail)`). `MarkedIncorrect` rows are greyed out; `IncorrectResolved`
-rows are colored by the now-visible result (green if passing, red if still
-failing).
+(underlying: Fail)`). `NewIncorrectResult` rows are greyed out; rows where the
+marking cleared are colored by the now-visible result (green if passing, red if
+still failing).
 
 ## The HTML report
 

@@ -58,15 +58,17 @@ InModuleScope Diff {
         }
 
         Context 'Get-ScubaBucketLabel' {
-            It 'Displays PolicyRemoved as "Policy Removed"' {
-                Get-ScubaBucketLabel 'PolicyRemoved' | Should -Be 'Policy Removed'
+            It 'Displays RemovedPolicy as "Removed Policy"' {
+                Get-ScubaBucketLabel 'RemovedPolicy' | Should -Be 'Removed Policy'
             }
             It 'Returns the raw token for buckets without a friendly label' {
-                Get-ScubaBucketLabel 'Regression' | Should -Be 'Regression'
+                Get-ScubaBucketLabel 'Errored' | Should -Be 'Errored'
             }
-            It 'Gives the false-positive buckets friendly labels' {
-                Get-ScubaBucketLabel 'MarkedIncorrect'   | Should -Be 'Marked Incorrect (false positive)'
-                Get-ScubaBucketLabel 'IncorrectResolved' | Should -Be 'Incorrect Result Resolved'
+            It 'Gives the result-transition buckets friendly labels' {
+                Get-ScubaBucketLabel 'NewFail'             | Should -Be 'New Fail'
+                Get-ScubaBucketLabel 'NewPass'             | Should -Be 'New Pass'
+                Get-ScubaBucketLabel 'PolicyVersionUpdate' | Should -Be 'Policy Version Update'
+                Get-ScubaBucketLabel 'NewIncorrectResult'  | Should -Be 'New Incorrect Result (false positive)'
             }
         }
 
@@ -118,18 +120,18 @@ InModuleScope Diff {
 
         Context 'Get-ScubaRowColorClass' {
             It 'Greys out removed policies regardless of before result' {
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'PolicyRemoved'; ResultAfter = $null }) | Should -Be 'grey'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'RemovedPolicy'; ResultAfter = $null }) | Should -Be 'grey'
             }
             It 'Colors by Result (After): Fail=red, Warning=yellow, Pass=green' {
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'Regression'; ResultAfter = 'Fail' })    | Should -Be 'red'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'NewFail'; ResultAfter = 'Fail' })       | Should -Be 'red'
                 Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'NewWarning'; ResultAfter = 'Warning' }) | Should -Be 'yellow'
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'Remediated'; ResultAfter = 'Pass' })    | Should -Be 'green'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'NewPass'; ResultAfter = 'Pass' })       | Should -Be 'green'
             }
             It 'Treats Error as red and manual/omitted/other as grey' {
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'Errored'; ResultAfter = 'Error' })     | Should -Be 'red'
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'NewlyManual'; ResultAfter = 'N/A' })   | Should -Be 'grey'
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'OmissionChanged'; ResultAfter = 'Omitted' }) | Should -Be 'grey'
-                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'Other'; ResultAfter = 'Bug' })         | Should -Be 'grey'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'Errored'; ResultAfter = 'Error' })          | Should -Be 'red'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'NewManualCheck'; ResultAfter = 'N/A' })     | Should -Be 'grey'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'NewOmission'; ResultAfter = 'Omitted' })    | Should -Be 'grey'
+                Get-ScubaRowColorClass ([pscustomobject]@{ Bucket = 'Other'; ResultAfter = 'Bug' })              | Should -Be 'grey'
             }
         }
 
@@ -141,24 +143,39 @@ InModuleScope Diff {
 
         Context 'Get-ScubaDiffBucket classification' {
             $cases = @(
-                @{ B = 'Pass';    A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'Regression' }
-                @{ B = 'Fail';    A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'Remediated' }
-                @{ B = 'Warning'; A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'WarningResolved' }
-                @{ B = 'Warning'; A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'WarningEscalated' }
+                @{ B = 'Pass';    A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'NewFail' }
+                @{ B = 'Fail';    A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewPass' }
+                @{ B = 'Warning'; A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewPass' }
+                @{ B = 'Warning'; A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'NewFail' }
                 @{ B = 'Pass';    A = 'Warning'; Bv = 'v1'; Av = 'v1'; Expected = 'NewWarning' }
                 @{ B = 'Fail';    A = 'Warning'; Bv = 'v1'; Av = 'v1'; Expected = 'NewWarning' }
-                @{ B = 'N/A';     A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewlyAutomated' }
-                @{ B = 'Pass';    A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewlyManual' }
-                @{ B = 'Pass';    A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'OmissionChanged' }
-                @{ B = 'Omitted'; A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'OmissionChanged' }
-                @{ B = 'Pass';    A = 'Pass';    Bv = 'v1'; Av = 'v2'; Expected = 'VersionChanged' }
+                @{ B = 'N/A';     A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewAutomatedCheck' }
+                @{ B = 'N/A';     A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'NewAutomatedCheck' }
+                @{ B = 'N/A';     A = 'Warning'; Bv = 'v1'; Av = 'v1'; Expected = 'NewAutomatedCheck' }
+                @{ B = 'Pass';    A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewManualCheck' }
+                @{ B = 'Fail';    A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewManualCheck' }
+                # An omitted prior result that is evaluated again buckets by the
+                # result it lands on, not as an omission change.
+                @{ B = 'Omitted'; A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewPass' }
+                @{ B = 'Omitted'; A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'NewFail' }
+                @{ B = 'Omitted'; A = 'Warning'; Bv = 'v1'; Av = 'v1'; Expected = 'NewWarning' }
+                # Omission changes with no landing result stay NewOmission.
+                @{ B = 'Pass';    A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
+                @{ B = 'Fail';    A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
+                @{ B = 'Omitted'; A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
+                @{ B = 'N/A';     A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
+                @{ B = 'Pass';    A = 'Pass';    Bv = 'v1'; Av = 'v2'; Expected = 'PolicyVersionUpdate' }
                 @{ B = 'Pass';    A = 'Error';   Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
                 @{ B = 'Error';   A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
                 @{ B = 'Pass';    A = 'Bug';     Bv = 'v1'; Av = 'v1'; Expected = 'Other' }
-                @{ B = 'Fail';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'MarkedIncorrect' }
-                @{ B = 'Pass';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'MarkedIncorrect' }
-                @{ B = 'Incorrect result'; A = 'Pass'; Bv = 'v1'; Av = 'v1'; Expected = 'IncorrectResolved' }
-                @{ B = 'Incorrect result'; A = 'Fail'; Bv = 'v1'; Av = 'v1'; Expected = 'IncorrectResolved' }
+                @{ B = 'Fail';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'NewIncorrectResult' }
+                @{ B = 'Pass';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'NewIncorrectResult' }
+                # A cleared incorrect-result marking buckets by the revealed result.
+                @{ B = 'Incorrect result'; A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewPass' }
+                @{ B = 'Incorrect result'; A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'NewFail' }
+                @{ B = 'Incorrect result'; A = 'Warning'; Bv = 'v1'; Av = 'v1'; Expected = 'NewWarning' }
+                @{ B = 'Incorrect result'; A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewManualCheck' }
+                @{ B = 'Incorrect result'; A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
                 @{ B = 'Incorrect result'; A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
                 @{ B = 'Pass';    A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
                 @{ B = 'Fail';    A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'Unchanged' }
@@ -171,10 +188,10 @@ InModuleScope Diff {
                 $bucket | Should -Be $Expected
             }
             It 'Classifies presence-only cases' {
-                (Get-ScubaDiffBucket -BeforeResult $null -AfterResult 'Pass' -BeforePresent $false -AfterPresent $true -BeforeVersion $null -AfterVersion 'v1') | Should -Be 'New'
-                (Get-ScubaDiffBucket -BeforeResult 'Pass' -AfterResult $null -BeforePresent $true -AfterPresent $false -BeforeVersion 'v1' -AfterVersion $null) | Should -Be 'PolicyRemoved'
+                (Get-ScubaDiffBucket -BeforeResult $null -AfterResult 'Pass' -BeforePresent $false -AfterPresent $true -BeforeVersion $null -AfterVersion 'v1') | Should -Be 'NewPolicy'
+                (Get-ScubaDiffBucket -BeforeResult 'Pass' -AfterResult $null -BeforePresent $true -AfterPresent $false -BeforeVersion 'v1' -AfterVersion $null) | Should -Be 'RemovedPolicy'
             }
-            It 'Prefers Errored over VersionChanged (precedence)' {
+            It 'Prefers Errored over PolicyVersionUpdate (precedence)' {
                 (Get-ScubaDiffBucket -BeforeResult 'Error' -AfterResult 'Pass' -BeforePresent $true -AfterPresent $true -BeforeVersion 'v1' -AfterVersion 'v2') | Should -Be 'Errored'
             }
         }
@@ -235,16 +252,16 @@ InModuleScope Diff {
         }
 
         $expected = @(
-            @{ Base = 'MS.AAD.1.1';  Bucket = 'Regression' }
-            @{ Base = 'MS.AAD.2.1';  Bucket = 'Remediated' }
-            @{ Base = 'MS.AAD.3.1';  Bucket = 'WarningResolved' }
-            @{ Base = 'MS.AAD.4.1';  Bucket = 'WarningEscalated' }
+            @{ Base = 'MS.AAD.1.1';  Bucket = 'NewFail' }
+            @{ Base = 'MS.AAD.2.1';  Bucket = 'NewPass' }
+            @{ Base = 'MS.AAD.3.1';  Bucket = 'NewPass' }
+            @{ Base = 'MS.AAD.4.1';  Bucket = 'NewFail' }
             @{ Base = 'MS.AAD.5.1';  Bucket = 'NewWarning' }
-            @{ Base = 'MS.AAD.6.1';  Bucket = 'NewlyAutomated' }
-            @{ Base = 'MS.AAD.7.1';  Bucket = 'NewlyManual' }
-            @{ Base = 'MS.AAD.8.1';  Bucket = 'OmissionChanged' }
-            @{ Base = 'MS.AAD.9.1';  Bucket = 'PolicyRemoved' }
-            @{ Base = 'MS.AAD.10.1'; Bucket = 'New' }
+            @{ Base = 'MS.AAD.6.1';  Bucket = 'NewAutomatedCheck' }
+            @{ Base = 'MS.AAD.7.1';  Bucket = 'NewManualCheck' }
+            @{ Base = 'MS.AAD.8.1';  Bucket = 'NewOmission' }
+            @{ Base = 'MS.AAD.9.1';  Bucket = 'RemovedPolicy' }
+            @{ Base = 'MS.AAD.10.1'; Bucket = 'NewPolicy' }
             @{ Base = 'MS.AAD.11.1'; Bucket = 'Errored' }
             @{ Base = 'MS.AAD.12.1'; Bucket = 'Other' }
             @{ Base = 'MS.AAD.14.1'; Bucket = 'Unchanged' }
@@ -269,22 +286,22 @@ InModuleScope Diff {
         }
 
         It 'Strips embedded HTML from the Requirement field' {
-            $ByBase['MS.AAD.1.1'].Requirement | Should -Be 'Regression control.'
+            $ByBase['MS.AAD.1.1'].Requirement | Should -Be 'NewFail control.'
             $ByBase['MS.AAD.1.1'].Requirement | Should -Not -Match 'policy-indicators'
         }
 
-        It 'Omits before-only fields for New controls' {
+        It 'Omits before-only fields for NewPolicy controls' {
             $ByBase['MS.AAD.10.1'].'Control ID (Before)' | Should -BeNullOrEmpty
             $ByBase['MS.AAD.10.1'].ResultBefore | Should -BeNullOrEmpty
         }
 
-        It 'Omits after-only fields for PolicyRemoved controls' {
+        It 'Omits after-only fields for RemovedPolicy controls' {
             $ByBase['MS.AAD.9.1'].'Control ID (After)' | Should -BeNullOrEmpty
             $ByBase['MS.AAD.9.1'].ResultAfter | Should -BeNullOrEmpty
         }
 
         It 'Reports every taxonomy bucket in the Summary' {
-            foreach ($e in @('Regression','Remediated','WarningResolved','WarningEscalated','NewWarning','NewlyAutomated','NewlyManual','OmissionChanged','PolicyRemoved','New','Errored','Other','Unchanged')) {
+            foreach ($e in @('NewFail','NewPass','NewWarning','NewAutomatedCheck','NewManualCheck','NewOmission','RemovedPolicy','NewPolicy','Errored','Other','Unchanged')) {
                 $DiffA.Summary.AAD.Contains($e) | Should -BeTrue -Because "bucket $e should appear in the summary"
             }
         }
@@ -342,16 +359,16 @@ InModuleScope Diff {
             @($DiffB.Diff.Keys) | Should -Contain 'Defender'
             @($DiffB.Diff.Keys) | Should -Contain 'SecuritySuite'
         }
-        It 'Reports every before-only (Defender) control as PolicyRemoved' {
+        It 'Reports every before-only (Defender) control as RemovedPolicy' {
             $DiffB.MetaData.ProductsOnlyInBefore | Should -Contain 'Defender'
             foreach ($rec in $DiffB.Diff.Defender) {
-                $rec.Bucket | Should -Be 'PolicyRemoved'
+                $rec.Bucket | Should -Be 'RemovedPolicy'
             }
         }
-        It 'Reports every after-only (SecuritySuite) control as New' {
+        It 'Reports every after-only (SecuritySuite) control as NewPolicy' {
             $DiffB.MetaData.ProductsOnlyInAfter | Should -Contain 'SecuritySuite'
             foreach ($rec in $DiffB.Diff.SecuritySuite) {
-                $rec.Bucket | Should -Be 'New'
+                $rec.Bucket | Should -Be 'NewPolicy'
             }
         }
         It 'Never emits a ProductRenamed field' {
@@ -368,7 +385,7 @@ InModuleScope Diff {
     }
 
     Describe -Tag 'Diff' -Name 'Version drift within a product' {
-        It 'Classifies a base ID at v1 vs v2 as VersionChanged (never New/PolicyRemoved)' {
+        It 'Classifies a base ID at v1 vs v2 as PolicyVersionUpdate (never NewPolicy/RemovedPolicy)' {
             function New-VerResults {
                 param($FullId)
                 $obj = @{
@@ -383,7 +400,7 @@ InModuleScope Diff {
             }
             $diff = Compare-ScubaResults -Before (New-VerResults 'MS.TEAMS.1.2v1') -After (New-VerResults 'MS.TEAMS.1.2v2')
             $rec = $diff.Diff.Teams[0]
-            $rec.Bucket | Should -Be 'VersionChanged'
+            $rec.Bucket | Should -Be 'PolicyVersionUpdate'
             $rec.'Control ID (Before)' | Should -Be 'MS.TEAMS.1.2v1'
             $rec.'Control ID (After)'  | Should -Be 'MS.TEAMS.1.2v2'
         }
@@ -405,21 +422,24 @@ InModuleScope Diff {
             }
         }
 
-        It 'Buckets a newly marked false positive as MarkedIncorrect and records the underlying result' {
+        It 'Buckets a newly marked false positive as NewIncorrectResult and records the underlying result' {
             $diff = Compare-ScubaResults -Before (New-FpResults 'Fail' 'Fail') -After (New-FpResults 'Incorrect result' 'Fail')
             $rec = $diff.Diff.AAD[0]
-            $rec.Bucket | Should -Be 'MarkedIncorrect'
+            $rec.Bucket | Should -Be 'NewIncorrectResult'
             $rec.MarkedIncorrectBefore | Should -BeFalse
             $rec.MarkedIncorrectAfter | Should -BeTrue
             $rec.UnderlyingResultAfter | Should -Be 'Fail'
         }
 
-        It 'Buckets a removed false positive as IncorrectResolved with the underlying transition' {
+        It 'Buckets a removed false positive by the result it reveals' {
             $diff = Compare-ScubaResults -Before (New-FpResults 'Incorrect result' 'Fail') -After (New-FpResults 'Pass' 'Pass')
             $rec = $diff.Diff.AAD[0]
-            $rec.Bucket | Should -Be 'IncorrectResolved'
+            $rec.Bucket | Should -Be 'NewPass'
             $rec.UnderlyingResultBefore | Should -Be 'Fail'
             $rec.UnderlyingResultAfter | Should -Be 'Pass'
+
+            $failDiff = Compare-ScubaResults -Before (New-FpResults 'Incorrect result' 'Fail') -After (New-FpResults 'Fail' 'Fail')
+            $failDiff.Diff.AAD[0].Bucket | Should -Be 'NewFail'
         }
 
         It 'Treats a stable false-positive marking as Unchanged' {
@@ -430,7 +450,7 @@ InModuleScope Diff {
         It 'Surfaces the underlying result and transition label in the HTML' {
             $diff = Compare-ScubaResults -Before (New-FpResults 'Fail' 'Fail') -After (New-FpResults 'Incorrect result' 'Fail')
             $html = New-ScubaDiffReport -DiffResults $diff
-            $html | Should -Match 'Marked Incorrect \(false positive\)'
+            $html | Should -Match 'New Incorrect Result \(false positive\)'
             $html | Should -Match 'underlying: Fail'
         }
     }
@@ -468,9 +488,9 @@ InModuleScope Diff {
             $Html | Should -Match 'diff-grey'
         }
         It 'Colors rows by Result (After): a Fail-after row is red' {
-            # MS.AAD.1.1 is Pass->Fail (Regression), so its row must be red, not
+            # MS.AAD.1.1 is Pass->Fail (NewFail), so its row must be red, not
             # colored by the transition bucket.
-            $Html | Should -Match 'MS.AAD.1.1v1[\s\S]*?Regression'
+            $Html | Should -Match 'MS.AAD.1.1v1[\s\S]*?New Fail'
             $Html | Should -Match 'class="diff-row diff-red"'
         }
         It 'Greys out removed-policy rows like manual checks' {
@@ -479,8 +499,8 @@ InModuleScope Diff {
         It 'Marks unchanged rows with the hide-by-default class' {
             $Html | Should -Match 'diff-unchanged-row'
         }
-        It 'Displays the PolicyRemoved bucket as "Policy Removed"' {
-            $Html | Should -Match 'Policy Removed'
+        It 'Displays the RemovedPolicy bucket as "Removed Policy"' {
+            $Html | Should -Match 'Removed Policy'
         }
         It 'Uses the friendly product title for the AAD heading' {
             $Html | Should -Match '<h2>Microsoft Entra ID / Azure Active Directory</h2>'
