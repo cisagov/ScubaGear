@@ -23,7 +23,7 @@ function Invoke-SmokeTests {
     Install-SeleniumForTesting
     # Install ScubaGear modules
     Import-Module -Name .\PowerShell\ScubaGear\ScubaGear.psd1
-    Initialize-SCuBA
+    Install-ScubaDependencies
 
     # ScubaGear currently requires the provisioning of a certificate for using a ServicePrincipal, rather than
     # using Workload Identity Federation, which would ordinarily be preferred for calling Microsoft APIs from

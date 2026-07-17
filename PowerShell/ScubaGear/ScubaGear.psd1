@@ -69,7 +69,7 @@ ScriptsToProcess = @(
 # TypesToProcess = @()
 
 # Format files (.ps1xml) to be loaded when importing this module
-# FormatsToProcess = @()
+FormatsToProcess = @('./ScubaGear.Format.ps1xml')
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
 NestedModules = @('Modules\Support\Support.psm1','Modules\Utility\ScubaLogging.psm1')
@@ -81,7 +81,9 @@ FunctionsToExport = @(
     'Disconnect-SCuBATenant',
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
-    'Initialize-SCuBA',
+    'Install-ScubaDependencies',
+    'Get-ScubaRequiredModuleList',
+    'Get-ScubaGearDependencyStatus',
     'Start-SCuBAConfigApp',
     'Show-SCuBABaselinePolicyViewer',
     'Get-ScubaDebugLogReport',
@@ -109,7 +111,9 @@ CmdletsToExport = @()
 # VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = @()
+AliasesToExport = @(
+    'Initialize-SCuBA'
+)
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()

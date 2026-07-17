@@ -201,7 +201,7 @@
                            -Scope $PPScope `
                            -ClientId $PPClientId `
                            -Tenant $TenantName `
-                           -M365Environment $M365Environment 
+                           -M365Environment $M365Environment
                    }
                    Write-Verbose "Power Platform token acquired successfully"
                }
@@ -297,7 +297,7 @@
                                     -Scope $PBIScope `
                                     -ClientId $PBIClientId `
                                     -Tenant $TenantName `
-                                    -M365Environment $M365Environment 
+                                    -M365Environment $M365Environment
                             }
                             Write-Verbose "Power BI token acquired successfully"
                        }
@@ -342,7 +342,7 @@
                                -Scope $SPOScope `
                                -ClientId $SPOClientId `
                                -Tenant $TenantName `
-                               -M365Environment $M365Environment 
+                               -M365Environment $M365Environment
                        }
                        Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false
