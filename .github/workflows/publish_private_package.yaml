@@ -36,7 +36,7 @@ jobs:
         shell: powershell
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: repo
       - name: Install Azure Signing Tool
@@ -159,19 +159,19 @@ jobs:
       # It's about a 20% performance improvement.
       - name: Cache ScubaGear
         id: scubagear-directory
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: C:\Program Files\WindowsPowerShell\Modules\ScubaGear
           key: "scubagear-directory-${{ github.run_id }}"
       - name: Cache Dependencies
         id: powershell-directory
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: C:\Users\runneradmin\Documents\WindowsPowerShell\Modules
           key: "powershell-directory-${{ github.run_id }}"
       - name: Cache OPA
         id: opa-directory
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: "opa-directory-${{ github.run_id }}"

@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Convert AAD to Text
         uses: docker://pandoc/core:3.9.0.2
         with:

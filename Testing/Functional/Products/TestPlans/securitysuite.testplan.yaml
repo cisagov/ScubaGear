@@ -164,42 +164,555 @@ TestPlan:
   - PolicyId: MS.SECURITYSUITE.3.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.1v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.1v1 Compliant case - DLP policy covers all three required sensitive info types
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.1v1 Non-Compliant case - DLP rule is missing Credit Card Number protection
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.2v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Compliant case - DLP policy applied to all five required locations
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Non-Compliant case - DLP policy missing Exchange location
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - ""
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.3.2v1 Non-Compliant case - DLP policy missing Devices location
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - ""
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.3v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Compliant case - DLP rule blocks access to everyone
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Non-Compliant case - DLP rule does not block access
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: false
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.3.3v1 Non-Compliant case - DLP rule blocks only external users, not everyone
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "PerUser"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.4v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Compliant case - DLP rule notifies at least one user
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.4v1 Non-Compliant case - DLP rule has no user notifications configured
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser: []
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions: []
+        Postconditions: []
         ExpectedResult: false
   - PolicyId: MS.SECURITYSUITE.3.5v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.3.5v1 Not Checked # TODO update once implemented
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Compliant case - DLP rule blocks both unallowed apps and Bluetooth, and Bluetooth recommended apps is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                endpoint_dlp_global_settings:
+                  - value: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Non-Compliant case - DLP rule audits instead of blocks unallowed apps
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                endpoint_dlp_global_settings:
+                  - value: true
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Audit"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.3.5v1 Non-Compliant case - Bluetooth recommended apps not enabled in tenant DLP settings
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                defender_dlp_license: true
+                defender_license: true
+                endpoint_dlp_global_settings: []
+                dlp_compliance_policies:
+                  - ExchangeLocation:
+                      - All
+                    SharePointLocation:
+                      - All
+                    TeamsLocation:
+                      - All
+                    EndpointDlpLocation:
+                      - All
+                    OneDriveLocation:
+                      - All
+                    Workload: "Exchange, SharePoint, OneDriveForBusiness, Teams, EndpointDevices"
+                    Name: "SCUBA Test DLP Policy"
+                    Mode: "Enable"
+                    Enabled: true
+                dlp_compliance_rules:
+                  - ContentContainsSensitiveInformation:
+                      - name: "U.S. Social Security Number (SSN)"
+                      - name: "U.S. Individual Taxpayer Identification Number (ITIN)"
+                      - name: "Credit Card Number"
+                    Name: "SCUBA Test DLP Rule"
+                    Disabled: false
+                    ParentPolicyName: "SCUBA Test DLP Policy"
+                    BlockAccess: true
+                    BlockAccessScope: "All"
+                    NotifyUser:
+                      - SiteAdmin
+                    NotifyUserType: "NotSet"
+                    IsAdvancedRule: false
+                    EndpointDlpRestrictions:
+                      - setting: "UnallowedApps"
+                        value: "Block"
+                      - setting: "UnallowedBluetoothTransferApps"
+                        value: "Block"
+        Postconditions: []
         ExpectedResult: false
 
   - PolicyId: MS.SECURITYSUITE.4.1v1
