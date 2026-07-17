@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Display formatting for ScubaGear objects.
+
+    Get-ScubaGearDependencyStatus (and the internal Get-ScubaModuleDependencyStatus
+    helper) emit ScubaGear.DependencyStatus objects. The table view below renders a
+    concise, user-friendly summary in the console while the full objects remain
+    available for the pipeline (e.g. Get-ScubaGearDependencyStatus | Where-Object ...).
+-->
+<Configuration>
+  <ViewDefinitions>
+    <View>
+      <Name>ScubaGear.DependencyStatus</Name>
+      <ViewSelectedBy>
+        <TypeName>ScubaGear.DependencyStatus</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>ModuleName</Label>
+            <Width>32</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Installed</Label>
+            <Width>10</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Versions</Label>
+            <Width>9</Width>
+            <Alignment>Right</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>HighestVersion</Label>
+            <Width>15</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Status</Label>
+            <Width>10</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Action</Label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>ModuleName</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Installed</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>VersionCount</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>HighestVersion</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>HighestVersionStatus</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Action</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>ScubaGear.DependencyResetResult</Name>
+      <ViewSelectedBy>
+        <TypeName>ScubaGear.DependencyResetResult</TypeName>
+      </ViewSelectedBy>
+      <CustomControl>
+        <CustomEntries>
+          <CustomEntry>
+            <CustomItem>
+              <ExpressionBinding>
+                <ScriptBlock>
+                  $lines = @("Status : $($_.Status)")
+                  if ($_.ActionsPerformed.Count -gt 0) {
+                      $lines += 'Changes:'
+                      foreach ($a in $_.ActionsPerformed) { $lines += "  $a" }
+                  }
+                  elseif ($_.ActionsNeeded -eq 0) {
+                      $lines += 'No changes needed.'
+                  }
+                  if ($_.Warnings.Count -gt 0) {
+                      $lines += 'Warnings:'
+                      foreach ($w in $_.Warnings) { $lines += "  $w" }
+                  }
+                  if ($_.Errors.Count -gt 0) {
+                      $lines += 'Errors:'
+                      foreach ($e in $_.Errors) { $lines += "  $e" }
+                  }
+                  ($lines -join [System.Environment]::NewLine) + [System.Environment]::NewLine
+                </ScriptBlock>
+              </ExpressionBinding>
+            </CustomItem>
+          </CustomEntry>
+        </CustomEntries>
+      </CustomControl>
+    </View>
+  </ViewDefinitions>
+</Configuration>

@@ -4,14 +4,16 @@ Before [executing](../execution/execution.md) ScubaGear, its dependencies must b
 
 ```powershell
 # Install the minimum required dependencies
-Initialize-SCuBA
+Install-ScubaDependencies
 ```
 
 > **Note**: ScubaGear utilizes several libraries from Microsoft to read data about their product configurations.  At least one of these libraries is tied to PowerShell 5.  Until Microsoft updates their library, ScubaGear will continue to use PowerShell 5.  As this version is only available on Windows, ScubaGear will only run on Windows.
 
-`Initialize-SCuBA` will install the modules in the [PowerShell Module Dependencies](#powershell-module-dependencies) section on your system. It will also install [OPA](https://www.openpolicyagent.org).
+> **Note**: `Install-ScubaDependencies` was previously named `Initialize-SCuBA`. The old name is retained as a backward-compatible alias, so existing scripts continue to work.
 
-> **Note**: The `Initialize-SCuBA` cmdlet creates a `.scubagear` folder in the users home directory.  This is where it stores OPA and any other related files.
+`Install-ScubaDependencies` will install the modules in the [PowerShell Module Dependencies](#powershell-module-dependencies) section on your system. It will also install [OPA](https://www.openpolicyagent.org).
+
+> **Note**: The `Install-ScubaDependencies` cmdlet creates a `.scubagear` folder in the users home directory.  This is where it stores OPA and any other related files.
 
 ## PowerShell Module Dependencies
 
@@ -30,7 +32,7 @@ The following PowerShell modules are required for ScubaGear to function properly
 
 ## OPA Installation
 
-Normally, the `Initialize-SCuBA` cmdlet installs OPA.  This can be verified by looking for the OPA executable file in `C:\Users\johndoe\.scubagear\Tools`.  If it failed to do so, or you set a parameter to prevent it from doing so, you can install OPA separately.
+Normally, the `Install-ScubaDependencies` cmdlet installs OPA.  This can be verified by looking for the OPA executable file in `C:\Users\johndoe\.scubagear\Tools`.  If it failed to do so, or you set a parameter to prevent it from doing so, you can install OPA separately.
 
 Try this cmdlet first:
 
