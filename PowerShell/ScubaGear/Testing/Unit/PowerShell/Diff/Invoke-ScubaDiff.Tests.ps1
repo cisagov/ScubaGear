@@ -455,6 +455,120 @@ InModuleScope Diff {
         }
     }
 
+    Describe -Tag 'Diff' -Name 'Invoke-SCuBADiff artifacts' {
+        BeforeAll {
+            $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $script:OutDir = Join-Path ([System.IO.Path]::GetTempPath()) ("scuba-diff-out-" + [guid]::NewGuid())
+            $script:Result = Invoke-SCuBADiff `
+                -BeforePath (Join-Path $FixtureDir 'PairA-Before.json') `
+                -AfterPath (Join-Path $FixtureDir 'PairA-After.json') `
+                -OutPath $OutDir
+        }
+        AfterAll {
+            Remove-Item -LiteralPath $script:OutDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
+        It 'Writes all three artifacts and returns their paths' {
+            Test-Path -LiteralPath $Result.JsonPath   | Should -BeTrue
+            Test-Path -LiteralPath $Result.CsvPath    | Should -BeTrue
+            Test-Path -LiteralPath $Result.ReportPath | Should -BeTrue
+        }
+
+        It 'Names the CSV DiffResults.csv by default' {
+            Split-Path -Leaf $Result.CsvPath | Should -Be 'DiffResults.csv'
+        }
+
+        It 'Honors -OutCsvFileName' {
+            $custom = Invoke-SCuBADiff `
+                -BeforePath (Join-Path $FixtureDir 'PairA-Before.json') `
+                -AfterPath (Join-Path $FixtureDir 'PairA-After.json') `
+                -OutPath $OutDir -OutCsvFileName 'MyDelta'
+            Split-Path -Leaf $custom.CsvPath | Should -Be 'MyDelta.csv'
+            Test-Path -LiteralPath $custom.CsvPath | Should -BeTrue
+        }
+
+        It 'Writes a CSV that parses back to one row per control' {
+            $rows = @(Import-Csv -LiteralPath $Result.CsvPath)
+            $rows.Count | Should -Be 14
+            $rows[0].Product | Should -Be 'AAD'
+            ($rows | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.1.1v1' }).Bucket | Should -Be 'NewFail'
+        }
+
+        It 'Includes unchanged rows in the CSV' {
+            $rows = @(Import-Csv -LiteralPath $Result.CsvPath)
+            ($rows | Where-Object { $_.Bucket -eq 'Unchanged' }).Count | Should -BeGreaterThan 0
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'ConvertTo-ScubaDiffCsvRecord' {
+        BeforeAll {
+            $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $script:DiffA = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
+            $script:RowsA = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $DiffA)
+        }
+
+        It 'Emits one row per control record' {
+            $RowsA.Count | Should -Be @($DiffA.Diff.AAD).Count
+        }
+
+        It 'Carries the product in a leading column' {
+            $RowsA[0].PSObject.Properties.Name[0] | Should -Be 'Product'
+            $RowsA[0].Product | Should -Be 'AAD'
+        }
+
+        It 'Gives every row the same columns, including the optional fields' {
+            $expectedColumns = @(
+                'Product','Control ID (Before)','Control ID (After)','GroupNumber','GroupName','Bucket',
+                'ResultBefore','ResultAfter','CriticalityBefore','CriticalityAfter','Requirement','DetailsAfter',
+                'MarkedIncorrectBefore','MarkedIncorrectAfter','UnderlyingResultBefore','UnderlyingResultAfter',
+                'AnnotationChanged','Comment','RemediationDate'
+            )
+            foreach ($row in $RowsA) {
+                ($row.PSObject.Properties.Name -join ',') | Should -Be ($expectedColumns -join ',')
+            }
+        }
+
+        It 'Flattens the transition bucket and both results' {
+            $row = $RowsA | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.1.1v1' }
+            $row.Bucket | Should -Be 'NewFail'
+            $row.ResultBefore | Should -Be 'Pass'
+            $row.ResultAfter | Should -Be 'Fail'
+        }
+
+        It 'Carries the annotation fields for a Fail->Fail record' {
+            $row = $RowsA | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.13.1v1' }
+            $row.AnnotationChanged | Should -BeTrue
+            $row.Comment | Should -Be 'Escalated to vendor'
+            $row.RemediationDate | Should -Be '2026-09-01'
+        }
+
+        It 'Leaves the optional fields empty for records that do not carry them' {
+            $row = $RowsA | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.1.1v1' }
+            $row.MarkedIncorrectBefore | Should -BeNullOrEmpty
+            $row.UnderlyingResultAfter | Should -BeNullOrEmpty
+            $row.Comment | Should -BeNullOrEmpty
+        }
+
+        It 'Orders products by the fixed report order' {
+            $FixtureDirB = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $diffB = Compare-ScubaResults `
+                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirB 'PairB-Before.json')) `
+                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirB 'PairB-After.json'))
+            $products = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $diffB | ForEach-Object { $_.Product } | Select-Object -Unique)
+            $products -join ',' | Should -Be 'Defender,SecuritySuite'
+        }
+
+        It 'Round-trips through ConvertTo-Csv with every column preserved' {
+            $csv = $RowsA | ConvertTo-Csv -NoTypeInformation
+            $parsed = @($csv | ConvertFrom-Csv)
+            $parsed.Count | Should -Be $RowsA.Count
+            $parsed[0].PSObject.Properties.Name | Should -Contain 'UnderlyingResultAfter'
+            ($parsed | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.1.1v1' }).Bucket | Should -Be 'NewFail'
+        }
+    }
+
     Describe -Tag 'Diff' -Name 'New-ScubaDiffReport HTML rendering' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'

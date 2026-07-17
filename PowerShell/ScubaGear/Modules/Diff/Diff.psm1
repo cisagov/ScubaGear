@@ -707,6 +707,68 @@ function Get-ScubaDiffFileEncoding {
     return 'utf8'
 }
 
+function ConvertTo-ScubaDiffCsvRecord {
+    <#
+    .Description
+    Flattens a DiffResults object into one row per control, ready for Export-Csv /
+    ConvertTo-Csv. Products are emitted in the report display order and carried in
+    a leading Product column, since the CSV has no per-product sections.
+
+    Every row is built from the same fixed column list, including the fields that
+    only some records carry (the false-positive and annotation fields), which are
+    left empty when absent. CSV headers come from the first object in the
+    pipeline, so a uniform shape is what keeps those columns from being dropped
+    for every record when the first one happens to lack them.
+
+    Field names mirror DiffResults.json rather than the HTML report's column
+    titles, so the CSV reads as a flattened view of the JSON.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject[]])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [object]
+        $DiffResults
+    )
+
+    $rows = @()
+    foreach ($product in (Get-ScubaOrderedProducts @($DiffResults.Diff.Keys))) {
+        foreach ($r in @($DiffResults.Diff.$product)) {
+            $get = {
+                param($Name)
+                $prop = $r.PSObject.Properties[$Name]
+                if ($null -eq $prop) { return $null }
+                return $prop.Value
+            }
+            $rows += [pscustomobject][ordered]@{
+                'Product'                = $product
+                'Control ID (Before)'    = $r.'Control ID (Before)'
+                'Control ID (After)'     = $r.'Control ID (After)'
+                'GroupNumber'            = $r.GroupNumber
+                'GroupName'              = $r.GroupName
+                'Bucket'                 = $r.Bucket
+                'ResultBefore'           = $r.ResultBefore
+                'ResultAfter'            = $r.ResultAfter
+                'CriticalityBefore'      = $r.CriticalityBefore
+                'CriticalityAfter'       = $r.CriticalityAfter
+                'Requirement'            = $r.Requirement
+                'DetailsAfter'           = $r.DetailsAfter
+                'MarkedIncorrectBefore'  = & $get 'MarkedIncorrectBefore'
+                'MarkedIncorrectAfter'   = & $get 'MarkedIncorrectAfter'
+                'UnderlyingResultBefore' = & $get 'UnderlyingResultBefore'
+                'UnderlyingResultAfter'  = & $get 'UnderlyingResultAfter'
+                'AnnotationChanged'      = & $get 'AnnotationChanged'
+                'Comment'                = & $get 'Comment'
+                'RemediationDate'        = & $get 'RemediationDate'
+            }
+        }
+    }
+    return $rows
+}
+
 function New-ScubaDiffReport {
     <#
     .Description
@@ -889,8 +951,8 @@ function Invoke-SCuBADiff {
     <#
     .SYNOPSIS
     Compares two ScubaResults.json files and produces a machine-readable diff
-    (DiffResults.json) and an HTML report (DiffReport.html) highlighting per-policy
-    status transitions.
+    (DiffResults.json), a flat CSV (DiffResults.csv), and an HTML report
+    (DiffReport.html) highlighting per-policy status transitions.
 
     .Description
     Invoke-SCuBADiff is an offline, post-hoc analysis command: it takes two
@@ -915,11 +977,14 @@ function Invoke-SCuBADiff {
     Path to the later ("after") ScubaResults.json file.
 
     .Parameter OutPath
-    The folder where DiffResults.json and DiffReport.html are written. Created if it
-    does not exist. Defaults to the current directory.
+    The folder where DiffResults.json, DiffResults.csv, and DiffReport.html are
+    written. Created if it does not exist. Defaults to the current directory.
 
     .Parameter OutJsonFileName
     Base name (without extension) of the diff JSON file. Defaults to "DiffResults".
+
+    .Parameter OutCsvFileName
+    Base name (without extension) of the diff CSV file. Defaults to "DiffResults".
 
     .Parameter OutReportFileName
     Base name (without extension) of the diff HTML report. Defaults to "DiffReport".
@@ -958,6 +1023,11 @@ function Invoke-SCuBADiff {
         [ValidateNotNullOrEmpty()]
         [string]
         $OutJsonFileName = 'DiffResults',
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName = 'DiffResults',
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
@@ -1001,15 +1071,29 @@ function Invoke-SCuBADiff {
     $Json = $Json.Replace("${Bs}u003c", '<').Replace("${Bs}u003e", '>').Replace("${Bs}u0027", "'")
     $Json | Set-Content -Path $JsonPath -Encoding $Encoding -ErrorAction Stop
 
+    # Write DiffResults.csv: one row per control, flattened across products.
+    # ConvertTo-Csv (rather than Export-Csv) keeps the write going through
+    # Set-Content with the same encoding as the other two artifacts.
+    $CsvPath = Join-Path -Path $OutPath -ChildPath "$OutCsvFileName.csv"
+    $CsvRows = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $DiffResults)
+    if ($CsvRows.Count -gt 0) {
+        $Csv = $CsvRows | ConvertTo-Csv -NoTypeInformation
+    }
+    else {
+        $Csv = @()
+    }
+    $Csv | Set-Content -Path $CsvPath -Encoding $Encoding -ErrorAction Stop
+
     # Write DiffReport.html.
     $ReportPath = Join-Path -Path $OutPath -ChildPath "$OutReportFileName.html"
     $Html = New-ScubaDiffReport -DiffResults $DiffResults -DarkMode:$DarkMode
     $Html | Set-Content -Path $ReportPath -Encoding $Encoding -ErrorAction Stop
 
-    Write-Information -MessageData "ScubaGear diff written to:`n  $JsonPath`n  $ReportPath" -InformationAction Continue
+    Write-Information -MessageData "ScubaGear diff written to:`n  $JsonPath`n  $CsvPath`n  $ReportPath" -InformationAction Continue
 
     return [PSCustomObject]@{
         JsonPath   = $JsonPath
+        CsvPath    = $CsvPath
         ReportPath = $ReportPath
     }
 }
@@ -1018,6 +1102,7 @@ Export-ModuleMember -Function @(
     'Invoke-SCuBADiff',
     'Import-ScubaResultsFile',
     'Compare-ScubaResults',
+    'ConvertTo-ScubaDiffCsvRecord',
     'New-ScubaDiffReport',
     'Get-ScubaBaseControlId',
     'Get-ScubaControlVersion',

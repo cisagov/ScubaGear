@@ -11,11 +11,13 @@ contacts a tenant. In that respect it works like cached execution
 disk — except that instead of a single output path it takes the two source files
 directly.
 
-It produces two artifacts:
+It produces three artifacts:
 
 1. **`DiffResults.json`** — a machine-readable delta describing every policy's
    transition, carrying a top-level `SchemaVersion` for downstream consumers.
-2. **`DiffReport.html`** — a self-contained HTML report that highlights the
+2. **`DiffResults.csv`** — the same delta flattened to one row per policy, for
+   spreadsheets and other tabular tooling. See [The CSV](#the-csv).
+3. **`DiffReport.html`** — a self-contained HTML report that highlights the
    transitions with color-coded rows and hides unchanged rows behind a toggle.
 
 The `DiffResults.json` schema is kept intentionally parallel to the
@@ -33,8 +35,8 @@ Invoke-SCuBADiff -BeforePath "C:\Runs\Q1\ScubaResults_abc123.json" `
                  -AfterPath  "C:\Runs\Q2\ScubaResults_def456.json"
 ```
 
-By default the two artifacts are written to the current directory as
-`DiffResults.json` and `DiffReport.html`. Use `-OutPath` to choose a folder
+By default the three artifacts are written to the current directory as
+`DiffResults.json`, `DiffResults.csv`, and `DiffReport.html`. Use `-OutPath` to choose a folder
 (it is created if it does not exist) and `-DarkMode` to default the report to a
 dark theme:
 
@@ -51,13 +53,14 @@ Invoke-SCuBADiff -BeforePath .\before\ScubaResults.json `
 |---|---|---|---|
 | `-BeforePath` | Yes | — | Path to the earlier ("before") `ScubaResults.json`. |
 | `-AfterPath` | Yes | — | Path to the later ("after") `ScubaResults.json`. |
-| `-OutPath` | No | Current directory | Folder to write the two artifacts to. Created if missing. |
+| `-OutPath` | No | Current directory | Folder to write the three artifacts to. Created if missing. |
 | `-OutJsonFileName` | No | `DiffResults` | Base name (no extension) of the diff JSON. |
+| `-OutCsvFileName` | No | `DiffResults` | Base name (no extension) of the diff CSV. |
 | `-OutReportFileName` | No | `DiffReport` | Base name (no extension) of the diff HTML report. |
 | `-DarkMode` | No | Off | Default the HTML report to dark theme. |
 
-The command returns an object with `JsonPath` and `ReportPath` pointing at the
-two artifacts.
+The command returns an object with `JsonPath`, `CsvPath`, and `ReportPath`
+pointing at the three artifacts.
 
 ## How controls are matched
 
@@ -184,6 +187,34 @@ In the report, the **Transition** column shows the marking change and the
 marking cleared are colored by the now-visible result (green if passing, red if
 still failing).
 
+## The CSV
+
+`DiffResults.csv` is the same data as `DiffResults.json`, flattened to **one row
+per policy** for spreadsheets, pivot tables, and other tabular tooling. Unlike
+the JSON (keyed by product) and the HTML report (sectioned by product), the CSV
+has no nesting, so the product is carried in a leading `Product` column.
+Products appear in the same fixed order as the report.
+
+Column names mirror the `DiffResults.json` field names rather than the report's
+column titles, so the CSV reads as a flattened view of the JSON:
+
+`Product`, `Control ID (Before)`, `Control ID (After)`, `GroupNumber`,
+`GroupName`, `Bucket`, `ResultBefore`, `ResultAfter`, `CriticalityBefore`,
+`CriticalityAfter`, `Requirement`, `DetailsAfter`, `MarkedIncorrectBefore`,
+`MarkedIncorrectAfter`, `UnderlyingResultBefore`, `UnderlyingResultAfter`,
+`AnnotationChanged`, `Comment`, `RemediationDate`.
+
+Every row carries every column. The last seven are only meaningful for some
+records — the false-positive fields only where a side is marked incorrect, the
+annotation fields only for `Fail → Fail` — and are left empty elsewhere, as are
+the before/after fields of a `NewPolicy` or `RemovedPolicy` row.
+
+Two differences from the HTML report worth noting:
+
+- **Unchanged rows are included**, not hidden — filter on `Bucket` to drop them.
+- The `Bucket` column carries the raw token (`NewFail`), not the report's
+  friendly label ("New Fail").
+
 ## The HTML report
 
 - **Unchanged rows are hidden by default.** Use the **"Show unchanged rows"**
@@ -194,7 +225,7 @@ still failing).
   and a per-product summary table shows the count of each bucket.
 - All policy text is HTML-escaped. The `Requirement` field, which embeds HTML
   indicator markup in `ScubaResults.json`, is stripped to plain text before it
-  is stored in `DiffResults.json` or rendered.
+  is stored in `DiffResults.json` / `DiffResults.csv` or rendered.
 
 ## Example workflow
 
@@ -210,5 +241,6 @@ Invoke-SCuBADiff `
     -AfterPath  (Get-ChildItem C:\Runs\Current  -Recurse -Filter ScubaResults_*.json).FullName `
     -OutPath    C:\Runs\Diff
 
-# 3. Open C:\Runs\Diff\DiffReport.html and/or consume DiffResults.json.
+# 3. Open C:\Runs\Diff\DiffReport.html, and/or consume DiffResults.json
+#    (nested, schema-versioned) or DiffResults.csv (one row per policy).
 ```

@@ -27,10 +27,16 @@ Several properties of M365 `ScubaResults.json` shape the design:
 
 Add an exported, fully-offline cmdlet `Invoke-SCuBADiff` in a new, dependency-free
 `Modules/Diff` module. It reads two `ScubaResults.json` files and emits
-`DiffResults.json` (with a top-level `SchemaVersion: "1.0"`) and a self-contained
-`DiffReport.html`. The `DiffResults.json` top-level shape (`SchemaVersion`,
-`MetaData`, `Summary`, `Diff`) is kept parallel to the ScubaGoggles `diff` output
-so downstream consumers can process both.
+`DiffResults.json` (with a top-level `SchemaVersion: "1.0"`), `DiffResults.csv`,
+and a self-contained `DiffReport.html`. The `DiffResults.json` top-level shape
+(`SchemaVersion`, `MetaData`, `Summary`, `Diff`) is kept parallel to the
+ScubaGoggles `diff` output so downstream consumers can process both.
+
+The CSV is a lossy-by-design convenience view: the JSON stays the authoritative,
+schema-versioned artifact, while the CSV flattens `Diff` to one row per policy
+(product as a leading column) for spreadsheet users, carrying no `MetaData` or
+`Summary`. It is derived from the same records as the other two artifacts rather
+than from a second comparison pass, so the three cannot disagree.
 
 The two substantive decisions below were the ones with real alternatives.
 
