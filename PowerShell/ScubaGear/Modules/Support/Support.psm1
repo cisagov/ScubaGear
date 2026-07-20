@@ -674,7 +674,8 @@ function New-SCuBAConfig {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Defender for Office 365: defender
+    - Security Suite: securitysuite
+    - Defender for Office 365 (legacy alias for securitysuite): defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -701,7 +702,7 @@ function New-SCuBAConfig {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: defender will ask for authentication even if this variable is set to `$false`
+    Note: securitysuite will ask for authentication even if this variable is set to `$false`
     ;;;.Parameter Version
     ;;;Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -738,7 +739,7 @@ function New-SCuBAConfig {
     command line can also be included in the file that will be provided to the
     tool for use in specific tests.
     .Parameter OmitPolicy
-    A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.DEFENDER.1.1v1.
+    A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.SECURITYSUITE.2.1v1.
     Note that the rationales will need to be manually added to the resulting config file.
     .Functionality
     Public
@@ -754,9 +755,10 @@ function New-SCuBAConfig {
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
+        # Both defender and securitysuite are options; defender remains a legacy alias for securitysuite
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = @("aad", "defender", "exo", "sharepoint", "teams"),
+        $ProductNames = @("aad", "securitysuite", "exo", "sharepoint", "teams"),
 
         [Parameter(Mandatory = $false)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
@@ -861,16 +863,10 @@ function New-SCuBAConfig {
         )
     $RoleExclusionNamespace = "MS.AAD.7.4v1"
 
-    $CommonSensitiveAccountFilterNamespace = @(
-        "MS.DEFENDER.1.4v1",
-        "MS.DEFENDER.1.5v1"
-        )
-
-    $UserImpersonationProtectionNamespace = "MS.DEFENDER.2.1v1"
-
-    $AgencyDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.2v1"
-
-    $PartnerDomainImpersonationProtectionNamespace = "MS.DEFENDER.2.3v1"
+    # Security Suite policy IDs that need sample config scaffolding.
+    # Keep the template limited to policies that still require org-specific values.
+    $UserImpersonationProtectionNamespace = "MS.SECURITYSUITE.2.1v1"
+    $PartnerDomainImpersonationProtectionNamespace = "MS.SECURITYSUITE.2.3v1"
 
     $OmissionNamespace = "OmitPolicy"
 
@@ -887,13 +883,22 @@ function New-SCuBAConfig {
             # later
             $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not a valid "
             $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
-            $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Skipping."
+            $Warning += "e.g., 'MS.SECURITYSUITE.2.1v1'. Skipping."
             Write-Warning $Warning
             Continue
         }
         $Product = ($Policy -Split "\.")[1]
+        # Normalize legacy DEFENDER policy IDs to securitysuite product selection
+        $ProductForValidation = $Product
+        if ($Product -eq "DEFENDER" -or $Product -eq "defender") {
+            $ProductForValidation = "securitysuite"
+        }
         # Here's where the product name is validated
-        if (-not ($ProductNames -Contains $Product)) {
+        $SelectedProducts = @($ProductNames)
+        if ($SelectedProducts -contains "defender" -and -not ($SelectedProducts -contains "securitysuite")) {
+            $SelectedProducts += "securitysuite"
+        }
+        if (-not ($SelectedProducts -Contains $ProductForValidation) -and -not ($SelectedProducts -Contains $Product)) {
             $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not encompassed by "
             $Warning += "the products specified in the ProductName parameter. Skipping."
             Write-Warning $Warning
@@ -917,13 +922,7 @@ function New-SCuBAConfig {
     $AadCapExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
     $AadRoleExclusions = New-Object ([System.Collections.specialized.OrderedDictionary])
 
-    $DefenderTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
-    $DefenderCommonSensitiveAccountFilter = New-Object ([System.Collections.specialized.OrderedDictionary])
-    #$defenderUserImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
-    #$defenderAgencyDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
-    #$defenderPartnerDomainImpersonationProtection = New-Object ([System.Collections.specialized.OrderedDictionary])
-
-
+    $SecuritySuiteTemplate = New-Object ([System.Collections.specialized.OrderedDictionary])
 
     $AadCapExclusions = @{ CapExclusions = @{} }
     $AadCapExclusions["CapExclusions"].add("Users", @(""))
@@ -939,31 +938,34 @@ function New-SCuBAConfig {
 
     $AadTemplate.add($RoleExclusionNamespace, $AadRoleExclusions)
 
-    $DefenderCommonSensitiveAccountFilter = @{ SensitiveAccounts = @{} }
-    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedUsers", @(""))
-    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedGroups", @(""))
-    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("IncludedDomains", @(""))
-    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedUsers", @(""))
-    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedGroups", @(""))
-    $DefenderCommonSensitiveAccountFilter['SensitiveAccounts'].add("ExcludedDomains", @(""))
+    # Scaffold only the Security Suite policies that still require org-specific values.
+    $SecuritySuiteTemplate.add($UserImpersonationProtectionNamespace, @{ SensitiveUsers = @("") })
+    $SecuritySuiteTemplate.add($PartnerDomainImpersonationProtectionNamespace, @{ PartnerDomains = @("") })
 
-    foreach ($Filter in $CommonSensitiveAccountFilterNamespace){
-        $DefenderTemplate.add($Filter, $DefenderCommonSensitiveAccountFilter)
+    $Products = @((Get-Variable -Name ProductNames -EA SilentlyContinue).Value)
+    # defender remains a legacy alias for securitysuite in generated sample configs
+    if ($Products -contains "defender" -and -not ($Products -contains "securitysuite")) {
+        $Products += "securitysuite"
+    }
+    $Products = @($Products | Where-Object { $_ -ne "defender" } | Select-Object -Unique)
+
+    # Persist the modern product names into the generated config as well
+    if ($config.Contains("ProductNames")) {
+        $config["ProductNames"] = $Products
     }
 
-    $DefenderTemplate.add($UserImpersonationProtectionNamespace, @{ SensitiveUsers = @("") })
-    $DefenderTemplate.add($AgencyDomainImpersonationProtectionNamespace, @{ AgencyDomains = @("") })
-    $DefenderTemplate.add($PartnerDomainImpersonationProtectionNamespace, @{ PartnerDomains = @("") })
-
-    $Products = (Get-Variable -Name ProductNames -EA SilentlyContinue).Value
     foreach ($Product in $Products){
         switch ($Product){
             "aad" {
-                $config.add("Aad", $AadTemplate)
+                if (-not $config.Contains("Aad")) {
+                    $config.add("Aad", $AadTemplate)
                 }
-            "defender" {
-                $config.add("Defender", $DefenderTemplate)
+            }
+            "securitysuite" {
+                if (-not $config.Contains("SecuritySuite")) {
+                    $config.add("SecuritySuite", $SecuritySuiteTemplate)
                 }
+            }
         }
     }
     convertto-yaml $Config | set-content "$($ConfigLocation)/SampleConfig.yaml"
