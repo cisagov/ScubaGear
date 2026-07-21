@@ -36,7 +36,7 @@ jobs:
         shell: powershell
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: repo
       - name: Install Azure Signing Tool
