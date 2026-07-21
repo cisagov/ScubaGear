@@ -1,4 +1,4 @@
-function Connect-GraphHelper {
+﻿function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.

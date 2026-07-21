@@ -1,13 +1,250 @@
+# G3-specific Security Suite functional tests. Policies that use ScubaCached with
+# UpdateProviderExport share the same test scenarios as the commercial test plan.
+
 ProductName: securitysuite
 TestPlan:
   - PolicyId: MS.SECURITYSUITE.1.1v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.SECURITYSUITE.1.1v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Compliant case - Strict preset active and covers all recipients
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_policy_rules:
+                  - Identity: Strict Preset Security Policy
+                    State: Enabled
+                    SentTo: []
+                    SentToMemberOf: []
+                    RecipientDomainIs: []
+                anti_malware_policies:
+                  - Identity: Strict Preset Security Policy
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+                anti_malware_rules: []
         Postconditions: []
-        IsNotChecked: true
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Compliant case - Standard preset active, Strict disabled, covers all recipients
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_policy_rules:
+                  - Identity: Strict Preset Security Policy
+                    State: Disabled
+                    SentTo: []
+                    SentToMemberOf: []
+                    RecipientDomainIs: []
+                  - Identity: Standard Preset Security Policy
+                    State: Enabled
+                    SentTo: []
+                    SentToMemberOf: []
+                    RecipientDomainIs: []
+                anti_malware_policies:
+                  - Identity: Standard Preset Security Policy
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+                anti_malware_rules: []
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Non-Compliant case - No presets or custom policies, Default policy has the common attachments filter disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_policy_rules: []
+                anti_malware_rules: []
+                anti_malware_policies:
+                  - Identity: Default
+                    EnableFileFilter: false
+                    FileTypes: []
+                    ZapEnabled: false
+        Postconditions: []
         ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Non-Compliant case - Default policy filter enabled but does not block all required file types
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_policy_rules: []
+                anti_malware_rules: []
+                anti_malware_policies:
+                  - Identity: Default
+                    EnableFileFilter: true
+                    FileTypes: [cmd, vbe]
+                    ZapEnabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Compliant case - No presets, single enabled custom policy targeted at all accepted domains covers all recipients and is compliant
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                accepted_domains:
+                  - DomainName: contoso.com
+                protection_policy_rules: []
+                anti_malware_rules:
+                  - State: Enabled
+                    Priority: 0
+                    MalwareFilterPolicy: FunctionalTest MalwarePolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                anti_malware_policies:
+                  - Identity: FunctionalTest MalwarePolicy
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+                  - Identity: Default
+                    EnableFileFilter: false
+                    FileTypes: []
+                    ZapEnabled: false
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Non-Compliant case - No presets, single enabled custom policy targeted at all accepted domains covers all recipients but is not compliant
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                accepted_domains:
+                  - DomainName: contoso.com
+                protection_policy_rules: []
+                anti_malware_rules:
+                  - State: Enabled
+                    Priority: 0
+                    MalwareFilterPolicy: FunctionalTest MalwarePolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                anti_malware_policies:
+                  - Identity: FunctionalTest MalwarePolicy
+                    EnableFileFilter: true
+                    FileTypes: [cmd, vbe]
+                    ZapEnabled: true
+                  - Identity: Default
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Non-Compliant case - Higher priority enabled custom policy targeted at all accepted domains covers all recipients and is not compliant, despite a lower priority compliant policy also existing
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                accepted_domains:
+                  - DomainName: contoso.com
+                protection_policy_rules: []
+                anti_malware_rules:
+                  - State: Enabled
+                    Priority: 0
+                    MalwareFilterPolicy: FunctionalTest HighPriorityPolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                  - State: Enabled
+                    Priority: 1
+                    MalwareFilterPolicy: FunctionalTest LowPriorityPolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                anti_malware_policies:
+                  - Identity: FunctionalTest HighPriorityPolicy
+                    EnableFileFilter: false
+                    FileTypes: []
+                    ZapEnabled: false
+                  - Identity: FunctionalTest LowPriorityPolicy
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Compliant case - Higher priority non-compliant policy is disabled, so the lower priority compliant policy targeted at all accepted domains is used instead
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                accepted_domains:
+                  - DomainName: contoso.com
+                protection_policy_rules: []
+                anti_malware_rules:
+                  - State: Disabled
+                    Priority: 0
+                    MalwareFilterPolicy: FunctionalTest HighPriorityPolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                  - State: Enabled
+                    Priority: 1
+                    MalwareFilterPolicy: FunctionalTest LowPriorityPolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                anti_malware_policies:
+                  - Identity: FunctionalTest HighPriorityPolicy
+                    EnableFileFilter: false
+                    FileTypes: []
+                    ZapEnabled: false
+                  - Identity: FunctionalTest LowPriorityPolicy
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.1.1v1 Compliant case - Strict preset active and compliant even though a non-compliant custom policy targeted at all accepted domains also exists
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                accepted_domains:
+                  - DomainName: contoso.com
+                protection_policy_rules:
+                  - Identity: Strict Preset Security Policy
+                    State: Enabled
+                    SentTo: []
+                    SentToMemberOf: []
+                    RecipientDomainIs: []
+                anti_malware_rules:
+                  - State: Enabled
+                    Priority: 0
+                    MalwareFilterPolicy: FunctionalTest NonCompliantPolicy
+                    SentTo: []
+                    SentToMemberOf: []
+                    ExceptIfSentTo: []
+                    ExceptIfSentToMemberOf: []
+                    ExceptIfRecipientDomainIs: []
+                    RecipientDomainIs: [contoso.com]
+                anti_malware_policies:
+                  - Identity: Strict Preset Security Policy
+                    EnableFileFilter: true
+                    FileTypes: [exe, cmd, vbe]
+                    ZapEnabled: true
+                  - Identity: FunctionalTest NonCompliantPolicy
+                    EnableFileFilter: false
+                    FileTypes: []
+                    ZapEnabled: false
+        Postconditions: []
+        ExpectedResult: true
   - PolicyId: MS.SECURITYSUITE.4.1v1
     TestDriver: ScubaCached
     Tests:
