@@ -452,7 +452,7 @@ InModuleScope ScubaLogging {
                 $fakeOpa = Join-Path $script:TestLogPath "opa_windows_amd64.exe"
                 Set-Content $fakeOpa "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa
+                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -464,7 +464,7 @@ InModuleScope ScubaLogging {
                 New-Item -ItemType Directory $opaDir -Force | Out-Null
                 Set-Content (Join-Path $opaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir
+                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -475,7 +475,7 @@ InModuleScope ScubaLogging {
                 $emptyDir = Join-Path $script:TestLogPath "emptydir-$(Get-Date -Format 'fff')"
                 New-Item -ItemType Directory $emptyDir -Force | Out-Null
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir
+                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -486,7 +486,7 @@ InModuleScope ScubaLogging {
             It "Should log Warning 'OPA Executable NOT found at configured path' when path does not exist" {
                 $nonExistent = Join-Path $script:TestLogPath "doesnotexist\opa.exe"
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent
+                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -495,7 +495,7 @@ InModuleScope ScubaLogging {
             }
 
             It "Should skip ConfiguredOPAPath check when parameter is not provided" {
-                Write-ScubaRunDetails
+                Write-ScubaRunDetails -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Not -Match "OPA Executable at configured path"
@@ -516,7 +516,7 @@ InModuleScope ScubaLogging {
 
                 $Script:ScubaHasErrors = $false
                 try {
-                    Write-ScubaRunDetails -ConfiguredOPAPath $customOpaDir
+                    Write-ScubaRunDetails -ConfiguredOPAPath $customOpaDir -TestNetworkConnectivity:$false
                 }
                 finally {
                     $env:USERPROFILE = $originalUserProfile
@@ -537,7 +537,7 @@ InModuleScope ScubaLogging {
                 $env:USERPROFILE = $fakeProfile
 
                 try {
-                    Write-ScubaRunDetails
+                    Write-ScubaRunDetails -TestNetworkConnectivity:$false
                 }
                 finally {
                     $env:USERPROFILE = $originalUserProfile
