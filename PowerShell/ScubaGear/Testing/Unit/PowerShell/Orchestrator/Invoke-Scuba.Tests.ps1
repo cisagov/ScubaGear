@@ -165,7 +165,7 @@ InModuleScope Orchestrator {
         }
         Context 'When checking module version' {
             It 'Given -Version should not throw' {
-                {Invoke-Scuba -Version -SilenceBODWarnings} | Should -Not -Throw
+                {Invoke-Scuba -Version} | Should -Not -Throw
             }
         }
         Context 'When modifying the CSV output files names' {
