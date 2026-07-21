@@ -151,7 +151,7 @@ InModuleScope Orchestrator {
         }
         Context 'When checking module version' {
             It 'Given -Version should not throw' {
-                {Invoke-SCuBACached -Version} | Should -Not -Throw
+                {Invoke-SCuBACached -Version -SilenceBODWarnings} | Should -Not -Throw
             }
         }
 
@@ -159,6 +159,13 @@ InModuleScope Orchestrator {
         # It's possible (but not expected) that there are multiple files matching
         # "ScubaResults*.json". In this case, ScubaGear should choose the file
         # created most recently.
+            BeforeAll {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParams')]
+                $SplatParams = @{
+                    M365Environment    = 'commercial'
+                    SilenceBODWarnings = $true
+                }
+            }
             It 'Should select the most recently created' {
                 Mock -CommandName Get-ChildItem { @(
                     [pscustomobject]@{"FullName"="ScubaResultsOld.json"; "CreationTime"=[DateTime]"2023-01-01"},

@@ -165,7 +165,7 @@ InModuleScope Orchestrator {
         }
         Context 'When checking module version' {
             It 'Given -Version should not throw' {
-                {Invoke-Scuba -Version} | Should -Not -Throw
+                {Invoke-Scuba -Version -SilenceBODWarnings} | Should -Not -Throw
             }
         }
         Context 'When modifying the CSV output files names' {
@@ -174,7 +174,7 @@ InModuleScope Orchestrator {
                     OutCsvFileName = "a"
                     SilenceBODWarnings = $true
                 }
-                {Invoke-Scuba -Version} | Should -Not -Throw
+                {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -OutActionPlanFileName should not throw' {
                 $SplatParams += @{
