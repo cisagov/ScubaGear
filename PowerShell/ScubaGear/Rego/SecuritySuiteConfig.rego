@@ -1,10 +1,3 @@
-# NOTE: This file (package securitysuite) is NOT evaluated at runtime.
-# The Orchestrator maps the 'securitysuite' product to BaselineName "Defender",
-# which resolves to DefenderConfig.rego (package defender) for both OPA evaluation
-# and report generation. This file is retained as a scaffold for future use if
-# the securitysuite product is ever decoupled from the defender baseline.
-# See Orchestrator.psm1: ArgToProd mapping (securitysuite = "Defender") and
-# RegoPackageName override ($Product -eq "securitysuite" => "defender").
 package securitysuite
 import rego.v1
 import data.utils.report.NotCheckedDetails
@@ -77,7 +70,7 @@ PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
 
 AntiMalwarePolicyMessage := ". The highest priority anti-malware policy that applies to all users is: "
 
-SecuritySuite_1_1_Details(Status) := 
+SecuritySuite_1_1_Details(Status) :=
     concat("", [
         ReportDetailsBoolean(Status),
         AntiMalwarePolicyMessage,
@@ -119,7 +112,7 @@ PolicyZAPNoncomplianceReasons contains "Zero-hour auto purge is disabled." if {
     Policy.ZapEnabled != true
 }
 
-SecuritySuite_1_2_Details(Status) := 
+SecuritySuite_1_2_Details(Status) :=
     concat("", [
         ReportDetailsBoolean(Status),
         ". The highest priority anti-malware policy that applies to all users is: ",
@@ -179,7 +172,7 @@ SecurySuite_1_3_Result := {
         ReportDetailsBoolean(false),
         ". The highest priority safe attachments policy that applies to all users is: ",
         UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
-        ". Safe Attachments unknown malware response is set to ",
+        ". Safe Attachments unknown malware Malware response is set to ",
         Policy.Action,
         "."
     ])

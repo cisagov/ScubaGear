@@ -89,6 +89,8 @@ function Get-MsalAccessToken {
     <#
     .SYNOPSIS
         Acquires an OAuth2 access token via MSAL using certificate or interactive auth.
+        Reuses cached MSAL app instances and attempts silent token acquisition before
+        prompting interactively, minimizing the number of browser popups per session.
     .FUNCTIONALITY
         Internal
     #>
@@ -131,30 +133,60 @@ function Get-MsalAccessToken {
         }
     }
 
+    # Cache MSAL app instances by key so token cache persists across calls.
+    # This enables AcquireTokenSilent to succeed for subsequent scope requests
+    # after the first interactive sign-in, reducing browser popups to one.
+    if (-not $Script:MsalAppCache) {
+        $Script:MsalAppCache = @{}
+    }
+
     $MaxAttempts = 3
     $Attempt = 0
     while ($Attempt -lt $MaxAttempts) {
         $Attempt++
         try {
             if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
-                $MsalApp = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
-                    WithCertificate($Certificate).
-                    WithAuthority($Authority).
-                    Build()
-
+                $CacheKey = "SP:$AppID|$Authority"
+                if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
+                    $Script:MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+                        WithCertificate($Certificate).
+                        WithAuthority($Authority).
+                        Build()
+                }
+                $MsalApp = $Script:MsalAppCache[$CacheKey]
                 $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
             }
             else {
                 $RedirectUri = "http://localhost"
-                $MsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-                    WithAuthority($Authority).
-                    WithRedirectUri($RedirectUri).
-                    Build()
+                $CacheKey = "PUB:$ClientId|$Authority"
+                if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
+                    $Script:MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                        WithAuthority($Authority).
+                        WithRedirectUri($RedirectUri).
+                        Build()
+                }
+                $MsalApp = $Script:MsalAppCache[$CacheKey]
 
-                $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
-                    WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                    WithUseEmbeddedWebView($false).
-                    ExecuteAsync().GetAwaiter().GetResult()
+                # Try silent acquisition first using cached accounts
+                $TokenResult = $null
+                try {
+                    $Accounts = $MsalApp.GetAccountsAsync().GetAwaiter().GetResult()
+                    if ($Accounts -and $Accounts.Count -gt 0) {
+                        $TokenResult = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $Accounts[0]).
+                            ExecuteAsync().GetAwaiter().GetResult()
+                    }
+                }
+                catch {
+                    # Silent failed (no cached token for this scope) — fall through to interactive
+                    $TokenResult = $null
+                }
+
+                if (-not $TokenResult) {
+                    $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
+                        WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
+                        WithUseEmbeddedWebView($false).
+                        ExecuteAsync().GetAwaiter().GetResult()
+                }
             }
 
             return $TokenResult.AccessToken

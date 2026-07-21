@@ -135,6 +135,11 @@ function Export-SecuritySuiteProvider {
     $SafeLinksRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksRule")
     $HostedContentFilterPolicies = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterPolicy")
     $HostedContentFilterRules = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterRule")
+    $AntiMalwarePolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterPolicy")
+    $AntiMalwareRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterRule")
+    $SafeAttachmentPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentPolicy")
+    $SafeAttachmentRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentRule")
+    $BuiltInProtectionRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPBuiltInProtectionRule")
 
     $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
     $ATPProtectionPolicyRuleResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
@@ -198,6 +203,9 @@ function Export-SecuritySuiteProvider {
     "dlp_compliance_rules": $DLPComplianceRules,
     "anti_phish_policies": $AntiPhishPolicy,
     "anti_phish_rules": $AntiPhishRule,
+    "safe_attachment_policies": $SafeAttachmentPolicy,
+    "safe_attachment_rules": $SafeAttachmentRule,
+    "built_in_protection_rules": $BuiltInProtectionRule,
     "accepted_domains": $AcceptedDomains,
     "protection_alerts": $ProtectionAlert,
     "admin_audit_log_config": $AdminAuditLogConfig,
@@ -211,6 +219,8 @@ function Export-SecuritySuiteProvider {
     "defender_dlp_license": $DLPLicense,
     "hosted_content_filter_policies": $HostedContentFilterPolicies,
     "hosted_content_filter_rules": $HostedContentFilterRules,
+    "anti_malware_policies": $AntiMalwarePolicy,
+    "anti_malware_rules": $AntiMalwareRule,
     "securitysuite_successful_commands": $SuccessfulCommands,
     "securitysuite_unsuccessful_commands": $UnSuccessfulCommands,
 "@
