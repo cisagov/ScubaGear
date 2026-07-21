@@ -220,6 +220,10 @@ class ScubaConfigValidator {
                     }
                     throw
                 }
+
+                # Note which keys carry a YAML anchor definition on their value
+                # (e.g. 'SensitiveUsers: &CommonSensitiveUsers').
+                $Result.AnchorDefinedProperties = [ScubaConfigValidator]::GetAnchorDefinedProperties($FileContent)
             }
             else {
                 # Parse JSON
@@ -236,7 +240,7 @@ class ScubaConfigValidator {
 
         # Phase 3: Schema validation (skip if deferred validation requested)
         if (-not $SkipScubaConfigRules) {
-            $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ParsedContent, $DebugMode)
+            $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ParsedContent, $DebugMode, $Result.AnchorDefinedProperties)
             $Result.ValidationErrors += $SchemaValidation.Errors
             $Result.Warnings += $SchemaValidation.Warnings
 
@@ -259,6 +263,14 @@ class ScubaConfigValidator {
 
     # Performs JSON Schema Draft-7 validation against configuration objects
     hidden static [PSCustomObject] ValidateAgainstSchema([object]$ConfigObject, [bool]$DebugMode) {
+        return [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $DebugMode, @())
+    }
+
+    # Performs JSON Schema Draft-7 validation against configuration objects.
+    # AnchorDefinedProperties lists top-level property names whose value carries a YAML
+    # anchor definition (e.g. 'SensitiveUsers: &CommonSensitiveUsers'), detected from the
+    # raw file text, so they can be excluded from "unknown property" warnings.
+    hidden static [PSCustomObject] ValidateAgainstSchema([object]$ConfigObject, [bool]$DebugMode, [array]$AnchorDefinedProperties) {
         $Validation = @{
             Errors = [System.Collections.ArrayList]::new()
             Warnings = [System.Collections.ArrayList]::new()
@@ -271,12 +283,36 @@ class ScubaConfigValidator {
         # This prevents default values from hiding missing required properties
 
         # Validate all properties against schema
-        [ScubaConfigValidator]::ValidateAllPropertiesAgainstSchema($ConfigObject, $Schema, $Validation)
+        [ScubaConfigValidator]::ValidateAllPropertiesAgainstSchema($ConfigObject, $Schema, $Validation, $AnchorDefinedProperties)
 
         # Validate product exclusions with metadata-driven checks
         [ScubaConfigValidator]::ValidateProductExclusions($ConfigObject, $Schema, $Validation)
 
         return [PSCustomObject]$Validation
+    }
+
+    # Scans raw YAML text for top-level (non-indented) keys whose value begins with an
+    # anchor definition (e.g. 'SensitiveUsers: &CommonSensitiveUsers'). YAML anchors can be
+    # attached to any node anywhere in a document, not just top-level keys; this method only
+    # looks at top-level keys because that's the only place a schema "unknown property"
+    # warning can be raised from. ConvertFrom-Yaml resolves anchors/aliases before the
+    # validator ever sees the parsed object, so by that point there is no way to tell
+    # whether a key's value happened to be anchored - this raw-text scan is the only place
+    # that information still exists, and is used purely as a heuristic to reduce false
+    # positives, not as proof that the key exists solely for reuse.
+    static [array] GetAnchorDefinedProperties([string]$YamlContent) {
+        $AnchorProperties = @()
+
+        if ([string]::IsNullOrWhiteSpace($YamlContent)) {
+            return $AnchorProperties
+        }
+
+        $AnchorKeyPattern = '(?m)^([A-Za-z_][\w-]*)\s*:\s*&[\w-]+'
+        foreach ($Match in [regex]::Matches($YamlContent, $AnchorKeyPattern)) {
+            $AnchorProperties += $Match.Groups[1].Value
+        }
+
+        return @($AnchorProperties | Select-Object -Unique)
     }
 
     # Performs Scuba configuration rule validation beyond basic schema compliance
@@ -473,6 +509,13 @@ class ScubaConfigValidator {
 
     # Dynamically validates all properties against their schema definitions
     static [void] ValidateAllPropertiesAgainstSchema([object]$ConfigObject, [object]$Schema, [hashtable]$Validation) {
+        [ScubaConfigValidator]::ValidateAllPropertiesAgainstSchema($ConfigObject, $Schema, $Validation, @())
+    }
+
+    # Dynamically validates all properties against their schema definitions.
+    # AnchorDefinedProperties lists top-level property names whose value carries a YAML
+    # anchor definition; these are excluded from "unknown property" warnings.
+    static [void] ValidateAllPropertiesAgainstSchema([object]$ConfigObject, [object]$Schema, [hashtable]$Validation, [array]$AnchorDefinedProperties) {
         if (-not $Schema.properties) {
             return
         }
@@ -588,10 +631,19 @@ class ScubaConfigValidator {
             }
 
             if (-not $PropertyExists) {
-                # Property not in schema - treat as warning (ScubaGear can still run with extra properties)
-                # Note: Root-level properties are case-insensitive in PowerShell, so typos may still work
-                # This warning means the property truly doesn't match any known configuration option
-                [void]$Validation.Warnings.Add("Unknown property '$PropertyName' is not defined in the schema. It will be ignored by ScubaGear.")
+                # If this unrecognized property's value carries a YAML anchor definition
+                # (e.g. 'SensitiveUsers: &CommonSensitiveUsers'), assume it's an ad hoc
+                # reuse block referenced elsewhere via an alias rather than a mistyped
+                # ScubaGear parameter, and don't flag it.
+                if ($AnchorDefinedProperties -and $PropertyName -in $AnchorDefinedProperties) {
+                    Write-Debug "Skipping unknown property warning for YAML anchor host property '$PropertyName'"
+                }
+                else {
+                    # Property not in schema - treat as warning (ScubaGear can still run with extra properties)
+                    # Note: Root-level properties are case-insensitive in PowerShell, so typos may still work
+                    # This warning means the property truly doesn't match any known configuration option
+                    [void]$Validation.Warnings.Add("Unknown property '$PropertyName' is not defined in the schema. It will be ignored by ScubaGear.")
+                }
             }
         }
     }
@@ -1539,12 +1591,18 @@ class ValidationResult {
     [array]$ValidationErrors
     [array]$Warnings
     [object]$ParsedContent
+    # Top-level property names whose sole purpose is to host a YAML anchor definition
+    # (e.g. 'SensitiveUsers: &CommonSensitiveUsers'), detected from the raw file text.
+    # These are user-defined reuse blocks, not ScubaGear configuration parameters, and
+    # are excluded from "unknown property" schema warnings.
+    [array]$AnchorDefinedProperties
 
     ValidationResult() {
         $this.IsValid = $true
         $this.ValidationErrors = @()
         $this.Warnings = @()
         $this.ParsedContent = $null
+        $this.AnchorDefinedProperties = @()
     }
 }
 
