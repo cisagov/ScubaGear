@@ -18,6 +18,11 @@ import data.utils.securitysuite.PresetRecipientsCovered
 import data.utils.securitysuite.RuleFieldEmpty
 import data.utils.securitysuite.PresetPolicyCoversAllRecipients
 import data.utils.securitysuite.CustomRuleCoversAllRecipients
+import data.utils.securitysuite.HighestPriorityActiveAntiMalwarePolicyName
+import data.utils.securitysuite.HighestPriorityActiveSafeAttachmentPolicyName
+import data.utils.securitysuite.UserFriendlyPolicyName
+import data.utils.securitysuite.ApplyLicenseWarning
+import data.utils.securitysuite.ApplyLicenseWarningStringCustom
 import data.utils.report.ReportDetailsArray
 import data.utils.securitysuite.DLPLicenseWarningString
 import data.utils.key.FilterArray
@@ -31,52 +36,196 @@ import data.utils.key.Count
 #
 # MS.SECURITYSUITE.1.1v1
 #--
+
+# Legend that explains each of the JSON nodes for the anti-malware policies 1.1 and 1.2
+# anti_malware_rules = Contains only the custom policies. State = "Enabled"/"Disabled", Identity = Name of the policy
+# anti_malware_policies = Contains all the policies (custom, standard preset, strict preset, default)
+#
+
+PolicyCompliantForBlockClickToRun(Policy) := true if {
+    Policy.EnableFileFilter == true
+    RequiredTypes := {"exe", "cmd", "vbe"}
+    MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
+    count(MissingTypes) == 0
+} else := false
+
+PolicyBlockClickToRunNoncomplianceReasons contains "The common attachments filter is disabled." if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Policy.EnableFileFilter != true
+}
+
+PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
+    RequiredTypes := {"exe", "cmd", "vbe"}
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    MissingTypes := RequiredTypes - {Type | some Type in Policy.FileTypes}
+    count(MissingTypes) > 0
+    Reason := concat("", [
+        "The common attachments filter does not include ",
+        concat(", ", MissingTypes),
+        "."
+    ])
+}
+
+AntiMalwarePolicyMessage := ". The highest priority anti-malware policy that applies to all users is: "
+
+SecuritySuite_1_1_Details(Status) := 
+    concat("", [
+        ReportDetailsBoolean(Status),
+        AntiMalwarePolicyMessage,
+        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName), ". ",
+        concat(" ", PolicyBlockClickToRunNoncomplianceReasons)
+    ])
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.1v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.1v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-MalwareFilterPolicy",
+        "Get-MalwareFilterRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": [{
+        "Policy Name": HighestPriorityActiveAntiMalwarePolicyName,
+        "EnableFileFilter": Policy.EnableFileFilter,
+        "FileTypes": Policy.FileTypes
+    }],
+    "ReportDetails": SecuritySuite_1_1_Details(Status),
+    "RequirementMet": Status
+}
+if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Status := PolicyCompliantForBlockClickToRun(Policy)
 }
 #--
 
 #
 # MS.SECURITYSUITE.1.2v1
 #--
+
+PolicyZAPNoncomplianceReasons contains "Zero-hour auto purge is disabled." if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Policy.ZapEnabled != true
+}
+
+SecuritySuite_1_2_Details(Status) := 
+    concat("", [
+        ReportDetailsBoolean(Status),
+        ". The highest priority anti-malware policy that applies to all users is: ",
+        UserFriendlyPolicyName(HighestPriorityActiveAntiMalwarePolicyName), ". ",
+        concat(" ", PolicyZAPNoncomplianceReasons)
+    ])
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.2v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.2v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-MalwareFilterPolicy",
+        "Get-MalwareFilterRule",
+        "Get-EOPProtectionPolicyRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": [{
+        "Policy Name": HighestPriorityActiveAntiMalwarePolicyName,
+        "EnableFileFilter": Policy.ZapEnabled
+    }],
+    "ReportDetails": SecuritySuite_1_2_Details(Status),
+    "RequirementMet": Status
+}
+if {
+    some Policy in input.anti_malware_policies
+    Policy.Identity == HighestPriorityActiveAntiMalwarePolicyName
+    Status := Policy.ZapEnabled == true
 }
 #--
 
 #
 # MS.SECURITYSUITE.1.3v1
 #--
+
+SecurySuite_1_3_Result := {
+    "Status": false,
+    "Description": concat("", [
+        ReportDetailsBoolean(false),
+        ". No safe attachments policy applies to all users, including built-in protection."
+    ])
+} if {
+    HighestPriorityActiveSafeAttachmentPolicyName == null
+} else := {
+    "Status": true,
+    "Description": concat("", [
+        ReportDetailsBoolean(true),
+        ". The highest priority safe attachments policy that applies to all users is: ",
+        UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName), "."
+    ])
+} if {
+    some Policy in input.safe_attachment_policies
+    Policy.Identity == HighestPriorityActiveSafeAttachmentPolicyName
+    Policy.Action in {"Block", "DynamicDelivery"}
+} else := {
+    "Status": false,
+    "Description": concat("", [
+        ReportDetailsBoolean(false),
+        ". The highest priority safe attachments policy that applies to all users is: ",
+        UserFriendlyPolicyName(HighestPriorityActiveSafeAttachmentPolicyName),
+        ". Safe Attachments unknown malware response is set to ",
+        Policy.Action,
+        "."
+    ])
+} if {
+    some Policy in input.safe_attachment_policies
+    Policy.Identity == HighestPriorityActiveSafeAttachmentPolicyName
+}
+
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.3v1",
-    "Criticality": "Shall/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.3v1"),
-    "RequirementMet": false
+    "Criticality": "Shall",
+    "Commandlet": [
+        "Get-SafeAttachmentPolicy",
+        "Get-SafeAttachmentRule",
+        "Get-ATPProtectionPolicyRule",
+        "Get-ATPBuiltInProtectionRule",
+        "Get-AcceptedDomain"
+    ],
+    "ActualValue": [{
+        "Policy Name": HighestPriorityActiveSafeAttachmentPolicyName
+    }],
+    "ReportDetails": ApplyLicenseWarningStringCustom(Description),
+    "RequirementMet": Status
+}
+if {
+    Status := SecurySuite_1_3_Result.Status
+    Description := SecurySuite_1_3_Result.Description
 }
 #--
 
 #
 # MS.SECURITYSUITE.1.4v1
 #--
+# Find the set of policies that have EnableATPForSPOTeamsODB set to true
+ATPPolicies contains {
+    "Identity": Policy.Identity,
+    "EnableATPForSPOTeamsODB": Policy.EnableATPForSPOTeamsODB
+} if {
+    some Policy in input.atp_policy_for_o365
+    Policy.EnableATPForSPOTeamsODB == true
+}
+
+# Pass if at least one policy exists
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.1.4v1",
-    "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
-    "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.SECURITYSUITE.1.4v1"),
-    "RequirementMet": false
+    "Criticality": "Should",
+    "Commandlet": ["Get-AtpPolicyForO365"],
+    "ActualValue": ATPPolicies,
+    "ReportDetails": ApplyLicenseWarning(Status),
+    "RequirementMet": Status
+}
+if {
+    Status := count(ATPPolicies) > 0
 }
 #--
 
