@@ -31,9 +31,7 @@ InModuleScope 'Support' {
 
         Context "Get-ScubaModuleDependencyStatus" {
             It "Should report a missing module when none is installed" {
-                Mock Get-Module { return $null }
-
-                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12' -InstalledModules $null
 
                 $status.Installed | Should -BeFalse
                 $status.Action | Should -Be "Install"
@@ -41,15 +39,15 @@ InModuleScope 'Support' {
             }
 
             It "Should report a single in-range version as requiring no action" {
-                Mock Get-Module {
-                    return [PSCustomObject]@{
+                $installed = @(
+                    [PSCustomObject]@{
                         Name = 'powershell-yaml'
                         Version = [version]'0.4.7'
                         ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\powershell-yaml\0.4.7"
                     }
-                }
+                )
 
-                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12' -InstalledModules $installed
 
                 $status.Installed | Should -BeTrue
                 $status.Action | Should -Be "None"
@@ -59,15 +57,15 @@ InModuleScope 'Support' {
             }
 
             It "Should flag a version above the maximum as requiring an update" {
-                Mock Get-Module {
-                    return [PSCustomObject]@{
+                $installed = @(
+                    [PSCustomObject]@{
                         Name = 'powershell-yaml'
                         Version = [version]'9.9.9'
                         ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\powershell-yaml\9.9.9"
                     }
-                }
+                )
 
-                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12' -InstalledModules $installed
 
                 $status.Action | Should -Be "Update"
                 $status.HighestVersionStatus | Should -Be "ABOVE MAX"
@@ -77,22 +75,20 @@ InModuleScope 'Support' {
             }
 
             It "Should recommend cleanup when multiple versions exist and one is in range" {
-                Mock Get-Module {
-                    return @(
-                        [PSCustomObject]@{
-                            Name = 'powershell-yaml'
-                            Version = [version]'0.4.5'
-                            ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\powershell-yaml\0.4.5"
-                        },
-                        [PSCustomObject]@{
-                            Name = 'powershell-yaml'
-                            Version = [version]'0.4.7'
-                            ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\powershell-yaml\0.4.7"
-                        }
-                    )
-                }
+                $installed = @(
+                    [PSCustomObject]@{
+                        Name = 'powershell-yaml'
+                        Version = [version]'0.4.5'
+                        ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\powershell-yaml\0.4.5"
+                    },
+                    [PSCustomObject]@{
+                        Name = 'powershell-yaml'
+                        Version = [version]'0.4.7'
+                        ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\powershell-yaml\0.4.7"
+                    }
+                )
 
-                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+                $status = Get-ScubaModuleDependencyStatus -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12' -InstalledModules $installed
 
                 $status.Action | Should -Be "Cleanup"
                 $status.VersionCount | Should -Be 2
