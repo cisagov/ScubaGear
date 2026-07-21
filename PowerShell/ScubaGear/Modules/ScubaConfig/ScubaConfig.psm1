@@ -789,9 +789,11 @@ class ScubaConfig {
     }
 
     # Returns all PascalCase baseline names from the schema (e.g., "AAD", "EXO", "SecuritySuite", ...).
+    # Ignore _* properties (e.g., "_comment") that are not actual products.
     static [array] GetProductBaselineNames() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties |
+            Where-Object { $_.Name -notlike '_*' } |
             ForEach-Object { $_.Value.baselineName }
     }
 

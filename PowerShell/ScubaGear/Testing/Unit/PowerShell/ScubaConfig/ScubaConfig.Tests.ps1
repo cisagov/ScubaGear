@@ -243,6 +243,74 @@ Describe "ScubaConfig Module Unit Tests" {
         }
     }
 
+    Context "Report Product Name Mapping Methods (Issue #2196)" {
+        It "GetScubaGitHubUrl should return the ScubaGear GitHub URL from defaults" {
+            $Url = [ScubaConfig]::GetScubaGitHubUrl()
+
+            $Url | Should -Not -BeNullOrEmpty
+            $Url | Should -BeOfType [string]
+            $Url | Should -Be "https://github.com/cisagov/ScubaGear"
+        }
+
+        It "GetAllValidProductNames should return all schema product enum values" {
+            $Products = @([ScubaConfig]::GetAllValidProductNames())
+
+            $Products.Count | Should -BeGreaterThan 0
+            # Should include canonical names plus the special 'defender' and '*' entries.
+            $Products | Should -Contain "aad"
+            $Products | Should -Contain "defender"
+            $Products | Should -Contain "securitysuite"
+            $Products | Should -Contain "*"
+        }
+
+        It "GetProductBaselineName should map a lowercase product ID to its PascalCase baseline name" {
+            [ScubaConfig]::GetProductBaselineName("aad") | Should -Be "AAD"
+            [ScubaConfig]::GetProductBaselineName("exo") | Should -Be "EXO"
+            [ScubaConfig]::GetProductBaselineName("securitysuite") | Should -Be "SecuritySuite"
+            [ScubaConfig]::GetProductBaselineName("powerplatform") | Should -Be "PowerPlatform"
+        }
+
+        It "GetProductBaselineName should throw for an unknown product name" {
+            { [ScubaConfig]::GetProductBaselineName("notaproduct") } | Should -Throw "*Unknown product name*"
+        }
+
+        It "GetProductBaselineNames should return all PascalCase baseline names" {
+            $BaselineNames = @([ScubaConfig]::GetProductBaselineNames())
+
+            $BaselineNames.Count | Should -Be 7
+            $BaselineNames | Should -Contain "AAD"
+            $BaselineNames | Should -Contain "EXO"
+            $BaselineNames | Should -Contain "SecuritySuite"
+            $BaselineNames | Should -Contain "PowerPlatform"
+            $BaselineNames | Should -Contain "SharePoint"
+            $BaselineNames | Should -Contain "Teams"
+            $BaselineNames | Should -Contain "PowerBI"
+        }
+
+        It "GetDisplayNameFromBaselineName should map a baseline name to its full display name" {
+            [ScubaConfig]::GetDisplayNameFromBaselineName("AAD") | Should -Be "Microsoft Entra ID"
+            [ScubaConfig]::GetDisplayNameFromBaselineName("EXO") | Should -Be "Exchange Online"
+            [ScubaConfig]::GetDisplayNameFromBaselineName("SecuritySuite") | Should -Be "Security Suite"
+        }
+
+        It "GetDisplayNameFromBaselineName should throw for an unknown baseline name" {
+            { [ScubaConfig]::GetDisplayNameFromBaselineName("NotABaseline") } | Should -Throw "*Unknown baseline name*"
+        }
+
+        It "GetProductBaselineName and GetDisplayNameFromBaselineName should round-trip for every product" {
+            foreach ($Product in @([ScubaConfig]::GetAllValidProductNames())) {
+                # Skip the special enum entries that have no reportProductNames mapping.
+                if ($Product -in @("defender", "*")) { continue }
+
+                $BaselineName = [ScubaConfig]::GetProductBaselineName($Product)
+                $BaselineName | Should -Not -BeNullOrEmpty
+
+                $DisplayName = [ScubaConfig]::GetDisplayNameFromBaselineName($BaselineName)
+                $DisplayName | Should -Not -BeNullOrEmpty
+            }
+        }
+    }
+
     Context "Instance Method Functionality" {
         It "Should have empty configuration initially" {
             $Instance = [ScubaConfig]::GetInstance()
