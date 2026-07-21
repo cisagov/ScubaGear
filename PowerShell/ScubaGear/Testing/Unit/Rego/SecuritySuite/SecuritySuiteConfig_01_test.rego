@@ -376,7 +376,7 @@ test_StrictWins_NonCompliant_1_3 if {
 
     ReportStrings := [
         "Requirement not met. The highest priority safe attachments policy that applies to all users is: Strict Preset.",
-        "Safe Attachments unknown malware Malware response is set to Allow."
+        "Safe Attachments unknown malware response is set to Allow."
     ]
     TestResultContains("MS.SECURITYSUITE.1.3v1", Output, ReportStrings, false) == true
 }
@@ -428,7 +428,7 @@ test_CustomWins_NonCompliant_1_3 if {
 
     ReportStrings := [
         "Requirement not met. The highest priority safe attachments policy that applies to all users is: Custom Safe Attachment Policy 1.",
-        "Safe Attachments unknown malware Malware response is set to Off."
+        "Safe Attachments unknown malware response is set to Off."
     ]
     TestResultContains("MS.SECURITYSUITE.1.3v1", Output, ReportStrings, false) == true
 }
