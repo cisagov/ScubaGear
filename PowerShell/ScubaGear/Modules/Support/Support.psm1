@@ -222,7 +222,7 @@ function Get-ScubaModuleDependencyStatus {
 
     $status.Installed         = $true
     $status.Modules           = $modules
-    # Wrap in @() so a single returned module counts as 1. 
+    # Wrap in @() so a single returned module counts as 1.
     $status.VersionCount      = @($modules).Count
     $status.InstalledVersions = @($modules | ForEach-Object { $_.Version })
     $status.InProgramFiles    = @($modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }).Count -gt 0
