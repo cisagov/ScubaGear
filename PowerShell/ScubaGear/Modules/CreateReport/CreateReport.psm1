@@ -515,13 +515,29 @@ function New-Report {
         # This allows us to dynamically inject generated HTML sections into the final report output.
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
 
-        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
-        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
+        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null.
+        # Provider exports created by older versions of ScubaGear may lack these keys. ConvertTo-Json
+        # cannot serialize $null in PowerShell 5.1; it writes an error and leaves the variable empty,
+        # which produces an empty JSON data island that breaks the report's JavaScript. Fall back to
+        # the JSON literal "null", which the report scripts already handle.
+        $CapJson = if ($null -ne $SettingsExport.cap_table_data) {
+            ConvertTo-Json $SettingsExport.cap_table_data
+        }
+        else { "null" }
 
         # Same for risky applications, third-party service principals, and severity score weights
-        $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
-        $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
-        $SeverityScoreWeightsJson = ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
+        $RiskyAppsJson = if ($null -ne $SettingsExport.risky_applications) {
+            ConvertTo-Json $SettingsExport.risky_applications -Depth 5
+        }
+        else { "null" }
+        $RiskyThirdPartySPJson = if ($null -ne $SettingsExport.risky_third_party_service_principals) {
+            ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
+        }
+        else { "null" }
+        $SeverityScoreWeightsJson = if ($null -ne $SettingsExport.severity_score_weights) {
+            ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
+        }
+        else { "null" }
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"

@@ -1,11 +1,11 @@
 window.addEventListener('DOMContentLoaded', () => {
     const MAX_DNS_ENTRIES = 20;
 
-    const darkMode = getJsonData('dark-mode-flag') === "true";
-    const caps = getJsonData('cap-json');
-    const riskyApps = getJsonData('risky-apps-json');
-    const riskyThirdPartySPs = getJsonData('risky-third-party-sp-json');
-    const severityScoreWeights = getJsonData('severity-score-weights-json');
+    const darkMode = tryGetJsonData('dark-mode-flag') === "true";
+    const caps = tryGetJsonData('cap-json');
+    const riskyApps = tryGetJsonData('risky-apps-json');
+    const riskyThirdPartySPs = tryGetJsonData('risky-third-party-sp-json');
+    const severityScoreWeights = tryGetJsonData('severity-score-weights-json');
 
     buildExpandableTable(caps, "caps");
     buildExpandableTable(riskyApps, "riskyApps", severityScoreWeights);
