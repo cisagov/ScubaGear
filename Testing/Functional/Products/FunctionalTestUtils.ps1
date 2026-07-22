@@ -167,6 +167,116 @@ function Invoke-FunctionalTestRestRequest {
 # $script:EXOApiEndpoint and $script:EXOAccessToken must be set by
 # Products.Tests.ps1 BeforeAll before these functions are called.
 # -----------------------------------------------------------------------
+function Invoke-FunctionalExoRestRequest {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)] [string]$CmdletName,
+    [Parameter(Mandatory = $true)] [string]$ApiEndpoint,
+    [Parameter(Mandatory = $true)] [string]$AccessToken,
+    [Parameter(Mandatory = $false)] [hashtable]$Parameters = @{},
+    [Parameter(Mandatory = $false)] [int]$MaxRetries = 3,
+    [Parameter(Mandatory = $false)] [int]$BaseDelaySeconds = 2
+  )
+
+  $Headers = @{
+    "Authorization"     = "Bearer $AccessToken"
+    "Prefer"            = "odata.maxpagesize=1000"
+    "X-ResponseFormat"  = "json"
+    "client-request-id" = [guid]::NewGuid().ToString()
+    "User-Agent"        = "ScubaGear-FunctionalTest"
+  }
+
+  $Body = @{
+    CmdletInput = @{
+      CmdletName = $CmdletName
+      Parameters = $Parameters
+    }
+  } | ConvertTo-Json -Depth 5
+
+  $IsReadOperation = $CmdletName -like 'Get-*'
+  $IsDeleteOperation = $CmdletName -like 'Remove-*' -or $CmdletName -like 'Disable-*'
+
+  for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+    try {
+      $Result = Invoke-FunctionalTestRestRequest `
+        -Uri $ApiEndpoint `
+        -Method 'POST' `
+        -Headers $Headers `
+        -Body $Body `
+        -ContentType 'application/json'
+
+      # Check for API-level errors embedded in 200 OK responses.
+      # The EXO InvokeCommand endpoint can return HTTP 200 with error details
+      # in the response body rather than signaling via HTTP status code.
+      if ($null -ne $Result) {
+        $EmbeddedError = $null
+        if ($null -ne $Result.'@odata.error') {
+          $EmbeddedError = $Result.'@odata.error'
+        } elseif ($null -ne $Result.error) {
+          $EmbeddedError = $Result.error
+        }
+
+        if ($null -ne $EmbeddedError) {
+          $ErrorDetail = $EmbeddedError | ConvertTo-Json -Depth 3 -Compress
+          $ErrorMessage = "EXO cmdlet '$CmdletName' returned an API-level error: $ErrorDetail"
+
+          # Treat throttling / transient embedded errors as retryable
+          $ErrorString = [string]$ErrorDetail
+          $IsTransientEmbedded = $ErrorString -match 'throttl|busy|unavailable|try again'
+
+          if ($IsTransientEmbedded -and $Attempt -lt $MaxRetries) {
+            $Delay = $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1)
+            Write-Information "[EXO] $CmdletName API error (attempt $Attempt/$MaxRetries): $ErrorDetail. Retrying in ${Delay}s..." -InformationAction Continue
+            Start-Sleep -Seconds $Delay
+            continue
+          }
+
+          Write-Information "[EXO] $CmdletName FAILED with API error: $ErrorDetail" -InformationAction Continue
+          throw $ErrorMessage
+        }
+      }
+
+      return $Result.value
+
+    } catch {
+      $Message = $_.Exception.Message
+
+      # Detect HTTP status codes from Invoke-FunctionalTestRestRequest exception messages
+      $StatusCode = 0
+      if ($Message -match 'status code (\d+)') {
+        $StatusCode = [int]$Matches[1]
+      }
+
+      # 404 tolerance for read and delete operations.
+      # Reads: eventual consistency means the object may not be visible yet.
+      # Deletes: removing something that doesn't exist is idempotent success.
+      if ($StatusCode -eq 404 -and ($IsReadOperation -or $IsDeleteOperation)) {
+        Write-Information "[EXO] $CmdletName returned 404 (not found) - treating as success." -InformationAction Continue
+        return $null
+      }
+
+      # Retry on transient HTTP errors
+      $IsTransient = $StatusCode -in @(429, 500, 502, 503, 504)
+      if ($IsTransient -and $Attempt -lt $MaxRetries) {
+        $Delay = $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1)
+
+        # Honor Retry-After for 429
+        if ($StatusCode -eq 429 -and $Message -match 'Retry-After:\s*(\d+)') {
+          $Delay = [math]::Max($Delay, [int]$Matches[1])
+        }
+
+        Write-Information "[EXO] $CmdletName failed with HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
+        Start-Sleep -Seconds $Delay
+        continue
+      }
+
+      # Non-transient or exhausted retries - log and rethrow
+      Write-Information "[EXO] $CmdletName FAILED after $Attempt attempt(s): $Message" -InformationAction Continue
+      throw
+    }
+  }
+}
+
 function Invoke-FunctionalExoCommand {
   [CmdletBinding()]
   param(
@@ -176,7 +286,7 @@ function Invoke-FunctionalExoCommand {
     [hashtable]$Parameters = @{}
   )
 
-  return Invoke-EXORestMethod `
+  return Invoke-FunctionalExoRestRequest `
     -CmdletName $CmdletName `
     -ApiEndpoint $script:EXOApiEndpoint `
     -AccessToken $script:EXOAccessToken `
@@ -512,7 +622,8 @@ function Set-ExoRemoteDomainAutoForwardEnabled {
   # Allow time for the write to propagate to all EXO backend replicas before
   # ScubaGear's independent REST session reads tenant state. Without this,
   # ScubaGear may read a replica that hasn't received the update yet.
-  Start-Sleep -Seconds 60
+  # GCC High environments have slower replica propagation, so 90s is used.
+  Start-Sleep -Seconds 90
 }
 
 function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
@@ -529,6 +640,10 @@ function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
     $CurrentValue = ConvertTo-FunctionalExoBoolean -Value $Config.SmtpClientAuthenticationDisabled
     $CurrentValue -eq $SmtpClientAuthenticationDisabled
   } -FailureMessage "Failed to observe SmtpClientAuthenticationDisabled=$SmtpClientAuthenticationDisabled after update."
+
+  # Allow time for the write to propagate to all EXO backend replicas before
+  # ScubaGear's independent REST session reads tenant state.
+  Start-Sleep -Seconds 60
 }
 
 function New-ExoSharingPolicy {
@@ -548,6 +663,10 @@ function New-ExoSharingPolicy {
         [string]$_.Name -eq $Name -or [string]$_.Identity -eq $Name
       }).Count -gt 0
   } -FailureMessage "Failed to observe new sharing policy '$Name' after creation."
+
+  # Allow time for the write to propagate to all EXO backend replicas before
+  # ScubaGear's independent REST session reads tenant state.
+  Start-Sleep -Seconds 60
 }
 
 function Remove-ExoSharingPolicy {
@@ -558,32 +677,73 @@ function Remove-ExoSharingPolicy {
   )
 
   Remove-SharingPolicy -Identity $Identity
+
+  # The Remove call returns null both on successful deletion and on 404
+  # (item already gone). In either case, verify the policy is not visible.
+  Wait-FunctionalExoCondition -Condition {
+    @(Get-SharingPolicy | Where-Object {
+        [string]$_.Name -eq $Identity -or [string]$_.Identity -eq $Identity
+      }).Count -eq 0
+  } -FailureMessage "Failed to observe removal of sharing policy '$Identity'."
+
+  # Allow time for the removal to propagate to all EXO backend replicas.
+  Start-Sleep -Seconds 60
 }
 
 function Disable-ExoExternalSenderWarningRules {
   [CmdletBinding()]
   param()
 
-  Get-TransportRule |
+  $RulesToDisable = @(Get-TransportRule |
     Where-Object {
       [string]$_.State -eq 'Enabled' -and
       [string]$_.Mode -eq 'Enforce' -and
       [string]$_.FromScope -eq 'NotInOrganization'
-    } |
-    Disable-TransportRule
+    })
+
+  $RulesToDisable | Disable-TransportRule
+
+  if ($RulesToDisable.Count -gt 0) {
+    Wait-FunctionalExoCondition -MaxAttempts 12 -DelaySeconds 10 -Condition {
+      @(Get-TransportRule | Where-Object {
+          [string]$_.State -eq 'Enabled' -and
+          [string]$_.Mode -eq 'Enforce' -and
+          [string]$_.FromScope -eq 'NotInOrganization'
+        }).Count -eq 0
+    } -FailureMessage "Failed to observe all external sender warning rules disabled after update."
+
+    # Allow time for the write to propagate to all EXO backend replicas.
+    Start-Sleep -Seconds 60
+  }
 }
 
 function Enable-ExoExternalSenderWarningRules {
   [CmdletBinding()]
   param()
 
-  Get-TransportRule |
+  $RulesToEnable = @(Get-TransportRule |
     Where-Object {
       [string]$_.State -eq 'Disabled' -and
       [string]$_.Mode -eq 'Enforce' -and
       [string]$_.FromScope -eq 'NotInOrganization'
-    } |
-    Enable-TransportRule
+    })
+
+  $RulesToEnable | Enable-TransportRule
+
+  if ($RulesToEnable.Count -gt 0) {
+    Wait-FunctionalExoCondition -MaxAttempts 12 -DelaySeconds 10 -Condition {
+      $ExpectedNames = $RulesToEnable | ForEach-Object { [string]$_.Name }
+      $EnabledRules = @(Get-TransportRule | Where-Object {
+          [string]$_.State -eq 'Enabled' -and
+          [string]$_.Mode -eq 'Enforce' -and
+          [string]$_.FromScope -eq 'NotInOrganization'
+        })
+      ($EnabledRules | Where-Object { [string]$_.Name -in $ExpectedNames }).Count -eq $RulesToEnable.Count
+    } -FailureMessage "Failed to observe all external sender warning rules re-enabled after update."
+
+    # Allow time for the write to propagate to all EXO backend replicas.
+    Start-Sleep -Seconds 60
+  }
 }
 
 function New-ExoExternalSenderWarningRule {
@@ -594,6 +754,16 @@ function New-ExoExternalSenderWarningRule {
   )
 
   New-TransportRule $Name -FromScope 'NotInOrganization' -PrependSubject '[External] ' | Out-Null
+
+  # Wait for the rule to become visible so ScubaGear's provider call sees it.
+  Wait-FunctionalExoCondition -Condition {
+    @(Get-TransportRule | Where-Object {
+        [string]$_.Name -eq $Name -and [string]$_.State -eq 'Enabled'
+      }).Count -gt 0
+  } -FailureMessage "Failed to observe new transport rule '$Name' after creation."
+
+  # Allow time for the write to propagate to all EXO backend replicas.
+  Start-Sleep -Seconds 60
 }
 
 function Remove-ExoExternalSenderWarningRule {
@@ -606,6 +776,16 @@ function Remove-ExoExternalSenderWarningRule {
   Get-TransportRule |
     Where-Object { $_.Identity -eq $Identity } |
     Remove-TransportRule
+
+  # Wait for the rule removal to propagate so future tests see a clean state.
+  Wait-FunctionalExoCondition -Condition {
+    @(Get-TransportRule | Where-Object {
+        [string]$_.Identity -eq $Identity -or [string]$_.Name -eq $Identity
+      }).Count -eq 0
+  } -FailureMessage "Failed to observe removal of transport rule '$Identity'."
+
+  # Allow time for the removal to propagate to all EXO backend replicas.
+  Start-Sleep -Seconds 60
 }
 
 function Set-ExoOrganizationAuditDisabled {
