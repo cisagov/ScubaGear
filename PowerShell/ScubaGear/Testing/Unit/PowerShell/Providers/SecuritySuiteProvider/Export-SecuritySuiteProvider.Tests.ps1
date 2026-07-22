@@ -17,6 +17,19 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                 [string[]]$SuccessfulCommands = @()
                 [string[]]$UnSuccessfulCommands = @()
 
+                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs, [bool]$SuppressWarning) {
+                    $this.SuccessfulCommands += $Command
+                    return @([pscustomobject]@{ Name = $Command })
+                }
+
+                [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
+                    return $this.TryCommand($Command, $CommandArgs, $false)
+                }
+
+                [System.Object[]] TryCommand([string]$Command) {
+                    return $this.TryCommand($Command, @{}, $false)
+                }
+
                 [void] AddSuccessfulCommand([string]$Command) {
                     $this.SuccessfulCommands += $Command
                 }
