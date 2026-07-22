@@ -1,8 +1,9 @@
 package utils.securitysuite
 
 import data.utils.key.FAIL
-import data.utils.key.ConvertToSet
+import data.utils.report.ReportDetailsBoolean
 import data.utils.report.ReportDetailsString
+import data.utils.key.ConvertToSet
 import rego.v1
 
 #############
@@ -21,16 +22,43 @@ DLPLICENSEWARNSTR := concat(" ", [
     "Data Loss Prevention, which is required for this feature.",
     "This feature is included in E3/G3/E5/G5 licenses.**"
 ])
-#################################################################################
-# Report Detail Functions for check that required Defender license #
-#################################################################################
+
+#############################################
+# Specific Defender Report Details Function #
+#############################################
+
 # If a defender license is present, don't apply the warning
 # and leave the message unchanged
+ApplyLicenseWarning(Status) := ReportDetailsBoolean(Status) if {
+    input.defender_license == true
+}
+
+# If a defender license is not present, assume failure and
+# replace the message with the warning
+ApplyLicenseWarning(_) := DEFLICENSEWARNSTR if {
+    input.defender_license == false
+}
+
+# If a defender license is not present, return a defender license warning
+# If a defender license is present and Status is true, return the standard success message and nothing else
+# If a defender license is present and Status is false, return the the custom provided message
 ApplyLicenseWarningString(Status, String) := ReportDetailsString(Status, String) if {
     input.defender_license == true
 }
 
-ApplyLicenseWarningString(_, _) := concat(" ", [FAIL, DEFLICENSEWARNSTR]) if {
+ApplyLicenseWarningString(_, _) := DEFLICENSEWARNSTR if {
+    input.defender_license == false
+}
+
+# If a defender license is not present, return a defender license warning
+# If a defender license is present, return the custom provided message
+# This differs from ApplyLicenseWarningString because it always returns the custom
+# message when licensed (Status is not needed).
+ApplyLicenseWarningStringCustom(String) := String if {
+    input.defender_license == true
+}
+
+ApplyLicenseWarningStringCustom(_) := DEFLICENSEWARNSTR if {
     input.defender_license == false
 }
 
@@ -83,6 +111,78 @@ ListConfigValues(PolicyID, ListKey) := Values if {
     }
 } else := set()
 
+###############################
+# Anti-malware policy helpers #
+###############################
+
+default HighestPriorityActiveAntiMalwarePolicyName := "Default"
+
+HighestPriorityActiveAntiMalwarePolicyName := PolicyName if {
+    PresetPolicyCoversAllRecipients(`(?i)Strict Preset Security Policy`)
+    some Policy in input.anti_malware_policies
+    regex.match(`(?i)Strict Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    PresetPolicyCoversAllRecipients(`(?i)Standard Preset Security Policy`)
+    some Policy in input.anti_malware_policies
+    regex.match(`(?i)Standard Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    count(input.anti_malware_rules) > 0
+    EnabledRules := {Rule | some Rule in input.anti_malware_rules; Rule.State == "Enabled"}
+    count(EnabledRules) > 0
+    # The "highest" priority rules is actually the rule with the lowest "Priority" value
+    MinPriority := min({Rule.Priority | some Rule in EnabledRules})
+    some Rule in EnabledRules
+    Rule.Priority == MinPriority
+    CustomRuleCoversAllRecipients(Rule)
+    PolicyName := Rule.MalwareFilterPolicy
+}
+
+UserFriendlyPolicyName(PolicyName) := Name if {
+    regex.match(`(?i)Strict Preset Security Policy`, PolicyName)
+    Name := "Strict Preset"
+} else := Name if {
+    regex.match(`(?i)Standard Preset Security Policy`, PolicyName)
+    Name := "Standard Preset"
+} else := Name if {
+    PolicyName == "Default"
+    Name := "Default"
+} else := PolicyName
+
+##################################
+# Safe attachment policy helpers #
+##################################
+
+default HighestPriorityActiveSafeAttachmentPolicyName := null
+
+HighestPriorityActiveSafeAttachmentPolicyName := PolicyName if {
+    PresetPolicyCoversAllRecipientsATP(`(?i)Strict Preset Security Policy`)
+    some Policy in input.safe_attachment_policies
+    regex.match(`(?i)Strict Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    PresetPolicyCoversAllRecipientsATP(`(?i)Standard Preset Security Policy`)
+    some Policy in input.safe_attachment_policies
+    regex.match(`(?i)Standard Preset Security Policy`, Policy.Identity)
+    PolicyName := Policy.Identity
+} else := PolicyName if {
+    count(input.safe_attachment_rules) > 0
+    EnabledRules := {Rule | some Rule in input.safe_attachment_rules; Rule.State == "Enabled"}
+    count(EnabledRules) > 0
+    # The "highest" priority rules is actually the rule with the lowest "Priority" value
+    MinPriority := min({Rule.Priority | some Rule in EnabledRules})
+    some Rule in EnabledRules
+    Rule.Priority == MinPriority
+    CustomRuleCoversAllRecipients(Rule)
+    PolicyName := Rule.SafeAttachmentPolicy
+} else := "Built-In Protection Policy" if {
+    some Rule in input.built_in_protection_rules
+    RuleFieldEmpty(Rule.ExceptIfSentTo)
+    RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
+}
+
 ##############################################
 # Impersonation protection — shared helpers
 ##############################################
@@ -126,6 +226,18 @@ PresetPolicyCoversAllRecipients(Identity) if {
     ]) > 0
 }
 
+PresetPolicyCoversAllRecipientsATP(Identity) if {
+    count([
+        Rule |
+        some Rule in input.atp_policy_rules
+        regex.match(Identity, Rule.Identity)
+        Rule.State == "Enabled"
+        RuleFieldEmpty(Rule.SentTo)
+        RuleFieldEmpty(Rule.SentToMemberOf)
+        RuleFieldEmpty(Rule.RecipientDomainIs)
+    ]) > 0
+}
+
 AntiPhishRuleForPolicy(Rule, Policy) if {
     Rule.State == "Enabled"
     Rule.AntiPhishPolicy == Policy.Name
@@ -144,6 +256,15 @@ CustomRuleCoversAllRecipients(Rule) if {
     RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
     RuleDomains := ConvertToSet(Rule.RecipientDomainIs)
     count(TenantDomainNames - RuleDomains) == 0
+}
+
+CustomRuleCoversAllRecipients(Rule) if {
+    RuleFieldEmpty(Rule.SentTo)
+    RuleFieldEmpty(Rule.SentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfSentTo)
+    RuleFieldEmpty(Rule.ExceptIfSentToMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfRecipientDomainIs)
+    RuleFieldEmpty(Rule.RecipientDomainIs)
 }
 
 CustomAntiPhishPolicyCoversAllRecipients(Policy) if {
