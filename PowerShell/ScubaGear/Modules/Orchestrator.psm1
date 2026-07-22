@@ -874,6 +874,8 @@ function Invoke-ProviderList {
                                 'M365Environment' = $ScubaConfig.M365Environment
                                 'AccessToken' = $ConnectionResult.EXOAccessToken
                                 'ApiEndpoint' = $ConnectionResult.EXOApiEndpoint
+                                'ComplianceAccessToken' = $ConnectionResult.ComplianceAccessToken
+                                'ComplianceApiEndpoint' = $ConnectionResult.ComplianceApiEndpoint
                             }
                             $RetVal = Export-SecuritySuiteProvider @SecuritySuiteProviderParams | Select-Object -Last 1
                         }
