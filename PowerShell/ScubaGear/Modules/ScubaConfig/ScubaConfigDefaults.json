@@ -155,6 +155,11 @@
         "actionMessageRef": "default"
       },
       {
+        "name": "Defender migration warnings",
+        "pattern": "^Defender\\s+migration\\s+warning:",
+        "actionMessageRef": "defenderMigration"
+      },
+      {
         "name": "Other warnings",
         "pattern": "",
         "actionMessageRef": "default"
@@ -168,6 +173,11 @@
       ],
       "opaPath": [
         "Please install OPA using 'Install-OPAforSCuBA' or place the executable in one of the following locations above."
+      ],
+      "defenderMigration": [
+        "The Defender product has been renamed to 'securitysuite' and many Defender, Exchange Online, and Teams policies were migrated into the MS.SECURITYSUITE.* baseline.",
+        "Update your configuration file: replace 'defender' with 'securitysuite' in ProductNames and update migrated policy IDs to their new MS.SECURITYSUITE.* equivalents.",
+        "Refer to the documentation [docs\\configuration\\defender-to-securitysuite-transition.md] and the mapping file [mappings\\scuba-baseline-policy-migrations.csv] for the complete list of migrated policies."
       ]
     }
   }
