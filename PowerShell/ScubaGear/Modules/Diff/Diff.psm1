@@ -35,9 +35,9 @@ $script:ProductOrder = @(
     'Teams'
 )
 
-# Bucket -> row color class used by the HTML report. Keep in sync with the
+# Classification -> row color class used by the HTML report. Keep in sync with the
 # Diff Key terminology in the ADR / usage doc.
-$script:BucketColorMap = [ordered]@{
+$script:ClassificationColorMap = [ordered]@{
     'Errored'             = 'red'
     'NewFail'             = 'red'
     'NewPass'             = 'green'
@@ -53,9 +53,9 @@ $script:BucketColorMap = [ordered]@{
     'Unchanged'           = 'unchanged'
 }
 
-# Bucket -> human-friendly label for HTML display. Buckets not listed here are
+# Classification -> human-friendly label for HTML display. Classifications not listed here are
 # displayed using their raw (camelCase) token.
-$script:BucketLabelMap = @{
+$script:ClassificationLabelMap = @{
     'NewFail'             = 'New Fail'
     'NewPass'             = 'New Pass'
     'NewWarning'          = 'New Warning'
@@ -241,10 +241,10 @@ function Get-ScubaResultCategory {
     }
 }
 
-function Get-ScubaDiffBucket {
+function Get-ScubaDiffClassification {
     <#
     .Description
-    Classifies a single base control ID into exactly one transition bucket,
+    Classifies a single base control ID into exactly one transition classification,
     honoring the precedence: Errored > PolicyVersionUpdate > Unchanged >
     NewIncorrectResult > specific transitions > NewOmission > Other.
     NewPolicy/RemovedPolicy are determined by presence and take precedence over
@@ -253,10 +253,10 @@ function Get-ScubaDiffBucket {
 
     Errored keys off the *after* state only: a control that is errored in the
     latest run is what an operator needs to see. A control that recovered *from* an
-    error (Error -> Pass/Fail/Warning) is bucketed by the state it lands in, like
+    error (Error -> Pass/Fail/Warning) is classified by the state it lands in, like
     any other prior non-evaluated state, so a resolved error is not reported as red.
 
-    Buckets are named for the state the control lands in, so a transition into
+    Classifications are named for the state the control lands in, so a transition into
     Pass/Fail/Warning from any prior state -- including Omitted, a prior Error, or a
     cleared "Incorrect result" marking -- reports as NewPass/NewFail/NewWarning.
     Only the Omitted transitions that have no such landing state (e.g. Pass ->
@@ -297,7 +297,7 @@ function Get-ScubaDiffBucket {
 
     # A control the user marked incorrect (a false positive) carries the literal
     # Result "Incorrect result" (category 'Incorrect'). Newly acquiring that
-    # marking is its own bucket; losing it is bucketed by the result it reveals
+    # marking is its own classification; losing it is classified by the result it reveals
     # via the transitions below.
     if ($aCat -eq 'Incorrect') { return 'NewIncorrectResult' }
 
@@ -334,11 +334,11 @@ function Get-ScubaDiffBucket {
     return 'Other'
 }
 
-function Get-ScubaBucketColor {
+function Get-ScubaClassificationColor {
     <#
     .Description
-    Maps a transition bucket to its HTML row color class (red/green/yellow/
-    neutral/unchanged). Unknown buckets fall back to yellow.
+    Maps a transition classification to its HTML row color class (red/green/yellow/
+    neutral/unchanged). Unknown classifications fall back to yellow.
     .Functionality
     Internal
     #>
@@ -346,19 +346,19 @@ function Get-ScubaBucketColor {
     param(
         [Parameter(Mandatory = $true)]
         [string]
-        $Bucket
+        $Classification
     )
-    if ($script:BucketColorMap.Contains($Bucket)) {
-        return $script:BucketColorMap[$Bucket]
+    if ($script:ClassificationColorMap.Contains($Classification)) {
+        return $script:ClassificationColorMap[$Classification]
     }
     return 'yellow'
 }
 
-function Get-ScubaBucketLabel {
+function Get-ScubaClassificationLabel {
     <#
     .Description
-    Maps a transition bucket to its human-friendly display label for the HTML
-    report. Buckets without an explicit label are shown using their raw token.
+    Maps a transition classification to its human-friendly display label for the HTML
+    report. Classifications without an explicit label are shown using their raw token.
     .Functionality
     Internal
     #>
@@ -366,12 +366,12 @@ function Get-ScubaBucketLabel {
     param(
         [Parameter(Mandatory = $true)]
         [string]
-        $Bucket
+        $Classification
     )
-    if ($script:BucketLabelMap.ContainsKey($Bucket)) {
-        return $script:BucketLabelMap[$Bucket]
+    if ($script:ClassificationLabelMap.ContainsKey($Classification)) {
+        return $script:ClassificationLabelMap[$Classification]
     }
-    return $Bucket
+    return $Classification
 }
 
 function Get-ScubaProductDisplayName {
@@ -434,7 +434,7 @@ function Get-ScubaRowColorClass {
         [object]
         $Record
     )
-    if ($Record.Bucket -eq 'RemovedPolicy') { return 'grey' }
+    if ($Record.Classification -eq 'RemovedPolicy') { return 'grey' }
     switch (Get-ScubaResultCategory $Record.ResultAfter) {
         'Fail'    { return 'red' }
         'Error'   { return 'red' }
@@ -607,7 +607,7 @@ function Compare-ScubaResults {
         $allBase = Get-ScubaOrderedControlIds @(@($beforeMap.Keys) + @($afterMap.Keys) | Select-Object -Unique)
 
         $records = @()
-        $bucketCounts = [ordered]@{}
+        $classificationCounts = [ordered]@{}
 
         foreach ($base in $allBase) {
             $b = $beforeMap[$base]
@@ -618,7 +618,7 @@ function Compare-ScubaResults {
             if ($bPresent) { $bResult = $b.Result; $bVersion = $b.Version } else { $bResult = $null; $bVersion = $null }
             if ($aPresent) { $aResult = $a.Result; $aVersion = $a.Version } else { $aResult = $null; $aVersion = $null }
 
-            $bucket = Get-ScubaDiffBucket -BeforeResult $bResult -AfterResult $aResult `
+            $classification = Get-ScubaDiffClassification -BeforeResult $bResult -AfterResult $aResult `
                 -BeforePresent $bPresent -AfterPresent $aPresent `
                 -BeforeVersion $bVersion -AfterVersion $aVersion
 
@@ -634,7 +634,7 @@ function Compare-ScubaResults {
                 'GroupNumber'         = $groupNumber
                 'ResultBefore'        = $bResult
                 'ResultAfter'         = $aResult
-                'Bucket'              = $bucket
+                'Classification'              = $classification
                 'CriticalityBefore'   = if ($bPresent) { $b.Criticality } else { $null }
                 'CriticalityAfter'    = if ($aPresent) { $a.Criticality } else { $null }
                 'DetailsAfter'        = $detailsAfter
@@ -668,12 +668,12 @@ function Compare-ScubaResults {
 
             $records += [pscustomobject]$record
 
-            if (-not $bucketCounts.Contains($bucket)) { $bucketCounts[$bucket] = 0 }
-            $bucketCounts[$bucket] += 1
+            if (-not $classificationCounts.Contains($classification)) { $classificationCounts[$classification] = 0 }
+            $classificationCounts[$classification] += 1
         }
 
         $diff[$product] = $records
-        $summary[$product] = $bucketCounts
+        $summary[$product] = $classificationCounts
     }
 
     $timestampZulu = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
@@ -761,7 +761,7 @@ function ConvertTo-ScubaDiffCsvRecord {
                 'Control ID (After)'     = $r.'Control ID (After)'
                 'GroupNumber'            = $r.GroupNumber
                 'GroupName'              = $r.GroupName
-                'Bucket'                 = $r.Bucket
+                'Classification'                 = $r.Classification
                 'ResultBefore'           = $r.ResultBefore
                 'ResultAfter'            = $r.ResultAfter
                 'CriticalityBefore'      = $r.CriticalityBefore
@@ -812,8 +812,8 @@ function New-ScubaDiffReport {
     $meta = $DiffResults.MetaData
     $enc = { param($s) ConvertTo-ScubaHtmlEncoded ([string]$s) }
 
-    # Ordered list of buckets for stable summary columns.
-    $bucketOrder = @($script:BucketColorMap.Keys)
+    # Ordered list of classifications for stable summary columns.
+    $classificationOrder = @($script:ClassificationColorMap.Keys)
 
     $sb = New-Object System.Text.StringBuilder
 
@@ -859,17 +859,17 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
-    # Per-product summary table. Every bucket in the taxonomy gets a column --
-    # including buckets absent from this diff -- so each one has a filter control.
+    # Per-product summary table. Every classification in the taxonomy gets a column --
+    # including classifications absent from this diff -- so each one has a filter control.
     # Each non-Unchanged column header carries a checkbox that filters both this
     # table (dimming the column and recomputing totals) and the per-product
     # transition tables below. Unchanged has no checkbox here: it stays governed by
     # the "Show unchanged rows" toggle in the report header.
-    $summaryColumns = @($bucketOrder)
+    $summaryColumns = @($classificationOrder)
 
     [void]$sb.AppendLine('<h2>Summary</h2>')
     [void]$sb.AppendLine('<div class="filter-controls">')
-    [void]$sb.AppendLine('  <span class="filter-hint">Use the checkboxes in the column headers to filter buckets. Filters apply to this table and the product tables below.</span>')
+    [void]$sb.AppendLine('  <span class="filter-hint">Use the checkboxes in the column headers to filter classifications. Filters apply to this table and the product tables below.</span>')
     [void]$sb.AppendLine('  <button type="button" id="toggle-all-filters" class="filter-btn">Uncheck all filters</button>')
     [void]$sb.AppendLine('</div>')
     [void]$sb.AppendLine('<table class="summary-table">')
@@ -877,10 +877,10 @@ function New-ScubaDiffReport {
     foreach ($col in $summaryColumns) {
         $colEnc = & $enc $col
         if ($col -eq 'Unchanged') {
-            [void]$sb.Append("<th class=""bucket-col"" data-bucket=""$colEnc"">$colEnc</th>")
+            [void]$sb.Append("<th class=""classification-col"" data-classification=""$colEnc"">$colEnc</th>")
         }
         else {
-            [void]$sb.Append("<th class=""bucket-col bucket-filter"" data-bucket=""$colEnc""><label><input type=""checkbox"" class=""bucket-toggle"" data-bucket=""$colEnc"" checked> $colEnc</label></th>")
+            [void]$sb.Append("<th class=""classification-col classification-filter"" data-classification=""$colEnc""><label><input type=""checkbox"" class=""classification-toggle"" data-classification=""$colEnc"" checked> $colEnc</label></th>")
         }
     }
     [void]$sb.AppendLine('<th>Total</th></tr>')
@@ -893,7 +893,7 @@ function New-ScubaDiffReport {
             $total += $val
             $colEnc = & $enc $col
             if ($val -eq 0) { $cls = 'count count-zero' } else { $cls = 'count' }
-            [void]$sb.Append("<td class=""$cls"" data-bucket=""$colEnc"" data-count=""$val"">$val</td>")
+            [void]$sb.Append("<td class=""$cls"" data-classification=""$colEnc"" data-count=""$val"">$val</td>")
         }
         [void]$sb.AppendLine("<td class=""summary-total"">$total</td></tr>")
     }
@@ -906,12 +906,12 @@ function New-ScubaDiffReport {
         [void]$sb.AppendLine('<table class="policy-diff">')
         [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Transition</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>')
         foreach ($r in $records) {
-            $bucket = $r.Bucket
+            $classification = $r.Classification
             # Row color follows the Result (After) value (Fail/Error=red,
             # Warning=yellow, Pass=green, manual/removed/other=grey).
             $color = Get-ScubaRowColorClass $r
             $rowClass = "diff-row diff-$color"
-            if ($bucket -eq 'Unchanged') { $rowClass += ' diff-unchanged-row' }
+            if ($classification -eq 'Unchanged') { $rowClass += ' diff-unchanged-row' }
 
             # Control ID display: show a "before -> after" arrow when the IDs differ.
             $beforeId = $r.'Control ID (Before)'
@@ -935,10 +935,10 @@ function New-ScubaDiffReport {
                 $resultAfterCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultAfter))</span>"
             }
 
-            [void]$sb.AppendLine("<tr class=""$rowClass"" data-bucket=""$(& $enc $bucket)"">")
+            [void]$sb.AppendLine("<tr class=""$rowClass"" data-classification=""$(& $enc $classification)"">")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
-            [void]$sb.AppendLine("  <td class=""bucket-label"">$(& $enc (Get-ScubaBucketLabel $bucket))</td>")
+            [void]$sb.AppendLine("  <td class=""classification-label"">$(& $enc (Get-ScubaClassificationLabel $classification))</td>")
             [void]$sb.AppendLine("  <td>$resultBeforeCell</td>")
             [void]$sb.AppendLine("  <td>$resultAfterCell</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.Requirement)</td>")
@@ -1138,9 +1138,9 @@ Export-ModuleMember -Function @(
     'ConvertTo-ScubaPlainText',
     'ConvertTo-ScubaHtmlEncoded',
     'Get-ScubaResultCategory',
-    'Get-ScubaDiffBucket',
-    'Get-ScubaBucketColor',
-    'Get-ScubaBucketLabel',
+    'Get-ScubaDiffClassification',
+    'Get-ScubaClassificationColor',
+    'Get-ScubaClassificationLabel',
     'Get-ScubaRowColorClass',
     'Get-ScubaProductDisplayName',
     'Get-ScubaOrderedProducts',

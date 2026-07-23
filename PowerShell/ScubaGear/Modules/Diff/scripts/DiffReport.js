@@ -4,8 +4,8 @@
  *   1. "Show unchanged rows" toggles the visibility of Unchanged rows, which
  *      are hidden by default (see decision 4 in the ADR). This follows the same
  *      per-report script pattern used by the CreateReport module.
- *   2. Per-bucket filter checkboxes in the summary-table column headers. Each one
- *      (every bucket except Unchanged, which the toggle above owns) hides the
+ *   2. Per-classification filter checkboxes in the summary-table column headers. Each one
+ *      (every classification except Unchanged, which the toggle above owns) hides the
  *      matching rows in the product tables, dims its own summary column, and
  *      recomputes each product's Total. Unchanged is always counted in the Total.
  *   3. "Dark Mode" toggles the light/dark theme by setting data-theme on <html>,
@@ -23,8 +23,8 @@
         document.documentElement.dataset.theme = enabled ? "dark" : "light";
     }
 
-    // The buckets whose filter checkbox is currently unchecked (hidden).
-    var hiddenBuckets = Object.create(null);
+    // The classifications whose filter checkbox is currently unchecked (hidden).
+    var hiddenClassifications = Object.create(null);
     // The "Uncheck all filters" / "Check all filters" button (assigned on load).
     var allFiltersBtn = null;
 
@@ -37,30 +37,30 @@
 
     function updateAllFiltersButton(toggles) {
         if (!allFiltersBtn) { return; }
-        // When at least one bucket is shown, the button clears them; once every
-        // bucket is hidden it flips to restore them, so users are never stranded.
+        // When at least one classification is shown, the button clears them; once every
+        // classification is hidden it flips to restore them, so users are never stranded.
         var someChecked = anyChecked(toggles);
         allFiltersBtn.textContent = someChecked ? "Uncheck all filters" : "Check all filters";
         allFiltersBtn.setAttribute("aria-pressed", someChecked ? "false" : "true");
     }
 
     function applyRowFilter() {
-        // Product transition rows carry data-bucket; summary rows do not. Unchanged
+        // Product transition rows carry data-classification; summary rows do not. Unchanged
         // rows are governed by the "Show unchanged rows" toggle, so skip them here.
-        var rows = document.querySelectorAll("tr[data-bucket]");
+        var rows = document.querySelectorAll("tr[data-classification]");
         for (var i = 0; i < rows.length; i++) {
             var row = rows[i];
             if (row.classList.contains("diff-unchanged-row")) { continue; }
-            var bucket = row.getAttribute("data-bucket");
-            row.style.display = hiddenBuckets[bucket] ? "none" : "";
+            var classification = row.getAttribute("data-classification");
+            row.style.display = hiddenClassifications[classification] ? "none" : "";
         }
     }
 
     function applyColumnDim() {
-        var cells = document.querySelectorAll(".summary-table [data-bucket]");
+        var cells = document.querySelectorAll(".summary-table [data-classification]");
         for (var i = 0; i < cells.length; i++) {
-            var bucket = cells[i].getAttribute("data-bucket");
-            if (hiddenBuckets[bucket]) { cells[i].classList.add("col-off"); }
+            var classification = cells[i].getAttribute("data-classification");
+            if (hiddenClassifications[classification]) { cells[i].classList.add("col-off"); }
             else { cells[i].classList.remove("col-off"); }
         }
     }
@@ -70,12 +70,12 @@
         for (var i = 0; i < rows.length; i++) {
             var totalCell = rows[i].querySelector(".summary-total");
             if (!totalCell) { continue; }
-            var counts = rows[i].querySelectorAll("td[data-bucket]");
+            var counts = rows[i].querySelectorAll("td[data-classification]");
             var sum = 0;
             for (var j = 0; j < counts.length; j++) {
-                var bucket = counts[j].getAttribute("data-bucket");
-                // Unchanged is always counted; other buckets only when active.
-                if (bucket === "Unchanged" || !hiddenBuckets[bucket]) {
+                var classification = counts[j].getAttribute("data-classification");
+                // Unchanged is always counted; other classifications only when active.
+                if (classification === "Unchanged" || !hiddenClassifications[classification]) {
                     sum += parseInt(counts[j].getAttribute("data-count"), 10) || 0;
                 }
             }
@@ -83,11 +83,11 @@
         }
     }
 
-    function refreshBucketFilters(toggles) {
-        hiddenBuckets = Object.create(null);
+    function refreshClassificationFilters(toggles) {
+        hiddenClassifications = Object.create(null);
         for (var i = 0; i < toggles.length; i++) {
             if (!toggles[i].checked) {
-                hiddenBuckets[toggles[i].getAttribute("data-bucket")] = true;
+                hiddenClassifications[toggles[i].getAttribute("data-classification")] = true;
             }
         }
         applyRowFilter();
@@ -105,30 +105,30 @@
             });
         }
 
-        // Per-bucket filter checkboxes in the summary header.
-        var bucketToggles = document.querySelectorAll(".bucket-toggle");
-        if (bucketToggles.length) {
-            for (var i = 0; i < bucketToggles.length; i++) {
-                bucketToggles[i].addEventListener("change", function () {
-                    refreshBucketFilters(bucketToggles);
+        // Per-classification filter checkboxes in the summary header.
+        var classificationToggles = document.querySelectorAll(".classification-toggle");
+        if (classificationToggles.length) {
+            for (var i = 0; i < classificationToggles.length; i++) {
+                classificationToggles[i].addEventListener("change", function () {
+                    refreshClassificationFilters(classificationToggles);
                 });
             }
 
-            // "Uncheck all filters" button: clears every bucket filter (and thus
+            // "Uncheck all filters" button: clears every classification filter (and thus
             // hides every classified row); once all are off it restores them.
             allFiltersBtn = document.getElementById("toggle-all-filters");
             if (allFiltersBtn) {
                 allFiltersBtn.addEventListener("click", function () {
-                    var target = !anyChecked(bucketToggles);
-                    for (var j = 0; j < bucketToggles.length; j++) {
-                        bucketToggles[j].checked = target;
+                    var target = !anyChecked(classificationToggles);
+                    for (var j = 0; j < classificationToggles.length; j++) {
+                        classificationToggles[j].checked = target;
                     }
-                    refreshBucketFilters(bucketToggles);
+                    refreshClassificationFilters(classificationToggles);
                 });
             }
 
             // Establish the initial state (all checked -> nothing hidden).
-            refreshBucketFilters(bucketToggles);
+            refreshClassificationFilters(classificationToggles);
         }
 
         // Dark mode toggle. Default comes from the PowerShell -DarkMode switch.

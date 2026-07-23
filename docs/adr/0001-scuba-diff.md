@@ -40,14 +40,14 @@ than from a second comparison pass, so the three cannot disagree.
 
 The two substantive decisions below were the ones with real alternatives.
 
-### 1. Base-ID matching with a `PolicyVersionUpdate` bucket (vs. exact full-ID matching)
+### 1. Base-ID matching with a `PolicyVersionUpdate` classification (vs. exact full-ID matching)
 
 **Decision:** Match controls on their **base ID** — the Control ID with the
 trailing `v<N>` suffix stripped. Same base ID + same version → direct comparison.
-Same base ID + different version → a dedicated `PolicyVersionUpdate` bucket in
+Same base ID + different version → a dedicated `PolicyVersionUpdate` classification in
 which the before/after result comparison is reported but labeled *informational*,
 because the policy's meaning changed between runs. Base ID present in only one
-file → `NewPolicy` / `RemovedPolicy`. The `RemovedPolicy` bucket (base ID present
+file → `NewPolicy` / `RemovedPolicy`. The `RemovedPolicy` classification (base ID present
 in the before file but absent from the after file) is named to align with the
 baselines' `removedpolicies.md`, which tracks policies removed from the SCBs.
 
@@ -56,7 +56,7 @@ baselines' `removedpolicies.md`, which tracks policies removed from the SCBs.
 version-bumped policy as a simultaneous `RemovedPolicy` (`v1`) + `NewPolicy`
 (`v2`), drowning the real signal in noise and losing the connection between the
 old and new form of the same policy. Base-ID matching preserves the connection
-while the `PolicyVersionUpdate` bucket honestly signals that the comparison is
+while the `PolicyVersionUpdate` classification honestly signals that the comparison is
 not an authoritative pass→fail delta.
 
 The base-ID regex tolerates both `v1` and a hypothetical `v1.2` form, even though
@@ -81,7 +81,7 @@ related annotation is the "marked incorrect" flag, which ScubaGear surfaces by
 rewriting the control's `Result` to the literal `"Incorrect result"`. Rather than
 letting that placeholder fall through to `Other`, the diff recognizes it as its
 own category: a result becoming a false positive is `NewIncorrectResult`, a
-marking that clears is bucketed by the result it reveals (`NewPass` / `NewFail` /
+marking that clears is classified by the result it reveals (`NewPass` / `NewFail` /
 `NewWarning`), and a stable marking stays `Unchanged`. For these records the diff also carries
 `MarkedIncorrect{Before,After}` and `UnderlyingResult{Before,After}` (from
 `OriginalResult`) so consumers compare the real evaluated result, not the
