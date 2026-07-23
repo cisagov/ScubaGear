@@ -93,16 +93,36 @@ Products are matched by name only. A product present in only one file has all of
 its controls reported as `NewPolicy` (only in *after*) or `RemovedPolicy` (only
 in *before*).
 
-## Transition taxonomy
+## Diff Key terminology
 
 Every base control ID present in either file is classified into exactly one
 bucket. Buckets are named for the state the control **lands in**, so any
 transition that ends in Pass, Fail, or Warning reports as `NewPass`, `NewFail`,
-or `NewWarning` — including transitions out of `Omitted` or out of an
-`Incorrect result` marking. Precedence, highest to lowest:
-`Errored` > `PolicyVersionUpdate` > `Unchanged` > `NewIncorrectResult` >
-specific transitions > `NewOmission` > `Other`. `NewPolicy` / `RemovedPolicy`
-are determined by presence.
+or `NewWarning` — including transitions out of `Omitted`, out of a prior
+`Error`, or out of an `Incorrect result` marking.
+
+### Precedence order
+
+A control can match more than one rule at once (for example, its version changed
+*and* its result changed). It is assigned to the **first** matching bucket in
+this order, highest to lowest:
+
+| Rank | Bucket | Applies when |
+|---|---|---|
+| 1 | `NewPolicy` / `RemovedPolicy` | The base ID is present in only one file (presence wins over everything). |
+| 2 | `Errored` | The **after** result is `Error` — keyed off the latest run only, so a live error surfaces even under a version bump. |
+| 3 | `PolicyVersionUpdate` | The version suffix changed; the before/after result comparison is informational. |
+| 4 | `Unchanged` | Result and version are identical (hidden by default). |
+| 5 | `NewIncorrectResult` | The after result is newly marked `Incorrect result`. |
+| 6 | specific transitions | A recognized result change: `NewFail`, `NewPass`, `NewWarning`, `NewAutomatedCheck`, `NewManualCheck`. |
+| 7 | `NewOmission` | A remaining transition into or out of `Omitted` with no landing result. |
+| 8 | `Other` | Anything else (both literal values preserved). |
+
+> A control that errored in a *prior* run but not the latest one
+> (`Error → Pass / Fail / Warning`) is **not** `Errored`; it is bucketed by the
+> state it lands in, so a resolved error is never reported as a red `Errored` row.
+
+### Transition table
 
 | Before → After | Bucket |
 |---|---|
@@ -117,10 +137,12 @@ are determined by presence.
 | Any → Incorrect result | `NewIncorrectResult` |
 | Omitted → Pass / Fail / Warning | `NewPass` / `NewFail` / `NewWarning` |
 | Incorrect result → Pass / Fail / Warning | `NewPass` / `NewFail` / `NewWarning` |
+| Error → Pass / Fail / Warning (recovered) | `NewPass` / `NewFail` / `NewWarning` |
+| Error → N/A (recovered) | `NewManualCheck` |
 | MS.PRODUCT.X.XvX → MS.PRODUCT.X.XvX+1 | `PolicyVersionUpdate` |
 | No prior policy → New Policy | `NewPolicy` |
 | MS.PRODUCT.X.XvX → Null (removed from baseline) | `RemovedPolicy` |
-| any ↔ Error | `Errored` |
+| Any → Error | `Errored` |
 | Any → Any (identical result and version) | `Unchanged` (hidden by default) |
 | Anything else | `Other` (both literal values preserved) |
 

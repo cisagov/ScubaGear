@@ -36,7 +36,7 @@ $script:ProductOrder = @(
 )
 
 # Bucket -> row color class used by the HTML report. Keep in sync with the
-# transition taxonomy in the ADR / usage doc.
+# Diff Key terminology in the ADR / usage doc.
 $script:BucketColorMap = [ordered]@{
     'Errored'             = 'red'
     'NewFail'             = 'red'
@@ -251,11 +251,16 @@ function Get-ScubaDiffBucket {
     everything else. RemovedPolicy (base ID present in the before file but absent
     from the after file) aligns with the baselines' removedpolicies.md tracking.
 
+    Errored keys off the *after* state only: a control that is errored in the
+    latest run is what an operator needs to see. A control that recovered *from* an
+    error (Error -> Pass/Fail/Warning) is bucketed by the state it lands in, like
+    any other prior non-evaluated state, so a resolved error is not reported as red.
+
     Buckets are named for the state the control lands in, so a transition into
-    Pass/Fail/Warning from any evaluated state -- including Omitted or a cleared
-    "Incorrect result" marking -- reports as NewPass/NewFail/NewWarning. Only the
-    Omitted transitions that have no such landing state (e.g. Pass -> Omitted,
-    N/A <-> Omitted) report as NewOmission.
+    Pass/Fail/Warning from any prior state -- including Omitted, a prior Error, or a
+    cleared "Incorrect result" marking -- reports as NewPass/NewFail/NewWarning.
+    Only the Omitted transitions that have no such landing state (e.g. Pass ->
+    Omitted, N/A <-> Omitted) report as NewOmission.
     .Functionality
     Internal
     #>
@@ -275,8 +280,11 @@ function Get-ScubaDiffBucket {
     $bCat = Get-ScubaResultCategory $BeforeResult
     $aCat = Get-ScubaResultCategory $AfterResult
 
-    # Errored has highest precedence among matched controls.
-    if ($bCat -eq 'Error' -or $aCat -eq 'Error') { return 'Errored' }
+    # Errored has highest precedence among matched controls, but keys off the
+    # after state only: a control that is errored *now* must surface regardless of
+    # a version bump. A control that recovered from a prior error falls through to
+    # the landing-state transitions below (Error -> Pass = NewPass, etc.).
+    if ($aCat -eq 'Error') { return 'Errored' }
 
     # A changed version suffix means the policy's meaning changed; the Result
     # comparison is informational, so this outranks the specific transitions.
@@ -298,14 +306,17 @@ function Get-ScubaDiffBucket {
         'Warning->Fail'      { return 'NewFail' }
         'Omitted->Fail'      { return 'NewFail' }
         'Incorrect->Fail'    { return 'NewFail' }
+        'Error->Fail'        { return 'NewFail' }
         'Fail->Pass'         { return 'NewPass' }
         'Warning->Pass'      { return 'NewPass' }
         'Omitted->Pass'      { return 'NewPass' }
         'Incorrect->Pass'    { return 'NewPass' }
+        'Error->Pass'        { return 'NewPass' }
         'Pass->Warning'      { return 'NewWarning' }
         'Fail->Warning'      { return 'NewWarning' }
         'Omitted->Warning'   { return 'NewWarning' }
         'Incorrect->Warning' { return 'NewWarning' }
+        'Error->Warning'     { return 'NewWarning' }
         'NA->Pass'           { return 'NewAutomatedCheck' }
         'NA->Fail'           { return 'NewAutomatedCheck' }
         'NA->Warning'        { return 'NewAutomatedCheck' }
@@ -313,6 +324,7 @@ function Get-ScubaDiffBucket {
         'Fail->NA'           { return 'NewManualCheck' }
         'Warning->NA'        { return 'NewManualCheck' }
         'Incorrect->NA'      { return 'NewManualCheck' }
+        'Error->NA'          { return 'NewManualCheck' }
     }
 
     # Any remaining non-identical transition involving Omitted (e.g. Pass ->

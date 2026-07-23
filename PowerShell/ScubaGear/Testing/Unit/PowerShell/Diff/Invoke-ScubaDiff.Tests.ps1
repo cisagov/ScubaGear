@@ -165,8 +165,17 @@ InModuleScope Diff {
                 @{ B = 'Omitted'; A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
                 @{ B = 'N/A';     A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
                 @{ B = 'Pass';    A = 'Pass';    Bv = 'v1'; Av = 'v2'; Expected = 'PolicyVersionUpdate' }
+                # Errored keys off the after state only.
                 @{ B = 'Pass';    A = 'Error';   Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
-                @{ B = 'Error';   A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
+                @{ B = 'Fail';    A = 'Error';   Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
+                @{ B = 'Error';   A = 'Error';   Bv = 'v1'; Av = 'v1'; Expected = 'Errored' }
+                # A control that recovered from a prior error buckets by the state
+                # it lands on, not as Errored.
+                @{ B = 'Error';   A = 'Pass';    Bv = 'v1'; Av = 'v1'; Expected = 'NewPass' }
+                @{ B = 'Error';   A = 'Fail';    Bv = 'v1'; Av = 'v1'; Expected = 'NewFail' }
+                @{ B = 'Error';   A = 'Warning'; Bv = 'v1'; Av = 'v1'; Expected = 'NewWarning' }
+                @{ B = 'Error';   A = 'N/A';     Bv = 'v1'; Av = 'v1'; Expected = 'NewManualCheck' }
+                @{ B = 'Error';   A = 'Omitted'; Bv = 'v1'; Av = 'v1'; Expected = 'NewOmission' }
                 @{ B = 'Pass';    A = 'Bug';     Bv = 'v1'; Av = 'v1'; Expected = 'Other' }
                 @{ B = 'Fail';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'NewIncorrectResult' }
                 @{ B = 'Pass';    A = 'Incorrect result'; Bv = 'v1'; Av = 'v1'; Expected = 'NewIncorrectResult' }
@@ -191,8 +200,11 @@ InModuleScope Diff {
                 (Get-ScubaDiffBucket -BeforeResult $null -AfterResult 'Pass' -BeforePresent $false -AfterPresent $true -BeforeVersion $null -AfterVersion 'v1') | Should -Be 'NewPolicy'
                 (Get-ScubaDiffBucket -BeforeResult 'Pass' -AfterResult $null -BeforePresent $true -AfterPresent $false -BeforeVersion 'v1' -AfterVersion $null) | Should -Be 'RemovedPolicy'
             }
-            It 'Prefers Errored over PolicyVersionUpdate (precedence)' {
-                (Get-ScubaDiffBucket -BeforeResult 'Error' -AfterResult 'Pass' -BeforePresent $true -AfterPresent $true -BeforeVersion 'v1' -AfterVersion 'v2') | Should -Be 'Errored'
+            It 'Prefers Errored (after-side) over PolicyVersionUpdate (precedence)' {
+                (Get-ScubaDiffBucket -BeforeResult 'Pass' -AfterResult 'Error' -BeforePresent $true -AfterPresent $true -BeforeVersion 'v1' -AfterVersion 'v2') | Should -Be 'Errored'
+            }
+            It 'A recovery from a prior error under a version bump is a PolicyVersionUpdate' {
+                (Get-ScubaDiffBucket -BeforeResult 'Error' -AfterResult 'Pass' -BeforePresent $true -AfterPresent $true -BeforeVersion 'v1' -AfterVersion 'v2') | Should -Be 'PolicyVersionUpdate'
             }
         }
     }
