@@ -47,6 +47,9 @@ h1, h2, h3 {
     color: var(--header-color);
 }
 
+/* Section titles (Summary and each product heading) are centered. */
+h2 { text-align: center; }
+
 a { color: var(--link-color); }
 
 .report-header {
@@ -58,9 +61,18 @@ a { color: var(--link-color); }
     padding: 1em 0;
 }
 
+.report-title h1 { margin: 0; }
+
+.report-subtitle {
+    margin: 0.25em 0 0;
+    color: var(--uuid-color);
+    font-size: 0.95em;
+}
+
 .source-summary {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 2em;
     margin: 1em 0;
 }
@@ -71,6 +83,8 @@ a { color: var(--link-color); }
     border-radius: 6px;
     padding: 0.75em 1.25em;
 }
+
+.source-card h3 { text-align: center; }
 
 .source-card .uuid { color: var(--uuid-color); font-size: 0.85em; }
 
@@ -116,7 +130,22 @@ tr.diff-grey   { background-color: var(--diff-grey); }
 tr.diff-unchanged-row { display: none; }
 body.show-unchanged tr.diff-unchanged-row { display: table-row; }
 
+/* The summary table is centered on the page and all of its cells are
+   center-aligned (both the header row and the count cells). */
+.summary-table {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.summary-table th, .summary-table td { text-align: center; }
+
 .summary-table td.count-zero { color: var(--uuid-color); }
+
+/* Product transition tables: only the header row is centered; body cells keep
+   the default left alignment. */
+.policy-diff th { text-align: center; }
 
 .bucket-label {
     font-weight: bold;

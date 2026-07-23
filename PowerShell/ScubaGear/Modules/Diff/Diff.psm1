@@ -818,7 +818,10 @@ function New-ScubaDiffReport {
     $sb = New-Object System.Text.StringBuilder
 
     [void]$sb.AppendLine('<div class="report-header">')
-    [void]$sb.AppendLine('  <h1>ScubaGear Diff Report</h1>')
+    [void]$sb.AppendLine('  <div class="report-title">')
+    [void]$sb.AppendLine('    <h1>ScubaGear Diff Report</h1>')
+    [void]$sb.AppendLine('    <p class="report-subtitle">Comparison between two ScubaResults.json files</p>')
+    [void]$sb.AppendLine('  </div>')
     [void]$sb.AppendLine('  <div class="controls-bar">')
     [void]$sb.AppendLine('    <label><input type="checkbox" id="toggle-unchanged"> Show unchanged rows</label>')
     [void]$sb.AppendLine('    <label><input type="checkbox" id="toggle-dark"> Dark Mode</label>')
