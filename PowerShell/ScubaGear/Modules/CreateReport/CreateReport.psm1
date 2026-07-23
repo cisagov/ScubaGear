@@ -615,6 +615,41 @@ function New-Report {
         $SeverityScoreWeightsJson = "null"
     }
 
+    # Handle SecuritySuite-specific reporting
+    if ($BaselineName -eq "securitysuite") {
+        $SecuritySuiteConfig = $SettingsExport.scuba_config.SecuritySuite
+        $DefenderConfig = $SettingsExport.scuba_config.Defender
+
+        $SensitiveUserConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.1v1'
+        if ($null -eq $SensitiveUserConfig) {
+            $SensitiveUserConfig = $DefenderConfig.'MS.DEFENDER.2.1v1'
+        }
+
+        $PartnerDomainConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.3v1'
+        if ($null -eq $PartnerDomainConfig) {
+            $PartnerDomainConfig = $DefenderConfig.'MS.DEFENDER.2.3v1'
+        }
+
+        $SensitiveUsers = @()
+        if ($null -ne $SensitiveUserConfig -and $null -ne $SensitiveUserConfig.SensitiveUsers) {
+            $SensitiveUsers = @($SensitiveUserConfig.SensitiveUsers)
+        }
+
+        $PartnerDomains = @()
+        if ($null -ne $PartnerDomainConfig -and $null -ne $PartnerDomainConfig.PartnerDomains) {
+            $PartnerDomains = @($PartnerDomainConfig.PartnerDomains)
+        }
+
+        $SensitiveUsersJson = ConvertTo-Json @($SensitiveUsers)
+        $PartnerDomainsJson = ConvertTo-Json @($PartnerDomains)
+        $AntiPhishPoliciesJson = ConvertTo-Json @($SettingsExport.anti_phish_policies) -Depth 5
+    }
+    else {
+        $SensitiveUsersJson = "null"
+        $PartnerDomainsJson = "null"
+        $AntiPhishPoliciesJson = "null"
+    }
+
     # Handle EXO-specific reporting
     if ($BaselineName -eq "exo") {
         $LogHtml = "<hr><h2 id=`"dns-logs`">DNS Logs</h2>"
@@ -671,6 +706,9 @@ function New-Report {
         "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
         "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
         "<script type='application/json' id='severity-score-weights-json'> $($SeverityScoreWeightsJson) </script>"
+        "<script type='application/json' id='securitysuite-sensitive-users-json'> $($SensitiveUsersJson) </script>"
+        "<script type='application/json' id='securitysuite-partner-domains-json'> $($PartnerDomainsJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-phish-policies-json'> $($AntiPhishPoliciesJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
@@ -681,6 +719,7 @@ function New-Report {
     $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
     $EXOFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "EXOTableFunctions.js") -Raw
     $AADFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "AADTableFunctions.js") -Raw
+    $SecuritySuiteFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "SecuritySuiteTableFunctions.js") -Raw
     $KeyValueListFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "KeyValueListFunctions.js") -Raw
 
     $JSFiles = @(
@@ -689,6 +728,7 @@ function New-Report {
         $TableFunctionsJS
         $EXOFunctionsJS
         $AADFunctionsJS
+        $SecuritySuiteFunctionsJS
         $KeyValueListFunctionsJS
     ) -join "`n"
 
