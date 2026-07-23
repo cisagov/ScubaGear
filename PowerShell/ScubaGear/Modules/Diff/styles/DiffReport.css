@@ -143,6 +143,29 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
 
 .summary-table td.count-zero { color: var(--uuid-color); }
 
+/* Bucket filters live in the summary header. Each non-Unchanged column header
+   carries a checkbox; toggling it off dims that column here (.col-off) and hides
+   the matching rows in the product tables. */
+.summary-table th.bucket-filter label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.summary-table th.bucket-filter input { cursor: pointer; }
+
+.summary-table .col-off { opacity: 0.3; }
+
+.filter-hint {
+    text-align: center;
+    color: var(--uuid-color);
+    font-size: 0.85em;
+    margin: 0.25em 0 0.75em;
+}
+
 /* Product transition tables: only the header row is centered; body cells keep
    the default left alignment. */
 .policy-diff th { text-align: center; }

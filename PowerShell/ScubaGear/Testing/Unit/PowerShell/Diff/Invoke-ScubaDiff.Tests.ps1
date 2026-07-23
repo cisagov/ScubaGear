@@ -596,6 +596,24 @@ InModuleScope Diff {
         It 'Includes the unchanged-rows toggle markup' {
             $Html | Should -Match 'id="toggle-unchanged"'
         }
+        It 'Emits a summary-header filter checkbox for a bucket present in the diff' {
+            # PairA has NewFail records, so its column must carry a filter toggle.
+            $Html | Should -Match 'class="bucket-toggle" data-bucket="NewFail"'
+        }
+        It 'Emits a filter checkbox for every taxonomy bucket, even ones absent from the diff' {
+            # PairA has no PolicyVersionUpdate or NewIncorrectResult records, yet the
+            # filter for each must still be present.
+            $Html | Should -Match 'class="bucket-toggle" data-bucket="PolicyVersionUpdate"'
+            $Html | Should -Match 'class="bucket-toggle" data-bucket="NewIncorrectResult"'
+        }
+        It 'Does not put a filter checkbox on the Unchanged column' {
+            # Unchanged stays governed by the "Show unchanged rows" toggle.
+            $Html | Should -Not -Match 'class="bucket-toggle" data-bucket="Unchanged"'
+        }
+        It 'Tags product rows and summary count cells with their bucket for filtering' {
+            $Html | Should -Match '<tr class="diff-row diff-red" data-bucket="NewFail">'
+            $Html | Should -Match '<td class="count[^"]*" data-bucket="NewFail" data-count="\d+">'
+        }
         It 'Includes the dark-mode toggle and flag' {
             $Html | Should -Match 'id="toggle-dark"'
             $Html | Should -Match 'id="dark-mode-flag"'

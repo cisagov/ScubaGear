@@ -859,19 +859,27 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
-    # Per-product summary table.
-    $usedBuckets = @()
-    foreach ($product in $DiffResults.Summary.Keys) {
-        foreach ($k in $DiffResults.Summary.$product.Keys) {
-            if ($usedBuckets -notcontains $k) { $usedBuckets += $k }
-        }
-    }
-    $summaryColumns = @($bucketOrder | Where-Object { $usedBuckets -contains $_ })
+    # Per-product summary table. Every bucket in the taxonomy gets a column --
+    # including buckets absent from this diff -- so each one has a filter control.
+    # Each non-Unchanged column header carries a checkbox that filters both this
+    # table (dimming the column and recomputing totals) and the per-product
+    # transition tables below. Unchanged has no checkbox here: it stays governed by
+    # the "Show unchanged rows" toggle in the report header.
+    $summaryColumns = @($bucketOrder)
 
     [void]$sb.AppendLine('<h2>Summary</h2>')
+    [void]$sb.AppendLine('<p class="filter-hint">Use the checkboxes in the column headers to filter buckets. Filters apply to this table and the product tables below.</p>')
     [void]$sb.AppendLine('<table class="summary-table">')
     [void]$sb.Append('<tr><th>Product</th>')
-    foreach ($col in $summaryColumns) { [void]$sb.Append("<th>$(& $enc $col)</th>") }
+    foreach ($col in $summaryColumns) {
+        $colEnc = & $enc $col
+        if ($col -eq 'Unchanged') {
+            [void]$sb.Append("<th class=""bucket-col"" data-bucket=""$colEnc"">$colEnc</th>")
+        }
+        else {
+            [void]$sb.Append("<th class=""bucket-col bucket-filter"" data-bucket=""$colEnc""><label><input type=""checkbox"" class=""bucket-toggle"" data-bucket=""$colEnc"" checked> $colEnc</label></th>")
+        }
+    }
     [void]$sb.AppendLine('<th>Total</th></tr>')
     foreach ($product in (Get-ScubaOrderedProducts @($DiffResults.Summary.Keys))) {
         $counts = $DiffResults.Summary.$product
@@ -880,10 +888,11 @@ function New-ScubaDiffReport {
         foreach ($col in $summaryColumns) {
             if ($counts.Contains($col)) { $val = $counts[$col] } else { $val = 0 }
             $total += $val
-            if ($val -eq 0) { $cls = ' class="count-zero"' } else { $cls = '' }
-            [void]$sb.Append("<td$cls>$val</td>")
+            $colEnc = & $enc $col
+            if ($val -eq 0) { $cls = 'count count-zero' } else { $cls = 'count' }
+            [void]$sb.Append("<td class=""$cls"" data-bucket=""$colEnc"" data-count=""$val"">$val</td>")
         }
-        [void]$sb.AppendLine("<td>$total</td></tr>")
+        [void]$sb.AppendLine("<td class=""summary-total"">$total</td></tr>")
     }
     [void]$sb.AppendLine('</table>')
 
@@ -923,7 +932,7 @@ function New-ScubaDiffReport {
                 $resultAfterCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultAfter))</span>"
             }
 
-            [void]$sb.AppendLine("<tr class=""$rowClass"">")
+            [void]$sb.AppendLine("<tr class=""$rowClass"" data-bucket=""$(& $enc $bucket)"">")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
             [void]$sb.AppendLine("  <td class=""bucket-label"">$(& $enc (Get-ScubaBucketLabel $bucket))</td>")

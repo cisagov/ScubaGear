@@ -241,6 +241,12 @@ Two differences from the HTML report worth noting:
 
 - **Unchanged rows are hidden by default.** Use the **"Show unchanged rows"**
   checkbox at the top of the report to reveal them.
+- **Per-bucket filters live in the summary table.** Every bucket in the taxonomy
+  has a column — including buckets absent from the current diff — and each column
+  header (every bucket except `Unchanged`) carries a checkbox. Unchecking a bucket
+  hides its rows in the per-product tables, dims its column in the summary table,
+  and recomputes each product's **Total**. `Unchanged` is filtered separately with
+  the **"Show unchanged rows"** toggle above and is always counted in the Total.
 - **Dark mode** can be toggled with the **"Dark Mode"** checkbox; `-DarkMode`
   sets its default.
 - Rows are color-coded by their Result (After) value (see [Row coloring](#row-coloring)),

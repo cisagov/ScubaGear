@@ -1,10 +1,14 @@
 /*
  * Client-side behavior for the ScubaGear diff report (Invoke-SCuBADiff).
- * Two controls:
+ * Three controls:
  *   1. "Show unchanged rows" toggles the visibility of Unchanged rows, which
  *      are hidden by default (see decision 4 in the ADR). This follows the same
  *      per-report script pattern used by the CreateReport module.
- *   2. "Dark Mode" toggles the light/dark theme by setting data-theme on <html>,
+ *   2. Per-bucket filter checkboxes in the summary-table column headers. Each one
+ *      (every bucket except Unchanged, which the toggle above owns) hides the
+ *      matching rows in the product tables, dims its own summary column, and
+ *      recomputes each product's Total. Unchanged is always counted in the Total.
+ *   3. "Dark Mode" toggles the light/dark theme by setting data-theme on <html>,
  *      matching the mechanism in CreateReport/scripts/Utils.js.
  */
 (function () {
@@ -19,6 +23,60 @@
         document.documentElement.dataset.theme = enabled ? "dark" : "light";
     }
 
+    // The buckets whose filter checkbox is currently unchecked (hidden).
+    var hiddenBuckets = Object.create(null);
+
+    function applyRowFilter() {
+        // Product transition rows carry data-bucket; summary rows do not. Unchanged
+        // rows are governed by the "Show unchanged rows" toggle, so skip them here.
+        var rows = document.querySelectorAll("tr[data-bucket]");
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (row.classList.contains("diff-unchanged-row")) { continue; }
+            var bucket = row.getAttribute("data-bucket");
+            row.style.display = hiddenBuckets[bucket] ? "none" : "";
+        }
+    }
+
+    function applyColumnDim() {
+        var cells = document.querySelectorAll(".summary-table [data-bucket]");
+        for (var i = 0; i < cells.length; i++) {
+            var bucket = cells[i].getAttribute("data-bucket");
+            if (hiddenBuckets[bucket]) { cells[i].classList.add("col-off"); }
+            else { cells[i].classList.remove("col-off"); }
+        }
+    }
+
+    function recomputeTotals() {
+        var rows = document.querySelectorAll(".summary-table tr");
+        for (var i = 0; i < rows.length; i++) {
+            var totalCell = rows[i].querySelector(".summary-total");
+            if (!totalCell) { continue; }
+            var counts = rows[i].querySelectorAll("td[data-bucket]");
+            var sum = 0;
+            for (var j = 0; j < counts.length; j++) {
+                var bucket = counts[j].getAttribute("data-bucket");
+                // Unchanged is always counted; other buckets only when active.
+                if (bucket === "Unchanged" || !hiddenBuckets[bucket]) {
+                    sum += parseInt(counts[j].getAttribute("data-count"), 10) || 0;
+                }
+            }
+            totalCell.textContent = String(sum);
+        }
+    }
+
+    function refreshBucketFilters(toggles) {
+        hiddenBuckets = Object.create(null);
+        for (var i = 0; i < toggles.length; i++) {
+            if (!toggles[i].checked) {
+                hiddenBuckets[toggles[i].getAttribute("data-bucket")] = true;
+            }
+        }
+        applyRowFilter();
+        applyColumnDim();
+        recomputeTotals();
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         // Unchanged-rows toggle. Default: unchanged rows hidden.
         var unchangedToggle = document.getElementById("toggle-unchanged");
@@ -26,6 +84,18 @@
             unchangedToggle.addEventListener("change", function () {
                 document.body.classList.toggle("show-unchanged", unchangedToggle.checked);
             });
+        }
+
+        // Per-bucket filter checkboxes in the summary header.
+        var bucketToggles = document.querySelectorAll(".bucket-toggle");
+        if (bucketToggles.length) {
+            for (var i = 0; i < bucketToggles.length; i++) {
+                bucketToggles[i].addEventListener("change", function () {
+                    refreshBucketFilters(bucketToggles);
+                });
+            }
+            // Establish the initial state (all checked -> nothing hidden).
+            refreshBucketFilters(bucketToggles);
         }
 
         // Dark mode toggle. Default comes from the PowerShell -DarkMode switch.
