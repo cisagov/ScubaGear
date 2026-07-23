@@ -105,15 +105,15 @@ this order, highest to lowest:
 | 3 | `PolicyVersionUpdate` | The version suffix changed; the before/after result comparison is informational. |
 | 4 | `Unchanged` | Result and version are identical (hidden by default). |
 | 5 | `NewIncorrectResult` | The after result is newly marked `Incorrect result`. |
-| 6 | specific transitions | A recognized result change: `NewFail`, `NewPass`, `NewWarning`, `NewAutomatedCheck`, `NewManualCheck`. |
-| 7 | `NewOmission` | A remaining transition into or out of `Omitted` with no landing result. |
+| 6 | specific diffs | A recognized result change: `NewFail`, `NewPass`, `NewWarning`, `NewAutomatedCheck`, `NewManualCheck`. |
+| 7 | `NewOmission` | A remaining diff into or out of `Omitted` with no landing result. |
 | 8 | `Other` | Anything else (both literal values preserved). |
 
 > A control that errored in a *prior* run but not the latest one
 > (`Error → Pass / Fail / Warning`) is **not** `Errored`; it is classified by the
 > state it lands in, so a resolved error is never reported as a red `Errored` row.
 
-### Transition table
+### Diff table
 
 | Before → After | Classification |
 |---|---|
@@ -137,7 +137,7 @@ this order, highest to lowest:
 | Any → Any (identical result and version) | `Unchanged` (hidden by default) |
 | Anything else | `Other` (both literal values preserved) |
 
-The classification appears in the report's **Transition** column. `Result` is treated as
+The classification appears in the report's **Diff** column. `Result` is treated as
 an **open string set**: any value the tool does not recognize (e.g. a future
 status) classifies as `Other` with both literal values preserved — it never
 crashes the diff.
@@ -145,8 +145,8 @@ crashes the diff.
 ## Row coloring
 
 Report rows are colored by the **Result (After)** value, so the color reflects
-the control's *current* state (not the transition type, which is shown in the
-Transition column):
+the control's *current* state (not the diff type, which is shown in the
+Diff column):
 
 | Result (After) | Row color |
 |---|---|
@@ -194,7 +194,7 @@ For any record where either side is marked incorrect, four fields are added:
   (`OriginalResult`) on each side, so consumers compare the *real* evaluated
   result rather than the `"Incorrect result"` placeholder.
 
-In the report, the **Transition** column shows the marking change and the
+In the report, the **Diff** column shows the marking change and the
 **Result** columns show the underlying result inline (e.g. `Incorrect result
 (underlying: Fail)`). `NewIncorrectResult` rows are greyed out; rows where the
 marking cleared are colored by the now-visible result (green if passing, red if

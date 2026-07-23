@@ -16,7 +16,7 @@
     "Results": {
         "AAD": [
             {
-                "GroupName": "Transitions",
+                "GroupName": "Diffs",
                 "GroupNumber": "1",
                 "GroupReferenceURL": "https://example.com/aad#1",
                 "Controls": [

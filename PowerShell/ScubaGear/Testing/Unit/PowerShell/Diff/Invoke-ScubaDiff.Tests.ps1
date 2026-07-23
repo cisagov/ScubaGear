@@ -64,7 +64,7 @@ InModuleScope Diff {
             It 'Returns the raw token for classifications without a friendly label' {
                 Get-ScubaClassificationLabel 'Errored' | Should -Be 'Errored'
             }
-            It 'Gives the result-transition classifications friendly labels' {
+            It 'Gives the result-diff classifications friendly labels' {
                 Get-ScubaClassificationLabel 'NewFail'             | Should -Be 'New Fail'
                 Get-ScubaClassificationLabel 'NewPass'             | Should -Be 'New Pass'
                 Get-ScubaClassificationLabel 'PolicyVersionUpdate' | Should -Be 'Policy Version Update'
@@ -459,7 +459,7 @@ InModuleScope Diff {
             $diff.Diff.AAD[0].Classification | Should -Be 'Unchanged'
         }
 
-        It 'Surfaces the underlying result and transition label in the HTML' {
+        It 'Surfaces the underlying result and diff label in the HTML' {
             $diff = Compare-ScubaResults -Before (New-FpResults 'Fail' 'Fail') -After (New-FpResults 'Incorrect result' 'Fail')
             $html = New-ScubaDiffReport -DiffResults $diff
             $html | Should -Match 'New Incorrect Result \(false positive\)'
@@ -542,7 +542,7 @@ InModuleScope Diff {
             }
         }
 
-        It 'Flattens the transition classification and both results' {
+        It 'Flattens the diff classification and both results' {
             $row = $RowsA | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.1.1v1' }
             $row.Classification | Should -Be 'NewFail'
             $row.ResultBefore | Should -Be 'Pass'
@@ -637,7 +637,7 @@ InModuleScope Diff {
         }
         It 'Colors rows by Result (After): a Fail-after row is red' {
             # MS.AAD.1.1 is Pass->Fail (NewFail), so its row must be red, not
-            # colored by the transition classification.
+            # colored by the diff classification.
             $Html | Should -Match 'MS.AAD.1.1v1[\s\S]*?New Fail'
             $Html | Should -Match 'class="diff-row diff-red"'
         }

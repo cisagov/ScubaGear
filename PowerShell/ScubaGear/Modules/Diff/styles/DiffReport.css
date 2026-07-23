@@ -187,7 +187,7 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
 
 .filter-btn:hover { border-color: var(--link-color); }
 
-/* Product transition tables: only the header row is centered; body cells keep
+/* Product diff tables: only the header row is centered; body cells keep
    the default left alignment. */
 .policy-diff th { text-align: center; }
 

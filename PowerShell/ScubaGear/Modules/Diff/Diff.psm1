@@ -244,9 +244,9 @@ function Get-ScubaResultCategory {
 function Get-ScubaDiffClassification {
     <#
     .Description
-    Classifies a single base control ID into exactly one transition classification,
+    Classifies a single base control ID into exactly one diff classification,
     honoring the precedence: Errored > PolicyVersionUpdate > Unchanged >
-    NewIncorrectResult > specific transitions > NewOmission > Other.
+    NewIncorrectResult > specific diffs > NewOmission > Other.
     NewPolicy/RemovedPolicy are determined by presence and take precedence over
     everything else. RemovedPolicy (base ID present in the before file but absent
     from the after file) aligns with the baselines' removedpolicies.md tracking.
@@ -256,10 +256,10 @@ function Get-ScubaDiffClassification {
     error (Error -> Pass/Fail/Warning) is classified by the state it lands in, like
     any other prior non-evaluated state, so a resolved error is not reported as red.
 
-    Classifications are named for the state the control lands in, so a transition into
+    Classifications are named for the state the control lands in, so a diff into
     Pass/Fail/Warning from any prior state -- including Omitted, a prior Error, or a
     cleared "Incorrect result" marking -- reports as NewPass/NewFail/NewWarning.
-    Only the Omitted transitions that have no such landing state (e.g. Pass ->
+    Only the Omitted diffs that have no such landing state (e.g. Pass ->
     Omitted, N/A <-> Omitted) report as NewOmission.
     .Functionality
     Internal
@@ -283,22 +283,22 @@ function Get-ScubaDiffClassification {
     # Errored has highest precedence among matched controls, but keys off the
     # after state only: a control that is errored *now* must surface regardless of
     # a version bump. A control that recovered from a prior error falls through to
-    # the landing-state transitions below (Error -> Pass = NewPass, etc.).
+    # the landing-state diffs below (Error -> Pass = NewPass, etc.).
     if ($aCat -eq 'Error') { return 'Errored' }
 
     # A changed version suffix means the policy's meaning changed; the Result
-    # comparison is informational, so this outranks the specific transitions.
+    # comparison is informational, so this outranks the specific diffs.
     if ($BeforeVersion -ne $AfterVersion) { return 'PolicyVersionUpdate' }
 
-    # Identical Result and version. Checked before the transitions below so a
+    # Identical Result and version. Checked before the diffs below so a
     # stable state -- including a stable "Incorrect result" marking or a control
-    # omitted in both runs -- is never mistaken for a transition.
+    # omitted in both runs -- is never mistaken for a diff.
     if ($bCat -eq $aCat -and $BeforeResult -eq $AfterResult) { return 'Unchanged' }
 
     # A control the user marked incorrect (a false positive) carries the literal
     # Result "Incorrect result" (category 'Incorrect'). Newly acquiring that
     # marking is its own classification; losing it is classified by the result it reveals
-    # via the transitions below.
+    # via the diffs below.
     if ($aCat -eq 'Incorrect') { return 'NewIncorrectResult' }
 
     switch ("$bCat->$aCat") {
@@ -327,7 +327,7 @@ function Get-ScubaDiffClassification {
         'Error->NA'          { return 'NewManualCheck' }
     }
 
-    # Any remaining non-identical transition involving Omitted (e.g. Pass ->
+    # Any remaining non-identical diff involving Omitted (e.g. Pass ->
     # Omitted, N/A <-> Omitted, Incorrect result -> Omitted).
     if ($bCat -eq 'Omitted' -or $aCat -eq 'Omitted') { return 'NewOmission' }
 
@@ -337,7 +337,7 @@ function Get-ScubaDiffClassification {
 function Get-ScubaClassificationColor {
     <#
     .Description
-    Maps a transition classification to its HTML row color class (red/green/yellow/
+    Maps a diff classification to its HTML row color class (red/green/yellow/
     neutral/unchanged). Unknown classifications fall back to yellow.
     .Functionality
     Internal
@@ -357,7 +357,7 @@ function Get-ScubaClassificationColor {
 function Get-ScubaClassificationLabel {
     <#
     .Description
-    Maps a transition classification to its human-friendly display label for the HTML
+    Maps a diff classification to its human-friendly display label for the HTML
     report. Classifications without an explicit label are shown using their raw token.
     .Functionality
     Internal
@@ -450,7 +450,7 @@ function Get-ScubaControlMap {
     Flattens a product's Results (a list of groups, each with Controls) into an
     ordered map keyed by base control ID. Each value carries the fields the diff
     needs. When multiple versions of the same base ID appear in one file, the
-    last one wins (an unusual, transition-only edge case).
+    last one wins (an unusual, diff-only edge case).
     .Functionality
     Internal
     #>
@@ -556,7 +556,7 @@ function Compare-ScubaResults {
     .Description
     Pure comparison of two parsed ScubaResults objects. Returns the full
     DiffResults object (SchemaVersion / MetaData / Summary / Diff). Performs
-    base-ID matching (per product, matched by name only), transition
+    base-ID matching (per product, matched by name only), diff
     classification, and Fail->Fail annotation comparison.
     .Functionality
     Internal
@@ -863,7 +863,7 @@ function New-ScubaDiffReport {
     # including classifications absent from this diff -- so each one has a filter control.
     # Each non-Unchanged column header carries a checkbox that filters both this
     # table (dimming the column and recomputing totals) and the per-product
-    # transition tables below. Unchanged has no checkbox here: it stays governed by
+    # diff tables below. Unchanged has no checkbox here: it stays governed by
     # the "Show unchanged rows" toggle in the report header.
     $summaryColumns = @($classificationOrder)
 
@@ -899,12 +899,12 @@ function New-ScubaDiffReport {
     }
     [void]$sb.AppendLine('</table>')
 
-    # Per-product transition tables.
+    # Per-product diff tables.
     foreach ($product in (Get-ScubaOrderedProducts @($DiffResults.Diff.Keys))) {
         $records = @($DiffResults.Diff.$product)
         [void]$sb.AppendLine("<h2>$(& $enc (Get-ScubaProductDisplayName $product))</h2>")
         [void]$sb.AppendLine('<table class="policy-diff">')
-        [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Transition</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>')
+        [void]$sb.AppendLine('<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>')
         foreach ($r in $records) {
             $classification = $r.Classification
             # Row color follows the Result (After) value (Fail/Error=red,
@@ -979,7 +979,7 @@ function Invoke-SCuBADiff {
     .SYNOPSIS
     Compares two ScubaResults.json files and produces a machine-readable diff
     (DiffResults.json), a flat CSV (DiffResults.csv), and an HTML report
-    (DiffReport.html) highlighting per-policy status transitions.
+    (DiffReport.html) highlighting per-policy status diffs.
 
     .Description
     Invoke-SCuBADiff is an offline, post-hoc analysis command: it takes two

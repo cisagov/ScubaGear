@@ -45,7 +45,7 @@
     }
 
     function applyRowFilter() {
-        // Product transition rows carry data-classification; summary rows do not. Unchanged
+        // Product diff rows carry data-classification; summary rows do not. Unchanged
         // rows are governed by the "Show unchanged rows" toggle, so skip them here.
         var rows = document.querySelectorAll("tr[data-classification]");
         for (var i = 0; i < rows.length; i++) {

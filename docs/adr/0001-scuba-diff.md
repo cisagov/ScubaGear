@@ -68,7 +68,7 @@ versions are currently expected to increment only by whole numbers.
 the top-level `AnnotatedFailedPolicies` dictionary, surfacing
 `AnnotationChanged` plus the after-file `Comment` and `RemediationDate`.
 
-**Alternative considered — diff annotations across all transitions and both
+**Alternative considered — diff annotations across all diffs and both
 annotation locations** (`AnnotatedFailedPolicies` *and* the per-control
 `Comments` / `ResolutionDate`). Rejected for v1: the per-control fields derive
 from the same config input as `AnnotatedFailedPolicies`, so comparing both is
