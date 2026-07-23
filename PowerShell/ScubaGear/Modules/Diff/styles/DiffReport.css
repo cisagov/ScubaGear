@@ -159,12 +159,33 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
 
 .summary-table .col-off { opacity: 0.3; }
 
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75em;
+    margin: 0.25em 0 0.75em;
+}
+
 .filter-hint {
     text-align: center;
     color: var(--uuid-color);
     font-size: 0.85em;
-    margin: 0.25em 0 0.75em;
 }
+
+.filter-btn {
+    font-family: inherit;
+    font-size: 0.85em;
+    color: var(--text-color);
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.35em 0.75em;
+    cursor: pointer;
+}
+
+.filter-btn:hover { border-color: var(--link-color); }
 
 /* Product transition tables: only the header row is centered; body cells keep
    the default left alignment. */

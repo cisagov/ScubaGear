@@ -868,7 +868,10 @@ function New-ScubaDiffReport {
     $summaryColumns = @($bucketOrder)
 
     [void]$sb.AppendLine('<h2>Summary</h2>')
-    [void]$sb.AppendLine('<p class="filter-hint">Use the checkboxes in the column headers to filter buckets. Filters apply to this table and the product tables below.</p>')
+    [void]$sb.AppendLine('<div class="filter-controls">')
+    [void]$sb.AppendLine('  <span class="filter-hint">Use the checkboxes in the column headers to filter buckets. Filters apply to this table and the product tables below.</span>')
+    [void]$sb.AppendLine('  <button type="button" id="toggle-all-filters" class="filter-btn">Uncheck all filters</button>')
+    [void]$sb.AppendLine('</div>')
     [void]$sb.AppendLine('<table class="summary-table">')
     [void]$sb.Append('<tr><th>Product</th>')
     foreach ($col in $summaryColumns) {

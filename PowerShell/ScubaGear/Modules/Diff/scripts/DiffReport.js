@@ -25,6 +25,24 @@
 
     // The buckets whose filter checkbox is currently unchecked (hidden).
     var hiddenBuckets = Object.create(null);
+    // The "Uncheck all filters" / "Check all filters" button (assigned on load).
+    var allFiltersBtn = null;
+
+    function anyChecked(toggles) {
+        for (var i = 0; i < toggles.length; i++) {
+            if (toggles[i].checked) { return true; }
+        }
+        return false;
+    }
+
+    function updateAllFiltersButton(toggles) {
+        if (!allFiltersBtn) { return; }
+        // When at least one bucket is shown, the button clears them; once every
+        // bucket is hidden it flips to restore them, so users are never stranded.
+        var someChecked = anyChecked(toggles);
+        allFiltersBtn.textContent = someChecked ? "Uncheck all filters" : "Check all filters";
+        allFiltersBtn.setAttribute("aria-pressed", someChecked ? "false" : "true");
+    }
 
     function applyRowFilter() {
         // Product transition rows carry data-bucket; summary rows do not. Unchanged
@@ -75,6 +93,7 @@
         applyRowFilter();
         applyColumnDim();
         recomputeTotals();
+        updateAllFiltersButton(toggles);
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -94,6 +113,20 @@
                     refreshBucketFilters(bucketToggles);
                 });
             }
+
+            // "Uncheck all filters" button: clears every bucket filter (and thus
+            // hides every classified row); once all are off it restores them.
+            allFiltersBtn = document.getElementById("toggle-all-filters");
+            if (allFiltersBtn) {
+                allFiltersBtn.addEventListener("click", function () {
+                    var target = !anyChecked(bucketToggles);
+                    for (var j = 0; j < bucketToggles.length; j++) {
+                        bucketToggles[j].checked = target;
+                    }
+                    refreshBucketFilters(bucketToggles);
+                });
+            }
+
             // Establish the initial state (all checked -> nothing hidden).
             refreshBucketFilters(bucketToggles);
         }

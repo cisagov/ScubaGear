@@ -606,6 +606,10 @@ InModuleScope Diff {
             $Html | Should -Match 'class="bucket-toggle" data-bucket="PolicyVersionUpdate"'
             $Html | Should -Match 'class="bucket-toggle" data-bucket="NewIncorrectResult"'
         }
+        It 'Includes the uncheck-all filters button' {
+            $Html | Should -Match 'id="toggle-all-filters"'
+            $Html | Should -Match 'Uncheck all filters'
+        }
         It 'Does not put a filter checkbox on the Unchanged column' {
             # Unchanged stays governed by the "Show unchanged rows" toggle.
             $Html | Should -Not -Match 'class="bucket-toggle" data-bucket="Unchanged"'
