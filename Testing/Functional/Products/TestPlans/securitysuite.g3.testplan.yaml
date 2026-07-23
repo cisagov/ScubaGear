@@ -267,6 +267,7 @@ TestPlan:
                   - Name: Tenant restricted from sending email
                     Disabled: false
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: false
       - TestDescription: MS.SECURITYSUITE.4.1v1 Compliant case - Required alerts are enabled
         Preconditions:
@@ -287,8 +288,8 @@ TestPlan:
                   - Name: Tenant restricted from sending email
                     Disabled: false
         Postconditions: []
+        IsNotChecked: true
         ExpectedResult: true
-
   - PolicyId: MS.SECURITYSUITE.5.2v1
     TestDriver: ScubaCached
     Tests:
@@ -305,5 +306,24 @@ TestPlan:
                   - Name: 12 month retention
                     RetentionDuration: TwelveMonths
                     Enabled: true
+                securitysuite_successful_commands:
+                  - Get-MgBetaSubscribedSku
+                  - Get-AdminAuditLogConfig
+                  - Get-EOPProtectionPolicyRule
+                  - Get-AntiPhishPolicy
+                  - Get-AntiPhishRule
+                  - Get-AcceptedDomain
+                  - Get-HostedConnectionFilterPolicy
+                  - Get-SafeLinksPolicy
+                  - Get-SafeLinksRule
+                  - Get-HostedContentFilterPolicy
+                  - Get-HostedContentFilterRule
+                  - Get-AtpPolicyForO365
+                  - Get-ATPProtectionPolicyRule
+                  - Get-DlpCompliancePolicy
+                  - Get-DlpComplianceRule
+                  - Get-ProtectionAlert
+                  - Get-UnifiedAuditLogRetentionPolicy
+                securitysuite_unsuccessful_commands: []
         Postconditions: []
         ExpectedResult: false

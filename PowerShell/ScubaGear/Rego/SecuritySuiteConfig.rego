@@ -70,7 +70,7 @@ PolicyBlockClickToRunNoncomplianceReasons contains Reason if {
 
 AntiMalwarePolicyMessage := ". The highest priority anti-malware policy that applies to all users is: "
 
-SecuritySuite_1_1_Details(Status) := 
+SecuritySuite_1_1_Details(Status) :=
     concat("", [
         ReportDetailsBoolean(Status),
         AntiMalwarePolicyMessage,
@@ -112,7 +112,7 @@ PolicyZAPNoncomplianceReasons contains "Zero-hour auto purge is disabled." if {
     Policy.ZapEnabled != true
 }
 
-SecuritySuite_1_2_Details(Status) := 
+SecuritySuite_1_2_Details(Status) :=
     concat("", [
         ReportDetailsBoolean(Status),
         ". The highest priority anti-malware policy that applies to all users is: ",

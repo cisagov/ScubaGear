@@ -176,11 +176,39 @@ function Invoke-FunctionalExoCommand {
     [hashtable]$Parameters = @{}
   )
 
-  return Invoke-EXORestMethod `
-    -CmdletName $CmdletName `
-    -ApiEndpoint $script:EXOApiEndpoint `
-    -AccessToken $script:EXOAccessToken `
-    -Parameters $Parameters
+  $MaxRetries = 5
+  $RetryDelay = 10
+
+  for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+    try {
+      return Invoke-EXORestMethod `
+        -CmdletName $CmdletName `
+        -ApiEndpoint $script:EXOApiEndpoint `
+        -AccessToken $script:EXOAccessToken `
+        -Parameters $Parameters
+    }
+    catch {
+      # 404 means the resource doesn't exist - return null silently.
+      if ($_.Exception.Message -match '\b404\b') {
+        return $null
+      }
+      # 429 rate limiting - back off and retry.
+      if ($_.Exception.Message -match '\b429\b' -and $Attempt -lt $MaxRetries) {
+        $Delay = $RetryDelay * $Attempt
+        Write-Warning "EXO REST '$CmdletName' throttled (429, attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..."
+        Start-Sleep -Seconds $Delay
+        continue
+      }
+      # 500/503 transient errors - retry with backoff.
+      if ($_.Exception.Message -match '\b50[03]\b' -and $Attempt -lt $MaxRetries) {
+        Write-Warning "EXO REST '$CmdletName' returned server error (attempt $Attempt/$MaxRetries). Retrying in ${RetryDelay}s..."
+        Start-Sleep -Seconds $RetryDelay
+        $RetryDelay *= 2
+        continue
+      }
+      throw
+    }
+  }
 }
 
 function Resolve-FunctionalExoIdentity {
@@ -638,6 +666,640 @@ function Set-ExoOrganizationAuditDisabled {
 }
 
 # -----------------------------------------------------------------------
+# Exchange Online REST wrappers for functional test pre/postconditions.
+# These replace ExchangeOnlineManagement cmdlets in EXO test plans.
+# $script:EXOApiEndpoint and $script:EXOAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+# NOTE: Invoke-FunctionalExoCommand is defined earlier in this file
+# (with 404/429/500 retry logic). Do NOT redefine it here.
+
+function Resolve-FunctionalExoIdentity {
+    param(
+        [Parameter(Mandatory = $false)][AllowNull()][object]$InputObject,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Identity
+    )
+    if (-not [string]::IsNullOrWhiteSpace($Identity)) { return $Identity }
+    if ($null -eq $InputObject) { return $null }
+    # Prefer Guid: accepted by all EXO REST mutating endpoints in every cloud.
+    # Name alone causes 404 in commercial tenants.
+    if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Guid))             { return [string]$InputObject.Guid }
+    if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.ExchangeObjectId)) { return [string]$InputObject.ExchangeObjectId }
+    if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Name))             { return [string]$InputObject.Name }
+    if (-not [string]::IsNullOrWhiteSpace([string]$InputObject.Identity))         { return [string]$InputObject.Identity }
+    return $null
+}
+
+function ConvertTo-FunctionalExoBoolean {
+    param([Parameter(Mandatory = $false)][AllowNull()][object]$Value)
+    if ($null -eq $Value) { return $null }
+    if ($Value -is [bool]) { return [bool]$Value }
+    $AsString = [string]$Value
+    if ([string]::IsNullOrWhiteSpace($AsString)) { return $null }
+    $Parsed = $false
+    if ([bool]::TryParse($AsString, [ref]$Parsed)) { return $Parsed }
+    return $null
+}
+
+function Wait-FunctionalExoCondition {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)][scriptblock]$Condition,
+        [Parameter(Mandatory = $false)][int]$MaxAttempts = 10,
+        [Parameter(Mandatory = $false)][int]$DelaySeconds = 2,
+        [Parameter(Mandatory = $false)][string]$FailureMessage = 'Condition was not met in the expected time window.'
+    )
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        if (& $Condition) { return }
+        if ($Attempt -lt $MaxAttempts) { Start-Sleep -Seconds $DelaySeconds }
+    }
+    throw $FailureMessage
+}
+
+function Get-RemoteDomain {
+    [CmdletBinding()]
+    param()
+    return Invoke-FunctionalExoCommand -CmdletName 'Get-RemoteDomain'
+}
+
+function Set-RemoteDomain {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)][AllowNull()][object]$InputObject,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Identity,
+        [Parameter(Mandatory = $true)][bool]$AutoForwardEnabled
+    )
+    process {
+        $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+        if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+            throw 'Set-RemoteDomain requires an Identity or piped object with Identity.'
+        }
+        Invoke-FunctionalExoCommand -CmdletName 'Set-RemoteDomain' -Parameters @{
+            Identity           = $ResolvedIdentity
+            AutoForwardEnabled = $AutoForwardEnabled
+        } | Out-Null
+    }
+}
+
+function Set-TransportConfig {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)][bool]$SmtpClientAuthenticationDisabled)
+    Invoke-FunctionalExoCommand -CmdletName 'Set-TransportConfig' -Parameters @{
+        SmtpClientAuthenticationDisabled = $SmtpClientAuthenticationDisabled
+    } | Out-Null
+}
+
+function Get-TransportConfig {
+    [CmdletBinding()]
+    param()
+    return Invoke-FunctionalExoCommand -CmdletName 'Get-TransportConfig'
+}
+
+function Get-SharingPolicy {
+    [CmdletBinding()]
+    param()
+    return Invoke-FunctionalExoCommand -CmdletName 'Get-SharingPolicy'
+}
+
+function New-SharingPolicy {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$Domains
+    )
+    # Explicitly enable the policy on creation; the EXO REST endpoint does not
+    # guarantee Enabled=$true by default, and Rego only evaluates enabled policies.
+    return Invoke-FunctionalExoCommand -CmdletName 'New-SharingPolicy' -Parameters @{
+        Name    = $Name
+        Domains = $Domains
+        Enabled = $true
+    }
+}
+
+function Remove-SharingPolicy {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)][string]$Identity)
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-SharingPolicy' -Parameters @{
+        Identity = $Identity
+    } | Out-Null
+}
+
+function Get-TransportRule {
+    [CmdletBinding()]
+    param()
+    return Invoke-FunctionalExoCommand -CmdletName 'Get-TransportRule'
+}
+
+function Disable-TransportRule {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)][AllowNull()][object]$InputObject,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Identity
+    )
+    process {
+        $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+        if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+            throw 'Disable-TransportRule requires an Identity or piped object with Identity.'
+        }
+        Invoke-FunctionalExoCommand -CmdletName 'Disable-TransportRule' -Parameters @{
+            Identity = $ResolvedIdentity
+        } | Out-Null
+    }
+}
+
+function Enable-TransportRule {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)][AllowNull()][object]$InputObject,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Identity
+    )
+    process {
+        $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+        if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+            throw 'Enable-TransportRule requires an Identity or piped object with Identity.'
+        }
+        Invoke-FunctionalExoCommand -CmdletName 'Enable-TransportRule' -Parameters @{
+            Identity = $ResolvedIdentity
+        } | Out-Null
+    }
+}
+
+function New-TransportRule {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, Position = 0)][string]$Name,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$FromScope,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$PrependSubject
+    )
+    $Params = @{ Name = $Name }
+    if (-not [string]::IsNullOrWhiteSpace($FromScope))  { $Params.FromScope      = $FromScope }
+    if ($null -ne $PrependSubject)                       { $Params.PrependSubject = $PrependSubject }
+    return Invoke-FunctionalExoCommand -CmdletName 'New-TransportRule' -Parameters $Params
+}
+
+function Remove-TransportRule {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromPipeline = $true)][AllowNull()][object]$InputObject,
+        [Parameter(Mandatory = $false)][AllowNull()][string]$Identity
+    )
+    process {
+        $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $InputObject -Identity $Identity
+        if ([string]::IsNullOrWhiteSpace($ResolvedIdentity)) {
+            throw 'Remove-TransportRule requires an Identity or piped object with Identity.'
+        }
+        Invoke-FunctionalExoCommand -CmdletName 'Remove-TransportRule' -Parameters @{
+            Identity = $ResolvedIdentity
+        } | Out-Null
+    }
+}
+
+function Set-OrganizationConfig {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)][bool]$AuditDisabled)
+    Invoke-FunctionalExoCommand -CmdletName 'Set-OrganizationConfig' -Parameters @{
+        AuditDisabled = $AuditDisabled
+    } | Out-Null
+}
+
+function Set-ExoRemoteDomainAutoForwardEnabled {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)][bool]$CurrentValue,
+        [Parameter(Mandatory = $true)][bool]$DesiredValue
+    )
+    $Targets = @(Get-RemoteDomain | Where-Object {
+        (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $CurrentValue
+    })
+    if ($Targets.Count -gt 0) {
+        $Targets | Set-RemoteDomain -AutoForwardEnabled $DesiredValue
+    }
+    # Direction-aware convergence check:
+    #   Compliant ($false) => ALL domains must have AutoForwardEnabled=false
+    #   Non-compliant ($true) => AT LEAST ONE domain must have AutoForwardEnabled=true
+    if ($DesiredValue -eq $false) {
+        Wait-FunctionalExoCondition -Condition {
+            @(Get-RemoteDomain | Where-Object {
+                (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $true
+            }).Count -eq 0
+        } -FailureMessage "Failed to observe all remote domains with AutoForwardEnabled=false after update."
+    } else {
+        Wait-FunctionalExoCondition -Condition {
+            @(Get-RemoteDomain | Where-Object {
+                (ConvertTo-FunctionalExoBoolean -Value $_.AutoForwardEnabled) -eq $true
+            }).Count -gt 0
+        } -FailureMessage "Failed to observe at least one remote domain with AutoForwardEnabled=true after update."
+    }
+    # Allow time for the write to propagate to all EXO backend replicas before
+    # ScubaGear's independent REST session reads tenant state.
+    Start-Sleep -Seconds 60
+}
+
+function Set-ExoTransportConfigSmtpClientAuthenticationDisabled {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)][bool]$SmtpClientAuthenticationDisabled)
+    Set-TransportConfig -SmtpClientAuthenticationDisabled $SmtpClientAuthenticationDisabled
+    Wait-FunctionalExoCondition -Condition {
+        $Config = Get-TransportConfig | Select-Object -First 1
+        $CurrentValue = ConvertTo-FunctionalExoBoolean -Value $Config.SmtpClientAuthenticationDisabled
+        $CurrentValue -eq $SmtpClientAuthenticationDisabled
+    } -FailureMessage "Failed to observe SmtpClientAuthenticationDisabled=$SmtpClientAuthenticationDisabled after update."
+}
+
+function New-ExoSharingPolicy {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)][string]$Name,
+        [Parameter(Mandatory = $true)][string]$Domains
+    )
+    # Remove any leftover policy from a prior failed run to avoid 400 on re-create
+    $Existing = Get-SharingPolicy | Where-Object {
+        [string]$_.Name -eq $Name -or [string]$_.Identity -eq $Name
+    } | Select-Object -First 1
+    if ($null -ne $Existing) {
+        $ExistingId = Resolve-FunctionalExoIdentity -InputObject $Existing
+        Remove-SharingPolicy -Identity $ExistingId
+    }
+    New-SharingPolicy -Name $Name -Domains $Domains | Out-Null
+    # Wait for the policy to become visible so ScubaGear's provider call sees it.
+    Wait-FunctionalExoCondition -Condition {
+        @(Get-SharingPolicy | Where-Object {
+            [string]$_.Name -eq $Name -or [string]$_.Identity -eq $Name
+        }).Count -gt 0
+    } -FailureMessage "Failed to observe new sharing policy '$Name' after creation."
+}
+
+function Remove-ExoSharingPolicy {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)][string]$Identity)
+    # Resolve name to GUID - EXO REST mutations require GUID on some tenants (name alone causes 404)
+    $Policy = Get-SharingPolicy | Where-Object {
+        [string]$_.Name -eq $Identity -or [string]$_.Identity -eq $Identity
+    } | Select-Object -First 1
+    $ResolvedIdentity = Resolve-FunctionalExoIdentity -InputObject $Policy -Identity $Identity
+    Remove-SharingPolicy -Identity $ResolvedIdentity
+}
+
+function Disable-ExoExternalSenderWarningRules {
+    [CmdletBinding()]
+    param()
+    Get-TransportRule |
+        Where-Object {
+            [string]$_.State -eq 'Enabled' -and
+            [string]$_.Mode -eq 'Enforce' -and
+            [string]$_.FromScope -eq 'NotInOrganization'
+        } |
+        Disable-TransportRule
+
+    # Wait for change to propagate to all EXO replicas before ScubaGear reads state
+    Wait-FunctionalExoCondition -Condition {
+        @(Get-TransportRule | Where-Object {
+            [string]$_.State -eq 'Enabled' -and
+            [string]$_.Mode -eq 'Enforce' -and
+            [string]$_.FromScope -eq 'NotInOrganization'
+        }).Count -eq 0
+    } -FailureMessage "Failed to observe all external sender warning rules disabled after update."
+    Start-Sleep -Seconds 60
+}
+
+function Enable-ExoExternalSenderWarningRules {
+    [CmdletBinding()]
+    param()
+    # Postcondition restore only - no propagation wait needed. The subsequent
+    # compliant test creates fresh state via New-ExoExternalSenderWarningRule.
+    # A wait for Count -gt 0 breaks on tenants that had no rules to begin with.
+    Get-TransportRule |
+        Where-Object {
+            [string]$_.State -eq 'Disabled' -and
+            [string]$_.Mode -eq 'Enforce' -and
+            [string]$_.FromScope -eq 'NotInOrganization'
+        } |
+        Enable-TransportRule
+}
+
+function New-ExoExternalSenderWarningRule {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $false)][string]$Name = 'FunctionalTest External sender warning')
+    # Remove any leftover rule from a prior failed run to avoid 400 on re-create
+    $Existing = Get-TransportRule | Where-Object {
+        [string]$_.Identity -eq $Name -or [string]$_.Name -eq $Name
+    } | Select-Object -First 1
+    if ($null -ne $Existing) {
+        $ExistingId = Resolve-FunctionalExoIdentity -InputObject $Existing
+        Remove-TransportRule -Identity $ExistingId
+    }
+    New-TransportRule $Name -FromScope 'NotInOrganization' -PrependSubject '[External] ' | Out-Null
+}
+
+function Remove-ExoExternalSenderWarningRule {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $false)][string]$Identity = 'FunctionalTest External sender warning')
+    Get-TransportRule |
+        Where-Object { $_.Identity -eq $Identity } |
+        Remove-TransportRule
+}
+
+function Set-ExoOrganizationAuditDisabled {
+    [CmdletBinding()]
+    param([Parameter(Mandatory = $true)][bool]$AuditDisabled)
+    try {
+        Set-OrganizationConfig -AuditDisabled $AuditDisabled
+    }
+    catch {
+        # Some tenants (GCC/GCCH) lock the audit policy and reject this change
+        # via service-principal REST calls. Log a warning and verify actual state.
+        Write-Warning "Set-ExoOrganizationAuditDisabled: Could not set AuditDisabled=$AuditDisabled - $($_.Exception.Message). The tenant may not permit this change."
+    }
+    # Wait for the desired value to become visible on a read replica. An immediate
+    # single readback can return a stale value even when the write succeeded.
+    # If the wait times out the tenant likely prohibits this change via service principal.
+    Wait-FunctionalExoCondition -MaxAttempts 12 -DelaySeconds 10 -Condition {
+        $Cfg = Invoke-FunctionalExoCommand -CmdletName 'Get-OrganizationConfig' | Select-Object -First 1
+        (ConvertTo-FunctionalExoBoolean -Value $Cfg.AuditDisabled) -eq $AuditDisabled
+    } -FailureMessage "Set-ExoOrganizationAuditDisabled: Tenant AuditDisabled did not reach '$AuditDisabled' after waiting. Tenant policy prohibits this change - this test cannot complete in this environment."
+    # Allow extra time for the write to propagate to all EXO replicas before
+    # ScubaGear's independent REST session reads tenant state.
+    Start-Sleep -Seconds 60
+}
+
+# -----------------------------------------------------------------------
+# Security Suite / Defender REST wrappers for functional test preconditions.
+# These replace ExchangeOnlineManagement cmdlets used in SecuritySuite test
+# plans (6.x, 8.x). $script:EXOApiEndpoint and $script:EXOAccessToken must
+# be set by Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+
+function Get-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-HostedContentFilterPolicy' -Parameters $Params
+}
+
+function Set-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    [string]$SpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidenceSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$PhishSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidencePhishAction,
+    [Parameter(Mandatory = $false)]
+    [string]$AddXHeaderValue,
+    [Parameter(Mandatory = $false)]
+    $AllowedSenderDomains
+  )
+
+  $Params = @{ Identity = $Identity }
+  if ($PSBoundParameters.ContainsKey('SpamAction')) { $Params['SpamAction'] = $SpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidenceSpamAction')) { $Params['HighConfidenceSpamAction'] = $HighConfidenceSpamAction }
+  if ($PSBoundParameters.ContainsKey('PhishSpamAction')) { $Params['PhishSpamAction'] = $PhishSpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidencePhishAction')) { $Params['HighConfidencePhishAction'] = $HighConfidencePhishAction }
+  if ($PSBoundParameters.ContainsKey('AddXHeaderValue')) { $Params['AddXHeaderValue'] = $AddXHeaderValue }
+  if ($PSBoundParameters.ContainsKey('AllowedSenderDomains')) {
+    if ($AllowedSenderDomains -is [hashtable] -and $AllowedSenderDomains.Count -eq 0) {
+      $Params['AllowedSenderDomains'] = @()
+    } else {
+      $Params['AllowedSenderDomains'] = $AllowedSenderDomains
+    }
+  }
+  Invoke-FunctionalExoCommand -CmdletName 'Set-HostedContentFilterPolicy' -Parameters $Params | Out-Null
+}
+
+function New-HostedContentFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $false)]
+    [string]$SpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidenceSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$PhishSpamAction,
+    [Parameter(Mandatory = $false)]
+    [string]$HighConfidencePhishAction
+  )
+
+  $Params = @{ Name = $Name }
+  if ($PSBoundParameters.ContainsKey('SpamAction')) { $Params['SpamAction'] = $SpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidenceSpamAction')) { $Params['HighConfidenceSpamAction'] = $HighConfidenceSpamAction }
+  if ($PSBoundParameters.ContainsKey('PhishSpamAction')) { $Params['PhishSpamAction'] = $PhishSpamAction }
+  if ($PSBoundParameters.ContainsKey('HighConfidencePhishAction')) { $Params['HighConfidencePhishAction'] = $HighConfidencePhishAction }
+  return Invoke-FunctionalExoCommand -CmdletName 'New-HostedContentFilterPolicy' -Parameters $Params
+}
+
+function New-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $true)]
+    [string]$HostedContentFilterPolicy,
+    [Parameter(Mandatory = $false)]
+    $RecipientDomainIs,
+    [Parameter(Mandatory = $false)]
+    $SentTo
+  )
+
+  $Params = @{ Name = $Name; HostedContentFilterPolicy = $HostedContentFilterPolicy }
+  if ($PSBoundParameters.ContainsKey('RecipientDomainIs')) { $Params['RecipientDomainIs'] = $RecipientDomainIs }
+  if ($PSBoundParameters.ContainsKey('SentTo')) { $Params['SentTo'] = $SentTo }
+  return Invoke-FunctionalExoCommand -CmdletName 'New-HostedContentFilterRule' -Parameters $Params
+}
+
+function Remove-HostedContentFilterRule {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-HostedContentFilterRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterRule' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
+}
+
+function Remove-HostedContentFilterPolicy {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-HostedContentFilterPolicy')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-HostedContentFilterPolicy' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
+}
+
+function Get-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-HostedContentFilterRule' -Parameters $Params
+}
+
+function Disable-HostedContentFilterRule {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Disable-HostedContentFilterRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-HostedContentFilterRule' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
+}
+
+function Enable-HostedContentFilterRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Enable-HostedContentFilterRule' -Parameters @{
+    Identity = $Identity
+  } | Out-Null
+}
+
+function Get-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-EOPProtectionPolicyRule' -Parameters $Params
+}
+
+function Disable-EOPProtectionPolicyRule {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Disable-EOPProtectionPolicyRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-EOPProtectionPolicyRule' -Parameters @{
+      Identity = $Identity
+    } | Out-Null
+  }
+}
+
+function Enable-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  Invoke-FunctionalExoCommand -CmdletName 'Enable-EOPProtectionPolicyRule' -Parameters @{
+    Identity = $Identity
+    Confirm = $false
+  } | Out-Null
+}
+
+function Set-EOPProtectionPolicyRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    $SentTo,
+    [Parameter(Mandatory = $false)]
+    $SentToMemberOf,
+    [Parameter(Mandatory = $false)]
+    $RecipientDomainIs
+  )
+
+  $Params = @{ Identity = $Identity }
+  if ($PSBoundParameters.ContainsKey('SentTo')) { $Params['SentTo'] = $SentTo }
+  if ($PSBoundParameters.ContainsKey('SentToMemberOf')) { $Params['SentToMemberOf'] = $SentToMemberOf }
+  if ($PSBoundParameters.ContainsKey('RecipientDomainIs')) { $Params['RecipientDomainIs'] = $RecipientDomainIs }
+  Invoke-FunctionalExoCommand -CmdletName 'Set-EOPProtectionPolicyRule' -Parameters $Params | Out-Null
+}
+
+function Get-Mailbox {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [int]$ResultSize
+  )
+
+  $Params = @{}
+  if ($PSBoundParameters.ContainsKey('ResultSize')) { $Params['ResultSize'] = $ResultSize }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-Mailbox' -Parameters $Params
+}
+
+function Get-AcceptedDomain {
+  [CmdletBinding()]
+  param()
+
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-AcceptedDomain'
+}
+
+function Get-HostedConnectionFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if (-not [string]::IsNullOrWhiteSpace($Identity)) {
+    $Params['Identity'] = $Identity
+  }
+  return Invoke-FunctionalExoCommand -CmdletName 'Get-HostedConnectionFilterPolicy' -Parameters $Params
+}
+
+function Set-HostedConnectionFilterPolicy {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity,
+    [Parameter(Mandatory = $false)]
+    $IPAllowList,
+    [Parameter(Mandatory = $false)]
+    $EnableSafeList
+  )
+
+  $Params = @{ Identity = $Identity }
+  if ($PSBoundParameters.ContainsKey('IPAllowList')) { $Params['IPAllowList'] = $IPAllowList }
+  if ($PSBoundParameters.ContainsKey('EnableSafeList')) { $Params['EnableSafeList'] = $EnableSafeList }
+  Invoke-FunctionalExoCommand -CmdletName 'Set-HostedConnectionFilterPolicy' -Parameters $Params | Out-Null
+}
+
+# -----------------------------------------------------------------------
 # Power Platform REST wrappers for functional test preconditions
 # These replace the removed Microsoft.PowerApps.Administration.PowerShell
 # cmdlets. $script:PPBaseUrl and $script:PPAccessToken must be set by
@@ -962,13 +1624,22 @@ function Set-NestedMemberValue {
     if ($Part -match '^(.+)\[(\d+)\]$') {
       $CollectionName = $Matches[1]
       $Index = [int]$Matches[2]
-      $Current = $Current.$CollectionName[$Index]
+      $Collection = $Current.$CollectionName
+      if ($null -eq $Collection -or $Index -ge @($Collection).Count) {
+        Write-Warning "Set-NestedMemberValue: '$CollectionName[$Index]' is out of range or null in path '$MemberPath'. Skipping update."
+        return
+      }
+      $Current = $Collection[$Index]
     }
     elseif ($null -ne (Get-Member -InputObject $Current -Name $Part -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
       $Current = $Current.$Part
     }
     else {
       throw "Member '$Part' not found while resolving path '$MemberPath'."
+    }
+    if ($null -eq $Current) {
+      Write-Warning "Set-NestedMemberValue: Resolved to null at '$Part' in path '$MemberPath'. Skipping update."
+      return
     }
   }
 
@@ -1004,6 +1675,67 @@ function Set-AllAntiPhishPolicyProperty {
   foreach ($Policy in $ProviderExport.anti_phish_policies) {
     if ($null -ne (Get-Member -InputObject $Policy -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
       $Policy.$PropertyName = $Value
+    }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
+function Set-AllHostedContentFilterPolicyProperty {
+  <#
+    .SYNOPSIS
+      Sets a property on every hosted content filter policy in the cached provider export.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $PropertyName,
+
+    [Parameter(Mandatory = $true)]
+    $Value,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  foreach ($Policy in $ProviderExport.hosted_content_filter_policies) {
+    if ($null -ne (Get-Member -InputObject $Policy -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $Policy.$PropertyName = $Value
+    }
+  }
+
+  PublishProviderExport -OutputFolder $OutputFolder -Export $ProviderExport
+}
+
+function Set-AllProtectionPolicyRuleProperty {
+  <#
+    .SYNOPSIS
+      Sets a property on every protection policy rule in the cached provider export.
+      Handles tenants with varying numbers of rules without index errors.
+  #>
+  param(
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $PropertyName,
+
+    [Parameter(Mandatory = $true)]
+    $Value,
+
+    [Parameter(Mandatory = $true)]
+    [ValidateScript({Test-Path -PathType Container $_})]
+    [string]
+    $OutputFolder
+  )
+
+  $ProviderExport = LoadProviderExport($OutputFolder)
+  foreach ($Rule in $ProviderExport.protection_policy_rules) {
+    if ($null -ne (Get-Member -InputObject $Rule -Name $PropertyName -MemberType NoteProperty, Property -ErrorAction SilentlyContinue)) {
+      $Rule.$PropertyName = $Value
     }
   }
 
@@ -1181,7 +1913,6 @@ function RemoveConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is removed.
   #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
@@ -1210,7 +1941,6 @@ function UpdateConditionalAccessPolicyByName{
     .NOTES
       If more than one conditional access policy has the same DisplayName then only the first is updated.
   #>
-  [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'DisplayName', Justification = 'Variable is used in ScriptBlock')]
   [CmdletBinding()]
   param (
       [Parameter(Mandatory = $true)]
@@ -1368,4 +2098,120 @@ function Get-ExpectedColumnSize {
         "riskyThirdPartySPs_table" { return 8 }
         default { return 0 }
     }
+}
+
+# SafeLinks REST wrappers for functional test preconditions
+function New-SafeLinksPolicy {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableSafeLinksForEmail = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableSafeLinksForTeams = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableSafeLinksForOffice = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$EnableForInternalSenders = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$ScanUrls = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$DeliverMessageAfterScan = $false,
+    [Parameter(Mandatory = $false)]
+    [bool]$TrackClicks = $false
+  )
+
+  $Params = @{ Name = $Name }
+  if ($PSBoundParameters.ContainsKey('EnableSafeLinksForEmail')) { $Params['EnableSafeLinksForEmail'] = $EnableSafeLinksForEmail }
+  if ($PSBoundParameters.ContainsKey('EnableSafeLinksForTeams')) { $Params['EnableSafeLinksForTeams'] = $EnableSafeLinksForTeams }
+  if ($PSBoundParameters.ContainsKey('EnableSafeLinksForOffice')) { $Params['EnableSafeLinksForOffice'] = $EnableSafeLinksForOffice }
+  if ($PSBoundParameters.ContainsKey('EnableForInternalSenders')) { $Params['EnableForInternalSenders'] = $EnableForInternalSenders }
+  if ($PSBoundParameters.ContainsKey('ScanUrls')) { $Params['ScanUrls'] = $ScanUrls }
+  if ($PSBoundParameters.ContainsKey('DeliverMessageAfterScan')) { $Params['DeliverMessageAfterScan'] = $DeliverMessageAfterScan }
+  if ($PSBoundParameters.ContainsKey('TrackClicks')) { $Params['TrackClicks'] = $TrackClicks }
+
+  if ($PSCmdlet.ShouldProcess($Name, 'New-SafeLinksPolicy')) {
+    Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksPolicy' -Parameters $Params
+  }
+}
+
+function New-SafeLinksRule {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Name,
+    [Parameter(Mandatory = $true)]
+    [string]$SafeLinksPolicy,
+    [Parameter(Mandatory = $false)]
+    [bool]$Enabled = $true,
+    [Parameter(Mandatory = $false)]
+    [int]$Priority = 0
+  )
+
+  if ($PSCmdlet.ShouldProcess($Name, 'New-SafeLinksRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'New-SafeLinksRule' -Parameters @{
+      Name = $Name
+      SafeLinksPolicy = $SafeLinksPolicy
+      Enabled = $Enabled
+      Priority = $Priority
+    }
+  }
+}
+
+function Remove-SafeLinksRule {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-SafeLinksRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksRule' -Parameters @{
+      Identity = $Identity
+      Confirm = $false
+    } | Out-Null
+  }
+}
+
+function Remove-SafeLinksPolicy {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Remove-SafeLinksPolicy')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Remove-SafeLinksPolicy' -Parameters @{
+      Identity = $Identity
+      Confirm = $false
+    } | Out-Null
+  }
+}
+
+function Get-SafeLinksRule {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory = $false)]
+    [string]$Identity
+  )
+
+  $Params = @{}
+  if ($Identity) { $Params['Identity'] = $Identity }
+  Invoke-FunctionalExoCommand -CmdletName 'Get-SafeLinksRule' -Parameters $Params
+}
+
+function Disable-SafeLinksRule {
+  [CmdletBinding(SupportsShouldProcess)]
+  param(
+    [Parameter(Mandatory = $true)]
+    [string]$Identity
+  )
+
+  if ($PSCmdlet.ShouldProcess($Identity, 'Disable-SafeLinksRule')) {
+    Invoke-FunctionalExoCommand -CmdletName 'Disable-SafeLinksRule' -Parameters @{
+      Identity = $Identity
+      Confirm = $false
+    } | Out-Null
+  }
 }
