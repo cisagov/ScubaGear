@@ -748,6 +748,25 @@ function Write-ScubaRunDetails {
 
         # 5. OPA Executable Information
         Write-ScubaLog -Message "Collecting OPA executable information..." -Level "Debug" -Source "RunDetails"
+
+        # Pre-resolve whether a custom OPAPath was supplied AND actually contains an OPA binary.
+        # When it does, the absence of OPA in the DEFAULT ~/.scubagear/Tools location is expected and
+        # benign, so the default-location check below logs it at Info instead of Warning. A benign
+        # Warning here would otherwise set $Script:ScubaHasErrors and trip the automatic error-report
+        # generator, producing a false "Errors detected!" report on an otherwise successful run.
+        # Note: Test-Path is case-insensitive on Windows, so a custom OPAPath that differs only in
+        # letter case from the actual folder still resolves correctly here.
+        $customOpaResolves = $false
+        if ($ConfiguredOPAPath) {
+            if (Test-Path $ConfiguredOPAPath -PathType Leaf) {
+                $customOpaResolves = $true
+            }
+            elseif ((Test-Path $ConfiguredOPAPath -PathType Container) -and
+                    (Get-ChildItem -Path $ConfiguredOPAPath -Filter 'opa*' -ErrorAction SilentlyContinue)) {
+                $customOpaResolves = $true
+            }
+        }
+
         try {
             $scubaDefaultPath = Join-Path -Path $env:USERPROFILE -ChildPath '.scubagear'
             $scubaTools = Join-Path -Path $scubaDefaultPath -ChildPath 'Tools'
@@ -779,11 +798,23 @@ function Write-ScubaRunDetails {
                     }
                 }
                 else {
-                    Write-ScubaLog -Message "No OPA executable found in $scubaTools" -Level "Warning" -Source "RunDetails"
+                    if ($customOpaResolves) {
+                        # Benign: OPA lives at the configured custom OPAPath, not the default location.
+                        Write-ScubaLog -Message "No OPA executable found in default location $scubaTools; a custom OPAPath is configured and will be used instead." -Level "Info" -Source "RunDetails"
+                    }
+                    else {
+                        Write-ScubaLog -Message "No OPA executable found in $scubaTools" -Level "Warning" -Source "RunDetails"
+                    }
                 }
             }
             else {
-                Write-ScubaLog -Message "ScubaGear Tools directory not found: $scubaTools" -Level "Warning" -Source "RunDetails"
+                if ($customOpaResolves) {
+                    # Benign: OPA lives at the configured custom OPAPath, so the default Tools folder is not required.
+                    Write-ScubaLog -Message "ScubaGear Tools directory not found: $scubaTools; a custom OPAPath is configured and will be used instead." -Level "Info" -Source "RunDetails"
+                }
+                else {
+                    Write-ScubaLog -Message "ScubaGear Tools directory not found: $scubaTools" -Level "Warning" -Source "RunDetails"
+                }
             }
         }
         catch {

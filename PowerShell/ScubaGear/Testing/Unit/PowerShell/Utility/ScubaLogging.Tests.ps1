@@ -452,7 +452,7 @@ InModuleScope ScubaLogging {
                 $fakeOpa = Join-Path $script:TestLogPath "opa_windows_amd64.exe"
                 Set-Content $fakeOpa "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa
+                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -464,7 +464,7 @@ InModuleScope ScubaLogging {
                 New-Item -ItemType Directory $opaDir -Force | Out-Null
                 Set-Content (Join-Path $opaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir
+                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -475,7 +475,7 @@ InModuleScope ScubaLogging {
                 $emptyDir = Join-Path $script:TestLogPath "emptydir-$(Get-Date -Format 'fff')"
                 New-Item -ItemType Directory $emptyDir -Force | Out-Null
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir
+                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -486,7 +486,7 @@ InModuleScope ScubaLogging {
             It "Should log Warning 'OPA Executable NOT found at configured path' when path does not exist" {
                 $nonExistent = Join-Path $script:TestLogPath "doesnotexist\opa.exe"
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent
+                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -495,11 +495,56 @@ InModuleScope ScubaLogging {
             }
 
             It "Should skip ConfiguredOPAPath check when parameter is not provided" {
-                Write-ScubaRunDetails
+                Write-ScubaRunDetails -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Not -Match "OPA Executable at configured path"
                 $logContent | Should -Not -Match "OPA Executable NOT found at configured path"
+            }
+
+            It "Should log default-location OPA absence as Info (not Warning) and not flag errors when a valid custom OPAPath is configured" {
+                # Point the default location at an EMPTY Tools folder so the default-location check misses.
+                $fakeProfile = Join-Path $script:TestLogPath "profile-$(Get-Date -Format 'fffffff')"
+                New-Item -ItemType Directory (Join-Path $fakeProfile ".scubagear\Tools") -Force | Out-Null
+                $originalUserProfile = $env:USERPROFILE
+                $env:USERPROFILE = $fakeProfile
+
+                # Provide a valid custom OPAPath (directory containing an opa binary).
+                $customOpaDir = Join-Path $script:TestLogPath "customopa-$(Get-Date -Format 'fffffff')"
+                New-Item -ItemType Directory $customOpaDir -Force | Out-Null
+                Set-Content (Join-Path $customOpaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
+
+                $Script:ScubaHasErrors = $false
+                try {
+                    Write-ScubaRunDetails -ConfiguredOPAPath $customOpaDir -TestNetworkConnectivity:$false
+                }
+                finally {
+                    $env:USERPROFILE = $originalUserProfile
+                }
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                # The default-location miss must be Info, not a Warning that would trip the auto error report.
+                $logContent | Should -Match "\[Info\s*\].*RunDetails.*No OPA executable found in default location"
+                $logContent | Should -Not -Match "\[Warning\s*\].*RunDetails.*No OPA executable found in"
+                $Script:ScubaHasErrors | Should -Be $false
+            }
+
+            It "Should log default-location OPA absence as Warning when no valid custom OPAPath is configured" {
+                # Empty default Tools folder and NO configured path -> genuine warning expected.
+                $fakeProfile = Join-Path $script:TestLogPath "profile-$(Get-Date -Format 'fffffff')"
+                New-Item -ItemType Directory (Join-Path $fakeProfile ".scubagear\Tools") -Force | Out-Null
+                $originalUserProfile = $env:USERPROFILE
+                $env:USERPROFILE = $fakeProfile
+
+                try {
+                    Write-ScubaRunDetails -TestNetworkConnectivity:$false
+                }
+                finally {
+                    $env:USERPROFILE = $originalUserProfile
+                }
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "\[Warning\s*\].*RunDetails.*No OPA executable found in"
             }
         }
 
