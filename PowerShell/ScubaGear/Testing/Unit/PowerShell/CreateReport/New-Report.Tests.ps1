@@ -67,6 +67,8 @@ InModuleScope CreateReport {
                 $ReportContent = Get-Content -Path $ReportPath -Raw
                 $ReportContent | Should -Match '<h2>Users with Privileged Roles</h2>'
                 $ReportContent | Should -Match 'id="privileged-users"'
+                $ReportContent | Should -Match "href='#caps'"
+                $ReportContent | Should -Match 'section\.id = tableType;'
 
                 $PrivilegedUsersTable = [regex]::Match($ReportContent, 'id="privileged-users".*?</table>', 'Singleline').Value
                 $DataRows = [regex]::Matches($PrivilegedUsersTable, '<tr>.*?</tr>', 'Singleline') | Select-Object -Skip 1
