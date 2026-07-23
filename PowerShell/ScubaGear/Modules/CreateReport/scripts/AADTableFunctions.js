@@ -305,6 +305,7 @@ const buildExpandableTable = (data, tableType, severityScoreWeights) => {
         const isSortable = tableType === "riskyApps" || tableType === "riskyThirdPartySPs";
         const colNames = metadata.columns;
         const section = document.createElement("section");
+        section.id = tableType;
         section.className = metadata.wrapperClass;
         document.querySelector("main").appendChild(section);
 
