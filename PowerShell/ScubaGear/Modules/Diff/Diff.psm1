@@ -840,7 +840,7 @@ function New-ScubaDiffReport {
         [void]$sb.AppendLine('  </div>')
     }
     [void]$sb.AppendLine('</div>')
-    [void]$sb.AppendLine("<p>Diff generated $(& $enc $meta.TimestampZulu) by ScubaGear $(& $enc $meta.ToolVersion).</p>")
+    [void]$sb.AppendLine("<p class=""diff-generated"">Diff generated $(& $enc $meta.TimestampZulu) by ScubaGear $(& $enc $meta.ToolVersion).</p>")
 
     if (@($meta.ProductsOnlyInBefore).Count -gt 0) {
         [void]$sb.AppendLine("<p><strong>Products only in Before (all controls Removed Policy):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")

@@ -181,9 +181,12 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
     font-style: italic;
 }
 
+.diff-generated { text-align: center; }
+
 .legend {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     gap: 1em;
     margin: 1em 0;
     font-size: 0.85em;
