@@ -1,22 +1,30 @@
 ProductName: exo
 TestPlan:
   - PolicyId: MS.EXO.1.1v2
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.1.1v2 Non-Compliant case - domains have auto forwarding Enabled
         Preconditions:
-          - Command: Set-ExoRemoteDomainAutoForwardEnabled
+          - Command: UpdateProviderExport
             Splat:
-              CurrentValue: false
-              DesiredValue: true
+              Updates:
+                remote_domains:
+                  - DomainName: "*"
+                    AutoForwardEnabled: true
+                  - DomainName: "contoso.com"
+                    AutoForwardEnabled: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.1.1v2 Compliant case - domains have auto forwarding Disabled
         Preconditions:
-          - Command: Set-ExoRemoteDomainAutoForwardEnabled
+          - Command: UpdateProviderExport
             Splat:
-              CurrentValue: true
-              DesiredValue: false
+              Updates:
+                remote_domains:
+                  - DomainName: "*"
+                    AutoForwardEnabled: false
+                  - DomainName: "contoso.com"
+                    AutoForwardEnabled: false
         Postconditions: []
         ExpectedResult: true
 
@@ -238,107 +246,143 @@ TestPlan:
         ExpectedResult: true
 
   - PolicyId: MS.EXO.5.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.5.1v1 Non-Compliant case - SMTP AUTH is Enabled
         Preconditions:
-          - Command: Set-ExoTransportConfigSmtpClientAuthenticationDisabled
+          - Command: UpdateProviderExport
             Splat:
-              SmtpClientAuthenticationDisabled: false
+              Updates:
+                transport_config:
+                  - Name: "Default"
+                    SmtpClientAuthenticationDisabled: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.5.1v1 Compliant case - SMTP AUTH is Disabled
         Preconditions:
-          - Command: Set-ExoTransportConfigSmtpClientAuthenticationDisabled
+          - Command: UpdateProviderExport
             Splat:
-              SmtpClientAuthenticationDisabled: true
+              Updates:
+                transport_config:
+                  - Name: "Default"
+                    SmtpClientAuthenticationDisabled: true
         Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.EXO.6.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.6.1v1 Non-Compliant case - Contacts shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
+          - Command: UpdateProviderExport
             Splat:
-              Name: "FunctionalTest ContactSharingAllDomains"
-              Domains: "*:ContactsSharing"
-        Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest ContactSharingAllDomains"
+              Updates:
+                sharing_policy:
+                  - Name: "Default Sharing Policy"
+                    Domains:
+                      - "ted.com:ContactsSharing"
+                  - Name: "FunctionalTest ContactSharingAllDomains"
+                    Domains:
+                      - "*:ContactsSharing"
+        Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.6.1v1 Compliant case - Contacts NOT shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
+          - Command: UpdateProviderExport
             Splat:
-              Name: "FunctionalTest ContactSharingLimitedDomains"
-              Domains: "ted.com:ContactsSharing"
-        Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest ContactSharingLimitedDomains"
+              Updates:
+                sharing_policy:
+                  - Name: "Default Sharing Policy"
+                    Domains:
+                      - "ted.com:ContactsSharing"
+                  - Name: "FunctionalTest ContactSharingLimitedDomains"
+                    Domains:
+                      - "ted.com:ContactsSharing"
+        Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.EXO.6.2v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.6.2v1 Non-Compliant case - Calendar shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
+          - Command: UpdateProviderExport
             Splat:
-              Name: "FunctionalTest CalendarSharingAllDomains"
-              Domains: "*:CalendarSharingFreeBusyReviewer"
-        Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest CalendarSharingAllDomains"
+              Updates:
+                sharing_policy:
+                  - Name: "Default Sharing Policy"
+                    Domains:
+                      - "ted.com:CalendarSharingFreeBusyReviewer"
+                  - Name: "FunctionalTest CalendarSharingAllDomains"
+                    Domains:
+                      - "*:CalendarSharingFreeBusyReviewer"
+        Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.6.2v1 Compliant case - Calendar NOT shared with all domains
         Preconditions:
-          - Command: New-ExoSharingPolicy
+          - Command: UpdateProviderExport
             Splat:
-              Name: "FunctionalTest CalendarSharingLimitedDomains"
-              Domains: "ted.com:CalendarSharingFreeBusyReviewer"
-        Postconditions:
-          - Command: Remove-ExoSharingPolicy
-            Splat:
-              Identity: "FunctionalTest CalendarSharingLimitedDomains"
+              Updates:
+                sharing_policy:
+                  - Name: "Default Sharing Policy"
+                    Domains:
+                      - "ted.com:CalendarSharingFreeBusyReviewer"
+                  - Name: "FunctionalTest CalendarSharingLimitedDomains"
+                    Domains:
+                      - "ted.com:CalendarSharingFreeBusyReviewer"
+        Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.EXO.7.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.7.1v1 Non-Compliant case - External sender warning rules Disabled
         Preconditions:
-          ### Disable all rules that match what the policy is checking for
-          - Command: Disable-ExoExternalSenderWarningRules
-        Postconditions:
-          - Command: Enable-ExoExternalSenderWarningRules
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                transport_rule:
+                  - Name: "External Sender Warning"
+                    State: "Disabled"
+                    Mode: "Enforce"
+                    FromScope: "NotInOrganization"
+                    PrependSubject: "[External] "
+        Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.7.1v1 Compliant case - External sender warning rule exists
         Preconditions:
-          ### By creating a new rule that matches what the policy is checking for, we guarantee that it exists in the tenant
-          - Command: New-ExoExternalSenderWarningRule
-        Postconditions:
-          - Command: Remove-ExoExternalSenderWarningRule
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                transport_rule:
+                  - Name: "External Sender Warning"
+                    State: "Enabled"
+                    Mode: "Enforce"
+                    FromScope: "NotInOrganization"
+                    PrependSubject: "[External] "
+        Postconditions: []
         ExpectedResult: true
 
   - PolicyId: MS.EXO.13.1v1
-    TestDriver: RunScuba
+    TestDriver: ScubaCached
     Tests:
       - TestDescription: MS.EXO.13.1v1 Non-Compliant case - Mailbox auditing is Disabled
         Preconditions:
-          - Command: Set-ExoOrganizationAuditDisabled
+          - Command: UpdateProviderExport
             Splat:
-              AuditDisabled: true
+              Updates:
+                org_config:
+                  - Name: "Default"
+                    AuditDisabled: true
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.EXO.13.1v1 Compliant case - Mailbox auditing is Enabled
         Preconditions:
-          - Command: Set-ExoOrganizationAuditDisabled
+          - Command: UpdateProviderExport
             Splat:
-              AuditDisabled: false
+              Updates:
+                org_config:
+                  - Name: "Default"
+                    AuditDisabled: false
         Postconditions: []
         ExpectedResult: true
