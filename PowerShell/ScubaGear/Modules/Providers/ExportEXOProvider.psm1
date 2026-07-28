@@ -763,13 +763,27 @@ function Get-ScubaDmarcRecord {
                 $Queries += 1
                 $LogEntries += $CandidateResponse.LogEntries
 
-                if ($CandidateResponse.Answers.Length -gt 0) {
-                    $Response = $CandidateResponse
-                }
-            }
+                # RFC 9989 tree-walk steps 2 and 6: an answer only counts as this
+                # target's DMARC policy if it is itself a valid DMARC record (begins
+                # with the version tag). Multiple valid records at the same target are
+                # ambiguous per RFC 7489 6.6.3 and are treated as no usable record
+                # there, same as zero answers. A single valid record carrying the psd
+                # tag marks the walk boundary explicitly, so stop there instead of
+                # continuing unconditionally through the remaining labels.
+                $ValidAnswers = @($CandidateResponse.Answers | Where-Object { $_ -match '^v=DMARC1' })
 
-            if ($Response.Answers.Length -eq 0 -and $null -ne $CandidateResponse) {
-                $Response = $CandidateResponse
+                if ($ValidAnswers.Length -eq 1) {
+                    $Response = [PSCustomObject]@{
+                        "Answers"    = @($ValidAnswers)
+                        "Errors"     = $CandidateResponse.Errors
+                        "NXDomain"   = $CandidateResponse.NXDomain
+                        "LogEntries" = $CandidateResponse.LogEntries
+                    }
+
+                    if ($ValidAnswers[0] -match 'psd=(n|y)\b') {
+                        break
+                    }
+                }
             }
         }
 
