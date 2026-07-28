@@ -1,8 +1,8 @@
 function Export-SecuritySuiteProvider {
     <#
     .Description
-    Gets the Microsoft 365 Defender settings that are relevant
-    to the SCuBA Microsoft 365 Security Suite using the Graph and EXO PowerShell Modules
+    Gets the Microsoft 365 Security Suite settings that are relevant
+    to the SCuBA Security Suite baselines using direct EXO Admin API calls.
     .Functionality
     Internal
     #>
@@ -14,40 +14,108 @@ function Export-SecuritySuiteProvider {
         [string]
         $M365Environment,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [hashtable]
-        $ServicePrincipalParams
+        [string]
+        $AccessToken,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ApiEndpoint,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ComplianceAccessToken,
+
+        [Parameter(Mandatory = $false)]
+        [string]
+        $ComplianceApiEndpoint
     )
-    $ParentPath = Split-Path $PSScriptRoot -Parent
-    $ConnectionFolderPath = Join-Path -Path $ParentPath -ChildPath "Connection"
-    Import-Module (Join-Path -Path $ConnectionFolderPath -ChildPath "ConnectHelpers.psm1")
+
+        Write-Verbose "Running SecuritySuite provider export for environment '$M365Environment'."
+
+        if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+            throw "AccessToken is required for SecuritySuite provider export."
+        }
+
+        if ([string]::IsNullOrWhiteSpace($ApiEndpoint)) {
+            throw "ApiEndpoint is required for SecuritySuite provider export."
+        }
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
+    Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Trace-ScubaFunction
     $Tracker = Get-CommandTracker
 
-    # Manually importing the module name here to bypass cmdlet name conflicts
-    # There are conflicting PowerShell Cmdlet names in EXO and Power Platform
-    Import-Module ExchangeOnlineManagement
+    function Invoke-SecuritySuiteTrackedCommand {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$CmdletName,
+            [Parameter(Mandatory = $false)]
+            [bool]$SuppressWarning = $false
+        )
 
-    # Sign in for the Defender Provider if not connected
-    $ExchangeConnected = Get-Command Get-OrganizationConfig -ErrorAction SilentlyContinue
-    if(-not $ExchangeConnected) {
         try {
-            $EXOHelperParams = @{
-                M365Environment = $M365Environment;
+            $Result = Trace-ScubaFunction -FunctionName $CmdletName -LogErrors $false -ScriptBlock {
+                Invoke-EXORestMethod -CmdletName $CmdletName -ApiEndpoint $ApiEndpoint -AccessToken $AccessToken
             }
-            if ($ServicePrincipalParams) {
-                $EXOHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-            }
-
-            Connect-EXOHelper @ServicePrincipalParams;
+            $Tracker.AddSuccessfulCommand($CmdletName)
+            return @($Result)
         }
         catch {
-            Write-Warning "Error connecting to ExchangeOnline: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            if (-not $SuppressWarning) {
+                Write-Warning "Error running ${CmdletName}: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            }
+            $Tracker.AddUnSuccessfulCommand($CmdletName)
+            return @()
         }
     }
+
+    # IPPS/Compliance cmdlets require the Security & Compliance endpoint.
+    # These include DLP, ProtectionAlert, and audit log retention policies.
+    $HasComplianceEndpoint = (-not [string]::IsNullOrWhiteSpace($ComplianceAccessToken)) -and (-not [string]::IsNullOrWhiteSpace($ComplianceApiEndpoint))
+
+    function Invoke-ComplianceTrackedCommand {
+        param(
+            [Parameter(Mandatory = $true)]
+            [string]$CmdletName,
+            [Parameter(Mandatory = $false)]
+            [bool]$SuppressWarning = $false
+        )
+
+        # Try compliance endpoint first, then fall back to EXO endpoint.
+        # GCCHigh: compliance endpoint works (EXO returns 403 for IPPS cmdlets)
+        # Commercial/GCC: EXO endpoint works (compliance rejects EXO-scoped tokens)
+        $Endpoints = @()
+        if ($HasComplianceEndpoint) {
+            $Endpoints += @{ Token = $ComplianceAccessToken; Endpoint = $ComplianceApiEndpoint }
+        }
+        $Endpoints += @{ Token = $AccessToken; Endpoint = $ApiEndpoint }
+
+        foreach ($ep in $Endpoints) {
+            try {
+                $Result = Trace-ScubaFunction -FunctionName $CmdletName -LogErrors $false -ScriptBlock {
+                    Invoke-EXORestMethod -CmdletName $CmdletName -ApiEndpoint $ep.Endpoint -AccessToken $ep.Token
+                }
+                $Tracker.AddSuccessfulCommand($CmdletName)
+                return @($Result)
+            }
+            catch {
+                # Try next endpoint
+                continue
+            }
+        }
+
+        # All endpoints failed
+        if (-not $SuppressWarning) {
+            Write-Warning "Error running ${CmdletName}: all endpoints failed."
+        }
+        $Tracker.AddUnSuccessfulCommand($CmdletName)
+        return @()
+    }
+
 
     # Get the tenant's provisioned service plans via Graph. These are used to
     # determine whether the tenant has the per-user license (E5 / E5 Compliance /
@@ -57,125 +125,77 @@ function Export-SecuritySuiteProvider {
     $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
-    # Regular Exchange i.e non IPPSSession cmdlets
-    $AdminAuditLogConfig = ConvertTo-Json @($Tracker.TryCommand("Get-AdminAuditLogConfig"))
-    $ProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-EOPProtectionPolicyRule"))
-    $AntiPhishPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishPolicy"))
-    $AntiPhishRule = ConvertTo-Json @($Tracker.TryCommand("Get-AntiPhishRule"))
-    $AcceptedDomains = ConvertTo-Json @($Tracker.TryCommand("Get-AcceptedDomain"))
-    $ConnectionFilter = ConvertTo-Json @($Tracker.TryCommand("Get-HostedConnectionFilterPolicy"))
-    $SafeLinksPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksPolicy"))
-    $SafeLinksRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeLinksRule"))
-    $HostedContentFilterPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterPolicy"))
-    $HostedContentFilterRules = ConvertTo-Json @($Tracker.TryCommand("Get-HostedContentFilterRule"))
-    $AntiMalwarePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterPolicy"))
-    $AntiMalwareRule = ConvertTo-Json @($Tracker.TryCommand("Get-MalwareFilterRule"))
-    $SafeAttachmentPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentPolicy"))
-    $SafeAttachmentRule = ConvertTo-Json @($Tracker.TryCommand("Get-SafeAttachmentRule"))
-    $BuiltInProtectionRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPBuiltInProtectionRule"))
+    $AdminAuditLogConfig = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
+    $ProtectionPolicyRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
+    $AntiPhishPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishPolicy")
+    $AntiPhishRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishRule")
+    $AcceptedDomains = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AcceptedDomain")
+    $ConnectionFilter = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedConnectionFilterPolicy")
+    $SafeLinksPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksPolicy")
+    $SafeLinksRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksRule")
+    $HostedContentFilterPolicies = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterPolicy")
+    $HostedContentFilterRules = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterRule")
+    $AntiMalwarePolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterPolicy")
+    $AntiMalwareRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterRule")
+    $SafeAttachmentPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentPolicy")
+    $SafeAttachmentRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentRule")
+    $BuiltInProtectionRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPBuiltInProtectionRule")
 
-    # Test if Defender specific commands are available. If the tenant does
-    # not have a defender license (plan 1 or plan 2), the following
-    # commandlets will fail with "The term [Cmdlet name] is not recognized
-    # as the name of a cmdlet, function, script file, or operable program,"
-    # so we can test for this using Get-Command.
-    if (Get-Command Get-AtpPolicyForO365 -ErrorAction SilentlyContinue) {
-        $ATPPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-AtpPolicyForO365"))
-        $ATPProtectionPolicyRule = ConvertTo-Json @($Tracker.TryCommand("Get-ATPProtectionPolicyRule"))
-        $DefenderLicense = ConvertTo-Json $true
-    }
-    else {
-        # The tenant can't make use of the defender commands
-        Write-Warning "Defender for Office 365 license not available in tenant. Omitting the following commands: Get-AtpPolicyForO365, Get-ATPProtectionPolicyRule."
-        $ATPPolicy = ConvertTo-Json @()
-        $ATPProtectionPolicyRule = ConvertTo-Json @()
+    $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
+    $ATPProtectionPolicyRuleResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
+
+    if (($Tracker.GetUnSuccessfulCommands() -contains "Get-AtpPolicyForO365") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ATPProtectionPolicyRule")) {
+        $ATPPolicyResult = @()
+        $ATPProtectionPolicyRuleResult = @()
         $DefenderLicense = ConvertTo-Json $false
 
-        # While it is counter-intuitive to add this both to SuccessfulCommands
-        # and UnSuccessfulCommands, this is a unique error case that is
-        # handled within the Rego.
+        # Keep compatibility with prior report behavior for missing defender license.
         $Tracker.AddSuccessfulCommand("Get-AtpPolicyForO365")
-        $Tracker.AddUnSuccessfulCommand("Get-AtpPolicyForO365")
         $Tracker.AddSuccessfulCommand("Get-ATPProtectionPolicyRule")
-        $Tracker.AddUnSuccessfulCommand("Get-ATPProtectionPolicyRule")
-    }
-
-    # Connect to Security & Compliance
-    $IPPSConnected = $false
-    try {
-        $DefenderHelperParams = @{
-            M365Environment = $M365Environment;
-        }
-
-        if ($ServicePrincipalParams) {
-            $DefenderHelperParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-        }
-        Write-Information "INFO: Authenticating to Security & Compliance..." -InformationAction Continue
-        Write-ScubaLog -Message "Authenticating to Security & Compliance" -Level "Info" -Source "Export-SecuritySuiteProvider"
-        Connect-DefenderHelper @DefenderHelperParams
-        $IPPSConnected = $true
-    }
-    catch {
-        Write-Warning "Error running Connect-IPPSSession: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-        Write-Warning "Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, Get-ProtectionAlert, and Get-UnifiedAuditLogRetentionPolicy."
-        $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
-        $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
-        $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
-        $Tracker.AddUnSuccessfulCommand("Get-UnifiedAuditLogRetentionPolicy")
-    }
-    if ($IPPSConnected) {
-        if (Get-Command Get-DlpCompliancePolicy -ErrorAction SilentlyContinue) {
-            $DLPCompliancePolicy = ConvertTo-Json @($Tracker.TryCommand("Get-DlpCompliancePolicy"))
-            $ProtectionAlert = ConvertTo-Json @($Tracker.TryCommand("Get-ProtectionAlert"))
-            $DLPComplianceRules = @($Tracker.TryCommand("Get-DlpComplianceRule"))
-            $DLPLicense = ConvertTo-Json $true
-
-        # Powershell is inconsistent with how it saves lists to json.
-        # This loop ensures that the format of ContentContainsSensitiveInformation
-        # will *always* be a list.
-
-            foreach($Rule in $DLPComplianceRules) {
-                if ($Rule.Count -gt 0) {
-                    $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
-                }
-            }
-        }
-        else {
-            Write-Warning "Defender for DLP license not available in tenant. Omitting the following commands: Get-DlpCompliancePolicy, Get-DlpComplianceRule, and Get-ProtectionAlert."
-            $DLPCompliancePolicy = ConvertTo-Json @()
-            $DLPComplianceRules = ConvertTo-Json @()
-            $ProtectionAlert = ConvertTo-Json @()
-            $DLPComplianceRules = ConvertTo-Json @()
-            $Tracker.AddUnSuccessfulCommand("Get-DlpCompliancePolicy")
-            $Tracker.AddUnSuccessfulCommand("Get-DlpComplianceRule")
-            $Tracker.AddUnSuccessfulCommand("Get-ProtectionAlert")
-            $Tracker.AddSuccessfulCommand("Get-DlpCompliancePolicy")
-            $Tracker.AddSuccessfulCommand("Get-DlpComplianceRule")
-            $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
-            $DLPLicense = ConvertTo-Json $false
-        }
-
-        # We need to specify the depth because the data contains some
-        # nested tables.
-        $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRules
-
-        # Audit log retention policies are managed through the Security &
-        # Compliance session and are needed to evaluate MS.SECURITYSUITE.5.2v1.
-        $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @($Tracker.TryCommand("Get-UnifiedAuditLogRetentionPolicy"))
     }
     else {
-        $DLPCompliancePolicy = ConvertTo-Json @()
-        $DLPComplianceRules = ConvertTo-Json @()
-        $ProtectionAlert = ConvertTo-Json @()
-        $DLPComplianceRules = ConvertTo-Json @()
-        $DLPLicense = ConvertTo-Json $false
-        $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @()
+        $DefenderLicense = ConvertTo-Json $true
     }
+
+    $ATPPolicy = ConvertTo-Json @($ATPPolicyResult)
+    $ATPProtectionPolicyRule = ConvertTo-Json @($ATPProtectionPolicyRuleResult)
+
+    $DLPCompliancePolicyResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpCompliancePolicy" -SuppressWarning $true)
+    $DLPComplianceRulesResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
+    $ProtectionAlertResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-ProtectionAlert" -SuppressWarning $true)
+
+    if (($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpCompliancePolicy") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpComplianceRule") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ProtectionAlert")) {
+        $DLPCompliancePolicyResult = @()
+        $DLPComplianceRulesResult = @()
+        $ProtectionAlertResult = @()
+        $DLPLicense = ConvertTo-Json $false
+
+        # Keep compatibility with prior report behavior for missing DLP license.
+        $Tracker.AddSuccessfulCommand("Get-DlpCompliancePolicy")
+        $Tracker.AddSuccessfulCommand("Get-DlpComplianceRule")
+        $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
+    }
+    else {
+        $DLPLicense = ConvertTo-Json $true
+    }
+
+    foreach($Rule in $DLPComplianceRulesResult) {
+        if ($Rule.Count -gt 0) {
+            $Rule.ContentContainsSensitiveInformation = @($Rule.ContentContainsSensitiveInformation)
+        }
+    }
+
+    $DLPCompliancePolicy = ConvertTo-Json @($DLPCompliancePolicyResult)
+    $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRulesResult
+    $ProtectionAlert = ConvertTo-Json @($ProtectionAlertResult)
+
+
+    # Audit log retention policies are needed to evaluate MS.SECURITYSUITE.5.2v1.
+    $UnifiedAuditLogRetentionPolicy = ConvertTo-Json @(Invoke-ComplianceTrackedCommand -CmdletName "Get-UnifiedAuditLogRetentionPolicy" -SuppressWarning $true)
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
-    # Note the spacing and the last comma in the json is important
     $json = @"
     "protection_policy_rules": $ProtectionPolicyRule,
     "atp_policy_rules": $ATPProtectionPolicyRule,

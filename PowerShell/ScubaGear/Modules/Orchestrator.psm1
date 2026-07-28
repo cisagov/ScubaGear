@@ -1,4 +1,5 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility/ScubaLogging.psm1")
 
 function Invoke-SCuBA {
     <#
@@ -11,7 +12,7 @@ function Invoke-SCuBA {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Security Suite: securitysuite
+    - Defender for Office 365: defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -38,8 +39,7 @@ function Invoke-SCuBA {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: When assessing the Security Suite baseline, Defender will ask for authentication even if
-    this variable is set to `$false`
+    Note: defender will ask for authentication even if this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -63,7 +63,7 @@ function Invoke-SCuBA {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "RegoOutput".
+    Defaults to "TestResults".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -109,7 +109,7 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Security Suite, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformance_*.
     .Example
     Invoke-SCuBA -Version
@@ -118,8 +118,8 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ConfigFilePath MyConfig.json
     This example uses the specified configuration file when executing SCuBAGear.
     .Example
-    Invoke-SCuBA -ProductNames aad, securitysuite -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Security Suite security
+    Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Defender security
     baselines.
     .Example
     Invoke-SCuBA -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -140,7 +140,6 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        # Both defender and securitysuite are options, as defender is an alias for securitysuite
         [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
@@ -608,12 +607,13 @@ function Invoke-SCuBA {
                     ModuleVersion = $ModuleVersion
                     OutFolderPath = $OutFolderPath
                     Guid = $Guid
+                    ConnectionResult = "[ConnectionResult Object]"
                 } -LogReturnValue $true -ScriptBlock {
-                    Invoke-ProviderList -ScubaConfig $ScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                    Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
                 }
             }
             else {
-                Invoke-ProviderList -ScubaConfig $ScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
             }
 
             if ($ProdProviderFailed.Count -gt 0) {
@@ -789,10 +789,6 @@ function Invoke-ProviderList {
         [object]
         $ScubaConfig,
 
-        [Parameter(Mandatory = $false)]
-        [hashtable]
-        $ConnectionResult = @{},
-
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -811,7 +807,11 @@ function Invoke-ProviderList {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Guid
+        $Guid,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $ConnectionResult
     )
     process {
         try {
@@ -820,9 +820,12 @@ function Invoke-ProviderList {
             $ProviderJSON = @"
 "@
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             $ProdProviderFailed = @()
             $ConnectTenantParams = @{
+                'M365Environment' = $ScubaConfig.M365Environment
+            }
+            $SPOProviderParams = @{
                 'M365Environment' = $ScubaConfig.M365Environment
             }
 
@@ -831,6 +834,7 @@ function Invoke-ProviderList {
                 $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
                 $ServicePrincipalAuth = $true
+                $SPOProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams }
             }
 
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -863,7 +867,17 @@ function Invoke-ProviderList {
                             $RetVal = Export-EXOProvider @EXOProviderParams | Select-Object -Last 1
                         }
                         "securitysuite" {
-                            $RetVal = Export-SecuritySuiteProvider @ConnectTenantParams  | Select-Object -Last 1
+                            if ([string]::IsNullOrEmpty($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrEmpty($ConnectionResult.EXOApiEndpoint)) {
+                                throw "Missing EXO token or endpoint for SecuritySuite provider. Re-run with -LogIn or check authentication."
+                            }
+                            $SecuritySuiteProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken' = $ConnectionResult.EXOAccessToken
+                                'ApiEndpoint' = $ConnectionResult.EXOApiEndpoint
+                                'ComplianceAccessToken' = $ConnectionResult.ComplianceAccessToken
+                                'ComplianceApiEndpoint' = $ConnectionResult.ComplianceApiEndpoint
+                            }
+                            $RetVal = Export-SecuritySuiteProvider @SecuritySuiteProviderParams | Select-Object -Last 1
                         }
                         "powerplatform" {
                             $PPProviderParams = @{
@@ -999,7 +1013,7 @@ function Invoke-RunRego {
     This function runs the RunRego module.
     Which runs the various rego files against the
     ProviderSettings.json using the specified OPA executable
-    Output will be stored as a RegoOutput.json in the OutPath Folder
+    Output will be stored as a TestResults.json in the OutPath Folder
     .Functionality
     Internal
     #>
@@ -1023,7 +1037,7 @@ function Invoke-RunRego {
     process {
         try {
             $ProdRegoFailed = @()
-            $RegoOutput = @()
+            $TestResults = @()
             $N = 0
             $Len = $ScubaConfig.ProductNames.Length
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -1060,7 +1074,7 @@ function Invoke-RunRego {
                 }
                 try {
                     $RetVal = Invoke-Rego @params
-                    $RegoOutput += $RetVal
+                    $TestResults += $RetVal
                     Write-ScubaLog -Message "Rego evaluation succeeded: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{ Product = $Product }
                 }
                 catch {
@@ -1078,9 +1092,9 @@ function Invoke-RunRego {
                 }
             }
 
-            $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
-            $RegoOutputJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
+            $TestResultsJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
             $ProdRegoFailed
         }
@@ -1235,7 +1249,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1341,7 +1355,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1408,8 +1422,6 @@ function Merge-JsonOutput {
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
                 "DomainName" = $TenantDetails.DomainName;
-                "OrgName" = $SettingsExportObject.scuba_config.OrgName;
-                "OrgUnitName" = $SettingsExportObject.scuba_config.OrgUnitName;
                 "ProductSuite" = "Microsoft 365";
                 "ProductsAssessed" = $FullNames;
                 "ProductAbbreviationMapping" = $ProductAbbreviationMapping
@@ -1525,7 +1537,7 @@ function Invoke-ReportCreation {
     <#
     .Description
     This function runs the CreateReport Module
-    which creates an HTML report using the RegoOutput.json.
+    which creates an HTML report using the TestResults.json.
     Output will be stored as various HTML files in the OutPath Folder.
     The report Home page will be named BaselineReports.html
     .Functionality
@@ -1701,12 +1713,10 @@ function Invoke-ReportCreation {
             $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
             $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
             $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
-            $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
 
             $JSFiles = @(
                 $ParentReportJS
                 $UtilsJS
-                $TableFunctionsJS
             ) -join "`n"
 
             $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
@@ -1731,6 +1741,57 @@ function Invoke-ReportCreation {
     }
 }
 
+function Get-EXOTenantDetailFromConnection {
+    <#
+    .Description
+    Gets tenant details through EXO Admin API using existing Defender/EXO connection context.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [hashtable]
+        $ConnectionResult
+    )
+
+    $EXORestHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers/ProviderHelpers/EXORestHelper.psm1"
+    Import-Module -Name $EXORestHelperPath -Function Invoke-EXORestMethod -ErrorAction Stop
+
+    if ([string]::IsNullOrWhiteSpace($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrWhiteSpace($ConnectionResult.EXOApiEndpoint)) {
+        throw "Missing EXO token or endpoint in ConnectionResult."
+    }
+
+    $OrgConfigResponse = Invoke-EXORestMethod `
+        -CmdletName "Get-OrganizationConfig" `
+        -ApiEndpoint $ConnectionResult.EXOApiEndpoint `
+        -AccessToken $ConnectionResult.EXOAccessToken
+
+    $OrgConfig = if ($OrgConfigResponse -is [System.Array]) { $OrgConfigResponse | Select-Object -First 1 } else { $OrgConfigResponse }
+    if (-not $OrgConfig) {
+        throw "Get-OrganizationConfig returned no data."
+    }
+
+    $TenantId = "Error retrieving Tenant ID"
+    $TenantIdMatch = [regex]::Match($ConnectionResult.EXOApiEndpoint, '/adminapi/(?:beta|v1\.0)/([^/]+)/InvokeCommand')
+    if ($TenantIdMatch.Success) {
+        $TenantId = $TenantIdMatch.Groups[1].Value
+    }
+
+    $DomainName = if ($OrgConfig.Name) { [string]$OrgConfig.Name } else { "Error retrieving Domain name" }
+    $DisplayName = if ($OrgConfig.DisplayName) { [string]$OrgConfig.DisplayName } else { $DomainName }
+
+    $TenantInfo = @{
+        "DisplayName" = $DisplayName;
+        "DomainName" = $DomainName;
+        "TenantId" = $TenantId;
+        "EXOAdditionalData" = "Retrieved via EXO REST Admin API";
+    }
+
+    ConvertTo-Json @($TenantInfo) -Depth 4
+}
+
 function Get-TenantDetail {
     <#
     .Description
@@ -1742,7 +1803,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1754,8 +1815,9 @@ function Get-TenantDetail {
         $M365Environment,
 
         [Parameter(Mandatory = $false)]
+        [AllowNull()]
         [hashtable]
-        $ConnectionResult = @{}
+        $ConnectionResult
     )
 
     # organized by best tenant details information
@@ -1765,14 +1827,14 @@ function Get-TenantDetail {
     elseif ($ProductNames.Contains("sharepoint")) {
         Get-AADTenantDetail -M365Environment $M365Environment
     }
+    elseif ($ProductNames.Contains("powerbi")) {
+        Get-AADTenantDetail -M365Environment $M365Environment
+    }
     elseif ($ProductNames.Contains("teams")) {
         Get-TeamsTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("powerplatform")) {
         Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerbi")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("exo")) {
         Get-EXOTenantDetail -M365Environment $M365Environment `
@@ -1824,24 +1886,17 @@ function Invoke-Connection {
         $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
     }
 
+    $ConnectionResult = @{
+        ProdAuthFailed = @()
+        EXOAccessToken = $null
+        EXOApiEndpoint = $null
+    }
+
     if ($ScubaConfig.LogIn) {
         $ConnectionResult = Connect-Tenant @ConnectTenantParams
-        $ConnectionResult
     }
-    else {
-        # Return empty result when not logging in
-        @{
-            ProdAuthFailed  = @()
-            PBILicenseFound = $true
-            PBILicenseReason = ""
-            SPOAccessToken  = $null
-            SPOAdminUrl     = $null
-            PPAccessToken   = $null
-            PPBaseUrl       = $null
-            PBIAccessToken  = $null
-            PBIBaseUrl      = $null
-        }
-    }
+
+    $ConnectionResult
 }
 
 function Compare-ProductList {
@@ -1856,13 +1911,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1898,14 +1953,10 @@ function Import-Resources {
     [CmdletBinding()]
     param()
     try {
-        # Import logging first and make exported functions visible outside Orchestrator module scope
-        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
-        Import-Module -Name $ScubaLoggingPath -Global
-
         $ProvidersPath = Join-Path -Path $PSScriptRoot `
-            -ChildPath "Providers" `
-            -Resolve `
-            -ErrorAction 'Stop'
+        -ChildPath "Providers" `
+        -Resolve `
+        -ErrorAction 'Stop'
         $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
         if (!$ProviderResources)
         {
@@ -1923,6 +1974,10 @@ function Import-Resources {
             Write-Debug "Importing $_ module $ModulePath"
             Import-Module -Name $ModulePath
         }
+
+        # Import ScubaLogging explicitly (not part of Utility folder import)
+        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
+        Import-Module -Name $ScubaLoggingPath -Force
     }
     catch {
         Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
@@ -1946,7 +2001,7 @@ function Remove-Resources {
     #>
     [CmdletBinding()]
     $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
+    "ExportSecuritySuiteProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
@@ -1989,7 +2044,7 @@ function Invoke-SCuBACached {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Security Suite: securitysuite
+    - Defender for Office 365: defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -2039,7 +2094,7 @@ function Invoke-SCuBACached {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "RegoOutput".
+    Defaults to "TestResults".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -2065,14 +2120,14 @@ function Invoke-SCuBACached {
     .Example
     Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Security Suite, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
     Invoke-SCuBACached -Version
     This example returns the version of SCuBAGear.
     .Example
-    Invoke-SCuBACached -ProductNames aad, securitysuite -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Security Suite security
+    Invoke-SCuBACached -ProductNames aad, defender -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Defender security
     baselines.
     .Example
     Invoke-SCuBACached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -2093,7 +2148,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -2217,7 +2272,7 @@ function Invoke-SCuBACached {
             $Script:ScubaLoggingEnabled = $false
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "securitysuite", "aad", "sharepoint", "powerplatform"
+                $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {
@@ -2390,7 +2445,7 @@ function Invoke-SCuBACached {
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
-                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment
+                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment -ConnectionResult $ConnectionResult
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
@@ -2400,7 +2455,7 @@ function Invoke-SCuBACached {
                     ModuleVersion = $ModuleVersion
                     Guid = $Guid
                 }
-                Invoke-ProviderList -ScubaConfig $TempScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                Invoke-ProviderList -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
                 Write-ScubaLog -Message "Provider execution completed" -Level "Info" -Source "ScubaCached"
             }
             else {
