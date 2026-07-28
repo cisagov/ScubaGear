@@ -9,14 +9,3 @@ updates:
       github-actions:
         patterns:
           - "*"
-
-  # Docker image dependencies (covers docker:// references in workflows,
-  # e.g. pandoc/core used in convert_baselines.yaml)
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    groups:
-      docker-images:
-        patterns:
-          - "*"
