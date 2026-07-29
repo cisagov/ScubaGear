@@ -27,7 +27,7 @@ MeetingsAllowingExternalControl contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": MeetingsAllowingExternalControl,
     "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingExternalControl, String),
     "RequirementMet": Status
@@ -52,7 +52,7 @@ MeetingsAllowingAnonStart contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.2v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": MeetingsAllowingAnonStart,
     "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingAnonStart, String),
     "RequirementMet": Status
@@ -88,7 +88,7 @@ ReportDetails1_3(Policy) := Description if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": [
         Policy.AutoAdmittedUsers,
         Policy.AllowPSTNUsersToBypassLobby
@@ -112,7 +112,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -129,7 +129,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.4v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": Policy.AutoAdmittedUsers,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -150,7 +150,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.4v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -174,7 +174,7 @@ MeetingsAllowingPSTNBypass contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": MeetingsAllowingPSTNBypass,
     "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingPSTNBypass, String),
     "RequirementMet": Status
@@ -187,7 +187,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -204,7 +204,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.6v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": Policy.AllowCloudRecording,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -220,7 +220,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.6v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false

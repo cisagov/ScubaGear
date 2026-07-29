@@ -903,12 +903,15 @@ function Invoke-ProviderList {
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
                         "teams" {
+                            $TeamsProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken' = $ConnectionResult.TeamsAccessToken
+                                'BaseUrl' = $ConnectionResult.TeamsBaseUrl
+                            }
                             if ($ServicePrincipalAuth) {
-                                $RetVal = Export-TeamsProvider -CertificateBasedAuth | Select-Object -Last 1
+                                $TeamsProviderParams['CertificateBasedAuth'] = $true
                             }
-                            else {
-                                $RetVal = Export-TeamsProvider | Select-Object -Last 1
-                            }
+                            $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"

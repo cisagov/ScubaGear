@@ -35,6 +35,7 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint, Get-ComplianceScope, Get-ComplianceApiEndpoint
@@ -66,6 +67,8 @@ function Connect-Tenant {
        EXOApiEndpoint     = $null
        ComplianceAccessToken = $null
        ComplianceApiEndpoint = $null
+       TeamsAccessToken   = $null
+       TeamsBaseUrl     = $null
    }
    $N = 0
    $Len = $ProductNames.Length
@@ -370,24 +373,67 @@ function Connect-Tenant {
                    }
                }
                "teams" {
-                   $TeamsParams = @{'ErrorAction'= 'Stop'}
-                   if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $TeamsConnectToTenant = @{
-                           CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                           ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                           TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
+                    $TeamsParams = @{'ErrorAction'= 'Stop'}
+                    if ($ServicePrincipalParams.CertThumbprintParams) {
+                        $TeamsConnectToTenant = @{
+                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
+                        }
+                        $TeamsParams += $TeamsConnectToTenant
+                    }
+                    switch ($M365Environment) {
+                        "gcchigh" {
+                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsGCCH';}
+                        }
+                        "dod" {
+                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsDOD';}
+                        }
+                    }
+                    Connect-MicrosoftTeams @TeamsParams | Out-Null
+
+                    #### Start of new auth code
+                    if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
                        }
-                       $TeamsParams += $TeamsConnectToTenant
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
                    }
-                   switch ($M365Environment) {
-                       "gcchigh" {
-                           $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsGCCH';}
-                       }
-                       "dod" {
-                           $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsDOD';}
-                       }
+
+                    $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
+                    $TokenData.TeamsBaseUrl = Get-TeamsBaseUrl -M365Environment $M365Environment
+                    Write-Information "Teams scope: $TeamsScope" -InformationAction Continue
+                    if ($ServicePrincipalParams.CertThumbprintParams) {
+                       $TokenData.TeamsAccessToken = Get-MsalAccessToken `
+                           -Scope $TeamsScope `
+                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                           -M365Environment $M365Environment
                    }
-                   Connect-MicrosoftTeams @TeamsParams | Out-Null
+                   else {
+                       # Resolve tenant name if not already cached from a previous product
+                       if ([string]::IsNullOrEmpty($TenantName)) {
+                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                           $TenantName = $InitialDomain.Name
+                           $InitialDomainPrefix = $TenantName.split(".")[0]
+                       }
+
+                       # MS Teams Powershell Cmdlets client ID
+                       $TeamsClientId = "12128f48-ec9e-42f0-b203-ea49fb6af367"
+                       $TokenData.TeamsAccessToken = Get-MsalAccessToken `
+                           -Scope $TeamsScope `
+                           -ClientId $TeamsClientId `
+                           -Tenant $TenantName `
+                           -M365Environment $M365Environment
+                   }
+                   Write-Information "Teams token acquired successfully `n$($TokenData.TeamsAccessToken)" -InformationAction Continue
                }
                default {
                    throw "Invalid ProductName argument"
@@ -426,6 +472,8 @@ function Connect-Tenant {
        ComplianceAccessToken = $TokenData.ComplianceAccessToken
        ComplianceApiEndpoint = $TokenData.ComplianceApiEndpoint
        EXOApiEndpoint   = $TokenData.EXOApiEndpoint
+       TeamsAccessToken = $TokenData.TeamsAccessToken
+       TeamsBaseUrl = $TokenData.TeamsBaseUrl
    }
 }
 

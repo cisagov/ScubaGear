@@ -1755,38 +1755,6 @@
     },
 
     {
-        "moduleCmdlet": "Connect-MicrosoftTeams",
-        "apiResource": "https://*.api.interfaces.records.teams.microsoft.com",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "MicrosoftTeams"
-        ],
-        "leastPermissions": [],
-        "higherPermissions": [],
-        "spRolePermissions": [
-            "Global Reader"
-        ],
-        "scubaGearProduct": [
-            "teams"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "ab3be6b7-f5df-413d-ac2d-abf1e3fd9c0b#gitleaks:allow",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/teams/connect-microsoftteams?view=teams-ps"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
         "moduleCmdlet": "SharePoint REST API",
         "apiResource": "https://{domain}-admin.sharepoint.com",
         "apiFilter": "",
@@ -1980,6 +1948,58 @@
         ],
         "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
         "oauthScope":  "https://service.apps.appsplatform.us//.default"
+    },
+
+    {
+        "moduleCmdlet":  "Teams REST API",
+        "apiResource":  "https://api.interfaces.records.teams.microsoft.com",
+        "apiFilter":  "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "None - Direct REST API"
+        ],
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "teams"
+        ],
+        "supportedEnv":  [
+            "commercial", "gcc"
+        ],
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+        ],
+        "notes":  "Teams data is retrieved via direct REST API calls to the Teams API.",
+        "oauthScope":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default"
+    },
+
+    {
+        "moduleCmdlet":  "Teams REST API",
+        "apiResource":  "https://api.interfaces.records.gov.teams.microsoft.us",
+        "apiFilter":  "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "None - Direct REST API"
+        ],
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "teams"
+        ],
+        "supportedEnv":  [
+            "gcchigh", "dod"
+        ],
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+        ],
+        "notes":  "Teams data is retrieved via direct REST API calls to the Teams API.",
+        "oauthScope":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default"
     },
 
     {

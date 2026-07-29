@@ -10,7 +10,21 @@ function Export-TeamsProvider {
     param(
         [Parameter(Mandatory = $false)]
         [switch]
-        $CertificateBasedAuth = $false
+        $CertificateBasedAuth = $false,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $AccessToken,
+
+        [Parameter(Mandatory = $true)]
+        [string]
+        $BaseUrl
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -18,7 +32,9 @@ function Export-TeamsProvider {
     $Tracker = Get-CommandTracker
 
     $TenantInfo = ConvertTo-Json @($Tracker.TryCommand("Get-CsTenant"))
-    $MeetingPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsMeetingPolicy"))
+    # $MeetingPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsMeetingPolicy"))
+    $MeetingPolicies = $Tracker.TryCommand("Get-TeamsMeetingPolicyRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $MeetingPoliciesJson = ConvertTo-Json -Depth 5 @($MeetingPolicies)
     $FedConfig = ConvertTo-Json @($Tracker.TryCommand("Get-CsTenantFederationConfiguration"))
     $ClientConfig = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsClientConfiguration"))
     $AppPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsAppPermissionPolicy"))
@@ -75,7 +91,7 @@ Org-wide app settings retrieved successfully.
     # Note the spacing and the last comma in the json is important
     $json = @"
     "teams_tenant_info": $TenantInfo,
-    "meeting_policies": $MeetingPolicies,
+    "meeting_policies": $MeetingPoliciesJson,
     "federation_configuration": $FedConfig,
     "client_configuration": $ClientConfig,
     "app_policies": $AppPolicies,
