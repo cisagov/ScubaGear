@@ -2,7 +2,7 @@ function Export-TeamsProvider {
     <#
     .Description
     Gets the Teams settings that are relevant
-    to the SCuBA Teams baselines using the Teams PowerShell Module
+    to the SCuBA Teams baselines using the Teams PowerShell module
     .Functionality
     Internal
     #>
