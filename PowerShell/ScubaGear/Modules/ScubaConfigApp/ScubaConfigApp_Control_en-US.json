@@ -1081,6 +1081,15 @@
         "contentBackground": "#FEF2F2",
         "isExpanded": false
       },
+      "nistMapping": {
+        "displayName": "NIST SP 800-53 Mappings",
+        "containerIndex": 3,
+        "jsonProperty": ["nistMapping"],
+        "headerBackground": "#E0E7FF",
+        "borderColor": "#6366F1",
+        "contentBackground": "#EEF2FF",
+        "isExpanded": false
+      },
       "implementation": {
         "displayName": "Implementation Instructions",
         "containerIndex": 5,
