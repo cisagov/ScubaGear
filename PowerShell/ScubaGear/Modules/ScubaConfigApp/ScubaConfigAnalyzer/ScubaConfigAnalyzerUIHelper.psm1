@@ -30,7 +30,7 @@ function Set-ScubaAnalyzerStatus {
         if ($syncHash.Window -and $syncHash.Status_Text) {
             $syncHash.Window.Dispatcher.Invoke([Action] { $syncHash.Status_Text.Text = $Message })
         }
-    } catch { }
+    } catch { Write-Verbose "Set-ScubaAnalyzerStatus failed: $($_.Exception.Message)" }
 }
 
 function Write-ScubaAnalyzerLog {
@@ -43,7 +43,7 @@ function Write-ScubaAnalyzerLog {
                 $syncHash.RunOutput_TextBox.ScrollToEnd()
             })
         }
-    } catch { }
+    } catch { Write-Verbose "Write-ScubaAnalyzerLog failed: $($_.Exception.Message)" }
 }
 
 function Format-ScubaAnalyzerIssues {
@@ -126,7 +126,7 @@ function Update-ScubaAnalyzerControlYaml {
         $guests = @($Finding.DetectedExclusions.GuestUserTypes)
         $lookup = if ($syncHash.Analysis -and $syncHash.Analysis.DisplayNameLookup) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
         $syncHash.Detail_Yaml.Text = New-ScubaAnalyzerControlYamlText -Finding $Finding -Users $users -Groups $groups -Applications $apps -GuestUserTypes $guests -DisplayNameLookup $lookup
-    } catch { }
+    } catch { Write-Verbose "Update-ScubaAnalyzerControlYaml failed: $($_.Exception.Message)" }
 }
 
 function Update-ScubaAnalyzerFullYaml {
@@ -134,7 +134,7 @@ function Update-ScubaAnalyzerFullYaml {
         if (-not $syncHash.Analysis) { return }
         $env = if ($syncHash.Environment_ComboBox.SelectedItem) { [string]$syncHash.Environment_ComboBox.SelectedItem } else { 'commercial' }
         $lookup = if ($syncHash.Analysis.DisplayNameLookup) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
-        $syncHash.FullYaml_TextBox.Text = Get-ScubaAnalyzerConfigYaml -Analysis $syncHash.Analysis -M365Environment $env -DisplayNameLookup $lookup
+        $syncHash.FullYaml_TextBox.Text = Get-ScubaAnalyzerConfigYaml -Analysis $syncHash.Analysis -M365Environment $env -DisplayNameLookup $lookup -AppId $syncHash.AppId -CertificateThumbprint $syncHash.CertificateThumbprint -Organization $syncHash.Organization
     } catch {
         Write-ScubaAnalyzerLog "Failed to build configuration YAML: $($_.Exception.Message)"
     }
@@ -356,9 +356,9 @@ function Start-ScubaAnalyzerAnalysis {
     $timer.Add_Tick({
         if (-not $syncHash.AnalysisSync.IsComplete) { return }
         $syncHash.AnalysisTimer.Stop()
-        try { [void]$syncHash.AnalysisBgPS.EndInvoke($syncHash.AnalysisBgHandle) } catch { }
-        try { $syncHash.AnalysisBgPS.Dispose() } catch { }
-        try { $syncHash.AnalysisBgRunspace.Close(); $syncHash.AnalysisBgRunspace.Dispose() } catch { }
+        try { [void]$syncHash.AnalysisBgPS.EndInvoke($syncHash.AnalysisBgHandle) } catch { Write-Verbose "Analysis EndInvoke cleanup: $($_.Exception.Message)" }
+        try { $syncHash.AnalysisBgPS.Dispose() } catch { Write-Verbose "Analysis PS dispose cleanup: $($_.Exception.Message)" }
+        try { $syncHash.AnalysisBgRunspace.Close(); $syncHash.AnalysisBgRunspace.Dispose() } catch { Write-Verbose "Analysis runspace dispose cleanup: $($_.Exception.Message)" }
 
         $syncHash.Run_Progress.Visibility = 'Collapsed'
         $syncHash.Run_Progress.IsIndeterminate = $false
@@ -399,19 +399,26 @@ function Start-ScubaAnalyzerTenantScan {
         $syncHash.Run_Progress.IsIndeterminate = $true
         $syncHash.Run_Progress.Visibility = 'Visible'
         $syncHash.MainTabs.SelectedIndex = 2   # Run Output tab (shows sign-in progress)
-        Set-ScubaAnalyzerStatus "Connecting to Microsoft Graph - complete sign-in in the browser..."
-        Write-ScubaAnalyzerLog "Connecting to Microsoft Graph ($env) for products '$($products -join ', ')'..."
-        # Force the UI to paint the status before the (blocking) interactive sign-in.
+        $appOnly = [bool]($syncHash.AppId -and $syncHash.CertificateThumbprint)
+        $connectStatus = if ($appOnly) { "Connecting to Microsoft Graph (app-only certificate)..." } else { "Connecting to Microsoft Graph - complete sign-in in the browser..." }
+        Set-ScubaAnalyzerStatus $connectStatus
+        Write-ScubaAnalyzerLog "Connecting to Microsoft Graph ($env) for products '$($products -join ', ')'$(if ($appOnly) { " - app-only cert (app $($syncHash.AppId))" })..."
+        # Force the UI to paint the status before the (blocking) sign-in / connect.
         $syncHash.Window.Dispatcher.Invoke([action] {}, [System.Windows.Threading.DispatcherPriority]::Render)
 
-        # Resolve scopes from the API catalog (JSON-driven) and connect on the UI thread.
+        # Connect on the UI thread. App-only cert auth is non-interactive; otherwise use
+        # interactive auth with the delegated scopes resolved from the API catalog.
         try {
             $baseline = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
-            $scopes = @()
-            foreach ($p in $products) { $scopes += Get-ScubaAnalyzerScopes -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerSchemaPath $syncHash.AnalyzerSchemaPath }
-            $scopes = @($scopes | Select-Object -Unique)
-            Write-ScubaAnalyzerLog "Requesting Graph scopes: $($scopes -join ', ')"
-            $ctx = Connect-ScubaAnalyzerGraph -Scopes $scopes -M365Environment $env
+            if ($appOnly) {
+                $ctx = Connect-ScubaAnalyzerGraph -M365Environment $env -AppId $syncHash.AppId -CertificateThumbprint $syncHash.CertificateThumbprint -Organization $syncHash.Organization
+            } else {
+                $scopes = @()
+                foreach ($p in $products) { $scopes += Get-ScubaAnalyzerScopes -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerSchemaPath $syncHash.AnalyzerSchemaPath }
+                $scopes = @($scopes | Select-Object -Unique)
+                Write-ScubaAnalyzerLog "Requesting Graph scopes: $($scopes -join ', ')"
+                $ctx = Connect-ScubaAnalyzerGraph -Scopes $scopes -M365Environment $env
+            }
         } catch {
             $syncHash.Run_Button.IsEnabled = $true
             $syncHash.Run_Progress.Visibility = 'Collapsed'; $syncHash.Run_Progress.IsIndeterminate = $false
@@ -477,9 +484,9 @@ function Start-ScubaAnalyzerTenantScan {
         $timer.Add_Tick({
             if (-not $syncHash.ScanSync.IsComplete) { return }
             $syncHash.ScanTimer.Stop()
-            try { [void]$syncHash.ScanBgPS.EndInvoke($syncHash.ScanBgHandle) } catch { }
-            try { $syncHash.ScanBgPS.Dispose() } catch { }
-            try { $syncHash.ScanBgRunspace.Close(); $syncHash.ScanBgRunspace.Dispose() } catch { }
+            try { [void]$syncHash.ScanBgPS.EndInvoke($syncHash.ScanBgHandle) } catch { Write-Verbose "Scan EndInvoke cleanup: $($_.Exception.Message)" }
+            try { $syncHash.ScanBgPS.Dispose() } catch { Write-Verbose "Scan PS dispose cleanup: $($_.Exception.Message)" }
+            try { $syncHash.ScanBgRunspace.Close(); $syncHash.ScanBgRunspace.Dispose() } catch { Write-Verbose "Scan runspace dispose cleanup: $($_.Exception.Message)" }
 
             $syncHash.Run_Progress.Visibility = 'Collapsed'; $syncHash.Run_Progress.IsIndeterminate = $false
             $syncHash.Run_Button.IsEnabled = $true
@@ -602,7 +609,7 @@ function Initialize-ScubaConfigAnalyzerUI {
     #>
 
     # Logo + version
-    try { if ($syncHash.ImgPath -and (Test-Path $syncHash.ImgPath)) { $syncHash.LogoImage.Source = $syncHash.ImgPath } } catch { }
+    try { if ($syncHash.ImgPath -and (Test-Path $syncHash.ImgPath)) { $syncHash.LogoImage.Source = $syncHash.ImgPath } } catch { Write-Verbose "Logo load failed: $($_.Exception.Message)" }
     if ($syncHash.AnalyzerVersion) { $syncHash.VersionText.Text = "v$($syncHash.AnalyzerVersion)" }
 
     # Environment combo
@@ -619,7 +626,7 @@ function Initialize-ScubaConfigAnalyzerUI {
         foreach ($p in $cs.schemaMetadata.productCapabilities.PSObject.Properties) {
             if ($p.Value.supportsExclusions -eq $true) { $configurable += ([string]$p.Name).ToLower() }
         }
-    } catch { }
+    } catch { Write-Verbose "Configurable products load failed: $($_.Exception.Message)" }
     $displayMap = @{}
     try {
         $as = Get-Content $syncHash.AnalyzerSchemaPath -Raw | ConvertFrom-Json
@@ -627,13 +634,13 @@ function Initialize-ScubaConfigAnalyzerUI {
             if ($p.Name -match '^_') { continue }
             $displayMap[([string]$p.Name).ToLower()] = if ($p.Value.displayName) { [string]$p.Value.displayName } else { [string]$p.Name }
         }
-    } catch { }
+    } catch { Write-Verbose "Product display-name load failed: $($_.Exception.Message)" }
     $products = @()
     try {
         $bs = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
         $baselineProducts = @($bs.baselineValidations.PSObject.Properties.Name)
         $products = @($baselineProducts | Where-Object { $configurable -contains ([string]$_).ToLower() })
-    } catch { }
+    } catch { Write-Verbose "Baseline products load failed: $($_.Exception.Message)" }
     if (@($products).Count -eq 0) { $products = @($configurable) }
     if (@($products).Count -eq 0) { $products = @('aad') }
     foreach ($p in $products) {
@@ -667,10 +674,10 @@ function Initialize-ScubaConfigAnalyzerUI {
 
     # YAML copy/export
     $syncHash.CopyControlYaml_Button.Add_Click({
-        try { [System.Windows.Clipboard]::SetText($syncHash.Detail_Yaml.Text); Set-ScubaAnalyzerStatus "Control YAML copied to clipboard." } catch { }
+        try { [System.Windows.Clipboard]::SetText($syncHash.Detail_Yaml.Text); Set-ScubaAnalyzerStatus "Control YAML copied to clipboard." } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
     })
     $syncHash.CopyAllYaml_Button.Add_Click({
-        try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus "Configuration YAML copied to clipboard." } catch { }
+        try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus "Configuration YAML copied to clipboard." } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
     })
     $syncHash.ExportYaml_Button.Add_Click({ Export-ScubaAnalyzerYaml })
 
@@ -705,7 +712,7 @@ function Initialize-ScubaConfigAnalyzerUI {
                     $btn = ($e.Source -as [System.Windows.Controls.Button])
                     if (-not $btn) { $btn = ($e.OriginalSource -as [System.Windows.Controls.Button]) }
                     if ($btn -and $btn.Tag) { Use-ScubaAnalyzerPolicy -PolicyId ([string]$btn.Tag) }
-                } catch { }
+                } catch { Write-Verbose "Use-policy click handler failed: $($_.Exception.Message)" }
             }
         )
     }

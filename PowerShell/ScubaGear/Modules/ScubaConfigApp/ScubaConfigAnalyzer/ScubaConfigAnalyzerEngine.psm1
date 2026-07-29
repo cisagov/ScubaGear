@@ -9,7 +9,7 @@
 
       - ScubaGearResultsBaselineSchema.json  (per-control validation logic / requiredSettings)
 
-    plus an analyzer-local ScubaConfigAnalyzer/ScubaGearAnalyzerSchema.json (friendly
+    plus an analyzer-local ScubaConfigAnalyzer/ScubaGearAnalyzerSchema_en-US.json (friendly
     display names for CA requirement paths). The canonical ScubaGear config-file schema
     is not duplicated here - see Modules/ScubaConfig/ScubaConfigSchema.json.
 
@@ -27,7 +27,7 @@
 #>
 
 # ------------------------------------------------------------------------------------
-# Analyzer knowledge caches - populated at runtime from ScubaGearAnalyzerSchema.json
+# Analyzer knowledge caches - populated at runtime from ScubaGearAnalyzerSchema_en-US.json
 # (product-key map, named Graph operations, Conditional Access condition rules) and
 # ScubaGearApiCatalog.json (API resource paths). Nothing product/condition/API specific
 # is hardcoded in this module; see Import-ScAAnalyzerRules / Import-ScAApiCatalog.
@@ -107,7 +107,7 @@ function Import-ScAConfigurableMap {
 function Import-ScAAnalyzerRules {
     <#
     .SYNOPSIS
-    Loads the analyzer rules from ScubaGearAnalyzerSchema.json into the module caches so
+    Loads the analyzer rules from ScubaGearAnalyzerSchema_en-US.json into the module caches so
     the engine is a generic interpreter (product-key map, requirement friendly names,
     named Graph operations, and Conditional Access condition rules are all JSON-driven).
     #>
@@ -773,7 +773,7 @@ function Invoke-ScubaConfigAnalysis {
     Optional override for ScubaGearResultsBaselineSchema.json.
 
     .PARAMETER AnalyzerSchemaPath
-    Optional override for ScubaGearAnalyzerSchema.json (friendly display names).
+    Optional override for ScubaGearAnalyzerSchema_en-US.json (friendly display names).
 
     .PARAMETER IncludePassing
     Include passing controls in the findings (default: only non-passing controls).
@@ -792,7 +792,7 @@ function Invoke-ScubaConfigAnalysis {
     )
 
     if (-not $BaselineSchemaPath) { $BaselineSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearResultsBaselineSchema.json' }
-    if (-not $AnalyzerSchemaPath) { $AnalyzerSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearAnalyzerSchema.json' }
+    if (-not $AnalyzerSchemaPath) { $AnalyzerSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearAnalyzerSchema_en-US.json' }
     if (-not $ConfigSchemaPath)   { $ConfigSchemaPath   = Resolve-ScAConfigSchemaPath }
 
     if (-not (Test-Path $BaselineSchemaPath)) { throw "Baseline schema not found: $BaselineSchemaPath" }
@@ -973,7 +973,10 @@ function Get-ScubaAnalyzerConfigYaml {
         [Parameter(Mandatory)]$Analysis,
         [hashtable]$ExclusionOverrides = @{},
         [string]$M365Environment = 'commercial',
-        [hashtable]$DisplayNameLookup = @{}
+        [hashtable]$DisplayNameLookup = @{},
+        [string]$AppId,
+        [string]$CertificateThumbprint,
+        [string]$Organization
     )
 
     $sb = [System.Text.StringBuilder]::new()
@@ -982,9 +985,15 @@ function Get-ScubaAnalyzerConfigYaml {
     [void]$sb.AppendLine("# Generated: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')")
     [void]$sb.AppendLine("# Review every exclusion below - only keep entries that are justified (e.g. break-glass accounts).")
     [void]$sb.AppendLine("")
-    if ($Analysis.MetaData.Organization) { [void]$sb.AppendLine("Organization: $($Analysis.MetaData.Organization)") }
+    $org = if ($Analysis.MetaData.Organization) { $Analysis.MetaData.Organization } elseif ($Organization) { $Organization } else { $null }
+    if ($org) { [void]$sb.AppendLine("Organization: $org") }
     if ($Analysis.MetaData.DisplayName) { [void]$sb.AppendLine("OrgName: $($Analysis.MetaData.DisplayName)") }
     [void]$sb.AppendLine("M365Environment: $M365Environment")
+    if ($AppId -and $CertificateThumbprint) {
+        # Non-interactive (service principal) authentication for Invoke-SCuBA.
+        [void]$sb.AppendLine("AppID: $AppId")
+        [void]$sb.AppendLine("CertificateThumbprint: $CertificateThumbprint")
+    }
     [void]$sb.AppendLine("ProductNames:")
     foreach ($p in @($Analysis.Products)) { [void]$sb.AppendLine("  - $p") }
     [void]$sb.AppendLine("")
@@ -1121,7 +1130,7 @@ function Get-ScubaAnalyzerScopes {
 
     Import-ScAApiCatalog -ApiCatalogPath $ApiCatalogPath
     if ($AnalyzerSchemaPath -and (Test-Path $AnalyzerSchemaPath)) {
-        try { Import-ScAAnalyzerRules -AnalyzerSchema (Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json) } catch { }
+        try { Import-ScAAnalyzerRules -AnalyzerSchema (Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json) } catch { Write-Verbose "Analyzer rules load failed (scopes): $($_.Exception.Message)" }
     }
 
     $prod = $Product.ToLower()
@@ -1147,12 +1156,17 @@ function Get-ScubaAnalyzerScopes {
 function Connect-ScubaAnalyzerGraph {
     <#
     .SYNOPSIS
-    Connects to Microsoft Graph for the given environment and scopes. Should be called
-    on the UI thread (interactive auth needs the window handle). Returns Get-MgContext.
+    Connects to Microsoft Graph for the given environment. Interactive (delegated scopes)
+    by default; if -AppId + -CertificateThumbprint are supplied it uses non-interactive
+    app-only certificate auth (application permissions, so -Scopes is ignored). Should be
+    called on the UI thread for the interactive path. Returns Get-MgContext.
     #>
     param(
-        [Parameter(Mandatory)][string[]]$Scopes,
-        [string]$M365Environment = 'commercial'
+        [string[]]$Scopes = @(),
+        [string]$M365Environment = 'commercial',
+        [string]$AppId,
+        [string]$CertificateThumbprint,
+        [string]$Organization
     )
 
     Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
@@ -1162,7 +1176,16 @@ function Connect-ScubaAnalyzerGraph {
         'dod'     { 'USGovDoD' }
         default   { 'Global' }
     }
-    $connectParams = @{ Scopes = $Scopes; Environment = $graphEnv; NoWelcome = $true; ErrorAction = 'Stop' }
+    $connectParams = @{ Environment = $graphEnv; NoWelcome = $true; ErrorAction = 'Stop' }
+    if ($AppId -and $CertificateThumbprint) {
+        # App-only (non-interactive) certificate auth uses application permissions, not
+        # delegated scopes, so -Scopes is intentionally not passed.
+        $connectParams.ClientId = $AppId
+        $connectParams.CertificateThumbprint = $CertificateThumbprint
+        if ($Organization) { $connectParams.TenantId = $Organization }
+    } else {
+        $connectParams.Scopes = $Scopes
+    }
     Connect-MgGraph @connectParams | Out-Null
     return (Get-MgContext)
 }
@@ -1229,7 +1252,7 @@ function Get-ScADisplayNameLookup {
                         if ($val) { $lookup[$id] = $val; break }
                     }
                 }
-            } catch { }
+            } catch { Write-Verbose "Display-name lookup failed for '$id': $($_.Exception.Message)" }
         }
     }
     return $lookup
@@ -1260,7 +1283,7 @@ function Get-ScubaTenantGraphData {
     # Load the analyzer rules (named operations) + API catalog so every URL below is
     # resolved from ScubaGearApiCatalog.json rather than hardcoded here.
     if ($AnalyzerSchemaPath -and (Test-Path $AnalyzerSchemaPath)) {
-        try { Import-ScAAnalyzerRules -AnalyzerSchema (Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json) } catch { }
+        try { Import-ScAAnalyzerRules -AnalyzerSchema (Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json) } catch { Write-Verbose "Analyzer rules load failed (tenant data): $($_.Exception.Message)" }
     }
     Import-ScAApiCatalog -ApiCatalogPath $ApiCatalogPath
 
@@ -1273,7 +1296,7 @@ function Get-ScubaTenantGraphData {
     }
 
     # Tenant identity + organization (resource resolved from the catalog).
-    try { $ctx = Get-MgContext; if ($ctx) { $data.TenantId = $ctx.TenantId } } catch { }
+    try { $ctx = Get-MgContext; if ($ctx) { $data.TenantId = $ctx.TenantId } } catch { Write-Verbose "Get-MgContext unavailable: $($_.Exception.Message)" }
     try {
         $orgUri = Resolve-ScAApiResource -Operation 'organization'
         if ($orgUri) {
@@ -1290,7 +1313,7 @@ function Get-ScubaTenantGraphData {
                 if (@($primary).Count -gt 0) { $data.Organization = $primary[0].name }
             }
         }
-    } catch { }
+    } catch { Write-Verbose "Organization lookup failed: $($_.Exception.Message)" }
 
     # Conditional Access policies: read only when a control uses the CA operation's cmdlet.
     $caOp = if ($script:ScAApiOperations.ContainsKey('conditionalAccessPolicies')) { $script:ScAApiOperations['conditionalAccessPolicies'] } else { $null }
@@ -1306,7 +1329,7 @@ function Get-ScubaTenantGraphData {
         if ($uri) {
             $data.conditional_access_policies = @(Invoke-ScubaGraphGet -Uri $uri)
             # Resolve display names for excluded principals/apps so the generated YAML can be annotated.
-            try { $data.DisplayNameLookup = Get-ScADisplayNameLookup -Policies $data.conditional_access_policies } catch { }
+            try { $data.DisplayNameLookup = Get-ScADisplayNameLookup -Policies $data.conditional_access_policies } catch { Write-Verbose "Display-name resolution skipped: $($_.Exception.Message)" }
         }
     }
 
@@ -1335,7 +1358,7 @@ function Invoke-ScubaTenantScan {
     )
 
     if (-not $BaselineSchemaPath) { $BaselineSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearResultsBaselineSchema.json' }
-    if (-not $AnalyzerSchemaPath) { $AnalyzerSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearAnalyzerSchema.json' }
+    if (-not $AnalyzerSchemaPath) { $AnalyzerSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearAnalyzerSchema_en-US.json' }
     if (-not $ConfigSchemaPath)   { $ConfigSchemaPath   = Resolve-ScAConfigSchemaPath }
     if (-not (Test-Path $BaselineSchemaPath)) { throw "Baseline schema not found: $BaselineSchemaPath" }
     if (-not (Test-Path $AnalyzerSchemaPath)) { throw "Analyzer schema not found: $AnalyzerSchemaPath" }
