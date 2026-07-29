@@ -1,4 +1,6 @@
-﻿function Connect-GraphHelper {
+﻿using module '..\ScubaConfig\ScubaConfig.psm1'
+
+function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
@@ -8,6 +10,7 @@
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,

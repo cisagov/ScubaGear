@@ -2,7 +2,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Sup
 
 InModuleScope Support {
     Describe "Copy sample config files to specified directory" {
-        $SampleFiles = (Get-ChildItem PowerShell/ScubaGear/Sample-Config-Files).Name
+        $SampleFiles = (Get-ChildItem (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Sample-Config-Files")).Name
         BeforeAll{
             $SampleConfigCopyFolder = Join-Path -Path $env:Temp -ChildPath 'samples/config-files'
             if (Test-Path -Path $SampleConfigCopyFolder){

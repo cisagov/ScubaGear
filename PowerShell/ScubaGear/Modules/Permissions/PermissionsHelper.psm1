@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Function Get-ScubaGearPermissions {
     <#
     .SYNOPSIS
@@ -78,7 +80,7 @@ Function Get-ScubaGearPermissions {
         'teams' | Get-ScubaGearPermissions -OutAs role
 
     .EXAMPLE
-        'aad','scubatank' | Get-ScubaGearPermissions
+        'aad','exo' | Get-ScubaGearPermissions
 
     .NOTES
         NAME: Get-ScubaGearPermissions
@@ -108,7 +110,14 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', '*')]
+        # Both defender and securitysuite are options, as defender is an alias for securitysuite
+        [ValidateScript({
+            $valid = [ScubaConfig]::GetAllValidProductNames()
+            $_ | ForEach-Object {
+                if ($_ -notin $valid) { throw "Invalid ProductName '$_'. Valid values: $($valid -join ', ')" }
+            }
+            $true
+        })]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
@@ -123,7 +132,7 @@ Function Get-ScubaGearPermissions {
         [string]$PermissionLevel = 'least',
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$Environment = 'commercial',
 
         [Parameter(Mandatory = $false)]
@@ -380,7 +389,6 @@ Function Get-ScubaGearEntraMinimumPermissions{
 
     param(
         [Parameter(Mandatory = $false)]
-        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
         [string]$Environment = 'commercial'
     )
 

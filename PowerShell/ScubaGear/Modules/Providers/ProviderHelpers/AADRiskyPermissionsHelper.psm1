@@ -253,7 +253,6 @@ function Invoke-GraphBatchRequestsWithRetry {
         $Requests,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
         [string]
         $M365Environment,
 

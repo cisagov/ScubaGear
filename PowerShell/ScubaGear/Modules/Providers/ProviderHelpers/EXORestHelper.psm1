@@ -12,7 +12,6 @@ function Get-ExchangeOnlineScope {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
 
@@ -194,7 +193,6 @@ function Get-ExchangeOnlineApiEndpoint {
         [string]$TenantDomain,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $true)]
