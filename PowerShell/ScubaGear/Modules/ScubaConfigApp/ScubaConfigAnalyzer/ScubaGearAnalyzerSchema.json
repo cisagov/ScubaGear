@@ -1,6 +1,71 @@
 {
-  "$comment": "Analyzer-specific settings for the ScubaGear Config Analyzer (Start-SCuBAConfigAnalyzer). This intentionally does NOT duplicate the ScubaGear config-file structure/regex - that is defined once in the canonical schema at ../../ScubaConfig/ScubaConfigSchema.json. This file only holds what the analyzer needs that the canonical schema does not: friendly display names for Conditional Access requirement paths surfaced in the findings UI.",
-  "version": "1.0.0",
+  "$comment": "Analyzer rules for the ScubaGear Config Analyzer (Start-SCuBAConfigAnalyzer). This is the single home for everything the analyzer needs that is NOT already in another schema: friendly requirement-path names, the product-key casing map, the named Graph operations it performs (resolved to real URLs via ScubaGearApiCatalog.json), and the rules for how to interpret conditionalAccessPolicy requirements in ScubaGearResultsBaselineSchema.json. The engine (ScubaConfigAnalyzerEngine.psm1) is a generic interpreter of this file - to add products, API calls, exclusion types or CA conditions, edit THIS file + the baseline schema, not the .psm1. The canonical config-file structure/regex is defined once in ../../ScubaConfig/ScubaConfigSchema.json and is not duplicated here.",
+  "version": "2.0.0",
+
+  "productMap": {
+    "_comment": "Maps the analyzer product key (lowercase; matches ScubaGear ProductNames and baselineValidations keys) to how the product appears in a ScubaResults JSON (resultsKey, under .Results/.Summary), in a ScubaGear config YAML (configKey), and a friendly displayName for the UI. Replaces the hardcoded product hashtable that used to live in the engine.",
+    "aad":           { "resultsKey": "AAD",           "configKey": "Aad",           "displayName": "Microsoft Entra ID (aad)" },
+    "securitysuite": { "resultsKey": "SecuritySuite", "configKey": "SecuritySuite", "displayName": "Security Suite (securitysuite)" },
+    "exo":           { "resultsKey": "EXO",           "configKey": "Exo",           "displayName": "Exchange Online (exo)" },
+    "powerplatform": { "resultsKey": "PowerPlatform", "configKey": "Powerplatform", "displayName": "Power Platform (powerplatform)" },
+    "sharepoint":    { "resultsKey": "SharePoint",    "configKey": "Sharepoint",    "displayName": "SharePoint & OneDrive (sharepoint)" },
+    "teams":         { "resultsKey": "Teams",         "configKey": "Teams",         "displayName": "Microsoft Teams (teams)" },
+    "powerbi":       { "resultsKey": "PowerBI",       "configKey": "Powerbi",       "displayName": "Power BI (powerbi)" }
+  },
+
+  "apiOperations": {
+    "_comment": "Named Graph operations the analyzer performs. 'cmdlet' is looked up in ScubaGearApiCatalog.json (the single source of truth for API paths + least permissions) to build the real URL - nothing here hardcodes a URL. resultKind: collection (list, paged) | byId (single item, {id} substituted) | byAppId (single service principal by appId). 'select' -> $select query; 'nameProperties' -> ordered display-name fallbacks for lookups.",
+    "conditionalAccessPolicies": { "cmdlet": "Get-MgBetaIdentityConditionalAccessPolicy", "resultKind": "collection" },
+    "organization":              { "cmdlet": "Get-MgBetaOrganization",                     "resultKind": "collection" },
+    "userLookup":                { "cmdlet": "Get-MgBetaUser",  "resultKind": "byId",    "select": "displayName,userPrincipalName", "nameProperties": ["displayName", "userPrincipalName"] },
+    "groupLookup":               { "cmdlet": "Get-MgBetaGroup", "resultKind": "byId",    "select": "displayName",                   "nameProperties": ["displayName"] },
+    "servicePrincipalLookup":    { "cmdlet": "Get-MgServicePrincipal", "resultKind": "byAppId", "select": "displayName",            "nameProperties": ["displayName"] }
+  },
+
+  "conditionalAccessAnalysis": {
+    "_comment": "Rules the engine uses to interpret a conditionalAccessPolicy control's validationLogic.requirements (from ScubaGearResultsBaselineSchema.json) against tenant CA policies. All paths are camelCase, relative to a CA policy object; the engine navigates them case-insensitively so both ScubaResults (PascalCase) and raw Graph (camelCase) policies work.",
+
+    "policyStateProperty": "state",
+    "enabledStateValue": "enabled",
+
+    "scopeGates": {
+      "_comment": "A policy is only a candidate to make a control pass if it targets the scope the requirement demands. A gate applies ONLY when the requirement asks for requiredValue at conditionPath; then the policy must also have requiredValue at policyPath or it is out of scope (persona/admin-scoped policies are dropped). Exclusions do not affect scope.",
+      "rules": [
+        { "conditionPath": "conditions.users.includeUsers",              "policyPath": "conditions.users.includeUsers",              "requiredValue": "All" },
+        { "conditionPath": "conditions.applications.includeApplications", "policyPath": "conditions.applications.includeApplications", "requiredValue": "All" }
+      ]
+    },
+
+    "relevanceSignals": {
+      "_comment": "A policy is only analyzed for a control if it is RELEVANT (about that control). arrayMatch: requirement + policy arrays overlap - match=all means the policy must contain every required value, match=any means at least one. grantControls: relevant when the requirement's grant controls match the policy's, but only via the enabled sub-signals (anyOf alternatives / an authentication-strength id) - builtInControls-only is off by default so broad 'block' policies do not over-match.",
+      "rules": [
+        { "kind": "arrayMatch", "conditionPath": "conditions.clientAppTypes",   "policyPath": "conditions.clientAppTypes",   "match": "all" },
+        { "kind": "arrayMatch", "conditionPath": "conditions.userRiskLevels",   "policyPath": "conditions.userRiskLevels",   "match": "any" },
+        { "kind": "arrayMatch", "conditionPath": "conditions.signInRiskLevels", "policyPath": "conditions.signInRiskLevels", "match": "any" },
+        { "kind": "grantControls", "conditionPath": "grantControls", "useWhenAnyOf": true, "useWhenAuthenticationStrength": true, "useWhenBuiltInControls": false }
+      ]
+    },
+
+    "exclusionDetectors": {
+      "_comment": "Config-waivable exclusions ScubaGear supports via CapExclusions. Each detector reads policyPath off the policy; when present it is reported as a waivable WARNING (add to config to pass) and collected under the config field. requiresExclusionType gates the detector to controls whose exclusionField matches (so guest/app waivers only apply where CapExclusions is supported). scopeRequirement limits a detector to controls that demand a scope (apps only when the requirement targets All cloud apps; guests only when it targets All users). valueKind idList = array of ids; csvOrArray = comma-string or array. unsupportedIsError: when the control does NOT support this exclusion type but the policy still has the exclusion, emit a setting ERROR instead.",
+      "rules": [
+        { "field": "Users",          "issueLabel": "user",                      "detailLabel": "User IDs",         "policyPath": "conditions.users.excludeUsers",                                  "valueKind": "idList",     "requiresExclusionType": "CapExclusions", "suggestion": "If justified (break-glass accounts): Add to CapExclusions Users in ScubaConfig" },
+        { "field": "Groups",         "issueLabel": "group",                     "detailLabel": "Group IDs",        "policyPath": "conditions.users.excludeGroups",                                 "valueKind": "idList",     "requiresExclusionType": "CapExclusions", "suggestion": "If justified: Add to CapExclusions Groups in ScubaConfig" },
+        { "field": "Applications",   "issueLabel": "application",               "detailLabel": "Application IDs",  "policyPath": "conditions.applications.excludeApplications",                    "valueKind": "idList",     "requiresExclusionType": "CapExclusions", "suggestion": "If justified: Add to CapExclusions Applications in ScubaConfig", "scopeRequirement": { "conditionPath": "conditions.applications.includeApplications", "requiredValue": "All" } },
+        { "field": "GuestUserTypes", "issueLabel": "guest/external user type",  "detailLabel": "Guest user types", "policyPath": "conditions.users.excludeGuestsOrExternalUsers.guestOrExternalUserTypes", "valueKind": "csvOrArray", "requiresExclusionType": "CapExclusions", "suggestion": "If justified: Add to CapExclusions GuestUserTypes in ScubaConfig", "scopeRequirement": { "conditionPath": "conditions.users.includeUsers", "requiredValue": "All" }, "unsupportedIsError": true, "unsupportedMessage": "Policy excludes guest/external user types ({values}); this control does not support guest exclusions - remove them from the policy." }
+      ]
+    },
+
+    "displayNameLookup": {
+      "_comment": "After a live scan, resolve friendly display names for the excluded principals/apps at these policy paths, via the named apiOperation, to annotate the generated YAML. GUIDs only; failures per id are ignored.",
+      "rules": [
+        { "policyPath": "conditions.users.excludeUsers",               "operation": "userLookup" },
+        { "policyPath": "conditions.users.excludeGroups",              "operation": "groupLookup" },
+        { "policyPath": "conditions.applications.excludeApplications", "operation": "servicePrincipalLookup" }
+      ]
+    }
+  },
+
   "RequirementFriendlyNames": {
     "state": "Policy State",
     "conditions.users.includeUsers": "Users > Include",
