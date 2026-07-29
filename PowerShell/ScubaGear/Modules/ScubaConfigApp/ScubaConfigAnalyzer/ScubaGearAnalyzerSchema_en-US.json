@@ -1,5 +1,8 @@
 {
   "$comment": "Analyzer rules for the ScubaGear Config Analyzer (Start-SCuBAConfigAnalyzer). This is the single home for everything the analyzer needs that is NOT already in another schema: friendly requirement-path names, the product-key casing map, the named Graph operations it performs (resolved to real URLs via ScubaGearApiCatalog.json), and the rules for how to interpret conditionalAccessPolicy requirements in ScubaGearResultsBaselineSchema.json. The engine (ScubaConfigAnalyzerEngine.psm1) is a generic interpreter of this file - to add products, API calls, exclusion types or CA conditions, edit THIS file + the baseline schema, not the .psm1. The canonical config-file structure/regex is defined once in ../../ScubaConfig/ScubaConfigSchema.json and is not duplicated here.",
+  "locale": "en-US",
+  "title": "ScubaGear Config Analyzer",
+  "description": "Scan your M365 tenant and see exactly what to change to pass ScubaGear",
   "version": "2.0.0",
 
   "productMap": {
