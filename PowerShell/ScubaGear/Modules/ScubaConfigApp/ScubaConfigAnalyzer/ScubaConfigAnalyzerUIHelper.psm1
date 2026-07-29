@@ -309,14 +309,15 @@ function Start-ScubaAnalyzerAnalysis {
         return
     }
 
-    $product = if ($syncHash.Product_ComboBox.SelectedItem) { [string]$syncHash.Product_ComboBox.SelectedItem } else { 'aad' }
+    $products = @($syncHash.Product_ListBox.SelectedItems | ForEach-Object { [string]$_.Key })
+    if (@($products).Count -eq 0) { $products = @('aad') }
 
     $syncHash.Run_Progress.IsIndeterminate = $true
     $syncHash.Run_Progress.Visibility = 'Visible'
     # Loading a results file is not a live tenant connection.
     $syncHash.ConnectedTenant = $false
     Set-ScubaAnalyzerStatus "Analyzing $(Split-Path $ResultsPath -Leaf) ..."
-    Write-ScubaAnalyzerLog "Analyzing results: $ResultsPath (product: $product)"
+    Write-ScubaAnalyzerLog "Analyzing results: $ResultsPath (products: $($products -join ', '))"
 
     $analysisSync = [hashtable]::Synchronized(@{ IsComplete = $false; Result = $null; Error = $null })
     $syncHash.AnalysisSync = $analysisSync
@@ -328,7 +329,7 @@ function Start-ScubaAnalyzerAnalysis {
     $bgRunspace.SessionStateProxy.SetVariable("analysisSync", $analysisSync)
     $bgRunspace.SessionStateProxy.SetVariable("enginePath", $syncHash.AnalyzerEnginePath)
     $bgRunspace.SessionStateProxy.SetVariable("resultsPath", $ResultsPath)
-    $bgRunspace.SessionStateProxy.SetVariable("product", $product)
+    $bgRunspace.SessionStateProxy.SetVariable("product", $products)
     $bgRunspace.SessionStateProxy.SetVariable("baselineSchemaPath", $syncHash.BaselineSchemaPath)
     $bgRunspace.SessionStateProxy.SetVariable("analyzerSchemaPath", $syncHash.AnalyzerSchemaPath)
     $bgRunspace.SessionStateProxy.SetVariable("configSchemaPath", $syncHash.ConfigSchemaPath)
@@ -390,7 +391,8 @@ function Start-ScubaAnalyzerTenantScan {
     stays responsive. No ScubaGear run - the schema drives what to query.
     #>
     try {
-        $product = if ($syncHash.Product_ComboBox.SelectedItem) { [string]$syncHash.Product_ComboBox.SelectedItem } else { 'aad' }
+        $products = @($syncHash.Product_ListBox.SelectedItems | ForEach-Object { [string]$_.Key })
+        if (@($products).Count -eq 0) { $products = @('aad') }
         $env     = if ($syncHash.Environment_ComboBox.SelectedItem) { [string]$syncHash.Environment_ComboBox.SelectedItem } else { 'commercial' }
 
         $syncHash.Run_Button.IsEnabled = $false
@@ -398,14 +400,16 @@ function Start-ScubaAnalyzerTenantScan {
         $syncHash.Run_Progress.Visibility = 'Visible'
         $syncHash.MainTabs.SelectedIndex = 2   # Run Output tab (shows sign-in progress)
         Set-ScubaAnalyzerStatus "Connecting to Microsoft Graph - complete sign-in in the browser..."
-        Write-ScubaAnalyzerLog "Connecting to Microsoft Graph ($env) for product '$product'..."
+        Write-ScubaAnalyzerLog "Connecting to Microsoft Graph ($env) for products '$($products -join ', ')'..."
         # Force the UI to paint the status before the (blocking) interactive sign-in.
         $syncHash.Window.Dispatcher.Invoke([action] {}, [System.Windows.Threading.DispatcherPriority]::Render)
 
         # Resolve scopes from the API catalog (JSON-driven) and connect on the UI thread.
         try {
             $baseline = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
-            $scopes = Get-ScubaAnalyzerScopes -Product $product -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath
+            $scopes = @()
+            foreach ($p in $products) { $scopes += Get-ScubaAnalyzerScopes -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerSchemaPath $syncHash.AnalyzerSchemaPath }
+            $scopes = @($scopes | Select-Object -Unique)
             Write-ScubaAnalyzerLog "Requesting Graph scopes: $($scopes -join ', ')"
             $ctx = Connect-ScubaAnalyzerGraph -Scopes $scopes -M365Environment $env
         } catch {
@@ -426,7 +430,15 @@ function Start-ScubaAnalyzerTenantScan {
         # using only Microsoft Graph auth + raw Graph API calls. Then validate on a
         # background runspace so the UI stays responsive.
         try {
-            $tenantData = Get-ScubaTenantGraphData -Product $product -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath
+            $tenantData = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{} }
+            foreach ($p in $products) {
+                $d = Get-ScubaTenantGraphData -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerSchemaPath $syncHash.AnalyzerSchemaPath
+                if (@($d.conditional_access_policies).Count -gt 0) { $tenantData.conditional_access_policies = $d.conditional_access_policies }
+                if ($d.OrgDisplayName) { $tenantData.OrgDisplayName = $d.OrgDisplayName }
+                if ($d.Organization)  { $tenantData.Organization  = $d.Organization }
+                if ($d.TenantId)      { $tenantData.TenantId      = $d.TenantId }
+                if ($d.DisplayNameLookup) { foreach ($k in @($d.DisplayNameLookup.Keys)) { $tenantData.DisplayNameLookup[$k] = $d.DisplayNameLookup[$k] } }
+            }
             Write-ScubaAnalyzerLog "Retrieved $(@($tenantData.conditional_access_policies).Count) Conditional Access policy/policies."
         } catch {
             $syncHash.Run_Button.IsEnabled = $true
@@ -443,7 +455,7 @@ function Start-ScubaAnalyzerTenantScan {
         $bg = [runspacefactory]::CreateRunspace(); $bg.ApartmentState = 'MTA'; $bg.ThreadOptions = 'ReuseThread'; $bg.Open()
         $bg.SessionStateProxy.SetVariable('scanSync', $scanSync)
         $bg.SessionStateProxy.SetVariable('enginePath', $syncHash.AnalyzerEnginePath)
-        $bg.SessionStateProxy.SetVariable('product', $product)
+        $bg.SessionStateProxy.SetVariable('product', $products)
         $bg.SessionStateProxy.SetVariable('env', $env)
         $bg.SessionStateProxy.SetVariable('tenantData', $tenantData)
         $bg.SessionStateProxy.SetVariable('baselineSchemaPath', $syncHash.BaselineSchemaPath)
@@ -597,15 +609,39 @@ function Initialize-ScubaConfigAnalyzerUI {
     foreach ($e in @('commercial', 'gcc', 'gcchigh', 'dod')) { [void]$syncHash.Environment_ComboBox.Items.Add($e) }
     $syncHash.Environment_ComboBox.SelectedIndex = 0
 
-    # Product combo from the baseline schema (JSON-driven, extensible)
-    $products = @('aad')
+    # Products list: only configurable products (supportsExclusions=true in
+    # ScubaConfigSchema.json), intersected with products that have baseline validations.
+    # Items carry the product key + a friendly displayName (from the analyzer schema
+    # productMap). Multi-select; nothing hardcoded.
+    $configurable = @()
+    try {
+        $cs = Get-Content $syncHash.ConfigSchemaPath -Raw | ConvertFrom-Json
+        foreach ($p in $cs.schemaMetadata.productCapabilities.PSObject.Properties) {
+            if ($p.Value.supportsExclusions -eq $true) { $configurable += ([string]$p.Name).ToLower() }
+        }
+    } catch { }
+    $displayMap = @{}
+    try {
+        $as = Get-Content $syncHash.AnalyzerSchemaPath -Raw | ConvertFrom-Json
+        foreach ($p in $as.productMap.PSObject.Properties) {
+            if ($p.Name -match '^_') { continue }
+            $displayMap[([string]$p.Name).ToLower()] = if ($p.Value.displayName) { [string]$p.Value.displayName } else { [string]$p.Name }
+        }
+    } catch { }
+    $products = @()
     try {
         $bs = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
-        $names = @($bs.baselineValidations.PSObject.Properties.Name)
-        if (@($names).Count -gt 0) { $products = $names }
+        $baselineProducts = @($bs.baselineValidations.PSObject.Properties.Name)
+        $products = @($baselineProducts | Where-Object { $configurable -contains ([string]$_).ToLower() })
     } catch { }
-    foreach ($p in $products) { [void]$syncHash.Product_ComboBox.Items.Add($p) }
-    $syncHash.Product_ComboBox.SelectedIndex = 0
+    if (@($products).Count -eq 0) { $products = @($configurable) }
+    if (@($products).Count -eq 0) { $products = @('aad') }
+    foreach ($p in $products) {
+        $key  = ([string]$p).ToLower()
+        $disp = if ($displayMap.ContainsKey($key)) { $displayMap[$key] } else { [string]$p }
+        [void]$syncHash.Product_ListBox.Items.Add([pscustomobject]@{ Key = [string]$p; Display = $disp })
+    }
+    $syncHash.Product_ListBox.SelectAll()
 
     # Toolbar
     $syncHash.Run_Button.Add_Click({ Start-ScubaAnalyzerTenantScan })
