@@ -1,0 +1,310 @@
+<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="ScubaGear Config Analyzer"
+    Height="880"
+    Width="1320"
+    WindowStartupLocation="CenterScreen"
+    Background="#F9FAFC"
+    Foreground="#333333"
+    ShowInTaskbar="true">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#3D5B96"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#62C0DA"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#D0D5E0"/>
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#666666"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+
+        <!-- Primary action button -->
+        <Style TargetType="Button" x:Key="PrimaryButton">
+            <Setter Property="Background" Value="#3D5B96"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="14,7"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="b" Property="Background" Value="#324B7D"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="b" Property="Background" Value="#B7C0D6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Secondary action button -->
+        <Style TargetType="Button" x:Key="SecondaryButton" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#5A6B8C"/>
+        </Style>
+
+        <!-- Success (run) button -->
+        <Style TargetType="Button" x:Key="RunButton" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#2E9B57"/>
+        </Style>
+
+        <!-- Small inline button -->
+        <Style TargetType="Button" x:Key="MiniButton">
+            <Setter Property="Background" Value="#EEF2F8"/>
+            <Setter Property="Foreground" Value="#3D5B96"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Margin" Value="4,0,0,0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#C3CEE0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+
+        <!-- Section header -->
+        <Style TargetType="TextBlock" x:Key="SectionHeader">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2A4365"/>
+            <Setter Property="Margin" Value="0,16,0,6"/>
+        </Style>
+
+        <!-- Result badge (list + detail): background driven by the bound Result -->
+        <Style TargetType="Border" x:Key="ResultBadge">
+            <Setter Property="Background" Value="#9E9E9E"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Padding" Value="6,1"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Result}" Value="Fail">
+                    <Setter Property="Background" Value="#E53935"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Result}" Value="Error">
+                    <Setter Property="Background" Value="#FB8C00"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Result}" Value="Warning">
+                    <Setter Property="Background" Value="#F9A825"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Result}" Value="Pass">
+                    <Setter Property="Background" Value="#43A047"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Findings list item template -->
+        <DataTemplate x:Key="FindingItemTemplate">
+            <Border BorderBrush="#E3E8F0" BorderThickness="0,0,0,1" Padding="10,8">
+                <StackPanel>
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="{Binding ControlId}" FontWeight="Bold" FontSize="13" Foreground="#2A4365" DockPanel.Dock="Left"/>
+                        <Border Style="{StaticResource ResultBadge}" DockPanel.Dock="Right">
+                            <TextBlock Text="{Binding Result}" Foreground="White" FontSize="11" FontWeight="SemiBold"/>
+                        </Border>
+                    </DockPanel>
+                    <TextBlock Text="{Binding Requirement}" Foreground="#555555" FontSize="12" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <!-- Matching policy card template (collapsible; selected policy starts expanded) -->
+        <DataTemplate x:Key="PolicyItemTemplate">
+            <Border BorderBrush="#DCE3EE" BorderThickness="1" CornerRadius="5" Margin="0,0,0,8" Background="#FBFCFE">
+                <Expander IsExpanded="{Binding IsExpanded}" Padding="6,3">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Margin="4,0,0,0">
+                            <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Foreground="#2A4365" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding StateText}" Foreground="#777777" FontSize="11" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <Border Background="#3D5B96" CornerRadius="3" Padding="6,1" VerticalAlignment="Center" Margin="10,0,0,0" Visibility="{Binding BestMatchVisibility}">
+                                <TextBlock Text="BEST MATCH" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                            </Border>
+                            <Border Background="#43A047" CornerRadius="3" Padding="6,1" VerticalAlignment="Center" Margin="6,0,0,0" Visibility="{Binding InUseVisibility}">
+                                <TextBlock Text="IN USE" Foreground="White" FontSize="10" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel Margin="26,4,8,8">
+                        <TextBlock Text="{Binding IssuesText}" Foreground="#B23B3B" FontSize="12" TextWrapping="Wrap" Visibility="{Binding IssuesVisibility}"/>
+                        <Button Content="Use this policy" Tag="{Binding PolicyId}" Visibility="{Binding UseButtonVisibility}" HorizontalAlignment="Left" Margin="0,8,0,0" Padding="10,3" Background="#3D5B96" Foreground="White" BorderThickness="0" Cursor="Hand" ToolTip="Base the ScubaGear config exclusions on this policy instead of the best match"/>
+                    </StackPanel>
+                </Expander>
+            </Border>
+        </DataTemplate>
+
+        <!-- Simple wrapped-text item template (recommendations / remediation) -->
+        <DataTemplate x:Key="BulletTextTemplate">
+            <DockPanel Margin="0,0,0,4">
+                <TextBlock Text="-" DockPanel.Dock="Left" Margin="0,0,6,0" Foreground="#3D5B96" FontWeight="Bold"/>
+                <TextBlock Text="{Binding}" TextWrapping="Wrap" Foreground="#444444"/>
+            </DockPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ============ Header ============ -->
+        <Border Grid.Row="0" Background="#2A4365" Padding="16,12">
+            <DockPanel LastChildFill="False">
+                <Image x:Name="LogoImage" Width="40" Height="40" DockPanel.Dock="Left" VerticalAlignment="Center"/>
+                <StackPanel DockPanel.Dock="Left" Margin="12,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="ScubaGear Config Analyzer" Foreground="White" FontSize="18" FontWeight="Bold"/>
+                    <TextBlock Text="Scan your M365 tenant and see exactly what to change to pass ScubaGear" Foreground="#B9C6DE" FontSize="12"/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock x:Name="TenantText" Text="Tenant: (none loaded)" Foreground="White" FontSize="12" HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="ScanDateText" Text="" Foreground="#B9C6DE" FontSize="11" HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="VersionText" Text="" Foreground="#8CA0C4" FontSize="10" HorizontalAlignment="Right"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- ============ Toolbar ============ -->
+        <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="14,10">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Product:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
+                <ComboBox x:Name="Product_ComboBox" Width="150" Margin="0,0,14,0" VerticalContentAlignment="Center"/>
+                <TextBlock Text="Environment:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
+                <ComboBox x:Name="Environment_ComboBox" Width="130" Margin="0,0,14,0" VerticalContentAlignment="Center"/>
+                <Button x:Name="Run_Button" Content="Connect &amp; Scan Tenant" Style="{StaticResource RunButton}"/>
+                <Button x:Name="Load_Button" Content="Load Results JSON..." Style="{StaticResource SecondaryButton}" ToolTip="Optional: analyze an existing ScubaGear results JSON instead of scanning live"/>
+                <Separator Margin="6,0" Background="#E0E0E0"/>
+                <CheckBox x:Name="IssuesOnly_CheckBox" Content="Issues only" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="Hide controls that already pass"/>
+                <CheckBox x:Name="ConfigurableOnly_CheckBox" Content="Configurable only" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="Show only policies a ScubaGear config file can make pass (exclusions/allow-lists)"/>
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
+                <TextBox x:Name="Search_TextBox" Width="170" VerticalContentAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ============ Main ============ -->
+        <TabControl x:Name="MainTabs" Grid.Row="2" Margin="10" BorderBrush="{StaticResource BorderBrush}">
+            <!-- Findings tab -->
+            <TabItem Header="Findings">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="400"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Findings list + summary -->
+                    <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+                        <DockPanel>
+                            <Border DockPanel.Dock="Top" Background="#EEF3FA" Padding="10,8">
+                                <StackPanel>
+                                    <TextBlock x:Name="SummaryText" Text="Run or load results to begin." FontWeight="SemiBold" Foreground="#2A4365" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="ComplianceText" Text="" Foreground="#555555" FontSize="12" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                            <ListBox x:Name="Findings_List"
+                                     ItemTemplate="{StaticResource FindingItemTemplate}"
+                                     BorderThickness="0"
+                                     HorizontalContentAlignment="Stretch"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                        </DockPanel>
+                    </Border>
+
+                    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="#EAEEF5"/>
+
+                    <!-- Details -->
+                    <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="18,14">
+                            <StackPanel x:Name="Details_Panel">
+                                <TextBlock x:Name="EmptyDetailText" Text="Select a finding on the left to see the root cause, best-matching policy, remediation steps and the exclusions to add to your ScubaGear config."
+                                           Foreground="#888888" TextWrapping="Wrap" FontSize="13"/>
+
+                                <StackPanel x:Name="DetailContent" Visibility="Collapsed">
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock x:Name="Detail_ControlId" DockPanel.Dock="Left" FontSize="20" FontWeight="Bold" Foreground="#2A4365"/>
+                                        <Border x:Name="Detail_ResultBadge" Style="{StaticResource ResultBadge}" DockPanel.Dock="Right">
+                                            <TextBlock x:Name="Detail_ResultText" Foreground="White" FontWeight="SemiBold"/>
+                                        </Border>
+                                        <Button x:Name="ViewBaseline_Button" Content="View baseline policy" Style="{StaticResource MiniButton}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip="Open the ScubaGear baseline policy viewer at this control"/>
+                                    </DockPanel>
+                                    <TextBlock x:Name="Detail_Requirement" FontSize="14" Foreground="#444444" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    <TextBlock x:Name="Detail_GroupText" FontSize="12" Foreground="#888888" TextWrapping="Wrap" Margin="0,2,0,0"/>
+
+                                    <TextBlock Text="Root cause" Style="{StaticResource SectionHeader}"/>
+                                    <Border Background="#FFF6F4" BorderBrush="#F1C9C1" BorderThickness="1" CornerRadius="4" Padding="10">
+                                        <StackPanel>
+                                            <TextBlock x:Name="Detail_RootCause" FontWeight="SemiBold" Foreground="#B23B3B" TextWrapping="Wrap"/>
+                                            <TextBlock x:Name="Detail_Details" Foreground="#555555" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                            <TextBlock x:Name="Detail_Criticality" Foreground="#777777" FontSize="12" Margin="0,4,0,0"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <TextBlock x:Name="RecommendationsHeader" Text="Recommendations" Style="{StaticResource SectionHeader}"/>
+                                    <ItemsControl x:Name="Detail_Recommendations" ItemTemplate="{StaticResource BulletTextTemplate}"/>
+
+                                    <TextBlock x:Name="PoliciesHeader" Text="Matching Conditional Access policies" Style="{StaticResource SectionHeader}"/>
+                                    <ItemsControl x:Name="Detail_Policies" ItemTemplate="{StaticResource PolicyItemTemplate}"/>
+
+                                    <TextBlock x:Name="RemediationHeader" Text="Step-by-step remediation" Style="{StaticResource SectionHeader}"/>
+                                    <ItemsControl x:Name="Detail_Remediation" ItemTemplate="{StaticResource BulletTextTemplate}"/>
+
+                                    <DockPanel Margin="0,18,0,6" LastChildFill="False">
+                                        <TextBlock Text="Control YAML" Style="{StaticResource SectionHeader}" DockPanel.Dock="Left" Margin="0,0,0,0"/>
+                                        <Button x:Name="CopyControlYaml_Button" Content="Copy" Style="{StaticResource MiniButton}" DockPanel.Dock="Right" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <Border Background="#1E272E" CornerRadius="4" Padding="2">
+                                        <TextBox x:Name="Detail_Yaml" IsReadOnly="True" Background="#1E272E" Foreground="#E6EDF3"
+                                                 BorderThickness="0" FontFamily="Consolas, Courier New" FontSize="12"
+                                                 AcceptsReturn="True" TextWrapping="NoWrap"
+                                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" MinHeight="80"/>
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- Configuration YAML tab -->
+            <TabItem Header="Configuration YAML">
+                <DockPanel Margin="2">
+                    <Border DockPanel.Dock="Top" Background="#EEF3FA" Padding="10,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <DockPanel LastChildFill="False">
+                            <TextBlock DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#444444"
+                                       Text="Open the ScubaConfig app with this configuration pre-loaded, copy it, or export a .yaml file."/>
+                            <Button x:Name="OpenConfigApp_Button" Content="Open ScubaConfig App" Style="{StaticResource PrimaryButton}" DockPanel.Dock="Right" ToolTip="Open the ScubaConfig app in this session with this configuration pre-loaded"/>
+                            <Button x:Name="ExportYaml_Button" Content="Export YAML..." Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right"/>
+                            <Button x:Name="CopyAllYaml_Button" Content="Copy all" Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                    </Border>
+                    <Border Background="#1E272E" Margin="0,8,0,0" CornerRadius="4" Padding="4">
+                        <TextBox x:Name="FullYaml_TextBox" IsReadOnly="True" Background="#1E272E" Foreground="#E6EDF3"
+                                 BorderThickness="0" FontFamily="Consolas, Courier New" FontSize="13"
+                                 AcceptsReturn="True" TextWrapping="NoWrap"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </Border>
+                </DockPanel>
+            </TabItem>
+
+            <!-- Activity log tab -->
+            <TabItem Header="Activity Log">
+                <Border Background="#1E272E" Margin="2" CornerRadius="4" Padding="4">
+                    <TextBox x:Name="RunOutput_TextBox" IsReadOnly="True" Background="#1E272E" Foreground="#C7D0DA"
+                             BorderThickness="0" FontFamily="Consolas, Courier New" FontSize="12"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"/>
+                </Border>
+            </TabItem>
+        </TabControl>
+
+        <!-- ============ Status bar ============ -->
+        <Border Grid.Row="3" Background="#2A4365" Padding="14,6">
+            <DockPanel LastChildFill="True">
+                <ProgressBar x:Name="Run_Progress" DockPanel.Dock="Right" Width="180" Height="14" IsIndeterminate="False" Visibility="Collapsed" Margin="10,0,0,0"/>
+                <TextBlock x:Name="Status_Text" Text="Ready." Foreground="#D6DFEF" VerticalAlignment="Center"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
