@@ -1655,7 +1655,199 @@ Function Show-SCuBABaselinePolicyViewer {
     }
 }
 
+Function Start-SCuBAConfigAnalyzer {
+    <#
+    .SYNOPSIS
+    Opens the ScubaGear Config Analyzer: analyzes an M365 tenant against the ScubaGear
+    baselines and shows which exclusions (users/groups) your ScubaGear config needs.
+
+    .DESCRIPTION
+    A WPF companion to Start-SCuBAConfigApp. It can run ScubaGear from within the app
+    (in a separate, visible PowerShell window so interactive Graph authentication
+    works) and then analyze the fresh results, or analyze an existing ScubaResults
+    JSON. The analysis is entirely JSON-schema driven (schemas ship in
+    PowerShell/ScubaGear/schemas) - nothing about the baselines is hard-coded.
+
+    For each non-compliant control it shows the root cause, the best-matching
+    Conditional Access policy, step-by-step remediation, and the users/groups excluded
+    on that policy. Those exclusions are editable and are written into a ready-to-use
+    ScubaGear configuration YAML that you can copy or export into the ScubaConfig app.
+
+    The window runs in its own STA runspace and performs analysis on a background
+    runspace, so the UI stays responsive while a large tenant is analyzed.
+
+    .PARAMETER ResultsPath
+    Optional path to an existing ScubaResults_*.json to analyze immediately on launch.
+
+    .PARAMETER M365Environment
+    The M365 environment used when running ScubaGear. Valid values are 'commercial',
+    'dod', 'gcc', 'gcchigh'. Default is 'commercial'.
+
+    .PARAMETER Organization
+    Optional tenant domain (e.g. contoso.onmicrosoft.com) used when running ScubaGear.
+
+    .EXAMPLE
+    Start-SCuBAConfigAnalyzer
+
+    .EXAMPLE
+    Start-SCuBAConfigAnalyzer -ResultsPath .\ScubaResults_1234.json
+
+    .LINK
+    Start-SCuBAConfigApp
+    #>
+    [CmdletBinding()]
+    Param(
+        [ValidateScript({ Test-Path $_ -PathType Leaf })]
+        [string]$ResultsPath,
+
+        [ValidateSet('commercial', 'dod', 'gcc', 'gcchigh')]
+        [string]$M365Environment = 'commercial',
+
+        [switch]$Passthru
+    )
+
+    [string]${CmdletName} = $MyInvocation.MyCommand
+    Write-Verbose ("{0}: Launching ScubaGear Config Analyzer" -f ${CmdletName})
+
+    # If a previous analyzer window was closed, dispose its runspace before launching a new one.
+    if ($script:ScubaConfigAnalyzerInstance) {
+        try {
+            $prev = $script:ScubaConfigAnalyzerInstance
+            $stillOpen = $false
+            try { if ($prev.SyncHash -and $prev.SyncHash.Window) { $stillOpen = ($prev.SyncHash.Window.IsVisible -eq $true) } } catch { $stillOpen = $false }
+            if (-not $stillOpen) {
+                try { $prev.PowerShell.Stop() } catch { }
+                try { $prev.PowerShell.Dispose() } catch { }
+                try { $prev.Runspace.Close(); $prev.Runspace.Dispose() } catch { }
+                $script:ScubaConfigAnalyzerInstance = $null
+            }
+        } catch { $script:ScubaConfigAnalyzerInstance = $null }
+    }
+
+    # Synchronized state shared between the UI runspace, background analysis runspace,
+    # DispatcherTimers and event handlers.
+    $syncHash = [hashtable]::Synchronized(@{})
+    $Runspace = [runspacefactory]::CreateRunspace()
+    $Runspace.ApartmentState = "STA"
+    $Runspace.ThreadOptions = "ReuseThread"
+    $Runspace.Open()
+    $syncHash.Runspace = $Runspace
+
+    # Resources (XAML + logos live in the shared ScubaConfigAppResources folder)
+    $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAnalyzerUI.xaml"
+    $syncHash.ImgPath  = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
+    $syncHash.IcoPath  = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.ico"
+
+    # Modular analyzer modules (imported inside the runspace)
+    $syncHash.AnalyzerEnginePath   = "$PSScriptRoot\ScubaConfigAnalyzer\ScubaConfigAnalyzerEngine.psm1"
+    $syncHash.AnalyzerUIHelperPath = "$PSScriptRoot\ScubaConfigAnalyzer\ScubaConfigAnalyzerUIHelper.psm1"
+
+    # This module's path so the analyzer can open the ScubaConfig app in-process (no new window/process).
+    $syncHash.ScubaConfigAppModulePath = "$PSScriptRoot\ScubaConfigApp.psm1"
+
+    # Baseline + config schemas (ScubaGear\schemas is two levels up from this module)
+    $schemasDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\schemas") -ErrorAction SilentlyContinue).Path
+    $syncHash.BaselineSchemaPath = if ($schemasDir) { Join-Path $schemasDir 'ScubaGearResultsBaselineSchema.json' } else { "$PSScriptRoot\ScubaConfigAnalyzer\ScubaGearResultsBaselineSchema.json" }
+    $syncHash.AnalyzerSchemaPath = "$PSScriptRoot\ScubaConfigAnalyzer\ScubaGearAnalyzerSchema.json"
+    $syncHash.ApiCatalogPath     = if ($schemasDir) { Join-Path $schemasDir 'ScubaGearApiCatalog.json' } else { $null }
+    # Canonical ScubaGear config schema (single source of truth for which policies are configurable via exclusions).
+    $syncHash.ConfigSchemaPath   = (Resolve-Path (Join-Path $PSScriptRoot '..\ScubaConfig\ScubaConfigSchema.json') -ErrorAction SilentlyContinue).Path
+
+    # ScubaGear module root (two levels up) so the run can import the local branch build
+    $resolvedScubaRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..") -ErrorAction SilentlyContinue).Path
+    $syncHash.ScubaGearModulePath = if ($resolvedScubaRoot -and (Test-Path (Join-Path $resolvedScubaRoot 'ScubaGear.psd1'))) { $resolvedScubaRoot } else { $null }
+
+    # Version (from the ScubaGear manifest)
+    $scubaGearPsd1 = Join-Path $PSScriptRoot "..\..\ScubaGear.psd1"
+    $syncHash.AnalyzerVersion = if (Test-Path $scubaGearPsd1) { try { (Import-PowerShellDataFile -Path $scubaGearPsd1).ModuleVersion } catch { $null } } else { $null }
+
+    # Initial parameters
+    $syncHash.InitialResultsPath  = $ResultsPath
+    $syncHash.M365Environment     = $M365Environment
+
+    # Expose the baseline policy viewer so the analyzer can jump straight to a control
+    # (same mechanism the ScubaConfig app's policy cards use).
+    $syncHash.ShowBaselinePolicyViewer = ${function:Show-SCuBABaselinePolicyViewer}
+
+    if (-not (Test-Path $syncHash.XamlPath)) {
+        throw "Analyzer UI not found: $($syncHash.XamlPath)"
+    }
+    Write-Output "Launching ScubaGear Config Analyzer...please wait."
+
+    $Runspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
+
+    $PowerShellCommand = [PowerShell]::Create().AddScript({
+
+        [System.Reflection.Assembly]::LoadWithPartialName('PresentationFramework') | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName('PresentationCore')      | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName('WindowsBase')           | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')  | Out-Null
+
+        try {
+            # Import the modular analyzer modules into this runspace
+            Import-Module $syncHash.AnalyzerEnginePath -Force -ErrorAction Stop
+            Import-Module $syncHash.AnalyzerUIHelperPath -Force -ErrorAction Stop
+
+            # Load the XAML (same normalization the main app uses: strip design-time bits,
+            # convert x:Name to Name so FindName + attribute lookups work).
+            [string]$XAML = (Get-Content $syncHash.XamlPath -ReadCount 0) -replace 'mc:Ignorable="d"', '' -replace "x:N", 'N' -replace '^<Win.*', '<Window' -replace 'Click=".*', '/>'
+            [xml]$UIXML = $XAML
+            $reader = New-Object System.Xml.XmlNodeReader ([xml]$UIXML)
+            $syncHash.Window = [Windows.Markup.XamlReader]::Load($reader)
+
+            # Store every named control on the syncHash for easy access.
+            $UIXML.SelectNodes("//*[@Name]") | ForEach-Object {
+                $ctrlName = $_.GetAttribute('Name')
+                if ($ctrlName) { $syncHash[$ctrlName] = $syncHash.Window.FindName($ctrlName) }
+            }
+
+            try { if (Test-Path $syncHash.IcoPath) { $syncHash.Window.Icon = $syncHash.IcoPath } } catch { }
+
+            # Wire the toolbar + events (defined in the UI helper module).
+            Initialize-ScubaConfigAnalyzerUI
+
+            # Apply initial parameters.
+            if ($syncHash.M365Environment) {
+                $idx = $syncHash.Environment_ComboBox.Items.IndexOf($syncHash.M365Environment)
+                if ($idx -ge 0) { $syncHash.Environment_ComboBox.SelectedIndex = $idx }
+            }
+
+            # If an existing results file was supplied, analyze it once the window is up.
+            $syncHash.Window.Add_Loaded({
+                $syncHash.Window.Topmost = $false
+                $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action] {
+                    if ($syncHash.InitialResultsPath -and (Test-Path $syncHash.InitialResultsPath)) {
+                        Start-ScubaAnalyzerAnalysis -ResultsPath $syncHash.InitialResultsPath
+                    }
+                })
+            })
+
+            $syncHash.Window.ShowDialog() | Out-Null
+        } catch {
+            [System.Windows.MessageBox]::Show("Failed to start the ScubaGear Config Analyzer:`n$($_.Exception.Message)", "ScubaGear Config Analyzer", 'OK', 'Error') | Out-Null
+        }
+        $syncHash.Error = $Error
+    })
+
+    # Launch non-blocking (like the Baseline Policy Viewer) so this PowerShell session
+    # stays available. Keep the instance referenced so the runspace isn't disposed while
+    # the window is open; it is cleaned up on the next launch after the window closes.
+    $PowerShellCommand.Runspace = $Runspace
+    $AsyncHandle = $PowerShellCommand.BeginInvoke()
+
+    $script:ScubaConfigAnalyzerInstance = @{
+        SyncHash   = $syncHash
+        Runspace   = $Runspace
+        PowerShell = $PowerShellCommand
+        Handle     = $AsyncHandle
+    }
+
+    Write-Output "ScubaGear Config Analyzer launched. This PowerShell window remains available."
+    if ($Passthru) { return $script:ScubaConfigAnalyzerInstance }
+}
+
 Export-ModuleMember -Function @(
     'Start-SCuBAConfigApp',
+    'Start-SCuBAConfigAnalyzer',
     'Show-SCuBABaselinePolicyViewer'
 )

@@ -1,0 +1,27 @@
+{
+  "$comment": "Analyzer-specific settings for the ScubaGear Config Analyzer (Start-SCuBAConfigAnalyzer). This intentionally does NOT duplicate the ScubaGear config-file structure/regex - that is defined once in the canonical schema at ../../ScubaConfig/ScubaConfigSchema.json. This file only holds what the analyzer needs that the canonical schema does not: friendly display names for Conditional Access requirement paths surfaced in the findings UI.",
+  "version": "1.0.0",
+  "RequirementFriendlyNames": {
+    "state": "Policy State",
+    "conditions.users.includeUsers": "Users > Include",
+    "conditions.users.excludeUsers": "Users > Exclude",
+    "conditions.users.includeGroups": "Groups > Include",
+    "conditions.users.excludeGroups": "Groups > Exclude",
+    "conditions.users.includeRoles": "Roles > Include",
+    "conditions.users.excludeRoles": "Roles > Exclude",
+    "conditions.users.excludeGuestsOrExternalUsers": "Guest / External Users > Exclude",
+    "conditions.applications.includeApplications": "Applications > Include",
+    "conditions.applications.excludeApplications": "Applications > Exclude",
+    "conditions.applications.includeUserActions": "User Actions > Include",
+    "conditions.clientAppTypes": "Client App Types",
+    "conditions.userRiskLevels": "User Risk Levels",
+    "conditions.signInRiskLevels": "Sign-in Risk Levels",
+    "conditions.authenticationFlows.transferMethods": "Authentication Flows",
+    "grantControls": "Grant Controls",
+    "grantControls.builtInControls": "Grant Controls",
+    "grantControls.operator": "Grant Controls Operator",
+    "grantControls.authenticationStrength": "Authentication Strength",
+    "grantControls.authenticationStrength.id": "Authentication Strength",
+    "grantControls.authenticationStrength.displayName": "Authentication Strength Name"
+  }
+}

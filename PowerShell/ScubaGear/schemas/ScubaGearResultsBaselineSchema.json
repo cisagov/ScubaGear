@@ -1,0 +1,1052 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/cisagov/ScubaGear/ScubaGearResultsBaselineSchema.json",
+  "title": "ScubaGear Results Analyzer Baseline Validation Schema",
+  "description": "Schema mapping baseline controls to Microsoft Graph API resources and validation logic for automated compliance checking and baseline configuration by the ScubaGear Results Analyzer Tool. API details (moduleCmdlet, permissions, supportedEnv) should be resolved from ScubaGearPermissions.json at runtime.",
+  "version": "1.0.0",
+  "lastModified": "2025-11-07",
+  "permissionsReference": "../Permissions/ScubaGearPermissions.json",
+  "baselineValidations": {
+    "aad": [
+      {
+        "id": "MS.AAD.1.1v1",
+        "name": "Legacy authentication SHALL be blocked",
+        "category": "Legacy Authentication",
+        "description": "Legacy authentication SHALL be blocked",
+        "rationale": "Legacy authentication protocols do not support MFA, increasing credential theft risk",
+        "exclusionField": "CapExclusions",
+        "requiresLicense": null,
+        "exceptions": null,
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "clientAppTypes": [
+                "exchangeActiveSync",
+                "other"
+              ]
+            },
+            "grantControls": {
+              "builtInControls": ["block"],
+              "operator": "OR"
+            }
+          }
+        },
+        "requiredSettings": {
+          "state": "enabled",
+          "conditions.users.includeUsers": ["All"],
+          "conditions.applications.includeApplications": ["All"],
+          "conditions.clientAppTypes": ["exchangeActiveSync", "other"],
+          "grantControls.builtInControls": ["block"],
+          "grantControls.operator": "OR"
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy to block legacy authentication",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Block Legacy Authentication",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "clientAppTypes": [
+                "exchangeActiveSync",
+                "other"
+              ]
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": ["block"]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "remediationSteps": [
+          "1. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "2. Go to Protection → Conditional Access → Policies",
+          "3. Click 'New policy' to create a new Conditional Access policy",
+          "4. Name: 'MS.AAD.1.1v1 - ScubaGear: Block Legacy Authentication'",
+          "5. Users: Include → All users",
+          "6. Target resources: Include → All cloud apps",
+          "7. Conditions: Client apps → Select 'Exchange ActiveSync clients' and 'Other clients'",
+          "8. Access controls: Grant → Select 'Block access'",
+          "9. Enable policy: Select 'On'",
+          "10. Click 'Create' to save the policy",
+          "11. Test the policy with pilot users before full deployment"
+        ],
+        "notes": "Validates that a CA policy exists blocking legacy authentication (Exchange ActiveSync and Other clients) for all users"
+      },
+      {
+        "id": "MS.AAD.2.1v1",
+        "name": "Users detected as high risk SHALL be blocked",
+        "category": "Risk Based Policies",
+        "description": "Users detected as high risk SHALL be blocked",
+        "rationale": "Blocking high-risk users prevents compromised accounts from accessing the tenant",
+        "exclusionField": "CapExclusions",
+        "requiresLicense": "Microsoft Entra ID P2",
+        "exceptions": null,
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "userRiskLevels": ["high"]
+            },
+            "grantControls": {
+              "builtInControls": ["block"],
+              "operator": "OR"
+            }
+          }
+        },
+        "requiredSettings": {
+          "state": "enabled",
+          "conditions.users.includeUsers": ["All"],
+          "conditions.applications.includeApplications": ["All"],
+          "conditions.userRiskLevels": ["high"],
+          "grantControls.builtInControls": ["block"],
+          "grantControls.operator": "OR"
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy blocking high-risk users",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Block High Risk Users",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "userRiskLevels": ["high"]
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": ["block"]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "remediationSteps": [
+          "1. Verify Microsoft Entra ID P2 license is assigned to users",
+          "2. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "3. Go to Protection → Conditional Access → Policies",
+          "4. Click 'New policy' to create a new Conditional Access policy",
+          "5. Name: 'MS.AAD.2.1v1 - ScubaGear: Block High Risk Users'",
+          "6. Users: Include → All users",
+          "7. Target resources: Include → All cloud apps",
+          "8. Conditions: User risk → Select 'High'",
+          "9. Access controls: Grant → Select 'Block access'",
+          "10. Enable policy: Select 'Report-only' for testing",
+          "11. Monitor report-only results for 24-48 hours",
+          "12. Change to 'On' after validating no false positives",
+          "13. Configure Identity Protection to remediate risky users"
+        ],
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features"
+      },
+      {
+        "id": "MS.AAD.2.2v1",
+        "name": "A notification SHOULD be sent to the administrator when high-risk users are detected",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-MgBetaRiskyUser",
+        "validationLogic": {
+          "type": "identityProtectionSetting",
+          "requiresPolicy": false,
+          "policyMustExist": false,
+          "requirements": {
+            "notificationEnabled": true,
+            "notificationType": "usersAtRiskDetected"
+          }
+        },
+        "buildInstructions": {
+          "description": "Configure Identity Protection notifications for high-risk users",
+          "apiResourceCreate": null,
+          "apiMethodCreate": null,
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Navigate to Microsoft Entra admin center",
+            "Select Protection > Identity Protection > User risk policy",
+            "Configure notifications to send alerts to administrators"
+          ]
+        },
+        "notes": "This setting is configured through the Entra admin center, not via Graph API. Manual validation required."
+      },
+      {
+        "id": "MS.AAD.2.3v1",
+        "name": "Sign-ins detected as high risk SHALL be blocked",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "signInRiskLevels": ["high"]
+            },
+            "grantControls": {
+              "builtInControls": ["block"],
+              "operator": "OR"
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy blocking high-risk sign-ins",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Block High Risk Sign-Ins",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "signInRiskLevels": ["high"]
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": ["block"]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection"
+      },
+      {
+        "id": "MS.AAD.3.1v1",
+        "name": "Phishing-resistant MFA SHALL be enforced for all users",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "authenticationStrength": {
+                "id": "00000000-0000-0000-0000-000000000004",
+                "displayName": "Phishing-resistant MFA"
+              }
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring phishing-resistant MFA",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require Phishing-Resistant MFA",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "authenticationStrength": {
+                "@odata.id": "https://graph.microsoft.com/beta/policies/authenticationStrengthPolicies/00000000-0000-0000-0000-000000000004"
+              }
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "Phishing-resistant MFA includes FIDO2 security keys and Windows Hello for Business"
+      },
+      {
+        "id": "MS.AAD.3.2v2",
+        "name": "If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "conditionalRequirement": "MS.AAD.3.1v1",
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "anyOf": [
+                { "builtInControls": ["mfa"] },
+                { "authenticationStrength": { "id": "00000000-0000-0000-0000-000000000002" } }
+              ]
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring MFA for all users (fallback if phishing-resistant not enforced)",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require MFA for All Users",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": ["mfa"]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "This is a fallback policy if MS.AAD.3.1v1 is not implemented. Only one needs to pass."
+      },
+      {
+        "id": "MS.AAD.3.3v2",
+        "name": "If Microsoft Authenticator is enabled, it SHALL be configured to show login context information",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-MgBetaPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration",
+        "validationLogic": {
+          "type": "authenticationMethodConfiguration",
+          "requiresPolicy": false,
+          "policyMustExist": false,
+          "conditionalCheck": "authenticatorEnabled",
+          "requirements": {
+            "state": "enabled",
+            "featureSettings": {
+              "displayAppInformationRequiredState": {
+                "state": "enabled",
+                "includeTarget": {
+                  "targetType": "group",
+                  "id": "all_users"
+                }
+              },
+              "displayLocationInformationRequiredState": {
+                "state": "enabled",
+                "includeTarget": {
+                  "targetType": "group",
+                  "id": "all_users"
+                }
+              }
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Configure Microsoft Authenticator to show context information",
+          "apiResourceCreate": "/beta/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator",
+          "apiMethodCreate": "PATCH",
+          "payloadTemplate": {
+            "state": "enabled",
+            "featureSettings": {
+              "displayAppInformationRequiredState": {
+                "state": "enabled",
+                "includeTarget": {
+                  "targetType": "group",
+                  "id": "all_users"
+                }
+              },
+              "displayLocationInformationRequiredState": {
+                "state": "enabled",
+                "includeTarget": {
+                  "targetType": "group",
+                  "id": "all_users"
+                }
+              }
+            }
+          }
+        },
+        "notes": "Only validates if Microsoft Authenticator is enabled. Shows app name and geographic location in push notifications.",
+        "remediationContent": {
+          "failurePattern": "*not met*",
+          "missingSettings": [
+            "Display app information: Not enabled for all users",
+            "Display location information: Not enabled for all users"
+          ],
+          "recommendations": [
+            "Microsoft Authenticator is enabled but context information is not shown",
+            "Enable context information in Microsoft Authenticator authentication method settings"
+          ]
+        },
+        "remediationSteps": [
+          "1. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "2. Go to Protection → Authentication methods → Microsoft Authenticator",
+          "3. Configure feature settings:",
+          "   - Display app name in push and passwordless notifications: Enabled → All users",
+          "   - Display geographic location in push and passwordless notifications: Enabled → All users",
+          "4. Click 'Save' to apply changes"
+        ]
+      },
+      {
+        "id": "MS.AAD.3.6v1",
+        "name": "Phishing-resistant MFA SHALL be required for highly privileged roles",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeRoles": [
+                  "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+                  "158c047a-c907-4556-b7ef-446551a6b5f7",
+                  "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2",
+                  "29232cdf-9323-42fd-ade2-1d097af3e4de",
+                  "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+                  "e8611ab8-c189-46e8-94e1-60213ab1f814",
+                  "fe930be7-5e62-47db-91af-98c3a49a38b1",
+                  "62e90394-69f5-4237-9190-012177145e10"
+                ]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "authenticationStrength": {
+                "id": "00000000-0000-0000-0000-000000000004"
+              }
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring phishing-resistant MFA for highly privileged roles",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require Phishing-Resistant MFA for Privileged Roles",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeRoles": [
+                  "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+                  "158c047a-c907-4556-b7ef-446551a6b5f7",
+                  "8ac3fc64-6eca-42ea-9e69-59f4c7b60eb2",
+                  "29232cdf-9323-42fd-ade2-1d097af3e4de",
+                  "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+                  "e8611ab8-c189-46e8-94e1-60213ab1f814",
+                  "fe930be7-5e62-47db-91af-98c3a49a38b1",
+                  "62e90394-69f5-4237-9190-012177145e10"
+                ],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "authenticationStrength": {
+                "@odata.id": "https://graph.microsoft.com/beta/policies/authenticationStrengthPolicies/00000000-0000-0000-0000-000000000004"
+              }
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "Highly privileged roles include Global Administrator, Privileged Role Administrator, etc. Role template IDs are used."
+      },
+      {
+        "id": "MS.AAD.3.7v1",
+        "name": "Managed devices SHOULD be required for authentication",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": [
+                "compliantDevice",
+                "domainJoinedDevice"
+              ]
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring managed devices",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require Managed Device",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": [
+                "compliantDevice",
+                "domainJoinedDevice"
+              ]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "Requires Intune or hybrid Azure AD join for device management. This is a SHOULD requirement."
+      },
+      {
+        "id": "MS.AAD.3.8v1",
+        "name": "Managed Devices SHOULD be required to register MFA",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeUserActions": ["urn:user:registersecurityinfo"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": [
+                "compliantDevice",
+                "domainJoinedDevice"
+              ]
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring managed devices for MFA registration",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require Managed Device for MFA Registration",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeUserActions": ["urn:user:registersecurityinfo"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": [
+                "compliantDevice",
+                "domainJoinedDevice"
+              ]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "Prevents adversaries from registering their own MFA devices by requiring a managed device for registration actions. This is a SHOULD requirement."
+      },
+      {
+        "id": "MS.AAD.3.9v1",
+        "name": "Device code authentication SHOULD be blocked",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"]
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "clientAppTypes": ["all"],
+              "authenticationFlows": {
+                "transferMethods": ["deviceCodeFlow"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": ["block"]
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy to block device code authentication flow",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Block Device Code Flow",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": ["All"],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "clientAppTypes": ["all"],
+              "authenticationFlows": {
+                "transferMethods": ["deviceCodeFlow"]
+              }
+            },
+            "grantControls": {
+              "operator": "OR",
+              "builtInControls": ["block"]
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "remediationContent": {
+          "failurePattern": "*not met*",
+          "missingSettings": [
+            "Device code authentication is not blocked by Conditional Access policy"
+          ],
+          "recommendations": [
+            "Create a Conditional Access policy to block device code flow",
+            "Device code authentication has been abused for phishing attacks",
+            "Block this flow unless specifically required by your organization"
+          ]
+        },
+        "remediationSteps": [
+          "1. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "2. Go to Protection → Conditional Access → Policies",
+          "3. Click 'New policy' → 'Create new policy'",
+          "4. Name the policy (e.g., 'Block Device Code Flow')",
+          "5. Under Assignments → Users:",
+          "   - Include: All users",
+          "   - Exclude: Emergency access accounts if needed",
+          "6. Under Assignments → Target resources:",
+          "   - Select 'All resources (formerly All cloud apps)'",
+          "7. Under Assignments → Conditions → Authentication flows:",
+          "   - Configure: Yes",
+          "   - Select: Device code flow",
+          "8. Under Access controls → Grant:",
+          "   - Select 'Block access'",
+          "9. Set 'Enable policy' to 'Report-only' initially for testing",
+          "10. Click 'Create'",
+          "11. After testing, change policy from 'Report-only' to 'On'"
+        ],
+        "notes": "Device code flow has been abused for phishing campaigns. This is a SHOULD requirement. See: https://aka.ms/devicecodeflowphishing"
+      },
+      {
+        "id": "MS.AAD.7.2v1",
+        "name": "Highly privileged roles SHALL use more granular roles instead of Global Administrator",
+        "category": "Privileged Role Management",
+        "description": "Highly privileged users SHALL be assigned finer-grained roles instead of Global Administrator",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-MgDirectoryRole",
+        "validationLogic": {
+          "type": "roleAssignmentAnalysis",
+          "requiresPolicy": false,
+          "policyMustExist": false,
+          "requirements": {
+            "detailsPattern": "*not met*"
+          }
+        },
+        "remediationContent": {
+          "failurePattern": "*not met*",
+          "missingSettings": [
+            "All privileged users are Global Administrators"
+          ],
+          "recommendations": [
+            "Assign users to appropriate role-based roles instead of Global Admin",
+            "This improves security through least privilege principle"
+          ]
+        },
+        "remediationSteps": [
+          "1. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "2. Go to Identity → Roles & admins → Roles & admins",
+          "3. Review users assigned to Global Administrator role",
+          "4. For each user, determine the minimum role needed based on their responsibilities",
+          "5. Assign users to more granular roles (e.g., Exchange Administrator, SharePoint Administrator)",
+          "6. Remove Global Administrator role assignment",
+          "7. Document the role assignment changes and justification"
+        ],
+        "notes": "Validates that privileged users are assigned appropriate granular roles rather than Global Administrator"
+      },
+      {
+        "id": "MS.AAD.7.4v1",
+        "name": "Permanent active role assignments SHALL be limited",
+        "category": "Privileged Identity Management",
+        "description": "Permanent active role assignments SHALL be limited to emergency access accounts",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-MgRoleManagementDirectoryRoleAssignment",
+        "validationLogic": {
+          "type": "roleAssignmentAnalysis",
+          "requiresPolicy": false,
+          "policyMustExist": false,
+          "requirements": {
+            "detailsPattern": "*role(s) that contain users with permanent active assignment*"
+          }
+        },
+        "remediationContent": {
+          "failurePattern": "*role(s) that contain users with permanent active assignment*",
+          "missingSettings": [
+            "Roles with permanent active assignments found"
+          ],
+          "recommendations": [
+            "Convert permanent assignments to time-limited or eligible assignments in PIM",
+            "Exceptions: Emergency access accounts and service accounts"
+          ]
+        },
+        "remediationSteps": [
+          "1. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "2. Go to Identity → Privileged Identity Management → Azure AD roles",
+          "3. Click on the role with permanent assignments",
+          "4. Review active role assignments",
+          "5. For each permanent assignment (except emergency access accounts):",
+          "   - Remove the permanent assignment",
+          "   - Add as eligible assignment with activation requirements",
+          "   - OR add as active assignment with time-limited duration",
+          "6. Document emergency access account exclusions and justification"
+        ],
+        "notes": "Validates that roles do not have permanent active assignments except for emergency access accounts"
+      },
+      {
+        "id": "MS.AAD.7.5v1",
+        "name": "Privileged roles SHALL be provisioned through Privileged Identity Management (PIM)",
+        "category": "Privileged Identity Management",
+        "description": "Privileged roles SHALL be cloud-only accounts provisioned with Privileged Identity Management",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-MgDirectoryRole",
+        "validationLogic": {
+          "type": "roleAssignmentAnalysis",
+          "requiresPolicy": false,
+          "policyMustExist": false,
+          "requirements": {
+            "detailsPattern": "*role(s) assigned to users outside of PIM*"
+          }
+        },
+        "remediationContent": {
+          "failurePattern": "*role(s) assigned to users outside of PIM*",
+          "missingSettings": [
+            "Roles assigned directly instead of through PIM"
+          ],
+          "recommendations": [
+            "Remove direct role assignments and recreate through PIM",
+            "This enables monitoring, approval workflows, and just-in-time access"
+          ]
+        },
+        "remediationSteps": [
+          "1. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "2. Go to Identity → Privileged Identity Management → Azure AD roles",
+          "3. For each role with direct assignments:",
+          "   - Note the users with direct assignments",
+          "   - Go to Identity → Roles & admins → [Role name]",
+          "   - Remove the direct assignments",
+          "4. Return to Privileged Identity Management",
+          "5. Click on the role → Add assignments",
+          "6. Select the users and configure:",
+          "   - Assignment type: Eligible (recommended) or Active",
+          "   - Duration: Time-limited",
+          "   - Justification required: Yes",
+          "   - Approval workflow: Enable if required",
+          "7. Click 'Assign' to provision through PIM"
+        ],
+        "notes": "Validates that privileged roles are assigned through PIM rather than direct role assignments"
+      }
+    ],
+    "exo": [
+      {
+        "id": "MS.EXO.1.1v2",
+        "name": "Automatic forwarding to external domains SHALL be disabled",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-RemoteDomain",
+        "validationLogic": {
+          "type": "exchangeRemoteDomain",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "defaultDomain": {
+              "AutoForwardEnabled": false
+            },
+            "allDomains": {
+              "checkAutoForward": true,
+              "allowOnlyApprovedDomains": true
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Disable automatic forwarding to external domains",
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Connect to Exchange Online PowerShell",
+            "Run: Set-RemoteDomain -Identity 'Default' -AutoForwardEnabled $false",
+            "Review each additional remote domain to ensure automatic forwarding is only allowed for approved domains"
+          ]
+        },
+        "notes": "Uses Exchange Online PowerShell cmdlets, not Microsoft Graph API"
+      },
+      {
+        "id": "MS.EXO.13.1v1",
+        "name": "The smtp authentication protocol SHALL be disabled",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-TransportConfig",
+        "validationLogic": {
+          "type": "exchangeTransportConfig",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "SmtpClientAuthenticationDisabled": true
+          }
+        },
+        "buildInstructions": {
+          "description": "Disable SMTP AUTH protocol for the organization",
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Sign in to Exchange admin center",
+            "Navigate to Settings > Mail Flow",
+            "Check 'Turn off SMTP AUTH protocol for your organization'",
+            "Save changes"
+          ]
+        },
+        "notes": "SMTP AUTH is a legacy protocol that should be disabled to improve security"
+      }
+    ],
+    "securitysuite": [],
+    "powerbi": [],
+    "powerplatform": [],
+    "sharepoint": [],
+    "teams": [
+      {
+        "id": "MS.TEAMS.1.1v1",
+        "name": "External participants SHOULD NOT be enabled to request control of shared screens",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-CsTeamsMeetingPolicy",
+        "validationLogic": {
+          "type": "teamsMeetingPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "AllowExternalParticipantGiveRequestControl": false
+          }
+        },
+        "buildInstructions": {
+          "description": "Disable external participant control of shared screens",
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Sign in to Microsoft Teams admin center",
+            "Select Meetings > Meeting policies",
+            "Select Global (Org-wide default) policy",
+            "Under Content sharing, set 'External participants can give or request control' to Off",
+            "Repeat for all custom policies if applicable"
+          ]
+        },
+        "notes": "Teams policies are managed through Teams PowerShell module, not Microsoft Graph API"
+      },
+      {
+        "id": "MS.TEAMS.2.1v2",
+        "name": "Anonymous users SHOULD NOT be enabled to join meetings",
+        "exclusionField": "none",
+        "apiPermissionRef": "Get-CsTeamsMeetingPolicy",
+        "validationLogic": {
+          "type": "teamsMeetingPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "AutoAdmittedUsers": "EveryoneInCompany",
+            "AllowPSTNUsersToBypassLobby": false
+          }
+        },
+        "buildInstructions": {
+          "description": "Configure lobby settings to prevent anonymous users from bypassing",
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Sign in to Microsoft Teams admin center",
+            "Select Meetings > Meeting policies",
+            "Select Global (Org-wide default) policy",
+            "Under Meeting join & lobby, ensure 'Who can bypass the lobby' is NOT set to Everyone",
+            "Set 'People dialing in can bypass the lobby' to Off"
+          ]
+        },
+        "notes": "AutoAdmittedUsers should be set to something other than 'Everyone' to require lobby admission"
+      }
+    ]
+  },
+  "metadata": {
+    "apiEndpoints": {
+      "conditionalAccess": {
+        "base": "/beta/identity/conditionalAccess",
+        "policies": "/beta/identity/conditionalAccess/policies",
+        "namedLocations": "/beta/identity/conditionalAccess/namedLocations",
+        "authenticationStrengths": "/beta/policies/authenticationStrengthPolicies"
+      },
+      "authentication": {
+        "methods": "/beta/policies/authenticationMethodsPolicy",
+        "methodConfigurations": "/beta/policies/authenticationMethodsPolicy/authenticationMethodConfigurations"
+      },
+      "identityProtection": {
+        "riskyUsers": "/beta/identityProtection/riskyUsers",
+        "riskDetections": "/beta/identityProtection/riskDetections"
+      }
+    },
+    "privilegedRoleTemplateIds": {
+      "globalAdministrator": "62e90394-69f5-4237-9190-012177145e10",
+      "privilegedRoleAdministrator": "e8611ab8-c189-46e8-94e1-60213ab1f814",
+      "userAdministrator": "fe930be7-5e62-47db-91af-98c3a49a38b1",
+      "privilegedAuthenticationAdministrator": "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+      "securityAdministrator": "194ae4cb-b126-40b2-bd5b-6091b380977d",
+      "globalReader": "f2ef992c-3afb-46b9-b7cf-a126ee74c451",
+      "cloudApplicationAdministrator": "158c047a-c907-4556-b7ef-446551a6b5f7",
+      "applicationAdministrator": "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+      "exchangeAdministrator": "29232cdf-9323-42fd-ade2-1d097af3e4de",
+      "helpdeskAdministrator": "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+      "sharepointAdministrator": "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+      "teamsAdministrator": "69091246-20e8-4a56-aa4d-066075b2a7a8",
+      "azureADJoinedDeviceLocalAdministrator": "9f06204d-73c1-4d4c-880a-6edb90606fd8",
+      "complianceAdministrator": "17315797-102d-40b4-93e0-432062caca18"
+    },
+    "authenticationStrengths": {
+      "phishingResistant": {
+        "id": "00000000-0000-0000-0000-000000000004",
+        "displayName": "Phishing-resistant MFA",
+        "description": "Requires phishing-resistant authentication methods like FIDO2 or Windows Hello for Business"
+      },
+      "mfa": {
+        "id": "00000000-0000-0000-0000-000000000002",
+        "displayName": "Multifactor authentication",
+        "description": "Requires any form of MFA"
+      },
+      "passwordlessMfa": {
+        "id": "00000000-0000-0000-0000-000000000005",
+        "displayName": "Passwordless MFA",
+        "description": "Requires passwordless authentication methods"
+      }
+    },
+    "supportedProducts": [
+      "aad",
+      "exo",
+      "securitysuite",
+      "powerbi",
+      "powerplatform",
+      "sharepoint",
+      "teams"
+    ],
+    "exclusionFieldTypes": {
+      "CapExclusions": {
+        "description": "Conditional Access Policy exclusions for users and groups",
+        "appliesToProducts": ["aad"],
+        "supportedExclusionTypes": ["users", "groups"]
+      },
+      "none": {
+        "description": "No exclusions supported for this baseline",
+        "appliesToProducts": ["all"],
+        "supportedExclusionTypes": []
+      }
+    }
+  }
+}
