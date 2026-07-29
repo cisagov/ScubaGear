@@ -1680,17 +1680,29 @@ Function Start-SCuBAConfigAnalyzer {
     Optional path to an existing ScubaResults_*.json to analyze immediately on launch.
 
     .PARAMETER M365Environment
-    The M365 environment used when running ScubaGear. Valid values are 'commercial',
-    'dod', 'gcc', 'gcchigh'. Default is 'commercial'.
+    The M365 environment. Valid values are 'commercial', 'dod', 'gcc', 'gcchigh'.
+    Default is 'commercial'.
+
+    .PARAMETER AppId
+    Optional. Application (client) ID of an Entra app registration, for non-interactive
+    (app-only) Microsoft Graph authentication. Requires -CertificateThumbprint and -Organization.
+
+    .PARAMETER CertificateThumbprint
+    Optional. Thumbprint of the certificate (in the CurrentUser or LocalMachine 'My' store)
+    associated with -AppId, for non-interactive app-only Graph authentication.
 
     .PARAMETER Organization
-    Optional tenant domain (e.g. contoso.onmicrosoft.com) used when running ScubaGear.
+    Tenant domain (e.g. contoso.onmicrosoft.com) or tenant ID. Required for non-interactive
+    (app-only) authentication.
 
     .EXAMPLE
     Start-SCuBAConfigAnalyzer
 
     .EXAMPLE
     Start-SCuBAConfigAnalyzer -ResultsPath .\ScubaResults_1234.json
+
+    .EXAMPLE
+    Start-SCuBAConfigAnalyzer -AppId 00000000-0000-0000-0000-000000000000 -CertificateThumbprint AABBCCDDEEFF00112233445566778899AABBCCDD -Organization contoso.onmicrosoft.com
 
     .LINK
     Start-SCuBAConfigApp
@@ -1703,11 +1715,29 @@ Function Start-SCuBAConfigAnalyzer {
         [ValidateSet('commercial', 'dod', 'gcc', 'gcchigh')]
         [string]$M365Environment = 'commercial',
 
+        # Non-interactive (app-only) Microsoft Graph auth: provide all three to connect with a
+        # certificate instead of an interactive browser sign-in.
+        [ValidatePattern('^[{(]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[)}]?$')]
+        [string]$AppId,
+
+        [ValidatePattern('^[A-Fa-f0-9]{40}$')]
+        [string]$CertificateThumbprint,
+
+        [string]$Organization,
+
         [switch]$Passthru
     )
 
     [string]${CmdletName} = $MyInvocation.MyCommand
     Write-Verbose ("{0}: Launching ScubaGear Config Analyzer" -f ${CmdletName})
+
+    # Non-interactive (app-only) auth needs the app id + certificate together, plus a tenant.
+    if ($AppId -xor $CertificateThumbprint) {
+        throw "For non-interactive Graph auth, provide BOTH -AppId and -CertificateThumbprint (and -Organization)."
+    }
+    if ($AppId -and $CertificateThumbprint -and -not $Organization) {
+        throw "Non-interactive (app-only) auth requires -Organization (tenant domain, e.g. contoso.onmicrosoft.com)."
+    }
 
     # If a previous analyzer window was closed, dispose its runspace before launching a new one.
     if ($script:ScubaConfigAnalyzerInstance) {
@@ -1716,9 +1746,9 @@ Function Start-SCuBAConfigAnalyzer {
             $stillOpen = $false
             try { if ($prev.SyncHash -and $prev.SyncHash.Window) { $stillOpen = ($prev.SyncHash.Window.IsVisible -eq $true) } } catch { $stillOpen = $false }
             if (-not $stillOpen) {
-                try { $prev.PowerShell.Stop() } catch { }
-                try { $prev.PowerShell.Dispose() } catch { }
-                try { $prev.Runspace.Close(); $prev.Runspace.Dispose() } catch { }
+                try { $prev.PowerShell.Stop() } catch { Write-Verbose "Previous analyzer PowerShell stop cleanup: $($_.Exception.Message)" }
+                try { $prev.PowerShell.Dispose() } catch { Write-Verbose "Previous analyzer PowerShell dispose cleanup: $($_.Exception.Message)" }
+                try { $prev.Runspace.Close(); $prev.Runspace.Dispose() } catch { Write-Verbose "Previous analyzer runspace dispose cleanup: $($_.Exception.Message)" }
                 $script:ScubaConfigAnalyzerInstance = $null
             }
         } catch { $script:ScubaConfigAnalyzerInstance = $null }
@@ -1748,7 +1778,7 @@ Function Start-SCuBAConfigAnalyzer {
     # Baseline + config schemas (ScubaGear\schemas is two levels up from this module)
     $schemasDir = (Resolve-Path (Join-Path $PSScriptRoot "..\..\schemas") -ErrorAction SilentlyContinue).Path
     $syncHash.BaselineSchemaPath = if ($schemasDir) { Join-Path $schemasDir 'ScubaGearResultsBaselineSchema.json' } else { "$PSScriptRoot\ScubaConfigAnalyzer\ScubaGearResultsBaselineSchema.json" }
-    $syncHash.AnalyzerSchemaPath = "$PSScriptRoot\ScubaConfigAnalyzer\ScubaGearAnalyzerSchema.json"
+    $syncHash.AnalyzerSchemaPath = "$PSScriptRoot\ScubaConfigAnalyzer\ScubaGearAnalyzerSchema_en-US.json"
     $syncHash.ApiCatalogPath     = if ($schemasDir) { Join-Path $schemasDir 'ScubaGearApiCatalog.json' } else { $null }
     # Canonical ScubaGear config schema (single source of truth for which policies are configurable via exclusions).
     $syncHash.ConfigSchemaPath   = (Resolve-Path (Join-Path $PSScriptRoot '..\ScubaConfig\ScubaConfigSchema.json') -ErrorAction SilentlyContinue).Path
@@ -1764,6 +1794,9 @@ Function Start-SCuBAConfigAnalyzer {
     # Initial parameters
     $syncHash.InitialResultsPath  = $ResultsPath
     $syncHash.M365Environment     = $M365Environment
+    $syncHash.AppId                 = $AppId
+    $syncHash.CertificateThumbprint = $CertificateThumbprint
+    $syncHash.Organization          = $Organization
 
     # Expose the baseline policy viewer so the analyzer can jump straight to a control
     # (same mechanism the ScubaConfig app's policy cards use).
@@ -1801,7 +1834,7 @@ Function Start-SCuBAConfigAnalyzer {
                 if ($ctrlName) { $syncHash[$ctrlName] = $syncHash.Window.FindName($ctrlName) }
             }
 
-            try { if (Test-Path $syncHash.IcoPath) { $syncHash.Window.Icon = $syncHash.IcoPath } } catch { }
+            try { if (Test-Path $syncHash.IcoPath) { $syncHash.Window.Icon = $syncHash.IcoPath } } catch { Write-Verbose "Analyzer window icon load failed: $($_.Exception.Message)" }
 
             # Wire the toolbar + events (defined in the UI helper module).
             Initialize-ScubaConfigAnalyzerUI
