@@ -123,10 +123,15 @@ Re-run ScubaGear (or the configuration validator) against your updated file to c
 
 ## Validator warnings
 
-When ScubaGear loads a configuration file, the built-in configuration validator checks for deprecated Defender usage and prints warnings to the console. You will see a `Defender migration warning` for each of the following situations:
+When ScubaGear loads a configuration file, the built-in configuration validator checks for deprecated Defender usage and prints warnings to the console. The validator uses two prefixes:
+
+`Defender migration warning:` for Defender-wide deprecations:
 
 - **Deprecated product name** - `ProductNames` still contains `defender`. ScubaGear runs `securitysuite` in its place and recommends updating the configuration.
 - **Deprecated `Defender` section** - the configuration still contains a top-level `Defender:` section. Move the settings under `SecuritySuite:`.
+
+`Policy migration warning:` for individual policy IDs referenced in the configuration:
+
 - **Migrated policy ID** - a policy ID referenced in the configuration (in an exclusion, annotation, or omission) has been migrated. The warning names the new `MS.SECURITYSUITE.*` policy ID to use.
 - **Removed policy ID** - a policy ID referenced in the configuration has been removed and should be deleted.
 
@@ -135,7 +140,7 @@ Example console output:
 ```text
 WARNING: Configuration validation found 2 warnings:
   Defender migration warning: The product name 'defender' is deprecated and has been renamed to 'securitysuite'. ScubaGear will run 'securitysuite' in its place. Update ProductNames to use 'securitysuite'. See docs\configuration\defender-to-securitysuite-transition.md and mappings\scuba-baseline-policy-migrations.csv for the full list of migrated policies.
-  Defender migration warning: Policy ID 'MS.DEFENDER.2.1v1' has been migrated to 'MS.SECURITYSUITE.2.1v1'. Update your configuration to use the new policy ID. See docs\configuration\defender-to-securitysuite-transition.md and mappings\scuba-baseline-policy-migrations.csv for the full list of migrated policies.
+  Policy migration warning: Policy ID 'MS.DEFENDER.2.1v1' has been migrated to 'MS.SECURITYSUITE.2.1v1'. Update your configuration to use the new policy ID. See docs\configuration\defender-to-securitysuite-transition.md and mappings\scuba-baseline-policy-migrations.csv for the full list of migrated policies.
 
 --- RECOMMENDED ACTION ---
   - The Defender product has been renamed to 'securitysuite' and many Defender, Exchange Online, and Teams policies were migrated into the MS.SECURITYSUITE.* baseline.
