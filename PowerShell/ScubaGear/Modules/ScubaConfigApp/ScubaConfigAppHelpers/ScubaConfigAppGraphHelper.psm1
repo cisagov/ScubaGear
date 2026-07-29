@@ -110,10 +110,11 @@ Function Invoke-GraphQueryWithFilter {
         [string]$QueryType,
         $GraphConfig,
         [string]$FilterString,
+        [string]$SearchString,
         [int]$Top = 999
     )
 
-    Write-DebugOutput "Starting Graph query - Type: $QueryType, Filter: $FilterString, Top: $Top" -Source "Invoke-GraphQueryWithFilter" -Level "Debug"
+    Write-DebugOutput "Starting Graph query - Type: $QueryType, Filter: $FilterString, Search: $SearchString, Top: $Top" -Source "Invoke-GraphQueryWithFilter" -Level "Debug"
 
     # Create runspace
     $runspace = [runspacefactory]::CreateRunspace()
@@ -127,7 +128,7 @@ Function Invoke-GraphQueryWithFilter {
 
     # Add script block
     $scriptBlock = {
-        param($QueryType, $GraphConfig, $FilterString, $Top)
+        param($QueryType, $GraphConfig, $FilterString, $SearchString, $Top)
 
         try {
             # Get query configuration
@@ -157,8 +158,22 @@ Function Invoke-GraphQueryWithFilter {
                 $queryStringParts += "`$filter=$FilterString"
             }
 
+            # Add $search if provided (portal-style "contains" matching). This
+            # requires an advanced query: ConsistencyLevel eventual + $count=true.
+            $useAdvancedQuery = $false
+            if (![string]::IsNullOrWhiteSpace($SearchString)) {
+                $queryStringParts += "`$search=" + [uri]::EscapeDataString($SearchString)
+                $useAdvancedQuery = $true
+            }
+
             # Add top parameter
             $queryStringParts += "`$top=$Top"
+
+            # Advanced queries must request a count and use eventual consistency.
+            if ($useAdvancedQuery) {
+                $queryStringParts += "`$count=true"
+                $queryParams.Headers = @{ ConsistencyLevel = 'eventual' }
+            }
 
             # Combine query string
             if ($queryStringParts.Count -gt 0) {
@@ -191,7 +206,7 @@ Function Invoke-GraphQueryWithFilter {
     }
 
     # Add parameters and start execution
-    $powershell.AddScript($scriptBlock).AddParameter("QueryType", $QueryType).AddParameter("GraphConfig", $GraphConfig).AddParameter("FilterString", $FilterString).AddParameter("Top", $Top)
+    $powershell.AddScript($scriptBlock).AddParameter("QueryType", $QueryType).AddParameter("GraphConfig", $GraphConfig).AddParameter("FilterString", $FilterString).AddParameter("SearchString", $SearchString).AddParameter("Top", $Top)
     $asyncResult = $powershell.BeginInvoke()
 
     return @{
@@ -292,10 +307,20 @@ Function Show-GraphProgressWindow {
             Write-DebugOutput -Message "Unsupported graph entity type: $GraphEntityType" -Source $MyInvocation.MyCommand -Level "Error"
         }
 
-        # Build filter string
+        # Build the query. A full object id (GUID) is matched exactly; any other
+        # text uses Graph $search for portal-style "contains" matching on the
+        # configured property (e.g. displayName) instead of a prefix-only filter.
         $filterString = $null
+        $searchString = $null
         if (![string]::IsNullOrWhiteSpace($SearchTerm)) {
-            $filterString = "startswith($($config.FilterProperty),'$SearchTerm')"
+            $trimmedTerm = $SearchTerm.Trim()
+            $parsedGuid = [guid]::Empty
+            if ([guid]::TryParse($trimmedTerm, [ref]$parsedGuid)) {
+                $filterString = "id eq '$($parsedGuid.ToString())'"
+            } else {
+                $escapedTerm = $trimmedTerm -replace '"', ''
+                $searchString = '"{0}:{1}"' -f $config.FilterProperty, $escapedTerm
+            }
         }
 
         # Show progress window
@@ -327,11 +352,13 @@ Function Show-GraphProgressWindow {
         $progressWindow.Content = $progressPanel
 
         # Start async operation
-        Write-DebugOutput -Message "Starting async operation for graph query type: $($config.QueryType) with filter: $filterString" -Source $MyInvocation.MyCommand -Level "Verbose"
+        Write-DebugOutput -Message "Starting async operation for graph query type: $($config.QueryType) with filter: [$filterString] search: [$searchString]" -Source $MyInvocation.MyCommand -Level "Verbose"
         $asyncOp = Invoke-GraphQueryWithFilter `
                         -QueryType $config.QueryType `
                         -GraphConfig $syncHash.UIConfigs.graphQueries `
-                        -FilterString $filterString -Top $Top
+                        -FilterString $filterString `
+                        -SearchString $searchString `
+                        -Top $Top
 
         # Show progress window
         $progressWindow.Show()
