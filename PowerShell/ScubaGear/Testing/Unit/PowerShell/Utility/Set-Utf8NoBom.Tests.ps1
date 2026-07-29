@@ -72,6 +72,24 @@ InModuleScope Utility {
             }
         }
 
+        # Paths containing [ ] are treated as wildcards by -Path; the function must resolve them literally.
+        Context 'Wildcard characters in path' {
+            BeforeAll {
+                # New-Item -Path cannot create bracketed folders (no -LiteralPath); use .NET.
+                [void][System.IO.Directory]::CreateDirectory("$TestDrive\wc\2185test[test]\lab")
+            }
+
+            It 'Resolves an absolute path containing square brackets' {
+                Set-Utf8NoBom -Content "test" -Location "$TestDrive\wc\2185test[test]\lab" -FileName "output.json" `
+                | Should -Be "$TestDrive\wc\2185test[test]\lab\output.json"
+            }
+
+            It 'Resolves a relative path containing square brackets' {
+                Set-Utf8NoBom -Content "test" -Location "wc\2185test[test]\lab" -FileName "output.json" `
+                | Should -Be "$TestDrive\wc\2185test[test]\lab\output.json"
+            }
+        }
+
         AfterAll {
             Pop-Location
         }

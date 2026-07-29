@@ -33,7 +33,8 @@ function Set-Utf8NoBom {
     )
     process {
         # Need to insure the location is an absolute path, otherwise you can get some inconsistent behavior.
-        $ResolvedPath = $(Resolve-Path $Location).ProviderPath
+        # LiteralPath so output folders containing wildcard characters (e.g. []) are treated literally.
+        $ResolvedPath = $(Resolve-Path -LiteralPath $Location).ProviderPath
         $FinalPath = Join-Path -Path $ResolvedPath -ChildPath $FileName -ErrorAction 'Stop'
         # The $false in the next line indicates that the BOM should not be used.
         $Utf8NoBomEncoding = New-Object System.Text.UTF8Encoding $False

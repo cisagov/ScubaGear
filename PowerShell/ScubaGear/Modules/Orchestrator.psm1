@@ -456,8 +456,9 @@ function Invoke-SCuBA {
         $FormattedTimeStamp = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
-        New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory -ErrorAction 'Stop' | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
+        # New-Item has no -LiteralPath; use .NET so output paths with wildcard chars (e.g. []) are created literally.
+        [System.IO.Directory]::CreateDirectory($OutFolderPath) | Out-Null
 
         # Initialize logging for troubleshooting - debug logs are ALWAYS created
         # Logs are placed in a DebugLogs subfolder within the output folder
@@ -1069,8 +1070,8 @@ function Invoke-RunRego {
                     OPAPath     = $resolvedOPAPath
                     InputFile   = $InputFile
                     RegoFile    = $RegoFile
-                    InputExists = (Test-Path $InputFile)
-                    RegoExists  = (Test-Path $RegoFile)
+                    InputExists = (Test-Path -LiteralPath $InputFile)
+                    RegoExists  = (Test-Path -LiteralPath $RegoFile)
                 }
                 try {
                     $RetVal = Invoke-Rego @params
@@ -1092,13 +1093,14 @@ function Invoke-RunRego {
                 }
             }
 
-            if ($null -eq $RegoOutput -or $RegoOutput.Count -eq 0) {
-                $RegoOutputJson = '[]'
+            # Guard against an empty $TestResults so ConvertTo-Json emits '[]' rather than $null
+            if ($null -eq $TestResults -or $TestResults.Count -eq 0) {
+                $TestResultsJson = '[]'
             } else {
-                $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+                $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
             }
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
-            $TestResultsJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
+            $TestResultsJson | Set-Content -LiteralPath $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
             $ProdRegoFailed
         }
@@ -1281,9 +1283,9 @@ function ConvertTo-ResultsCsv {
         try {
             $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName
 
-            if (Test-Path $ScubaResultsPath -PathType Leaf) {
+            if (Test-Path -LiteralPath $ScubaResultsPath -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
-                $ScubaResults = Get-Content -Encoding UTF8 (Get-ChildItem $ScubaResultsPath).FullName | ConvertFrom-Json
+                $ScubaResults = Get-Content -Encoding UTF8 -LiteralPath $ScubaResultsPath | ConvertFrom-Json
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
@@ -1293,7 +1295,7 @@ function ConvertTo-ResultsCsv {
                 foreach ($Product in $ProductNames) {
                     $BaselineName = $ArgToProd[$Product]
                     $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
-                    $IndividualResults = Get-Content -Encoding UTF8 $FileName | ConvertFrom-Json
+                    $IndividualResults = Get-Content -Encoding UTF8 -LiteralPath $FileName | ConvertFrom-Json
                     $ScubaResults.Results | Add-Member -NotePropertyName $BaselineName `
                         -NotePropertyValue $IndividualResults.Results
                 }
@@ -1326,16 +1328,16 @@ function ConvertTo-ResultsCsv {
             $ResultsCsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
             $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutActionPlanFileName.csv"
             $Encoding = Get-FileEncoding
-            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $ResultsCsvFileName -Encoding $Encoding
+            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $ResultsCsvFileName -Encoding $Encoding
             if ($ActionPlanCsv.Length -eq 0) {
                 # If no tests failed, add the column names to ensure a file is still output
                 $Headers = $ScubaResultsCsv[0].psobject.Properties.Name -Join '","'
                 $Headers = "`"$Headers`""
                 $Headers += '"Non-Compliance Reason","Remediation Completion Date","Justification"'
-                $Headers | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+                $Headers | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
             }
             else {
-                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
             }
         }
         catch {
@@ -1405,7 +1407,7 @@ function Merge-JsonOutput {
             # Load the raw provider output
             $SettingsExportPath = Join-Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
             $DeletionList += $SettingsExportPath
-            $SettingsExport =  Get-Content -Encoding UTF8 $SettingsExportPath -Raw
+            $SettingsExport =  Get-Content -Encoding UTF8 -LiteralPath $SettingsExportPath -Raw
             $SettingsExportObject = $(ConvertFrom-Json $SettingsExport)
             $TimestampZulu = $SettingsExportObject.timestamp_zulu
 
@@ -1443,7 +1445,7 @@ function Merge-JsonOutput {
                 $BaselineName = $ArgToProd[$Product]
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
                 $DeletionList += $FileName
-                $IndividualResults = Get-Content -Encoding UTF8 $FileName | ConvertFrom-Json
+                $IndividualResults = Get-Content -Encoding UTF8 -LiteralPath $FileName | ConvertFrom-Json
 
                 $Results | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.Results
@@ -1500,11 +1502,11 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u0027", "'")
 
             $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName -ErrorAction 'Stop'
-            $ReportJson | Set-Content -Path $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ReportJson | Set-Content -LiteralPath $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             # Delete the now redundant files
             foreach ($File in $DeletionList) {
-                Remove-Item $File
+                Remove-Item -LiteralPath $File
             }
         }
         catch {
@@ -1585,7 +1587,8 @@ function Invoke-ReportCreation {
             $Len = $ScubaConfig.ProductNames.Length
             $Fragment = @()
             $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
-            New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
+            # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+            [System.IO.Directory]::CreateDirectory($IndividualReportPath) | Out-Null
 
             $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
             $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
@@ -1691,7 +1694,8 @@ function Invoke-ReportCreation {
             $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
             $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
-            $ProviderJSONFilePath = Join-Path -Path $OutFolderPath -ChildPath "$($ScubaConfig.OutProviderFileName).json" -Resolve
+            # No -Resolve: it expands wildcard chars (e.g. []); Get-Utf8NoBom resolves the path literally.
+            $ProviderJSONFilePath = Join-Path -Path $OutFolderPath -ChildPath "$($ScubaConfig.OutProviderFileName).json"
             $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
 
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
@@ -1726,10 +1730,11 @@ function Invoke-ReportCreation {
             $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
             Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
             $ReportFileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutReportName).html" -ErrorAction 'Stop'
-            [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
+            [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File -LiteralPath $ReportFileName -ErrorAction 'Stop'
 
             if (-Not $Quiet) {
-                Invoke-Item $ReportFileName
+                # LiteralPath so a report path with wildcard chars (e.g. []) opens instead of failing to resolve
+                Invoke-Item -LiteralPath $ReportFileName
             }
         }
         catch {
@@ -2286,9 +2291,10 @@ function Invoke-SCuBACached {
             }
 
             # Create outpath if $Outpath does not exist
-            if(-not (Test-Path -PathType "container" $OutPath))
+            if(-not (Test-Path -LiteralPath $OutPath -PathType "container"))
             {
-                New-Item -ItemType "Directory" -Path $OutPath | Out-Null
+                # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+                [System.IO.Directory]::CreateDirectory($OutPath) | Out-Null
             }
             $OutFolderPath = $OutPath
             $ProductNames = $ProductNames | Sort-Object -Unique
@@ -2396,10 +2402,10 @@ function Invoke-SCuBACached {
 
                     # Check if there is a previous ScubaResults file
                     # delete if found
-                    $PreviousResultsFiles = Get-ChildItem -Path $OutPath -Filter "$($OutJsonFileName)*.json"
+                    $PreviousResultsFiles = Get-ChildItem -LiteralPath $OutPath -Filter "$($OutJsonFileName)*.json"
                     if ($PreviousResultsFiles) {
                         $PreviousResultsFiles | ForEach-Object {
-                            Remove-Item $_.FullName -Force
+                            Remove-Item -LiteralPath $_.FullName -Force
                         }
                         Write-ScubaLog -Message "Removed $($PreviousResultsFiles.Count) previous result file(s)" -Level "Debug" -Source "ScubaCached"
                     }
@@ -2469,11 +2475,11 @@ function Invoke-SCuBACached {
             #####################################
             # If a ScubaResults file exists we grab its System.IO.FileInfo object which is referenced further down.
             #####################################
-            $ScubaResultsFileNameWildcard = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName)*.json"
             $ScubaResultsFileFound = $false
             $ScubaResultsFileObject = $null
-            if (Test-Path $ScubaResultsFileNameWildcard) {
-                $ScubaResultsFilesArray = @(Get-ChildItem $ScubaResultsFileNameWildcard)
+            # -LiteralPath on the folder (handles wildcard chars like [] in OutPath) + -Filter for the file wildcard.
+            $ScubaResultsFilesArray = @(Get-ChildItem -LiteralPath $OutPath -Filter "$($OutJsonFileName)*.json" -ErrorAction SilentlyContinue)
+            if ($ScubaResultsFilesArray.Count -gt 0) {
                 if ($ScubaResultsFilesArray.Count -gt 1) {
                     throw "You must only have a single ScubaResults file in this folder: $OutPath"
                 }
@@ -2489,7 +2495,7 @@ function Invoke-SCuBACached {
             # ProjectSettingsObject keeps a PowerShell object of the provider JSON in memory so we can reference its properties such as tenant_details further down.
             $ProviderSettingsObject = $null
             # If the provider output does not exist as a file, extract it from the ScubaResults file .Raw section so downstream functions that rely on it can execute.
-            if (-not (Test-Path $ProviderJSONFilePath)) {
+            if (-not (Test-Path -LiteralPath $ProviderJSONFilePath)) {
                 Write-ScubaLog -Message "Provider JSON file not found so extracting from ScubaResults" -Level "Info" -Source "ScubaCached"
                 if (-not $ScubaResultsFileFound) {
                     throw "No provider JSON or ScubaResults JSON file was found in folder: $OutPath. Double check the values you passed for -OutPath or -OutProviderFileName to ensure one of those file exists in that folder."
@@ -2525,10 +2531,10 @@ function Invoke-SCuBACached {
             if ($ScubaResultsFileFound -and $KeepIndividualJSON) {
                 $NewScubaResultsName = "Unused-$($ScubaResultsFileObject.Name)"
                 $NewScubaResultsPath = Join-Path $ScubaResultsFileObject.DirectoryName $NewScubaResultsName
-                if (Test-Path $NewScubaResultsPath) {
-                    Remove-Item $NewScubaResultsPath -Force
+                if (Test-Path -LiteralPath $NewScubaResultsPath) {
+                    Remove-Item -LiteralPath $NewScubaResultsPath -Force
                 }
-                Rename-Item -Path $ScubaResultsFileObject.FullName -NewName $NewScubaResultsName
+                Rename-Item -LiteralPath $ScubaResultsFileObject.FullName -NewName $NewScubaResultsName
                 Write-Warning "Detected a ScubaResults file along with a ProviderSettingsExport file when calling with the -KeepIndividualJSON parameter."
                 Write-Warning "Renamed the ScubaResults to $NewScubaResultsName to avoid ambiguous results. ScubaCached will use the ProviderSettingsExport file since that takes priority."
             }
@@ -2632,7 +2638,7 @@ function Repair-ScubaGearJson {
     if ($ReturnObject.RepairedJson) {
         Write-Warning "The provider JSON file required automatic repair."
     }
-    
+
     $ProviderJsonObject = $ProviderSettingsObject.JsonObject
 
     .EXAMPLE
@@ -2671,7 +2677,7 @@ function Repair-ScubaGearJson {
     # We are parsing a JSON file
     if ($FilePath) {
         # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
-        $JsonString = Get-Content $FilePath -Encoding UTF8 -Raw
+        $JsonString = Get-Content -LiteralPath $FilePath -Encoding UTF8 -Raw
     }
     # We are parsing a JSON string
     else {
@@ -2690,7 +2696,7 @@ function Repair-ScubaGearJson {
         else {
             $ReturnObject.JsonString = $JsonInputString
         }
-       
+
         return $ReturnObject
     }
     catch {
@@ -2709,7 +2715,7 @@ function Repair-ScubaGearJson {
         else {
             Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object"
         }
-        
+
         Write-Warning "Please report this to the ScubaGear team as a bug report either by GitHub or the Scuba mailbox."
         Write-Warning "Attempting to auto repair the JSON..."
 
