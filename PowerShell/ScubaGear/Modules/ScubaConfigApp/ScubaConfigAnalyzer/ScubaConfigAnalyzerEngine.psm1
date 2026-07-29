@@ -27,20 +27,16 @@
 #>
 
 # ------------------------------------------------------------------------------------
-# Product mapping (schema uses lowercase keys; results + config YAML use other casing)
+# Analyzer knowledge caches - populated at runtime from ScubaGearAnalyzerSchema.json
+# (product-key map, named Graph operations, Conditional Access condition rules) and
+# ScubaGearApiCatalog.json (API resource paths). Nothing product/condition/API specific
+# is hardcoded in this module; see Import-ScAAnalyzerRules / Import-ScAApiCatalog.
 # ------------------------------------------------------------------------------------
-$script:ScAProductMap = @{
-    aad            = @{ ResultsKey = 'AAD';            ConfigKey = 'Aad' }
-    securitysuite  = @{ ResultsKey = 'SecuritySuite';  ConfigKey = 'SecuritySuite' }
-    exo            = @{ ResultsKey = 'EXO';            ConfigKey = 'Exo' }
-    powerplatform  = @{ ResultsKey = 'PowerPlatform';  ConfigKey = 'Powerplatform' }
-    sharepoint     = @{ ResultsKey = 'SharePoint';     ConfigKey = 'Sharepoint' }
-    teams          = @{ ResultsKey = 'Teams';          ConfigKey = 'Teams' }
-    powerbi        = @{ ResultsKey = 'PowerBI';        ConfigKey = 'Powerbi' }
-}
-
-# Friendly-name lookup populated from the config schema during analysis.
-$script:ScAFriendlyNames = $null
+$script:ScAProductMap    = @{}    # prodLower -> @{ ResultsKey; ConfigKey }
+$script:ScAApiOperations = @{}    # operation name -> operation definition (from apiOperations)
+$script:ScACaRules       = $null  # conditionalAccessAnalysis rules object
+$script:ScAApiCatalog    = @{}    # moduleCmdlet -> ScubaGearApiCatalog.json entry
+$script:ScAFriendlyNames = $null  # requirement path -> friendly label
 
 function Resolve-ScASchemaPath {
     <#
@@ -106,6 +102,119 @@ function Import-ScAConfigurableMap {
     } catch {
         Write-Warning "Failed to read config schema '$ConfigSchemaPath': $($_.Exception.Message)"
     }
+}
+
+function Import-ScAAnalyzerRules {
+    <#
+    .SYNOPSIS
+    Loads the analyzer rules from ScubaGearAnalyzerSchema.json into the module caches so
+    the engine is a generic interpreter (product-key map, requirement friendly names,
+    named Graph operations, and Conditional Access condition rules are all JSON-driven).
+    #>
+    param([Parameter(Mandatory)]$AnalyzerSchema)
+
+    # Requirement path -> friendly label (supports a 'default' sub-object or a flat map).
+    $script:ScAFriendlyNames =
+        if ($AnalyzerSchema.RequirementFriendlyNames.default) { $AnalyzerSchema.RequirementFriendlyNames.default }
+        elseif ($AnalyzerSchema.RequirementFriendlyNames)     { $AnalyzerSchema.RequirementFriendlyNames }
+        else { $null }
+
+    # Product key map (prodLower -> ResultsKey/ConfigKey).
+    $script:ScAProductMap = @{}
+    if ($AnalyzerSchema.productMap) {
+        foreach ($p in $AnalyzerSchema.productMap.PSObject.Properties) {
+            if ($p.Name -match '^_') { continue }
+            $script:ScAProductMap[$p.Name.ToLower()] = @{ ResultsKey = [string]$p.Value.resultsKey; ConfigKey = [string]$p.Value.configKey; DisplayName = [string]$p.Value.displayName }
+        }
+    }
+    if ($script:ScAProductMap.Count -eq 0) { Write-Warning "Analyzer schema has no 'productMap' - product result/config keys are unavailable." }
+
+    # Named Graph operations (operation name -> definition; resolved to URLs via the API catalog).
+    $script:ScAApiOperations = @{}
+    if ($AnalyzerSchema.apiOperations) {
+        foreach ($op in $AnalyzerSchema.apiOperations.PSObject.Properties) {
+            if ($op.Name -match '^_') { continue }
+            $script:ScAApiOperations[$op.Name] = $op.Value
+        }
+    }
+
+    # Conditional Access interpretation rules.
+    $script:ScACaRules = $AnalyzerSchema.conditionalAccessAnalysis
+}
+
+function Import-ScAApiCatalog {
+    <#
+    .SYNOPSIS
+    Loads ScubaGearApiCatalog.json (moduleCmdlet -> entry) so API resource paths and
+    least permissions come from the catalog, never from hardcoded URLs in this module.
+    #>
+    param([string]$ApiCatalogPath)
+
+    $script:ScAApiCatalog = @{}
+    if (-not $ApiCatalogPath) { $ApiCatalogPath = Resolve-ScASchemaPath -FileName 'ScubaGearApiCatalog.json' }
+    if (-not (Test-Path $ApiCatalogPath)) { Write-Warning "API catalog not found: $ApiCatalogPath"; return }
+    try {
+        $catalog = Get-Content $ApiCatalogPath -Raw | ConvertFrom-Json
+        foreach ($e in @($catalog)) { if ($e.moduleCmdlet) { $script:ScAApiCatalog[[string]$e.moduleCmdlet] = $e } }
+    } catch {
+        Write-Warning "Failed to read API catalog '$ApiCatalogPath': $($_.Exception.Message)"
+    }
+}
+
+function Resolve-ScAApiResource {
+    <#
+    .SYNOPSIS
+    Builds a Graph request URI for a named analyzer operation by resolving its cmdlet to
+    an apiResource in ScubaGearApiCatalog.json. resultKind: collection (list) | byId
+    (single item, {id} substituted) | byAppId (service principal by appId). Returns $null
+    when the operation or catalog entry is unknown (caller falls back gracefully).
+    #>
+    param([Parameter(Mandatory)][string]$Operation, [string]$Id)
+
+    if (-not $script:ScAApiOperations.ContainsKey($Operation)) { return $null }
+    $op = $script:ScAApiOperations[$Operation]
+    $cmd = [string]$op.cmdlet
+    if (-not $cmd -or -not $script:ScAApiCatalog.ContainsKey($cmd)) { return $null }
+
+    $entry    = $script:ScAApiCatalog[$cmd]
+    $resource = [string]$entry.apiResource
+    if (-not $resource) { return $null }
+    $filter = if ($entry.apiFilter) { [string]$entry.apiFilter } else { '' }
+    $select = if ($op.select) { '?$select=' + [string]$op.select } else { '' }
+    $kind   = if ($op.resultKind) { [string]$op.resultKind } else { 'collection' }
+
+    switch ($kind) {
+        'byId' {
+            $base = if ($resource -match '\{id\}') { $resource }
+                    elseif ($filter -match '\{id\}') { $resource + $filter }
+                    else { $resource.TrimEnd('/') + '/{id}' }
+            return ($base -replace '\{id\}', $Id) + $select
+        }
+        'byAppId' {
+            $collection = ($resource -replace '/\{id\}\s*$', '').TrimEnd('/')
+            return "$collection(appId='$Id')" + $select
+        }
+        default { return $resource + $select }
+    }
+}
+
+function Get-ScAValueAtPath {
+    <#
+    .SYNOPSIS
+    Navigates a dotted, camelCase path (e.g. conditions.users.excludeUsers) on an object,
+    matching property names case-insensitively so both ScubaResults (PascalCase) and raw
+    Graph (camelCase) shapes resolve. Returns the value or $null if any segment is missing.
+    #>
+    param($Object, [Parameter(Mandatory)][string]$Path)
+
+    $cur = $Object
+    foreach ($part in ($Path -split '\.')) {
+        if ($null -eq $cur) { return $null }
+        $prop = $cur.PSObject.Properties | Where-Object { $_.Name -ieq $part } | Select-Object -First 1
+        if (-not $prop) { return $null }
+        $cur = $prop.Value
+    }
+    return $cur
 }
 
 function Get-ScAConfigAction {
@@ -303,40 +412,70 @@ function Test-ScAPolicyRequirement {
     return @{ Meets = $meets; Issues = $issues }
 }
 
-function Get-ScAExclusionsFromIssues {
+function Test-ScAPolicyRelevance {
     <#
     .SYNOPSIS
-    Parses excluded-user/group/application/guest issue strings into an exclusions map
-    ({Users,Groups,Applications,GuestUserTypes}) matching the CapExclusions config fields.
+    Returns $true if a policy is RELEVANT to a control (i.e. "about" it), per the
+    relevanceSignals rules in the analyzer schema. arrayMatch signals overlap the
+    requirement + policy arrays (match all|any); the grantControls signal defers to
+    Test-ScAGrantControlRelevance but only via the enabled sub-signals. With no rules the
+    policy is considered relevant (nothing to filter on).
     #>
-    param(
-        [Parameter(Mandatory = $false)]
-        [AllowEmptyCollection()]
-        [array]$Issues = @()
-    )
+    param($Policy, $Requirements, $Rules)
 
-    $exclusions = @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
+    if (-not $Rules -or -not $Rules.relevanceSignals -or -not $Rules.relevanceSignals.rules) { return $true }
 
-    foreach ($issue in $Issues) {
-        if ($issue -match "excluded user.*\|DETAILS:User IDs:\s*([^|]+)") {
-            $exclusions.Users += ($matches[1] -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
-        }
-        if ($issue -match "excluded group.*\|DETAILS:Group IDs:\s*([^|]+)") {
-            $exclusions.Groups += ($matches[1] -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
-        }
-        if ($issue -match "excluded application.*\|DETAILS:Application IDs:\s*([^|]+)") {
-            $exclusions.Applications += ($matches[1] -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
-        }
-        if ($issue -match "excluded guest.*\|DETAILS:Guest user types:\s*([^|]+)") {
-            $exclusions.GuestUserTypes += ($matches[1] -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    foreach ($sig in @($Rules.relevanceSignals.rules)) {
+        switch ([string]$sig.kind) {
+            'arrayMatch' {
+                $reqVal = Get-ScAValueAtPath -Object $Requirements -Path $sig.conditionPath
+                if ($null -eq $reqVal) { continue }   # requirement doesn't use this signal
+                $reqArr = @($reqVal)
+                $polArr = @(Get-ScAValueAtPath -Object $Policy -Path $sig.policyPath)
+                if ([string]$sig.match -eq 'all') {
+                    if (@($reqArr).Count -gt 0) {
+                        $all = $true
+                        foreach ($t in $reqArr) { if ($polArr -notcontains $t) { $all = $false; break } }
+                        if ($all) { return $true }
+                    }
+                } else {
+                    foreach ($t in $reqArr) { if ($polArr -contains $t) { return $true } }
+                }
+            }
+            'grantControls' {
+                $gc = Get-ScAValueAtPath -Object $Requirements -Path $sig.conditionPath
+                if (-not $gc) { continue }
+                $names = @($gc.PSObject.Properties.Name)
+                $use = (($names -contains 'anyOf') -and $sig.useWhenAnyOf) -or
+                       (($names -contains 'authenticationStrength') -and $sig.useWhenAuthenticationStrength) -or
+                       (($names -contains 'builtInControls') -and $sig.useWhenBuiltInControls)
+                if ($use -and (Test-ScAGrantControlRelevance -Policy $Policy -GrantReq $gc)) { return $true }
+            }
         }
     }
+    return $false
+}
 
-    $exclusions.Users          = @($exclusions.Users          | Select-Object -Unique)
-    $exclusions.Groups         = @($exclusions.Groups         | Select-Object -Unique)
-    $exclusions.Applications   = @($exclusions.Applications   | Select-Object -Unique)
-    $exclusions.GuestUserTypes = @($exclusions.GuestUserTypes | Select-Object -Unique)
-    return $exclusions
+function Test-ScAPolicyInScope {
+    <#
+    .SYNOPSIS
+    Returns $true unless a scopeGate disqualifies the policy: a gate applies only when the
+    requirement demands requiredValue at conditionPath, in which case the policy must also
+    have requiredValue at policyPath (persona/admin-scoped policies are dropped).
+    #>
+    param($Policy, $Requirements, $Rules)
+
+    if (-not $Rules -or -not $Rules.scopeGates -or -not $Rules.scopeGates.rules) { return $true }
+
+    foreach ($gate in @($Rules.scopeGates.rules)) {
+        $reqVal = Get-ScAValueAtPath -Object $Requirements -Path $gate.conditionPath
+        if ($null -eq $reqVal) { continue }
+        if (@($reqVal) -contains $gate.requiredValue) {
+            $polVal = @(Get-ScAValueAtPath -Object $Policy -Path $gate.policyPath)
+            if ($polVal -notcontains $gate.requiredValue) { return $false }
+        }
+    }
+    return $true
 }
 
 function Test-ScAGrantControlRelevance {
@@ -392,173 +531,85 @@ function Get-ScAPolicyAnalysis {
         return @{ AllPolicies = @(); TotalPoliciesFound = 0 }
     }
 
-    $caPolicies   = $Results.Raw.conditional_access_policies
-    $requirements = $ValidationSchema.validationLogic.requirements
-    $matchingPolicies = @($caPolicies | Where-Object { $_.State -eq 'enabled' })
+    $rules          = $script:ScACaRules
+    $caPolicies     = $Results.Raw.conditional_access_policies
+    $requirements   = $ValidationSchema.validationLogic.requirements
+    $exclusionField = if ($ValidationSchema.exclusionField) { [string]$ValidationSchema.exclusionField } else { 'none' }
+
+    $stateProp  = if ($rules -and $rules.policyStateProperty) { [string]$rules.policyStateProperty } else { 'state' }
+    $enabledVal = if ($rules -and $rules.enabledStateValue)   { [string]$rules.enabledStateValue }   else { 'enabled' }
+    $matchingPolicies = @($caPolicies | Where-Object { (Get-ScAValueAtPath -Object $_ -Path $stateProp) -eq $enabledVal })
 
     foreach ($policy in $matchingPolicies) {
-        $policyIssues  = @()
-        $meetsCriteria = $true
-        $excludedCount = 0
+        $settingIssues   = @()   # requirement failures + disallowed exclusions (need a tenant change)
+        $exclusionIssues = @()   # config-waivable exclusions (add to config to pass)
+        $detected        = @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
+        $excludedCount   = 0
 
-        # Validate each requirement dynamically from the schema.
+        # 1. Validate each requirement dynamically from the baseline schema.
         foreach ($reqProperty in $requirements.PSObject.Properties) {
             $friendlyName = Get-ScAFriendlyName -Path $reqProperty.Name
             $validationResult = Test-ScAPolicyRequirement -Policy $policy -SchemaPath $reqProperty.Name -ExpectedValue $reqProperty.Value -FriendlyName $friendlyName
-            if (-not $validationResult.Meets) {
-                $meetsCriteria = $false
-                foreach ($issue in $validationResult.Issues) { $policyIssues += $issue }
+            if (-not $validationResult.Meets) { $settingIssues += $validationResult.Issues }
+        }
+
+        # 2. Detect config-waivable exclusions, driven by the exclusionDetectors rules
+        #    (which config field, which policy path, and when each detector applies).
+        foreach ($det in @($rules.exclusionDetectors.rules)) {
+            $typeSupported = (-not $det.requiresExclusionType) -or ($exclusionField -eq [string]$det.requiresExclusionType)
+
+            if ($det.scopeRequirement) {
+                $reqScope = Get-ScAValueAtPath -Object $requirements -Path $det.scopeRequirement.conditionPath
+                if (@($reqScope) -notcontains $det.scopeRequirement.requiredValue) { continue }
+            }
+
+            $raw = Get-ScAValueAtPath -Object $policy -Path $det.policyPath
+            $vals = if ([string]$det.valueKind -eq 'csvOrArray') {
+                if ($raw -is [string]) { @($raw -split '\s*,\s*' | Where-Object { $_ }) } else { @($raw | Where-Object { $_ }) }
+            } else {
+                @($raw | Where-Object { $_ })
+            }
+            if (@($vals).Count -eq 0) { continue }
+
+            if ($typeSupported) {
+                $excludedCount += @($vals).Count
+                if ($det.field -and $detected.ContainsKey([string]$det.field)) { $detected[[string]$det.field] += @($vals) }
+                $lbl  = if ($det.issueLabel)  { [string]$det.issueLabel }  else { 'item' }
+                $dlbl = if ($det.detailLabel) { [string]$det.detailLabel } else { 'IDs' }
+                $sug  = if ($det.suggestion)  { [string]$det.suggestion }  else { 'Review if these exclusions are justified and documented' }
+                $exclusionIssues += "WARNING: Policy has $(@($vals).Count) excluded ${lbl}(s)|DETAILS:${dlbl}: $(@($vals) -join ', ')|SUGGESTION:$sug"
+            }
+            elseif ($det.unsupportedIsError) {
+                $msg = if ($det.unsupportedMessage) { ([string]$det.unsupportedMessage) -replace '\{values\}', (@($vals) -join ', ') }
+                       else { "Policy has disallowed exclusions: $(@($vals) -join ', ')" }
+                $settingIssues += "ERROR: $msg"
             }
         }
 
-        # Detect exclusions using the schema-declared exclusion paths.
-        # Detect config-waivable exclusions. ScubaGear lets you waive excluded users,
-        # groups, applications, and guest/external user types via the config file
-        # (CapExclusions), so these are WARNINGS the config can satisfy - not setting
-        # errors that require changing the policy.
-        $supportsCap = ($ValidationSchema.exclusionField -eq 'CapExclusions')
+        $policyIssues  = @($settingIssues) + @($exclusionIssues)
+        $meetsCriteria = (@($policyIssues).Count -eq 0)
 
-        # Users / groups (and any other principal paths declared by the schema).
-        if ($ValidationSchema.buildInstructions.PSObject.Properties.Name -contains 'exclusionHandling') {
-            $exclusionConfig = $ValidationSchema.buildInstructions.exclusionHandling
-            if ($exclusionConfig -is [array]) {
-                foreach ($exclusionPath in $exclusionConfig) {
-                    $pascalParts = ($exclusionPath -split '\.') | ForEach-Object { $_.Substring(0, 1).ToUpper() + $_.Substring(1) }
-                    $currentValue = $policy
-                    foreach ($part in $pascalParts) {
-                        if ($currentValue.PSObject.Properties.Name -contains $part) { $currentValue = $currentValue.$part }
-                        else { $currentValue = $null; break }
-                    }
-                    if ($currentValue -and @($currentValue).Count -gt 0) {
-                        $excludedCount += @($currentValue).Count
-                        $exclusionType = if ($exclusionPath -like '*excludeUsers') { 'user' }
-                                         elseif ($exclusionPath -like '*excludeGroups') { 'group' }
-                                         elseif ($exclusionPath -like '*excludeRoles') { 'role' }
-                                         else { 'item' }
-                        $typeTitle = [System.Globalization.CultureInfo]::CurrentCulture.TextInfo.ToTitleCase($exclusionType)
-                        $suggestion = if ($exclusionType -eq 'user') { 'If justified (break-glass accounts): Add to CapExclusions in ScubaConfig' } else { 'Review if these exclusions are justified and documented' }
-                        $policyIssues += "WARNING: Policy has $(@($currentValue).Count) excluded ${exclusionType}(s)|DETAILS:$typeTitle IDs: $(@($currentValue) -join ', ')|SUGGESTION:$suggestion"
-                        $meetsCriteria = $false
-                    }
-                }
-            }
-        }
-
-        # Excluded applications - waivable via CapExclusions.Applications, but only where
-        # the requirement targets All cloud apps (e.g. not MS.AAD.3.8v1, which uses user actions).
-        $requiresAllApps = ($requirements.PSObject.Properties.Name -contains 'conditions') -and
-                           ($requirements.conditions.PSObject.Properties.Name -contains 'applications') -and
-                           ($requirements.conditions.applications.PSObject.Properties.Name -contains 'includeApplications') -and
-                           (@($requirements.conditions.applications.includeApplications) -contains 'All')
-        if ($supportsCap -and $requiresAllApps) {
-            $exApps = @($policy.Conditions.Applications.ExcludeApplications | Where-Object { $_ })
-            if (@($exApps).Count -gt 0) {
-                $excludedCount += @($exApps).Count
-                $policyIssues += "WARNING: Policy has $(@($exApps).Count) excluded application(s)|DETAILS:Application IDs: $(@($exApps) -join ', ')|SUGGESTION:If justified: Add to CapExclusions Applications in ScubaConfig"
-                $meetsCriteria = $false
-            }
-        }
-
-        # Excluded guest / external user types. ScubaGear now lets these be waived via
-        # CapExclusions.GuestUserTypes, so treat them as a config-waivable WARNING where the
-        # control supports CapExclusions and targets All users; otherwise it is a setting error.
-        $requiresAllUsers = ($requirements.PSObject.Properties.Name -contains 'conditions') -and
-                            ($requirements.conditions.PSObject.Properties.Name -contains 'users') -and
-                            ($requirements.conditions.users.PSObject.Properties.Name -contains 'includeUsers') -and
-                            (@($requirements.conditions.users.includeUsers) -contains 'All')
-        if ($requiresAllUsers) {
-            $exGuest = $policy.Conditions.Users.ExcludeGuestsOrExternalUsers
-            $guestTypes = @()
-            if ($exGuest -and $exGuest.GuestOrExternalUserTypes) {
-                $g = $exGuest.GuestOrExternalUserTypes
-                $guestTypes = if ($g -is [string]) { @($g -split '\s*,\s*' | Where-Object { $_ }) } else { @($g | Where-Object { $_ }) }
-            }
-            if (@($guestTypes).Count -gt 0) {
-                if ($supportsCap) {
-                    $excludedCount += @($guestTypes).Count
-                    $policyIssues += "WARNING: Policy has $(@($guestTypes).Count) excluded guest/external user type(s)|DETAILS:Guest user types: $(@($guestTypes) -join ', ')|SUGGESTION:If justified: Add to CapExclusions GuestUserTypes in ScubaConfig"
-                    $meetsCriteria = $false
-                } else {
-                    $policyIssues += "ERROR: Policy excludes guest/external user types ($(@($guestTypes) -join ', ')); this control does not support guest exclusions - remove them from the policy."
-                    $meetsCriteria = $false
-                }
-            }
-        }
-
-        # Only include policies that are actually relevant to THIS control, using the
-        # unique characteristics declared in the requirements.
-        $hasRelevantConfig = $false
-        if ($requirements.PSObject.Properties.Name -contains 'conditions') {
-            if ($requirements.conditions.PSObject.Properties.Name -contains 'clientAppTypes') {
-                $requiredTypes = $requirements.conditions.clientAppTypes
-                $matchingTypes = 0
-                if ($policy.Conditions.ClientAppTypes) {
-                    foreach ($type in $requiredTypes) {
-                        if ($policy.Conditions.ClientAppTypes -contains $type) { $matchingTypes++ }
-                    }
-                }
-                if ($matchingTypes -eq @($requiredTypes).Count) { $hasRelevantConfig = $true }
-            }
-            if ($requirements.conditions.PSObject.Properties.Name -contains 'userRiskLevels') {
-                if ($policy.Conditions.UserRiskLevels) {
-                    foreach ($level in $requirements.conditions.userRiskLevels) {
-                        if ($policy.Conditions.UserRiskLevels -contains $level) { $hasRelevantConfig = $true; break }
-                    }
-                }
-            }
-            if ($requirements.conditions.PSObject.Properties.Name -contains 'signInRiskLevels') {
-                if ($policy.Conditions.SignInRiskLevels) {
-                    foreach ($level in $requirements.conditions.signInRiskLevels) {
-                        if ($policy.Conditions.SignInRiskLevels -contains $level) { $hasRelevantConfig = $true; break }
-                    }
-                }
-            }
-        }
-        if (-not $hasRelevantConfig -and $requirements.PSObject.Properties.Name -contains 'grantControls') {
-            $gc = $requirements.grantControls
-            if ($gc.PSObject.Properties.Name -contains 'anyOf') {
-                # Alternatives (e.g. MFA via built-in control OR MFA authentication strength).
-                if (Test-ScAGrantControlRelevance -Policy $policy -GrantReq $gc) { $hasRelevantConfig = $true }
-            }
-            elseif ($gc.PSObject.Properties.Name -contains 'authenticationStrength') {
-                if ($policy.GrantControls.AuthenticationStrength.Id -eq $gc.authenticationStrength.id) {
-                    $hasRelevantConfig = $true
-                }
-            }
-        }
-
-        # Scope gate: a policy is only usable for a ScubaGear pass if it targets the scope
-        # the requirement demands - All users and/or All cloud apps. Persona / admin-scoped
-        # policies would need major changes (not config), so they are not candidates.
-        # Exclusions (users/groups/apps/guests) do not affect scope membership.
-        $inScope = $true
-        if ($requirements.PSObject.Properties.Name -contains 'conditions') {
-            $reqCond = $requirements.conditions
-            if (($reqCond.PSObject.Properties.Name -contains 'users') -and
-                ($reqCond.users.PSObject.Properties.Name -contains 'includeUsers') -and
-                (@($reqCond.users.includeUsers) -contains 'All') -and
-                (@($policy.Conditions.Users.IncludeUsers) -notcontains 'All')) {
-                $inScope = $false
-            }
-            if (($reqCond.PSObject.Properties.Name -contains 'applications') -and
-                ($reqCond.applications.PSObject.Properties.Name -contains 'includeApplications') -and
-                (@($reqCond.applications.includeApplications) -contains 'All') -and
-                (@($policy.Conditions.Applications.IncludeApplications) -notcontains 'All')) {
-                $inScope = $false
-            }
-        }
+        # 3. Keep only policies relevant to THIS control and in the required scope
+        #    (both are driven by the relevanceSignals / scopeGates rules).
+        $hasRelevantConfig = Test-ScAPolicyRelevance -Policy $policy -Requirements $requirements -Rules $rules
+        $inScope           = Test-ScAPolicyInScope   -Policy $policy -Requirements $requirements -Rules $rules
 
         if ($hasRelevantConfig -and $inScope) {
             $allPoliciesData += @{
                 DisplayName   = $policy.DisplayName
                 Id            = $policy.Id
-                State         = $policy.State
+                State         = (Get-ScAValueAtPath -Object $policy -Path $stateProp)
                 MeetsCriteria = $meetsCriteria
                 Issues        = $policyIssues
                 IssueCount    = @($policyIssues).Count
-                SettingIssueCount = @($policyIssues | Where-Object { $_ -notmatch 'Policy has \d+ excluded' }).Count
+                SettingIssueCount = @($settingIssues).Count
                 ExcludedPrincipalCount = $excludedCount
-                DetectedExclusions = (Get-ScAExclusionsFromIssues -Issues $policyIssues)
+                DetectedExclusions = @{
+                    Users          = @($detected.Users          | Select-Object -Unique)
+                    Groups         = @($detected.Groups         | Select-Object -Unique)
+                    Applications   = @($detected.Applications   | Select-Object -Unique)
+                    GuestUserTypes = @($detected.GuestUserTypes | Select-Object -Unique)
+                }
             }
         }
     }
@@ -754,7 +805,8 @@ function Invoke-ScubaConfigAnalysis {
     $baselineSchema = Get-Content $BaselineSchemaPath -Raw | ConvertFrom-Json
     $analyzerSchema = Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json
 
-    $script:ScAFriendlyNames = if ($analyzerSchema.RequirementFriendlyNames.default) { $analyzerSchema.RequirementFriendlyNames.default } elseif ($analyzerSchema.RequirementFriendlyNames) { $analyzerSchema.RequirementFriendlyNames } else { $null }
+    # Load analyzer rules (product map, friendly names, CA condition rules) from the schema.
+    Import-ScAAnalyzerRules -AnalyzerSchema $analyzerSchema
 
     $findings = @()
     $summary  = @{ Passes = 0; Failures = 0; Warnings = 0; Errors = 0; Manual = 0 }
@@ -804,7 +856,7 @@ function Invoke-ScubaConfigAnalysis {
                 $bestMatch      = if (@($sortedPolicies).Count -gt 0) { $sortedPolicies[0] } else { $null }
 
                 $detectedExclusions = if ($bestMatch) {
-                    Get-ScAExclusionsFromIssues -Issues @($bestMatch.Issues)
+                    $bestMatch.DetectedExclusions
                 } else {
                     @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
                 }
@@ -1041,9 +1093,7 @@ function Get-ScAActionClassification {
     if ($best.MeetsCriteria) {
         return @{ Result = 'Pass'; Action = 'NONE'; RootCause = 'A Conditional Access policy already satisfies this baseline.' }
     }
-    $exIssues      = @($best.Issues | Where-Object { $_ -match 'Policy has \d+ excluded' })
-    $settingIssues = @($best.Issues | Where-Object { $_ -notmatch 'Policy has \d+ excluded' })
-    if (@($settingIssues).Count -eq 0 -and @($exIssues).Count -gt 0) {
+    if ($best.SettingIssueCount -eq 0 -and $best.ExcludedPrincipalCount -gt 0) {
         return @{ Result = 'Fail'; Action = 'ADD_EXCLUSIONS'; RootCause = 'The best-matching policy meets this baseline but excludes users/groups/apps/guests. Add them to your config to pass.' }
     }
     return @{ Result = 'Fail'; Action = 'FIX_POLICY'; RootCause = 'The best-matching policy needs configuration changes to pass this baseline.' }
@@ -1056,37 +1106,41 @@ function Get-ScAActionClassification {
 function Get-ScubaAnalyzerScopes {
     <#
     .SYNOPSIS
-    Aggregates the Microsoft Graph delegated scopes a product's controls need, resolved
-    from the API catalog (least permissions per cmdlet named in the baseline schema).
+    Aggregates the Microsoft Graph delegated scopes a product needs, resolved from the API
+    catalog: least permissions for every cmdlet named in the baseline schema (apiPermissionRef)
+    plus every cmdlet behind a named analyzer apiOperation (CA read, organization, name
+    lookups). Fully JSON-driven - the only hardcoded scope is a Directory.Read.All safety net
+    used when the catalog cannot be read at all.
     #>
     param(
         [Parameter(Mandatory)][string]$Product,
         [Parameter(Mandatory)]$BaselineSchema,
-        [string]$ApiCatalogPath
+        [string]$ApiCatalogPath,
+        [string]$AnalyzerSchemaPath
     )
+
+    Import-ScAApiCatalog -ApiCatalogPath $ApiCatalogPath
+    if ($AnalyzerSchemaPath -and (Test-Path $AnalyzerSchemaPath)) {
+        try { Import-ScAAnalyzerRules -AnalyzerSchema (Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json) } catch { }
+    }
 
     $prod = $Product.ToLower()
     $cmdlets = @()
     if ($BaselineSchema.baselineValidations.PSObject.Properties.Name -contains $prod) {
         foreach ($c in $BaselineSchema.baselineValidations.$prod) { if ($c.apiPermissionRef) { $cmdlets += $c.apiPermissionRef } }
     }
+    # The named operations (CA read, organization, user/group/SP lookups) need scopes too.
+    foreach ($op in $script:ScAApiOperations.Values) { if ($op.cmdlet) { $cmdlets += [string]$op.cmdlet } }
     $cmdlets = @($cmdlets | Select-Object -Unique)
 
     $scopes = New-Object System.Collections.Generic.HashSet[string]
-    if ($ApiCatalogPath -and (Test-Path $ApiCatalogPath)) {
-        try {
-            $catalog = Get-Content $ApiCatalogPath -Raw | ConvertFrom-Json
-            foreach ($cmd in $cmdlets) {
-                $entry = $catalog | Where-Object { $_.moduleCmdlet -eq $cmd } | Select-Object -First 1
-                if ($entry -and $entry.leastPermissions) {
-                    foreach ($p in @($entry.leastPermissions)) { if ($p) { [void]$scopes.Add([string]$p) } }
-                }
-            }
-        } catch { }
+    foreach ($cmd in $cmdlets) {
+        $entry = if ($script:ScAApiCatalog.ContainsKey($cmd)) { $script:ScAApiCatalog[$cmd] } else { $null }
+        if ($entry -and $entry.leastPermissions) {
+            foreach ($p in @($entry.leastPermissions)) { if ($p) { [void]$scopes.Add([string]$p) } }
+        }
     }
-    # Always include CA policy + directory read (tenant/org details + name resolution).
-    [void]$scopes.Add('Policy.Read.All')
-    [void]$scopes.Add('Directory.Read.All')
+    if ($scopes.Count -eq 0) { [void]$scopes.Add('Directory.Read.All') }   # safety net when the catalog is unavailable
     return @($scopes)
 }
 
@@ -1142,43 +1196,41 @@ function Invoke-ScubaGraphGet {
 function Get-ScADisplayNameLookup {
     <#
     .SYNOPSIS
-    Best-effort resolve of display names for users, groups, and applications excluded
-    across the given Conditional Access policies, via Microsoft Graph. Returns id -> name,
-    used to annotate the generated YAML. Requires an active Graph connection; failures for
-    individual ids are ignored (the id is simply left uncommented).
+    Best-effort resolve of display names for excluded principals/apps across the given
+    Conditional Access policies. Which policy paths to read and which Graph operation resolves
+    each are declared in the analyzer schema's displayNameLookup rules (the actual URLs come
+    from the API catalog). Returns id -> name to annotate the generated YAML. Requires an
+    active Graph connection; per-id failures are ignored.
     #>
     param([array]$Policies = @())
 
     $lookup = @{}
+    $rules = $script:ScACaRules
+    if (-not $rules -or -not $rules.displayNameLookup -or -not $rules.displayNameLookup.rules) { return $lookup }
     $guidRe = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
 
-    $userIds = @(); $groupIds = @(); $appIds = @()
-    foreach ($p in @($Policies)) {
-        $userIds  += @($p.conditions.users.excludeUsers)
-        $groupIds += @($p.conditions.users.excludeGroups)
-        $appIds   += @($p.conditions.applications.excludeApplications)
-    }
-    $userIds  = @($userIds  | Where-Object { $_ -match $guidRe } | Select-Object -Unique)
-    $groupIds = @($groupIds | Where-Object { $_ -match $guidRe } | Select-Object -Unique)
-    $appIds   = @($appIds   | Where-Object { $_ -match $guidRe } | Select-Object -Unique)
+    foreach ($rule in @($rules.displayNameLookup.rules)) {
+        $ids = @()
+        foreach ($p in @($Policies)) { $ids += @(Get-ScAValueAtPath -Object $p -Path $rule.policyPath) }
+        $ids = @($ids | Where-Object { $_ -match $guidRe } | Select-Object -Unique)
+        if (@($ids).Count -eq 0) { continue }
 
-    foreach ($id in $userIds) {
-        try {
-            $o = Invoke-MgGraphRequest -Method GET -Uri ("/v1.0/users/$id" + '?$select=displayName,userPrincipalName') -OutputType PSObject -ErrorAction Stop
-            if ($o) { $lookup[$id] = if ($o.displayName) { $o.displayName } else { $o.userPrincipalName } }
-        } catch { }
-    }
-    foreach ($id in $groupIds) {
-        try {
-            $o = Invoke-MgGraphRequest -Method GET -Uri ("/v1.0/groups/$id" + '?$select=displayName') -OutputType PSObject -ErrorAction Stop
-            if ($o -and $o.displayName) { $lookup[$id] = $o.displayName }
-        } catch { }
-    }
-    foreach ($id in $appIds) {
-        try {
-            $o = Invoke-MgGraphRequest -Method GET -Uri ("/v1.0/servicePrincipals(appId='$id')" + '?$select=displayName') -OutputType PSObject -ErrorAction Stop
-            if ($o -and $o.displayName) { $lookup[$id] = $o.displayName }
-        } catch { }
+        $op = if ($script:ScAApiOperations.ContainsKey([string]$rule.operation)) { $script:ScAApiOperations[[string]$rule.operation] } else { $null }
+        $nameProps = if ($op -and $op.nameProperties) { @($op.nameProperties) } else { @('displayName') }
+
+        foreach ($id in $ids) {
+            $uri = Resolve-ScAApiResource -Operation ([string]$rule.operation) -Id $id
+            if (-not $uri) { continue }
+            try {
+                $o = Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject -ErrorAction Stop
+                if ($o) {
+                    foreach ($np in $nameProps) {
+                        $val = ($o.PSObject.Properties | Where-Object { $_.Name -ieq [string]$np } | Select-Object -First 1).Value
+                        if ($val) { $lookup[$id] = $val; break }
+                    }
+                }
+            } catch { }
+        }
     }
     return $lookup
 }
@@ -1199,21 +1251,20 @@ function Get-ScubaTenantGraphData {
     param(
         [Parameter(Mandatory)][string]$Product,
         [Parameter(Mandatory)]$BaselineSchema,
-        [string]$ApiCatalogPath
+        [string]$ApiCatalogPath,
+        [string]$AnalyzerSchemaPath
     )
 
     Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
 
-    $data = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{} }
-
-    # cmdlet -> apiResource map from the catalog (JSON-driven, changeable).
-    $resourceMap = @{}
-    if ($ApiCatalogPath -and (Test-Path $ApiCatalogPath)) {
-        try {
-            $catalog = Get-Content $ApiCatalogPath -Raw | ConvertFrom-Json
-            foreach ($e in $catalog) { if ($e.moduleCmdlet -and $e.apiResource) { $resourceMap[$e.moduleCmdlet] = $e.apiResource } }
-        } catch { }
+    # Load the analyzer rules (named operations) + API catalog so every URL below is
+    # resolved from ScubaGearApiCatalog.json rather than hardcoded here.
+    if ($AnalyzerSchemaPath -and (Test-Path $AnalyzerSchemaPath)) {
+        try { Import-ScAAnalyzerRules -AnalyzerSchema (Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json) } catch { }
     }
+    Import-ScAApiCatalog -ApiCatalogPath $ApiCatalogPath
+
+    $data = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{} }
 
     $prod = $Product.ToLower()
     $controls = @()
@@ -1221,37 +1272,42 @@ function Get-ScubaTenantGraphData {
         $controls = @($BaselineSchema.baselineValidations.$prod)
     }
 
-    # Tenant identity.
+    # Tenant identity + organization (resource resolved from the catalog).
     try { $ctx = Get-MgContext; if ($ctx) { $data.TenantId = $ctx.TenantId } } catch { }
     try {
-        $org = @(Invoke-ScubaGraphGet -Uri '/v1.0/organization')
-        if (@($org).Count -gt 0) {
-            $data.OrgDisplayName = $org[0].displayName
-            # Organization = the tenant's PRIMARY (default) verified domain, so a custom
-            # domain set as primary is used. Fall back to the initial onmicrosoft.com
-            # domain, then to the first verified domain.
-            $domains = @($org[0].verifiedDomains)
-            $primary = @($domains | Where-Object { $_.isDefault -eq $true })
-            if (@($primary).Count -eq 0) { $primary = @($domains | Where-Object { $_.isInitial -eq $true }) }
-            if (@($primary).Count -eq 0) { $primary = $domains }
-            if (@($primary).Count -gt 0) { $data.Organization = $primary[0].name }
+        $orgUri = Resolve-ScAApiResource -Operation 'organization'
+        if ($orgUri) {
+            $org = @(Invoke-ScubaGraphGet -Uri $orgUri)
+            if (@($org).Count -gt 0) {
+                $data.OrgDisplayName = $org[0].displayName
+                # Organization = the tenant's PRIMARY (default) verified domain, so a custom
+                # domain set as primary is used. Fall back to the initial onmicrosoft.com
+                # domain, then to the first verified domain.
+                $domains = @($org[0].verifiedDomains)
+                $primary = @($domains | Where-Object { $_.isDefault -eq $true })
+                if (@($primary).Count -eq 0) { $primary = @($domains | Where-Object { $_.isInitial -eq $true }) }
+                if (@($primary).Count -eq 0) { $primary = $domains }
+                if (@($primary).Count -gt 0) { $data.Organization = $primary[0].name }
+            }
         }
     } catch { }
 
-    # Conditional Access policies: resolve the read resource for the CA cmdlet.
-    $caCmdlet = 'Get-MgBetaIdentityConditionalAccessPolicy'
-    $usesCa = @($controls | Where-Object { $_.apiPermissionRef -eq $caCmdlet }).Count -gt 0
+    # Conditional Access policies: read only when a control uses the CA operation's cmdlet.
+    $caOp = if ($script:ScAApiOperations.ContainsKey('conditionalAccessPolicies')) { $script:ScAApiOperations['conditionalAccessPolicies'] } else { $null }
+    $caCmdlet = if ($caOp) { [string]$caOp.cmdlet } else { $null }
+    $usesCa = $caCmdlet -and (@($controls | Where-Object { $_.apiPermissionRef -eq $caCmdlet }).Count -gt 0)
     if ($usesCa) {
-        $uri = $null
-        if ($resourceMap.ContainsKey($caCmdlet)) { $uri = $resourceMap[$caCmdlet] }
+        $uri = Resolve-ScAApiResource -Operation 'conditionalAccessPolicies'
         if (-not $uri) {
+            # Fall back to the baseline's own create-resource for the CA cmdlet if the catalog lacks it.
             $caControl = @($controls | Where-Object { $_.apiPermissionRef -eq $caCmdlet -and $_.buildInstructions.apiResourceCreate })[0]
             if ($caControl) { $uri = $caControl.buildInstructions.apiResourceCreate }
         }
-        if (-not $uri) { $uri = '/beta/identity/conditionalAccess/policies' }
-        $data.conditional_access_policies = @(Invoke-ScubaGraphGet -Uri $uri)
-        # Resolve display names for excluded principals/apps so the generated YAML can be annotated.
-        try { $data.DisplayNameLookup = Get-ScADisplayNameLookup -Policies $data.conditional_access_policies } catch { }
+        if ($uri) {
+            $data.conditional_access_policies = @(Invoke-ScubaGraphGet -Uri $uri)
+            # Resolve display names for excluded principals/apps so the generated YAML can be annotated.
+            try { $data.DisplayNameLookup = Get-ScADisplayNameLookup -Policies $data.conditional_access_policies } catch { }
+        }
     }
 
     return $data
@@ -1289,7 +1345,8 @@ function Invoke-ScubaTenantScan {
 
     $baselineSchema = Get-Content $BaselineSchemaPath -Raw | ConvertFrom-Json
     $analyzerSchema = Get-Content $AnalyzerSchemaPath -Raw | ConvertFrom-Json
-    $script:ScAFriendlyNames = if ($analyzerSchema.RequirementFriendlyNames.default) { $analyzerSchema.RequirementFriendlyNames.default } elseif ($analyzerSchema.RequirementFriendlyNames) { $analyzerSchema.RequirementFriendlyNames } else { $null }
+    # Load analyzer rules (product map, friendly names, CA condition rules) from the schema.
+    Import-ScAAnalyzerRules -AnalyzerSchema $analyzerSchema
 
     $findings = @()
     $summary  = @{ Passes = 0; Failures = 0; Warnings = 0; Errors = 0; Manual = 0 }
@@ -1339,7 +1396,7 @@ function Invoke-ScubaTenantScan {
 
             $sortedPolicies = @($policyAnalysis.AllPolicies | Sort-Object { $_.SettingIssueCount }, { $_.ExcludedPrincipalCount }, { $_.IssueCount })
             $bestMatch      = if (@($sortedPolicies).Count -gt 0) { $sortedPolicies[0] } else { $null }
-            $detectedExclusions = if ($bestMatch) { Get-ScAExclusionsFromIssues -Issues @($bestMatch.Issues) } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
+            $detectedExclusions = if ($bestMatch) { $bestMatch.DetectedExclusions } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
             $missingSettings = @()
             foreach ($p in @($policyAnalysis.AllPolicies)) { $missingSettings += $p.Issues }
 

@@ -169,19 +169,58 @@
 
         <!-- ============ Toolbar ============ -->
         <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="14,10">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Product:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
-                <ComboBox x:Name="Product_ComboBox" Width="150" Margin="0,0,14,0" VerticalContentAlignment="Center"/>
-                <TextBlock Text="Environment:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
-                <ComboBox x:Name="Environment_ComboBox" Width="130" Margin="0,0,14,0" VerticalContentAlignment="Center"/>
-                <Button x:Name="Run_Button" Content="Connect &amp; Scan Tenant" Style="{StaticResource RunButton}"/>
-                <Button x:Name="Load_Button" Content="Load Results JSON..." Style="{StaticResource SecondaryButton}" ToolTip="Optional: analyze an existing ScubaGear results JSON instead of scanning live"/>
-                <Separator Margin="6,0" Background="#E0E0E0"/>
-                <CheckBox x:Name="IssuesOnly_CheckBox" Content="Issues only" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="Hide controls that already pass"/>
-                <CheckBox x:Name="ConfigurableOnly_CheckBox" Content="Configurable only" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="Show only policies a ScubaGear config file can make pass (exclusions/allow-lists)"/>
-                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
-                <TextBox x:Name="Search_TextBox" Width="170" VerticalContentAlignment="Center"/>
-            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 0: products (left, horizontal) + environment + actions (right) -->
+                <DockPanel Grid.Row="0" LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Environment:" VerticalAlignment="Center" Margin="12,0,6,0" Foreground="#444444"/>
+                        <ComboBox x:Name="Environment_ComboBox" Width="130" Margin="0,0,12,0" VerticalContentAlignment="Center"/>
+                        <Button x:Name="Run_Button" Content="Connect &amp; Scan Tenant" Style="{StaticResource RunButton}"/>
+                        <Button x:Name="Load_Button" Content="Load Results JSON..." Style="{StaticResource SecondaryButton}" Margin="8,0,0,0" ToolTip="Optional: analyze an existing ScubaGear results JSON instead of scanning live"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Left" Text="Products:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
+                    <ListBox x:Name="Product_ListBox" SelectionMode="Multiple" BorderThickness="0" Background="Transparent"
+                             VerticalAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                             ToolTip="Select one or more configurable products (only products that support exclusions are listed)">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Margin" Value="0,0,14,0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <ContentPresenter/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Display}" IsHitTestVisible="False"
+                                          IsChecked="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}, Mode=TwoWay}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+
+                <!-- Row 1: findings filters + search -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                    <CheckBox x:Name="IssuesOnly_CheckBox" Content="Issues only" VerticalAlignment="Center" Margin="0,0,16,0" ToolTip="Hide controls that already pass"/>
+                    <CheckBox x:Name="ConfigurableOnly_CheckBox" Content="Configurable only" IsChecked="True" VerticalAlignment="Center" Margin="0,0,16,0" ToolTip="Show only policies a ScubaGear config file can make pass (exclusions/allow-lists)"/>
+                    <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#444444"/>
+                    <TextBox x:Name="Search_TextBox" Width="240" VerticalContentAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <!-- ============ Main ============ -->
