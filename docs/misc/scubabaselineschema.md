@@ -77,6 +77,12 @@ Each policy object represents a single security baseline control:
   "criticality": "SHALL",
   "lastModified": "January 2024",
   "implementation": "Instructions for implementing...",
+  "nistMapping": [
+    {
+      "Name": "NIST SP 800-53 Rev. 5 FedRAMP High Baseline: AC-2",
+      "Url": "https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_2_0/home?element=AC-02"
+    }
+  ],
   "mitreMapping": [
     {
       "Name": "Valid Accounts",
@@ -123,6 +129,7 @@ Each policy object represents a single security baseline control:
 | `criticality` | string | Criticality level: "SHALL", "SHOULD", "MAY", "3RD PARTY", "NOT-IMPLEMENTED" |
 | `lastModified` | string | Last modification date (format varies) |
 | `implementation` | string | Implementation instructions |
+| `nistMapping` | array | Array of NIST SP 800-53 Rev. 5 FedRAMP High Baseline mapping objects, each with a `Name` (control ID label) and `Url` (CPRT catalog element deep-link for the control) |
 | `mitreMapping` | array | Array of MITRE ATT&CK technique objects |
 | `resources` | array | Array of resource link objects |
 | `licenseRequirements` | array | Array of license requirement strings |
