@@ -102,12 +102,19 @@ try {
     $JsonContent = Get-Content $OutputFilePath -Raw | ConvertFrom-Json
     $ProductCount = $JsonContent.baselines.PSObject.Properties.Count
     $TotalPolicies = 0
+    $PoliciesWithNist = 0
     foreach ($product in $JsonContent.baselines.PSObject.Properties) {
         $TotalPolicies += $product.Value.Count
+        foreach ($policy in $product.Value) {
+            if ($policy.PSObject.Properties.Name.Contains('nistMapping') -and $policy.nistMapping.Count -gt 0) {
+                $PoliciesWithNist++
+            }
+        }
     }
 
     Write-Output "Products: $ProductCount"
     Write-Output "Total Policies: $TotalPolicies"
+    Write-Output "Policies with NIST mapping: $PoliciesWithNist"
     Write-Output "Version: $($JsonContent.Version)"
 
     # Validate if requested

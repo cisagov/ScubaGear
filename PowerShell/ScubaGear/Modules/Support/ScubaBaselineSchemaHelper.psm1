@@ -138,7 +138,7 @@ function Update-ScubaConfigBaselineWithMarkdown {
     An array of product names to filter the policies.
 
     .PARAMETER AdditionalFields
-    An array of additional fields to include in the policy objects. Available fields: criticality, lastModified, implementation, mitreMapping, resources, link, badges.
+    An array of additional fields to include in the policy objects. Available fields: criticality, lastModified, implementation, nistMapping, mitreMapping, resources, link, badges.
 
     .EXAMPLE
     Update-ScubaConfigBaselineWithMarkdown -BaselineFilePath ".\ScubaBaselines_en-US.json" -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
@@ -157,7 +157,7 @@ function Update-ScubaConfigBaselineWithMarkdown {
         [string[]]$ProductFilter = @(),
 
         [Parameter(Mandatory=$false)]
-        [string[]]$AdditionalFields = @("criticality", "lastModified", "implementation", "mitreMapping", "resources", "licenseRequirements", "link", "badges")
+        [string[]]$AdditionalFields = @("criticality", "lastModified", "implementation", "nistMapping", "mitreMapping", "resources", "licenseRequirements", "link", "badges")
     )
 
     # Get the exclusion mappings from markdown file markers
@@ -288,6 +288,11 @@ function Update-ScubaConfigBaselineWithMarkdown {
                     "implementation" {
                         if ($policy.Implementation) {
                             $policyObj['implementation'] = $policy.Implementation
+                        }
+                    }
+                    "nistMapping" {
+                        if ($policy.NIST_Mapping -and $policy.NIST_Mapping.Count -gt 0) {
+                            $policyObj['nistMapping'] = $policy.NIST_Mapping
                         }
                     }
                     "mitreMapping" {
@@ -620,6 +625,7 @@ function Get-ScubaBaselineSections {
                 $currentPolicy.Criticality = $policyDetails.Criticality
                 $currentPolicy.LastModified = $policyDetails.LastModified
                 $currentPolicy.Rationale = $policyDetails.Rationale
+                $currentPolicy.NIST_Mapping = $policyDetails.NIST_Mapping
                 $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
                 $currentPolicy.Badges = $policyDetails.Badges
                 # Extract implementation instructions for this policy
@@ -651,6 +657,7 @@ function Get-ScubaBaselineSections {
                 $currentPolicy.Criticality = $policyDetails.Criticality
                 $currentPolicy.LastModified = $policyDetails.LastModified
                 $currentPolicy.Rationale = $policyDetails.Rationale
+                $currentPolicy.NIST_Mapping = $policyDetails.NIST_Mapping
                 $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
                 $currentPolicy.Badges = $policyDetails.Badges
                 # Extract implementation instructions for this policy
@@ -695,6 +702,7 @@ function Get-ScubaBaselineSections {
         $currentPolicy.Criticality = $policyDetails.Criticality
         $currentPolicy.LastModified = $policyDetails.LastModified
         $currentPolicy.Rationale = $policyDetails.Rationale
+        $currentPolicy.NIST_Mapping = $policyDetails.NIST_Mapping
         $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
         $currentPolicy.Badges = $policyDetails.Badges
         $currentPolicy.Implementation = Get-ScubaPolicyImplementation -Content $Content -PolicyId $currentPolicy.PolicyId
@@ -829,6 +837,7 @@ function Get-ScubaPolicyContent {
         Criticality = $null
         LastModified = $null
         Rationale = $null
+        NIST_Mapping = @()
         MITRE_Mapping = @()
         Badges = @()
         LicenseRequirements = @()
@@ -842,6 +851,30 @@ function Get-ScubaPolicyContent {
     if ($Content -match '(?s)- _Rationale:_\s*(.+?)(?=\n\s*-|\n\s*\n|\z)') {
         $rationale = $matches[1].Trim()
         $result.Rationale = $rationale -replace '\s+', ' '
+    }
+    # NIST SP 800-53 mapping is a single line of comma-separated control IDs (e.g., AC-2, AC-3, IA-8).
+    # Each control links to its CPRT catalog element; the control number is zero-padded (CM-7 -> CM-07).
+    if ($Content -match '- _NIST SP 800-53 Rev\. 5 FedRAMP High Baseline Mapping:_\s*(.+)') {
+        $nistLine = $matches[1].Trim()
+        if ($nistLine -and $nistLine -notmatch '^(N/?A|None)$') {
+            $cprtBase = 'https://csrc.nist.gov/projects/cprt/catalog#/cprt/framework/version/SP_800_53_5_2_0/home?element='
+            $result.NIST_Mapping = @(
+                $nistLine -split ',' |
+                    ForEach-Object { $_.Trim() } |
+                    Where-Object { $_ -ne '' } |
+                    ForEach-Object {
+                        $control = $_
+                        $element = $control
+                        if ($control -match '^([A-Za-z]+)-([0-9]+)(.*)$') {
+                            $element = '{0}-{1:D2}{2}' -f $matches[1], [int]$matches[2], $matches[3]
+                        }
+                        [ordered]@{
+                            Name = "NIST SP 800-53 Rev. 5 FedRAMP High Baseline: $control"
+                            Url  = $cprtBase + [uri]::EscapeDataString($element)
+                        }
+                    }
+            )
+        }
     }
     if ($Content -match '(_MITRE ATT&CK TTP Mapping:_[\s\S]+?)(\n\s*\n|###|$)') {
         $mitreBlock = $matches[1]
