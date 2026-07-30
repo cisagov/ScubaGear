@@ -32,7 +32,7 @@ function Connect-Tenant {
    $ServicePrincipalParams
    )
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
-   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Get-FullExceptionDetails
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
@@ -395,18 +395,19 @@ function Connect-Tenant {
            }
        }
        catch {
+           $ExceptionDetails = Get-FullExceptionDetails -ErrorRecord $_
            $ErrorDetails = @{
                Product = $Product
-               ErrorMessage = $_.Exception.Message
+               ErrorMessage = $ExceptionDetails.Message
                ErrorType = $_.Exception.GetType().FullName
-               ScriptStackTrace = $_.ScriptStackTrace
+               ScriptStackTrace = $ExceptionDetails.StackTrace
                TargetObject = if ($_.TargetObject) { $_.TargetObject.ToString() } else { "N/A" }
            }
 
            # Log detailed error information for troubleshooting
            Write-ScubaLog -Message "Authentication failed for product: $Product" -Level "Error" -Source "ConnectTenant" -Data $ErrorDetails
 
-           Write-Warning "Error establishing a connection with $($Product): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+           Write-Warning "Error establishing a connection with $($Product): $($ExceptionDetails.Message)`n$($ExceptionDetails.StackTrace)"
            $ProdAuthFailed += $Product
            Write-Warning "$($Product) will be omitted from the output because of failed authentication"
        }
