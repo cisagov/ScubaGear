@@ -407,7 +407,6 @@ function Connect-Tenant {
 
                     $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
                     $TokenData.TeamsBaseUrl = Get-TeamsBaseUrl -M365Environment $M365Environment
-                    Write-Information "Teams scope: $TeamsScope" -InformationAction Continue
                     if ($ServicePrincipalParams.CertThumbprintParams) {
                        $TokenData.TeamsAccessToken = Get-MsalAccessToken `
                            -Scope $TeamsScope `
@@ -433,7 +432,6 @@ function Connect-Tenant {
                            -Tenant $TenantName `
                            -M365Environment $M365Environment
                    }
-                   Write-Information "Teams token acquired successfully `n$($TokenData.TeamsAccessToken)" -InformationAction Continue
                }
                default {
                    throw "Invalid ProductName argument"

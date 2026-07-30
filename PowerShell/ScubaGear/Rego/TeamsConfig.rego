@@ -310,7 +310,10 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": [],
+    "ActualValue": {
+        "FederationConfiguration": FederationConfiguration,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
     "RequirementMet": true
 } if {
@@ -347,7 +350,10 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": FederationConfiguration,
+    "ActualValue": {
+        "FederationConfiguration": FederationConfiguration,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": ReportDetailsArray(Status, FederationConfiguration, String),
     "RequirementMet": Status
 } if {
@@ -366,7 +372,10 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": [],
+    "ActualValue": {
+        "InternalCannotEnable": InternalCannotEnable,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
     "RequirementMet": true
 } if {
@@ -386,7 +395,10 @@ tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": InternalCannotEnable,
+    "ActualValue": {
+        "InternalCannotEnable": InternalCannotEnable,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": ReportDetailsArray(Status, InternalCannotEnable, String),
     "RequirementMet": Status
 } if {
@@ -411,31 +423,19 @@ ConfigsAllowingEmail contains Policy.Identity if {
     Policy.AllowEmailIntoChannel == true
 }
 
-# Concat the AssignedPlan for each tenant in one comma separated string
-AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
-    some TenantConfig in input.teams_tenant_info
-}
-
-# If AssignedPlan (one of the tenant configs) contain the string
-# "GCC" and/or "DOD", return true, else return false
 default IsUSGovTenantRegion := false
 IsUSGovTenantRegion := true if {
-    GCCConditions := [
-        contains(AssignedPlans, "GCC"),
-        contains(AssignedPlans, "GCCHIGH"),
-        contains(AssignedPlans, "DOD")
-    ]
-    count(FilterArray(GCCConditions, true)) > 0
+    input.scuba_config.M365Environment in {"gcc", "gcchigh", "dod"}
 }
 
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
+    "Commandlet": ["Get-CsTeamsClientConfiguration"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
-        "AssignedPlans": AssignedPlans
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
     },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.4.1v1", Reason),
     "RequirementMet": true
@@ -453,10 +453,10 @@ ReportDetails4_1(false) := FAIL
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
+    "Commandlet": ["Get-CsTeamsClientConfiguration"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
-        "AssignedPlans": AssignedPlans
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
     },
     "ReportDetails": ReportDetails4_1(IsEnabled),
     "RequirementMet": IsEnabled
@@ -465,7 +465,7 @@ tests contains {
     IsEnabled := count(ConfigsAllowingEmail) == 0
 }
 
-# Edge case where pulling configuration from tenant fails
+# Edge case where client_configuration field is empty array
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
@@ -474,7 +474,7 @@ tests contains {
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
 } if {
-    count(input.teams_tenant_info) == 0
+    count(input.client_configuration) == 0
 }
 #--
 
