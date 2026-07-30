@@ -34,10 +34,17 @@ function Export-TeamsProvider {
     $MeetingPolicies = $Tracker.TryCommand("Get-TeamsMeetingPolicyRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
     $MeetingPoliciesJson = ConvertTo-Json -Depth 5 @($MeetingPolicies)
 
-    $FedConfig = ConvertTo-Json @($Tracker.TryCommand("Get-CsTenantFederationConfiguration"))
-    $ClientConfig = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsClientConfiguration"))
-    $AppPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsAppPermissionPolicy"))
-    $BroadcastPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-CsTeamsMeetingBroadcastPolicy"))
+    $FedConfig = $Tracker.TryCommand("Get-TeamsTenantFederationConfigurationRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $FedConfigJson = ConvertTo-Json -Depth 5 @($FedConfig)
+
+    $ClientConfig = $Tracker.TryCommand("Get-TeamsClientConfigurationRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $ClientConfigJson = ConvertTo-Json -Depth 5 @($ClientConfig)
+
+    $AppPolicies = $Tracker.TryCommand("Get-TeamsAppPermissionPolicyRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $AppPoliciesJson = ConvertTo-Json -Depth 5 @($AppPolicies)
+
+    $BroadcastPolicies = $Tracker.TryCommand("Get-TeamsMeetingBroadcastPolicyRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
+    $BroadcastPoliciesJson = ConvertTo-Json -Depth 5 @($BroadcastPolicies)
 
     # Determine which Teams app settings to retrieve based on authentication method
     # Two scenarios:
@@ -90,10 +97,10 @@ Org-wide app settings retrieved successfully.
     # Note the spacing and the last comma in the json is important
     $json = @"
     "meeting_policies": $MeetingPoliciesJson,
-    "federation_configuration": $FedConfig,
-    "client_configuration": $ClientConfig,
-    "app_policies": $AppPolicies,
-    "broadcast_policies": $BroadcastPolicies,
+    "federation_configuration": $FedConfigJson,
+    "client_configuration": $ClientConfigJson,
+    "app_policies": $AppPoliciesJson,
+    "broadcast_policies": $BroadcastPoliciesJson,
     "tenant_app_settings": $TenantAppSettings,
     "teams_successful_commands": $TeamsSuccessfulCommands,
     "teams_unsuccessful_commands": $TeamsUnSuccessfulCommands,

@@ -237,7 +237,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingBroadcastPolicy"],
+    "Commandlet": ["Get-TeamsMeetingBroadcastPolicyRest"],
     "ActualValue": Policy.BroadcastRecordingMode,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -257,7 +257,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingBroadcastPolicy"],
+    "Commandlet": ["Get-TeamsMeetingBroadcastPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -291,7 +291,7 @@ ExternalAccessConfig contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.2.1v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
     "ActualValue": ExternalAccessConfig,
     "ReportDetails": ReportDetailsArray(Status, ExternalAccessConfig, String),
     "RequirementMet": Status
@@ -309,7 +309,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
     "ActualValue": {
         "FederationConfiguration": FederationConfiguration,
         "IsUSGovTenantRegion": IsUSGovTenantRegion
@@ -349,7 +349,7 @@ FederationConfiguration contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
     "ActualValue": {
         "FederationConfiguration": FederationConfiguration,
         "IsUSGovTenantRegion": IsUSGovTenantRegion
@@ -371,7 +371,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
     "ActualValue": {
         "InternalCannotEnable": InternalCannotEnable,
         "IsUSGovTenantRegion": IsUSGovTenantRegion
@@ -394,7 +394,7 @@ InternalCannotEnable contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
     "ActualValue": {
         "InternalCannotEnable": InternalCannotEnable,
         "IsUSGovTenantRegion": IsUSGovTenantRegion
@@ -432,7 +432,7 @@ IsUSGovTenantRegion := true if {
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration"],
+    "Commandlet": ["Get-TeamsClientConfigurationRest"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
         "IsUSGovTenantRegion": IsUSGovTenantRegion
@@ -453,7 +453,7 @@ ReportDetails4_1(false) := FAIL
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration"],
+    "Commandlet": ["Get-TeamsClientConfigurationRest"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
         "IsUSGovTenantRegion": IsUSGovTenantRegion
@@ -469,7 +469,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration"],
+    "Commandlet": ["Get-TeamsClientConfigurationRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -547,7 +547,7 @@ GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
     "ActualValue": {"Policies": PoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
@@ -711,7 +711,7 @@ GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
     "ActualValue": {"Policies": PoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
@@ -875,7 +875,7 @@ GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
     "ActualValue": {"Policies": PoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
