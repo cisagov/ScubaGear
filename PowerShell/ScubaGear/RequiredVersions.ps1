@@ -2,17 +2,17 @@
 $ModuleList = @(
     @{
         ModuleName = 'MicrosoftTeams'
-        ModuleVersion = [version] '4.9.3'
-        MaximumVersion = [version] '7.8.0'
+        ModuleVersion = [version] '7.9.0'
+        MaximumVersion = [version] '7.9.0'
         Purpose = 'Microsoft Teams configuration management'
         IsPinned = "False"
     },
     @{
         ModuleName = 'Microsoft.Graph.Authentication'
-        ModuleVersion = [version] '2.0.0'
-        MaximumVersion = [version] '2.25.0'
+        ModuleVersion = [version] '2.38.1'
+        MaximumVersion = [version] '2.38.1'
         Purpose = 'Microsoft Graph API authentication'
-        IsPinned = "True"
+        IsPinned = "False"
     },
     @{
         ModuleName = 'powershell-yaml'
