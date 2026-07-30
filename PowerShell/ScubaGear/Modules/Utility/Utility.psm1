@@ -1,4 +1,54 @@
 
+function Get-FullExceptionDetails {
+    <#
+    .Description
+    Returns the full message and script stack trace for an error record.
+    Aggregate exception messages include the messages from all nested
+    exceptions.
+    .Functionality
+    Internal
+    .Parameter ErrorRecord
+    The error record to inspect.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [System.Management.Automation.ErrorRecord]
+        $ErrorRecord
+    )
+    process {
+        $Exception = $ErrorRecord.Exception
+        $Messages = @($Exception.Message)
+
+        if ($Exception -is [System.AggregateException]) {
+            $NestedExceptions = [System.Collections.Queue]::new()
+            foreach ($InnerException in $Exception.InnerExceptions) {
+                $NestedExceptions.Enqueue($InnerException)
+            }
+
+            while ($NestedExceptions.Count -gt 0) {
+                $NestedException = $NestedExceptions.Dequeue()
+                $Messages += $NestedException.Message
+
+                if ($NestedException -is [System.AggregateException]) {
+                    foreach ($InnerException in $NestedException.InnerExceptions) {
+                        $NestedExceptions.Enqueue($InnerException)
+                    }
+                }
+                elseif ($null -ne $NestedException.InnerException) {
+                    $NestedExceptions.Enqueue($NestedException.InnerException)
+                }
+            }
+        }
+
+        [PSCustomObject]@{
+            Message    = $Messages -join "`n"
+            StackTrace = $ErrorRecord.ScriptStackTrace
+        }
+    }
+}
+
 function Set-Utf8NoBom {
     <#
     .Description
@@ -782,6 +832,7 @@ function Invoke-ScubaRestMethod {
 }
 
 Export-ModuleMember -Function @(
+    'Get-FullExceptionDetails',
     'Get-Utf8NoBom',
     'Set-Utf8NoBom',
     'Invoke-GraphDirectly',

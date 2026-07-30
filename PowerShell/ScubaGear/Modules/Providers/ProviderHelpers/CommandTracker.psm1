@@ -5,7 +5,7 @@ Import-Module -Name $PSScriptRoot/AADHybridExchangeHelper.psm1 -Function Get-Leg
 Import-Module -Name $PSScriptRoot/EXORestHelper.psm1 -Function Invoke-EXORestMethod
 Import-Module -Name $PSScriptRoot/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformTenantSettingsRest, Get-PowerPlatformEnvironmentsRest, Get-PowerPlatformDlpPoliciesRest, Get-PowerPlatformTenantIsolationRest
 Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
-Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Get-FullExceptionDetails
 Import-Module -Name $PSScriptRoot/AADAppManagementPolicyHelper.psm1 -Function Get-AppManagementPolicies
 Import-Module -Name $PSScriptRoot/../../Utility/ScubaLogging.psm1 -Function Write-ScubaLog, Trace-ScubaFunction
 
@@ -75,15 +75,16 @@ class CommandTracker {
             $this.SuccessfulCommands += $TrackedCommand
         }
         catch {
+            $ExceptionDetails = Get-FullExceptionDetails -ErrorRecord $_
             if (-not $SuppressWarning) {
-                Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+                Write-Warning "Error running $($Command): $($ExceptionDetails.Message)`n$($ExceptionDetails.StackTrace)"
             }
 
             # We set the log level to Info here because Write-ScubaLog will track Warning or Error as a terminating error.
             Write-ScubaLog -Message "Error running command" -Level "Info" -Source "TryCommand" -Data @{
                 Command = $Command
-                Error   = $_.Exception.Message
-                StackTrace = $_.ScriptStackTrace
+                Error   = $ExceptionDetails.Message
+                StackTrace = $ExceptionDetails.StackTrace
             }
 
             $this.UnSuccessfulCommands += $TrackedCommand
