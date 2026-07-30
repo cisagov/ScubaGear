@@ -9,7 +9,7 @@ $ModuleList = @(
     },
     @{
         ModuleName = 'Microsoft.Graph.Authentication'
-        ModuleVersion = [version] '2.38.1'
+        ModuleVersion = [version] '2.30'
         MaximumVersion = [version] '2.38.1'
         Purpose = 'Microsoft Graph API authentication'
         IsPinned = "False"
