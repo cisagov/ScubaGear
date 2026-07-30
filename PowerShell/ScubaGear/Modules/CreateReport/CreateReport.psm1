@@ -649,11 +649,17 @@ function New-Report {
         $SensitiveUsersJson = ConvertTo-Json @($SensitiveUsers)
         $PartnerDomainsJson = ConvertTo-Json @($PartnerDomains)
         $AntiPhishPoliciesJson = ConvertTo-Json @($SettingsExport.anti_phish_policies) -Depth 5
+        $AntiPhishRulesJson = ConvertTo-Json @($SettingsExport.anti_phish_rules) -Depth 5
+        $ProtectionPolicyRulesJson = ConvertTo-Json @($SettingsExport.protection_policy_rules) -Depth 5
+        $AcceptedDomainsJson = ConvertTo-Json @($SettingsExport.accepted_domains) -Depth 5
     }
     else {
         $SensitiveUsersJson = "null"
         $PartnerDomainsJson = "null"
         $AntiPhishPoliciesJson = "null"
+        $AntiPhishRulesJson = "null"
+        $ProtectionPolicyRulesJson = "null"
+        $AcceptedDomainsJson = "null"
     }
 
     # Handle EXO-specific reporting
@@ -715,6 +721,9 @@ function New-Report {
         "<script type='application/json' id='securitysuite-sensitive-users-json'> $($SensitiveUsersJson) </script>"
         "<script type='application/json' id='securitysuite-partner-domains-json'> $($PartnerDomainsJson) </script>"
         "<script type='application/json' id='securitysuite-anti-phish-policies-json'> $($AntiPhishPoliciesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-phish-rules-json'> $($AntiPhishRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-protection-policy-rules-json'> $($ProtectionPolicyRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-accepted-domains-json'> $($AcceptedDomainsJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 

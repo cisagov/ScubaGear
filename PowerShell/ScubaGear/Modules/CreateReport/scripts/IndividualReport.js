@@ -9,11 +9,21 @@ window.addEventListener('DOMContentLoaded', () => {
     const securitySuiteSensitiveUsers = getJsonData('securitysuite-sensitive-users-json');
     const securitySuitePartnerDomains = getJsonData('securitysuite-partner-domains-json');
     const securitySuiteAntiPhishPolicies = getJsonData('securitysuite-anti-phish-policies-json');
+    const securitySuiteAntiPhishRules = getJsonData('securitysuite-anti-phish-rules-json');
+    const securitySuiteProtectionPolicyRules = getJsonData('securitysuite-protection-policy-rules-json');
+    const securitySuiteAcceptedDomains = getJsonData('securitysuite-accepted-domains-json');
 
     buildExpandableTable(caps, "caps");
     buildExpandableTable(riskyApps, "riskyApps", severityScoreWeights);
     buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs", severityScoreWeights);
-    buildSecuritySuiteConfigTables(securitySuiteSensitiveUsers, securitySuitePartnerDomains, securitySuiteAntiPhishPolicies);
+    buildSecuritySuiteConfigTables(
+        securitySuiteSensitiveUsers,
+        securitySuitePartnerDomains,
+        securitySuiteAntiPhishPolicies,
+        securitySuiteAntiPhishRules,
+        securitySuiteProtectionPolicyRules,
+        securitySuiteAcceptedDomains
+    );
 
     colorRows();
     applyScopeAttributes();

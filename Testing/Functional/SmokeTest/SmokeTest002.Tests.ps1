@@ -259,7 +259,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         @("Partner Domain")
                     }
                     else {
-                        @("Policy", "Enabled", "Users Protected", "Partner Domains Protected", "Safety Indicators")
+                            @("", "Policy", "Enabled", "Applicability", "Users Protected", "Partner Domains Protected", "Safety Indicators")
                     }
 
                     foreach ($Row in $Rows) {
@@ -278,7 +278,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         if ($RowData.Count -gt 0) {
                             $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
                             if ($TableClass -match "securitysuite-anti-phish-policies-table") {
-                                $RowData[1].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
+                                $RowData[2].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
                             }
                         }
                     }

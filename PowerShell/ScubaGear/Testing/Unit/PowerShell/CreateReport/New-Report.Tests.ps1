@@ -106,11 +106,26 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match "id='securitysuite-sensitive-users-json'"
                 $ReportContent | Should -Match "id='securitysuite-partner-domains-json'"
                 $ReportContent | Should -Match "id='securitysuite-anti-phish-policies-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-phish-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-protection-policy-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-accepted-domains-json'"
                 $ReportContent | Should -Match "jdoe@first.example.com"
                 $ReportContent | Should -Match "John Doe;jdoe@second.example.com"
                 $ReportContent | Should -Match "random.mail.example.com"
                 $ReportContent | Should -Match '"EnableFirstContactSafetyTips"'
                 $ReportContent | Should -Match "buildSecuritySuiteConfigTables"
+                $ReportContent | Should -Match 'document\.createElement\("ul"\)'
+                $ReportContent | Should -Match '"Applicability"'
+                $ReportContent | Should -Match '"Users included"'
+                $ReportContent | Should -Match '"Groups included"'
+                $ReportContent | Should -Match '"Domains included"'
+                $ReportContent | Should -Match '"Users excluded"'
+                $ReportContent | Should -Match '"Groups excluded"'
+                $ReportContent | Should -Match '"Domains excluded"'
+                $ReportContent | Should -Match 'createAntiPhishExpandButton'
+                $ReportContent | Should -Match 'createAntiPhishTruncationButton'
+                $ReportContent | Should -Match "Sensitive Users and Partner Domains are configured in the SecuritySuite config file\."
+                $ReportContent | Should -Match "Anti-Phish Protection Policies are exported from the tenant\."
             }
         }
     }
