@@ -21,7 +21,7 @@ The following PowerShell modules are required for ScubaGear to function properly
 
 | Module Name                                   | Minimum Version | Maximum Version  | Purpose                                      |
 |:---------------------------------------------:|:---------------:|:----------------:|:---------------------------------------------|
-| Microsoft.Graph.Authentication |           2.0.0 |           2.25.0 | Microsoft Graph API authentication |
+| Microsoft.Graph.Authentication |           2.38.1 |           2.38.1 | Microsoft Graph API authentication |
 | powershell-yaml |           0.4.2 |           0.4.12 | YAML file processing and configuration management |
 
 > **Note**: SharePoint and PowerPlatform data are now retrieved via REST API and no longer require Microsoft.Online.SharePoint.PowerShell or PnP.PowerShell modules.
