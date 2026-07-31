@@ -27,7 +27,7 @@ The following PowerShell modules are required for ScubaGear to function properly
 
 > **Note**: The maximum versions are updated to the latest available versions on a scheduled basis.
 
-ScubaGear bundles Microsoft Authentication Library (MSAL) binaries for Microsoft Graph authentication. Their versions, hashes, and approved Authenticode signers are recorded in `PowerShell/ScubaGear/dependencies/msal-lock.json` and validated during builds.
+ScubaGear bundles Microsoft Authentication Library (MSAL) binaries for Microsoft Graph authentication. Their versions, hashes, and Authenticode signer metadata are recorded in `PowerShell/ScubaGear/dependencies/msal-lock.json`. Builds enforce exact hashes and valid Microsoft Authenticode signatures.
 
 ## OPA Installation
 
