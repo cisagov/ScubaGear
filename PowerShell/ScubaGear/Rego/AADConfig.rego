@@ -363,6 +363,7 @@ tests contains {
 #--
 
 # Returns the auth policy migration state object
+default AuthenticationPolicyMigrationState := null
 AuthenticationPolicyMigrationState := PolicyMigrationState if {
     some Setting in input.authentication_method
     PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState

@@ -55,6 +55,11 @@ Describe "JSON-based Configuration System" {
             $disconnectDefault | Should -Be $false
         }
 
+        It "Should read UseSystemBrowserAuthentication default as true from JSON" {
+            $systemBrowserDefault = [ScubaConfig]::ScubaDefault('DefaultUseSystemBrowserAuthentication')
+            $systemBrowserDefault | Should -Be $true
+        }
+
         It "Should read LogIn default as true from JSON" {
             $loginDefault = [ScubaConfig]::ScubaDefault('DefaultLogIn')
             $loginDefault | Should -Be $true

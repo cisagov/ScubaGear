@@ -32,6 +32,9 @@ LogIn: true
 # DisconnectOnExit deletes the authentication tokens from the local system that were used to connect to the Microsoft APIs
 DisconnectOnExit: false
 
+# UseSystemBrowserAuthentication uses the system browser instead of WAM for delegated Graph and Teams authentication. Set to false to use WAM.
+UseSystemBrowserAuthentication: true
+
 # The following fields are used to authenticate to the M365 environment using service principal authentication.
 # Uncomment the following lines to use AppID and CertificateThumbprint for ServicePrincipal authentication.
 # Organization: tenant.onmicrosoft.com

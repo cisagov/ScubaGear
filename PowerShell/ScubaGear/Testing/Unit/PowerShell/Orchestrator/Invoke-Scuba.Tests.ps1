@@ -80,6 +80,18 @@ InModuleScope Orchestrator {
                 {Invoke-Scuba -SilenceBODWarnings} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-ReportCreation -Exactly -Times 1 -ParameterFilter {$Quiet -eq $false}
             }
+            It 'Uses system-browser authentication by default' {
+                {Invoke-Scuba -ProductNames aad,teams -SilenceBODWarnings} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-Connection -Exactly -Times 1 -ParameterFilter {
+                    $ScubaConfig.UseSystemBrowserAuthentication -eq $true
+                }
+            }
+            It 'Allows WAM authentication when explicitly requested' {
+                {Invoke-Scuba -ProductNames aad,teams -UseSystemBrowserAuthentication:$false -SilenceBODWarnings} | Should -Not -Throw
+                Should -Invoke -CommandName Invoke-Connection -Exactly -Times 1 -ParameterFilter {
+                    $ScubaConfig.UseSystemBrowserAuthentication -eq $false
+                }
+            }
             It 'Given -ProductNames aad should not throw' {
                 $SplatParams += @{
                     ProductNames = @("aad")

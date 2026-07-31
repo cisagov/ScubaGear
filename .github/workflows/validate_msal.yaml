@@ -1,0 +1,40 @@
+name: Validate bundled MSAL dependencies
+
+on:
+  pull_request:
+    paths:
+      - 'PowerShell/ScubaGear/dependencies/**'
+      - 'PowerShell/ScubaGear/lib/**'
+      - 'PowerShell/ScubaGear/runtimes/**'
+      - 'PowerShell/ScubaGear/Modules/Connection/**'
+      - 'utils/workflow/Update-Msal.ps1'
+      - 'utils/workflow/Test-MsalTeamsCompatibility.ps1'
+      - '.github/workflows/validate_msal.yaml'
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Validate signatures and hashes
+        run: |
+          . ./utils/workflow/Update-Msal.ps1
+          Test-MsalDependencyIntegrity -RepoRoot .
+
+      - name: Run updater tests
+        run: |
+          Import-Module Pester -MinimumVersion 5.0 -Force
+          $result = Invoke-Pester -Path ./Testing/workflow/Update-Msal.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { throw "$($result.FailedCount) updater tests failed." }
+
+      - name: Test MicrosoftTeams load order
+        run: |
+          ./utils/workflow/Test-MsalTeamsCompatibility.ps1 -RepoRoot . -TeamsVersion 7.9.0

@@ -4,14 +4,7 @@ ScubaGear uses Graph to assess Entra ID and Sharepoint, and one of the following
 
 ## Infinite Entra ID Signin Loop
 
-Sometimes the Entra ID sign-in prompt will get stuck in a loop, when using interactive mode, repeatedly asking for login credentials. This is likely an issue with the connection to Microsoft Graph. To fix the loop, run this command:
-
-```powershell
-# Delete the Graph tokens
-Disconnect-MgGraph
-```
-
-Then run ScubaGear again.
+Sometimes the Entra ID sign-in prompt will get stuck in a loop when using interactive mode. Close the current PowerShell session to clear ScubaGear's in-memory account and token cache, then run ScubaGear again.
 
 ## Key not valid for use in specified state.
 
@@ -24,6 +17,6 @@ rm -r C:\Users\johndoe\.graph
 
 After deleting the `.graph` folder in your home directory, re-run ScubaGear, and the error should disappear.
 
-## Could not load file or assembly 'Microsoft.Graph.Authentication'
+## Could not load a Microsoft.Identity.Client assembly
 
-This error can be seen when running ScubaGear. It indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by ScubaGear. Follow the instructions on the [dependencies page](../prerequisites/dependencies.md) and execute the `Initialize-SCuBA` cmdlet, which will ensure that the module versions get synchronized with dependencies. Then run the tool again.
+This indicates that another module loaded an incompatible MSAL assembly before ScubaGear, or that a bundled file failed validation. Start a new Windows PowerShell session and import ScubaGear before other Microsoft 365 modules. If the error continues, reinstall ScubaGear so the signed dependency files and lock manifest are restored.

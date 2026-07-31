@@ -128,6 +128,8 @@ function Invoke-SCuBA {
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter UseSystemBrowserAuthentication
+    Use the system browser instead of WAM for delegated Graph and Teams authentication.
     .Parameter ConfigFilePath
     Local file path to a JSON or YAML formatted configuration file.
     Configuration file parameters can be used in place of command-line
@@ -216,6 +218,11 @@ function Invoke-SCuBA {
         [ValidateNotNullOrEmpty()]
         [switch]
         $DisconnectOnExit,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
+        $UseSystemBrowserAuthentication = [ScubaConfig]::ScubaDefault('DefaultUseSystemBrowserAuthentication'),
 
         [Parameter(ParameterSetName = 'VersionOnly')]
         [ValidateNotNullOrEmpty()]
@@ -377,6 +384,7 @@ function Invoke-SCuBA {
                 'OPAPath' = $OPAPath
                 'LogIn' = $LogIn
                 'DisconnectOnExit' = $DisconnectOnExit
+                'UseSystemBrowserAuthentication' = $UseSystemBrowserAuthentication
                 'OutPath' = $OutPath
                 'OutFolderName' = $OutFolderName
                 'OutProviderFileName' = $OutProviderFileName
@@ -1934,6 +1942,10 @@ function Invoke-Connection {
     $ConnectTenantParams = @{
         'ProductNames' = $ScubaConfig.ProductNames;
         'M365Environment' = $ScubaConfig.M365Environment
+    }
+
+    if ($ScubaConfig.UseSystemBrowserAuthentication) {
+        $ConnectTenantParams += @{UseSystemBrowserAuthentication = $true}
     }
 
     if ($ScubaConfig.AppID) {

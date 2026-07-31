@@ -10,11 +10,22 @@ InModuleScope Connection {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            function Connect-GraphHelper {throw 'this will be mocked'}
+            function Connect-GraphHelper {
+                param($UseSystemBrowserAuthentication, $ServicePrincipalParams, $M365Environment, $Scopes)
+                throw 'this will be mocked'
+            }
             Mock Connect-GraphHelper -MockWith {}
             # SharePoint now uses REST API - no PnP/SPO connection needed
-            function Connect-MicrosoftTeams{throw 'this will be mocked'}
+            function Connect-MicrosoftTeams {
+                param($DisableWAM, $AccessTokens, $CertificateThumbprint, $ApplicationId, $TenantId, $TeamsEnvironmentName)
+                throw 'this will be mocked'
+            }
             Mock Connect-MicrosoftTeams -MockWith {}
+            function Get-TeamsAccessTokens {
+                param($M365Environment)
+                throw 'this will be mocked'
+            }
+            Mock Get-TeamsAccessTokens -MockWith { return @('mock-graph-token', 'mock-teams-token') }
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
             Mock Get-ExchangeOnlineApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
             function Get-ExchangeOnlineScope {throw 'this will be mocked'}
@@ -33,7 +44,10 @@ InModuleScope Connection {
                     }
                 }
             }
-            function Get-MsalAccessToken {throw 'this will be mocked'}
+            function Get-MsalAccessToken {
+                param($Scope, $ClientId, $Tenant, $M365Environment, $DisableBroker, $CertificateThumbprint, $AppID)
+                throw 'this will be mocked'
+            }
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
             }
@@ -75,6 +89,68 @@ InModuleScope Connection {
                 }
             }
 
+        }
+        Context 'System browser authentication' {
+            It 'disables broker for Exchange and Compliance token acquisition' {
+                Connect-Tenant -ProductNames 'exo' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Get-MsalAccessToken -Times 2 -ParameterFilter {
+                    $ClientId -eq 'fb78d390-0c51-40cd-8e17-fdbfab77341b' -and $DisableBroker
+                }
+            }
+
+            It 'disables broker for Power Platform token acquisition' {
+                Connect-Tenant -ProductNames 'powerplatform' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
+                    $ClientId -eq '1950a258-227b-4e31-a9cf-717495945fc2' -and $DisableBroker
+                }
+            }
+
+            It 'disables broker for SharePoint token acquisition' {
+                Connect-Tenant -ProductNames 'sharepoint' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
+                    $ClientId -eq '9bc3ab49-b65d-410a-85ad-de819febfddc' -and $DisableBroker
+                }
+            }
+
+            It 'uses system-browser Graph authentication and WAM for Teams on Windows PowerShell' {
+                Connect-Tenant -ProductNames 'aad', 'teams' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Connect-GraphHelper -Times 1 -ParameterFilter {
+                    $UseSystemBrowserAuthentication -and -not $ServicePrincipalParams
+                }
+                Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
+                Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
+                    -not $DisableWAM -and
+                    -not $AccessTokens -and
+                    -not $CertificateThumbprint
+                }
+            }
+
+            It 'retains WAM when system browser authentication is disabled' {
+                Connect-Tenant -ProductNames 'teams' -M365Environment $Endpoint
+                Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
+                Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
+                    -not $DisableWAM -and -not $AccessTokens -and -not $CertificateThumbprint
+                }
+            }
+
+            It 'does not pass delegated controls to service principal connections' {
+                $ServicePrincipalParams = @{
+                    CertThumbprintParams = @{
+                        AppID = 'a'
+                        CertificateThumbprint = 'b'
+                        Organization = 'c'
+                    }
+                }
+                Connect-Tenant -ProductNames 'aad', 'teams' -M365Environment $Endpoint `
+                    -ServicePrincipalParams $ServicePrincipalParams -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Connect-GraphHelper -Times 0 -ParameterFilter {
+                    $UseSystemBrowserAuthentication
+                }
+                Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
+                Should -Invoke -CommandName Connect-MicrosoftTeams -Times 0 -ParameterFilter {
+                    $DisableWAM -or $AccessTokens
+                }
+            }
         }
     }
 }

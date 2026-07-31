@@ -1,3 +1,5 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Get-TeamsAccessTokens, Invoke-ScubaGraphRequest -Force
+
 function Connect-Tenant {
     <#
    .Description
@@ -29,7 +31,13 @@ function Connect-Tenant {
    [Parameter(Mandatory = $false)]
    [AllowNull()]
    [hashtable]
-   $ServicePrincipalParams
+    $ServicePrincipalParams,
+
+    [Parameter(ParameterSetName = 'Auto')]
+    [Parameter(ParameterSetName = 'Manual')]
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $UseSystemBrowserAuthentication
    )
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
@@ -94,6 +102,9 @@ function Connect-Tenant {
                    if($ServicePrincipalParams) {
                     $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                    }
+                   elseif ($UseSystemBrowserAuthentication) {
+                       $GraphParams += @{UseSystemBrowserAuthentication = $true}
+                   }
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
@@ -106,6 +117,9 @@ function Connect-Tenant {
                            }
                            if ($ServicePrincipalParams) {
                                $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                           }
+                           elseif ($UseSystemBrowserAuthentication) {
+                               $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                            }
                            Connect-GraphHelper @LimitedGraphParams
                            $AADAuthRequired = $false
@@ -132,11 +146,14 @@ function Connect-Tenant {
                        }
                        else {
                            $EXOClientId = "fb78d390-0c51-40cd-8e17-fdbfab77341b"
-                           $TokenData.EXOAccessToken = Get-MsalAccessToken `
-                               -Scope $EXOScope `
-                               -ClientId $EXOClientId `
-                               -Tenant $TenantName `
-                               -M365Environment $M365Environment
+                           $EXOAuthParams = @{
+                               Scope = $EXOScope
+                               ClientId = $EXOClientId
+                               Tenant = $TenantName
+                               M365Environment = $M365Environment
+                               DisableBroker = $UseSystemBrowserAuthentication
+                           }
+                           $TokenData.EXOAccessToken = Get-MsalAccessToken @EXOAuthParams
                        }
 
                        # Resolve the EXO API endpoint (handles redirects)
@@ -162,11 +179,14 @@ function Connect-Tenant {
                                    -M365Environment $M365Environment
                            }
                            else {
-                               $TokenData.ComplianceAccessToken = Get-MsalAccessToken `
-                                   -Scope $ComplianceScope `
-                                   -ClientId $EXOClientId `
-                                   -Tenant $TenantName `
-                                   -M365Environment $M365Environment
+                               $ComplianceAuthParams = @{
+                                   Scope = $ComplianceScope
+                                   ClientId = $EXOClientId
+                                   Tenant = $TenantName
+                                   M365Environment = $M365Environment
+                                   DisableBroker = $UseSystemBrowserAuthentication
+                               }
+                               $TokenData.ComplianceAccessToken = Get-MsalAccessToken @ComplianceAuthParams
                            }
                            $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
                                -TenantId $TenantId `
@@ -190,6 +210,9 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
@@ -218,11 +241,14 @@ function Connect-Tenant {
 
                        # Azure PowerShell well-known client ID
                        $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                       $TokenData.PPAccessToken = Get-MsalAccessToken `
-                           -Scope $PPScope `
-                           -ClientId $PPClientId `
-                           -Tenant $TenantName `
-                           -M365Environment $M365Environment
+                       $PPAuthParams = @{
+                           Scope = $PPScope
+                           ClientId = $PPClientId
+                           Tenant = $TenantName
+                           M365Environment = $M365Environment
+                           DisableBroker = $UseSystemBrowserAuthentication
+                       }
+                       $TokenData.PPAccessToken = Get-MsalAccessToken @PPAuthParams
                    }
                    Write-Verbose "Power Platform token acquired successfully"
                }
@@ -234,6 +260,9 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
@@ -261,11 +290,16 @@ function Connect-Tenant {
                        else {
                            # SharePoint Online Management Shell app ID
                            $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
-                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                               -Scope $SPOScope `
-                               -ClientId $SPOClientId `
-                               -Tenant $TenantName `
-                               -M365Environment $M365Environment
+                           $SPOAuthParams = @{
+                               Scope = $SPOScope
+                               ClientId = $SPOClientId
+                               Tenant = $TenantName
+                               M365Environment = $M365Environment
+                           }
+                           if ($UseSystemBrowserAuthentication) {
+                               $SPOAuthParams.DisableBroker = $true
+                           }
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken @SPOAuthParams
                        }
                        Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false
@@ -280,6 +314,9 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
@@ -312,7 +349,7 @@ function Connect-Tenant {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                           $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           $UserLicenseResponse = Invoke-ScubaGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
                            $UserPlans = $UserLicenseResponse.value |
                                Where-Object { $null -ne $_.servicePlans } |
                                ForEach-Object { $_.servicePlans } |
@@ -359,11 +396,14 @@ function Connect-Tenant {
                                # Same ClientId as PowerPlatform - MSAL cache and SSO enable silent acquisition
                                # if PowerPlatform already signed in interactively this session.
                                $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                               $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                                   -Scope $PBIScope `
-                                   -ClientId $PBIClientId `
-                                   -Tenant $TenantName `
-                                   -M365Environment $M365Environment
+                               $PBIAuthParams = @{
+                                   Scope = $PBIScope
+                                   ClientId = $PBIClientId
+                                   Tenant = $TenantName
+                                   M365Environment = $M365Environment
+                                   DisableBroker = $UseSystemBrowserAuthentication
+                               }
+                               $TokenData.PBIAccessToken = Get-MsalAccessToken @PBIAuthParams
                            }
                            Write-Verbose "Power BI token acquired successfully"
                        }
@@ -378,6 +418,15 @@ function Connect-Tenant {
                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
                        }
                        $TeamsParams += $TeamsConnectToTenant
+                   }
+                   elseif ($UseSystemBrowserAuthentication) {
+                       if ($PSEdition -eq 'Desktop') {
+                           Write-Warning 'MicrosoftTeams 7.9.0 system-browser token authentication is not compatible with Windows PowerShell 5.1. Using WAM for Teams.'
+                       }
+                       else {
+                           $TeamsAccessTokens = @(Get-TeamsAccessTokens -M365Environment $M365Environment -DisableBroker)
+                           $TeamsParams += @{AccessTokens = $TeamsAccessTokens}
+                       }
                    }
                    switch ($M365Environment) {
                        "gcchigh" {
@@ -468,25 +517,25 @@ function Disconnect-SCuBATenant {
            Write-Progress -Activity "Disconnecting from each service" -Status "Disconnecting from $($Product); $($n) of $($Len) disconnected." -PercentComplete $Percent
            Write-Verbose "Disconnecting from $Product."
            if (($Product -eq "aad") -or ($Product -eq "sharepoint")) {
-               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               Disconnect-ScubaGraph -ErrorAction SilentlyContinue
                # SharePoint uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif ($Product -eq "teams") {
                Disconnect-MicrosoftTeams -Confirm:$false -ErrorAction SilentlyContinue
            }
            elseif ($Product -eq "powerplatform") {
-               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               Disconnect-ScubaGraph -ErrorAction SilentlyContinue
                # Power Platform uses REST API with on-demand token - no persistent connection to disconnect
            }
            elseif ($Product -eq "powerbi") {
-               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               Disconnect-ScubaGraph -ErrorAction SilentlyContinue
            }
            elseif (($Product -eq "exo") -or ($Product -eq "defender") -or ($Product -eq "securitysuite")) {
                if (($Product -eq "defender") -or ($Product -eq "securitysuite")) {
-                   Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+                   Disconnect-ScubaGraph -ErrorAction SilentlyContinue
                }
                # EXO now uses REST API with on-demand token - no persistent connection to disconnect
-               Disconnect-MgGraph -ErrorAction SilentlyContinue | Out-Null
+               Disconnect-ScubaGraph -ErrorAction SilentlyContinue
            }
            else {
                Write-Warning "Product $Product not recognized, skipping..."

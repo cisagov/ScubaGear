@@ -731,6 +731,8 @@ function New-SCuBAConfig {
     Defaults to "BaselineReports".
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter UseSystemBrowserAuthentication
+    Use the system browser instead of WAM for delegated Graph and Teams authentication.
     .Parameter ConfigFilePath
     Local file path to a JSON or YAML formatted configuration file.
     Configuration file parameters can be used in place of command-line
@@ -780,6 +782,12 @@ function New-SCuBAConfig {
         [ValidateSet($true, $false)]
         [boolean]
         $DisconnectOnExit = $false,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $UseSystemBrowserAuthentication = $true,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]

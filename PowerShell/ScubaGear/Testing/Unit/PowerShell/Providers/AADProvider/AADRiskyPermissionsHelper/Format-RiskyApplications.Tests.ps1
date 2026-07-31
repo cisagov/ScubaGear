@@ -37,9 +37,9 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
 
-            function Invoke-MgGraphRequest { }
+            function Invoke-ScubaGraphRequest { }
 
-            Mock Invoke-MgGraphRequest {
+            Mock Invoke-ScubaGraphRequest {
                 return @{
                     responses = @(
                         @{

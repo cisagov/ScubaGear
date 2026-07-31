@@ -111,6 +111,26 @@ Invoke-SCuBA -ProductNames teams `
   -DisconnectOnExit
 ```
 
+## UseSystemBrowserAuthentication
+
+**UseSystemBrowserAuthentication** uses the system browser instead of Windows Web Account Manager (WAM) for ScubaGear-owned delegated authentication to Microsoft Graph, Exchange Online, Security and Compliance, Power Platform, Power BI, and SharePoint. System-browser authentication is enabled by default and does not use an embedded browser or device-code authentication. This option does not affect certificate-based service principal authentication. Set it to `$false` to use WAM.
+
+MicrosoftTeams 7.9.0 is an exception on Windows PowerShell 5.1 and continues to use WAM because that module cannot accept the browser-acquired tokens in that host.
+
+| Parameter   | Value   |
+|-------------|---------|
+| Optional    | Yes     |
+| Datatype    | Switch  |
+| Default     | `$true` |
+| Config File | Yes     |
+
+```powershell
+# Use WAM instead of the default system-browser authentication
+Invoke-SCuBA -ProductNames aad,teams `
+  -M365Environment gcc `
+  -UseSystemBrowserAuthentication:$false
+```
+
 ## KeepIndividualJSON
 
 **KeepIndividualJSON** Keeps the individual JSON files (e.g., `TeamsReport.json`) in the `IndividualReports` folder along with `ProviderSettingsExport.json` without combining the results in to one uber JSON file named the `ScubaResults.json`. The parameter is for backwards compatibility with older versions of ScubaGear.

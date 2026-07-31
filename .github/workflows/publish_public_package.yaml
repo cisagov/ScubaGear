@@ -39,6 +39,10 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: repo
+      - name: Validate bundled MSAL dependencies
+        run: |
+          . repo/utils/workflow/Update-Msal.ps1
+          Test-MsalDependencyIntegrity -RepoRoot repo
       - name: Install Azure Signing Tool
         run: |
           . repo/utils/workflow/Install-AzureSignTool.ps1
