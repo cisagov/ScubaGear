@@ -340,7 +340,7 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
-            if ($Item -is [System.Collections.IDictionary] -or $Item -is [pscustomobject]) {
+            if ($Item -is [System.Collections.IDictionary] -or $Item.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject') {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
@@ -356,7 +356,7 @@ Function ConvertFrom-GraphHashtable {
                 # Process each property in the Graph response
                 foreach ($property in $Properties) {
                     $UpperCamelCase = ($property.Name).Substring(0,1).ToUpper() + ($property.Name).Substring(1)
-                    if ($property.Value -is [System.Collections.IDictionary] -or $property.Value -is [pscustomobject]) {
+                    if ($property.Value -is [System.Collections.IDictionary] -or $property.Value.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject') {
                         # Recursive call to process nested Graph objects
                         $NestedObject = ConvertFrom-GraphHashtable -GraphData @($property.Value)
 
@@ -366,7 +366,7 @@ Function ConvertFrom-GraphHashtable {
                         # Handle arrays (check if elements are Graph objects)
                         $ProcessedArray = @()
                         foreach ($element in $property.Value) {
-                            if ($element -is [System.Collections.IDictionary] -or $element -is [pscustomobject]) {
+                            if ($element -is [System.Collections.IDictionary] -or $element.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject') {
                                 $ProcessedArray += ConvertFrom-GraphHashtable -GraphData @($element)
                             } else {
                                 $ProcessedArray += $element
