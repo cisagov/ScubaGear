@@ -340,24 +340,33 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
-            if ($Item -is [hashtable]) {
+            if ($Item -is [System.Collections.IDictionary] -or $Item -is [pscustomobject]) {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
-                # Process each property in the hashtable
-                foreach ($property in $Item.GetEnumerator()) {
-                    $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
-                    if ($property.Value -is [hashtable]) {
-                        # Recursive call to process nested hashtables
+                $Properties = if ($Item -is [System.Collections.IDictionary]) {
+                    $Item.GetEnumerator() | ForEach-Object {
+                        [pscustomobject]@{ Name = $_.Key; Value = $_.Value }
+                    }
+                }
+                else {
+                    $Item.PSObject.Properties
+                }
+
+                # Process each property in the Graph response
+                foreach ($property in $Properties) {
+                    $UpperCamelCase = ($property.Name).Substring(0,1).ToUpper() + ($property.Name).Substring(1)
+                    if ($property.Value -is [System.Collections.IDictionary] -or $property.Value -is [pscustomobject]) {
+                        # Recursive call to process nested Graph objects
                         $NestedObject = ConvertFrom-GraphHashtable -GraphData @($property.Value)
 
                         $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $NestedObject
                     }
                     elseif ($property.Value -is [array]) {
-                        # Handle arrays (check if elements are hashtables)
+                        # Handle arrays (check if elements are Graph objects)
                         $ProcessedArray = @()
                         foreach ($element in $property.Value) {
-                            if ($element -is [hashtable]) {
+                            if ($element -is [System.Collections.IDictionary] -or $element -is [pscustomobject]) {
                                 $ProcessedArray += ConvertFrom-GraphHashtable -GraphData @($element)
                             } else {
                                 $ProcessedArray += $element
