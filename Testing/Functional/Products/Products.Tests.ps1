@@ -593,15 +593,15 @@ Describe "Policy Checks for <ProductName>" {
                     }
                     # Security Suite configuration tables are appended to the Security Suite report.
                     elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
-                        $ExpectedHeaders = if ($TableClass -match "securitysuite-sensitive-users-table") {
-                            @("Username", "Email")
+                        $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
+                            "Username", "Email"
                         }
                         elseif ($TableClass -match "securitysuite-partner-domains-table") {
-                            @("Partner Domain")
+                            "Partner Domain"
                         }
                         else {
-                            @("", "Policy", "Enabled", "Applicability", "Users Protected", "Partner Domains Protected", "Safety Indicators")
-                        }
+                            "", "Policy", "Enabled", "Applicability", "Users Protected", "Partner Domains Protected", "Safety Indicators"
+                        })
 
                         foreach ($Row in $Rows) {
                             $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'

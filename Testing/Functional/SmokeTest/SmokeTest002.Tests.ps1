@@ -252,15 +252,15 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                 }
                 # Security Suite configuration tables are appended to the Security Suite report.
                 elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
-                    $ExpectedHeaders = if ($TableClass -match "securitysuite-sensitive-users-table") {
-                        @("Username", "Email")
+                    $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
+                        "Username", "Email"
                     }
                     elseif ($TableClass -match "securitysuite-partner-domains-table") {
-                        @("Partner Domain")
+                        "Partner Domain"
                     }
                     else {
-                            @("", "Policy", "Enabled", "Applicability", "Users Protected", "Partner Domains Protected", "Safety Indicators")
-                    }
+                        "", "Policy", "Enabled", "Applicability", "Users Protected", "Partner Domains Protected", "Safety Indicators"
+                    })
 
                     foreach ($Row in $Rows) {
                         $RowHeaders = Get-SeElement -Element $Row -By TagName 'th'
@@ -289,8 +289,11 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
                     for ($i = 1; $i -lt $Rows.Length; $i++) {
                         $RowData = Get-SeElement -Element $Rows[$i] -By TagName 'td'
+                        # Anti-phish policy rows have an expand/collapse control in the
+                        # first cell, so their Policy value (the second cell) is the row header.
+                        $RowHeaderIndex = if ($TableClass -match "securitysuite-anti-phish-policies-table") { 1 } else { 0 }
                         for ($j = 0; $j -lt $RowData.Length; $j++) {
-                            if ($j -eq 0) {
+                            if ($j -eq $RowHeaderIndex) {
                                 $RowData[$j].GetAttribute("scope") | Should -Be "row" -Because "There should only be one scope attribute set for each data row"
                             }
                             else {
