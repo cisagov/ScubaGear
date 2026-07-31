@@ -7,6 +7,7 @@ InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-GraphHelper' {
         BeforeAll {
             function Get-MsalAccessToken {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
                 param($Scope, $ClientId, $Tenant, $M365Environment, $DisableBroker, $CertificateThumbprint, $AppID)
                 throw 'this will be mocked'
             }

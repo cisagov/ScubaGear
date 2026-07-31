@@ -82,6 +82,7 @@ function Disconnect-ScubaGraph {
 }
 
 function Invoke-ScubaGraphRequest {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OutputType', Justification = 'Retained for Invoke-MgGraphRequest call-site compatibility; Invoke-RestMethod already returns PSObject output.')]
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
