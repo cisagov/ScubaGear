@@ -137,6 +137,15 @@ InModuleScope Utility {
             $Json.Contains('"AllowedToCreateApps"') | Should -BeTrue
             $Json.Contains('"servicePlanName"') | Should -BeFalse
         }
+
+        It "preserves wrapped primitive responses" {
+            $Response = [pscustomobject]42
+
+            $Result = ConvertFrom-GraphHashtable -GraphData $Response
+
+            $Result | Should -Be 42
+            $Result.GetType() | Should -Be ([int])
+        }
     }
 }
 
