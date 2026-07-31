@@ -5,9 +5,19 @@ InModuleScope ExportAADProvider {
     BeforeAll {
         Mock Invoke-GraphDirectly {
             return [pscustomobject]@{
-                DisplayName = "DisplayName";
-                Name = "DomainName";
-                Id = "TenantId";
+                Value = @(
+                    [pscustomobject]@{
+                        DisplayName = "DisplayName";
+                        Id = "TenantId";
+                        MobileDeviceManagementAuthority = $null;
+                        VerifiedDomains = @(
+                            [pscustomobject]@{
+                                IsInitial = $true;
+                                Name = "DomainName";
+                            }
+                        )
+                    }
+                )
             }
         } -ParameterFilter { $commandlet -eq "Get-MgBetaOrganization" -or $Uri -match "/organization" } -ModuleName ExportAADProvider
 
@@ -27,10 +37,13 @@ InModuleScope ExportAADProvider {
         }
     }
     Describe -Tag 'AADProvider' -Name "Get-AADTenantDetail" {
-        It "Returns valid JSON" {
+        It "returns tenant details from a Graph response with null properties" {
             $Json = Get-AADTenantDetail -M365Environment Commercial
-            $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
-            $ValidJson | Should -Be $true
+            $TenantDetails = $Json | ConvertFrom-Json
+
+            $TenantDetails.DisplayName | Should -Be "DisplayName"
+            $TenantDetails.DomainName | Should -Be "DomainName"
+            $TenantDetails.TenantId | Should -Be "TenantId"
         }
     }
 }
