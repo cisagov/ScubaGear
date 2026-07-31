@@ -13,6 +13,7 @@ InModuleScope Orchestrator {
                     UseSystemBrowserAuthentication = $true
                 }
                 function Connect-Tenant {
+                    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
                     param($ProductNames, $M365Environment, $UseSystemBrowserAuthentication, $ServicePrincipalParams)
                     throw 'this will be mocked'
                 }

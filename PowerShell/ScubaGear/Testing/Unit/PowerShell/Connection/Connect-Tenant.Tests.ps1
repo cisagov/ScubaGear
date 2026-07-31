@@ -11,6 +11,7 @@ InModuleScope Connection {
     ){
         BeforeAll {
             function Connect-GraphHelper {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
                 param($UseSystemBrowserAuthentication, $ServicePrincipalParams, $M365Environment, $Scopes)
                 throw 'this will be mocked'
             }
@@ -39,6 +40,7 @@ InModuleScope Connection {
                 }
             }
             function Get-MsalAccessToken {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
                 param($Scope, $ClientId, $Tenant, $M365Environment, $DisableBroker, $CertificateThumbprint, $AppID)
                 throw 'this will be mocked'
             }
@@ -112,16 +114,28 @@ InModuleScope Connection {
                 }
             }
 
-            It 'uses system-browser Graph authentication and WAM for Teams on Windows PowerShell' {
+            It 'uses system-browser Graph authentication and edition-compatible Teams authentication' {
                 Connect-Tenant -ProductNames 'aad', 'teams' -M365Environment $Endpoint -UseSystemBrowserAuthentication
                 Should -Invoke -CommandName Connect-GraphHelper -Times 1 -ParameterFilter {
                     $UseSystemBrowserAuthentication -and -not $ServicePrincipalParams
                 }
-                Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
-                Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
-                    -not $DisableWAM -and
-                    -not $AccessTokens -and
-                    -not $CertificateThumbprint
+                if ($PSEdition -eq 'Desktop') {
+                    Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
+                    Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
+                        -not $DisableWAM -and
+                        -not $AccessTokens -and
+                        -not $CertificateThumbprint
+                    }
+                }
+                else {
+                    Should -Invoke -CommandName Get-TeamsAccessTokens -Times 1 -ParameterFilter {
+                        $DisableBroker
+                    }
+                    Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
+                        -not $DisableWAM -and
+                        $AccessTokens.Count -eq 2 -and
+                        -not $CertificateThumbprint
+                    }
                 }
             }
 

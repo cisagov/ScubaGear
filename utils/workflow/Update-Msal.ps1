@@ -280,6 +280,7 @@ function Restore-MsalDependencies {
             }
             catch {
                 # Native binaries do not have a managed assembly identity.
+                $null = $_
             }
             [ordered]@{
                 path = $file.FullName.Substring($paths.ModuleRoot.Length + 1).Replace('\', '/')
