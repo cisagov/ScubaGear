@@ -223,7 +223,6 @@ function Connect-Tenant {
                            -ClientId $PPClientId `
                            -Tenant $TenantName `
                            -M365Environment $M365Environment
-                           -M365Environment $M365Environment
                    }
                    Write-Verbose "Power Platform token acquired successfully"
                }
