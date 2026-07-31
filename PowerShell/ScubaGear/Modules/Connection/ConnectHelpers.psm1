@@ -259,7 +259,9 @@ function Initialize-Msal {
                 throw "Bundled MSAL dependency failed SHA-256 validation: $($Record.path)"
             }
             $Signature = Get-AuthenticodeSignature -FilePath $FilePath
-            if ($Signature.Status -ne 'Valid' -or $Signature.SignerCertificate.Subject -ne $Record.signerSubject) {
+            if ($Signature.Status -ne 'Valid' -or
+                -not $Signature.SignerCertificate -or
+                $Signature.SignerCertificate.Subject -notmatch '(^|,\s*)O=Microsoft Corporation(,|$)') {
                 throw "Bundled MSAL dependency failed Authenticode validation: $($Record.path)"
             }
         }

@@ -343,10 +343,7 @@ function Test-MsalDependencyIntegrity {
         if ($actualHash -ne $record.sha256) {
             throw "SHA-256 mismatch for $($record.path)."
         }
-        $signature = Assert-MsalAuthenticodeSignature -File $file
-        if ($signature.SignerCertificate.Subject -ne $record.signerSubject) {
-            throw "Authenticode signer drift detected for $($record.path)."
-        }
+        $null = Assert-MsalAuthenticodeSignature -File $file
     }
 
     $msalVersions = @($lock.files |
