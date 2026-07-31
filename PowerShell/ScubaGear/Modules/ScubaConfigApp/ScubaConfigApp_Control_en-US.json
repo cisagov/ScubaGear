@@ -203,7 +203,7 @@
     "ValidationErrors": "Please correct the validation errors before proceeding.",
     "GraphError": "Error retrieving data from Graph: {0}",
     "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'.",
-    "GraphNotConnected": "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually."
+    "GraphNotConnected": "Microsoft Graph is not connected.`n`nRestart the application with the -Online parameter to connect."
   },
   "localeStatusMessages": {
     "GraphConnected": "Graph Connected",

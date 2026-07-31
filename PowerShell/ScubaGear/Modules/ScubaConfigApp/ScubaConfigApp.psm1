@@ -1,4 +1,6 @@
-﻿# Helper function to show message boxes on top of the main window
+﻿Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-ScubaGraphContext, Invoke-ScubaGraphRequest -Force
+
+# Helper function to show message boxes on top of the main window
 function Show-ScubaMessageBox {
     param(
         [string]$Message,
@@ -101,7 +103,6 @@ Function Start-SCuBAConfigApp {
     https://github.com/cisagov/ScubaGear
 
     .LINK
-    Connect-MgGraph
     ConvertFrom-Yaml
     #>
 
@@ -174,10 +175,10 @@ Function Start-SCuBAConfigApp {
             #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
             Write-Output "Connecting to Microsoft Graph..."
-            Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
+            Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphParameters.Scopes -UseSystemBrowserAuthentication
 
             #ensure user is authenticated
-            Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+            Invoke-ScubaGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
             Write-Output " - Successfully connected to Microsoft Graph"
             $GraphConnected = $true
         }
@@ -640,7 +641,7 @@ Function Start-SCuBAConfigApp {
         # Handle Organization TextBox with special Graph Connected logic
         if ($syncHash.GraphConnected) {
             try {
-                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
+                $tenantDetails = (Invoke-ScubaGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
                 $tenantName = ($tenantDetails.VerifiedDomains | Where-Object { $_.IsDefault -eq $true }).Name
                 $syncHash.Organization_TextBox.Text = $tenantName
                 $syncHash.Organization_TextBox.Foreground = [System.Windows.Media.Brushes]::Gray
@@ -1202,8 +1203,8 @@ Function Start-SCuBAConfigApp {
             $syncHash.isClosing = $true
 
             # Disconnect safely
-            if (Get-MgContext) {
-                try { Disconnect-MgGraph -ErrorAction SilentlyContinue } catch {
+            if (Get-ScubaGraphContext) {
+                try { Disconnect-ScubaGraph -ErrorAction SilentlyContinue } catch {
                     Write-Error "Error disconnecting from Microsoft Graph: $($_.Exception.Message)"
                 }
             }

@@ -1,5 +1,5 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper -force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper, Invoke-ScubaGraphRequest -force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest -force
 
 function Compare-ScubaGearRole {
@@ -1572,7 +1572,7 @@ function Set-ScubaGearAppPermission {
                         foreach ($grant in $CurrentDelegatedGrants) {
                             try {
                                 $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgOauth2PermissionGrant -Environment $M365Environment -outAs api -id $grant.Id)
-                                Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                                Invoke-ScubaGraphRequest -Method DELETE -Uri $deleteUri
                                 Write-Verbose "Removed OAuth2 grant: $($grant.Id) with scopes: $($grant.Scope)"
                             } catch {
                                 Write-Warning "Failed to remove OAuth2 grant $($grant.Id): $($_.Exception.Message)"
@@ -1640,7 +1640,7 @@ function Set-ScubaGearAppPermission {
                     if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
                         foreach ($extraPerm in $ExtraPermissionsDetails) {
                             $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -outAs api -id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
-                            Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                            Invoke-ScubaGraphRequest -Method DELETE -Uri $deleteUri
                             Write-Output "Removed consented extra permission: $($extraPerm.PermissionName)"
                         }
                     }

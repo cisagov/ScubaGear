@@ -1,0 +1,100 @@
+name: Check bundled MSAL dependencies
+
+on:
+  schedule:
+    - cron: "23 3 * * 1"
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  update-msal-dependency:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: powershell
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Detect MSAL update
+        id: detect
+        run: |
+          . ./utils/workflow/Update-Msal.ps1
+          $result = Confirm-MsalUpdateRequirements -RepoRoot .
+          $result | ConvertTo-Json | Write-Output
+          "updateRequired=$($result.UpdateRequired.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "currentVersion=$($result.CurrentVersion)" >> $env:GITHUB_OUTPUT
+          "latestVersion=$($result.LatestVersion)" >> $env:GITHUB_OUTPUT
+          if ($result.State -eq 'QueryFailed') { throw $result.Summary }
+
+      - name: Restore updated signed dependencies
+        if: steps.detect.outputs.updateRequired == 'true'
+        run: |
+          . ./utils/workflow/Update-Msal.ps1
+          Update-MsalDependencyVersion `
+            -RepoRoot . `
+            -Version '${{ steps.detect.outputs.latestVersion }}' | Out-Null
+          Test-MsalDependencyIntegrity -RepoRoot .
+
+      - name: Run MSAL workflow tests
+        if: steps.detect.outputs.updateRequired == 'true'
+        run: |
+          Import-Module Pester -MinimumVersion 5.0 -Force
+          $result = Invoke-Pester -Path ./Testing/workflow/Update-Msal.Tests.ps1 -PassThru
+          if ($result.FailedCount -gt 0) { throw "$($result.FailedCount) MSAL workflow tests failed." }
+
+      - name: Test MicrosoftTeams load order
+        if: steps.detect.outputs.updateRequired == 'true'
+        id: compatibility
+        continue-on-error: true
+        run: |
+          ./utils/workflow/Test-MsalTeamsCompatibility.ps1 -RepoRoot . -TeamsVersion 7.9.0
+
+      - name: Create update pull request
+        if: steps.detect.outputs.updateRequired == 'true'
+        env:
+          CURRENT_VERSION: ${{ steps.detect.outputs.currentVersion }}
+          LATEST_VERSION: ${{ steps.detect.outputs.latestVersion }}
+          COMPATIBILITY_OUTCOME: ${{ steps.compatibility.outcome }}
+        run: |
+          $branch = "msal-version-bump-$env:LATEST_VERSION"
+          if (git ls-remote --exit-code --heads origin $branch) {
+            Write-Output "Branch $branch already exists; skipping duplicate pull request."
+            exit 0
+          }
+
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git switch -c $branch
+          git add --all --force PowerShell/ScubaGear/dependencies PowerShell/ScubaGear/lib PowerShell/ScubaGear/runtimes
+          git commit -m "Update bundled MSAL dependencies to $env:LATEST_VERSION"
+          git push origin $branch
+
+          $body = @"
+          Updates the signed, bundled MSAL dependency set from $env:CURRENT_VERSION to $env:LATEST_VERSION.
+
+          - NuGet repository signatures verified
+          - Authenticode publishers verified
+          - SHA-256 lock manifest regenerated
+          - Integrity tests passed
+          - MicrosoftTeams 7.9.0 load-order result: $env:COMPATIBILITY_OUTCOME
+
+          This update must not be merged until delegated WAM, certificate authentication, and MicrosoftTeams smoke tests pass.
+          "@
+          $arguments = @(
+            'pr', 'create',
+            '--base', '${{ github.event.repository.default_branch }}',
+            '--head', $branch,
+            '--title', "Update bundled MSAL dependencies to $env:LATEST_VERSION",
+            '--body', $body
+          )
+          if ($env:COMPATIBILITY_OUTCOME -ne 'success') {
+            $arguments += '--draft'
+          }
+          gh @arguments

@@ -1298,6 +1298,13 @@ test_PolicyMigrationState_Correct_NullValue if {
     TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
 }
 
+# Test when Graph omits the authentication method policy for a newly created tenant
+test_PolicyMigrationState_Correct_MissingPolicy if {
+    Auth := object.remove(AuthenticationMethod, ["authentication_method_policy"])
+    Output := aad.tests with input.authentication_method as [Auth]
+    TestResult("MS.AAD.3.4v1", Output, PASS, true) == true
+}
+
 test_PolicyMigrationState_preMigration_Incorrect if {
     Auth := json.patch(AuthenticationMethod,
                 [{"op": "add", "path": "authentication_method_policy/PolicyMigrationState", "value": "preMigration"}])

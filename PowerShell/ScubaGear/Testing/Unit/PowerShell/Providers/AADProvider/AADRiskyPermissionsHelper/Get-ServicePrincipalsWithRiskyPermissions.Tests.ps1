@@ -70,7 +70,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 return $data
             }
 
-            function Invoke-MgGraphRequest { }
+            function Invoke-ScubaGraphRequest { }
 
             Mock Invoke-GraphDirectly {
                 return @{

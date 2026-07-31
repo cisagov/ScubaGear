@@ -22,7 +22,7 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" } -ModuleName AADRiskyPermissionsHelper
 
-            function Invoke-MgGraphRequest { }
+            function Invoke-ScubaGraphRequest { }
             # Simulate that "Test SP 6" from MockServicePrincipals.json has the Exchange Administrator role
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MockPrivilegedServicePrincipals')]
             $MockPrivilegedServicePrincipals = @{
@@ -36,7 +36,7 @@ InModuleScope AADRiskyPermissionsHelper {
 
             function Get-ServicePrincipalAll { $MockServicePrincipals }
 
-            Mock Invoke-MgGraphRequest {
+            Mock Invoke-ScubaGraphRequest {
                 return @{
                     responses = @(
                         @{

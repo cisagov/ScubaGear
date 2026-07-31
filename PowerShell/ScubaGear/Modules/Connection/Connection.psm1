@@ -1,3 +1,5 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Invoke-ScubaGraphRequest -Force
+
 function Connect-Tenant {
     <#
    .Description
@@ -29,7 +31,13 @@ function Connect-Tenant {
    [Parameter(Mandatory = $false)]
    [AllowNull()]
    [hashtable]
-   $ServicePrincipalParams
+    $ServicePrincipalParams,
+
+    [Parameter(ParameterSetName = 'Auto')]
+    [Parameter(ParameterSetName = 'Manual')]
+    [Parameter(Mandatory = $false)]
+    [switch]
+    $UseSystemBrowserAuthentication
    )
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
@@ -42,7 +50,8 @@ function Connect-Tenant {
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
-   $MsGraphAuthRequired = $true
+   $SPOAuthRequired = $true
+   $AADAuthRequired = $true
 
    $ProdAuthFailed = @()
 
@@ -53,17 +62,6 @@ function Connect-Tenant {
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
    $InitialDomainPrefix = $null
-
-   #####
-   # The variables below are used to dynamically determine the M365Environment for interactive auth.
-   # For non-interactive auth, the environment is dynamically determined in the Orchestrator not here in Connect-Tenant.
-   # String that holds the tenant identifiter GUID
-   $TenantId = $null
-   # String that holds the M365Environment value that was auto detected.
-   $DetectedM365Environment = $null
-   # Boolean that ensures we only auto detect once during execution.
-   $AutodetectEnvironmentCompleted = $false
-   #####
 
    # Token data for REST-based products (populated during connection)
    $TokenData = @{
@@ -101,34 +99,35 @@ function Connect-Tenant {
            switch ($Product) {
                "aad" {
                    $GraphScopes = Get-ScubaGearEntraMinimumPermissions
-                   Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes $GraphScopes
-                   $MsGraphAuthRequired = $false
-
-                    # Dynamically determine the M365Environment for interactive auth
-                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
-                        $UserAuthInfo = Get-MgContext
-                        $TenantId = $UserAuthInfo.TenantId
-                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
-                        $M365Environment = $DetectedM365Environment
-                        $AutodetectEnvironmentCompleted = $true
-                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
-                    }
+                   $GraphParams = @{
+                       'M365Environment' = $M365Environment;
+                       'Scopes' = $GraphScopes;
+                   }
+                   if($ServicePrincipalParams) {
+                    $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                   }
+                   elseif ($UseSystemBrowserAuthentication) {
+                       $GraphParams += @{UseSystemBrowserAuthentication = $true}
+                   }
+                   Connect-GraphHelper @GraphParams
+                   $AADAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
-                       #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for EXO / Security Suite auth
-                       Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-                       $MsGraphAuthRequired = $false
-
-                        # Dynamically determine the M365Environment for interactive auth
-                        if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
-                            $UserAuthInfo = Get-MgContext
-                            $TenantId = $UserAuthInfo.TenantId
-                            $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
-                            $M365Environment = $DetectedM365Environment
-                            $AutodetectEnvironmentCompleted = $true
-                            Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
-                        }
+                       if ($AADAuthRequired) {
+                           $LimitedGraphParams = @{
+                               'M365Environment' = $M365Environment;
+                               'ErrorAction' = 'Stop';
+                           }
+                           if ($ServicePrincipalParams) {
+                               $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                           }
+                           elseif ($UseSystemBrowserAuthentication) {
+                               $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
+                           }
+                           Connect-GraphHelper @LimitedGraphParams
+                           $AADAuthRequired = $false
+                       }
 
                        # Resolve tenant info if not already cached
                        if ([string]::IsNullOrEmpty($TenantName)) {
@@ -151,11 +150,14 @@ function Connect-Tenant {
                        }
                        else {
                            $EXOClientId = "fb78d390-0c51-40cd-8e17-fdbfab77341b"
-                           $TokenData.EXOAccessToken = Get-MsalAccessToken `
-                               -Scope $EXOScope `
-                               -ClientId $EXOClientId `
-                               -Tenant $TenantName `
-                               -M365Environment $M365Environment
+                           $EXOAuthParams = @{
+                               Scope = $EXOScope
+                               ClientId = $EXOClientId
+                               Tenant = $TenantName
+                               M365Environment = $M365Environment
+                               DisableBroker = $UseSystemBrowserAuthentication
+                           }
+                           $TokenData.EXOAccessToken = Get-MsalAccessToken @EXOAuthParams
                        }
 
                        # Resolve the EXO API endpoint (handles redirects)
@@ -181,11 +183,14 @@ function Connect-Tenant {
                                    -M365Environment $M365Environment
                            }
                            else {
-                               $TokenData.ComplianceAccessToken = Get-MsalAccessToken `
-                                   -Scope $ComplianceScope `
-                                   -ClientId $EXOClientId `
-                                   -Tenant $TenantName `
-                                   -M365Environment $M365Environment
+                               $ComplianceAuthParams = @{
+                                   Scope = $ComplianceScope
+                                   ClientId = $EXOClientId
+                                   Tenant = $TenantName
+                                   M365Environment = $M365Environment
+                                   DisableBroker = $UseSystemBrowserAuthentication
+                               }
+                               $TokenData.ComplianceAccessToken = Get-MsalAccessToken @ComplianceAuthParams
                            }
                            $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
                                -TenantId $TenantId `
@@ -202,19 +207,20 @@ function Connect-Tenant {
                    }
                }
                "powerplatform" {
-                    #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Power Platform auth
-                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-                    $MsGraphAuthRequired = $false
-
-                    # Dynamically determine the M365Environment for interactive auth
-                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
-                        $UserAuthInfo = Get-MgContext
-                        $TenantId = $UserAuthInfo.TenantId
-                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
-                        $M365Environment = $DetectedM365Environment
-                        $AutodetectEnvironmentCompleted = $true
-                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
-                    }
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
 
                    # Acquire Power Platform access token
                    $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
@@ -239,74 +245,86 @@ function Connect-Tenant {
 
                        # Azure PowerShell well-known client ID
                        $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                       $TokenData.PPAccessToken = Get-MsalAccessToken `
-                           -Scope $PPScope `
-                           -ClientId $PPClientId `
-                           -Tenant $TenantName `
-                           -M365Environment $M365Environment
+                       $PPAuthParams = @{
+                           Scope = $PPScope
+                           ClientId = $PPClientId
+                           Tenant = $TenantName
+                           M365Environment = $M365Environment
+                           DisableBroker = $UseSystemBrowserAuthentication
+                       }
+                       $TokenData.PPAccessToken = Get-MsalAccessToken @PPAuthParams
                    }
                    Write-Verbose "Power Platform token acquired successfully"
                }
                "sharepoint" {
-                    #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Sharepoint auth
-                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-                    $MsGraphAuthRequired = $false
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
+                   if ($SPOAuthRequired) {
+                       # Resolve tenant info if not already cached from a previous product
+                       if ([string]::IsNullOrEmpty($TenantName)) {
+                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                           $TenantName = $InitialDomain.Name
+                           $InitialDomainPrefix = $TenantName.split(".")[0]
+                       }
 
-                    # Dynamically determine the M365Environment for interactive auth
-                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
-                        $UserAuthInfo = Get-MgContext
-                        $TenantId = $UserAuthInfo.TenantId
-                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
-                        $M365Environment = $DetectedM365Environment
-                        $AutodetectEnvironmentCompleted = $true
-                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
-                    }
+                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
+                       $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
 
-                    # Resolve tenant info if not already cached from a previous product
-                    if ([string]::IsNullOrEmpty($TenantName)) {
-                        $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                        $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                        $TenantName = $InitialDomain.Name
-                        $InitialDomainPrefix = $TenantName.split(".")[0]
-                    }
-
-                    $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
-                    $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
-
-                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                        $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                            -Scope $SPOScope `
-                            -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                            -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                            -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                            -M365Environment $M365Environment
-                    }
-                    else {
-                        # SharePoint Online Management Shell app ID
-                        $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
-                        $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                            -Scope $SPOScope `
-                            -ClientId $SPOClientId `
-                            -Tenant $TenantName `
-                            -M365Environment $M365Environment
-                    }
-                    Write-Verbose "SharePoint token acquired successfully"
+                       if ($ServicePrincipalParams.CertThumbprintParams) {
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
+                               -Scope $SPOScope `
+                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                               -M365Environment $M365Environment
+                       }
+                       else {
+                           # SharePoint Online Management Shell app ID
+                           $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
+                           $SPOAuthParams = @{
+                               Scope = $SPOScope
+                               ClientId = $SPOClientId
+                               Tenant = $TenantName
+                               M365Environment = $M365Environment
+                           }
+                           if ($UseSystemBrowserAuthentication) {
+                               $SPOAuthParams.DisableBroker = $true
+                           }
+                           $TokenData.SPOAccessToken = Get-MsalAccessToken @SPOAuthParams
+                       }
+                       Write-Verbose "SharePoint token acquired successfully"
+                       $SPOAuthRequired = $false
+                   }
                }
                "powerbi" {
-                   #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Powerbi auth
-                   # /subscribedSkus API requires the Organization.Read.All permission.
-                   Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes @("Organization.Read.All")
-                   $MsGraphAuthRequired = $false
-
-                   # Dynamically determine the M365Environment for interactive auth
-                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
-                        $UserAuthInfo = Get-MgContext
-                        $TenantId = $UserAuthInfo.TenantId
-                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
-                        $M365Environment = $DetectedM365Environment
-                        $AutodetectEnvironmentCompleted = $true
-                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
-                    }
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                           'Scopes' = @("Organization.Read.All");
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
 
                    # Check for Power BI license before attempting token acquisition.
                    # This prevents triggering a second consent/browser window for the
@@ -335,7 +353,7 @@ function Connect-Tenant {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                           $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           $UserLicenseResponse = Invoke-ScubaGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
                            $UserPlans = $UserLicenseResponse.value |
                                Where-Object { $null -ne $_.servicePlans } |
                                ForEach-Object { $_.servicePlans } |
@@ -382,31 +400,20 @@ function Connect-Tenant {
                                # Same ClientId as PowerPlatform - MSAL cache and SSO enable silent acquisition
                                # if PowerPlatform already signed in interactively this session.
                                $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                               $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                                   -Scope $PBIScope `
-                                   -ClientId $PBIClientId `
-                                   -Tenant $TenantName `
-                                   -M365Environment $M365Environment
+                               $PBIAuthParams = @{
+                                   Scope = $PBIScope
+                                   ClientId = $PBIClientId
+                                   Tenant = $TenantName
+                                   M365Environment = $M365Environment
+                                   DisableBroker = $UseSystemBrowserAuthentication
+                               }
+                               $TokenData.PBIAccessToken = Get-MsalAccessToken @PBIAuthParams
                            }
                            Write-Verbose "Power BI token acquired successfully"
                        }
                    }
                }
                "teams" {
-                    #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Teams auth
-                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-                    $MsGraphAuthRequired = $false
-
-                    # Dynamically determine the M365Environment for interactive auth
-                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
-                        $UserAuthInfo = Get-MgContext
-                        $TenantId = $UserAuthInfo.TenantId
-                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
-                        $M365Environment = $DetectedM365Environment
-                        $AutodetectEnvironmentCompleted = $true
-                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
-                    }
-
                     # Get access tokens for Teams Admin API and Teams Unified settings API
                     # The Teams Unified settings API is used for some operations that are not available in the standard Teams Admin API
                     $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
@@ -507,7 +514,6 @@ function Connect-Tenant {
        TeamsBaseUrl = $TokenData.TeamsBaseUrl
        TeamsUnifiedAccessToken   = $TokenData.TeamsUnifiedAccessToken
        TeamsUnifiedBaseUrl     = $TokenData.TeamsUnifiedBaseUrl
-       DetectedM365Environment = $DetectedM365Environment
    }
 }
 
@@ -536,14 +542,10 @@ function Disconnect-SCuBATenant {
 
     try {
         Write-Information "Disconnecting from tenant..." -InformationAction Continue
-        Disconnect-MgGraph -ErrorAction Stop | Out-Null
+        Disconnect-ScubaGraph -ErrorAction SilentlyContinue
         Write-Information "Disconnect Completed!" -InformationAction Continue
     } catch {
-        if ($_.Exception.Message -like "*No application to sign out from*") {
-            Write-Information "No active Graph session to disconnect. Completed!" -InformationAction Continue
-        } else {
-            Write-Warning "Could not disconnect from tenant`n: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-        }
+        Write-Warning "Could not disconnect from tenant`n: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
     }
 }
 
@@ -622,39 +624,6 @@ function Get-M365EnvironmentByDomain {
     }
 
     return $M365Environment
-}
-
-# Internal function to authenticate to Microsoft Graph with limited permission scopes based on the provided parameters
-function Connect-GraphIfNecessary {
-    param(
-        [Parameter(Mandatory)]
-        [bool]$MsGraphAuthRequired,
-
-        [Parameter(Mandatory)]
-        [ValidateNotNullOrEmpty()]
-        [string]$M365Environment,
-
-        [hashtable]$ServicePrincipalParams,
-
-        [array]$Scopes
-    )
-
-    if ($MsGraphAuthRequired) {
-        $LimitedGraphParams = @{
-            'M365Environment' = $M365Environment
-            'ErrorAction'     = 'Stop'
-        }
-
-        if ($ServicePrincipalParams) {
-            $LimitedGraphParams += @{ ServicePrincipalParams = $ServicePrincipalParams }
-        }
-
-        if ($Scopes) {
-            $LimitedGraphParams += @{ Scopes = $Scopes }
-        }
-
-        Connect-GraphHelper @LimitedGraphParams
-    }
 }
 
 Export-ModuleMember -Function @(

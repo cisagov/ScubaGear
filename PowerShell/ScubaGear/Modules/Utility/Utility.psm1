@@ -1,3 +1,4 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Invoke-ScubaGraphRequest -Force
 
 function Set-Utf8NoBom {
     <#
@@ -255,7 +256,7 @@ function Invoke-GraphDirectly {
     }
 
     # Execute the initial request
-    $resp = Invoke-MgGraphRequest @graphParams
+    $resp = Invoke-ScubaGraphRequest @graphParams
 
     if ($Method -notmatch "DELETE|PATCH") {
         # If the response is a collection (has a 'value' key)
@@ -280,7 +281,7 @@ function Invoke-GraphDirectly {
 
                 # Update the URI to the next page; all other params (Headers, Method) carry over
                 $pageParams['Uri'] = $nextLink
-                $pageResp = Invoke-MgGraphRequest @pageParams
+                $pageResp = Invoke-ScubaGraphRequest @pageParams
 
                 # Accumulate results from this page
                 foreach ($item in $pageResp['value']) {
@@ -561,10 +562,10 @@ function Invoke-GraphBatchRequest {
             }
 
             try {
-                # Execute batch request using Invoke-MgGraphRequest
+                # Execute batch request using the internal Graph transport
                 Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
                 $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
-                $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
+                $batchResponse = Invoke-ScubaGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
             }
             catch {
                 # Entire batch request failed (e.g., network error, auth error, or even a 429 if the batch envelope itself is too large).
