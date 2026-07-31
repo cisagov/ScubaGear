@@ -21,10 +21,8 @@ function Invoke-PSSA {
 	Write-Warning " "
 
 	# Install PSScriptAnalyzer
-	$PSScriptAnalyzerVersion = '1.24.0'
 	Set-PSRepository PSGallery -InstallationPolicy Trusted
-	Install-Module -Name PSScriptAnalyzer -RequiredVersion $PSScriptAnalyzerVersion -Force -ErrorAction Stop
-	Import-Module -Name PSScriptAnalyzer -RequiredVersion $PSScriptAnalyzerVersion -Force -ErrorAction Stop
+	Install-Module -Name PSScriptAnalyzer -ErrorAction Stop
 
 	# Get all PowerShell script files in the repository
 	$PsFiles = Get-ChildItem -Path $RepoPath -Include *.ps1, *ps1xml, *.psc1, *.psd1, *.psm1, *.pssc, *.psrc, *.cdxml -Recurse
@@ -39,11 +37,19 @@ function Invoke-PSSA {
 
 	# Analyze each file and collect results
 	foreach ($PsFile in $PsFiles) {
-		try {
-			$Results = Invoke-ScriptAnalyzer -Path $PsFile.FullName -Settings $ConfigPath -ErrorAction Stop
-		}
-		catch {
-			throw "PSScriptAnalyzer failed for '$($PsFile.FullName)': $($_.Exception.Message)"
+		$Results = $null
+		foreach ($Attempt in 1..2) {
+			try {
+				$Results = Invoke-ScriptAnalyzer -Path $PsFile.FullName -Settings $ConfigPath -ErrorAction Stop
+				break
+			}
+			catch {
+				$IsTransientNullReference = $_.Exception.Message -match 'Object reference not set to an instance of an object'
+				if (-not $IsTransientNullReference -or $Attempt -eq 2) {
+					throw "PSScriptAnalyzer failed for '$($PsFile.FullName)': $($_.Exception.Message)"
+				}
+				Write-Warning "PSScriptAnalyzer encountered a transient null reference for '$($PsFile.FullName)'; retrying."
+			}
 		}
 		foreach ($Result in $Results) {
 			Write-Warning "File:     $($Result.ScriptPath)"
