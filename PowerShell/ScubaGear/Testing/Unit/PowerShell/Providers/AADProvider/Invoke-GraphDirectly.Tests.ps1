@@ -146,6 +146,19 @@ InModuleScope Utility {
             $Result | Should -Be 42
             $Result.GetType() | Should -Be ([int])
         }
+
+        It "preserves null properties and array elements" {
+            $Response = [pscustomobject]@{
+                nullableProperty = $null
+                items = @($null, [pscustomobject]@{ id = '1' })
+            }
+
+            $Result = ConvertFrom-GraphHashtable -GraphData $Response
+
+            $Result.NullableProperty | Should -BeNullOrEmpty
+            $Result.Items[0] | Should -BeNullOrEmpty
+            $Result.Items[1].Id | Should -Be '1'
+        }
     }
 }
 
