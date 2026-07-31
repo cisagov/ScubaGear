@@ -12,7 +12,8 @@ function Get-MsalDependencyPaths {
         [string]$RepoRoot
     )
 
-    $moduleRoot = Join-Path $RepoRoot 'PowerShell/ScubaGear'
+    $resolvedRepoRoot = (Resolve-Path -Path $RepoRoot -ErrorAction Stop).Path
+    $moduleRoot = Join-Path $resolvedRepoRoot 'PowerShell/ScubaGear'
     @{
         ModuleRoot = $moduleRoot
         PackagesConfig = Join-Path $moduleRoot 'dependencies/packages.config'

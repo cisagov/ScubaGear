@@ -25,6 +25,19 @@ Describe 'MSAL dependency updates' {
         New-TestMsalPackagesConfig -Root $TestDrive
     }
 
+    It 'normalizes relative repository paths' {
+        Push-Location $TestDrive
+        try {
+            $paths = Get-MsalDependencyPaths -RepoRoot '.'
+
+            [IO.Path]::IsPathRooted($paths.ModuleRoot) | Should -BeTrue
+            $paths.ModuleRoot | Should -Be (Join-Path $TestDrive 'PowerShell/ScubaGear')
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
     It 'returns the aligned current package version' {
         $paths = Get-MsalDependencyPaths -RepoRoot $TestDrive
         Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig | Should -Be '4.82.0'
