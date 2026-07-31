@@ -96,38 +96,14 @@ For more details on setting up service principal authentication, see the [Non-In
 
 ## Generate Configuration Files
 
-ScubaGear provides two methods for creating configuration files: a command-line utility and a graphical user interface.
-
-### Method 1: Configuration UI (Recommended)
-
-The **Configuration UI** provides an intuitive graphical interface for creating and managing ScubaGear configuration files:
+ScubaGear provides the **Configuration UI**, an intuitive graphical interface for creating and managing ScubaGear configuration files:
 
 ```powershell
 # Launch the Configuration UI
 Start-SCuBAConfigApp
 ```
 
-This is the **recommended method** for users who prefer visual interfaces or are new to ScubaGear configuration.
-
 For complete documentation on using the Configuration UI, see the [Configuration UI Guide](scubaconfigapp.md).
-
-### Method 2: Command-Line Generation
-
-You can also generate an empty sample configuration file using the command line. The `New-SCuBAConfig` cmdlet will create a template configuration file called `SampleConfig.yaml`:
-
-```powershell
-# Create an empty config file
-New-SCuBAConfig
-```
-
-Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values in the sample configuration:
-
-```powershell
-# Create config with pre-set values
-New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,securitysuite"
-```
-
-The generated file can then be manually edited to add your specific configuration settings.
 
 ## Annotate Policies
 
