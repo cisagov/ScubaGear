@@ -740,7 +740,27 @@ function Get-ScubaDmarcRecord {
         $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName" -PreferredDnsResolvers $PreferredDnsResolvers `
             -SkipDoH $SkipDoH
         $LogEntries += $Response.LogEntries
-        if ($Response.Answers.Length -eq 0) {
+        # RFC 9989 step 2 applies to the starting target as well as every
+        # subsequent tree-walk target. Do not let unrelated TXT records or an
+        # ambiguous set of DMARC records suppress parent-domain discovery.
+        $ValidAnswers = @($Response.Answers | Where-Object { $_ -match '^v=DMARC1' })
+
+        if ($ValidAnswers.Length -eq 1) {
+            $Response = [PSCustomObject]@{
+                "Answers"    = @($ValidAnswers)
+                "Errors"     = $Response.Errors
+                "NXDomain"   = $Response.NXDomain
+                "LogEntries" = $Response.LogEntries
+            }
+        }
+        else {
+            $Response = [PSCustomObject]@{
+                "Answers"    = @()
+                "Errors"     = $Response.Errors
+                "NXDomain"   = $Response.NXDomain
+                "LogEntries" = $Response.LogEntries
+            }
+
             # RFC 9989 replaces Public Suffix List organizational-domain discovery with
             # a bounded DNS Tree Walk. Keep the author-domain query above, then walk
             # parent domains without exceeding eight total DNS queries.

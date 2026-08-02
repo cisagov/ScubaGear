@@ -220,6 +220,41 @@ InModuleScope 'ExportEXOProvider' {
                     "_dmarc.com"
                 )
             }
+
+            It "Discards a non-DMARC answer at the author domain and starts the tree walk" {
+                $script:DmarcAnswersByName["_dmarc.a.b.example.com"] = "some unrelated TXT record"
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+
+            It "Discards multiple DMARC records at the author domain and starts the tree walk" {
+                $script:DmarcAnswersByName["_dmarc.a.b.example.com"] = @(
+                    "v=DMARC1; p=none;",
+                    "v=DMARC1; p=quarantine;"
+                )
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
         }
     }
 }
