@@ -155,6 +155,24 @@ InModuleScope ConnectHelpers {
             @($result.value.id) | Should -Be @('1', '2')
             Should -Invoke Invoke-RestMethod -Times 2
         }
+
+        It 'retries a transient transport failure' {
+            $Script:RequestCount = 0
+            Mock Start-Sleep
+            Mock Invoke-RestMethod {
+                $Script:RequestCount++
+                if ($Script:RequestCount -eq 1) {
+                    throw [System.Net.Http.HttpRequestException]::new('Temporary Graph connection failure')
+                }
+                [pscustomobject]@{ id = 'tenant-id' }
+            }
+
+            $result = Invoke-ScubaGraphRequest -Uri '/v1.0/organization'
+
+            $result.id | Should -Be 'tenant-id'
+            Should -Invoke Invoke-RestMethod -Times 2
+            Should -Invoke Start-Sleep -Times 1 -ParameterFilter { $Seconds -eq 1 }
+        }
     }
 }
 AfterAll {
