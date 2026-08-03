@@ -183,6 +183,11 @@ function Invoke-ScubaGraphRequest {
                 Start-Sleep -Seconds $RetryAfter
                 continue
             }
+            $IsTransientFailure = $null -eq $StatusCode -or $StatusCode -in @(408, 500, 502, 503, 504)
+            if ($IsTransientFailure -and $Attempt -le $MaxRetries) {
+                Start-Sleep -Seconds ([Math]::Min([Math]::Pow(2, $Attempt - 1), 4))
+                continue
+            }
             throw
         }
     }
