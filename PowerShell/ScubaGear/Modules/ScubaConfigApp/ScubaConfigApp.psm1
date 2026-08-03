@@ -80,6 +80,16 @@ Function Start-SCuBAConfigApp {
     .PARAMETER M365Environment
     Specifies the M365 environment to use. Valid values are 'commercial', 'dod', 'gcc', 'gcchigh'. Default is 'commercial'.
 
+    .PARAMETER TenantName
+    Tenant domain (e.g. contoso.onmicrosoft.com) or tenant ID to connect to when -Online is used.
+
+    .PARAMETER AppId
+    Application (client) ID for non-interactive (app-only) Microsoft Graph auth with -Online.
+    Requires -CertificateThumbprint (and -TenantName).
+
+    .PARAMETER CertificateThumbprint
+    Thumbprint of the certificate associated with -AppId for non-interactive (app-only) Graph auth.
+
     .PARAMETER Passthru
     If specified, returns the configuration object after loading.
 
@@ -123,6 +133,16 @@ Function Start-SCuBAConfigApp {
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
         [string]$TenantName,
 
+        # App-only (non-interactive) certificate auth. With -Online, provide both to connect
+        # without an interactive sign-in (uses application permissions).
+        [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
+        [ValidatePattern('^[{(]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[)}]?$')]
+        [string]$AppId,
+
+        [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
+        [ValidatePattern('^[A-Fa-f0-9]{40}$')]
+        [string]$CertificateThumbprint,
+
         [switch]$Passthru
     )
 
@@ -161,23 +181,33 @@ Function Start-SCuBAConfigApp {
     If($TenantName) {
         $GraphParameters.TenantId = $TenantName
     }
-    $GraphParameters.Scopes = @(
-        "User.Read.All",
-        "Group.Read.All",
-        "Organization.Read.All",
-        "Application.Read.All"
-    )
+    # App-only (non-interactive) certificate auth uses application permissions, so no scopes.
+    $AppOnlyAuth = ($AppId -and $CertificateThumbprint)
+    if ($AppOnlyAuth) {
+        $GraphParameters.ClientId = $AppId
+        $GraphParameters.CertificateThumbprint = $CertificateThumbprint
+    } else {
+        $GraphParameters.Scopes = @(
+            "User.Read.All",
+            "Group.Read.All",
+            "Organization.Read.All",
+            "Application.Read.All"
+        )
+    }
 
     # Connect to Microsoft Graph if Online parameter is used
     if ($Online) {
         try {
             #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
-            Write-Output "Connecting to Microsoft Graph..."
+            Write-Output $(if ($AppOnlyAuth) { "Connecting to Microsoft Graph (app-only certificate)..." } else { "Connecting to Microsoft Graph..." })
             Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
 
-            #ensure user is authenticated
-            Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+            # Interactive auth resolves a signed-in user; confirm it. App-only has no user
+            # context (/me returns 400), so a successful Connect-MgGraph is sufficient there.
+            if (-not $AppOnlyAuth) {
+                Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+            }
             Write-Output " - Successfully connected to Microsoft Graph"
             $GraphConnected = $true
         }
@@ -210,6 +240,9 @@ Function Start-SCuBAConfigApp {
     # Build the syncHash with necessary paths and parameters
     $syncHash.Online = $Online
     $syncHash.GraphConnected = $GraphConnected
+    # Record the auth mode so the runspace can log app-only (cert) connections to the debug log.
+    $syncHash.AppOnlyAuth = $AppOnlyAuth
+    $syncHash.ConnectedAppId = if ($AppOnlyAuth) { $AppId } else { $null }
     # Cache mapping object IDs (GUIDs) to their display names.
     # Populated when the user selects items via Graph queries or when importing YAML with inline comments.
     # Used to emit friendly-name comments in generated YAML (e.g.  - guid #DisplayName).
@@ -258,6 +291,9 @@ Function Start-SCuBAConfigApp {
     $syncHash.ExclusionData = [ordered]@{}
     $syncHash.OmissionData = [ordered]@{}
     $syncHash.AnnotationData = [ordered]@{}
+    # Per-policy documentation comments for exclusions (policyId -> ordered array of lines).
+    # Emitted as "# ..." above each policy in the generated YAML; not a ScubaGear config value.
+    $syncHash.ExclusionComments = [ordered]@{}
     #build runspace
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
@@ -313,6 +349,14 @@ Function Start-SCuBAConfigApp {
         #
         #===========================================================================
         $source = "Initialization"
+
+        # Log the Graph authentication mode (helps troubleshoot app-only certificate connections).
+        if ($syncHash.AppOnlyAuth) {
+            Write-DebugOutput -Message "Connected to Microsoft Graph using app-only certificate authentication (AppId: $($syncHash.ConnectedAppId))" -Source "Graph Connection" -Level "Info"
+        } elseif ($syncHash.GraphConnected) {
+            Write-DebugOutput -Message "Connected to Microsoft Graph using interactive authentication" -Source "Graph Connection" -Level "Info"
+        }
+
         # Set window icon from DrawingImage resource
         $syncHash.Window.Icon = $syncHash.IcoPath
         $syncHash.LogoImage.Source = $syncHash.ImgPath

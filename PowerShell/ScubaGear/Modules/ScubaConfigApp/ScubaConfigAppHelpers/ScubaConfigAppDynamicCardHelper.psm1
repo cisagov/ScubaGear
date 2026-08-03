@@ -1262,7 +1262,75 @@ Function New-FieldListCard {
         [void]$buttonPanel.Children.Add($dismissButton)
     }
 
+    # Comment (exclusions only): a hidden multi-line box toggled by an "Add comment" button.
+    # Purely YAML documentation - each non-empty line becomes a "# ..." above the policy; not a config value.
+    $commentPanel = $null
+    if ($controlType -eq 'Exclusions') {
+        $commentButton = New-Object System.Windows.Controls.Button
+        $commentButton.Content = "Add comment"
+        $commentButton.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_CommentButton")
+        $commentButton.Style = $syncHash.Window.FindResource("PrimaryButton")
+        $commentButton.Width = 120
+        $commentButton.Height = 28
+        # Left margin (the buttons before it use right-margins, and Remove/Dismiss have none) keeps the gap even.
+        $commentButton.Margin = "10,0,0,0"
+        $commentButton.Background = [System.Windows.Media.Brushes]::SlateGray
+        $commentButton.Foreground = [System.Windows.Media.Brushes]::White
+        $commentButton.BorderThickness = "0"
+        $commentButton.FontWeight = "SemiBold"
+        $commentButton.Cursor = [System.Windows.Input.Cursors]::Hand
+        [void]$buttonPanel.Children.Add($commentButton)
+
+        $commentPanel = New-Object System.Windows.Controls.StackPanel
+        $commentPanel.Visibility = "Collapsed"
+        $commentPanel.Margin = "0,10,0,0"
+
+        $commentLabel = New-Object System.Windows.Controls.TextBlock
+        $commentLabel.Text = "Comment (YAML documentation only; each line becomes a # comment above this policy):"
+        $commentLabel.FontSize = 11
+        $commentLabel.Foreground = $syncHash.Window.FindResource("MutedTextBrush")
+        $commentLabel.TextWrapping = "Wrap"
+        $commentLabel.Margin = "0,0,0,4"
+        [void]$commentPanel.Children.Add($commentLabel)
+
+        $commentBox = New-Object System.Windows.Controls.TextBox
+        $commentBox.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_CommentBox")
+        $commentBox.AcceptsReturn = $true
+        $commentBox.TextWrapping = "Wrap"
+        $commentBox.MinHeight = 60
+        $commentBox.MaxHeight = 160
+        $commentBox.VerticalScrollBarVisibility = "Auto"
+        [void]$commentPanel.Children.Add($commentBox)
+
+        # Persist each line into ExclusionComments (ordered array) keyed by this policy id.
+        $commentBox.Add_TextChanged({
+            if ([string]::IsNullOrWhiteSpace($this.Text)) {
+                if ($syncHash.ExclusionComments.Contains($PolicyId)) { [void]$syncHash.ExclusionComments.Remove($PolicyId) }
+            } else {
+                $syncHash.ExclusionComments[$PolicyId] = @($this.Text -split "`r?`n")
+            }
+        }.GetNewClosure())
+
+        # Toggle the box; focus it when shown.
+        $commentButton.Add_Click({
+            if ($commentPanel.Visibility -eq [System.Windows.Visibility]::Visible) {
+                $commentPanel.Visibility = 'Collapsed'
+            } else {
+                $commentPanel.Visibility = 'Visible'
+                [void]$commentBox.Focus()
+            }
+        }.GetNewClosure())
+
+        # Restore an existing comment (e.g. after re-render) and reveal the box.
+        if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) {
+            $commentBox.Text = (@($syncHash.ExclusionComments[$PolicyId]) -join [Environment]::NewLine)
+            $commentPanel.Visibility = 'Visible'
+            $commentButton.Content = 'Edit comment'
+        }
+    }
+
     [void]$detailsPanel.Children.Add($buttonPanel)
+    if ($commentPanel) { [void]$detailsPanel.Children.Add($commentPanel) }
 
     # Add elements to main grid
     [void]$cardGrid.Children.Add($headerGrid)
