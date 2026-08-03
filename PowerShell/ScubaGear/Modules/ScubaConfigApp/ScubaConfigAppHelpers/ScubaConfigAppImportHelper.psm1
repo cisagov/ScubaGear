@@ -334,6 +334,7 @@ Function Invoke-YamlImportWithProgress {
         # Clear in-place rather than replacing so card closures that captured these object
         # references at creation time continue to point at the live data stores.
         $syncHash.ExclusionData.Clear()
+        if ($syncHash.ExclusionComments) { $syncHash.ExclusionComments.Clear() }
         $syncHash.OmissionData.Clear()
         $syncHash.AnnotationData.Clear()
         $syncHash.GeneralSettingsData.Clear()

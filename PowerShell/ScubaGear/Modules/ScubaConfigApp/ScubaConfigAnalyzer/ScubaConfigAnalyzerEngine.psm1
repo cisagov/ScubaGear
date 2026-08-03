@@ -21,6 +21,66 @@
     This module is intentionally UI-free so the analysis can be unit-tested on its
     own (Invoke-ScubaConfigAnalysis -ResultsPath <file>).
 
+    ----------------------------------------------------------------------------------
+    TWO ENTRY POINTS (the public functions the UI calls)
+    ----------------------------------------------------------------------------------
+      Invoke-ScubaConfigAnalysis -ResultsPath <file>   OFFLINE: analyze an existing
+                                                       ScubaResults_*.json on disk.
+      Invoke-ScubaTenantScan     -Product <p> ...      LIVE: read the tenant straight
+                                                       from Microsoft Graph and analyze
+                                                       it (no ScubaGear run needed).
+    Both return the SAME findings object (see OUTPUT CONTRACT), so the UI renders either
+    identically. Get-ScubaAnalyzerConfigYaml turns that object into a ScubaGear config file.
+
+    ----------------------------------------------------------------------------------
+    PIPELINE (how one control becomes a finding)
+    ----------------------------------------------------------------------------------
+      1. Get-ScAValidationSchema        - look up the baseline rule for the control id.
+      2. Get-ScAPolicyAnalysis          - find the CA policies related to the control,
+                                          validate each requirement, and DETECT excluded
+                                          users/groups/apps (the exclusionDetectors rules).
+      3. Get-ScAActionClassification /  - decide how to make it pass: already passing,
+         Get-ScAConfigAction              add exclusions to config, fix the policy, or
+                                          create a new one.
+      4. Build-ScAYamlExclusionsBlock    - emit the exclusions as ScubaGear config YAML
+         (per control) / Get-ScubaAnalyzerConfigYaml (whole tenant).
+
+    ----------------------------------------------------------------------------------
+    SCHEMA-DRIVEN DESIGN (nothing product/policy specific is hardcoded)
+    ----------------------------------------------------------------------------------
+      ScubaGearResultsBaselineSchema.json - the controls, their validation logic,
+                                            requiredSettings, exclusionField, remediation.
+      ScubaGearAnalyzerSchema_en-US.json  - productMap (key -> results/config key), friendly
+                                            requirement names, named Graph apiOperations, and
+                                            the conditionalAccessAnalysis rules (policyState,
+                                            exclusionDetectors, scopeGates, displayNameLookup).
+      ScubaGearApiCatalog.json            - cmdlet -> Graph REST resource + least scopes.
+      ScubaConfigSchema.json              - which controls are configurable via exclusions.
+    The $script:ScA* caches at the top of this file are filled from these at runtime by the
+    Import-ScA* functions; everything below is just an interpreter over that JSON.
+
+    ----------------------------------------------------------------------------------
+    OUTPUT CONTRACT (what the two entry points return - the UI depends on this shape)
+    ----------------------------------------------------------------------------------
+      MetaData = @{ DisplayName; Organization; TenantId; ScanDate; ResultsPath }
+      Summary  = @{ Passes; Failures; Warnings; Errors; Manual; Total; ComplianceRate }
+      Products = @('aad', ...)
+      Findings = @( <Finding>, ... )
+      DisplayNameLookup = @{ '<object id>' = '<display name>' }
+
+      <Finding> (one per analyzed control):
+        ControlId 'MS.AAD.3.1v1'; ProductConfigKey 'Aad'; Requirement '...'; Result
+        'Fail'|'Warning'|'Pass'|'Error'|'Manual'; Configurable $true/$false;
+        ExclusionField 'CapExclusions'|'none'; ConfigAction 'EXCLUDE'|'FIX_TENANT'|...;
+        DetectedExclusions @{ Users; Groups; Applications; GuestUserTypes };
+        AllPolicies @( <PolicyCandidate> ); BestMatch <PolicyCandidate>|$null;
+        SelectedPolicyId; RootCause; Recommendations; RemediationSteps; YamlBlock; ...
+
+      <PolicyCandidate> (one matching Conditional Access policy):
+        Id; DisplayName; State; MeetsCriteria; IssueCount; SettingIssueCount;
+        ExcludedPrincipalCount; Issues @( 'WARNING: ...|DETAILS:...|SUGGESTION:...' );
+        DetectedExclusions @{ Users; Groups; Applications; GuestUserTypes }
+
 .NOTES
     Ported and adapted from the standalone AnalyzeScubaGearResults tool.
     Part of the ScubaGear project - https://github.com/cisagov/ScubaGear
@@ -515,12 +575,30 @@ function Get-ScAPolicyAnalysis {
     .SYNOPSIS
     Analyzes conditional access policies for a control and returns relevant policies
     with their validation issues (including detected exclusions).
+    .DESCRIPTION
+    For every ENABLED Conditional Access policy that is relevant to this control and in
+    scope (both decided by the JSON rules), this:
+      1. validates each baseline requirement       -> wrong settings become "setting issues";
+      2. runs the exclusionDetectors rules to find  -> excluded principals config CAN waive
+         become "exclusion issues"; disallowed ones become "errors";
+      3. keeps the policy as a candidate, recording its issues + detected exclusions.
+    A candidate with zero issues MeetsCriteria (the control already passes via that policy).
+    .OUTPUTS
+    @{ AllPolicies = @( <PolicyCandidate> ); TotalPoliciesFound = <int> }  e.g.
+      @{ TotalPoliciesFound = 1; AllPolicies = @(@{
+           DisplayName='Block legacy auth'; Id='...'; State='enabled';
+           MeetsCriteria=$false; IssueCount=1; SettingIssueCount=0; ExcludedPrincipalCount=2;
+           Issues=@('WARNING: Policy has 2 excluded user(s)|DETAILS:IDs: a,b|SUGGESTION:...');
+           DetectedExclusions=@{ Users=@('a','b'); Groups=@(); Applications=@(); GuestUserTypes=@() } }) }
     #>
     param(
         [Parameter(Mandatory)][string]$ControlId,
         [Parameter(Mandatory)]$Results,
         [Parameter(Mandatory)]$ValidationSchema
     )
+
+    # $ControlId is context for diagnostics; the matching itself is driven by $ValidationSchema.
+    Write-Verbose "Get-ScAPolicyAnalysis: analyzing Conditional Access policies for control '$ControlId'."
 
     $allPoliciesData = @()
 
@@ -556,30 +634,39 @@ function Get-ScAPolicyAnalysis {
         # 2. Detect config-waivable exclusions, driven by the exclusionDetectors rules
         #    (which config field, which policy path, and when each detector applies).
         foreach ($det in @($rules.exclusionDetectors.rules)) {
+            # A detector may only apply to a specific exclusion field (e.g. CapExclusions).
             $typeSupported = (-not $det.requiresExclusionType) -or ($exclusionField -eq [string]$det.requiresExclusionType)
 
+            # Some detectors only fire when the baseline requires a particular scope
+            # (e.g. "all users"): skip this detector when that gate isn't met.
             if ($det.scopeRequirement) {
                 $reqScope = Get-ScAValueAtPath -Object $requirements -Path $det.scopeRequirement.conditionPath
                 if (@($reqScope) -notcontains $det.scopeRequirement.requiredValue) { continue }
             }
 
+            # Read the excluded values from the policy at the detector's path. valueKind
+            # 'csvOrArray' means the field may be a comma-separated string OR an array.
             $raw = Get-ScAValueAtPath -Object $policy -Path $det.policyPath
             $vals = if ([string]$det.valueKind -eq 'csvOrArray') {
                 if ($raw -is [string]) { @($raw -split '\s*,\s*' | Where-Object { $_ }) } else { @($raw | Where-Object { $_ }) }
             } else {
                 @($raw | Where-Object { $_ })
             }
-            if (@($vals).Count -eq 0) { continue }
+            if (@($vals).Count -eq 0) { continue }   # nothing excluded here -> next detector
 
             if ($typeSupported) {
+                # Config CAN waive these: record them + emit a WARNING (not a hard failure).
                 $excludedCount += @($vals).Count
                 if ($det.field -and $detected.ContainsKey([string]$det.field)) { $detected[[string]$det.field] += @($vals) }
                 $lbl  = if ($det.issueLabel)  { [string]$det.issueLabel }  else { 'item' }
                 $dlbl = if ($det.detailLabel) { [string]$det.detailLabel } else { 'IDs' }
                 $sug  = if ($det.suggestion)  { [string]$det.suggestion }  else { 'Review if these exclusions are justified and documented' }
+                # Pipe-delimited issue string; Format-ScubaAnalyzerIssues (UI) parses this shape.
                 $exclusionIssues += "WARNING: Policy has $(@($vals).Count) excluded ${lbl}(s)|DETAILS:${dlbl}: $(@($vals) -join ', ')|SUGGESTION:$sug"
             }
             elseif ($det.unsupportedIsError) {
+                # Config CANNOT waive these (e.g. excluded apps on a policy type with no such
+                # config key): emit an ERROR so the control is flagged as needing a tenant fix.
                 $msg = if ($det.unsupportedMessage) { ([string]$det.unsupportedMessage) -replace '\{values\}', (@($vals) -join ', ') }
                        else { "Policy has disallowed exclusions: $(@($vals) -join ', ')" }
                 $settingIssues += "ERROR: $msg"
@@ -621,6 +708,19 @@ function Build-ScAYamlExclusionsBlock {
     <#
     .SYNOPSIS
     Builds a per-control YAML exclusion block for a single product.
+    .DESCRIPTION
+    ValueShape 'principal' emits Users:/Groups:/Applications:/GuestUserTypes: sub-lists
+    (Conditional Access + role exclusions); 'list' emits a flat list (e.g. allowed
+    forwarding domains). Ids are annotated with '# Friendly Name' when DisplayNameLookup
+    has them. This is the engine-side twin of the UI's New-ScubaAnalyzerControlYamlText.
+    .EXAMPLE
+    # ProductConfigKey 'Aad', ControlId 'MS.AAD.3.1v1', ExcludedUsers @('1111....'):
+    #   Aad:
+    #     # Legacy authentication SHALL be blocked.
+    #     MS.AAD.3.1v1:
+    #       CapExclusions:
+    #         Users:
+    #           - 1111....  # Break Glass 1
     #>
     param(
         [Parameter(Mandatory)][string]$ProductConfigKey,
@@ -967,6 +1067,23 @@ function Get-ScubaAnalyzerConfigYaml {
 
     .PARAMETER DisplayNameLookup
     Optional map of object id -> display name used to emit friendly-name comments.
+
+    .EXAMPLE
+    Get-ScubaAnalyzerConfigYaml -Analysis $a -M365Environment commercial
+    # Produces a ready-to-use ScubaGear config, e.g.:
+    #   # ScubaGear configuration generated by Start-SCuBAConfigAnalyzer
+    #   Organization: contoso.onmicrosoft.com
+    #   M365Environment: commercial
+    #   ProductNames:
+    #     - aad
+    #
+    #   Aad:
+    #     # Legacy authentication SHALL be blocked.
+    #     # CA policy: Block legacy auth
+    #     MS.AAD.3.1v1:
+    #       CapExclusions:
+    #         Users:
+    #           - 1111....  # Break Glass 1
     #>
     [CmdletBinding()]
     param(
@@ -1091,20 +1208,28 @@ function Get-ScAActionClassification {
                        (fix = add those exclusions to the ScubaGear config).
       FIX_POLICY     - the closest (best-match) policy has the wrong settings.
       CREATE_POLICY  - no relevant policy exists; a new one must be created.
+    .OUTPUTS
+    @{ Result = 'Pass'|'Fail'; Action = 'NONE'|'ADD_EXCLUSIONS'|'FIX_POLICY'|'CREATE_POLICY';
+       RootCause = '<plain-English why>' }
     #>
     param([Parameter(Mandatory)]$PolicyAnalysis)
 
     $policies = @($PolicyAnalysis.AllPolicies)
+    # No relevant policy at all -> the tenant must create one.
     if (@($policies).Count -eq 0) {
         return @{ Result = 'Fail'; Action = 'CREATE_POLICY'; RootCause = 'No Conditional Access policy addresses this baseline - create a new one.' }
     }
+    # Best match = fewest setting problems, then fewest excluded principals, then fewest issues.
     $best = @($policies | Sort-Object { $_.SettingIssueCount }, { $_.ExcludedPrincipalCount }, { $_.IssueCount })[0]
+    # Zero issues -> the control already passes through this policy.
     if ($best.MeetsCriteria) {
         return @{ Result = 'Pass'; Action = 'NONE'; RootCause = 'A Conditional Access policy already satisfies this baseline.' }
     }
+    # Settings are correct but principals are excluded -> config can waive it (add exclusions).
     if ($best.SettingIssueCount -eq 0 -and $best.ExcludedPrincipalCount -gt 0) {
         return @{ Result = 'Fail'; Action = 'ADD_EXCLUSIONS'; RootCause = 'The best-matching policy meets this baseline but excludes users/groups/apps/guests. Add them to your config to pass.' }
     }
+    # Otherwise the closest policy has wrong settings -> the tenant must fix the policy.
     return @{ Result = 'Fail'; Action = 'FIX_POLICY'; RootCause = 'The best-matching policy needs configuration changes to pass this baseline.' }
 }
 
@@ -1356,6 +1481,10 @@ function Invoke-ScubaTenantScan {
         [string]$ConfigSchemaPath,
         [hashtable]$TenantData
     )
+
+    # $M365Environment is recorded for context only; the Graph connection that actually uses
+    # it is established by the caller (on the UI thread) before this scan runs.
+    Write-Verbose "Invoke-ScubaTenantScan: products '$($Product -join ", ")' in environment '$M365Environment'."
 
     if (-not $BaselineSchemaPath) { $BaselineSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearResultsBaselineSchema.json' }
     if (-not $AnalyzerSchemaPath) { $AnalyzerSchemaPath = Resolve-ScASchemaPath -FileName 'ScubaGearAnalyzerSchema_en-US.json' }

@@ -161,6 +161,7 @@
                 </StackPanel>
                 <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" HorizontalAlignment="Right">
                     <TextBlock x:Name="TenantText" Text="Tenant: (none loaded)" Foreground="White" FontSize="12" HorizontalAlignment="Right"/>
+                    <TextBlock x:Name="ConnectionText" Text="" Foreground="#7FE0A0" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                     <TextBlock x:Name="ScanDateText" Text="" Foreground="#B9C6DE" FontSize="11" HorizontalAlignment="Right"/>
                     <TextBlock x:Name="VersionText" Text="" Foreground="#8CA0C4" FontSize="10" HorizontalAlignment="Right"/>
                 </StackPanel>
