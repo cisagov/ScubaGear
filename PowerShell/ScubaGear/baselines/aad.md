@@ -25,6 +25,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following are key terms and descriptions used in this document.
 
+**Microsoft Entra admin center**: The dedicated web-based interface at [entra.microsoft.com](https://entra.microsoft.com/#home) used to manage Microsoft Entra ID settings.
+
+**Microsoft Entra Portal**: The Microsoft Entra ID / Azure Active Directory management experience embedded within the general Azure Portal at [portal.azure.com](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview). This is a distinct, separately-maintained interface from the Microsoft Entra admin center, though both currently operate against the same tenant data. Where implementation steps in this document reference the Microsoft Entra Portal specifically, using the Microsoft Entra admin center instead may present different menu structures or labels.
+
 **Microsoft Entra ID hybrid**: This term denotes the scenario
 when an organization has an on-premises Microsoft Windows Server Active Directory that contains the
 master user directory but federates access to the cloud M365
@@ -475,7 +479,7 @@ We recommend using a custom authentication strength because you can enforce the 
 #### MS.AAD.3.3v2 Instructions
 If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
-1. In **Microsoft Entra admin center**, click **Protection > Authentication methods > Microsoft Authenticator**.
+1. In **Microsoft Entra admin center**, click **Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP** select *No*.
 4. Under **Show application name in push and passwordless notifications** select **Status > Enabled** and **Target > Include > All users**.
@@ -488,7 +492,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 2. Once ready to finish the migration, [set the **Manage Migration** option to **Migration Complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
 #### MS.AAD.3.5v2 Instructions
-1. In **Microsoft Entra admin center** , click **Protection > Authentication methods**
+1. In **Microsoft Entra admin center**, click **Authentication methods**
 2. Click on the **SMS**, **Voice Call**, and **Email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
 #### MS.AAD.3.6v1 Instructions
@@ -1096,7 +1100,7 @@ Exception cases:
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
+1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
@@ -1110,7 +1114,7 @@ Exception cases:
 
 #### MS.AAD.7.7v1 Instructions
 
-1.  In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then under **Manage**, select **Microsoft Entra roles**.
+1.  In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example:
 
@@ -1125,7 +1129,7 @@ Exception cases:
 
 #### MS.AAD.7.8v1 Instructions
 
-1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Under **Manage**, select **Microsoft Entra roles**.
+1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Select **Microsoft Entra roles**.
 
 2. Click the **Global Administrator** role.
 
