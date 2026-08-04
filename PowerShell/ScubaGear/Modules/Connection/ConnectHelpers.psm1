@@ -1,4 +1,4 @@
-# Session state stored globally so all module import paths share the same instance
+﻿# Session state stored globally so all module import paths share the same instance
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
 if (-not $Global:ScubaGearState) {
@@ -69,6 +69,12 @@ function Connect-GraphHelper {
 }
 
 function Get-ScubaGraphContext {
+    <#
+    .SYNOPSIS
+        Returns the active Graph session environment and endpoint.
+    .FUNCTIONALITY
+        Internal
+    #>
     [CmdletBinding()]
     param()
 
@@ -81,6 +87,12 @@ function Get-ScubaGraphContext {
 }
 
 function Disconnect-ScubaGraph {
+    <#
+    .SYNOPSIS
+        Clears the Graph session and MSAL token cache.
+    .FUNCTIONALITY
+        Internal
+    #>
     [CmdletBinding()]
     param()
 
@@ -89,6 +101,12 @@ function Disconnect-ScubaGraph {
 }
 
 function Invoke-ScubaGraphRequest {
+    <#
+    .SYNOPSIS
+        Sends an authenticated REST request to the Microsoft Graph API.
+    .FUNCTIONALITY
+        Internal
+    #>
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OutputType', Justification = 'Retained for Invoke-MgGraphRequest call-site compatibility; Invoke-RestMethod already returns PSObject output.')]
     [CmdletBinding()]
     param(
