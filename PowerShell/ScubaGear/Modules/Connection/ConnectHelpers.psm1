@@ -1,4 +1,9 @@
-﻿function Connect-GraphHelper {
+# Session state stored globally so all module import paths share the same instance
+if (-not $Global:ScubaGearState) {
+    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false }
+}
+
+function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
@@ -49,7 +54,7 @@
     }
 
     $TokenParameters.M365Environment = $M365Environment
-    $Script:ScubaGraphSession = @{
+    $Global:ScubaGearState.Session = @{
         M365Environment = $M365Environment
         GraphEndpoint = switch ($M365Environment) {
             'gcchigh' { 'https://graph.microsoft.us' }
@@ -65,10 +70,10 @@ function Get-ScubaGraphContext {
     [CmdletBinding()]
     param()
 
-    if ($Script:ScubaGraphSession) {
+    if ($Global:ScubaGearState.Session) {
         [pscustomobject]@{
-            Environment = $Script:ScubaGraphSession.M365Environment
-            GraphEndpoint = $Script:ScubaGraphSession.GraphEndpoint
+            Environment = $Global:ScubaGearState.Session.M365Environment
+            GraphEndpoint = $Global:ScubaGearState.Session.GraphEndpoint
         }
     }
 }
@@ -77,8 +82,8 @@ function Disconnect-ScubaGraph {
     [CmdletBinding()]
     param()
 
-    $Script:ScubaGraphSession = $null
-    $Script:MsalAppCache = @{}
+    $Global:ScubaGearState.Session = $null
+    $Global:ScubaGearState.MsalAppCache = @{}
 }
 
 function Invoke-ScubaGraphRequest {
@@ -103,7 +108,7 @@ function Invoke-ScubaGraphRequest {
         [int]$MaxRetries = 3
     )
 
-    if (-not $Script:ScubaGraphSession) {
+    if (-not $Global:ScubaGearState.Session) {
         throw 'Microsoft Graph is not connected. Call Connect-GraphHelper first.'
     }
 
@@ -111,14 +116,14 @@ function Invoke-ScubaGraphRequest {
         $Uri
     }
     else {
-        "$($Script:ScubaGraphSession.GraphEndpoint)/$($Uri.TrimStart('/'))"
+        "$($Global:ScubaGearState.Session.GraphEndpoint)/$($Uri.TrimStart('/'))"
     }
 
     $Attempt = 0
     $RefreshedToken = $false
     while ($Attempt -le $MaxRetries) {
         $Attempt++
-        $TokenParameters = $Script:ScubaGraphSession.TokenParameters
+        $TokenParameters = $Global:ScubaGearState.Session.TokenParameters
         $AccessToken = Get-MsalAccessToken @TokenParameters
         $RequestHeaders = @{
             Authorization = "Bearer $AccessToken"
@@ -171,7 +176,7 @@ function Invoke-ScubaGraphRequest {
             }
             if ($StatusCode -eq 401 -and -not $RefreshedToken) {
                 $RefreshedToken = $true
-                $Script:MsalAppCache = @{}
+                $Global:ScubaGearState.MsalAppCache = @{}
                 continue
             }
             if ($StatusCode -eq 429 -and $Attempt -le $MaxRetries) {
@@ -253,7 +258,7 @@ function Initialize-Msal {
         throw "Microsoft.Identity.Client $($LoadedMsal.GetName().Version) is already loaded; ScubaGear requires $ExpectedAssemblyVersion. Start a new PowerShell session."
     }
 
-    if (-not $Script:MsalDependenciesValidated) {
+    if (-not $Global:ScubaGearState.MsalValidated) {
         foreach ($Record in $Lock.files) {
             $FilePath = Join-Path $ModuleRoot $Record.path
             if (-not (Test-Path -Path $FilePath -PathType Leaf)) {
@@ -270,7 +275,7 @@ function Initialize-Msal {
                 throw "Bundled MSAL dependency failed Authenticode validation: $($Record.path)"
             }
         }
-        $Script:MsalDependenciesValidated = $true
+        $Global:ScubaGearState.MsalValidated = $true
     }
 
     $Architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
@@ -391,8 +396,8 @@ function Get-MsalAccessToken {
     # Cache MSAL app instances by key so token cache persists across calls.
     # This enables AcquireTokenSilent to succeed for subsequent scope requests
     # after the first interactive sign-in, reducing browser popups to one.
-    if (-not $Script:MsalAppCache) {
-        $Script:MsalAppCache = @{}
+    if (-not $Global:ScubaGearState.MsalAppCache) {
+        $Global:ScubaGearState.MsalAppCache = @{}
     }
 
     $MaxAttempts = 3
@@ -402,18 +407,18 @@ function Get-MsalAccessToken {
         try {
             if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
                 $CacheKey = "SP:$AppID|$Authority"
-                if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
-                    $Script:MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+                if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
                         WithCertificate($Certificate).
                         WithAuthority($Authority).
                         Build()
                 }
-                $MsalApp = $Script:MsalAppCache[$CacheKey]
+                $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
                 $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
             }
             else {
                 $CacheKey = "PUB:$ClientId|$Authority|Broker:$(-not $DisableBroker)"
-                if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
+                if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
                     $Builder = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
                         WithAuthority($Authority)
                     if ($DisableBroker) {
@@ -429,9 +434,9 @@ function Get-MsalAccessToken {
                         )
                         $Builder = [Microsoft.Identity.Client.Broker.BrokerExtension]::WithBroker($Builder, $BrokerOptions)
                     }
-                    $Script:MsalAppCache[$CacheKey] = $Builder.Build()
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = $Builder.Build()
                 }
-                $MsalApp = $Script:MsalAppCache[$CacheKey]
+                $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
 
                 # Try silent acquisition first using cached accounts
                 $TokenResult = $null
