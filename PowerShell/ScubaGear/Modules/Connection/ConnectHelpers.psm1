@@ -1,4 +1,6 @@
 # Session state stored globally so all module import paths share the same instance
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
 if (-not $Global:ScubaGearState) {
     $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false }
 }
