@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Get-TeamsAccessTokens, Invoke-ScubaGraphRequest -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Get-TeamsAccessTokens, Invoke-ScubaGraphRequest
 
 function Connect-Tenant {
     <#
@@ -39,7 +39,6 @@ function Connect-Tenant {
     [switch]
     $UseSystemBrowserAuthentication
    )
-   Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope

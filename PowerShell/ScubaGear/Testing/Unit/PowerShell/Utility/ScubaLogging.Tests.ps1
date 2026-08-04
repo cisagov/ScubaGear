@@ -757,7 +757,7 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Info   ] [ModuleSnapshot      ] Module snapshot 'InitialLoad' captured: 2 module(s)",
                     '    Data: {"SnapshotName":"InitialLoad","ModuleCount":2,"Modules":["ScubaGear (1.7.1)","powershell-yaml (0.4.7)"],"ModulePaths":["ScubaGear=C:\\Modules\\ScubaGear","powershell-yaml=C:\\Modules\\yaml"],"ModuleSummary":"ScubaGear (1.7.1); powershell-yaml (0.4.7)","ModulePathsSummary":"ScubaGear=C:\\Modules\\ScubaGear; powershell-yaml=C:\\Modules\\yaml"}',
                     "[2026-01-01 10:00:00.012] [Info   ] [ModuleSnapshot      ] Module snapshot 'PostAuthentication' captured: 3 module(s)",
-                    '    Data: {"SnapshotName":"PostAuthentication","ModuleCount":3,"Modules":["ScubaGear (1.7.1)","powershell-yaml (0.4.7)","Microsoft.Graph.Authentication (2.25.0)"],"ModulePaths":["ScubaGear=C:\\Modules\\ScubaGear","powershell-yaml=C:\\Modules\\yaml","Microsoft.Graph.Authentication=C:\\Modules\\Graph"],"ModuleSummary":"ScubaGear (1.7.1); powershell-yaml (0.4.7); Microsoft.Graph.Authentication (2.25.0)","ModulePathsSummary":"ScubaGear=C:\\Modules\\ScubaGear; powershell-yaml=C:\\Modules\\yaml; Microsoft.Graph.Authentication=C:\\Modules\\Graph"}'
+                    '    Data: {"SnapshotName":"PostAuthentication","ModuleCount":3,"Modules":["ScubaGear (1.7.1)","powershell-yaml (0.4.7)","MicrosoftTeams (7.9.0)"],"ModulePaths":["ScubaGear=C:\\Modules\\ScubaGear","powershell-yaml=C:\\Modules\\yaml","MicrosoftTeams=C:\\Modules\\Teams"],"ModuleSummary":"ScubaGear (1.7.1); powershell-yaml (0.4.7); MicrosoftTeams (7.9.0)","ModulePathsSummary":"ScubaGear=C:\\Modules\\ScubaGear; powershell-yaml=C:\\Modules\\yaml; MicrosoftTeams=C:\\Modules\\Teams"}'
                 )
 
                 $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
@@ -766,8 +766,8 @@ InModuleScope ScubaLogging {
                 $report | Should -Match '\| Snapshot \| Module \| Version \| Path \|'
                 $report | Should -Match 'InitialLoad'
                 $report | Should -Match 'PostAuthentication'
-                $report | Should -Match 'Microsoft\.Graph\.Authentication'
-                $report | Should -Match '2\.25\.0'
+                $report | Should -Match 'MicrosoftTeams'
+                $report | Should -Match '7\.9\.0'
             }
 
             It "Should show unique modules only in Module Loading Progression table" {
@@ -775,7 +775,7 @@ InModuleScope ScubaLogging {
                     "[2026-01-01 10:00:00.011] [Info   ] [ModuleSnapshot      ] Module snapshot 'InitialLoad' captured: 1 module(s)",
                     '    Data: {"SnapshotName":"InitialLoad","ModuleCount":1,"Modules":["powershell-yaml (0.4.7)"],"ModulePaths":["powershell-yaml=C:\\Modules\\yaml"],"ModuleSummary":"powershell-yaml (0.4.7)","ModulePathsSummary":"powershell-yaml=C:\\Modules\\yaml"}',
                     "[2026-01-01 10:00:00.012] [Info   ] [ModuleSnapshot      ] Module snapshot 'PostAuthentication' captured: 2 module(s)",
-                    '    Data: {"SnapshotName":"PostAuthentication","ModuleCount":2,"Modules":["powershell-yaml (0.4.7)","Microsoft.Graph.Authentication (2.25.0)"],"ModulePaths":["powershell-yaml=C:\\Modules\\yaml","Microsoft.Graph.Authentication=C:\\Modules\\Graph"],"ModuleSummary":"powershell-yaml (0.4.7); Microsoft.Graph.Authentication (2.25.0)","ModulePathsSummary":"powershell-yaml=C:\\Modules\\yaml; Microsoft.Graph.Authentication=C:\\Modules\\Graph"}'
+                    '    Data: {"SnapshotName":"PostAuthentication","ModuleCount":2,"Modules":["powershell-yaml (0.4.7)","MicrosoftTeams (7.9.0)"],"ModulePaths":["powershell-yaml=C:\\Modules\\yaml","MicrosoftTeams=C:\\Modules\\Teams"],"ModuleSummary":"powershell-yaml (0.4.7); MicrosoftTeams (7.9.0)","ModulePathsSummary":"powershell-yaml=C:\\Modules\\yaml; MicrosoftTeams=C:\\Modules\\Teams"}'
                 )
 
                 $report = Get-ScubaDebugLogReport -DebugLogPath $script:FakeLogPath
