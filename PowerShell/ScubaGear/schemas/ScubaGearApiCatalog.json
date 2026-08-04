@@ -1951,7 +1951,7 @@
     },
 
     {
-        "moduleCmdlet":  "Teams REST API",
+        "moduleCmdlet":  "Teams admin REST API",
         "apiResource":  "https://api.interfaces.records.teams.microsoft.com",
         "apiFilter":  "",
         "apiHeader": [
@@ -1977,7 +1977,7 @@
     },
 
     {
-        "moduleCmdlet":  "Teams REST API",
+        "moduleCmdlet":  "Teams admin REST API",
         "apiResource":  "https://api.interfaces.records.gov.teams.microsoft.us",
         "apiFilter":  "",
         "apiHeader": [
@@ -2000,6 +2000,32 @@
         ],
         "notes":  "Teams data is retrieved via direct REST API calls to the Teams API.",
         "oauthScope":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default"
+    },
+
+    {
+        "moduleCmdlet":  "Teams unified settings REST API",
+        "apiResource":  "https://substrate.office.com",
+        "apiFilter":  "",
+        "apiHeader": [
+            { }
+        ],
+        "poshModule": [
+            "None - Direct REST API"
+        ],
+        "leastPermissions":  [],
+        "higherPermissions":  [],
+        "spRolePermissions":  [],
+        "scubaGearProduct":  [
+            "teamsunified"
+        ],
+        "supportedEnv":  [
+            "commercial", "gcc"
+        ],
+        "resourceAPIAppId":  "",
+        "supportLinks":  [
+        ],
+        "notes":  "Teams data is retrieved via direct REST API calls to the Teams API.",
+        "oauthScope":  "08ff1ce2-4973-4b08-86a3-ebed13badc7f/.default"
     },
 
     {

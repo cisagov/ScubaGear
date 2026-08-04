@@ -907,6 +907,8 @@ function Invoke-ProviderList {
                                 'M365Environment' = $ScubaConfig.M365Environment
                                 'AccessToken' = $ConnectionResult.TeamsAccessToken
                                 'BaseUrl' = $ConnectionResult.TeamsBaseUrl
+                                'UnifiedAccessToken' = $ConnectionResult.TeamsUnifiedAccessToken
+                                'UnifiedBaseUrl' = $ConnectionResult.TeamsUnifiedBaseUrl
                             }
                             if ($ServicePrincipalAuth) {
                                 $TeamsProviderParams['CertificateBasedAuth'] = $true

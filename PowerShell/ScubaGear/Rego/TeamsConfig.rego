@@ -487,9 +487,12 @@ tests contains {
 # MS.TEAMS.5.1v2
 #--
 
+# Possible values for DefaultCatalogAppsType are:
+# AllowedAppList - this blocks all Microsoft apps unless added to the allow list.
+# BlockedAppList - this allows all Microsoft apps by default, with no apps blocked unless explicitly added to the block list.
 # Iterate through all app permission policies. For each, check if DefaultCatalogAppsType
-# is BlockedAppList. If so, save the policy Identity to the PoliciesBlockingDefaultApps list.
-PoliciesBlockingDefaultApps contains Policy.Identity if {
+# is BlockedAppList. If so, save the policy Identity to the return set.
+NonCompliantPoliciesBlockingDefaultApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
@@ -548,17 +551,17 @@ tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
     "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
-    "ActualValue": {"Policies": PoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
+    "ActualValue": {"Policies": NonCompliantPoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    LegacyCompliant := count(PoliciesBlockingDefaultApps) == 0
+    LegacyCompliant := count(NonCompliantPoliciesBlockingDefaultApps) == 0
 
     # Determine compliance based on what's available
     Status := GetDefaultAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesBlockingDefaultApps, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, NonCompliantPoliciesBlockingDefaultApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "Microsoft Apps by default:"
     ]))
@@ -651,9 +654,12 @@ GetDefaultAppTenantDetails := concat("", [
 # MS.TEAMS.5.2v2
 #--
 
+# Possible values for GlobalCatalogAppsType are:
+# AllowedAppList - this blocks all third party apps unless added to the allow list.
+# BlockedAppList - this allows all third party apps by default, with no apps blocked unless explicitly added to the block list.
 # Iterate through all app permission policies. For each, check if GlobalCatalogAppsType
-# is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingGlobalApps list.
-PoliciesAllowingGlobalApps contains Policy.Identity if {
+# is BlockedAppList. If so, save the policy Identity to the return set.
+NonCompliantPoliciesAllowingGlobalApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
@@ -712,17 +718,17 @@ tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
     "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
-    "ActualValue": {"Policies": PoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
+    "ActualValue": {"Policies": NonCompliantPoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    LegacyCompliant := count(PoliciesAllowingGlobalApps) == 0
+    LegacyCompliant := count(NonCompliantPoliciesAllowingGlobalApps) == 0
 
     # Determine compliance based on what's available
     Status := GetGlobalAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesAllowingGlobalApps, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, NonCompliantPoliciesAllowingGlobalApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "third-party apps by default:"
     ]))
@@ -815,9 +821,12 @@ GetGlobalAppTenantDetails := concat("", [
 # MS.TEAMS.5.3v2
 #--
 
+# Possible values for PrivateCatalogAppsType are:
+# AllowedAppList - this blocks all custom apps unless added to the allow list.
+# BlockedAppList - this allows all custom apps by default, with no apps blocked unless explicitly added to the block list.
 # Iterate through all app permission policies. For each, check if PrivateCatalogAppsType
-# is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingCustomApps list.
-PoliciesAllowingCustomApps contains Policy.Identity if {
+# is BlockedAppList. If so, save the policy Identity to the return set.
+NonCompliantPoliciesAllowingCustomApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
@@ -876,17 +885,17 @@ tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
     "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
-    "ActualValue": {"Policies": PoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
+    "ActualValue": {"Policies": NonCompliantPoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    LegacyCompliant := count(PoliciesAllowingCustomApps) == 0
+    LegacyCompliant := count(NonCompliantPoliciesAllowingCustomApps) == 0
 
     # Determine compliance based on what's available
     Status := GetPrivateAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesAllowingCustomApps, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, NonCompliantPoliciesAllowingCustomApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "custom apps by default:"
     ]))

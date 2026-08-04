@@ -24,7 +24,17 @@ function Export-TeamsProvider {
 
         [Parameter(Mandatory = $true)]
         [string]
-        $BaseUrl
+        $BaseUrl,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]
+        $UnifiedAccessToken,
+
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [string]
+        $UnifiedBaseUrl
     )
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
@@ -46,49 +56,35 @@ function Export-TeamsProvider {
     $BroadcastPolicies = $Tracker.TryCommand("Get-TeamsMeetingBroadcastPolicyRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
     $BroadcastPoliciesJson = ConvertTo-Json -Depth 5 @($BroadcastPolicies)
 
-    # Determine which Teams app settings to retrieve based on authentication method
-    # Two scenarios:
-    # 1. Certificate-based auth: Use legacy settings only (Get-M365UnifiedTenantSettings unavailable)
-    # 2. Interactive auth: Try unified settings first, fall back to legacy if unavailable
 
-    if ($CertificateBasedAuth) {
-        # Scenario 1: Certificate-based authentication - legacy only
+    # The Teams unified app settings REST API is only available in certain environments and only works with interactive authentication.
+    if ($M365Environment -in @('gcchigh', 'dod')) {
+        # Scenario 1: GCC HIGH / DOD environments: Use legacy settings only (Teams unified app settings REST API is not available in these environments)
+        Write-Warning @"
+GCC HIGH or DOD environment detected.
+- MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against legacy Teams app permission policies.
+- Unified app settings cannot be retrieved in these environments (Teams unified app settings REST API is unavailable).
+"@
+        $TenantAppSettingsJson = ConvertTo-Json @([PSCustomObject]@{ })
+    }
+    elseif ($CertificateBasedAuth) {
+        # Scenario 2: Certificate-based auth: Use legacy settings only (Teams unified app settings REST API only works in Delegated (on-behalf-of) flow)
         Write-Warning @"
 Certificate-based authentication detected.
 - MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against legacy Teams app permission policies.
-- Org-wide app settings cannot be retrieved with certificate authentication (Get-M365UnifiedTenantSettings requires user login).
+- Unified app settings cannot be retrieved with certificate authentication (Teams unified app settings REST API requires user login).
 - If your organization uses the newer Teams Admin Center org-wide app settings,
   please re-run ScubaGear using interactive user authentication to validate against org-wide settings instead of legacy policies.
 "@
         # Use a marker to indicate certificate auth was used
-        $TenantAppSettings = ConvertTo-Json @([PSCustomObject]@{
+        $TenantAppSettingsJson = ConvertTo-Json @([PSCustomObject]@{
             CertificateBasedAuth = $true
         })
     }
     else {
-        # Scenario 2: Interactive auth - try unified settings first with automatic fallback
-        $UnifiedSettings = @($Tracker.TryCommand("Get-M365UnifiedTenantSettings", @{}, $true))
-
-        if ($UnifiedSettings.Count -eq 0 -or $null -eq $UnifiedSettings[0]) {
-            # Cmdlet failed or returned no data - fall back to legacy
-            Write-Warning @"
-Org-wide app settings could not be retrieved.
-Possible reasons:
-  - Tenant does not have the newer Teams Admin Center org-wide app settings configured
-  - Get-M365UnifiedTenantSettings cmdlet is not available in this environment
-
-FALLBACK: MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against legacy Teams app permission policies instead of org-wide settings.
-"@
-            $TenantAppSettings = ConvertTo-Json @()
-        }
-        else {
-            # Successfully retrieved org-wide settings
-            Write-Information @"
-Org-wide app settings retrieved successfully.
-- MS.TEAMS.5.1v2, 5.2v2, and 5.3v2 will be validated against org-wide app settings.
-"@
-            $TenantAppSettings = ConvertTo-Json $UnifiedSettings
-        }
+        # Scenario 3: Interactive auth: Commercial and GCC environments: Call Teams unified app settings REST API
+        $UnifiedSettings = $Tracker.TryCommand("Get-TeamsM365UnifiedTenantSettingsRest", @{BaseUrl = $UnifiedBaseUrl; AccessToken = $UnifiedAccessToken})
+        $TenantAppSettingsJson = ConvertTo-Json -Depth 5 @($UnifiedSettings)
     }
 
     $TeamsSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
@@ -101,7 +97,7 @@ Org-wide app settings retrieved successfully.
     "client_configuration": $ClientConfigJson,
     "app_policies": $AppPoliciesJson,
     "broadcast_policies": $BroadcastPoliciesJson,
-    "tenant_app_settings": $TenantAppSettings,
+    "tenant_app_settings": $TenantAppSettingsJson,
     "teams_successful_commands": $TeamsSuccessfulCommands,
     "teams_unsuccessful_commands": $TeamsUnSuccessfulCommands,
 "@

@@ -35,7 +35,7 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
-   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl, Get-TeamsUnifiedScope, Get-TeamsUnifiedBaseUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint, Get-ComplianceScope, Get-ComplianceApiEndpoint
@@ -69,6 +69,8 @@ function Connect-Tenant {
        ComplianceApiEndpoint = $null
        TeamsAccessToken   = $null
        TeamsBaseUrl     = $null
+       TeamsUnifiedAccessToken   = $null
+       TeamsUnifiedBaseUrl     = $null
    }
    $N = 0
    $Len = $ProductNames.Length
@@ -373,24 +375,24 @@ function Connect-Tenant {
                    }
                }
                "teams" {
-                    $TeamsParams = @{'ErrorAction'= 'Stop'}
-                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                        $TeamsConnectToTenant = @{
-                            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-                            ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
-                            TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
-                        }
-                        $TeamsParams += $TeamsConnectToTenant
-                    }
-                    switch ($M365Environment) {
-                        "gcchigh" {
-                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsGCCH';}
-                        }
-                        "dod" {
-                            $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsDOD';}
-                        }
-                    }
-                    Connect-MicrosoftTeams @TeamsParams | Out-Null
+                    # $TeamsParams = @{'ErrorAction'= 'Stop'}
+                    # if ($ServicePrincipalParams.CertThumbprintParams) {
+                    #     $TeamsConnectToTenant = @{
+                    #         CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
+                    #         ApplicationId = $ServicePrincipalParams.CertThumbprintParams.AppID;
+                    #         TenantId  = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization Domain is actually required here.
+                    #     }
+                    #     $TeamsParams += $TeamsConnectToTenant
+                    # }
+                    # switch ($M365Environment) {
+                    #     "gcchigh" {
+                    #         $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsGCCH';}
+                    #     }
+                    #     "dod" {
+                    #         $TeamsParams += @{'TeamsEnvironmentName'= 'TeamsDOD';}
+                    #     }
+                    # }
+                    # Connect-MicrosoftTeams @TeamsParams | Out-Null
 
                     #### Start of new auth code
                     if ($AADAuthRequired) {
@@ -405,32 +407,63 @@ function Connect-Tenant {
                        $AADAuthRequired = $false
                    }
 
+                    # Get access tokens for Teams Admin API and Teams Unified settings API
+                    # The Teams Unified settings API is used for some operations that are not available in the standard Teams Admin API
                     $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
                     $TokenData.TeamsBaseUrl = Get-TeamsBaseUrl -M365Environment $M365Environment
-                    if ($ServicePrincipalParams.CertThumbprintParams) {
-                       $TokenData.TeamsAccessToken = Get-MsalAccessToken `
-                           -Scope $TeamsScope `
-                           -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                           -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                           -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                           -M365Environment $M365Environment
-                   }
-                   else {
-                       # Resolve tenant name if not already cached from a previous product
-                       if ([string]::IsNullOrEmpty($TenantName)) {
-                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                           $TenantName = $InitialDomain.Name
-                           $InitialDomainPrefix = $TenantName.split(".")[0]
-                       }
 
-                       # MS Teams Powershell Cmdlets client ID
-                       $TeamsClientId = "12128f48-ec9e-42f0-b203-ea49fb6af367"
-                       $TokenData.TeamsAccessToken = Get-MsalAccessToken `
-                           -Scope $TeamsScope `
-                           -ClientId $TeamsClientId `
-                           -Tenant $TenantName `
-                           -M365Environment $M365Environment
+                    # Teams unified settings API is only available in environments that are not gcc high and dod.
+                    if ($M365Environment -notin @('gcchigh', 'dod')) {
+                        $TeamsUnifiedScope = Get-TeamsUnifiedScope -M365Environment $M365Environment
+                        $TokenData.TeamsUnifiedBaseUrl = Get-TeamsUnifiedBaseUrl -M365Environment $M365Environment
+                    }
+                    else {
+                        # Set auth return values to empty strings since API is not available
+                        $TokenData.TeamsUnifiedBaseUrl = ""
+                        $TokenData.TeamsUnifiedAccessToken = ""
+                    }
+                    
+                    # MS Teams Powershell Cmdlets well-knodwn client ID used when authenticating interactively
+                    $TeamsClientId = "12128f48-ec9e-42f0-b203-ea49fb6af367"
+
+                    if ($ServicePrincipalParams.CertThumbprintParams) {
+                        # Get the token for the Teams admin API, which is used for most Teams operations
+                        $TokenData.TeamsAccessToken = Get-MsalAccessToken `
+                            -Scope $TeamsScope `
+                            -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                            -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                            -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                            -M365Environment $M365Environment
+                        
+                        # Set auth return values to empty strings since Teams unified setttings API is only available for interactive auth flows.
+                        $TokenData.TeamsUnifiedBaseUrl = ""
+                        $TokenData.TeamsUnifiedAccessToken = ""
+                    }
+                    else {
+                        # Resolve tenant domain name if not already cached from a previous product
+                        if ([string]::IsNullOrEmpty($TenantName)) {
+                            $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                            $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                            $TenantName = $InitialDomain.Name
+                            $InitialDomainPrefix = $TenantName.split(".")[0]
+                        }
+
+                        # Get the token for the Teams admin API, which is used for most Teams operations
+                        $TokenData.TeamsAccessToken = Get-MsalAccessToken `
+                            -Scope $TeamsScope `
+                            -ClientId $TeamsClientId `
+                            -Tenant $TenantName `
+                            -M365Environment $M365Environment
+
+                        # Teams unified settings API is only available in environments that are not gcc high and dod.
+                        if ($M365Environment -notin @('gcchigh', 'dod')) {
+                            # Get the token for the Teams Unified settings API, which is used for some operations that are not available in the standard Teams Admin API
+                            $TokenData.TeamsUnifiedAccessToken = Get-MsalAccessToken `
+                                -Scope $TeamsUnifiedScope `
+                                -ClientId $TeamsClientId `
+                                -Tenant $TenantName `
+                                -M365Environment $M365Environment
+                        }
                    }
                }
                default {
@@ -472,6 +505,8 @@ function Connect-Tenant {
        EXOApiEndpoint   = $TokenData.EXOApiEndpoint
        TeamsAccessToken = $TokenData.TeamsAccessToken
        TeamsBaseUrl = $TokenData.TeamsBaseUrl
+       TeamsUnifiedAccessToken   = $TokenData.TeamsUnifiedAccessToken
+       TeamsUnifiedBaseUrl     = $TokenData.TeamsUnifiedBaseUrl
    }
 }
 

@@ -777,7 +777,69 @@ function Invoke-ScubaRestMethod {
         $Params.Body = $Body
     }
 
-    $Response = Invoke-RestMethod @Params
+    try {
+        $Response = Invoke-RestMethod @Params
+    }
+    # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
+    catch {
+        $ErrorRecord = $_
+        $WebResponse = $ErrorRecord.Exception.Response
+
+        $ErrorBuffer = [System.Text.StringBuilder]::new()
+
+        [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
+        [void]$ErrorBuffer.AppendLine("Message       : $($ErrorRecord.Exception.Message)")
+
+        if ($null -eq $WebResponse) {
+            [void]$ErrorBuffer.AppendLine("No HTTP response object was returned.")
+            $LogText = $ErrorBuffer.ToString()
+            Write-Host $LogText
+            return
+        }
+
+        [void]$ErrorBuffer.AppendLine("Response Type : $($WebResponse.GetType().FullName)")
+        [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
+        [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.StatusDescription)")
+        [void]$ErrorBuffer.AppendLine("Content Type  : $($WebResponse.ContentType)")
+        [void]$ErrorBuffer.AppendLine("Content Length: $($WebResponse.ContentLength)")
+
+        [void]$ErrorBuffer.AppendLine("")
+        [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
+
+        foreach ($HeaderName in $WebResponse.Headers.AllKeys) {
+            [void]$ErrorBuffer.AppendLine("${HeaderName}: $($WebResponse.Headers[$HeaderName])")
+        }
+
+        [void]$ErrorBuffer.AppendLine("")
+        [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
+
+        $ResponseStream = $WebResponse.GetResponseStream()
+
+        if ($null -eq $ResponseStream) {
+            [void]$ErrorBuffer.AppendLine("No response stream in Error.Exception.Response object.")
+        }
+        else {
+            $Reader = New-Object System.IO.StreamReader($ResponseStream)
+
+            try {
+                $ResponseBody = $Reader.ReadToEnd()
+            }
+            finally {
+                $Reader.Dispose()
+                $ResponseStream.Dispose()
+            }
+
+            if ([string]::IsNullOrWhiteSpace($ResponseBody)) {
+                [void]$ErrorBuffer.AppendLine("Empty response body.")
+            }
+            else {
+                [void]$ErrorBuffer.AppendLine($ResponseBody)
+            }
+        }
+
+        throw $ErrorBuffer.ToString()
+    }
+
     return $Response
 }
 

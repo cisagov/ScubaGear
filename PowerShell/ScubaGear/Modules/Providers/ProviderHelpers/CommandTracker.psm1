@@ -4,7 +4,7 @@ Import-Module -Name $PSScriptRoot/AADRiskyPermissionsHelper.psm1 -Function Get-A
 Import-Module -Name $PSScriptRoot/AADHybridExchangeHelper.psm1 -Function Get-LegacyExchangeServicePrincipal, Get-DedicatedExchangeHybridApplications
 Import-Module -Name $PSScriptRoot/EXORestHelper.psm1 -Function Invoke-EXORestMethod
 Import-Module -Name $PSScriptRoot/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformTenantSettingsRest, Get-PowerPlatformEnvironmentsRest, Get-PowerPlatformDlpPoliciesRest, Get-PowerPlatformTenantIsolationRest
-Import-Module -Name $PSScriptRoot/TeamsRestHelper.psm1 -Function Get-TeamsMeetingPolicyRest, Get-TeamsTenantFederationConfigurationRest, Get-TeamsClientConfigurationRest, Get-TeamsAppPermissionPolicyRest, Get-TeamsMeetingBroadcastPolicyRest
+Import-Module -Name $PSScriptRoot/TeamsRestHelper.psm1 -Function Get-TeamsMeetingPolicyRest, Get-TeamsTenantFederationConfigurationRest, Get-TeamsClientConfigurationRest, Get-TeamsAppPermissionPolicyRest, Get-TeamsMeetingBroadcastPolicyRest, Get-TeamsM365UnifiedTenantSettingsRest
 Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
 Import-Module -Name $PSScriptRoot/AADAppManagementPolicyHelper.psm1 -Function Get-AppManagementPolicies
