@@ -58,6 +58,9 @@ function Connect-Tenant {
    $PBILicenseFound = $false
    $PBILicenseReason = ""
 
+   # Clear prior session so consecutive Invoke-SCuBA calls don't leak tokens across tenants
+   Disconnect-ScubaGraph
+
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
    $InitialDomainPrefix = $null
