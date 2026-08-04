@@ -47,6 +47,34 @@
     Connect-MgGraph @GraphParams | Out-Null
 }
 
+function Get-MsalDll {
+    <#
+    .SYNOPSIS
+        Locates the Microsoft.Identity.Client.dll that matches the current PowerShell runtime.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ModulePath
+    )
+
+    # Match Desktop vs Core MSAL build to the current PowerShell runtime
+    $RuntimeFolder = if ($PSVersionTable.PSEdition -eq 'Core') { 'Core' } else { 'Desktop' }
+    $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue |
+        Where-Object { $_.Directory.Name -eq $RuntimeFolder } |
+        Select-Object -First 1
+
+    if (-not $MsalDll) {
+        throw "Microsoft.Identity.Client.dll for runtime '$RuntimeFolder' not found in the Microsoft.Graph.Authentication module directory."
+    }
+
+    return $MsalDll
+}
+
 function Initialize-Msal {
     <#
     .SYNOPSIS
@@ -71,11 +99,7 @@ function Initialize-Msal {
     }
 
     $ModulePath = $GraphModule.Path | Split-Path
-    $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
-
-    if (-not $MsalDll) {
-        throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
-    }
+    $MsalDll = Get-MsalDll -ModulePath $ModulePath
 
     $Sig = Get-AuthenticodeSignature -FilePath $MsalDll.FullName
     if ($Sig.Status -ne 'Valid') {
