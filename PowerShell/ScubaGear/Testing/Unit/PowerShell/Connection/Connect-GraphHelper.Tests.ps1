@@ -109,7 +109,7 @@ InModuleScope ConnectHelpers {
 
     Describe -Tag 'Connection' -Name 'Invoke-ScubaGraphRequest' {
         BeforeEach {
-            $Script:ScubaGraphSession = @{
+            $Global:ScubaGearState.Session = @{
                 M365Environment = 'commercial'
                 GraphEndpoint = 'https://graph.microsoft.com'
                 TokenParameters = @{
@@ -123,7 +123,7 @@ InModuleScope ConnectHelpers {
         }
 
         It 'requires an active Graph session' {
-            $Script:ScubaGraphSession = $null
+            $Global:ScubaGearState.Session = $null
             { Invoke-ScubaGraphRequest -Uri '/v1.0/organization' } | Should -Throw '*not connected*'
         }
 
