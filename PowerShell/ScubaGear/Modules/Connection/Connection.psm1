@@ -60,6 +60,7 @@ function Connect-Tenant {
 
    # Clear prior session so consecutive Invoke-SCuBA calls don't leak tokens across tenants
    Disconnect-ScubaGraph
+   Write-Warning "[CONN-DIAG] Connect-Tenant entry: M365Env=$M365Environment SPOrg=$($ServicePrincipalParams.CertThumbprintParams.Organization) SessionAfterClear=$(if($Script:ScubaGraphSession){'SET'}else{'NULL'}) CacheKeys=$($Script:MsalAppCache.Keys -join ';')"
 
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null

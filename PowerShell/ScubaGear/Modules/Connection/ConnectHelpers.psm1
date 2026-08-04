@@ -402,6 +402,7 @@ function Get-MsalAccessToken {
         try {
             if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
                 $CacheKey = "SP:$AppID|$Authority"
+                Write-Warning "[MSAL-DIAG] SP token request: Scope=$Scope CacheKey=$CacheKey CacheHit=$($Script:MsalAppCache.ContainsKey($CacheKey)) CertThumb=$($Certificate.Thumbprint)"
                 if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
                     $Script:MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
                         WithCertificate($Certificate).
