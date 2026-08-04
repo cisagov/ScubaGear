@@ -49,14 +49,8 @@ InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Initialize-Msal' {
         Context 'When MSAL types are not yet loaded' {
             It 'Throws when Microsoft.Graph.Authentication is not loaded' {
-                $TypesAvailable = $false
-                try {
-                    $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
-                    $TypesAvailable = $true
-                }
-                catch { }
-
-                if ($TypesAvailable) {
+                $MsalType = [System.Management.Automation.PSTypeName]'Microsoft.Identity.Client.ConfidentialClientApplicationBuilder'
+                if ($null -ne $MsalType.Type) {
                     Set-ItResult -Skipped -Because 'MSAL types are already loaded; Graph-missing path cannot be exercised'
                     return
                 }
