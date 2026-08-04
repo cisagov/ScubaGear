@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Invoke-ScubaGraphRequest -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Invoke-ScubaGraphRequest
 
 function Set-Utf8NoBom {
     <#
