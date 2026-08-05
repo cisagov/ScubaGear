@@ -663,6 +663,534 @@ function Copy-ScubaModuleFile {
     }
 }
 
+function New-SCuBAConfig {
+    <#
+    .SYNOPSIS
+    Generate a config file for the ScubaGear tool
+    .Description
+    Using provided user input generate a config file to run ScubaGear tailored to the end user.
+    The configurable exclusion sections for each product are generated dynamically from the
+    ScubaGear configuration schema (Modules/ScubaConfig/ScubaConfigSchema.json) rather than being
+    hardcoded, so the generated template automatically stays in sync with what the config validator
+    accepts (product namespaces, per-policy exclusion types, and their structures).
+    This cmdlet is the cross-platform (macOS/Linux) alternative to the Windows-only
+    ScubaGear Configuration UI (Start-SCuBAConfigApp).
+    .Parameter ProductNames
+    A list of one or more M365 shortened product names that the tool will assess when it is executed. Acceptable product name values are listed below.
+    To assess Azure Active Directory you would enter the value aad.
+    To assess Exchange Online you would enter exo and so forth.
+    - Azure Active Directory: aad
+    - Defender for Office 365: defender
+    - Security Suite: securitysuite
+    - Exchange Online: exo
+    - MS Power Platform: powerplatform
+    - Power BI: powerbi
+    - SharePoint Online: sharepoint
+    - MS Teams: teams.
+    Use '*' to run all baselines.
+    .Parameter M365Environment
+    This parameter is used to authenticate to the different commercial/government environments.
+    Valid values include "commercial", "gcc", "gcchigh", or "dod".
+    - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
+    - For M365 Government community cloud tenants with G3/G5 licenses enter the value **"gcc"**.
+    - For M365 Government community cloud High tenants enter the value **"gcchigh"**.
+    - For M365 Department of Defense tenants enter the value **"dod"**.
+    Default value is 'commercial'.
+    .Parameter OPAPath
+    The folder location of the OPA Rego executable file.
+    The OPA Rego executable embedded with this project is located in the project's root folder.
+    If you want to execute the tool using a version of OPA Rego located in another folder,
+    then customize the variable value with the full path to the alternative OPA Rego exe file.
+    .Parameter LogIn
+    A `$true` or `$false` variable that if set to `$true`
+    will prompt you to provide credentials if you want to establish a connection
+    to the specified M365 products in the **$ProductNames** variable.
+    For most use cases, leave this variable to be `$true`.
+    A connection is established in the current PowerShell terminal session with the first authentication.
+    If you want to run another verification in the same PowerShell session simply set
+    this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
+    Note: defender will ask for authentication even if this variable is set to `$false`
+    ;;;.Parameter Version
+    ;;;Will output the current ScubaGear version to the terminal without running this cmdlet.
+    .Parameter AppID
+    The application ID of the service principal that's used during certificate based
+    authentication. A valid value is the GUID of the application ID (service principal).
+    .Parameter CertificateThumbprint
+    The thumbprint value specifies the certificate that's used for certificate base authentication.
+    The underlying PowerShell modules retrieve the certificate from the user's certificate store.
+    As such, a copy of the certificate must be located there.
+    .Parameter Organization
+    Specify the organization that's used in certificate based authentication.
+    Use the tenant's tenantname.onmicrosoft.com domain for the parameter value.
+    .Parameter OutPath
+    The folder path where both the output JSON and the HTML report will be created.
+    The folder will be created if it does not exist. Defaults to current directory.
+    .Parameter OutFolderName
+    The name of the folder in OutPath where both the output JSON and the HTML report will be created.
+    Defaults to "M365BaselineConformance". The client's local timestamp will be appended.
+    .Parameter OutProviderFileName
+    The name of the Provider output JSON created in the folder created in OutPath.
+    Defaults to "ProviderSettingsExport".
+    .Parameter OutRegoFileName
+    The name of the Rego output JSON and CSV created in the folder created in OutPath.
+    Defaults to "RegoOutput".
+    .Parameter OutReportName
+    The name of the main html file page created in the folder created in OutPath.
+    Defaults to "BaselineReports".
+    .Parameter DisconnectOnExit
+    Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    .Parameter ConfigLocation
+    The folder path where the generated SampleConfig.yaml will be created. Defaults to the current directory.
+    .Parameter OmitPolicy
+    A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.AAD.1.1v1.
+    Note that the rationales will need to be manually added to the resulting config file.
+    Tab completion is available for this parameter and is populated from the ScubaGear baselines.
+    .Parameter ExclusionPolicy
+    A comma-separated list of exclusion-supporting policy IDs to include in the generated config's
+    exclusion sections, e.g., MS.AAD.1.1v1. When omitted, every exclusion-supporting policy for the
+    selected products is generated. Tab completion is available and is populated from the ScubaGear
+    configuration schema.
+    .Parameter AnnotatePolicy
+    A comma-separated list of policies to annotate in the ScubaGear report, e.g., MS.AAD.1.1v1.
+    Entries are added under the AnnotatePolicy section; the required comment must be added manually
+    to the resulting config file. Tab completion is available and is populated from the ScubaGear
+    baselines.
+    .Parameter SkipDoH
+    When $true, ScubaGear will not retry failed DNS queries over DNS-over-HTTPS. Default is $false.
+    .Parameter PreferredDnsResolvers
+    A comma-separated list of preferred DNS resolver IPv4 addresses used to fetch SPF, DKIM, and DMARC
+    records. Each value must be a valid IPv4 address.
+    .EXAMPLE
+    New-SCuBAConfig
+    Generates SampleConfig.yaml in the current directory using the default product set
+    (aad, exo, sharepoint, teams).
+    .EXAMPLE
+    New-SCuBAConfig -ProductNames aad, exo, teams
+    Generates a config that assesses only Entra ID, Exchange Online, and Teams.
+    .EXAMPLE
+    New-SCuBAConfig -ProductNames '*'
+    Generates a config that includes every supported product baseline.
+    .EXAMPLE
+    New-SCuBAConfig -ConfigLocation 'C:\ScubaGear\Configs'
+    Saves the generated SampleConfig.yaml to the specified folder instead of the current directory.
+    .EXAMPLE
+    New-SCuBAConfig -Organization contoso.onmicrosoft.com -AppID '00000000-0000-0000-0000-000000000000' -CertificateThumbprint 'A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0'
+    Pre-populates the config with service principal (non-interactive) authentication values.
+    .EXAMPLE
+    New-SCuBAConfig -OmitPolicy MS.AAD.1.1v1, MS.EXO.1.1v2
+    Generates a config that omits the specified policies. Open the resulting file to add the
+    required rationales for each omitted policy.
+    .EXAMPLE
+    New-SCuBAConfig -ExclusionPolicy MS.AAD.1.1v1, MS.AAD.7.4v1
+    Generates a config whose exclusion section contains only the specified policies instead of every
+    exclusion-supporting policy for the selected products.
+    .EXAMPLE
+    New-SCuBAConfig -AnnotatePolicy MS.AAD.1.1v1, MS.EXO.1.1v2
+    Generates a config that annotates the specified policies. Open the resulting file to add the
+    required comment for each annotated policy.
+    .EXAMPLE
+    New-SCuBAConfig -PreferredDnsResolvers 1.1.1.1, 8.8.8.8 -SkipDoH $true
+    Sets preferred DNS resolvers and disables DNS-over-HTTPS retries in the generated config.
+    .Functionality
+    Public
+    #>
+    [CmdletBinding(DefaultParameterSetName='Report')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
+    param (
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Description = "YAML configuration file with default description", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "powerbi", "sharepoint", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames = @("aad", "exo", "sharepoint", "teams"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment = "commercial",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateScript({Test-Path -PathType Container $_})]
+        [string]
+        $OPAPath = ".", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $LogIn = $true,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $DisconnectOnExit = $false,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet($true, $false)]
+        [boolean]
+        $SkipDoH = $false,
+
+        [Parameter(Mandatory = $false)]
+        [ValidatePattern('^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')]
+        [string[]]
+        $PreferredDnsResolvers = @(),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutPath = '.',
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $AppID,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $CertificateThumbprint,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Organization,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderName = "M365BaselineConformance",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutProviderFileName = "ProviderSettingsExport",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutRegoFileName = "RegoOutput",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutReportName = "BaselineReports",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $ConfigLocation = "./",
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [ArgumentCompleter({
+            # Runs in the caller's scope, so resolve the baselines file from the command's module base
+            # rather than relying on module-private helpers or $PSScriptRoot.
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            $ModuleBase = (Get-Command -Name $CommandName -ErrorAction SilentlyContinue).Module.ModuleBase
+            if (-not $ModuleBase) { return }
+            $BaselinePath = Join-Path -Path $ModuleBase -ChildPath "..\..\schemas\ScubaBaselines.json"
+            if (-not (Test-Path -Path $BaselinePath)) {
+                # When imported via the ScubaGear root module, the schemas folder is one level up instead.
+                $BaselinePath = Join-Path -Path $ModuleBase -ChildPath "schemas\ScubaBaselines.json"
+                if (-not (Test-Path -Path $BaselinePath)) { return }
+            }
+            $Baselines = (Get-Content -Path $BaselinePath -Raw | ConvertFrom-Json).baselines
+            foreach ($Product in $Baselines.PSObject.Properties.Name) {
+                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
+                if ($Product -eq 'defender') { continue }
+                foreach ($Policy in $Baselines.$Product) {
+                    if ($Policy.id -like "$WordToComplete*") {
+                        [System.Management.Automation.CompletionResult]::new($Policy.id, $Policy.id, 'ParameterValue', $Policy.id)
+                    }
+                }
+            }
+        })]
+        [string[]]
+        $OmitPolicy = @(),
+
+        [Parameter(Mandatory = $false)]
+        [ArgumentCompleter({
+            # Runs in the caller's scope; resolve the config schema from the command's module base. Only
+            # policies that support an exclusion are offered (from the schema's policyExclusionMappings).
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            $ModuleBase = (Get-Command -Name $CommandName -ErrorAction SilentlyContinue).Module.ModuleBase
+            if (-not $ModuleBase) { return }
+            $SchemaPath = Join-Path -Path $ModuleBase -ChildPath "..\ScubaConfig\ScubaConfigSchema.json"
+            if (-not (Test-Path -Path $SchemaPath)) {
+                # When imported via the ScubaGear root module, the ScubaConfig folder is nested instead.
+                $SchemaPath = Join-Path -Path $ModuleBase -ChildPath "Modules\ScubaConfig\ScubaConfigSchema.json"
+                if (-not (Test-Path -Path $SchemaPath)) { return }
+            }
+            $Mappings = (Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json).schemaMetadata.policyExclusionMappings
+            foreach ($PolicyId in $Mappings.PSObject.Properties.Name) {
+                if ($PolicyId -eq '_comment') { continue }
+                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
+                if ($PolicyId -like 'MS.DEFENDER.*') { continue }
+                if ($PolicyId -like "$WordToComplete*") {
+                    [System.Management.Automation.CompletionResult]::new($PolicyId, $PolicyId, 'ParameterValue', $PolicyId)
+                }
+            }
+        })]
+        [string[]]
+        $ExclusionPolicy = @(),
+
+        [Parameter(Mandatory = $false)]
+        [ArgumentCompleter({
+            # Runs in the caller's scope, so resolve the baselines file from the command's module base
+            # rather than relying on module-private helpers or $PSScriptRoot.
+            param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
+            $ModuleBase = (Get-Command -Name $CommandName -ErrorAction SilentlyContinue).Module.ModuleBase
+            if (-not $ModuleBase) { return }
+            $BaselinePath = Join-Path -Path $ModuleBase -ChildPath "..\..\schemas\ScubaBaselines.json"
+            if (-not (Test-Path -Path $BaselinePath)) {
+                # When imported via the ScubaGear root module, the schemas folder is one level up instead.
+                $BaselinePath = Join-Path -Path $ModuleBase -ChildPath "schemas\ScubaBaselines.json"
+                if (-not (Test-Path -Path $BaselinePath)) { return }
+            }
+            $Baselines = (Get-Content -Path $BaselinePath -Raw | ConvertFrom-Json).baselines
+            foreach ($Product in $Baselines.PSObject.Properties.Name) {
+                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
+                if ($Product -eq 'defender') { continue }
+                foreach ($Policy in $Baselines.$Product) {
+                    if ($Policy.id -like "$WordToComplete*") {
+                        [System.Management.Automation.CompletionResult]::new($Policy.id, $Policy.id, 'ParameterValue', $Policy.id)
+                    }
+                }
+            }
+        })]
+        [string[]]
+        $AnnotatePolicy = @()
+    )
+
+    # Parameters that are used to control this cmdlet's output and are not valid ScubaGear config settings.
+    $NonConfigParameters = @("OmitPolicy", "ConfigLocation", "ExclusionPolicy", "AnnotatePolicy")
+
+    $Config = New-Object ([System.Collections.specialized.OrderedDictionary])
+
+    # Populate the general settings section from the bound/default parameter values.
+    ($MyInvocation.MyCommand.Parameters).Keys | ForEach-Object {
+        if ($NonConfigParameters -contains $_) {
+            return
+        }
+        $Val = (Get-Variable -Name $_ -EA SilentlyContinue).Value
+        if ($Val.length -gt 0) {
+            $Config.add($_, $Val)
+        }
+    }
+
+    # The ScubaGear configuration schema is the single source of truth for which products support
+    # exclusions, which exclusion type(s) each policy supports, and the exact structure of every
+    # exclusion type. Building the template from it (instead of hardcoding) keeps the generated config
+    # in sync with what the config validator accepts.
+    $SchemaPath = Join-Path -Path $PSScriptRoot -ChildPath "..\ScubaConfig\ScubaConfigSchema.json"
+
+    # Resolves a JSON Schema "$ref" (e.g. "#/definitions/exclusionTypes/CapExclusions") to its node.
+    function Resolve-SchemaReference {
+        param($Reference, $Schema)
+        $Node = $Schema
+        foreach ($Segment in ($Reference.TrimStart('#').Trim('/') -split '/')) {
+            $Node = $Node.$Segment
+        }
+        return $Node
+    }
+
+    # Builds an empty, correctly-shaped template for a schema node: objects become ordered dictionaries
+    # of their properties, arrays become a single empty placeholder entry, and scalars become "".
+    function New-SchemaTemplate {
+        param($Node, $Schema)
+        if ($Node.PSObject.Properties.Name -contains '$ref') {
+            $Node = Resolve-SchemaReference -Reference $Node.'$ref' -Schema $Schema
+        }
+        switch ($Node.type) {
+            'object' {
+                $Template = [ordered]@{}
+                foreach ($PropertyName in $Node.properties.PSObject.Properties.Name) {
+                    if ($PropertyName -eq '_comment') { continue }
+                    $Template[$PropertyName] = New-SchemaTemplate -Node $Node.properties.$PropertyName -Schema $Schema
+                }
+                return $Template
+            }
+            # Unary comma keeps the single-element array from being unwrapped to a scalar on return,
+            # so the field renders as a YAML list placeholder the user can add entries to.
+            'array' { return ,@("") }
+            default { return "" }
+        }
+    }
+
+    $OmissionNamespace = "OmitPolicy"
+
+    # List to track which policies the user specified in $OmitPolicy are properly formatted
+    $OmitPolicyValidated = @()
+
+    # Build the omitted policies template; only add the section if at least one policy was provided.
+    $OmitEntries = [ordered]@{}
+
+    foreach ($Policy in $OmitPolicy) {
+        if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
+            # Note that -match is a case insensitive match
+            # Note that the regex does not validate the product name, this will be done
+            # later
+            $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not a valid "
+            $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
+            $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Skipping."
+            Write-Warning $Warning
+            Continue
+        }
+        $Product = ($Policy -Split "\.")[1]
+        # Here's where the product name is validated
+        if (-not ($ProductNames -Contains $Product)) {
+            $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not encompassed by "
+            $Warning += "the products specified in the ProductName parameter. Skipping."
+            Write-Warning $Warning
+            Continue
+        }
+        # Ensure the policy ID is properly capitalized (i.e., all caps except for the "v1" portion)
+        $PolicyCapitalized = $Policy.Substring(0, $Policy.Length-2).ToUpper() + $Policy.SubString($Policy.Length-2)
+        $OmitPolicyValidated += $PolicyCapitalized
+        $OmitEntries[$PolicyCapitalized] = @{
+            "Rationale" = "";
+            "Expiration" = "";
+        }
+    }
+
+    if ($OmitEntries.Count -gt 0) {
+        $config[$OmissionNamespace] = $OmitEntries
+    }
+
+    if ($OmitPolicy.Count -gt 0) {
+        $Warning = "The following policies have been configured for omission: $($OmitPolicyValidated -Join ', '). "
+        $Warning += "Note that as the New-SCuBAConfig function does not support providing the rationale for omission via "
+        $Warning += "the commandline, you will need to open the resulting config file and manually enter the rationales."
+        Write-Warning $Warning
+    }
+
+    $AnnotationNamespace = "AnnotatePolicy"
+
+    # List to track which policies the user specified in $AnnotatePolicy are properly formatted
+    $AnnotatePolicyValidated = @()
+
+    # Build the annotated policies template; only add the section if at least one policy was provided.
+    $AnnotateEntries = [ordered]@{}
+
+    foreach ($Policy in $AnnotatePolicy) {
+        if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
+            $Warning = "The policy, $Policy, in the AnnotatePolicy parameter, is not a valid "
+            $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
+            $Warning += "e.g., 'MS.AAD.1.1v1'. Skipping."
+            Write-Warning $Warning
+            Continue
+        }
+        $Product = ($Policy -Split "\.")[1]
+        if (-not ($ProductNames -Contains $Product)) {
+            $Warning = "The policy, $Policy, in the AnnotatePolicy parameter, is not encompassed by "
+            $Warning += "the products specified in the ProductName parameter. Skipping."
+            Write-Warning $Warning
+            Continue
+        }
+        # Ensure the policy ID is properly capitalized (i.e., all caps except for the "v1" portion)
+        $PolicyCapitalized = $Policy.Substring(0, $Policy.Length-2).ToUpper() + $Policy.SubString($Policy.Length-2)
+        $AnnotatePolicyValidated += $PolicyCapitalized
+        $AnnotateEntries[$PolicyCapitalized] = [ordered]@{
+            "Comment" = "";
+            "RemediationDate" = "";
+            "IncorrectResult" = $false;
+        }
+    }
+
+    if ($AnnotateEntries.Count -gt 0) {
+        $config[$AnnotationNamespace] = $AnnotateEntries
+
+        $Warning = "The following policies have been configured for annotation: $($AnnotatePolicyValidated -Join ', '). "
+        $Warning += "Note that as the New-SCuBAConfig function does not support providing the comment via the "
+        $Warning += "commandline, you will need to open the resulting config file and manually enter the comments."
+        Write-Warning $Warning
+    }
+
+    # Build the per-product exclusion sections directly from the configuration schema.
+    if (Test-Path -Path $SchemaPath) {
+        $Schema = Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json
+
+        # Discover the exclusion namespaces (e.g. "Aad", "SecuritySuite") from the schema, capturing the
+        # exclusion fields each one allows and mapping each product's short name (parsed from its policy-ID
+        # pattern, e.g. "aad") to that namespace.
+        $NamespaceExclusionFields = @{}
+        $ShortNameToNamespace = @{}
+        foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
+            $PropertyNode = $Schema.properties.$PropertyName
+            if (-not $PropertyNode.patternProperties) { continue }
+            foreach ($Pattern in $PropertyNode.patternProperties.PSObject.Properties.Name) {
+                $PatternNode = $PropertyNode.patternProperties.$Pattern
+                # Only product namespaces that define exclusion fields have a nested "properties" object.
+                if (-not $PatternNode.properties) { continue }
+                $NamespaceExclusionFields[$PropertyName] = $PatternNode.properties
+                if ($Pattern -match 'MS\\\.([A-Za-z]+)\\\.') {
+                    $ShortNameToNamespace[$Matches[1].ToLower()] = $PropertyName
+                }
+            }
+        }
+
+        # Expand '*' to every product the schema defines an exclusion namespace for.
+        $SelectedProducts = if ($ProductNames -contains '*') { $ShortNameToNamespace.Keys } else { $ProductNames }
+
+        # policyExclusionMappings is the authoritative list of concrete policy IDs and the exclusion
+        # type(s) each supports. Emit an empty template for every selected policy. When specific
+        # ExclusionPolicy IDs are requested, only those are generated.
+        $MatchedExclusions = @()
+        $PolicyExclusionMappings = $Schema.schemaMetadata.policyExclusionMappings
+        foreach ($PolicyId in $PolicyExclusionMappings.PSObject.Properties.Name) {
+            if ($PolicyId -eq '_comment') { continue }
+            if ($ExclusionPolicy.Count -gt 0 -and ($ExclusionPolicy -notcontains $PolicyId)) { continue }
+
+            $ProductShortName = ($PolicyId -split '\.')[1].ToLower()
+            if ($SelectedProducts -notcontains $ProductShortName) { continue }
+
+            $Namespace = $ShortNameToNamespace[$ProductShortName]
+            if (-not $Namespace) { continue }
+
+            $PolicyTemplate = [ordered]@{}
+            foreach ($ExclusionType in $PolicyExclusionMappings.$PolicyId) {
+                $FieldNode = $NamespaceExclusionFields[$Namespace].$ExclusionType
+                if ($null -eq $FieldNode) { continue }
+                $PolicyTemplate[$ExclusionType] = New-SchemaTemplate -Node $FieldNode -Schema $Schema
+            }
+
+            if ($PolicyTemplate.Count -gt 0) {
+                if (-not $config.Contains($Namespace)) {
+                    $config[$Namespace] = [ordered]@{}
+                }
+                $config[$Namespace][$PolicyId] = $PolicyTemplate
+                $MatchedExclusions += $PolicyId
+            }
+        }
+
+        # Warn about any requested ExclusionPolicy entries that were not generated.
+        if ($ExclusionPolicy.Count -gt 0) {
+            $UnmatchedExclusions = $ExclusionPolicy | Where-Object { $MatchedExclusions -notcontains $_ }
+            if ($UnmatchedExclusions) {
+                $Warning = "The following ExclusionPolicy entries were not added because they do not "
+                $Warning += "support an exclusion, are not encompassed by the selected ProductNames, or "
+                $Warning += "are not valid policy IDs: $($UnmatchedExclusions -join ', ')."
+                Write-Warning $Warning
+            }
+        }
+    }
+    else {
+        $Warning = "Could not locate the ScubaGear configuration schema at '$SchemaPath'. "
+        $Warning += "The generated configuration file will not include the product exclusion templates."
+        Write-Warning $Warning
+    }
+
+    ConvertTo-Yaml $Config | Set-Content "$($ConfigLocation)/SampleConfig.yaml"
+}
+
 function Test-ScubaGearVersion {
     <#
     .SYNOPSIS
@@ -1784,6 +2312,7 @@ Export-ModuleMember -Function @(
     'Initialize-SCuBA',
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',
+    'New-SCuBAConfig',
     'Update-ScubaGear',
     'Test-ScubaGearVersion',
     'Reset-ScubaGearDependencies'

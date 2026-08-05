@@ -1,0 +1,20 @@
+Description: test
+ProductNames:
+- exo
+M365Environment: gcchigh
+OPAPath: .
+LogIn: true
+DisconnectOnExit: false
+SkipDoH: true
+PreferredDnsResolvers:
+- 8.8.8.8
+OutPath: .
+OutFolderName: M365BaselineConformance
+OutProviderFileName: ProviderSettingsExport
+OutRegoFileName: RegoOutput
+OutReportName: BaselineReports
+Exo:
+  MS.EXO.1.1v2:
+    AllowedForwardingDomains:
+    - ""
+
