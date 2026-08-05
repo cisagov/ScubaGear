@@ -53,13 +53,10 @@ jobs:
           enable-AzPSSession: true
       - name: Get Key Vault info
         id: key-vault-info
-        env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
-        run: |
-          . repo/utils/workflow/Publish-PublicPackage.ps1
-          $KeyVaultData = Get-KeyVaultInfo -KeyVaultInfo ${env:KEY_VAULT_INFO}
-          echo "KeyVaultUrl=$($KeyVaultData.KeyVaultUrl)" >> $env:GITHUB_OUTPUT
-          echo "KeyVaultCertificateName=$($KeyVaultData.KeyVaultCertificateName)" >> $env:GITHUB_OUTPUT
+        uses: ./.github/actions/get-keyvault-info
+        with:
+          key-vault-info: ${{ secrets.SCUBA_KEY_VAULT_PROD }}
+          checkout-path: repo
       - name: Sign and Publish Module
         run: |
           . repo/utils/workflow/Publish-ScubaGear.ps1
@@ -69,12 +66,12 @@ jobs:
           Remove-GitFiles -RootFolderPath "repo"
 
           # Extract the API key used to publish to PSGallery
-          $ApiKey = Get-PSGalleryApiKey -KeyVaultUrl '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
+          $ApiKey = Get-PSGalleryApiKey -KeyVaultUrl '${{ steps.key-vault-info.outputs.key-vault-url }}'
 
           # Setup the parameters using the new function
           $Parameters = Set-PublishParameters `
-            -AzureKeyVaultUrl '${{ steps.key-vault-info.outputs.KeyVaultUrl }}' `
-            -CertificateName '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}' `
+            -AzureKeyVaultUrl '${{ steps.key-vault-info.outputs.key-vault-url }}' `
+            -CertificateName '${{ steps.key-vault-info.outputs.certificate-name }}' `
             -ModuleSourcePath 'repo/PowerShell/ScubaGear' `
             -ApiKey $ApiKey `
             -IsPrerelease ('true' -eq '${{ inputs.IsPrerelease }}') `

@@ -14,6 +14,8 @@ jobs:
     update-opa-dependency:
         name: Update OPA Dependency
         runs-on: windows-latest
+        outputs:
+            pr_url: ${{ steps.create-pr.outputs.pr_url }}
         permissions:
             contents: write
             pull-requests: write
@@ -64,6 +66,7 @@ jobs:
                     -LatestOpaVersion $LatestOPAVersion
 
             - name: Create new PR
+              id: create-pr
               if: steps.determine-update-required.outputs.updaterequired == 'true'
               run: |
                   $LatestOpaVersion = "${{ steps.determine-update-required.outputs.latestopaversion }}"
@@ -76,6 +79,9 @@ jobs:
                     -CurrentOpaVersion $CurrentOpaVersion `
                     -LatestOpaVersion $LatestOPAVersion `
                     -OpaVersionBumpBranch $OpaVersionBumpBranch
+
+                  $PrUrl = gh pr list --head $OpaVersionBumpBranch --json url --jq '.[0].url'
+                  echo "pr_url=$PrUrl" >> $env:GITHUB_OUTPUT
 
             - name: Trigger smoke test workflow
               if: steps.determine-update-required.outputs.updaterequired == 'true'
@@ -95,3 +101,12 @@ jobs:
                  -Uri "https://api.github.com/repos/${{ github.repository }}/actions/workflows/run_smoke_test.yaml/dispatches" `
                  -Headers $headers `
                  -Body $body
+
+    auto-approve:
+        name: Auto-approve PR
+        needs: update-opa-dependency
+        if: needs.update-opa-dependency.outputs.pr_url
+        uses: ./.github/workflows/auto-approve-pr.yaml
+        with:
+            pr-url: ${{ needs.update-opa-dependency.outputs.pr_url }}
+        secrets: inherit

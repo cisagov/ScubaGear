@@ -1,0 +1,85 @@
+# Purpose: Approve a pull request using a GitHub App token retrieved from
+# Azure Key Vault. The App identity must differ from the PR author for the
+# approval to count toward branch protection.
+# Can be called by other workflows or run manually via workflow_dispatch
+# with a PR URL (useful for existing Dependabot/OPA PRs).
+
+name: Auto-approve PR
+
+on:
+  workflow_call:
+    inputs:
+      pr-url:
+        description: "URL of the PR to approve"
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      # checkov:skip=CKV_GHA_7:Manual inputs are desired.
+      pr-url:
+        description: "URL of the PR to approve"
+        required: true
+        type: string
+
+permissions: read-all
+
+jobs:
+  approve:
+    name: Approve PR
+    runs-on: ubuntu-latest
+    environment: Development
+    permissions:
+      id-token: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Login to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Retrieve GitHub App credentials from Key Vault
+        id: app-creds
+        run: |
+          . utils/workflow/Get-KeyVaultSecret.ps1
+          $Info = Get-KeyVaultInfo -KeyVaultInfo $env:KEY_VAULT_INFO
+
+          $ClientId = Get-KeyVaultSecret -KeyVaultUrl $Info.KeyVaultUrl -SecretName 'SCUBA-AUTO-REVIEWER-CLIENTID'
+          $PrivateKey = Get-KeyVaultSecret -KeyVaultUrl $Info.KeyVaultUrl -SecretName 'SCUBA-AUTO-REVIEWER-PRIVATE-KEY'
+
+          # Mask every line so multiline PEM keys never appear in logs
+          Write-Host "::add-mask::$ClientId"
+          foreach ($line in ($PrivateKey -split "`n")) {
+              $trimmed = $line.Trim()
+              if ($trimmed.Length -gt 0) {
+                  Write-Host "::add-mask::$trimmed"
+              }
+          }
+
+          # Output client ID (single-line)
+          echo "client-id=$ClientId" >> $env:GITHUB_OUTPUT
+
+          # Output private key (multiline) using delimiter syntax
+          $delimiter = "ghadelimiter_$([guid]::NewGuid().ToString('N'))"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "private-key<<$delimiter"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value $PrivateKey
+          Add-Content -Path $env:GITHUB_OUTPUT -Value $delimiter
+        env:
+          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD }}
+        shell: pwsh
+
+      - name: Generate auto-reviewer token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ steps.app-creds.outputs.client-id }}
+          private-key: ${{ steps.app-creds.outputs.private-key }}
+
+      - name: Approve PR
+        run: gh pr review --approve "${{ inputs.pr-url }}"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}

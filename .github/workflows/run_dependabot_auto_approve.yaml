@@ -1,0 +1,24 @@
+# Purpose: Auto-approve Dependabot pull requests using a GitHub App identity
+# whose credentials are stored in Azure Key Vault. Uses pull_request_target
+# so secrets are available (Dependabot-triggered pull_request runs cannot
+# access repository secrets).
+
+name: Dependabot Auto-approve
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions: read-all
+
+jobs:
+  auto-approve:
+    name: Auto-approve PR
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    uses: ./.github/workflows/auto-approve-pr.yaml
+    with:
+      pr-url: ${{ github.event.pull_request.html_url }}
+    secrets: inherit

@@ -53,14 +53,11 @@ jobs:
           enable-AzPSSession: true
       - name: Get Key Vault Info
         id: key-vault-info
-        env:
-          KEY_VAULT_INFO: ${{ secrets.KeyVaultInfo }}
-        # Do not attempt to access the Key Vault if logging into Azure failed.
         if: ${{ success() }}
-        run: |
-          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+        uses: ./.github/actions/get-keyvault-info
+        with:
+          key-vault-info: ${{ secrets.KeyVaultInfo }}
+          checkout-path: repo
       - name: Create Private Gallery
         run: |
           . repo/utils/workflow/Publish-ScubaGear.ps1
@@ -73,8 +70,8 @@ jobs:
           Remove-NonReleaseFiles -RootFolderName "repo"
           # Setup the parameters
           $Parameters = @{
-            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.KeyVaultUrl }}'
-            CertificateName = '${{ steps.key-vault-info.outputs.KeyVaultCertificateName }}'
+            AzureKeyVaultUrl = '${{ steps.key-vault-info.outputs.key-vault-url }}'
+            CertificateName = '${{ steps.key-vault-info.outputs.certificate-name }}'
             ModuleSourcePath = 'repo/PowerShell/ScubaGear'
             GalleryName = $env:GalleryName
           }
