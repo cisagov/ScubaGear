@@ -49,14 +49,21 @@ jobs:
           $ClientId = Get-KeyVaultSecret -KeyVaultUrl $Info.KeyVaultUrl -SecretName 'SCUBA-AUTO-REVIEWER-CLIENTID'
           $PrivateKey = Get-KeyVaultSecret -KeyVaultUrl $Info.KeyVaultUrl -SecretName 'SCUBA-AUTO-REVIEWER-PRIVATE-KEY'
 
-          # Mask every line so multiline PEM keys never appear in logs
-          Write-Host "::add-mask::$ClientId"
+          # Key Vault may store the PEM as a single line; convert to proper
+          # multiline PEM so create-github-app-token can parse it.
+          if ($PrivateKey -notmatch "`n") {
+              $PrivateKey = $PrivateKey -replace '(-----BEGIN [A-Z ]+-----)\s*', "`$1`n"
+              $PrivateKey = $PrivateKey -replace '\s*(-----END [A-Z ]+-----)', "`n`$1"
+          }
+
+          # Mask every line so PEM content never appears in logs
           foreach ($line in ($PrivateKey -split "`n")) {
               $trimmed = $line.Trim()
               if ($trimmed.Length -gt 0) {
                   Write-Host "::add-mask::$trimmed"
               }
           }
+          Write-Host "::add-mask::$ClientId"
 
           # Output client ID (single-line)
           echo "client-id=$ClientId" >> $env:GITHUB_OUTPUT
