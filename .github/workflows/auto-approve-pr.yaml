@@ -21,8 +21,6 @@ on:
         required: true
         type: string
 
-permissions: read-all
-
 jobs:
   approve:
     name: Approve PR

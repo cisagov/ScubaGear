@@ -106,9 +106,6 @@ jobs:
         name: Auto-approve PR
         needs: update-opa-dependency
         if: needs.update-opa-dependency.outputs.pr_url
-        permissions:
-            id-token: write
-            pull-requests: write
         uses: ./.github/workflows/auto-approve-pr.yaml
         with:
             pr-url: ${{ needs.update-opa-dependency.outputs.pr_url }}
