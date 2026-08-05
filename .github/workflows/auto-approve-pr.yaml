@@ -33,10 +33,10 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Login to Azure
-        uses: azure/login@v3
+        uses: azure/login@d54469830ea7d513b7371e02a077c3ee5cb7b112 # v3
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -74,7 +74,7 @@ jobs:
 
       - name: Generate auto-reviewer token
         id: app-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
         with:
           client-id: ${{ steps.app-creds.outputs.client-id }}
           private-key: ${{ steps.app-creds.outputs.private-key }}
