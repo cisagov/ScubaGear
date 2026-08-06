@@ -202,6 +202,25 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
     font-style: italic;
 }
 
+/* Marks a row whose before and after sides are different policies, aligned
+   across the Defender -> Security Suite migration. Deliberately colorless: the
+   row keeps its Result (After) color and this only annotates the ID pair. */
+.migrated-badge {
+    display: inline-block;
+    margin-left: 0.4em;
+    padding: 0 0.4em;
+    border: 1px solid var(--border-color);
+    border-radius: 0.8em;
+    background-color: var(--background-secondary);
+    color: var(--uuid-color);
+    font-size: 0.75em;
+    font-style: italic;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.legend .migrated-badge { margin-left: 0; margin-right: 0.35em; }
+
 .diff-generated { text-align: center; }
 
 .legend {

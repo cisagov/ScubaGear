@@ -391,8 +391,213 @@ InModuleScope Diff {
             }
         }
         It 'Strips embedded HTML from the Requirement field' {
-            $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.SECURITYSUITE.3.1' }
+            $rec = $DiffB.Diff.SecuritySuite | Where-Object { (Get-ScubaBaseControlId $_.'Control ID (After)') -eq 'MS.SECURITYSUITE.1.3' }
             $rec.Requirement | Should -Be 'Configure A & B properly.'
+        }
+        It 'Leaves the split MS.DEFENDER.1.x policies unmigrated' {
+            # MS.DEFENDER.1.1v1 - 1.5v1 are excluded from the migration map because
+            # each was split across several Security Suite policies.
+            foreach ($rec in $DiffB.Diff.Defender) {
+                $rec.PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            }
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'Fixture pair C: Defender to Security Suite migration' {
+        BeforeAll {
+            $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairC-Before.json')
+            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairC-After.json')
+            $script:DiffC = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
+            $script:GetC = {
+                param($BaseId)
+                foreach ($product in @($DiffC.Diff.Keys)) {
+                    $hit = $DiffC.Diff.$product | Where-Object {
+                        (Get-ScubaBaseControlId $_.'Control ID (After)') -eq $BaseId -or
+                        (Get-ScubaBaseControlId $_.'Control ID (Before)') -eq $BaseId
+                    }
+                    if ($hit) { return $hit }
+                }
+                return $null
+            }
+        }
+
+        It 'Files a migrated pair under the Security Suite product, not Defender' {
+            $rec = & $GetC 'MS.SECURITYSUITE.2.1'
+            $rec | Should -Not -BeNullOrEmpty
+            @($DiffC.Diff.SecuritySuite | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.2.1v1' }).Count | Should -Be 1
+            @($DiffC.Diff.Defender | Where-Object { $_.'Control ID (Before)' -eq 'MS.DEFENDER.2.1v1' }).Count | Should -Be 0
+        }
+
+        It 'Keeps both real IDs on the record' {
+            $rec = & $GetC 'MS.SECURITYSUITE.2.1'
+            $rec.'Control ID (Before)' | Should -Be 'MS.DEFENDER.2.1v1'
+            $rec.'Control ID (After)' | Should -Be 'MS.SECURITYSUITE.2.1v1'
+        }
+
+        It 'Classifies a migrated pair by its result, like any other pair' {
+            (& $GetC 'MS.SECURITYSUITE.2.1').Classification | Should -Be 'NewFail'   # Pass -> Fail
+            (& $GetC 'MS.SECURITYSUITE.1.4').Classification | Should -Be 'Unchanged' # Pass -> Pass
+        }
+
+        It 'Does not classify a migrated pair as PolicyVersionUpdate when the version suffixes differ' {
+            # MS.DEFENDER.4.1v2 -> MS.SECURITYSUITE.3.1v1: different families, so the
+            # suffixes are not comparable and the result diff must win.
+            $rec = & $GetC 'MS.SECURITYSUITE.3.1'
+            $rec.'Control ID (Before)' | Should -Be 'MS.DEFENDER.4.1v2'
+            $rec.Classification | Should -Be 'NewPass'
+        }
+
+        It 'Marks migrated records with the migration fields' {
+            $rec = & $GetC 'MS.SECURITYSUITE.3.1'
+            $rec.Migrated | Should -BeTrue
+            $rec.MigratedFromId | Should -Be 'MS.DEFENDER.4.1v2'
+            $rec.MigratedFromProduct | Should -Be 'Defender'
+        }
+
+        It 'Omits the migration fields from records that were not migrated' {
+            (& $GetC 'MS.SECURITYSUITE.6.1').PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            (& $GetC 'MS.DEFENDER.6.2').PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+        }
+
+        It 'Takes the Requirement, Group, and Details from the Security Suite side' {
+            $rec = & $GetC 'MS.SECURITYSUITE.1.4'
+            $rec.GroupNumber | Should -Be '1'
+            $rec.GroupName | Should -Be 'Threat Protection'
+            $rec.DetailsAfter | Should -Be 'Passing after.'
+        }
+
+        It 'Reports a split MS.DEFENDER.1.x policy as RemovedPolicy under Defender' {
+            $rec = & $GetC 'MS.DEFENDER.1.1'
+            $rec.Classification | Should -Be 'RemovedPolicy'
+            $rec.PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+        }
+
+        It 'Reports a retired policy (New ID "None") as RemovedPolicy' {
+            (& $GetC 'MS.DEFENDER.4.5').Classification | Should -Be 'RemovedPolicy'
+        }
+
+        It 'Reports a Security Suite policy with no Defender source as NewPolicy' {
+            (& $GetC 'MS.SECURITYSUITE.6.1').Classification | Should -Be 'NewPolicy'
+        }
+
+        It 'Still compares a surviving Defender policy normally' {
+            (& $GetC 'MS.DEFENDER.6.2').Classification | Should -Be 'Unchanged'
+        }
+
+        It 'Counts a migrated record under the Security Suite product summary' {
+            $DiffC.Summary.SecuritySuite['NewFail'] | Should -Be 1
+            $DiffC.Summary.SecuritySuite['NewPass'] | Should -Be 1
+            $DiffC.Summary.SecuritySuite['NewPolicy'] | Should -Be 1
+            $DiffC.Summary.Defender['NewFail'] | Should -BeNullOrEmpty
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'Policy migration alignment rules' {
+        BeforeAll {
+            $script:NewSide = {
+                param($Product, $Controls)
+                # $Controls: array of @{ Id = ...; Result = ... }
+                $list = @($Controls | ForEach-Object {
+                    [pscustomobject]@{
+                        'Control ID'   = $_.Id
+                        'Requirement'  = 'Requirement text.'
+                        'Result'       = $_.Result
+                        'OriginalResult' = $_.Result
+                        'Criticality'  = 'Shall'
+                        'Details'      = 'Details text.'
+                    }
+                })
+                $results = [pscustomobject]@{}
+                $results | Add-Member -NotePropertyName $Product -NotePropertyValue @(
+                    [pscustomobject]@{ GroupName = 'Group'; GroupNumber = '1'; Controls = $list }
+                )
+                return [pscustomobject]@{
+                    MetaData = [pscustomobject]@{ ReportUUID = 'x'; TimestampZulu = 'y'; ToolVersion = 'z' }
+                    Summary  = [pscustomobject]@{}
+                    Results  = $results
+                }
+            }
+        }
+
+        It 'Matches on base ID, so an older version of the retired policy still aligns' {
+            # The migration table pins MS.DEFENDER.4.1v2; a before file carrying v1
+            # must still align to MS.SECURITYSUITE.3.1v1.
+            $b = & $NewSide 'Defender' @(@{ Id = 'MS.DEFENDER.4.1v1'; Result = 'Fail' })
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.3.1v1'; Result = 'Pass' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $rec = $diff.Diff.SecuritySuite[0]
+            $rec.Migrated | Should -BeTrue
+            $rec.MigratedFromId | Should -Be 'MS.DEFENDER.4.1v1'
+            $rec.Classification | Should -Be 'NewPass'
+        }
+
+        It 'Does not align when the after run has no replacement policy' {
+            $b = & $NewSide 'Defender' @(@{ Id = 'MS.DEFENDER.2.1v1'; Result = 'Fail' })
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.9.9v1'; Result = 'Pass' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $diff.Diff.Defender[0].Classification | Should -Be 'RemovedPolicy'
+            $diff.Diff.Defender[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+        }
+
+        It 'Prefers a direct match when the after run still carries the retired Defender policy' {
+            $b = & $NewSide 'Defender' @(@{ Id = 'MS.DEFENDER.2.1v1'; Result = 'Fail' })
+            $a = [pscustomobject]@{
+                MetaData = [pscustomobject]@{ ReportUUID = 'x'; TimestampZulu = 'y'; ToolVersion = 'z' }
+                Summary  = [pscustomobject]@{}
+                Results  = [pscustomobject]@{
+                    Defender      = @([pscustomobject]@{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        [pscustomobject]@{ 'Control ID' = 'MS.DEFENDER.2.1v1'; Requirement = 'r'; Result = 'Pass'; OriginalResult = 'Pass'; Criticality = 'Shall'; Details = 'd' }) })
+                    SecuritySuite = @([pscustomobject]@{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        [pscustomobject]@{ 'Control ID' = 'MS.SECURITYSUITE.2.1v1'; Requirement = 'r'; Result = 'Fail'; OriginalResult = 'Fail'; Criticality = 'Shall'; Details = 'd' }) })
+                }
+            }
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $diff.Diff.Defender[0].Classification | Should -Be 'NewPass'
+            $diff.Diff.Defender[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            $diff.Diff.SecuritySuite[0].Classification | Should -Be 'NewPolicy'
+        }
+
+        It 'Prefers a direct match when both runs are already post-migration' {
+            $b = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.2.1v1'; Result = 'Fail' })
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.2.1v1'; Result = 'Pass' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $diff.Diff.SecuritySuite[0].Classification | Should -Be 'NewPass'
+            $diff.Diff.SecuritySuite[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+        }
+
+        It 'Does not align in reverse (Security Suite before, Defender after)' {
+            $b = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.2.1v1'; Result = 'Pass' })
+            $a = & $NewSide 'Defender' @(@{ Id = 'MS.DEFENDER.2.1v1'; Result = 'Fail' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $diff.Diff.SecuritySuite[0].Classification | Should -Be 'RemovedPolicy'
+            $diff.Diff.Defender[0].Classification | Should -Be 'NewPolicy'
+        }
+
+        It 'Drops a product left with no records once every policy migrated out' {
+            $b = & $NewSide 'Defender' @(@{ Id = 'MS.DEFENDER.2.1v1'; Result = 'Pass' })
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.2.1v1'; Result = 'Pass' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            @($diff.Diff.Keys) | Should -Not -Contain 'Defender'
+            @($diff.Diff.Keys) | Should -Contain 'SecuritySuite'
+        }
+
+        It 'Maps every Defender to Security Suite pair one-to-one' {
+            $targets = @($script:PolicyMigrationMap.Values)
+            ($targets | Select-Object -Unique).Count | Should -Be $targets.Count
+            $script:PolicyMigrationMap.Count | Should -Be 13
+        }
+
+        It 'Excludes the split and retired Defender policies from the migration map' {
+            foreach ($excluded in @('MS.DEFENDER.1.1','MS.DEFENDER.1.2','MS.DEFENDER.1.3','MS.DEFENDER.1.4','MS.DEFENDER.1.5','MS.DEFENDER.4.5')) {
+                $script:PolicyMigrationMap.Contains($excluded) | Should -BeFalse
+            }
+        }
+
+        It 'Contains no EXO or Teams source policies' {
+            foreach ($key in @($script:PolicyMigrationMap.Keys)) {
+                $key | Should -BeLike 'MS.DEFENDER.*'
+            }
         }
     }
 
@@ -535,7 +740,8 @@ InModuleScope Diff {
                 'Product','Control ID (Before)','Control ID (After)','GroupNumber','GroupName','Classification',
                 'ResultBefore','ResultAfter','CriticalityBefore','CriticalityAfter','Requirement','DetailsAfter',
                 'MarkedIncorrectBefore','MarkedIncorrectAfter','UnderlyingResultBefore','UnderlyingResultAfter',
-                'AnnotationChanged','Comment','RemediationDate'
+                'AnnotationChanged','Comment','RemediationDate',
+                'Migrated','MigratedFromId','MigratedFromProduct'
             )
             foreach ($row in $RowsA) {
                 ($row.PSObject.Properties.Name -join ',') | Should -Be ($expectedColumns -join ',')
@@ -570,6 +776,24 @@ InModuleScope Diff {
                 -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirB 'PairB-After.json'))
             $products = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $diffB | ForEach-Object { $_.Product } | Select-Object -Unique)
             $products -join ',' | Should -Be 'Defender,SecuritySuite'
+        }
+
+        It 'Carries the migration fields for a migrated record and leaves them empty otherwise' {
+            $FixtureDirC = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $diffC = Compare-ScubaResults `
+                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-Before.json')) `
+                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-After.json'))
+            $rowsC = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $diffC)
+
+            $migrated = $rowsC | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.3.1v1' }
+            $migrated.Product | Should -Be 'SecuritySuite'
+            $migrated.Migrated | Should -BeTrue
+            $migrated.MigratedFromId | Should -Be 'MS.DEFENDER.4.1v2'
+            $migrated.MigratedFromProduct | Should -Be 'Defender'
+
+            $notMigrated = $rowsC | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.6.1v1' }
+            $notMigrated.Migrated | Should -BeNullOrEmpty
+            $notMigrated.MigratedFromId | Should -BeNullOrEmpty
         }
 
         It 'Round-trips through ConvertTo-Csv with every column preserved' {
@@ -678,6 +902,18 @@ InModuleScope Diff {
         It 'HTML-escapes user content and never emits the raw indicator markup' {
             $HtmlB | Should -Match 'Configure A &amp; B properly'
             $HtmlB | Should -Not -Match "policy-indicators"
+        }
+        It 'Badges a migrated row and shows both control IDs' {
+            $FixtureDirC = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $diffC = Compare-ScubaResults `
+                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-Before.json')) `
+                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-After.json'))
+            $htmlC = New-ScubaDiffReport -DiffResults $diffC
+            $htmlC | Should -Match 'MS\.DEFENDER\.4\.1v2 &rarr; MS\.SECURITYSUITE\.3\.1v1 <span class="migrated-badge"'
+            $htmlC | Should -Match 'data-migrated="true"'
+            # A migrated row is classified by result, so it keeps a normal
+            # classification and stays reachable by the existing filters.
+            $htmlC | Should -Match 'data-classification="NewPass"'
         }
     }
 }

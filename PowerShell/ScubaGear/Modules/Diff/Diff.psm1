@@ -68,6 +68,42 @@ $script:ClassificationLabelMap = @{
     'PolicyVersionUpdate' = 'Policy Version Update'
 }
 
+# Defender -> Security Suite policy migration, keyed by *base* control ID (no
+# version suffix) on both sides. Derived from mappings\scuba-baseline-policy-migrations.csv,
+# restricted to the rows whose Old ID is a Defender policy and whose New ID is a
+# single Security Suite policy. Within that subset the mapping is one-to-one.
+#
+# Deliberately excluded (they fall through to the normal presence rules, i.e.
+# RemovedPolicy):
+#   - MS.DEFENDER.1.1v1 - MS.DEFENDER.1.5v1, each split across several Security
+#     Suite policies (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1), so no
+#     single target exists to align to.
+#   - MS.DEFENDER.4.5v1, retired outright (New ID "None").
+#   - Every EXO and Teams row. Those policies are manual checks that only ever
+#     produced N/A, so an aligned before/after comparison would carry no signal;
+#     they are reported as RemovedPolicy instead.
+$script:PolicyMigrationMap = [ordered]@{
+    'MS.DEFENDER.2.1' = 'MS.SECURITYSUITE.2.1'
+    'MS.DEFENDER.2.2' = 'MS.SECURITYSUITE.2.2'
+    'MS.DEFENDER.2.3' = 'MS.SECURITYSUITE.2.3'
+    'MS.DEFENDER.3.1' = 'MS.SECURITYSUITE.1.4'
+    'MS.DEFENDER.4.1' = 'MS.SECURITYSUITE.3.1'
+    'MS.DEFENDER.4.2' = 'MS.SECURITYSUITE.3.2'
+    'MS.DEFENDER.4.3' = 'MS.SECURITYSUITE.3.3'
+    'MS.DEFENDER.4.4' = 'MS.SECURITYSUITE.3.4'
+    'MS.DEFENDER.4.6' = 'MS.SECURITYSUITE.3.5'
+    'MS.DEFENDER.5.1' = 'MS.SECURITYSUITE.4.1'
+    'MS.DEFENDER.5.2' = 'MS.SECURITYSUITE.4.2'
+    'MS.DEFENDER.6.1' = 'MS.SECURITYSUITE.5.1'
+    'MS.DEFENDER.6.3' = 'MS.SECURITYSUITE.5.2'
+}
+
+# The products either side of $script:PolicyMigrationMap. A migrated record is
+# filed under the target product, following the after side like the rest of the
+# report.
+$script:PolicyMigrationSourceProduct = 'Defender'
+$script:PolicyMigrationTargetProduct = 'SecuritySuite'
+
 function Get-ScubaBaseControlId {
     <#
     .Description
@@ -271,7 +307,8 @@ function Get-ScubaDiffClassification {
         [Parameter(Mandatory = $true)] [bool] $BeforePresent,
         [Parameter(Mandatory = $true)] [bool] $AfterPresent,
         [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $BeforeVersion,
-        [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $AfterVersion
+        [Parameter(Mandatory = $true)] [AllowNull()] [AllowEmptyString()] [string] $AfterVersion,
+        [Parameter(Mandatory = $false)] [switch] $IsMigrated
     )
 
     if (-not $BeforePresent) { return 'NewPolicy' }
@@ -287,8 +324,11 @@ function Get-ScubaDiffClassification {
     if ($aCat -eq 'Error') { return 'Errored' }
 
     # A changed version suffix means the policy's meaning changed; the Result
-    # comparison is informational, so this outranks the specific diffs.
-    if ($BeforeVersion -ne $AfterVersion) { return 'PolicyVersionUpdate' }
+    # comparison is informational, so this outranks the specific diffs. Skipped for
+    # a migrated pair: the two IDs come from different policy families (e.g.
+    # MS.DEFENDER.4.1v2 -> MS.SECURITYSUITE.3.1v1), so their version suffixes are
+    # not comparable and the pair is classified by its result like any other.
+    if (-not $IsMigrated -and $BeforeVersion -ne $AfterVersion) { return 'PolicyVersionUpdate' }
 
     # Identical Result and version. Checked before the diffs below so a
     # stable state -- including a stable "Incorrect result" marking or a control
@@ -490,6 +530,78 @@ function Get-ScubaControlMap {
     return $map
 }
 
+function Invoke-ScubaPolicyMigrationAlignment {
+    <#
+    .Description
+    Aligns the Defender -> Security Suite policy migration across the two runs so
+    a retired Defender policy is compared against the Security Suite policy that
+    replaced it, instead of being reported as RemovedPolicy alongside a matching
+    NewPolicy.
+
+    Operates on the per-product control maps in place: a matched before-side entry
+    is moved out of the Defender map and re-keyed under its Security Suite base ID
+    in the SecuritySuite map, so the record is produced -- and counted -- under the
+    Security Suite product. The moved entry is tagged with MigratedFromId /
+    MigratedFromProduct, which become the record's migration fields.
+
+    A direct base-ID match always wins over the migration alias: a pair is only
+    aligned when the before run has the retired policy, the after run has its
+    replacement, and neither run carries both. That leaves a transitional run
+    containing the old and new policy side by side compared as-is.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [System.Collections.Specialized.OrderedDictionary]
+        $BeforeMaps,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [System.Collections.Specialized.OrderedDictionary]
+        $AfterMaps
+    )
+
+    $source = $script:PolicyMigrationSourceProduct
+    $target = $script:PolicyMigrationTargetProduct
+
+    # Nothing to align unless the before run assessed the source product and the
+    # after run assessed the target product.
+    if (-not $BeforeMaps.Contains($source)) { return }
+    if (-not $AfterMaps.Contains($target)) { return }
+
+    $sourceBefore = $BeforeMaps[$source]
+    $targetAfter = $AfterMaps[$target]
+    if ($AfterMaps.Contains($source)) { $sourceAfter = $AfterMaps[$source] } else { $sourceAfter = $null }
+    if ($BeforeMaps.Contains($target)) { $targetBefore = $BeforeMaps[$target] } else { $targetBefore = $null }
+
+    foreach ($oldBase in @($script:PolicyMigrationMap.Keys)) {
+        $newBase = $script:PolicyMigrationMap[$oldBase]
+
+        # The before run must carry the retired policy and the after run its
+        # replacement; otherwise there is nothing to pair.
+        if (-not $sourceBefore.Contains($oldBase)) { continue }
+        if (-not $targetAfter.Contains($newBase)) { continue }
+
+        # Either side carrying both forms means this is not a migration boundary.
+        if ($null -ne $sourceAfter -and $sourceAfter.Contains($oldBase)) { continue }
+        if ($null -ne $targetBefore -and $targetBefore.Contains($newBase)) { continue }
+
+        $entry = $sourceBefore[$oldBase]
+        Add-Member -InputObject $entry -NotePropertyName 'MigratedFromId' -NotePropertyValue $entry.FullId -Force
+        Add-Member -InputObject $entry -NotePropertyName 'MigratedFromProduct' -NotePropertyValue $source -Force
+
+        if ($null -eq $targetBefore) {
+            $targetBefore = [ordered]@{}
+            $BeforeMaps[$target] = $targetBefore
+        }
+        $targetBefore[$newBase] = $entry
+        $sourceBefore.Remove($oldBase)
+    }
+}
+
 function Get-ScubaAnnotationEntry {
     <#
     .Description
@@ -581,10 +693,22 @@ function Compare-ScubaResults {
     $beforeProducts = @($Before.Results.PSObject.Properties.Name)
     $afterProducts = @($After.Results.PSObject.Properties.Name)
 
+    # Flatten every product to a base-ID keyed control map up front, so the
+    # Defender -> Security Suite migration can move before-side entries across
+    # product boundaries before any product is compared.
+    $beforeMaps = [ordered]@{}
+    foreach ($product in $beforeProducts) { $beforeMaps[$product] = Get-ScubaControlMap $Before.Results.$product }
+    $afterMaps = [ordered]@{}
+    foreach ($product in $afterProducts) { $afterMaps[$product] = Get-ScubaControlMap $After.Results.$product }
+
+    Invoke-ScubaPolicyMigrationAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
+
     # Each product is compared independently and matched by name only. A product
     # present in only one file has all of its controls reported as NewPolicy (only
-    # in after) or RemovedPolicy (only in before).
-    $allProducts = @(@($beforeProducts) + @($afterProducts) | Select-Object -Unique | Sort-Object)
+    # in after) or RemovedPolicy (only in before). The union is taken over the
+    # control maps rather than the raw product lists, since migration can give the
+    # target product a before side it did not have in the input file.
+    $allProducts = @(@($beforeMaps.Keys) + @($afterMaps.Keys) | Select-Object -Unique | Sort-Object)
 
     $beforeAnnot = $Before.AnnotatedFailedPolicies
     $afterAnnot = $After.AnnotatedFailedPolicies
@@ -595,14 +719,13 @@ function Compare-ScubaResults {
     $productsOnlyAfter = @()
 
     foreach ($product in $allProducts) {
-        $inBefore = $beforeProducts -contains $product
-        $inAfter = $afterProducts -contains $product
+        # ProductsOnlyIn* describes the input files, so it is derived from the raw
+        # product lists rather than the post-migration maps.
+        if (($beforeProducts -contains $product) -and -not ($afterProducts -contains $product)) { $productsOnlyBefore += $product }
+        if (($afterProducts -contains $product) -and -not ($beforeProducts -contains $product)) { $productsOnlyAfter += $product }
 
-        if ($inBefore -and -not $inAfter) { $productsOnlyBefore += $product }
-        if ($inAfter -and -not $inBefore) { $productsOnlyAfter += $product }
-
-        if ($inBefore) { $beforeMap = Get-ScubaControlMap $Before.Results.$product } else { $beforeMap = [ordered]@{} }
-        if ($inAfter) { $afterMap = Get-ScubaControlMap $After.Results.$product } else { $afterMap = [ordered]@{} }
+        if ($beforeMaps.Contains($product)) { $beforeMap = $beforeMaps[$product] } else { $beforeMap = [ordered]@{} }
+        if ($afterMaps.Contains($product)) { $afterMap = $afterMaps[$product] } else { $afterMap = [ordered]@{} }
 
         $allBase = Get-ScubaOrderedControlIds @(@($beforeMap.Keys) + @($afterMap.Keys) | Select-Object -Unique)
 
@@ -618,9 +741,14 @@ function Compare-ScubaResults {
             if ($bPresent) { $bResult = $b.Result; $bVersion = $b.Version } else { $bResult = $null; $bVersion = $null }
             if ($aPresent) { $aResult = $a.Result; $aVersion = $a.Version } else { $aResult = $null; $aVersion = $null }
 
+            # Set by Invoke-ScubaPolicyMigrationAlignment on a before-side entry it
+            # relocated into this product.
+            $isMigrated = ($bPresent -and $null -ne $b.PSObject.Properties['MigratedFromId'])
+
             $classification = Get-ScubaDiffClassification -BeforeResult $bResult -AfterResult $aResult `
                 -BeforePresent $bPresent -AfterPresent $aPresent `
-                -BeforeVersion $bVersion -AfterVersion $aVersion
+                -BeforeVersion $bVersion -AfterVersion $aVersion `
+                -IsMigrated:$isMigrated
 
             if ($aPresent) { $reqSource = $a.Requirement } else { $reqSource = $b.Requirement }
             if ($aPresent) { $groupName = $a.GroupName; $groupNumber = $a.GroupNumber } else { $groupName = $b.GroupName; $groupNumber = $b.GroupNumber }
@@ -638,6 +766,16 @@ function Compare-ScubaResults {
                 'CriticalityBefore'   = if ($bPresent) { $b.Criticality } else { $null }
                 'CriticalityAfter'    = if ($aPresent) { $a.Criticality } else { $null }
                 'DetailsAfter'        = $detailsAfter
+            }
+
+            # Migration metadata. The record is classified by result like any other
+            # pair; these fields are what tell a consumer the comparison spans the
+            # Defender -> Security Suite migration rather than a single policy's
+            # history. Control ID (Before) already carries the retired ID.
+            if ($isMigrated) {
+                $record['Migrated'] = $true
+                $record['MigratedFromId'] = $b.MigratedFromId
+                $record['MigratedFromProduct'] = $b.MigratedFromProduct
             }
 
             # False-positive (marked incorrect) metadata. When either side carries
@@ -671,6 +809,11 @@ function Compare-ScubaResults {
             if (-not $classificationCounts.Contains($classification)) { $classificationCounts[$classification] = 0 }
             $classificationCounts[$classification] += 1
         }
+
+        # A product can end up with no records at all once migration has moved its
+        # before-side entries elsewhere (e.g. a Defender product whose every policy
+        # migrated). Dropping it keeps an empty section out of the report.
+        if ($records.Count -eq 0) { continue }
 
         $diff[$product] = $records
         $summary[$product] = $classificationCounts
@@ -775,6 +918,9 @@ function ConvertTo-ScubaDiffCsvRecord {
                 'AnnotationChanged'      = & $get 'AnnotationChanged'
                 'Comment'                = & $get 'Comment'
                 'RemediationDate'        = & $get 'RemediationDate'
+                'Migrated'               = & $get 'Migrated'
+                'MigratedFromId'         = & $get 'MigratedFromId'
+                'MigratedFromProduct'    = & $get 'MigratedFromProduct'
             }
         }
     }
@@ -843,7 +989,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine("<p class=""diff-generated"">Diff generated $(& $enc $meta.TimestampZulu) by ScubaGear $(& $enc $meta.ToolVersion).</p>")
 
     if (@($meta.ProductsOnlyInBefore).Count -gt 0) {
-        [void]$sb.AppendLine("<p><strong>Products only in Before (all controls Removed Policy):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")
+        [void]$sb.AppendLine("<p><strong>Products only in Before (controls reported as Removed Policy unless migrated):</strong> $(& $enc ((@($meta.ProductsOnlyInBefore)) -join ', '))</p>")
     }
     if (@($meta.ProductsOnlyInAfter).Count -gt 0) {
         [void]$sb.AppendLine("<p><strong>Products only in After (all controls New Policy):</strong> $(& $enc ((@($meta.ProductsOnlyInAfter)) -join ', '))</p>")
@@ -856,6 +1002,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Pass (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Removed Policy</span>')
+    [void]$sb.AppendLine('  <span><span class="migrated-badge">migrated</span>Before result comes from the retired Defender policy shown in the Control ID column.</span>')
     [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
@@ -922,6 +1069,13 @@ function New-ScubaDiffReport {
             elseif ($afterId) { $idDisplay = & $enc $afterId }
             else { $idDisplay = & $enc $beforeId }
 
+            # Badge a pair aligned across the Defender -> Security Suite migration,
+            # so a reader can tell the before result came from a different policy.
+            $isMigratedRow = ($r.PSObject.Properties['Migrated'] -and $r.Migrated)
+            if ($isMigratedRow) {
+                $idDisplay += " <span class=""migrated-badge"" title=""Aligned across the Defender to Security Suite policy migration"">migrated</span>"
+            }
+
             $groupDisplay = & $enc (("$($r.GroupNumber) $($r.GroupName)").Trim())
 
             # Result cells. For a side marked incorrect (false positive), surface
@@ -935,7 +1089,8 @@ function New-ScubaDiffReport {
                 $resultAfterCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultAfter))</span>"
             }
 
-            [void]$sb.AppendLine("<tr class=""$rowClass"" data-classification=""$(& $enc $classification)"">")
+            if ($isMigratedRow) { $migratedAttr = ' data-migrated="true"' } else { $migratedAttr = '' }
+            [void]$sb.AppendLine("<tr class=""$rowClass"" data-classification=""$(& $enc $classification)""$migratedAttr>")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
             [void]$sb.AppendLine("  <td class=""classification-label"">$(& $enc (Get-ScubaClassificationLabel $classification))</td>")
@@ -1145,6 +1300,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaProductDisplayName',
     'Get-ScubaOrderedProducts',
     'Get-ScubaControlMap',
+    'Invoke-ScubaPolicyMigrationAlignment',
     'Get-ScubaAnnotationEntry',
     'Get-ScubaDiffFileEncoding'
 )

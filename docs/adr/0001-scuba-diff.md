@@ -89,6 +89,46 @@ placeholder. This was chosen over treating `"Incorrect result"` as an opaque
 `Other` string because false positives moving between runs is exactly the kind of
 operator-relevant change the diff exists to surface.
 
+### 3. Defender-only alignment of the Security Suite migration (vs. mapping the whole CSV)
+
+**Decision:** Carry a fixed 13-entry table, embedded in `Diff.psm1` and keyed by
+base control ID, that aligns retired Defender policies with the Security Suite
+policies that replaced them. A matched before-side control is relocated into the
+Security Suite product and compared there. The record is classified by its
+**result** like any other pair, with `Migrated` / `MigratedFromId` /
+`MigratedFromProduct` fields (and a report badge) marking that the comparison
+spans the migration. The `PolicyVersionUpdate` check is skipped for these
+records, since the two IDs come from different policy families and their version
+suffixes are not comparable. A direct base-ID match always wins over the alias,
+so two post-migration runs — or a transitional run carrying both forms — are
+compared as-is.
+
+The table is the Defender→SecuritySuite subset of
+`mappings\scuba-baseline-policy-migrations.csv`, which is one-to-one. Three
+groups of rows are deliberately excluded and fall through to `RemovedPolicy`:
+`MS.DEFENDER.1.1v1`–`1.5v1` (each split across several Security Suite policies,
+so no single target exists), `MS.DEFENDER.4.5v1` (retired outright), and every
+EXO/Teams row.
+
+**Alternative considered — mapping every row in the CSV.** Rejected because the
+EXO and Teams rows are many-to-one (five old IDs collapse onto
+`MS.SECURITYSUITE.3.1v1` alone), which would force a record shape that either
+duplicates the after result across N rows or invents an aggregation rule for
+disagreeing before results. Those policies are also manual checks that only ever
+produced `N/A`, so the aligned comparison would carry no signal to justify the
+complexity. Reporting them as `RemovedPolicy` is both simpler and more honest.
+
+**Alternative considered — a dedicated `PolicyMigration` classification**
+(parallel to `PolicyVersionUpdate`). Rejected because it would collapse all 13
+into one informational bucket, hiding a genuine `Pass → Fail` across the
+migration — exactly the posture change the diff exists to surface. The marker
+fields keep both signals.
+
+**Alternative considered — reading the CSV at runtime.** Rejected for v1: it
+would add a file dependency and range/`None` parsing to a module the ADR
+deliberately keeps self-contained, to express 13 pairs that are reviewable in a
+PR diff. The table must be updated by hand if the CSV grows.
+
 ## Consequences
 
 - A new `Modules/Diff` module and one new exported function
@@ -102,6 +142,12 @@ operator-relevant change the diff exists to surface.
   expand additively.
 - Unknown `Result` values are handled as `Other` with both literals preserved,
   so new status strings never crash the diff.
+- The Defender→SecuritySuite migration table is a hand-maintained copy of a
+  subset of `scuba-baseline-policy-migrations.csv`; a future migration wave needs
+  a corresponding edit to `Diff.psm1`. The record fields it adds (`Migrated`,
+  `MigratedFromId`, `MigratedFromProduct`) are additive to `SchemaVersion 1.0`.
+- A product left with no records once migration has moved its before side
+  elsewhere is dropped from the output rather than rendered as an empty section.
 
 ## References
 

@@ -82,7 +82,83 @@ trailing version suffix removed (`MS.AAD.1.1v1` → `MS.AAD.1.1`):
 
 Products are matched by name only. A product present in only one file has all of
 its controls reported as `NewPolicy` (only in *after*) or `RemovedPolicy` (only
-in *before*).
+in *before*) — except for the Defender controls covered by the
+[Security Suite migration](#defender-to-security-suite-migration) below.
+
+## Defender to Security Suite migration
+
+Several Defender policies were retired and replaced by Security Suite policies
+under new IDs. Base-ID matching alone would report each of those as a
+`RemovedPolicy` under Defender alongside an unrelated `NewPolicy` under Security
+Suite, losing the connection between the two. `Invoke-SCuBADiff` carries a fixed
+migration table so the retired policy is compared against its replacement.
+
+The table is derived from
+[scuba-baseline-policy-migrations.csv](../../PowerShell/ScubaGear/mappings/scuba-baseline-policy-migrations.csv),
+restricted to the rows whose Old ID is a Defender policy and whose New ID is a
+single Security Suite policy. Within that subset the mapping is one-to-one:
+
+| Old (Defender) | New (Security Suite) |
+|---|---|
+| `MS.DEFENDER.2.1v1` | `MS.SECURITYSUITE.2.1v1` |
+| `MS.DEFENDER.2.2v1` | `MS.SECURITYSUITE.2.2v1` |
+| `MS.DEFENDER.2.3v1` | `MS.SECURITYSUITE.2.3v1` |
+| `MS.DEFENDER.3.1v1` | `MS.SECURITYSUITE.1.4v1` |
+| `MS.DEFENDER.4.1v2` | `MS.SECURITYSUITE.3.1v1` |
+| `MS.DEFENDER.4.2v1` | `MS.SECURITYSUITE.3.2v1` |
+| `MS.DEFENDER.4.3v1` | `MS.SECURITYSUITE.3.3v1` |
+| `MS.DEFENDER.4.4v1` | `MS.SECURITYSUITE.3.4v1` |
+| `MS.DEFENDER.4.6v1` | `MS.SECURITYSUITE.3.5v1` |
+| `MS.DEFENDER.5.1v1` | `MS.SECURITYSUITE.4.1v1` |
+| `MS.DEFENDER.5.2v1` | `MS.SECURITYSUITE.4.2v1` |
+| `MS.DEFENDER.6.1v1` | `MS.SECURITYSUITE.5.1v1` |
+| `MS.DEFENDER.6.3v1` | `MS.SECURITYSUITE.5.2v1` |
+
+For a migrated pair:
+
+- The record is filed under the **SecuritySuite** product, following the after
+  side like the rest of the report. It is counted in the Security Suite summary
+  row, not Defender's.
+- `Control ID (Before)` keeps the retired Defender ID and `Control ID (After)`
+  the Security Suite ID, so the report shows `MS.DEFENDER.4.1v2 →
+  MS.SECURITYSUITE.3.1v1` with a **migrated** badge.
+- The record is classified by its **result**, exactly like any other pair —
+  `NewFail`, `NewPass`, `Unchanged`, and so on. The version-suffix check that
+  produces `PolicyVersionUpdate` is skipped, because the two IDs come from
+  different policy families and their suffixes are not comparable.
+- Three fields are added: `Migrated` (always `true`), `MigratedFromId` (the
+  retired full ID), and `MigratedFromProduct` (always `Defender`).
+
+Matching is on **base ID**, so a before file carrying an older version of the
+retired policy (e.g. `MS.DEFENDER.4.1v1`) still aligns.
+
+A **direct base-ID match always wins over the migration alias.** A pair is only
+aligned when the before run has the retired policy, the after run has its
+replacement, and neither run carries both. Two post-migration runs, or a
+transitional run carrying the old and new policy side by side, are compared
+as-is with no migration applied. The alias is directional: passing the files in
+reverse order (Security Suite as *before*, Defender as *after*) does not align
+anything.
+
+### What is deliberately not migrated
+
+These fall through to the normal presence rules, i.e. `RemovedPolicy`:
+
+- **`MS.DEFENDER.1.1v1` – `MS.DEFENDER.1.5v1`.** Each was split across several
+  Security Suite policies (`MS.SECURITYSUITE.1.1v1` – `MS.SECURITYSUITE.1.4v1`),
+  so there is no single target to align to.
+- **`MS.DEFENDER.4.5v1`**, retired outright (New ID `None` in the mapping CSV).
+- **Every EXO and Teams row in the mapping CSV.** Those policies are manual
+  checks that only ever produced `N/A`, so an aligned before/after comparison
+  would carry no signal.
+
+As a result, the Security Suite policies sourced only from EXO or Teams
+(`1.1`, `1.2`, `1.3`, `2.4`, `6.1`, `6.2`, `7.1`, `7.2`, `7.3`, `8.1`, `8.2`)
+report as `NewPolicy`, and their EXO/Teams originals as `RemovedPolicy`.
+
+> **Note:** a product left with no records at all — for example a Defender
+> product whose every assessed policy migrated out — is dropped from the output
+> rather than rendered as an empty section.
 
 ## Diff Key Terminology
 
@@ -102,7 +178,7 @@ this order, highest to lowest:
 |---|---|---|
 | 1 | `NewPolicy` / `RemovedPolicy` | The base ID is present in only one file (presence wins over everything). |
 | 2 | `Errored` | The **after** result is `Error` — keyed off the latest run only, so a live error surfaces even under a version bump. |
-| 3 | `PolicyVersionUpdate` | The version suffix changed; the before/after result comparison is informational. |
+| 3 | `PolicyVersionUpdate` | The version suffix changed; the before/after result comparison is informational. Skipped for a [migrated](#defender-to-security-suite-migration) pair, whose two IDs come from different policy families. |
 | 4 | `Unchanged` | Result and version are identical (hidden by default). |
 | 5 | `NewIncorrectResult` | The after result is newly marked `Incorrect result`. |
 | 6 | specific diffs | A recognized result change: `NewFail`, `NewPass`, `NewWarning`, `NewAutomatedCheck`, `NewManualCheck`. |
@@ -215,12 +291,15 @@ column titles, so the CSV reads as a flattened view of the JSON:
 `GroupName`, `Classification`, `ResultBefore`, `ResultAfter`, `CriticalityBefore`,
 `CriticalityAfter`, `Requirement`, `DetailsAfter`, `MarkedIncorrectBefore`,
 `MarkedIncorrectAfter`, `UnderlyingResultBefore`, `UnderlyingResultAfter`,
-`AnnotationChanged`, `Comment`, `RemediationDate`.
+`AnnotationChanged`, `Comment`, `RemediationDate`, `Migrated`,
+`MigratedFromId`, `MigratedFromProduct`.
 
-Every row carries every column. The last seven are only meaningful for some
+Every row carries every column. The last ten are only meaningful for some
 records — the false-positive fields only where a side is marked incorrect, the
-annotation fields only for `Fail → Fail` — and are left empty elsewhere, as are
-the before/after fields of a `NewPolicy` or `RemovedPolicy` row.
+annotation fields only for `Fail → Fail`, and the migration fields only for a
+[migrated](#defender-to-security-suite-migration) pair — and are left empty
+elsewhere, as are the before/after fields of a `NewPolicy` or `RemovedPolicy`
+row.
 
 Two differences from the HTML report worth noting:
 
@@ -242,6 +321,11 @@ Two differences from the HTML report worth noting:
   sets its default.
 - Rows are color-coded by their Result (After) value (see [Row coloring](#row-coloring)),
   and a per-product summary table shows the count of each classification.
+- A pair aligned across the [Defender to Security Suite
+  migration](#defender-to-security-suite-migration) shows both control IDs
+  (`MS.DEFENDER.4.1v2 → MS.SECURITYSUITE.3.1v1`) with a **migrated** badge. The
+  badge is an annotation only: the row keeps its normal classification and its
+  Result (After) color, so it stays reachable by the classification filters.
 - All policy text is HTML-escaped. The `Requirement` field, which embeds HTML
   indicator markup in `ScubaResults.json`, is stripped to plain text before it
   is stored in `DiffResults.json` / `DiffResults.csv` or rendered.
