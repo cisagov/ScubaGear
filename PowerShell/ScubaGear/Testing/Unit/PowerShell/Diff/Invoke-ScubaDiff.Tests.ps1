@@ -403,7 +403,7 @@ InModuleScope Diff {
         }
     }
 
-    Describe -Tag 'Diff' -Name 'Fixture pair C: Defender to Security Suite migration' {
+    Describe -Tag 'Diff' -Name 'Fixture pair C: legacy to Security Suite migration' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairC-Before.json')
@@ -582,21 +582,106 @@ InModuleScope Diff {
             @($diff.Diff.Keys) | Should -Contain 'SecuritySuite'
         }
 
-        It 'Maps every Defender to Security Suite pair one-to-one' {
-            $targets = @($script:PolicyMigrationMap.Values)
+        It 'Aligns a retired EXO policy with its Security Suite replacement' {
+            $b = & $NewSide 'EXO' @(@{ Id = 'MS.EXO.15.1v1'; Result = 'Fail' })
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.7.1v1'; Result = 'Pass' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $rec = $diff.Diff.SecuritySuite[0]
+            $rec.Migrated | Should -BeTrue
+            $rec.MigratedFromId | Should -Be 'MS.EXO.15.1v1'
+            $rec.MigratedFromProduct | Should -Be 'EXO'
+            $rec.'Control ID (After)' | Should -Be 'MS.SECURITYSUITE.7.1v1'
+            $rec.Classification | Should -Be 'NewPass'
+        }
+
+        It 'Aligns Defender and EXO sources in the same run' {
+            $b = [pscustomobject]@{
+                MetaData = [pscustomobject]@{ ReportUUID = 'x'; TimestampZulu = 'y'; ToolVersion = 'z' }
+                Summary  = [pscustomobject]@{}
+                Results  = [pscustomobject]@{
+                    Defender = @([pscustomobject]@{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        [pscustomobject]@{ 'Control ID' = 'MS.DEFENDER.2.1v1'; Requirement = 'r'; Result = 'Pass'; OriginalResult = 'Pass'; Criticality = 'Should'; Details = 'd' }) })
+                    EXO      = @([pscustomobject]@{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                        [pscustomobject]@{ 'Control ID' = 'MS.EXO.12.1v1'; Requirement = 'r'; Result = 'Pass'; OriginalResult = 'Pass'; Criticality = 'Should'; Details = 'd' }) })
+                }
+            }
+            $a = & $NewSide 'SecuritySuite' @(
+                @{ Id = 'MS.SECURITYSUITE.2.1v1'; Result = 'Fail' },
+                @{ Id = 'MS.SECURITYSUITE.8.1v1'; Result = 'Fail' }
+            )
+            $diff = Compare-ScubaResults -Before $b -After $a
+            @($diff.Diff.Keys) | Should -Not -Contain 'Defender'
+            @($diff.Diff.Keys) | Should -Not -Contain 'EXO'
+            $fromDefender = $diff.Diff.SecuritySuite | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.2.1v1' }
+            $fromDefender.MigratedFromProduct | Should -Be 'Defender'
+            $fromExo = $diff.Diff.SecuritySuite | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.8.1v1' }
+            $fromExo.MigratedFromProduct | Should -Be 'EXO'
+            $fromExo.MigratedFromId | Should -Be 'MS.EXO.12.1v1'
+            $diff.Summary.SecuritySuite['NewFail'] | Should -Be 2
+        }
+
+        It 'Migrates MS.EXO.14.2v1 onto MS.SECURITYSUITE.6.1 and leaves MS.EXO.14.1v2 removed' {
+            # Both CSV rows point at MS.SECURITYSUITE.6.1v1; only 14.2 is in the table.
+            $b = & $NewSide 'EXO' @(
+                @{ Id = 'MS.EXO.14.1v2'; Result = 'Pass' },
+                @{ Id = 'MS.EXO.14.2v1'; Result = 'Pass' }
+            )
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.6.1v1'; Result = 'Fail' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            @($diff.Diff.EXO).Count | Should -Be 1
+            $diff.Diff.EXO[0].'Control ID (Before)' | Should -Be 'MS.EXO.14.1v2'
+            $diff.Diff.EXO[0].Classification | Should -Be 'RemovedPolicy'
+            $ss = $diff.Diff.SecuritySuite[0]
+            $ss.MigratedFromId | Should -Be 'MS.EXO.14.2v1'
+            $ss.Classification | Should -Be 'NewFail'
+        }
+
+        It 'Does not align in reverse (Security Suite before, EXO after)' {
+            $b = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.8.1v1'; Result = 'Pass' })
+            $a = & $NewSide 'EXO' @(@{ Id = 'MS.EXO.12.1v1'; Result = 'Fail' })
+            $diff = Compare-ScubaResults -Before $b -After $a
+            $diff.Diff.SecuritySuite[0].Classification | Should -Be 'RemovedPolicy'
+            $diff.Diff.EXO[0].Classification | Should -Be 'NewPolicy'
+        }
+
+        It 'Maps every legacy policy to a Security Suite policy one-to-one' {
+            $sources = @()
+            $targets = @()
+            foreach ($product in @($script:PolicyMigrationMap.Keys)) {
+                $entries = $script:PolicyMigrationMap[$product]
+                $sources += @($entries.Keys)
+                $targets += @($entries.Values)
+            }
+            ($sources | Select-Object -Unique).Count | Should -Be $sources.Count
             ($targets | Select-Object -Unique).Count | Should -Be $targets.Count
-            $script:PolicyMigrationMap.Count | Should -Be 13
+            $script:PolicyMigrationMap['Defender'].Count | Should -Be 13
+            $script:PolicyMigrationMap['EXO'].Count | Should -Be 7
         }
 
         It 'Excludes the split and retired Defender policies from the migration map' {
             foreach ($excluded in @('MS.DEFENDER.1.1','MS.DEFENDER.1.2','MS.DEFENDER.1.3','MS.DEFENDER.1.4','MS.DEFENDER.1.5','MS.DEFENDER.4.5')) {
-                $script:PolicyMigrationMap.Contains($excluded) | Should -BeFalse
+                $script:PolicyMigrationMap['Defender'].Contains($excluded) | Should -BeFalse
             }
         }
 
-        It 'Contains no EXO or Teams source policies' {
-            foreach ($key in @($script:PolicyMigrationMap.Keys)) {
-                $key | Should -BeLike 'MS.DEFENDER.*'
+        It 'Carries only the EXO 12, 14, and 15 groups, with MS.EXO.14.1 excluded' {
+            $script:PolicyMigrationMap['EXO'].Contains('MS.EXO.14.1') | Should -BeFalse
+            $script:PolicyMigrationMap['EXO']['MS.EXO.14.2'] | Should -Be 'MS.SECURITYSUITE.6.1'
+            foreach ($key in @($script:PolicyMigrationMap['EXO'].Keys)) {
+                $key | Should -Match '^MS\.EXO\.(12|14|15)\.\d+$'
+            }
+        }
+
+        It 'Sources only from Defender and EXO, keying each entry under its own product' {
+            @($script:PolicyMigrationMap.Keys).Count | Should -Be 2
+            foreach ($product in @('Defender','EXO')) {
+                $script:PolicyMigrationMap.Contains($product) | Should -BeTrue
+                foreach ($key in @($script:PolicyMigrationMap[$product].Keys)) {
+                    $key | Should -BeLike "MS.$($product.ToUpper()).*"
+                }
+                foreach ($value in @($script:PolicyMigrationMap[$product].Values)) {
+                    $value | Should -BeLike 'MS.SECURITYSUITE.*'
+                }
             }
         }
     }

@@ -203,7 +203,7 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
 }
 
 /* Marks a row whose before and after sides are different policies, aligned
-   across the Defender -> Security Suite migration. Deliberately colorless: the
+   across the legacy -> Security Suite migration. Deliberately colorless: the
    row keeps its Result (After) color and this only annotates the ID pair. */
 .migrated-badge {
     display: inline-block;

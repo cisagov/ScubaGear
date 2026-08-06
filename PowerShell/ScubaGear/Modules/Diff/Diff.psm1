@@ -68,10 +68,11 @@ $script:ClassificationLabelMap = @{
     'PolicyVersionUpdate' = 'Policy Version Update'
 }
 
-# Defender -> Security Suite policy migration, keyed by *base* control ID (no
-# version suffix) on both sides. Derived from mappings\scuba-baseline-policy-migrations.csv,
-# restricted to the rows whose Old ID is a Defender policy and whose New ID is a
-# single Security Suite policy. Within that subset the mapping is one-to-one.
+# Legacy -> Security Suite policy migration, keyed by source product and then by
+# *base* control ID (no version suffix) on both sides. Derived from
+# mappings\scuba-baseline-policy-migrations.csv, restricted to the rows whose New
+# ID is a single Security Suite policy. Across the whole table the mapping is
+# one-to-one: no two source policies claim the same Security Suite target.
 #
 # Deliberately excluded (they fall through to the normal presence rules, i.e.
 # RemovedPolicy):
@@ -79,29 +80,45 @@ $script:ClassificationLabelMap = @{
 #     Suite policies (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1), so no
 #     single target exists to align to.
 #   - MS.DEFENDER.4.5v1, retired outright (New ID "None").
-#   - Every EXO and Teams row. Those policies are manual checks that only ever
-#     produced N/A, so an aligned before/after comparison would carry no signal;
-#     they are reported as RemovedPolicy instead.
+#   - MS.EXO.14.1v2 ("A spam filter SHALL be enabled"), which shares the
+#     MS.SECURITYSUITE.6.1v1 target with MS.EXO.14.2v1. Only one source policy can
+#     own a target, and 6.1 ("Emails detected as spam and phishing SHALL NOT be
+#     delivered to the user's inbox") restates 14.2, so 14.2 owns it.
+#   - Every remaining EXO row and every Teams row. Most collapse many-to-one onto
+#     a target a Defender row already claims (MS.EXO.16.1v1 and MS.DEFENDER.5.1v1
+#     both map to MS.SECURITYSUITE.4.1v1, for instance); the rest are manual
+#     checks that only ever produced N/A, so an aligned before/after comparison
+#     would carry no signal.
 $script:PolicyMigrationMap = [ordered]@{
-    'MS.DEFENDER.2.1' = 'MS.SECURITYSUITE.2.1'
-    'MS.DEFENDER.2.2' = 'MS.SECURITYSUITE.2.2'
-    'MS.DEFENDER.2.3' = 'MS.SECURITYSUITE.2.3'
-    'MS.DEFENDER.3.1' = 'MS.SECURITYSUITE.1.4'
-    'MS.DEFENDER.4.1' = 'MS.SECURITYSUITE.3.1'
-    'MS.DEFENDER.4.2' = 'MS.SECURITYSUITE.3.2'
-    'MS.DEFENDER.4.3' = 'MS.SECURITYSUITE.3.3'
-    'MS.DEFENDER.4.4' = 'MS.SECURITYSUITE.3.4'
-    'MS.DEFENDER.4.6' = 'MS.SECURITYSUITE.3.5'
-    'MS.DEFENDER.5.1' = 'MS.SECURITYSUITE.4.1'
-    'MS.DEFENDER.5.2' = 'MS.SECURITYSUITE.4.2'
-    'MS.DEFENDER.6.1' = 'MS.SECURITYSUITE.5.1'
-    'MS.DEFENDER.6.3' = 'MS.SECURITYSUITE.5.2'
+    'Defender' = [ordered]@{
+        'MS.DEFENDER.2.1' = 'MS.SECURITYSUITE.2.1'
+        'MS.DEFENDER.2.2' = 'MS.SECURITYSUITE.2.2'
+        'MS.DEFENDER.2.3' = 'MS.SECURITYSUITE.2.3'
+        'MS.DEFENDER.3.1' = 'MS.SECURITYSUITE.1.4'
+        'MS.DEFENDER.4.1' = 'MS.SECURITYSUITE.3.1'
+        'MS.DEFENDER.4.2' = 'MS.SECURITYSUITE.3.2'
+        'MS.DEFENDER.4.3' = 'MS.SECURITYSUITE.3.3'
+        'MS.DEFENDER.4.4' = 'MS.SECURITYSUITE.3.4'
+        'MS.DEFENDER.4.6' = 'MS.SECURITYSUITE.3.5'
+        'MS.DEFENDER.5.1' = 'MS.SECURITYSUITE.4.1'
+        'MS.DEFENDER.5.2' = 'MS.SECURITYSUITE.4.2'
+        'MS.DEFENDER.6.1' = 'MS.SECURITYSUITE.5.1'
+        'MS.DEFENDER.6.3' = 'MS.SECURITYSUITE.5.2'
+    }
+    'EXO'      = [ordered]@{
+        'MS.EXO.12.1' = 'MS.SECURITYSUITE.8.1'
+        'MS.EXO.12.2' = 'MS.SECURITYSUITE.8.2'
+        'MS.EXO.14.2' = 'MS.SECURITYSUITE.6.1'
+        'MS.EXO.14.3' = 'MS.SECURITYSUITE.6.2'
+        'MS.EXO.15.1' = 'MS.SECURITYSUITE.7.1'
+        'MS.EXO.15.2' = 'MS.SECURITYSUITE.7.2'
+        'MS.EXO.15.3' = 'MS.SECURITYSUITE.7.3'
+    }
 }
 
-# The products either side of $script:PolicyMigrationMap. A migrated record is
-# filed under the target product, following the after side like the rest of the
+# The product every entry in $script:PolicyMigrationMap targets. A migrated record
+# is filed under this product, following the after side like the rest of the
 # report.
-$script:PolicyMigrationSourceProduct = 'Defender'
 $script:PolicyMigrationTargetProduct = 'SecuritySuite'
 
 function Get-ScubaBaseControlId {
@@ -533,16 +550,16 @@ function Get-ScubaControlMap {
 function Invoke-ScubaPolicyMigrationAlignment {
     <#
     .Description
-    Aligns the Defender -> Security Suite policy migration across the two runs so
-    a retired Defender policy is compared against the Security Suite policy that
+    Aligns the legacy (Defender, EXO) -> Security Suite policy migration across the
+    two runs so a retired policy is compared against the Security Suite policy that
     replaced it, instead of being reported as RemovedPolicy alongside a matching
     NewPolicy.
 
     Operates on the per-product control maps in place: a matched before-side entry
-    is moved out of the Defender map and re-keyed under its Security Suite base ID
-    in the SecuritySuite map, so the record is produced -- and counted -- under the
-    Security Suite product. The moved entry is tagged with MigratedFromId /
-    MigratedFromProduct, which become the record's migration fields.
+    is moved out of its source product's map and re-keyed under its Security Suite
+    base ID in the SecuritySuite map, so the record is produced -- and counted --
+    under the Security Suite product. The moved entry is tagged with MigratedFromId
+    / MigratedFromProduct, which become the record's migration fields.
 
     A direct base-ID match always wins over the migration alias: a pair is only
     aligned when the before run has the retired policy, the after run has its
@@ -564,41 +581,48 @@ function Invoke-ScubaPolicyMigrationAlignment {
         $AfterMaps
     )
 
-    $source = $script:PolicyMigrationSourceProduct
     $target = $script:PolicyMigrationTargetProduct
 
-    # Nothing to align unless the before run assessed the source product and the
-    # after run assessed the target product.
-    if (-not $BeforeMaps.Contains($source)) { return }
+    # Nothing to align unless the after run assessed the target product.
     if (-not $AfterMaps.Contains($target)) { return }
 
-    $sourceBefore = $BeforeMaps[$source]
     $targetAfter = $AfterMaps[$target]
-    if ($AfterMaps.Contains($source)) { $sourceAfter = $AfterMaps[$source] } else { $sourceAfter = $null }
     if ($BeforeMaps.Contains($target)) { $targetBefore = $BeforeMaps[$target] } else { $targetBefore = $null }
 
-    foreach ($oldBase in @($script:PolicyMigrationMap.Keys)) {
-        $newBase = $script:PolicyMigrationMap[$oldBase]
+    foreach ($source in @($script:PolicyMigrationMap.Keys)) {
+        # Nothing to align from a source product the before run did not assess.
+        if (-not $BeforeMaps.Contains($source)) { continue }
 
-        # The before run must carry the retired policy and the after run its
-        # replacement; otherwise there is nothing to pair.
-        if (-not $sourceBefore.Contains($oldBase)) { continue }
-        if (-not $targetAfter.Contains($newBase)) { continue }
+        $sourceBefore = $BeforeMaps[$source]
+        if ($AfterMaps.Contains($source)) { $sourceAfter = $AfterMaps[$source] } else { $sourceAfter = $null }
 
-        # Either side carrying both forms means this is not a migration boundary.
-        if ($null -ne $sourceAfter -and $sourceAfter.Contains($oldBase)) { continue }
-        if ($null -ne $targetBefore -and $targetBefore.Contains($newBase)) { continue }
+        $entries = $script:PolicyMigrationMap[$source]
+        foreach ($oldBase in @($entries.Keys)) {
+            $newBase = $entries[$oldBase]
 
-        $entry = $sourceBefore[$oldBase]
-        Add-Member -InputObject $entry -NotePropertyName 'MigratedFromId' -NotePropertyValue $entry.FullId -Force
-        Add-Member -InputObject $entry -NotePropertyName 'MigratedFromProduct' -NotePropertyValue $source -Force
+            # The before run must carry the retired policy and the after run its
+            # replacement; otherwise there is nothing to pair.
+            if (-not $sourceBefore.Contains($oldBase)) { continue }
+            if (-not $targetAfter.Contains($newBase)) { continue }
 
-        if ($null -eq $targetBefore) {
-            $targetBefore = [ordered]@{}
-            $BeforeMaps[$target] = $targetBefore
+            # Either side carrying both forms means this is not a migration
+            # boundary. This also keeps a target claimed by an earlier alignment
+            # from being overwritten, should the table ever gain two source
+            # policies pointing at the same Security Suite ID.
+            if ($null -ne $sourceAfter -and $sourceAfter.Contains($oldBase)) { continue }
+            if ($null -ne $targetBefore -and $targetBefore.Contains($newBase)) { continue }
+
+            $entry = $sourceBefore[$oldBase]
+            Add-Member -InputObject $entry -NotePropertyName 'MigratedFromId' -NotePropertyValue $entry.FullId -Force
+            Add-Member -InputObject $entry -NotePropertyName 'MigratedFromProduct' -NotePropertyValue $source -Force
+
+            if ($null -eq $targetBefore) {
+                $targetBefore = [ordered]@{}
+                $BeforeMaps[$target] = $targetBefore
+            }
+            $targetBefore[$newBase] = $entry
+            $sourceBefore.Remove($oldBase)
         }
-        $targetBefore[$newBase] = $entry
-        $sourceBefore.Remove($oldBase)
     }
 }
 
@@ -694,7 +718,7 @@ function Compare-ScubaResults {
     $afterProducts = @($After.Results.PSObject.Properties.Name)
 
     # Flatten every product to a base-ID keyed control map up front, so the
-    # Defender -> Security Suite migration can move before-side entries across
+    # legacy -> Security Suite migration can move before-side entries across
     # product boundaries before any product is compared.
     $beforeMaps = [ordered]@{}
     foreach ($product in $beforeProducts) { $beforeMaps[$product] = Get-ScubaControlMap $Before.Results.$product }
@@ -770,7 +794,7 @@ function Compare-ScubaResults {
 
             # Migration metadata. The record is classified by result like any other
             # pair; these fields are what tell a consumer the comparison spans the
-            # Defender -> Security Suite migration rather than a single policy's
+            # legacy -> Security Suite migration rather than a single policy's
             # history. Control ID (Before) already carries the retired ID.
             if ($isMigrated) {
                 $record['Migrated'] = $true
@@ -1002,7 +1026,7 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Pass (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Removed Policy</span>')
-    [void]$sb.AppendLine('  <span><span class="migrated-badge">migrated</span>Before result comes from the retired Defender policy shown in the Control ID column.</span>')
+    [void]$sb.AppendLine('  <span><span class="migrated-badge">migrated</span>Before result comes from the retired policy shown in the Control ID column.</span>')
     [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
@@ -1069,11 +1093,11 @@ function New-ScubaDiffReport {
             elseif ($afterId) { $idDisplay = & $enc $afterId }
             else { $idDisplay = & $enc $beforeId }
 
-            # Badge a pair aligned across the Defender -> Security Suite migration,
+            # Badge a pair aligned across the legacy -> Security Suite migration,
             # so a reader can tell the before result came from a different policy.
             $isMigratedRow = ($r.PSObject.Properties['Migrated'] -and $r.Migrated)
             if ($isMigratedRow) {
-                $idDisplay += " <span class=""migrated-badge"" title=""Aligned across the Defender to Security Suite policy migration"">migrated</span>"
+                $idDisplay += " <span class=""migrated-badge"" title=""Aligned across the legacy to Security Suite policy migration"">migrated</span>"
             }
 
             $groupDisplay = & $enc (("$($r.GroupNumber) $($r.GroupName)").Trim())
