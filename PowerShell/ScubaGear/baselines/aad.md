@@ -25,10 +25,6 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The following are key terms and descriptions used in this document.
 
-**Microsoft Entra admin center**: The dedicated web-based interface at [entra.microsoft.com](https://entra.microsoft.com/#home) used to manage Microsoft Entra ID settings.
-
-**Microsoft Entra Portal**: The Microsoft Entra ID / Azure Active Directory management experience embedded within the general Azure Portal at [portal.azure.com](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview). This is a distinct, separately-maintained interface from the Microsoft Entra admin center, though both currently operate against the same tenant data. Where implementation steps in this document reference the Microsoft Entra Portal specifically, using the Microsoft Entra admin center instead may present different menu structures or labels.
-
 **Microsoft Entra ID hybrid**: This term denotes the scenario
 when an organization has an on-premises Microsoft Windows Server Active Directory that contains the
 master user directory but federates access to the cloud M365
@@ -1100,12 +1096,12 @@ Exception cases:
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
+1. In **Microsoft Entra admin center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
   1.  Select the **Global Administrator** role in the list.
-  2.  Click **Settings**.
+  2.  Click **Role settings**.
   3.  Click **Edit**.
   4.  Select the **Require approval to activate** option.
   5.  Click **Update**.
@@ -1114,13 +1110,13 @@ Exception cases:
 
 #### MS.AAD.7.7v1 Instructions
 
-1.  In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
+1.  In **Microsoft Entra admin center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example:
 
   1. Click the **Global Administrator** role.
-  2. Click **Settings** and then click **Edit**.
-  3. Click the **Notification** tab.
+  2. Click **Role settings** and then click **Edit**.
+  3. Click the **Notifications** tab.
   4. Under **Send notifications when members are assigned as eligible to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
   5. Under **Send notifications when members are assigned as active to this role**, in the **Role assignment alert > Additional recipients** textbox, enter the email address of the security monitoring mailbox configured to receive privileged role assignment alerts.
   6. Click **Update**.
@@ -1129,13 +1125,13 @@ Exception cases:
 
 #### MS.AAD.7.8v1 Instructions
 
-1. In the **Microsoft Entra Portal**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Select **Microsoft Entra roles**.
+1. In **Microsoft Entra admin center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Select **Microsoft Entra roles**.
 
 2. Click the **Global Administrator** role.
 
-3. Click **Settings** then click **Edit**.
+3. Click **Role settings** then click **Edit**.
 
-4. Click the **Notification** tab.
+4. Click the **Notifications** tab.
 
 5. Under **Send notifications when eligible members activate this role**, in the **Role activation alert** select the  **Additional recipients** textbox and enter the email address of the security monitoring mailbox configured to receive Global Administrator activation alerts.
 
