@@ -1,7 +1,9 @@
-$HelperPath = '../../../../../Modules/Providers/ProviderHelpers/EXORestHelper.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $HelperPath) -Force
-
 Describe -Tag 'EXORestHelper' -Name 'Invoke-EXORestMethod' {
+    BeforeAll {
+        $HelperPath = '../../../../../Modules/Providers/ProviderHelpers/EXORestHelper.psm1'
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $HelperPath) -Force
+    }
+
     It 'Retries a transient connection failure' {
         Mock -ModuleName EXORestHelper Start-Sleep {}
         Mock -ModuleName EXORestHelper Invoke-WebRequest {
