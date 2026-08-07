@@ -101,8 +101,11 @@ Describe -tag "Analyzer" -name 'ScubaConfigAnalyzer baseline schema stays in syn
                     $coveredPrefixes -contains $prefix -and -not $modeled.Contains($_)
                 } | Sort-Object)
 
-            Write-Host "[Config Analyzer coverage] modeled $(@($analyzerControls).Count) control(s); $(@($unmodeled).Count) Rego policy(ies) in covered products are not yet modeled:"
-            foreach ($id in $unmodeled) { Write-Host "  - $id" }
+            # Informational coverage report (Write-Information, not Write-Host, to satisfy
+            # PSAvoidUsingWriteHost); -InformationAction Continue keeps it visible in CI logs.
+            $coverageLines = @("[Config Analyzer coverage] modeled $(@($analyzerControls).Count) control(s); $(@($unmodeled).Count) Rego policy(ies) in covered products are not yet modeled:")
+            foreach ($id in $unmodeled) { $coverageLines += "  - $id" }
+            Write-Information ($coverageLines -join [Environment]::NewLine) -InformationAction Continue
 
             # Informational only: partial coverage is intentional.
             $true | Should -BeTrue
