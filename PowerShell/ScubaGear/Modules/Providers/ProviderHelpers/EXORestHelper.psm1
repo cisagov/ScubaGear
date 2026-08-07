@@ -356,9 +356,9 @@ function Invoke-EXORestMethod {
                 continue
             }
 
-            # Transient server errors (500, 503) - retry with backoff
-            if ($StatusCode -in @(500, 503) -and $Attempt -lt $MaxRetries) {
-                Write-Warning "EXO REST '$CmdletName' returned $StatusCode. Retrying in ${RetryDelay}s (attempt $Attempt/$MaxRetries)..."
+            # Retry transient transport and server failures with backoff.
+            if (($StatusCode -eq 0 -or $StatusCode -in @(408, 500, 502, 503, 504)) -and $Attempt -lt $MaxRetries) {
+                Write-Warning "EXO REST '$CmdletName' encountered a transient failure. Retrying in ${RetryDelay}s (attempt $Attempt/$MaxRetries)..."
                 Start-Sleep -Seconds $RetryDelay
                 $RetryDelay *= 2
                 continue
