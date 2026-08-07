@@ -104,6 +104,28 @@ InModuleScope ScubaLogging {
                 Test-Path $testPath | Should -Be $true
             }
 
+            It "Should resolve relative log paths from the PowerShell location" {
+                $originalLocation = Get-Location
+                $originalProcessDirectory = [Environment]::CurrentDirectory
+                $powerShellDirectory = Join-Path $TestDrive 'PowerShellLocation'
+                $processDirectory = Join-Path $TestDrive 'ProcessLocation'
+                New-Item -ItemType Directory -Path $powerShellDirectory, $processDirectory -Force | Out-Null
+
+                try {
+                    [Environment]::CurrentDirectory = $processDirectory
+                    Set-Location $powerShellDirectory
+
+                    Initialize-ScubaLogging -LogPath 'RelativeLogs' -DisableAutoReport
+
+                    Test-Path -LiteralPath (Join-Path $powerShellDirectory 'RelativeLogs') | Should -Be $true
+                    Test-Path -LiteralPath (Join-Path $processDirectory 'RelativeLogs') | Should -Be $false
+                }
+                finally {
+                    Set-Location $originalLocation
+                    [Environment]::CurrentDirectory = $originalProcessDirectory
+                }
+            }
+
             It "Should enable tracing when EnableTracing is specified" {
                 Initialize-ScubaLogging -EnableTracing -DisableAutoReport
 

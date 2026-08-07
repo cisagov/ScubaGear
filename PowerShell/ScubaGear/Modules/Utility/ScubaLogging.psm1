@@ -91,6 +91,8 @@ function Initialize-ScubaLogging {
 
         # Setup log directory and file path with timestamp
         if ($LogPath) {
+            $LogPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogPath)
+
             # Create the log directory if it doesn't exist
             if (!(Test-Path -LiteralPath $LogPath)) {
                 # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
