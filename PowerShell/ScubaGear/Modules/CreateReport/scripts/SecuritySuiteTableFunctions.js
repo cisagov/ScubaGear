@@ -61,11 +61,15 @@ const RECIPIENT_SCOPE_FIELDS = [
 
 const ANTI_PHISH_TABLE_CLASS = "securitysuite-anti-phish-policies-table";
 
-const formatProtectedValues = (values) => {
+const getProtectedValues = (values) => {
     const normalizedValues = normalizeToArray(values)
         .map(value => String(value ?? "").trim())
         .filter(value => value.length > 0);
-    return normalizedValues.length > 0 ? normalizedValues.join("\n") : "None";
+    return normalizedValues.length > 0 ? normalizedValues : ["None"];
+};
+
+const formatProtectedValues = (values) => {
+    return getProtectedValues(values).join("\n");
 };
 
 const isEnabled = (value) => value === true || String(value).toLowerCase() === "true";
@@ -164,7 +168,7 @@ const getAntiPhishPolicyRows = (
                 protectionPolicyRules,
                 acceptedDomains
             ),
-            "Users Protected": formatProtectedValues(policy.TargetedUsersToProtect),
+            "Users Protected": getProtectedValues(policy.TargetedUsersToProtect),
             "Partner Domains Protected": formatProtectedValues(policy.TargetedDomainsToProtect),
             "Safety Indicators": SAFETY_TIP_FIELDS
                 .map(([label, field]) => ({
@@ -185,47 +189,42 @@ const getAntiPhishPolicyRows = (
  * @param {string} tableClass The CSS class to add to the table.
  * @returns {HTMLTableElement} The created table.
  */
-const createAntiPhishExpandButton = (expanded, onClick) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.classList.add("chevron");
-    button.title = expanded ? "Show less policy information" : "Show more policy information";
-    button.setAttribute("aria-label", button.title);
-    button.setAttribute("aria-expanded", expanded.toString());
-    button.appendChild(createChevronIcon(expanded ? "down" : "right", expanded ? 14 : 10));
-    button.addEventListener("click", onClick);
-    return button;
-};
-
-const createAntiPhishTruncationButton = (onClick) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.classList.add("truncated-dots");
-    button.textContent = "...";
-    button.title = "Show more policy information";
-    button.setAttribute("aria-label", button.title);
-    button.addEventListener("click", onClick);
-    return button;
-};
-
 const appendAntiPhishPolicyCell = (cell, value, expanded, onExpand) => {
     if (Array.isArray(value)) {
         const list = document.createElement("ul");
         const items = expanded ? value : value.slice(0, 1);
-        items.forEach(indicator => {
+        items.forEach(itemValue => {
             const item = document.createElement("li");
-            item.textContent = `${indicator.label}: ${indicator.enabled ? "Enabled" : "Disabled"}`;
+            item.textContent = typeof itemValue === "object" && itemValue !== null
+                ? `${itemValue.label}: ${itemValue.enabled ? "Enabled" : "Disabled"}`
+                : itemValue;
             list.appendChild(item);
         });
         cell.appendChild(list);
-        if (!expanded && value.length > 1) cell.appendChild(createAntiPhishTruncationButton(onExpand));
+        if (!expanded && value.length > 1) {
+            cell.appendChild(createRowActionButton({
+                title: "Show more policy information",
+                className: "truncated-dots",
+                expanded: false,
+                onClick: onExpand,
+                contentBuilder: () => document.createTextNode("...")
+            }));
+        }
         return;
     }
 
     const lines = String(value ?? "N/A").split("\n");
     cell.textContent = expanded ? lines.join("\n") : lines[0];
     cell.style.whiteSpace = "pre-line";
-    if (!expanded && lines.length > 1) cell.appendChild(createAntiPhishTruncationButton(onExpand));
+    if (!expanded && lines.length > 1) {
+        cell.appendChild(createRowActionButton({
+            title: "Show more policy information",
+            className: "truncated-dots",
+            expanded: false,
+            onClick: onExpand,
+            contentBuilder: () => document.createTextNode("...")
+        }));
+    }
 };
 
 const renderAntiPhishPolicyRow = (row, columns, data, expanded) => {
@@ -233,8 +232,12 @@ const renderAntiPhishPolicyRow = (row, columns, data, expanded) => {
     const expand = () => renderAntiPhishPolicyRow(row, columns, data, true);
 
     const actionCell = document.createElement("td");
-    actionCell.appendChild(createAntiPhishExpandButton(expanded, () => {
-        renderAntiPhishPolicyRow(row, columns, data, !expanded);
+    actionCell.appendChild(createRowActionButton({
+        title: expanded ? "Show less policy information" : "Show more policy information",
+        className: "chevron",
+        expanded,
+        onClick: () => renderAntiPhishPolicyRow(row, columns, data, !expanded),
+        contentBuilder: () => createChevronIcon(expanded ? "down" : "right", expanded ? 14 : 10)
     }));
     row.appendChild(actionCell);
 

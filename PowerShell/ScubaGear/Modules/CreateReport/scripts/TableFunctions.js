@@ -122,3 +122,51 @@ const applyScopeAttributes = () => {
         console.error(`Error in applyScopeAttributes, ${error}`);
     }
 }
+
+/**
+ * Creates a chevron <img> icon for right/down arrows.
+ *
+ * @param {string} direction - Direction of the chevron arrow.
+ * @param {number} width - Icon width in pixels.
+ * @returns {HTMLImageElement} An <img> element.
+ */
+const createChevronIcon = (direction, width) => {
+    const img = document.createElement("img");
+    const map = {
+        right: { src: "images/angle-right-solid.svg", alt: "Chevron arrow pointing right" },
+        down: { src: "images/angle-down-solid.svg", alt: "Chevron arrow pointing down" }
+    };
+
+    const metadata = map[direction] || map.right;
+    img.setAttribute("src", metadata.src);
+    img.setAttribute("alt", metadata.alt);
+    img.style.width = `${width}px`;
+    return img;
+};
+
+/**
+ * Creates a generic row-action button with custom content (img/span/etc.).
+ *
+ * @param {Object} options - Button configuration.
+ * @param {string} options.title - Button title.
+ * @param {string} options.className - Optional CSS class for the button.
+ * @param {number} [options.rowIndex] - The row index (0-indexed, not counting the header row).
+ * @param {boolean} options.expanded - Whether the related row is expanded.
+ * @param {function} options.onClick - Click event handler for the button.
+ * @param {function} options.contentBuilder - Returns the content Node for the button.
+ * @returns {HTMLButtonElement} The configured button.
+ */
+const createRowActionButton = ({ title, className, rowIndex, expanded, onClick, contentBuilder }) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.title = title;
+    if (rowIndex !== undefined) btn.rowNumber = rowIndex;
+    btn.setAttribute("aria-label", title);
+    btn.setAttribute("aria-expanded", expanded.toString());
+    btn.addEventListener("click", onClick);
+    if (className) btn.classList.add(className);
+
+    const content = contentBuilder();
+    if (content) btn.appendChild(content);
+    return btn;
+};
