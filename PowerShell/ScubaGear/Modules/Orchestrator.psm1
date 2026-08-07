@@ -1,6 +1,53 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility/ScubaLogging.psm1")
 
+function ConvertTo-ScubaProductNames {
+    <#
+    .SYNOPSIS
+    Normalizes a list of ScubaGear product names.
+    .DESCRIPTION
+    Centralizes ScubaGear product-name normalization so the value is handled identically
+    regardless of whether it originates from the -ProductNames parameter or an imported
+    configuration file. It:
+      1. Expands the '*' wildcard to the full list of supported products.
+      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
+         (adding 'securitysuite' only if not already present).
+      3. Returns a sorted, de-duplicated array.
+    .PARAMETER ProductNames
+    The array of product names to normalize.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [string[]]
+        $ProductNames
+    )
+
+    if ($null -eq $ProductNames) {
+        return @()
+    }
+
+    # Expand the wildcard to all supported products
+    if ($ProductNames -contains '*') {
+        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+        Write-Debug "Setting ProductNames to all products because of wildcard"
+    }
+
+    # 'defender' is a deprecated alias for 'securitysuite'
+    if ($ProductNames -contains 'defender') {
+        if (-not ($ProductNames -contains 'securitysuite')) {
+            $ProductNames = @($ProductNames) + "securitysuite"
+        }
+        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
+        Write-Debug "Substituting defender with securitysuite in ProductNames"
+    }
+
+    return @($ProductNames | Sort-Object -Unique)
+}
+
 function Invoke-SCuBA {
     <#
     .SYNOPSIS
@@ -315,20 +362,11 @@ function Invoke-SCuBA {
         # Initialize logging flag - actual initialization happens after output folder is created
         $Script:ScubaLoggingEnabled = $false
 
-        # Transform ProductNames into list of all products if it contains wildcard
-        if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
-            Write-Debug "Setting ProductName to all products because of wildcard"
-        }
-
-        # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
-        if ($ProductNames.Contains('defender')){
-            if (-not $ProductNames.Contains('securitysuite')) {
-                $ProductNames = $PSBoundParameters['ProductNames'] = $ProductNames + "securitysuite"
-            }
-            $ProductNames = $PSBoundParameters['ProductNames'] = @($ProductNames | Where-Object {$_ -ne "defender" })
-            Write-Debug "Substituting defender with securitysuite in ProductNames"
-        }
+        # ProductNames normalization (wildcard expansion and the deprecated 'defender' ->
+        # 'securitysuite' substitution) is centralized in ConvertTo-ScubaProductNames and
+        # applied once to the resolved $ScubaConfig.ProductNames below, after the command-line
+        # parameters and any configuration file have been merged. Handling it at that single
+        # convergence point ensures products from either source are normalized identically.
 
         # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
@@ -438,6 +476,14 @@ function Invoke-SCuBA {
             }
         }
 
+        # Normalize the fully-resolved product list once, after command-line parameters and
+        # any configuration file have been merged into $ScubaConfig. This is the single point
+        # where products from the -ProductNames parameter and from an imported config file
+        # converge, so normalizing here expands the '*' wildcard and substitutes the deprecated
+        # 'defender' alias with 'securitysuite' for both sources. It runs after
+        # ValidateConfiguration so the Defender deprecation warning is still emitted first.
+        $ScubaConfig.ProductNames = ConvertTo-ScubaProductNames -ProductNames $ScubaConfig.ProductNames
+
         if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgName) {
             $Warning = "Config file option OrgName not provided. This option is required for BOD "
             $Warning += "submissions. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#scuba-compliance-use for more details. "
@@ -480,7 +526,7 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $true
             Write-ScubaLog -Message "ScubaGear logging initialized" -Level "Info" -Source "InvokeScuba" -Data @{
                 Version = $ModuleVersion
-                ProductNames = ($ProductNames -join ', ')
+                ProductNames = ($ScubaConfig.ProductNames -join ', ')
                 UserPassedEnvironment = $M365Environment
                 OutputFolder = $OutFolderPath
                 LogFolder = $ScubaLogFolder
@@ -2628,7 +2674,7 @@ function Repair-ScubaGearJson {
     if ($ReturnObject.RepairedJson) {
         Write-Warning "The provider JSON file required automatic repair."
     }
-    
+
     $ProviderJsonObject = $ProviderSettingsObject.JsonObject
 
     .EXAMPLE
@@ -2686,7 +2732,7 @@ function Repair-ScubaGearJson {
         else {
             $ReturnObject.JsonString = $JsonInputString
         }
-       
+
         return $ReturnObject
     }
     catch {
@@ -2705,7 +2751,7 @@ function Repair-ScubaGearJson {
         else {
             Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object"
         }
-        
+
         Write-Warning "Please report this to the ScubaGear team as a bug report either by GitHub or the Scuba mailbox."
         Write-Warning "Attempting to auto repair the JSON..."
 
