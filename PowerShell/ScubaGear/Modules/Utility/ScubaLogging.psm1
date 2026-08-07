@@ -91,6 +91,8 @@ function Initialize-ScubaLogging {
 
         # Setup log directory and file path with timestamp
         if ($LogPath) {
+            $LogPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogPath)
+
             # Create the log directory if it doesn't exist
             if (!(Test-Path -LiteralPath $LogPath)) {
                 # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.

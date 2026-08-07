@@ -480,6 +480,7 @@ function Invoke-SCuBA {
         # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
         $OutFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFolderPath)
         # New-Item has no -LiteralPath; use .NET so output paths with wildcard chars (e.g. []) are created literally.
+        $OutFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFolderPath)
         [System.IO.Directory]::CreateDirectory($OutFolderPath) | Out-Null
 
         # Initialize logging for troubleshooting - debug logs are ALWAYS created
@@ -2072,6 +2073,7 @@ function Invoke-ReportCreation {
             # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
             $IndividualReportPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($IndividualReportPath)
             # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+            $IndividualReportPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($IndividualReportPath)
             [System.IO.Directory]::CreateDirectory($IndividualReportPath) | Out-Null
 
             $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
@@ -2616,6 +2618,7 @@ function Invoke-SCuBACached {
                 # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
                 $OutPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutPath)
                 # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+                $OutPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutPath)
                 [System.IO.Directory]::CreateDirectory($OutPath) | Out-Null
             }
             $OutFolderPath = $OutPath
