@@ -11,11 +11,13 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath './Modules/Support/Servi
 
 $m365Completer = {
     param($cmd, $param, $word, $ast, $fakeBound)
+    $null = $cmd, $param, $ast, $fakeBound
     [ScubaConfig]::GetSupportedEnvironments() | Where-Object { $_ -like "$word*" }
 }
 
 $productCompleter = {
     param($cmd, $param, $word, $ast, $fakeBound)
+    $null = $cmd, $param, $ast, $fakeBound
     (@([ScubaConfig]::ScubaDefault('AllProductNames')) + '*') | Where-Object { $_ -like "$word*" }
 }
 
