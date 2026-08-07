@@ -122,8 +122,8 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match '"Users excluded"'
                 $ReportContent | Should -Match '"Groups excluded"'
                 $ReportContent | Should -Match '"Domains excluded"'
-                $ReportContent | Should -Match 'createAntiPhishExpandButton'
-                $ReportContent | Should -Match 'createAntiPhishTruncationButton'
+                $ReportContent | Should -Match 'createRowActionButton\(\{'
+                $ReportContent | Should -Match 'contentBuilder: \(\) => document\.createTextNode\("\.\.\."\)'
                 $ReportContent | Should -Match "Sensitive Users and Partner Domains are configured in the SecuritySuite config file\."
                 $ReportContent | Should -Match "Anti-Phish Protection Policies are exported from the tenant\."
             }
