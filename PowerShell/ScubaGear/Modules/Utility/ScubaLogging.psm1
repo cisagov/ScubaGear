@@ -92,8 +92,9 @@ function Initialize-ScubaLogging {
         # Setup log directory and file path with timestamp
         if ($LogPath) {
             # Create the log directory if it doesn't exist
-            if (!(Test-Path $LogPath)) {
-                New-Item -ItemType Directory -Path $LogPath -Force | Out-Null
+            if (!(Test-Path -LiteralPath $LogPath)) {
+                # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+                [System.IO.Directory]::CreateDirectory($LogPath) | Out-Null
             }
 
             # Create unique timestamped log filename to avoid conflicts
@@ -131,7 +132,7 @@ function Initialize-ScubaLogging {
             # Create transcript file with same timestamp as main log
             $transcriptPath = Join-Path $LogPath "ScubaGear-Transcript-$timestamp.log"
             # Start transcript to capture all PowerShell console activity
-            Start-Transcript -Path $transcriptPath -Append -ErrorAction SilentlyContinue
+            Start-Transcript -LiteralPath $transcriptPath -Append -ErrorAction SilentlyContinue
             Write-ScubaLog -Message "Transcript logging started: $transcriptPath (verbose/debug output enabled globally)" -Level "Info" -Source "LoggingSystem"
         }
     }
@@ -222,18 +223,19 @@ function Write-ScubaLog {
 
         # Write to log file if path is configured (file logging is optional)
         if ($Script:ScubaLogPath) {
-            # Append to log file with UTF8 encoding, silently continue on errors to not break execution
-            $logLine | Out-File -FilePath $Script:ScubaLogPath -Append -Encoding UTF8 -ErrorAction SilentlyContinue
+            # Append to log file with UTF8 encoding, silently continue on errors to not break execution.
+            # LiteralPath so log paths containing wildcard characters (e.g. []) are written literally.
+            $logLine | Out-File -LiteralPath $Script:ScubaLogPath -Append -Encoding UTF8 -ErrorAction SilentlyContinue
 
             # Add structured data on separate lines if present (indented for readability)
             if ($Data.Count -gt 0) {
                 # Convert data to compact JSON format for structured logging
-                "    Data: $($Data | ConvertTo-Json -Compress -Depth 3)" | Out-File -FilePath $Script:ScubaLogPath -Append -Encoding UTF8 -ErrorAction SilentlyContinue
+                "    Data: $($Data | ConvertTo-Json -Compress -Depth 3)" | Out-File -LiteralPath $Script:ScubaLogPath -Append -Encoding UTF8 -ErrorAction SilentlyContinue
             }
 
             # Add exception details on separate line if exception was provided
             if ($Exception) {
-                "    Exception: $($Exception.GetType().Name) - $($Exception.Message)" | Out-File -FilePath $Script:ScubaLogPath -Append -Encoding UTF8 -ErrorAction SilentlyContinue
+                "    Exception: $($Exception.GetType().Name) - $($Exception.Message)" | Out-File -LiteralPath $Script:ScubaLogPath -Append -Encoding UTF8 -ErrorAction SilentlyContinue
             }
         }
 
@@ -275,8 +277,9 @@ function Write-ScubaLog {
 
     }
     catch {
-        # Fallback logging - don't let logging errors break the main process
-        Write-Output "Logging error: $_"
+        # Fallback logging - don't let logging errors break the main process.
+        # Write-Warning (not Write-Output) so a logging hiccup never pollutes a caller's output/data stream.
+        Write-Warning "Logging error: $_"
     }
 }
 
@@ -1255,7 +1258,7 @@ function Get-ScubaDebugLogReport {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
         [ValidateScript({
-            if (-not (Test-Path $_ -PathType Leaf)) {
+            if (-not (Test-Path -LiteralPath $_ -PathType Leaf)) {
                 throw "File not found: $_"
             }
             $fileName = Split-Path $_ -Leaf
@@ -1298,7 +1301,7 @@ function Get-ScubaDebugLogReport {
     $entries = [System.Collections.Generic.List[PSCustomObject]]::new()
     $current = $null
 
-    foreach ($line in (Get-Content $DebugLogPath -Encoding UTF8)) {
+    foreach ($line in (Get-Content -LiteralPath $DebugLogPath -Encoding UTF8)) {
         if ($line -match $linePattern) {
             if ($current) { $entries.Add($current) }
             $current = [PSCustomObject]@{
@@ -1821,7 +1824,7 @@ function Get-ScubaDebugLogReport {
     }
 
     if ($OutputPath) {
-        $reportText | Set-Content -Path $OutputPath -Encoding UTF8
+        $reportText | Set-Content -LiteralPath $OutputPath -Encoding UTF8
         Write-Output "Report saved to: $OutputPath"
     }
 }

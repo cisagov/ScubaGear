@@ -52,7 +52,7 @@ InModuleScope Orchestrator {
             It 'Show report' {
                 $ScubaConfig.ProductNames = @("aad")
                 { Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode } | Should -Not -Throw
-                Should -Invoke -CommandName Invoke-Item -Exactly -Times 1 -ParameterFilter {-Not [string]::IsNullOrEmpty($Path) }
+                Should -Invoke -CommandName Invoke-Item -Exactly -Times 1 -ParameterFilter { (-Not [string]::IsNullOrEmpty($LiteralPath)) -or (-Not [string]::IsNullOrEmpty($Path)) }
                 $ScubaConfig.ProductNames = @()
             }
             It 'With -ProductNames "aad", should not throw' {

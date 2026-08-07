@@ -161,14 +161,14 @@ function New-Report {
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateScript({Test-Path -LiteralPath $_ -PathType Container})]
         [ValidateNotNullOrEmpty()]
         [string]
         $IndividualReportPath,
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateScript({Test-Path -LiteralPath $_ -PathType Container})]
         [ValidateScript({Test-Path -IsValid $_})]
         [string]
         $OutPath,
@@ -198,10 +198,16 @@ function New-Report {
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json" -Resolve
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
+    if (-not (Test-Path -LiteralPath $FileName -PathType Leaf)) {
+        throw "Provider settings file not found at '$FileName'. Verify the output path is accessible and does not contain issues (e.g., Some paths with spaces may require specifying an explicit -OutPath)."
+    }
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
+    if (-not (Test-Path -LiteralPath $FileName -PathType Leaf)) {
+        throw "Rego output file not found at '$FileName'. The OPA evaluation may have failed for all products. If the module is installed in a folder with spaces in the path, try specifying an explicit -OutPath to a local directory without spaces."
+    }
     $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
@@ -425,7 +431,7 @@ function New-Report {
     $ReportJson = $ReportJson.replace("\u003c", "<")
     $ReportJson = $ReportJson.replace("\u003e", ">")
     $ReportJson = $ReportJson.replace("\u0027", "'")
-    $ReportJson | Out-File $JsonFileName
+    $ReportJson | Out-File -LiteralPath $JsonFileName
 
     # Finish building the html report
     $Title = "$($FullName) Baseline Report"
@@ -695,7 +701,7 @@ function New-Report {
     $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
-    [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
+    [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File -LiteralPath $FileName
 
     $ReportSummary
 }

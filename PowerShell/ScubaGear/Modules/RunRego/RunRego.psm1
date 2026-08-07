@@ -10,7 +10,7 @@ function Invoke-Rego {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateScript({Test-Path -PathType Leaf $_})]
+        [ValidateScript({Test-Path -LiteralPath $_ -PathType Leaf})]
         [string]
         $InputFile,
 
@@ -34,33 +34,34 @@ function Invoke-Rego {
     $Cmd = Join-Path -Path $OPAPath -ChildPath $OPAFileName  -ErrorAction 'Stop'
 
     # Set backup execution path to be current directory if ScubaTools path fails
-    if (-not (Test-Path $Cmd -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $Cmd -PathType Leaf)) {
         $Cmd = Join-Path -Path (Get-Location | Select-Object -ExpandProperty Path) -ChildPath $OPAFileName -ErrorAction 'Stop'
     }
 
     # See if the OPA executable is in the current executing directory
-    if (-not (Test-Path $Cmd)) {
+    if (-not (Test-Path -LiteralPath $Cmd)) {
         throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and which directory it should be placed."
     }
 
     # Load Utils
-    if (-not (Test-Path $RegoFile -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $RegoFile -PathType Leaf)) {
         throw "Rego file not found at: $RegoFile"
     }
 
-    $ResolvedInputFile = (Resolve-Path -Path $InputFile -ErrorAction Stop).Path
-    $ResolvedRegoFile = (Resolve-Path -Path $RegoFile -ErrorAction Stop).Path
+    # LiteralPath so input/output paths containing wildcard characters (e.g. []) resolve correctly.
+    $ResolvedInputFile = (Resolve-Path -LiteralPath $InputFile -ErrorAction Stop).Path
+    $ResolvedRegoFile = (Resolve-Path -LiteralPath $RegoFile -ErrorAction Stop).Path
 
-    $RegoFileObject = Get-Item $ResolvedRegoFile -ErrorAction Stop
+    $RegoFileObject = Get-Item -LiteralPath $ResolvedRegoFile -ErrorAction Stop
     if ($null -eq $RegoFileObject) {
         throw "Failed to get Rego file object at: $RegoFile"
     }
 
     $ScubaUtils = Join-Path -Path $RegoFileObject.DirectoryName -ChildPath "Utils" -ErrorAction 'Stop'
-    if (-not (Test-Path $ScubaUtils -PathType Container)) {
+    if (-not (Test-Path -LiteralPath $ScubaUtils -PathType Container)) {
         throw "Rego Utils directory not found at: $ScubaUtils"
     }
-    $ResolvedScubaUtils = (Resolve-Path -Path $ScubaUtils -ErrorAction Stop).Path
+    $ResolvedScubaUtils = (Resolve-Path -LiteralPath $ScubaUtils -ErrorAction Stop).Path
 
     $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $ResolvedInputFile, "-d", $ResolvedRegoFile, "-d", $ResolvedScubaUtils, "-f", "values")
 

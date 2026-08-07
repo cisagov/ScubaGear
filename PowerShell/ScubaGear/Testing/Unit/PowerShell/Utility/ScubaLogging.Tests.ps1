@@ -46,6 +46,37 @@ InModuleScope ScubaLogging {
             }
         }
 
+        Context "Wildcard characters in log path (literal path handling)" {
+            BeforeAll {
+                # Folder name contains [ ] which PowerShell treats as wildcards unless -LiteralPath is used
+                $script:BracketLogRoot = Join-Path $env:TEMP "ScubaLogging-WC-$(Get-Date -Format 'yyyyMMddHHmmss')"
+                $script:BracketLogPath = Join-Path $script:BracketLogRoot '2185test[test]\lab\DebugLogs'
+                [void][System.IO.Directory]::CreateDirectory($script:BracketLogPath)
+            }
+
+            AfterAll {
+                if (Test-Path -LiteralPath $script:BracketLogRoot) {
+                    Remove-Item -LiteralPath $script:BracketLogRoot -Recurse -Force -ErrorAction SilentlyContinue
+                }
+            }
+
+            It "Creates and writes the debug log when the path contains square brackets" {
+                Initialize-ScubaLogging -LogPath $script:BracketLogPath -DisableAutoReport
+                $Script:ScubaLogPath | Should -Not -BeNullOrEmpty
+                Write-ScubaLog -Message "wildcard log path works" -Level "Info" -Source "Test"
+                Test-Path -LiteralPath $Script:ScubaLogPath | Should -Be $true
+                (Get-Content -LiteralPath $Script:ScubaLogPath -Raw) | Should -Match "wildcard log path works"
+            }
+
+            It "Does not leak logging errors to the output stream when path contains brackets" {
+                Initialize-ScubaLogging -LogPath $script:BracketLogPath -DisableAutoReport
+                # Redirect warning/verbose/debug/information away; capture only the success (output) stream
+                $leaked = Write-ScubaLog -Message "no leak expected" -Level "Info" -Source "Test" 3>$null 4>$null 5>$null 6>$null
+                $leaked | Should -BeNullOrEmpty
+                (Get-Content -LiteralPath $Script:ScubaLogPath -Raw) | Should -Not -Match "Logging error"
+            }
+        }
+
         Context "Initialize-ScubaLogging Function" {
 
             It "Should initialize logging with minimal parameters" {
@@ -87,10 +118,12 @@ InModuleScope ScubaLogging {
             }
 
             It "Should handle errors gracefully" {
-                # Mock an error condition
-                Mock New-Item { throw "Test error" } -ParameterFilter { $ItemType -eq "Directory" }
+                # Force directory creation to fail portably: make a parent path component a file
+                $fileAsParent = Join-Path $script:TestLogPath "not-a-dir"
+                Set-Content -LiteralPath $fileAsParent -Value "x" -Force
+                $badLogPath = Join-Path $fileAsParent "Logs"
 
-                { Initialize-ScubaLogging -LogPath "C:\InvalidPath\That\DoesNot\Exist" } | Should -Not -Throw
+                { Initialize-ScubaLogging -LogPath $badLogPath } | Should -Not -Throw
                 $Script:ScubaLogEnabled | Should -Be $false
             }
 
@@ -615,10 +648,10 @@ InModuleScope ScubaLogging {
                 )
 
                 # Mock Test-Path so the ValidateScript on LogPath passes without a real file on disk
-                Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Test-Path { $true } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
 
                 # Mock Get-Content to always return $script:TestLines (which tests can modify)
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
             }
 
             BeforeEach {
@@ -928,10 +961,10 @@ InModuleScope ScubaLogging {
                 $script:FakeLogPath = 'C:\fake\ScubaGear-DebugLog-redaction-test.log'
 
                 # Mock Test-Path so ValidateScript passes
-                Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Test-Path { $true } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
 
                 # Mock Get-Content to return test log content
-                Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
 
                 # Override Get-Content for the redaction schema to return the real file as-is
                 Mock Get-Content {
