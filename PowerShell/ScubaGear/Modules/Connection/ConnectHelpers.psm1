@@ -442,6 +442,7 @@ function Get-MsalAccessToken {
                     $Builder = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
                         WithAuthority($Authority)
                     if ($DisableBroker) {
+                        # MSAL convention: loopback redirect for public client system-browser flow
                         $Builder = $Builder.WithRedirectUri('http://localhost')
                     }
                     else {

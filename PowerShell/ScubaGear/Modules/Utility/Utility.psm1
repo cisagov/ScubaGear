@@ -230,7 +230,7 @@ function Invoke-GraphDirectly {
     Write-Debug "Graph Api direct: $endpoint"
 
     If ($null -eq $endpoint) {
-        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
+        throw "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
@@ -255,46 +255,10 @@ function Invoke-GraphDirectly {
         $graphParams['ContentType'] = 'application/json'
     }
 
-    # Execute the initial request
+    # Execute the initial request (Invoke-ScubaGraphRequest handles pagination internally)
     $resp = Invoke-ScubaGraphRequest @graphParams
 
     if ($Method -notmatch "DELETE|PATCH") {
-        # If the response is a collection (has a 'value' key)
-        if ($resp -is [hashtable] -and $resp.ContainsKey('value')) {
-            $allItems = [System.Collections.Generic.List[object]]::new()
-            foreach ($item in $resp['value']) {
-                $allItems.Add($item)
-            }
-
-            # Build paging params from the shared set (keep Headers if present, drop Body/ContentType)
-            $pageParams = @{ ErrorAction = 'Stop'; Method = 'GET' }
-            if ($graphParams.ContainsKey('Headers')) {
-                $pageParams['Headers'] = $graphParams['Headers']
-            }
-
-            # Get the next page link from the initial response
-            $nextLink = $resp['@odata.nextLink']
-
-            # Follow pagination until no more pages remain
-            while ($null -ne $nextLink -and $nextLink -ne '') {
-                Write-Debug "Following @odata.nextLink: $nextLink"
-
-                # Update the URI to the next page; all other params (Headers, Method) carry over
-                $pageParams['Uri'] = $nextLink
-                $pageResp = Invoke-ScubaGraphRequest @pageParams
-
-                # Accumulate results from this page
-                foreach ($item in $pageResp['value']) {
-                    $allItems.Add($item)
-                }
-
-                # Advance to the next page (null when no more pages exist)
-                $nextLink = $pageResp['@odata.nextLink']
-            }
-
-            $resp['value'] = $allItems.ToArray()
-        }
-
         return $resp | ConvertFrom-GraphHashtable
     }
 }

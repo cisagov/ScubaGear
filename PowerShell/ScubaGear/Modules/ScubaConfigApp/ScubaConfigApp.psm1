@@ -172,7 +172,6 @@ Function Start-SCuBAConfigApp {
     # Connect to Microsoft Graph if Online parameter is used
     if ($Online) {
         try {
-            #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
             Write-Output "Connecting to Microsoft Graph..."
             Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphParameters.Scopes -UseSystemBrowserAuthentication

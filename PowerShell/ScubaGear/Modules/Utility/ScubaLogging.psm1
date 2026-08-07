@@ -309,8 +309,8 @@ function Trace-ScubaFunction {
     The caller will use $false when they want to handle the error themselves.
 
     .EXAMPLE
-    $result = Trace-ScubaFunction -FunctionName "Get-MgUser" -Parameters @{UserId="test@domain.com"} -ScriptBlock {
-        Get-MgUser -UserId $UserId
+    $result = Trace-ScubaFunction -FunctionName "Get-MgBetaOrganization" -ScriptBlock {
+        Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment
     }
     #>
     [CmdletBinding()]

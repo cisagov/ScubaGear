@@ -533,10 +533,7 @@ function Disconnect-SCuBATenant {
                Disconnect-ScubaGraph -ErrorAction SilentlyContinue
            }
            elseif (($Product -eq "exo") -or ($Product -eq "defender") -or ($Product -eq "securitysuite")) {
-               if (($Product -eq "defender") -or ($Product -eq "securitysuite")) {
-                   Disconnect-ScubaGraph -ErrorAction SilentlyContinue
-               }
-               # EXO now uses REST API with on-demand token - no persistent connection to disconnect
+               # EXO/Defender/SecuritySuite use REST API with on-demand token - clear cached session
                Disconnect-ScubaGraph -ErrorAction SilentlyContinue
            }
            else {
