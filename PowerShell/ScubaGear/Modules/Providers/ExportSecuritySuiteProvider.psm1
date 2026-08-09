@@ -46,7 +46,7 @@ function Export-SecuritySuiteProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")
-    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Trace-ScubaFunction
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Trace-ScubaFunction, Write-ScubaLog
     $Tracker = Get-CommandTracker
 
     function Format-SecuritySuitePolicyTable {
@@ -94,6 +94,24 @@ function Export-SecuritySuiteProvider {
         $InputObject | Sort-Object -Property $SortProperties
     }
 
+    # Maps cmdlet name to the error message of its failed call so the license
+    # checks below can tell a missing-license failure apart from any other
+    # API failure.
+    $CommandErrors = @{}
+
+    function Test-MissingLicenseError {
+        param(
+            [Parameter(Mandatory = $false)]
+            [string]$Message
+        )
+
+        # A tenant without the required license does not have the cmdlet
+        # provisioned, so the Admin API rejects the call with HTTP 400 and an
+        # unrecognized cmdlet message. Any other failure is an API error, not
+        # evidence that the license is missing.
+        return (-not [string]::IsNullOrWhiteSpace($Message)) -and ($Message -match '\b400\b|not recognized')
+    }
+
     function Invoke-SecuritySuiteTrackedCommand {
         param(
             [Parameter(Mandatory = $true)]
@@ -110,8 +128,18 @@ function Export-SecuritySuiteProvider {
             return @($Result)
         }
         catch {
-            if (-not $SuppressWarning) {
-                Write-Warning "Error running ${CmdletName}: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+            $ErrorMessage = $_.Exception.Message
+            $CommandErrors[$CmdletName] = $ErrorMessage
+            # SuppressWarning only covers the expected missing-license failure;
+            # any other failure must stay visible for troubleshooting.
+            if ((-not $SuppressWarning) -or (-not (Test-MissingLicenseError -Message $ErrorMessage))) {
+                Write-Warning "Error running ${CmdletName}: ${ErrorMessage}`n$($_.ScriptStackTrace)"
+            }
+            # Level is Info because Write-ScubaLog tracks Warning or Error as a terminating error.
+            Write-ScubaLog -Message "Error running command" -Level "Info" -Source "Export-SecuritySuiteProvider" -Data @{
+                Command    = $CmdletName
+                Error      = $ErrorMessage
+                StackTrace = $_.ScriptStackTrace
             }
             $Tracker.AddUnSuccessfulCommand($CmdletName)
             return @()
@@ -148,14 +176,28 @@ function Export-SecuritySuiteProvider {
                 return @($Result)
             }
             catch {
+                # Keep every endpoint's error so a missing-license response from
+                # one endpoint is not hidden by a later endpoint's failure.
+                if ($CommandErrors.ContainsKey($CmdletName)) {
+                    $CommandErrors[$CmdletName] = "$($CommandErrors[$CmdletName]); $($_.Exception.Message)"
+                }
+                else {
+                    $CommandErrors[$CmdletName] = $_.Exception.Message
+                }
                 # Try next endpoint
                 continue
             }
         }
 
         # All endpoints failed
-        if (-not $SuppressWarning) {
-            Write-Warning "Error running ${CmdletName}: all endpoints failed."
+        $ErrorMessage = $CommandErrors[$CmdletName]
+        if ((-not $SuppressWarning) -or (-not (Test-MissingLicenseError -Message $ErrorMessage))) {
+            Write-Warning "Error running ${CmdletName}: all endpoints failed: ${ErrorMessage}"
+        }
+        # Level is Info because Write-ScubaLog tracks Warning or Error as a terminating error.
+        Write-ScubaLog -Message "Error running command" -Level "Info" -Source "Export-SecuritySuiteProvider" -Data @{
+            Command = $CmdletName
+            Error   = $ErrorMessage
         }
         $Tracker.AddUnSuccessfulCommand($CmdletName)
         return @()
@@ -189,7 +231,10 @@ function Export-SecuritySuiteProvider {
     $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
     $ATPProtectionPolicyRuleResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
 
-    if (($Tracker.GetUnSuccessfulCommands() -contains "Get-AtpPolicyForO365") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ATPProtectionPolicyRule")) {
+    $FailedATPCmdlets = @(@("Get-AtpPolicyForO365", "Get-ATPProtectionPolicyRule") | Where-Object { $Tracker.GetUnSuccessfulCommands() -contains $_ })
+    $ATPLicenseFailures = @($FailedATPCmdlets | Where-Object { Test-MissingLicenseError -Message $CommandErrors[$_] })
+
+    if (($FailedATPCmdlets.Count -gt 0) -and ($ATPLicenseFailures.Count -eq $FailedATPCmdlets.Count)) {
         $ATPPolicyResult = @()
         $ATPProtectionPolicyRuleResult = @()
         $DefenderLicense = ConvertTo-Json $false
@@ -199,6 +244,9 @@ function Export-SecuritySuiteProvider {
         $Tracker.AddSuccessfulCommand("Get-ATPProtectionPolicyRule")
     }
     else {
+        # A failure that does not look like a missing license stays in the
+        # unsuccessful command list so the report flags it as an API error
+        # instead of a missing license.
         $DefenderLicense = ConvertTo-Json $true
     }
 
@@ -209,7 +257,10 @@ function Export-SecuritySuiteProvider {
     $DLPComplianceRulesResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
     $ProtectionAlertResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-ProtectionAlert" -SuppressWarning $true)
 
-    if (($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpCompliancePolicy") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-DlpComplianceRule") -or ($Tracker.GetUnSuccessfulCommands() -contains "Get-ProtectionAlert")) {
+    $FailedDLPCmdlets = @(@("Get-DlpCompliancePolicy", "Get-DlpComplianceRule", "Get-ProtectionAlert") | Where-Object { $Tracker.GetUnSuccessfulCommands() -contains $_ })
+    $DLPLicenseFailures = @($FailedDLPCmdlets | Where-Object { Test-MissingLicenseError -Message $CommandErrors[$_] })
+
+    if (($FailedDLPCmdlets.Count -gt 0) -and ($DLPLicenseFailures.Count -eq $FailedDLPCmdlets.Count)) {
         $DLPCompliancePolicyResult = @()
         $DLPComplianceRulesResult = @()
         $ProtectionAlertResult = @()
@@ -221,6 +272,9 @@ function Export-SecuritySuiteProvider {
         $Tracker.AddSuccessfulCommand("Get-ProtectionAlert")
     }
     else {
+        # A failure that does not look like a missing license stays in the
+        # unsuccessful command list so the report flags it as an API error
+        # instead of a missing license.
         $DLPLicense = ConvertTo-Json $true
     }
 
