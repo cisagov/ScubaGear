@@ -65,11 +65,12 @@ const getProtectedValues = (values) => {
     const normalizedValues = normalizeToArray(values)
         .map(value => String(value ?? "").trim())
         .filter(value => value.length > 0);
-    return normalizedValues.length > 0 ? normalizedValues : ["None"];
+    return normalizedValues.length > 0 ? normalizedValues : "None";
 };
 
 const formatProtectedValues = (values) => {
-    return getProtectedValues(values).join("\n");
+    const protectedValues = getProtectedValues(values);
+    return Array.isArray(protectedValues) ? protectedValues.join("\n") : protectedValues;
 };
 
 const isEnabled = (value) => value === true || String(value).toLowerCase() === "true";
@@ -168,7 +169,7 @@ const getAntiPhishPolicyRows = (
                 protectionPolicyRules,
                 acceptedDomains
             ),
-            "Users Protected": getProtectedValues(policy.TargetedUsersToProtect),
+            "Impersonation Protection": getProtectedValues(policy.TargetedUsersToProtect),
             "Partner Domains Protected": formatProtectedValues(policy.TargetedDomainsToProtect),
             "Safety Indicators": SAFETY_TIP_FIELDS
                 .map(([label, field]) => ({
@@ -382,7 +383,7 @@ const buildSecuritySuiteConfigTables = (
     appendSecuritySuiteTableSection(
         section,
         "Anti-Phish Protection Policies",
-        ["Policy", "Enabled", "Applicability", "Users Protected", "Partner Domains Protected", "Safety Indicators"],
+        ["Policy", "Enabled", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"],
         getAntiPhishPolicyRows(antiPhishPolicies, antiPhishRules, protectionPolicyRules, acceptedDomains),
         "securitysuite-anti-phish-policies-table",
         "No anti-phish policies were exported."
