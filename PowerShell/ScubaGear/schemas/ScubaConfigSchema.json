@@ -74,15 +74,20 @@
       }
     },
 
+    "deprecatedProductAliases": {
+      "_comment": "Deprecated product name aliases and their canonical replacements. Remove an entry here when the alias is fully retired.",
+      "defender": "securitysuite"
+    },
+
     "reportProductNames": {
       "_comment": "Maps lowercase product identifiers to their PascalCase baseline name and full display name",
-      "aad":           { "baselineName": "AAD",           "displayName": "Microsoft Entra ID" },
-      "exo":           { "baselineName": "EXO",           "displayName": "Exchange Online" },
-      "securitysuite": { "baselineName": "SecuritySuite", "displayName": "Security Suite" },
-      "powerplatform": { "baselineName": "PowerPlatform", "displayName": "Microsoft Power Platform" },
-      "sharepoint":    { "baselineName": "SharePoint",    "displayName": "SharePoint Online" },
-      "teams":         { "baselineName": "Teams",         "displayName": "Microsoft Teams" },
-      "powerbi":       { "baselineName": "PowerBI",       "displayName": "Microsoft Power BI" }
+      "aad":           { "baselineName": "AAD",           "displayName": "Microsoft Entra ID",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 1 },
+      "sharepoint":    { "baselineName": "SharePoint",    "displayName": "SharePoint Online",        "tenantDetailProvider": "aad",           "tenantDetailPriority": 2 },
+      "powerbi":       { "baselineName": "PowerBI",       "displayName": "Microsoft Power BI",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 3 },
+      "teams":         { "baselineName": "Teams",         "displayName": "Microsoft Teams",          "tenantDetailProvider": "teams",         "tenantDetailPriority": 4 },
+      "powerplatform": { "baselineName": "PowerPlatform", "displayName": "Microsoft Power Platform", "tenantDetailProvider": "powerplatform",  "tenantDetailPriority": 5 },
+      "exo":           { "baselineName": "EXO",           "displayName": "Exchange Online",          "tenantDetailProvider": "exo",           "tenantDetailPriority": 6 },
+      "securitysuite": { "baselineName": "SecuritySuite", "displayName": "Security Suite",           "tenantDetailProvider": "exo",           "tenantDetailPriority": 7 }
     }
   },
 

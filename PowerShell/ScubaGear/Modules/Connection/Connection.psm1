@@ -460,7 +460,7 @@ function Disconnect-SCuBATenant {
        })]
        [ValidateNotNullOrEmpty()]
        [string[]]
-    $ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi")
+    $ProductNames = [ScubaConfig]::GetSupportedProducts()
    )
    $ErrorActionPreference = "SilentlyContinue"
 

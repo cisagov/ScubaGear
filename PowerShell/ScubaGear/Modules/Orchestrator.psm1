@@ -32,17 +32,20 @@ function ConvertTo-ScubaProductNames {
 
     # Expand the wildcard to all supported products
     if ($ProductNames -contains '*') {
-        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+        $ProductNames = [ScubaConfig]::GetSupportedProducts()
         Write-Debug "Setting ProductNames to all products because of wildcard"
     }
 
-    # 'defender' is a deprecated alias for 'securitysuite'
-    if ($ProductNames -contains 'defender') {
-        if (-not ($ProductNames -contains 'securitysuite')) {
-            $ProductNames = @($ProductNames) + "securitysuite"
+    $aliases = [ScubaConfig]::GetDeprecatedProductAliases()
+    foreach ($alias in $aliases.Keys) {
+        if ($ProductNames -contains $alias) {
+            $canonical = $aliases[$alias]
+            if (-not ($ProductNames -contains $canonical)) {
+                $ProductNames = @($ProductNames) + $canonical
+            }
+            $ProductNames = @($ProductNames | Where-Object { $_ -ne $alias })
+            Write-Debug "Substituting deprecated alias '$alias' with '$canonical' in ProductNames"
         }
-        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
-        Write-Debug "Substituting defender with securitysuite in ProductNames"
     }
 
     return @($ProductNames | Sort-Object -Unique)
@@ -1863,40 +1866,30 @@ function Get-TenantDetail {
     )
 
     # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerbi")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("teams")) {
-        Get-TeamsTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerplatform")) {
-        Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("exo")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    elseif ($ProductNames.Contains("securitysuite")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    else {
-        $TenantInfo = @{
-            "DisplayName" = "Orchestrator Error retrieving Display name";
-            "DomainName" = "Orchestrator Error retrieving Domain name";
-            "TenantId" = "Orchestrator Error retrieving Tenant ID";
-            "AdditionalData" = "Orchestrator Error retrieving additional data";
+    switch ([ScubaConfig]::GetTenantDetailProvider($ProductNames)) {
+        'aad' {
+            Get-AADTenantDetail -M365Environment $M365Environment
         }
-        $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 3
-        $TenantInfo
+        'teams' {
+            Get-TeamsTenantDetail -M365Environment $M365Environment
+        }
+        'powerplatform' {
+            Get-PowerPlatformTenantDetail -M365Environment $M365Environment
+        }
+        'exo' {
+            Get-EXOTenantDetail -M365Environment $M365Environment `
+                -AccessToken $ConnectionResult.EXOAccessToken `
+                -ApiEndpoint $ConnectionResult.EXOApiEndpoint
+        }
+        default {
+            $TenantInfo = @{
+                "DisplayName" = "Orchestrator Error retrieving Display name";
+                "DomainName" = "Orchestrator Error retrieving Domain name";
+                "TenantId" = "Orchestrator Error retrieving Tenant ID";
+                "AdditionalData" = "Orchestrator Error retrieving additional data";
+            }
+            $TenantInfo | ConvertTo-Json -Depth 3
+        }
     }
 }
 
@@ -2318,7 +2311,7 @@ function Invoke-SCuBACached {
             $Script:ScubaLoggingEnabled = $false
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+                $ProductNames = [ScubaConfig]::GetSupportedProducts()
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {
