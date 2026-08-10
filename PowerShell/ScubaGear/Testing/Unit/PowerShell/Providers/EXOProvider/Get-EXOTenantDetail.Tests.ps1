@@ -58,5 +58,4 @@ InModuleScope ExportEXOProvider {
 
 AfterAll {
     Remove-Module ExportEXOProvider -Force -ErrorAction SilentlyContinue
-    Remove-Module ExchangeOnlineManagement -Force -ErrorAction SilentlyContinue
 }
