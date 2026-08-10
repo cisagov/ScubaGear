@@ -752,6 +752,15 @@ function Invoke-SCuBA {
                 'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
+
+            # Craft the csv version of risky applications/service principals for remediation
+            $RiskyAppsCsvParams = @{
+                'ProductNames'         = $ScubaConfig.ProductNames;
+                'OutFolderPath'        = $OutFolderPath;
+                'FullScubaResultsName' = $FullScubaResultsName;
+                'OutProviderFileName'  = $ScubaConfig.OutProviderFileName;
+            }
+            ConvertTo-RiskyAppsCsv @RiskyAppsCsvParams
         }
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
@@ -1392,6 +1401,337 @@ function ConvertTo-ResultsCsv {
                 StackTrace = $_.ScriptStackTrace
             }
             Write-Warning "Error creating CSV output file: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+        }
+    }
+}
+
+function ConvertFrom-RiskyAppsCsvDate {
+    <#
+    .Description
+    Parses Graph/.NET JSON date strings used on credential objects into DateTime values.
+    .Functionality
+    Internal
+    #>
+    param(
+        [string]
+        $DateString
+    )
+
+    if ([string]::IsNullOrEmpty($DateString)) {
+        return $null
+    }
+
+    # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
+    if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
+        $EpochMs = $Matches[1]
+        return [System.DateTimeOffset]::FromUnixTimeMilliseconds($EpochMs).UtcDateTime
+    }
+
+    try {
+        return [Datetime]::Parse($DateString)
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-RiskyAppsCredentialCounts {
+    <#
+    .Description
+    Counts active and expired credentials and how many active credentials exceed a lifetime threshold.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $false)]
+        $Credentials,
+
+        [Parameter(Mandatory = $true)]
+        [int]
+        $LifetimeThresholdDays
+    )
+
+    $ActiveCount = 0
+    $ExpiredCount = 0
+    $ActiveExceedingLifetimeCount = 0
+    $Now = Get-Date
+
+    if ($null -eq $Credentials) {
+        return [PSCustomObject]@{
+            ActiveCount = $ActiveCount
+            ExpiredCount = $ExpiredCount
+            ActiveExceedingLifetimeCount = $ActiveExceedingLifetimeCount
+        }
+    }
+
+    foreach ($Credential in @($Credentials)) {
+        if ($null -eq $Credential) {
+            continue
+        }
+
+        $End = $null
+        if ($null -ne $Credential.EndDateTime) {
+            if ($Credential.EndDateTime -is [datetime]) {
+                $End = $Credential.EndDateTime
+            }
+            else {
+                $End = ConvertFrom-RiskyAppsCsvDate -DateString "$($Credential.EndDateTime)"
+            }
+        }
+
+        $IsExpired = ($null -ne $End -and $End -lt $Now)
+        if ($IsExpired) {
+            $ExpiredCount++
+            continue
+        }
+
+        $ActiveCount++
+
+        $Start = $null
+        if ($null -ne $Credential.StartDateTime) {
+            if ($Credential.StartDateTime -is [datetime]) {
+                $Start = $Credential.StartDateTime
+            }
+            else {
+                $Start = ConvertFrom-RiskyAppsCsvDate -DateString "$($Credential.StartDateTime)"
+            }
+        }
+
+        if ($null -ne $Start -and $null -ne $End) {
+            $DurationDays = (New-TimeSpan -Start $Start -End $End).Days
+            if ($DurationDays -gt $LifetimeThresholdDays) {
+                $ActiveExceedingLifetimeCount++
+            }
+        }
+    }
+
+    return [PSCustomObject]@{
+        ActiveCount = $ActiveCount
+        ExpiredCount = $ExpiredCount
+        ActiveExceedingLifetimeCount = $ActiveExceedingLifetimeCount
+    }
+}
+
+function Get-RiskyAppsRiskLevel {
+    <#
+    .Description
+    Resolves the highest permission risk level for a risky application or service principal.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Object
+    )
+
+    if ($null -ne $Object.ScoreBreakdown -and
+        -not [string]::IsNullOrEmpty("$($Object.ScoreBreakdown.HighestRiskLevel)")) {
+        return "$($Object.ScoreBreakdown.HighestRiskLevel)"
+    }
+
+    $RiskLevelPriority = @{ Critical = 4; High = 3; Medium = 2; Low = 1 }
+    $HighestRiskLevel = "None"
+    $HighestPriority = 0
+
+    foreach ($Permission in @($Object.Permissions)) {
+        if ($null -eq $Permission -or $Permission.IsRisky -ne $true) {
+            continue
+        }
+
+        $Priority = $RiskLevelPriority[$Permission.RiskLevel]
+        if ($null -ne $Priority -and $Priority -gt $HighestPriority) {
+            $HighestPriority = $Priority
+            $HighestRiskLevel = $Permission.RiskLevel
+        }
+    }
+
+    return $HighestRiskLevel
+}
+
+function ConvertTo-RiskyAppsCsv {
+    <#
+    .Description
+    Creates a CSV in the ScubaGear output directory to assist remediation of risky
+    applications and third-party service principals. Rows are ordered by severity score
+    (highest first).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderPath,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $FullScubaResultsName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutProviderFileName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutRiskyAppsFileName = "RiskyApps"
+    )
+    process {
+        # Risky application data is only produced by the AAD provider
+        if ($ProductNames -notcontains "aad" -and $ProductNames -notcontains "*") {
+            return
+        }
+
+        try {
+            $RiskyApplications = @()
+            $RiskyThirdPartyServicePrincipals = @()
+            $ProviderData = $null
+
+            $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName
+            if (Test-Path -LiteralPath $ScubaResultsPath -PathType Leaf) {
+                $ScubaResults = Get-Content -Encoding UTF8 -LiteralPath $ScubaResultsPath | ConvertFrom-Json
+                if ($null -ne $ScubaResults.Raw) {
+                    $ProviderData = $ScubaResults.Raw
+                }
+            }
+
+            if ($null -eq $ProviderData) {
+                $ProviderSettingsPath = Join-Path $OutFolderPath -ChildPath "$OutProviderFileName.json"
+                if (Test-Path -LiteralPath $ProviderSettingsPath -PathType Leaf) {
+                    $ProviderData = Get-Content -Encoding UTF8 -LiteralPath $ProviderSettingsPath | ConvertFrom-Json
+                }
+            }
+
+            if ($null -ne $ProviderData) {
+                if ($null -ne $ProviderData.risky_applications) {
+                    $RiskyApplications = @($ProviderData.risky_applications | Where-Object { $null -ne $_ })
+                }
+                if ($null -ne $ProviderData.risky_third_party_service_principals) {
+                    $RiskyThirdPartyServicePrincipals = @(
+                        $ProviderData.risky_third_party_service_principals | Where-Object { $null -ne $_ }
+                    )
+                }
+            }
+
+            $RiskyAppsCsv = @()
+
+            foreach ($App in $RiskyApplications) {
+                $PasswordCounts = Get-RiskyAppsCredentialCounts `
+                    -Credentials $App.PasswordCredentials `
+                    -LifetimeThresholdDays 180
+                $KeyCounts = Get-RiskyAppsCredentialCounts `
+                    -Credentials $App.KeyCredentials `
+                    -LifetimeThresholdDays 365
+
+                $PrivilegedRoles = @()
+                if ($null -ne $App.PrivilegedRoles) {
+                    $PrivilegedRoles = @($App.PrivilegedRoles | Where-Object { -not [string]::IsNullOrEmpty("$_") })
+                }
+
+                $RiskyAppsCsv += [PSCustomObject]@{
+                    "Display Name" = $App.DisplayName
+                    "Severity Score" = $(if ($null -ne $App.SeverityScore) { $App.SeverityScore } else { 0 })
+                    "Risk Level" = Get-RiskyAppsRiskLevel -Object $App
+                    "Multi-Tenant" = [bool]$App.IsMultiTenantEnabled
+                    "Third-Party Service Principal" = $false
+                    "Assigned Privileged Roles" = ($PrivilegedRoles -join "; ")
+                    "Active Password Credentials" = $PasswordCounts.ActiveCount
+                    "Expired Password Credentials" = $PasswordCounts.ExpiredCount
+                    "Active Password Credentials Exceeding 180 Days" = $PasswordCounts.ActiveExceedingLifetimeCount
+                    "Active Key Credentials" = $KeyCounts.ActiveCount
+                    "Expired Key Credentials" = $KeyCounts.ExpiredCount
+                    "Active Key Credentials Exceeding 365 Days" = $KeyCounts.ActiveExceedingLifetimeCount
+                }
+            }
+
+            foreach ($ServicePrincipal in $RiskyThirdPartyServicePrincipals) {
+                $PasswordCounts = Get-RiskyAppsCredentialCounts `
+                    -Credentials $ServicePrincipal.PasswordCredentials `
+                    -LifetimeThresholdDays 180
+                $KeyCounts = Get-RiskyAppsCredentialCounts `
+                    -Credentials $ServicePrincipal.KeyCredentials `
+                    -LifetimeThresholdDays 365
+
+                $IsMultiTenant = $false
+                if ($null -ne $ServicePrincipal.IsMultiTenantEnabled) {
+                    $IsMultiTenant = [bool]$ServicePrincipal.IsMultiTenantEnabled
+                }
+                elseif ($ServicePrincipal.SignInAudience -eq "AzureADMultipleOrgs") {
+                    $IsMultiTenant = $true
+                }
+
+                $PrivilegedRoles = @()
+                if ($null -ne $ServicePrincipal.PrivilegedRoles) {
+                    $PrivilegedRoles = @(
+                        $ServicePrincipal.PrivilegedRoles | Where-Object { -not [string]::IsNullOrEmpty("$_") }
+                    )
+                }
+
+                $RiskyAppsCsv += [PSCustomObject]@{
+                    "Display Name" = $ServicePrincipal.DisplayName
+                    "Severity Score" = $(
+                        if ($null -ne $ServicePrincipal.SeverityScore) { $ServicePrincipal.SeverityScore } else { 0 }
+                    )
+                    "Risk Level" = Get-RiskyAppsRiskLevel -Object $ServicePrincipal
+                    "Multi-Tenant" = $IsMultiTenant
+                    "Third-Party Service Principal" = $true
+                    "Assigned Privileged Roles" = ($PrivilegedRoles -join "; ")
+                    "Active Password Credentials" = $PasswordCounts.ActiveCount
+                    "Expired Password Credentials" = $PasswordCounts.ExpiredCount
+                    "Active Password Credentials Exceeding 180 Days" = $PasswordCounts.ActiveExceedingLifetimeCount
+                    "Active Key Credentials" = $KeyCounts.ActiveCount
+                    "Expired Key Credentials" = $KeyCounts.ExpiredCount
+                    "Active Key Credentials Exceeding 365 Days" = $KeyCounts.ActiveExceedingLifetimeCount
+                }
+            }
+
+            if ($RiskyAppsCsv.Count -gt 0) {
+                $RiskyAppsCsv = @(
+                    $RiskyAppsCsv | Sort-Object -Property @{ Expression = { $_."Severity Score" }; Descending = $true },
+                        @{ Expression = { $_."Display Name" }; Descending = $false }
+                )
+            }
+
+            $RiskyAppsCsvPath = Join-Path -Path $OutFolderPath "$OutRiskyAppsFileName.csv"
+            $Encoding = Get-FileEncoding
+            if ($RiskyAppsCsv.Count -eq 0) {
+                $Headers = @(
+                    "Display Name",
+                    "Severity Score",
+                    "Risk Level",
+                    "Multi-Tenant",
+                    "Third-Party Service Principal",
+                    "Assigned Privileged Roles",
+                    "Active Password Credentials",
+                    "Expired Password Credentials",
+                    "Active Password Credentials Exceeding 180 Days",
+                    "Active Key Credentials",
+                    "Expired Key Credentials",
+                    "Active Key Credentials Exceeding 365 Days"
+                )
+                $HeaderLine = ($Headers | ForEach-Object { "`"$_`"" }) -join ","
+                $HeaderLine | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
+            }
+            else {
+                $RiskyAppsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
+            }
+        }
+        catch {
+            Write-ScubaLog -Message "Error creating risky applications CSV output file" -Level "Warning" -Source "CreateRiskyAppsCsv" -Data @{
+                Error = $_.Exception.Message
+                StackTrace = $_.ScriptStackTrace
+            }
+            Write-Warning "Error creating risky applications CSV output file: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
         }
     }
 }
@@ -2627,6 +2967,15 @@ function Invoke-SCuBACached {
                 'OutActionPlanFileName' = $TempScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
+
+            # Craft the csv version of risky applications/service principals for remediation
+            $RiskyAppsCsvParams = @{
+                'ProductNames'         = $TempScubaConfig.ProductNames;
+                'OutFolderPath'        = $OutFolderPath;
+                'FullScubaResultsName' = $FullScubaResultsName;
+                'OutProviderFileName'  = $TempScubaConfig.OutProviderFileName;
+            }
+            ConvertTo-RiskyAppsCsv @RiskyAppsCsvParams
         }
         finally {
             # Clean up debug logging module
