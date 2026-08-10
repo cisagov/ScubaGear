@@ -16,7 +16,7 @@ InModuleScope Orchestrator {
             '{"DisplayName": "displayName"}'
         }
         function Get-EXOTenantDetail {}
-        Mock -ModuleName Orchestrator Get-PowerPlatformTenantDetail {
+        Mock -ModuleName Orchestrator Get-EXOTenantDetail {
             '{"DisplayName": "displayName"}'
         }
         function Get-EXOTenantDetailFromConnection {}

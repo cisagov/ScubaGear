@@ -819,4 +819,25 @@ class ScubaConfig {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigDefaults.privilegedRoles
     }
+
+    # Returns the deprecated product alias map from the schema (e.g. @{ defender = 'securitysuite' }).
+    static [hashtable] GetDeprecatedProductAliases() {
+        [ScubaConfig]::InitializeValidator()
+        $aliases = @{}
+        foreach ($prop in [ScubaConfig]::_ConfigSchema.schemaMetadata.deprecatedProductAliases.PSObject.Properties) {
+            if ($prop.Name -notlike '_*') { $aliases[$prop.Name] = $prop.Value }
+        }
+        return $aliases
+    }
+
+    # Returns the highest-priority tenantDetailProvider for the given product list (e.g. 'aad', 'exo').
+    static [string] GetTenantDetailProvider([string[]]$ProductNames) {
+        [ScubaConfig]::InitializeValidator()
+        $match = [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties |
+            Where-Object { $_.Name -notlike '_*' -and $ProductNames -contains $_.Name } |
+            Sort-Object { $_.Value.tenantDetailPriority } |
+            Select-Object -First 1
+        if ($null -eq $match) { return 'unknown' }
+        return $match.Value.tenantDetailProvider
+    }
 }
