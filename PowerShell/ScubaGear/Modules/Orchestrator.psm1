@@ -1836,7 +1836,7 @@ function Get-TenantDetail {
         Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("teams")) {
-        Get-TeamsTenantDetail -M365Environment $M365Environment
+        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("powerplatform")) {
         Get-PowerPlatformTenantDetail -M365Environment $M365Environment

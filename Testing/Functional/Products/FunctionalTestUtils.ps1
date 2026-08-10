@@ -58,6 +58,7 @@ function Resolve-FunctionalTestPollingUri {
   return [System.Uri]::new([System.Uri]$RequestUri, $PollingUri).AbsoluteUri
 }
 
+# This function is a wrapper around Invoke-WebRequest that handles HTTP 202 (processing not completed) responses with polling.
 function Invoke-FunctionalTestRestRequest {
   [CmdletBinding()]
   param(
@@ -1575,6 +1576,110 @@ function Set-PowerAppTenantIsolationPolicy {
             Start-Sleep -Seconds 5
         }
     }
+}
+
+# -----------------------------------------------------------------------
+# Teams REST wrappers for functional test preconditions
+# These replace the removed MicrosoftTeams PowerShell cmdlets.
+# $script:TeamsBaseUrl and $script:TeamsAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+
+function Set-CsTeamsMeetingPolicyRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Host $Body
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsMeetingPolicy/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Get-CsTeamsMeetingPolicyRest {
+  $response = Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsMeetingPolicy" `
+    -Method 'GET' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" }
+  return $response
+}
+
+function Set-CsTeamsMeetingBroadcastPolicyRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Host $Body
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsMeetingBroadcastPolicy/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Set-CsTenantFederationConfigurationRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Host $Body
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TenantFederationSettings/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Get-CsTeamsAppPermissionPolicyRest {
+  $response = Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsAppPermissionPolicy" `
+    -Method 'GET' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" }
+  return $response
+}
+
+function Set-CsTeamsAppPermissionPolicyRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Host $Body
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsAppPermissionPolicy/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Set-CsTeamsClientConfigurationRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Host $Body
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsClientConfiguration/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
 }
 
 # -----------------------------------------------------------------------

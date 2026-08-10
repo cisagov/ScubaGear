@@ -290,6 +290,33 @@ BeforeAll {
         }
     }
 
+    # Teams functional tests: acquire REST token for precondition helper calls.
+    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
+    # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
+    if ($ProductName -eq "teams") {
+        $TeamsHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/TeamsRestHelper.psm1"
+        Import-Module $TeamsHelperPath -Force
+        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
+        Import-Module $ConnectHelpersPath -Force
+        $script:TeamsBaseUrl = Get-TeamsBaseUrl -M365Environment $M365Environment
+        $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
+        if (-Not [string]::IsNullOrEmpty($AppId)) {
+            $script:TeamsAccessToken = Get-MsalAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -Scope $TeamsScope
+        }
+        else {
+            $script:TeamsAccessToken = Get-MsalAccessToken `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -ClientId "12128f48-ec9e-42f0-b203-ea49fb6af367" `
+                -Scope $TeamsScope
+        }
+    }
+
     # Power BI functional tests: acquire REST token for precondition helper calls.
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
