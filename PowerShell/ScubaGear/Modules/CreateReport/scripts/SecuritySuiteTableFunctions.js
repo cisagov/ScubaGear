@@ -68,11 +68,6 @@ const getProtectedValues = (values) => {
     return normalizedValues.length > 0 ? normalizedValues : "None";
 };
 
-const formatProtectedValues = (values) => {
-    const protectedValues = getProtectedValues(values);
-    return Array.isArray(protectedValues) ? protectedValues.join("\n") : protectedValues;
-};
-
 const isEnabled = (value) => value === true || String(value).toLowerCase() === "true";
 
 const getNonEmptyValues = (value) => normalizeToArray(value)
@@ -170,7 +165,7 @@ const getAntiPhishPolicyRows = (
                 acceptedDomains
             ),
             "Impersonation Protection": getProtectedValues(policy.TargetedUsersToProtect),
-            "Partner Domains Protected": formatProtectedValues(policy.TargetedDomainsToProtect),
+            "Partner Domains Protected": getProtectedValues(policy.TargetedDomainsToProtect),
             "Safety Indicators": SAFETY_TIP_FIELDS
                 .map(([label, field]) => ({
                     label,
