@@ -298,3 +298,64 @@ DomainReportDetails(Status, Metadata) := PASS if {
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 } else := FAIL
+
+############################################
+# Shared helper functions for identifying near misses in CAP exclusions and reporting them
+############################################
+
+CapMissingLabels(checks) := [c.label |
+    c := checks[_]
+    not c.ok
+]
+
+CapEval(base_ok, checks) := {
+    "status": "pass",
+    "missing_exclusion_types": missing,
+} if {
+    base_ok
+    missing := CapMissingLabels(checks)
+    count(missing) == 0
+}
+
+CapEval(base_ok, checks) := {
+    "status": "near_miss",
+    "missing_exclusion_types": missing,
+} if {
+    base_ok
+    missing := CapMissingLabels(checks)
+    count(missing) > 0
+}
+
+CapEval(base_ok, checks) := {
+    "status": "fail",
+    "missing_exclusion_types": missing,
+} if {
+    not base_ok
+    missing := CapMissingLabels(checks)
+}
+
+CapNearMissMessages(near_miss_objects) := [msg |
+    obj := near_miss_objects[_]
+    msg := sprintf(
+        "%s would pass if the config file is updated to include: %s",
+        [obj.name, concat(", ", obj.missing_exclusion_types)],
+    )
+]
+
+CapNearMissDetails(actual_value, near_miss_objects) := details if {
+    count(actual_value) > 0
+    details := ""
+}
+
+CapNearMissDetails(actual_value, near_miss_objects) := details if {
+    count(actual_value) == 0
+    count(near_miss_objects) > 0
+    near_miss_messages := CapNearMissMessages(near_miss_objects)
+    details := sprintf("Near miss: %s", [concat("; ", near_miss_messages)])
+}
+
+CapNearMissDetails(actual_value, near_miss_objects) := details if {
+    count(actual_value) == 0
+    count(near_miss_objects) == 0
+    details := ""
+}
