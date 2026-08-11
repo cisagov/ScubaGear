@@ -430,7 +430,7 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
 2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
-Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#module-installation-and-sign-in). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
 
 3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
 
@@ -473,7 +473,7 @@ The Share with Everyone feature SHOULD be disabled.
 1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
 2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
-Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#module-installation-and-sign-in). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
 
 3. Then run the following PowerShell commands to get the settings object and set the variable `disableShareWithEveryone` to `$true`.
 
