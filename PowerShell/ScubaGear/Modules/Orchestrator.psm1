@@ -503,6 +503,8 @@ function Invoke-SCuBA {
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
+        # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+        $OutFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFolderPath)
         # New-Item has no -LiteralPath; use .NET so output paths with wildcard chars (e.g. []) are created literally.
         [System.IO.Directory]::CreateDirectory($OutFolderPath) | Out-Null
 
@@ -1633,6 +1635,8 @@ function Invoke-ReportCreation {
             $Len = $ScubaConfig.ProductNames.Length
             $Fragment = @()
             $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
+            # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+            $IndividualReportPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($IndividualReportPath)
             # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
             [System.IO.Directory]::CreateDirectory($IndividualReportPath) | Out-Null
 
@@ -2339,6 +2343,8 @@ function Invoke-SCuBACached {
             # Create outpath if $Outpath does not exist
             if(-not (Test-Path -LiteralPath $OutPath -PathType "container"))
             {
+                # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+                $OutPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutPath)
                 # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
                 [System.IO.Directory]::CreateDirectory($OutPath) | Out-Null
             }

@@ -93,6 +93,8 @@ function Initialize-ScubaLogging {
         if ($LogPath) {
             # Create the log directory if it doesn't exist
             if (!(Test-Path -LiteralPath $LogPath)) {
+                # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+                $LogPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogPath)
                 # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
                 [System.IO.Directory]::CreateDirectory($LogPath) | Out-Null
             }
