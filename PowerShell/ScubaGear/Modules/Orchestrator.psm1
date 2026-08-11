@@ -1447,7 +1447,7 @@ function Get-RiskyAppsCredentialCounts {
     param(
         [Parameter(Mandatory = $false)]
         [object[]]
-        $Credentials,
+        $AccessKeys,
 
         [Parameter(Mandatory = $true)]
         [int]
@@ -1459,7 +1459,7 @@ function Get-RiskyAppsCredentialCounts {
     $ActiveExceedingLifetimeCount = 0
     $Now = Get-Date
 
-    if ($null -eq $Credentials) {
+    if ($null -eq $AccessKeys) {
         return [PSCustomObject]@{
             ActiveCount = $ActiveCount
             ExpiredCount = $ExpiredCount
@@ -1467,18 +1467,18 @@ function Get-RiskyAppsCredentialCounts {
         }
     }
 
-    foreach ($Credential in @($Credentials)) {
-        if ($null -eq $Credential) {
+    foreach ($AccessKey in @($AccessKeys)) {
+        if ($null -eq $AccessKey) {
             continue
         }
 
         $End = $null
-        if ($null -ne $Credential.EndDateTime) {
-            if ($Credential.EndDateTime -is [datetime]) {
-                $End = $Credential.EndDateTime
+        if ($null -ne $AccessKey.EndDateTime) {
+            if ($AccessKey.EndDateTime -is [datetime]) {
+                $End = $AccessKey.EndDateTime
             }
             else {
-                $End = ConvertFrom-RiskyAppsCsvDate -DateString "$($Credential.EndDateTime)"
+                $End = ConvertFrom-RiskyAppsCsvDate -DateString "$($AccessKey.EndDateTime)"
             }
         }
 
@@ -1491,12 +1491,12 @@ function Get-RiskyAppsCredentialCounts {
         $ActiveCount++
 
         $Start = $null
-        if ($null -ne $Credential.StartDateTime) {
-            if ($Credential.StartDateTime -is [datetime]) {
-                $Start = $Credential.StartDateTime
+        if ($null -ne $AccessKey.StartDateTime) {
+            if ($AccessKey.StartDateTime -is [datetime]) {
+                $Start = $AccessKey.StartDateTime
             }
             else {
-                $Start = ConvertFrom-RiskyAppsCsvDate -DateString "$($Credential.StartDateTime)"
+                $Start = ConvertFrom-RiskyAppsCsvDate -DateString "$($AccessKey.StartDateTime)"
             }
         }
 
@@ -1630,10 +1630,10 @@ function ConvertTo-RiskyAppsCsv {
 
             foreach ($App in $RiskyApplications) {
                 $PasswordCounts = Get-RiskyAppsCredentialCounts `
-                    -Credentials $App.PasswordCredentials `
+                    -AccessKeys $App.PasswordCredentials `
                     -LifetimeThresholdDays 180
                 $KeyCounts = Get-RiskyAppsCredentialCounts `
-                    -Credentials $App.KeyCredentials `
+                    -AccessKeys $App.KeyCredentials `
                     -LifetimeThresholdDays 365
 
                 $PrivilegedRoles = @()
@@ -1659,10 +1659,10 @@ function ConvertTo-RiskyAppsCsv {
 
             foreach ($ServicePrincipal in $RiskyThirdPartyServicePrincipals) {
                 $PasswordCounts = Get-RiskyAppsCredentialCounts `
-                    -Credentials $ServicePrincipal.PasswordCredentials `
+                    -AccessKeys $ServicePrincipal.PasswordCredentials `
                     -LifetimeThresholdDays 180
                 $KeyCounts = Get-RiskyAppsCredentialCounts `
-                    -Credentials $ServicePrincipal.KeyCredentials `
+                    -AccessKeys $ServicePrincipal.KeyCredentials `
                     -LifetimeThresholdDays 365
 
                 $IsMultiTenant = $false
