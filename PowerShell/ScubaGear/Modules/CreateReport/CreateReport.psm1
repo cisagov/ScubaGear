@@ -264,7 +264,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
-                $Result = Get-RegoResult $Test $MissingCommands $Control
+                $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
 
                 $Config = $SettingsExport.scuba_config
 
@@ -975,6 +975,12 @@ function Import-SecureBaseline{
 }
 
 function New-MarkdownAnchor{
+    <#
+    .Description
+    Creates a markdown anchor link from a baseline group number and name.
+    .Functionality
+    Internal
+    #>
     param (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]

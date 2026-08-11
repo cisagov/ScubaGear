@@ -1444,6 +1444,7 @@ function Get-RiskyAppsCredentialCounts {
     #>
     param(
         [Parameter(Mandatory = $false)]
+        [object[]]
         $Credentials,
 
         [Parameter(Mandatory = $true)]
