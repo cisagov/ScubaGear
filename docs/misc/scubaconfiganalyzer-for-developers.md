@@ -1,4 +1,4 @@
-# Config Analyzer Schema Maintenance (Rego ↔ JSON)
+# Scuba Config Analyzer for Developers
 
 This guide is for **ScubaGear developers**. It explains how the `Start-SCuBAConfigAnalyzer`
 cmdlet's baseline rules relate to the Rego policies, and exactly what a developer must do to
