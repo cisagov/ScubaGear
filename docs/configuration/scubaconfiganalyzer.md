@@ -11,7 +11,7 @@ Start-SCuBAConfigAnalyzer
 ```
 
 > Developers: for how the analyzer's rules stay in sync with the Rego policies, see
-> [Config Analyzer schema maintenance](../misc/scubaconfiganalyzer-schema-maintenance.md).
+> [Scuba Config Analyzer for developers](../misc/scubaconfiganalyzer-for-developers.md).
 
 ## What it does
 
