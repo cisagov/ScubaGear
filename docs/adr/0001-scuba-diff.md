@@ -103,6 +103,17 @@ families and their version suffixes are not comparable. A direct base-ID match
 always wins over the alias, so two post-migration runs — or a transitional run
 carrying both forms — are compared as-is.
 
+The relocation also leaves a **before-only `Migrated` record** in the source
+product, greyed out like a `RemovedPolicy`, carrying the retired ID, before
+result, criticality, and requirement, plus `MigratedToId` / `MigratedToProduct`
+naming its replacement. Its after columns stay empty on purpose: the result
+comparison belongs to exactly one row, the target product's, and duplicating it
+would double-count the change across two product summaries. Without the stub a
+retired policy simply vanished from its own section, which reads as data loss to
+an operator scanning the Defender or EXO table. `Migrated` is a first-class
+classification, so it gets a summary column and a filter checkbox, and — unlike
+`Unchanged` — is visible without toggling anything.
+
 The table is the one-to-one subset of
 `mappings\scuba-baseline-policy-migrations.csv`: 13 Defender rows and the 7 EXO
 rows covering baseline groups 12, 14, and 15 (Security Suite groups 8, 6, and 7).
@@ -150,9 +161,14 @@ PR diff. The table must be updated by hand if the CSV grows.
 - The legacy→SecuritySuite migration table is a hand-maintained copy of a
   subset of `scuba-baseline-policy-migrations.csv`; a future migration wave needs
   a corresponding edit to `Diff.psm1`. The record fields it adds (`Migrated`,
-  `MigratedFromId`, `MigratedFromProduct`) are additive to `SchemaVersion 1.0`.
-- A product left with no records once migration has moved its before side
-  elsewhere is dropped from the output rather than rendered as an empty section.
+  `MigratedFromId`, `MigratedFromProduct`, `MigratedToId`, `MigratedToProduct`)
+  are additive to `SchemaVersion 1.0`, as is the `Migrated` classification.
+- A migrated policy produces two records — the compared pair under the target
+  product and the before-only stub under the source product — so a control ID can
+  appear twice in a diff. Only one of them carries a result comparison.
+- A product left with no records is dropped rather than rendered as an empty
+  section. Migration no longer produces that case, since every relocated entry
+  leaves a stub behind.
 
 ## References
 

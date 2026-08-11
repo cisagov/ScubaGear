@@ -422,11 +422,43 @@ InModuleScope Diff {
             }
         }
 
-        It 'Files a migrated pair under the Security Suite product, not Defender' {
+        It 'Compares a migrated pair under the Security Suite product, not Defender' {
             $rec = & $GetC 'MS.SECURITYSUITE.2.1'
             $rec | Should -Not -BeNullOrEmpty
             @($DiffC.Diff.SecuritySuite | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.2.1v1' }).Count | Should -Be 1
-            @($DiffC.Diff.Defender | Where-Object { $_.'Control ID (Before)' -eq 'MS.DEFENDER.2.1v1' }).Count | Should -Be 0
+            # The Defender side keeps a before-only stub so the retired policy is
+            # still visible in its own section; the result diff lives on the
+            # Security Suite row above.
+            $stub = @($DiffC.Diff.Defender | Where-Object { $_.'Control ID (Before)' -eq 'MS.DEFENDER.2.1v1' })
+            $stub.Count | Should -Be 1
+            $stub[0].Classification | Should -Be 'Migrated'
+        }
+
+        It 'Leaves the after columns empty on the source-side Migrated stub' {
+            $stub = @($DiffC.Diff.Defender | Where-Object { $_.'Control ID (Before)' -eq 'MS.DEFENDER.4.1v2' })[0]
+            $stub.'Control ID (After)' | Should -BeNullOrEmpty
+            $stub.ResultAfter | Should -BeNullOrEmpty
+            $stub.CriticalityAfter | Should -BeNullOrEmpty
+            $stub.DetailsAfter | Should -BeNullOrEmpty
+            # ...while the before side and requirement are carried.
+            $stub.ResultBefore | Should -Be 'Fail'
+            $stub.CriticalityBefore | Should -Not -BeNullOrEmpty
+            $stub.Requirement | Should -Not -BeNullOrEmpty
+            $stub.GroupNumber | Should -Be '4'
+        }
+
+        It 'Points the Migrated stub at the policy that replaced it' {
+            $stub = @($DiffC.Diff.Defender | Where-Object { $_.'Control ID (Before)' -eq 'MS.DEFENDER.4.1v2' })[0]
+            $stub.MigratedToId | Should -Be 'MS.SECURITYSUITE.3.1v1'
+            $stub.MigratedToProduct | Should -Be 'SecuritySuite'
+            # The stub is not itself an aligned pair.
+            $stub.PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+        }
+
+        It 'Counts the Migrated stubs under the source product summary' {
+            $DiffC.Summary.Defender['Migrated'] | Should -Be 3
+            $DiffC.Summary.Defender['RemovedPolicy'] | Should -Be 2
+            $DiffC.Summary.SecuritySuite['Migrated'] | Should -BeNullOrEmpty
         }
 
         It 'Keeps both real IDs on the record' {
@@ -574,12 +606,18 @@ InModuleScope Diff {
             $diff.Diff.Defender[0].Classification | Should -Be 'NewPolicy'
         }
 
-        It 'Drops a product left with no records once every policy migrated out' {
+        It 'Keeps the source product as a Migrated stub once every policy migrated out' {
             $b = & $NewSide 'Defender' @(@{ Id = 'MS.DEFENDER.2.1v1'; Result = 'Pass' })
             $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.2.1v1'; Result = 'Pass' })
             $diff = Compare-ScubaResults -Before $b -After $a
-            @($diff.Diff.Keys) | Should -Not -Contain 'Defender'
+            @($diff.Diff.Keys) | Should -Contain 'Defender'
             @($diff.Diff.Keys) | Should -Contain 'SecuritySuite'
+            $diff.Diff.Defender[0].Classification | Should -Be 'Migrated'
+            $diff.Diff.Defender[0].'Control ID (Before)' | Should -Be 'MS.DEFENDER.2.1v1'
+            $diff.Diff.Defender[0].'Control ID (After)' | Should -BeNullOrEmpty
+            $diff.Diff.Defender[0].MigratedToId | Should -Be 'MS.SECURITYSUITE.2.1v1'
+            # The pair is still compared exactly once, on the target side.
+            $diff.Diff.SecuritySuite[0].Migrated | Should -BeTrue
         }
 
         It 'Aligns a retired EXO policy with its Security Suite replacement' {
@@ -610,8 +648,11 @@ InModuleScope Diff {
                 @{ Id = 'MS.SECURITYSUITE.8.1v1'; Result = 'Fail' }
             )
             $diff = Compare-ScubaResults -Before $b -After $a
-            @($diff.Diff.Keys) | Should -Not -Contain 'Defender'
-            @($diff.Diff.Keys) | Should -Not -Contain 'EXO'
+            # Each source product keeps a before-only stub of its retired policy.
+            $diff.Diff.Defender[0].Classification | Should -Be 'Migrated'
+            $diff.Diff.Defender[0].MigratedToId | Should -Be 'MS.SECURITYSUITE.2.1v1'
+            $diff.Diff.EXO[0].Classification | Should -Be 'Migrated'
+            $diff.Diff.EXO[0].MigratedToId | Should -Be 'MS.SECURITYSUITE.8.1v1'
             $fromDefender = $diff.Diff.SecuritySuite | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.2.1v1' }
             $fromDefender.MigratedFromProduct | Should -Be 'Defender'
             $fromExo = $diff.Diff.SecuritySuite | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.8.1v1' }
@@ -628,9 +669,13 @@ InModuleScope Diff {
             )
             $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.6.1v1'; Result = 'Fail' })
             $diff = Compare-ScubaResults -Before $b -After $a
-            @($diff.Diff.EXO).Count | Should -Be 1
-            $diff.Diff.EXO[0].'Control ID (Before)' | Should -Be 'MS.EXO.14.1v2'
-            $diff.Diff.EXO[0].Classification | Should -Be 'RemovedPolicy'
+            @($diff.Diff.EXO).Count | Should -Be 2
+            $removed = $diff.Diff.EXO | Where-Object { $_.'Control ID (Before)' -eq 'MS.EXO.14.1v2' }
+            $removed.Classification | Should -Be 'RemovedPolicy'
+            $removed.PSObject.Properties['MigratedToId'] | Should -BeNullOrEmpty
+            $stub = $diff.Diff.EXO | Where-Object { $_.'Control ID (Before)' -eq 'MS.EXO.14.2v1' }
+            $stub.Classification | Should -Be 'Migrated'
+            $stub.MigratedToId | Should -Be 'MS.SECURITYSUITE.6.1v1'
             $ss = $diff.Diff.SecuritySuite[0]
             $ss.MigratedFromId | Should -Be 'MS.EXO.14.2v1'
             $ss.Classification | Should -Be 'NewFail'
@@ -826,7 +871,7 @@ InModuleScope Diff {
                 'ResultBefore','ResultAfter','CriticalityBefore','CriticalityAfter','Requirement','DetailsAfter',
                 'MarkedIncorrectBefore','MarkedIncorrectAfter','UnderlyingResultBefore','UnderlyingResultAfter',
                 'AnnotationChanged','Comment','RemediationDate',
-                'Migrated','MigratedFromId','MigratedFromProduct'
+                'Migrated','MigratedFromId','MigratedFromProduct','MigratedToId','MigratedToProduct'
             )
             foreach ($row in $RowsA) {
                 ($row.PSObject.Properties.Name -join ',') | Should -Be ($expectedColumns -join ',')
@@ -999,6 +1044,23 @@ InModuleScope Diff {
             # A migrated row is classified by result, so it keeps a normal
             # classification and stays reachable by the existing filters.
             $htmlC | Should -Match 'data-classification="NewPass"'
+        }
+
+        It 'Renders the source-side Migrated stub greyed out with empty after cells' {
+            $FixtureDirC = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $diffC = Compare-ScubaResults `
+                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-Before.json')) `
+                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-After.json'))
+            $htmlC = New-ScubaDiffReport -DiffResults $diffC
+            # Greyed like a removed policy, and filterable via its own classification.
+            $htmlC | Should -Match '<tr class="diff-row diff-grey" data-classification="Migrated">'
+            # Control ID column carries the retired ID alone -- no arrow, no after ID.
+            $htmlC | Should -Match '<td>MS\.DEFENDER\.4\.1v2</td>'
+            $htmlC | Should -Not -Match 'MS\.DEFENDER\.4\.1v2 &rarr; MS\.SECURITYSUITE\.3\.1v1</td>'
+            # The Diff cell names where the comparison actually happens.
+            $htmlC | Should -Match 'title="Replaced by MS\.SECURITYSUITE\.3\.1v1; compared in the Security Suite section"'
+            # Migrated gets a summary column and filter checkbox like any classification.
+            $htmlC | Should -Match 'class="classification-toggle" data-classification="Migrated"'
         }
     }
 }

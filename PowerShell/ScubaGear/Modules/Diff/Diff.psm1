@@ -50,6 +50,7 @@ $script:ClassificationColorMap = [ordered]@{
     'NewManualCheck'      = 'neutral'
     'NewPolicy'           = 'neutral'
     'RemovedPolicy'       = 'neutral'
+    'Migrated'            = 'neutral'
     'Unchanged'           = 'unchanged'
 }
 
@@ -477,10 +478,11 @@ function Get-ScubaOrderedProducts {
 function Get-ScubaRowColorClass {
     <#
     .Description
-    Determines the HTML row color for a diff record. Removed policies are greyed
-    out to match the manual-check styling; every other row is colored by its
-    Result (After) value: Fail/Error -> red, Warning -> yellow, Pass -> green, and
-    manual (N/A) / Omitted / anything else -> grey.
+    Determines the HTML row color for a diff record. Removed and migrated-away
+    policies are greyed out to match the manual-check styling (neither has an
+    after side to color by); every other row is colored by its Result (After)
+    value: Fail/Error -> red, Warning -> yellow, Pass -> green, and manual (N/A) /
+    Omitted / anything else -> grey.
     .Functionality
     Internal
     #>
@@ -491,7 +493,7 @@ function Get-ScubaRowColorClass {
         [object]
         $Record
     )
-    if ($Record.Classification -eq 'RemovedPolicy') { return 'grey' }
+    if ($Record.Classification -eq 'RemovedPolicy' -or $Record.Classification -eq 'Migrated') { return 'grey' }
     switch (Get-ScubaResultCategory $Record.ResultAfter) {
         'Fail'    { return 'red' }
         'Error'   { return 'red' }
@@ -561,6 +563,10 @@ function Invoke-ScubaPolicyMigrationAlignment {
     under the Security Suite product. The moved entry is tagged with MigratedFromId
     / MigratedFromProduct, which become the record's migration fields.
 
+    A stub tagged MigratedToId / MigratedToProduct is left in the source product's
+    map so the retired policy still shows up in its own section as a before-only
+    'Migrated' record. The comparison itself happens once, under the target product.
+
     A direct base-ID match always wins over the migration alias: a pair is only
     aligned when the before run has the retired policy, the after run has its
     replacement, and neither run carries both. That leaves a transitional run
@@ -621,7 +627,27 @@ function Invoke-ScubaPolicyMigrationAlignment {
                 $BeforeMaps[$target] = $targetBefore
             }
             $targetBefore[$newBase] = $entry
-            $sourceBefore.Remove($oldBase)
+
+            # Replace the source-side entry with a stub rather than dropping it, so
+            # the retired policy still appears in its own product's section instead
+            # of vanishing from the report. MigratedToId/MigratedToProduct make the
+            # stub produce a before-only 'Migrated' record pointing at where the
+            # comparison was actually made. A fresh object (not $entry) keeps the two
+            # records' migration markers from aliasing each other.
+            $sourceBefore[$oldBase] = [pscustomobject]@{
+                FullId            = $entry.FullId
+                BaseId            = $entry.BaseId
+                Version           = $entry.Version
+                Result            = $entry.Result
+                OriginalResult    = $entry.OriginalResult
+                Criticality       = $entry.Criticality
+                Requirement       = $entry.Requirement
+                Details           = $entry.Details
+                GroupName         = $entry.GroupName
+                GroupNumber       = $entry.GroupNumber
+                MigratedToId      = $targetAfter[$newBase].FullId
+                MigratedToProduct = $target
+            }
         }
     }
 }
@@ -768,11 +794,20 @@ function Compare-ScubaResults {
             # Set by Invoke-ScubaPolicyMigrationAlignment on a before-side entry it
             # relocated into this product.
             $isMigrated = ($bPresent -and $null -ne $b.PSObject.Properties['MigratedFromId'])
+            # Set on the stub it left behind in the source product. The pair is
+            # compared once, under the target product, so this record is before-only
+            # and is classified 'Migrated' rather than by a result diff it does not have.
+            $isMigratedOut = ($bPresent -and $null -ne $b.PSObject.Properties['MigratedToId'])
 
-            $classification = Get-ScubaDiffClassification -BeforeResult $bResult -AfterResult $aResult `
-                -BeforePresent $bPresent -AfterPresent $aPresent `
-                -BeforeVersion $bVersion -AfterVersion $aVersion `
-                -IsMigrated:$isMigrated
+            if ($isMigratedOut) {
+                $classification = 'Migrated'
+            }
+            else {
+                $classification = Get-ScubaDiffClassification -BeforeResult $bResult -AfterResult $aResult `
+                    -BeforePresent $bPresent -AfterPresent $aPresent `
+                    -BeforeVersion $bVersion -AfterVersion $aVersion `
+                    -IsMigrated:$isMigrated
+            }
 
             if ($aPresent) { $reqSource = $a.Requirement } else { $reqSource = $b.Requirement }
             if ($aPresent) { $groupName = $a.GroupName; $groupNumber = $a.GroupNumber } else { $groupName = $b.GroupName; $groupNumber = $b.GroupNumber }
@@ -800,6 +835,15 @@ function Compare-ScubaResults {
                 $record['Migrated'] = $true
                 $record['MigratedFromId'] = $b.MigratedFromId
                 $record['MigratedFromProduct'] = $b.MigratedFromProduct
+            }
+
+            # The mirror of the above, on the source product's side: a before-only
+            # record naming the policy that replaced this one. The after columns are
+            # deliberately left empty -- the result comparison is reported once,
+            # under the target product.
+            if ($isMigratedOut) {
+                $record['MigratedToId'] = $b.MigratedToId
+                $record['MigratedToProduct'] = $b.MigratedToProduct
             }
 
             # False-positive (marked incorrect) metadata. When either side carries
@@ -834,9 +878,9 @@ function Compare-ScubaResults {
             $classificationCounts[$classification] += 1
         }
 
-        # A product can end up with no records at all once migration has moved its
-        # before-side entries elsewhere (e.g. a Defender product whose every policy
-        # migrated). Dropping it keeps an empty section out of the report.
+        # Guard against an empty section, e.g. a product key present in a file with
+        # no controls under it. Migration no longer empties a product -- it leaves a
+        # 'Migrated' stub behind for every entry it relocates.
         if ($records.Count -eq 0) { continue }
 
         $diff[$product] = $records
@@ -945,6 +989,8 @@ function ConvertTo-ScubaDiffCsvRecord {
                 'Migrated'               = & $get 'Migrated'
                 'MigratedFromId'         = & $get 'MigratedFromId'
                 'MigratedFromProduct'    = & $get 'MigratedFromProduct'
+                'MigratedToId'           = & $get 'MigratedToId'
+                'MigratedToProduct'      = & $get 'MigratedToProduct'
             }
         }
     }
@@ -1025,8 +1071,9 @@ function New-ScubaDiffReport {
     [void]$sb.AppendLine('  <span><span class="swatch diff-red"></span>Fail (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-yellow"></span>Warning (Result After)</span>')
     [void]$sb.AppendLine('  <span><span class="swatch diff-green"></span>Pass (Result After)</span>')
-    [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Removed Policy</span>')
+    [void]$sb.AppendLine('  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Removed Policy / Migrated</span>')
     [void]$sb.AppendLine('  <span><span class="migrated-badge">migrated</span>Before result comes from the retired policy shown in the Control ID column.</span>')
+    [void]$sb.AppendLine('  <span><strong>Migrated</strong> rows are the retired policy in its own product section; its result is compared under Security Suite.</span>')
     [void]$sb.AppendLine('  <span>Unchanged rows are hidden by default (use the toggle above).</span>')
     [void]$sb.AppendLine('</div>')
 
@@ -1113,11 +1160,20 @@ function New-ScubaDiffReport {
                 $resultAfterCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultAfter))</span>"
             }
 
+            # The source-side stub of a migrated policy. Name its replacement in a
+            # tooltip so a reader can find where the comparison was made without
+            # filling in the after columns, which belong to the target product's row.
+            $classificationLabel = & $enc (Get-ScubaClassificationLabel $classification)
+            if ($r.PSObject.Properties['MigratedToId'] -and $r.MigratedToId) {
+                $classificationTitle = " title=""Replaced by $(& $enc $r.MigratedToId); compared in the $(& $enc (Get-ScubaProductDisplayName $r.MigratedToProduct)) section"""
+            }
+            else { $classificationTitle = '' }
+
             if ($isMigratedRow) { $migratedAttr = ' data-migrated="true"' } else { $migratedAttr = '' }
             [void]$sb.AppendLine("<tr class=""$rowClass"" data-classification=""$(& $enc $classification)""$migratedAttr>")
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
-            [void]$sb.AppendLine("  <td class=""classification-label"">$(& $enc (Get-ScubaClassificationLabel $classification))</td>")
+            [void]$sb.AppendLine("  <td class=""classification-label""$classificationTitle>$classificationLabel</td>")
             [void]$sb.AppendLine("  <td>$resultBeforeCell</td>")
             [void]$sb.AppendLine("  <td>$resultAfterCell</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.Requirement)</td>")
