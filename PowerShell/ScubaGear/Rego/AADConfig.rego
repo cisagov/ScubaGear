@@ -23,6 +23,8 @@ import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
 import data.utils.key.Count
 import data.utils.aad.EnsureTrimmedArray
+import data.utils.aad.CapEval
+import data.utils.aad.CapNearMissDetails
 
 
 #############
@@ -44,29 +46,44 @@ MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 # MS.AAD.1.1v1
 #--
 
-# If policy matches basic conditions, special conditions,
-# & all exclusions are intentional, save the policy name
+# Check the basic and special conditions for the policy
+LegacyAuthenticationBaseCheck(policy) if {
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
+
+    "other" in policy.Conditions.ClientAppTypes
+    "exchangeActiveSync" in policy.Conditions.ClientAppTypes
+    "block" in policy.GrantControls.BuiltInControls
+}
+
+# Only match policies with user and group exclusions per the confile file
+LegacyAuthenticationEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+    ]
+    result := CapEval(LegacyAuthenticationBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
 LegacyAuthentication contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
+    eval := LegacyAuthenticationEval(CAPolicy)
+    eval.status == "pass"
+}
 
-    ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
-    ###
-
-    ### Conditional access checks specific to this policy
-    "other" in CAPolicy.Conditions.ClientAppTypes
-    "exchangeActiveSync" in CAPolicy.Conditions.ClientAppTypes
-    "block" in CAPolicy.GrantControls.BuiltInControls
-    ###
-
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
+# Check if any conditional access policies meet the conditions but have missing exclusions
+LegacyAuthenticationNeedsConfigUpdate contains {
+    "name": CAPolicy.DisplayName,
+    "missing_exclusion_types": eval.missing_exclusion_types,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := LegacyAuthenticationEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -75,10 +92,18 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": LegacyAuthentication,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        LegacyAuthentication,
+        LegacyAuthenticationNeedsConfigUpdate,
+    )
+    ReportDetails := concat(". ", [
+        ReportFullDetailsArray(LegacyAuthentication, DescriptionString), 
+        NearMissReportDetails, 
+        CAPLINK])
     Status := Count(LegacyAuthentication) > 0
 }
 #--
