@@ -259,7 +259,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         "Partner Domain"
                     }
                     else {
-                        "", "Policy", "Enabled", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"
+                        "", "Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"
                     })
 
                     foreach ($Row in $Rows) {

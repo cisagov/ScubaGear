@@ -117,7 +117,7 @@ const formatScopeCounts = (rules) => {
         const count = new Set(values.map(value => value.toLowerCase())).size;
         if (count === 0) return null;
         return `${label}: ${count} ${singularNoun}${count === 1 ? "" : "s"}`;
-    }).filter(Boolean).join("\n");
+    }).filter(Boolean);
 };
 
 const getPolicyApplicability = (policy, antiPhishRules, protectionPolicyRules, acceptedDomains) => {
@@ -129,8 +129,23 @@ const getPolicyApplicability = (policy, antiPhishRules, protectionPolicyRules, a
         .flatMap(getNonEmptyValues);
 
     if (rules.some(rule => ruleAppliesToAllUsers(rule, tenantDomains))) return "All Users";
-    if (rules.length > 0) return formatScopeCounts(rules) || "Scoped";
+    if (rules.length > 0) {
+        const scopeCounts = formatScopeCounts(rules);
+        return scopeCounts.length > 0 ? scopeCounts : "Scoped";
+    }
     return policy.IsDefault ? "All Users" : "Not available";
+};
+
+const getPolicyPriority = (policy, antiPhishRules, protectionPolicyRules) => {
+    const priorities = [...normalizeToArray(antiPhishRules), ...normalizeToArray(protectionPolicyRules)]
+        .filter(rule => rule && typeof rule === "object")
+        .filter(rule => ruleMatchesPolicy(rule, policy))
+        .map(rule => rule.Priority)
+        .filter(priority => priority !== null && priority !== undefined && String(priority).trim() !== "");
+
+    return priorities.length > 0
+        ? [...new Set(priorities)].sort((first, second) => Number(first) - Number(second)).join(", ")
+        : "N/A";
 };
 
 /**
@@ -158,6 +173,7 @@ const getAntiPhishPolicyRows = (
         rows.push({
             "Policy": policyName,
             "Enabled": isEnabled(policy.Enabled),
+            "Priority": getPolicyPriority(policy, antiPhishRules, protectionPolicyRules),
             "Applicability": getPolicyApplicability(
                 policy,
                 antiPhishRules,
@@ -378,7 +394,7 @@ const buildSecuritySuiteConfigTables = (
     appendSecuritySuiteTableSection(
         section,
         "Anti-Phish Protection Policies",
-        ["Policy", "Enabled", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"],
+        ["Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"],
         getAntiPhishPolicyRows(antiPhishPolicies, antiPhishRules, protectionPolicyRules, acceptedDomains),
         "securitysuite-anti-phish-policies-table",
         "No anti-phish policies were exported."
