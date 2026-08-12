@@ -195,15 +195,15 @@ control of the shared desktop or window in the meeting:
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Content sharing** section, set **External
-    participants can give or request control** to **Off**.
+4.  Under the **Content sharing** section, ensure **External participants can give or request control** is set to the **Off** position.
 
-5.  If custom policies were created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
+5.  Select **Save** (if applicable).
+
+6.  If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.2v2 Instructions
 
-To configure settings for anonymous users:
+To configure settings for anonymous users so that they cannot start meetings:
 
 1.	Sign in to the **Microsoft Teams admin center**.
 
@@ -211,23 +211,33 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section, ensure the **Anonymous users and dial-in callers can start a meeting** setting remains at the default position of **Off**.
+4.	Under the **Meeting join & lobby** section, ensure the **Anonymous users and dial-in callers can start a meeting** setting remains in the default **Off** position.
 
-5.	If custom policies were created, repeat these steps for each policy, selecting the appropriate policy in step 3.
+5.  Select **Save** (if applicable).
+
+6.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.3v1 Instructions
 
+To configure settings for anonymous users so that they are not admitted automatically:
+
 1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed.
+4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed or approved.
 
-5.	In the same section, set **People dialing in can bypass the lobby** to **Off**.
+5.	In the same section, ensure **People dialing in can bypass the lobby** is set to the **Off** position.
+
+6.  Select **Save** (if applicable).
+
+7.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.4v1 Instructions
+
+To configure settings so that internal users are admitted automatically:
 
 1.	Sign in to the **Microsoft Teams admin center**.
 
@@ -237,9 +247,15 @@ To configure settings for anonymous users:
 
 4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is set to **People in my org**.
 
-5.	In the same section, set **People dialing in can bypass the lobby** to **Off**.
+5.	In the same section, ensure **People dialing in can bypass the lobby** is set to the **Off** position.
+
+6.  Select **Save** (if applicable).
+
+7.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.5v1 Instructions
+
+To configure settings for anonymous users so that they are not able to bypass the lobby:
 
 1.	Sign in to the **Microsoft Teams admin center**.
 
@@ -247,9 +263,15 @@ To configure settings for anonymous users:
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join & lobby** section, set **People dialing in can bypass the lobby** to **Off**.
+4.	Under the **Meeting join & lobby** section, ensure **People dialing in can bypass the lobby** is set to the **Off** position.
+
+5.  Select **Save** (if applicable).
+
+6.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.6v1 Instructions
+
+To configure the settings that control meeting recordings:
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
@@ -257,26 +279,27 @@ To configure settings for anonymous users:
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Recording & transcription** section, set **Meeting
-    recording** to **Off**.
+4.  Under the **Recording & transcription** section, ensure **Meeting recording** is set to the **Off** position.
 
-5.  Select **Save**.
+5.  Select **Save** (if applicable).
+
+6.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.1.7v2 Instructions
 
-1.  Sign in to the **Microsoft Teams admin
-    center**.
+To configure the settings that control "live events" meeting recordings:
+
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Live events policies**.
 
 3.  Select **Global (Org-wide default)** policy.
 
-4.  Set **Record an event** to either  **Organizer can record** or **Never record**
+4.  Set **Record an event** to either  **Organizer can record** or **Never record**.
 
-5.  Click **Save**.
+5.  Select **Save** (if applicable).
 
-6.  If custom policies were created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
+6.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 
 
@@ -310,7 +333,7 @@ External access for users SHALL only be enabled on a per-domain basis.
 
 <!--Policy: MS.TEAMS.2.1v2; Criticality: SHALL -->
 - _Rationale:_ The default configuration allows members to communicate with all external users with similar access permissions. Unrestricted access can lead to data breaches and other security threats. This policy provides protection against threats posed by unrestricted access by allowing communication with only trusted domains.
-- _Last modified:_ August 2025
+- _Last modified:_ August 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
@@ -325,7 +348,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 
 <!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting.
-- _Last modified:_ August 2025
+- _Last modified:_ August 2026
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -339,7 +362,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 
 <!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
-- _Last modified:_ August 2025
+- _Last modified:_ August 2026
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
@@ -378,47 +401,62 @@ To enable external access for only specific domains:
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Users** > **External access** > **Organization settings**.
+2.  Select **External collaboration** > **External access** > **Organization settings** (Tab).
 
-3.  Next to **Teams and Skype for Business users in external organizations**,
-    select **Allow only specific external domains**
+3.  Next to **Teams and Skype for Business users in external organizations**, select **Allow only specific external domains**
 
-4.  Select **Add external domains**. Enter domains allowed, and then select **Done**
+4.  Select **Add a domain**. Enter the allowed domain in the text box, press **Add**, and then select **Done** to save your changes.
 
-    **NOTE:** Domains will need to be added in this step in order for users to communicate with them.
+    **NOTE:** Domains will need to be added in this step in order for users to communicate with them. Ensure only currently allowed domains remain present in the list.
 
-5.  Click **Save**.
+5.  Click **Save** and then **Confirm**.
+
+    **NOTE:** You'll receive a pop-up at this stage stating **Changes will take time to take effect - Changes to External access will have an impact across the organization and can't be rolled back immediately.** This is an expected message.
 
 #### MS.TEAMS.2.2v2 Instructions
 
+To ensure unmanaged users cannot initiate contact with internal users:
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Users > External access**.
+2.  Select **External collaboration** > **External access** > **Policies** (Tab).
 
-3.  Select **Policies**.
+3.  Select **Global (Org-wide Default)**.
 
-4.  Select **Global (Org-wide Default)**.
-
-5. Under **Edit policy details**, toggle **People in my organization can communicate with unmanaged Teams accounts** to one of the following:
-    1. To completely block contact with unmanaged users, toggle the setting to **Off**.
+4.  On the **Edit policy details** screen, set **People in my org can chat and have meetings with external users who have unmanaged Microsoft accounts** to one of the following:
+    1. To completely block contact with unmanaged users, toggle the setting to the **Off** position.
     2. To allow contact with unmanaged users only if the internal user initiates the contact:
-        - Toggle the setting to **On**.
-        - Clear the check next to **External users with Teams accounts not managed by an organization can contact users in my organization**.
+        - Toggle the setting to the **On** position.
+        - Clear the check next to **People in my org can join external meetings and receive new chats from users who have unmanaged Microsoft accounts.**.
+
+5.  Click **Save** and then **Confirm**.
+
+    **NOTE:** You'll receive a pop-up at this stage stating **Changes will take time to take effect - Changes to Global (Org-wide default) will have an impact across the organization and can't be rolled back immediately.** This is an expected message.
+
+6.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### MS.TEAMS.2.3v2 Instructions
 
+To ensure internal users cannot initiate contact with unmanaged users:
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
-2.  Select **Users > External access**.
+2.  Select **External collaboration** > **External access** > **Policies** (Tab).
 
-3.  Select **Policies**.
+3.  Select **Global (Org-wide Default)**.
 
-4.  Select **Global (Org-wide Default)**.
+4.  To completely block contact with unmanaged users, under **Edit policy details**, set **People in my org can chat and have meetings with external users who have unmanaged Microsoft accounts** to the **Off** position.
 
-4.  To completely block contact with unmanaged users, under **Edit policy details**, set **People in my organization can communicate with unmanaged Teams accounts** to **Off**.
+5.  Click **Save** and then **Confirm**.
+
+    **NOTE:** You'll receive a pop-up at this stage stating **Changes will take time to take effect - Changes to Global (Org-wide default) will have an impact across the organization and can't be rolled back immediately.** This is an expected message.
+
+6.	If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
+
+
 
 ## 4. Teams Email Integration
-This section helps reduce security risks related to Teams email integration. Teams provides an optional feature allowing channels to have an email address and receive email.
+This section helps reduce potential security risks related to Teams' email integration functionality. Teams provides an optional email integration feature that allows senders to send email to a channel-specific email address, causing the email and its contents to appear in the channel. If this is not appropriately restricted, this functionality can provide a pathway for external or untrusted content to enter Teams channels.
 
 ### Policies
 #### MS.TEAMS.4.1v1
@@ -430,7 +468,7 @@ Teams email integration SHALL be disabled.
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft, not tenant domain, email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, an agency prevents potentially sensitive Teams messages from being sent through external email gateways.
 - _Last modified:_ July 2023
-- _Note:_ Teams email integration is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
+- _Note:_ Teams email integration availability may vary by Microsoft 365 environment and tenant, particularly within Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8, SC-7(10)(a), AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -450,13 +488,19 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 #### MS.TEAMS.4.1v1 Instructions
 
-1.  Sign in to the **Microsoft Teams admin
-    center**.
+To ensure users cannot send emails and their contents to a channel email address:
+
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams** > **Teams Settings**.
 
-3.  Under the **Email integration** section, set **Users can send
-    emails to a channel email address** to **Off**.
+3.  Under the **Email integration** section, ensure **Users can send emails to a channel email address** is set to the **Off** position.
+
+4. Under the same section, ensure the **Accept channel email from these SMTP domains** field has no domains entered and that it remains empty.
+
+5.  Select **Save** (if applicable).
+
+
 
 ## 5. App Management
 
@@ -537,11 +581,11 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  In the upper right-hand corner select **Actions**
+3.  In the upper right-hand corner select **Actions**.
 
 4.  Select **Org-wide app settings**.
 
-5.  Under **Microsoft apps** > Select **On**
+5.  Under **Microsoft apps** > Select **On**.
 
 6.  Click **Save**.
 
