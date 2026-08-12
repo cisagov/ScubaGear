@@ -187,6 +187,9 @@ For each omitted policy, the config file allows you to indicate the following:
 
 Config files can include a top-level level key for a given product whose values are related to that specific product. For example, the `SecuritySuite` key contains configuration options specific to the Security Suite baseline. Currently, only Entra ID, Security Suite, and Exchange Online use this extra configuration.
 
+> [!IMPORTANT]
+> The `defender` product has been renamed to `securitysuite`, and many Defender, Exchange Online, and Teams policies have been migrated into the Security Suite baseline. If you have an existing configuration file that references `defender` or migrated policy IDs, see [Transitioning from Defender to the Security Suite Baseline](defender-to-securitysuite-transition.md).
+
 Under a product key, there can be policy keys that provide configuration values unique to the product. In the Security Suite configuration, for example, there is the `MS.SECURITYSUITE.2.1v1` key.
 
 ### Entra ID Configuration
