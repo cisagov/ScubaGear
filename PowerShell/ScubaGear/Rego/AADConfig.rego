@@ -100,10 +100,16 @@ tests contains {
         LegacyAuthentication,
         LegacyAuthenticationNeedsConfigUpdate,
     )
+    # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
-        ReportFullDetailsArray(LegacyAuthentication, DescriptionString), 
-        NearMissReportDetails, 
-        CAPLINK])
+        ReportDetail |
+        ReportDetail := [
+            ReportFullDetailsArray(LegacyAuthentication, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK
+        ][_]
+        ReportDetail != ""
+    ])
     Status := Count(LegacyAuthentication) > 0
 }
 #--
