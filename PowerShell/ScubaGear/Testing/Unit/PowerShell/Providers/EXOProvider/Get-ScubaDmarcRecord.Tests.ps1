@@ -170,6 +170,37 @@ InModuleScope 'ExportEXOProvider' {
                 )
             }
 
+            It "Prefers the Organizational Domain record over its PSD record" {
+                $script:DmarcAnswersByName["_dmarc.cisa.gov"] = "v=DMARC1; p=reject;"
+                $script:DmarcAnswersByName["_dmarc.gov"] = "v=DMARC1; p=reject; psd=y;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "example.cisa.gov"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.example.cisa.gov",
+                    "_dmarc.cisa.gov",
+                    "_dmarc.gov"
+                )
+            }
+
+            It "Uses the PSD record when the Organizational Domain has no record" {
+                $script:DmarcAnswersByName["_dmarc.b.c.gov"] = "v=DMARC1; p=none;"
+                $script:DmarcAnswersByName["_dmarc.gov"] = "v=DMARC1; p=reject; psd=y;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.c.gov"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject; psd=y;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.c.gov",
+                    "_dmarc.b.c.gov",
+                    "_dmarc.c.gov",
+                    "_dmarc.gov"
+                )
+            }
+
             It "Stops the walk early when a valid record carries psd=n" {
                 $script:DmarcAnswersByName["_dmarc.b.example.com"] = "v=DMARC1; p=none; psd=n;"
                 $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"

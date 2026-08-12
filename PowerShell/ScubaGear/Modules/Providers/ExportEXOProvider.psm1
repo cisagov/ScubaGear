@@ -764,9 +764,12 @@ function Get-ScubaDmarcRecord {
             # RFC 9989 replaces Public Suffix List organizational-domain discovery with
             # a bounded DNS Tree Walk. Keep the author-domain query above, then walk
             # parent domains without exceeding eight total DNS queries.
-            $Labels = @($d.DomainName.Split(".") | Where-Object { $_ -ne "" })
+            $AuthorDomainLabels = @($d.DomainName.Split(".") | Where-Object { $_ -ne "" })
+            $Labels = @($AuthorDomainLabels)
             $Queries = 1
             $CandidateResponse = $null
+            $PolicyResponse = $null
+            $PolicyDomain = $null
 
             while ($Labels.Length -gt 1 -and $Queries -lt 8) {
                 if ($Labels.Length -ge 8) {
@@ -793,14 +796,38 @@ function Get-ScubaDmarcRecord {
                 $ValidAnswers = @($CandidateResponse.Answers | Where-Object { $_ -match '^v=DMARC1' })
 
                 if ($ValidAnswers.Length -eq 1) {
-                    $Response = [PSCustomObject]@{
+                    $ValidatedResponse = [PSCustomObject]@{
                         "Answers"    = @($ValidAnswers)
                         "Errors"     = $CandidateResponse.Errors
                         "NXDomain"   = $CandidateResponse.NXDomain
                         "LogEntries" = $CandidateResponse.LogEntries
                     }
 
-                    if ($ValidAnswers[0] -match 'psd=(n|y)\b') {
+                    if ($ValidAnswers[0] -match 'psd=y\b') {
+                        # The Organizational Domain is exactly one label below the PSD.
+                        # Prefer its record over the PSD record when one was discovered.
+                        $OrganizationalDomainStart = $AuthorDomainLabels.Length - $Labels.Length - 1
+                        $OrganizationalDomain = if ($OrganizationalDomainStart -ge 0) {
+                            $AuthorDomainLabels[$OrganizationalDomainStart..($AuthorDomainLabels.Length - 1)] -join "."
+                        }
+                        else {
+                            $null
+                        }
+
+                        $Response = if ($PolicyDomain -eq $OrganizationalDomain) {
+                            $PolicyResponse
+                        }
+                        else {
+                            $ValidatedResponse
+                        }
+                        break
+                    }
+
+                    $Response = $ValidatedResponse
+                    $PolicyResponse = $ValidatedResponse
+                    $PolicyDomain = $TreeWalkDomain
+
+                    if ($ValidAnswers[0] -match 'psd=n\b') {
                         break
                     }
                 }
