@@ -46,6 +46,37 @@ InModuleScope ScubaLogging {
             }
         }
 
+        Context "Wildcard characters in log path (literal path handling)" {
+            BeforeAll {
+                # Folder name contains [ ] which PowerShell treats as wildcards unless -LiteralPath is used
+                $script:BracketLogRoot = Join-Path $env:TEMP "ScubaLogging-WC-$(Get-Date -Format 'yyyyMMddHHmmss')"
+                $script:BracketLogPath = Join-Path $script:BracketLogRoot '2185test[test]\lab\DebugLogs'
+                [void][System.IO.Directory]::CreateDirectory($script:BracketLogPath)
+            }
+
+            AfterAll {
+                if (Test-Path -LiteralPath $script:BracketLogRoot) {
+                    Remove-Item -LiteralPath $script:BracketLogRoot -Recurse -Force -ErrorAction SilentlyContinue
+                }
+            }
+
+            It "Creates and writes the debug log when the path contains square brackets" {
+                Initialize-ScubaLogging -LogPath $script:BracketLogPath -DisableAutoReport
+                $Script:ScubaLogPath | Should -Not -BeNullOrEmpty
+                Write-ScubaLog -Message "wildcard log path works" -Level "Info" -Source "Test"
+                Test-Path -LiteralPath $Script:ScubaLogPath | Should -Be $true
+                (Get-Content -LiteralPath $Script:ScubaLogPath -Raw) | Should -Match "wildcard log path works"
+            }
+
+            It "Does not leak logging errors to the output stream when path contains brackets" {
+                Initialize-ScubaLogging -LogPath $script:BracketLogPath -DisableAutoReport
+                # Redirect warning/verbose/debug/information away; capture only the success (output) stream
+                $leaked = Write-ScubaLog -Message "no leak expected" -Level "Info" -Source "Test" 3>$null 4>$null 5>$null 6>$null
+                $leaked | Should -BeNullOrEmpty
+                (Get-Content -LiteralPath $Script:ScubaLogPath -Raw) | Should -Not -Match "Logging error"
+            }
+        }
+
         Context "Initialize-ScubaLogging Function" {
 
             It "Should initialize logging with minimal parameters" {
@@ -87,10 +118,12 @@ InModuleScope ScubaLogging {
             }
 
             It "Should handle errors gracefully" {
-                # Mock an error condition
-                Mock New-Item { throw "Test error" } -ParameterFilter { $ItemType -eq "Directory" }
+                # Force directory creation to fail portably: make a parent path component a file
+                $fileAsParent = Join-Path $script:TestLogPath "not-a-dir"
+                Set-Content -LiteralPath $fileAsParent -Value "x" -Force
+                $badLogPath = Join-Path $fileAsParent "Logs"
 
-                { Initialize-ScubaLogging -LogPath "C:\InvalidPath\That\DoesNot\Exist" } | Should -Not -Throw
+                { Initialize-ScubaLogging -LogPath $badLogPath } | Should -Not -Throw
                 $Script:ScubaLogEnabled | Should -Be $false
             }
 
@@ -452,7 +485,7 @@ InModuleScope ScubaLogging {
                 $fakeOpa = Join-Path $script:TestLogPath "opa_windows_amd64.exe"
                 Set-Content $fakeOpa "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa
+                Write-ScubaRunDetails -ConfiguredOPAPath $fakeOpa -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -464,7 +497,7 @@ InModuleScope ScubaLogging {
                 New-Item -ItemType Directory $opaDir -Force | Out-Null
                 Set-Content (Join-Path $opaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir
+                Write-ScubaRunDetails -ConfiguredOPAPath $opaDir -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable at configured path"
@@ -475,7 +508,7 @@ InModuleScope ScubaLogging {
                 $emptyDir = Join-Path $script:TestLogPath "emptydir-$(Get-Date -Format 'fff')"
                 New-Item -ItemType Directory $emptyDir -Force | Out-Null
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir
+                Write-ScubaRunDetails -ConfiguredOPAPath $emptyDir -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -486,7 +519,7 @@ InModuleScope ScubaLogging {
             It "Should log Warning 'OPA Executable NOT found at configured path' when path does not exist" {
                 $nonExistent = Join-Path $script:TestLogPath "doesnotexist\opa.exe"
 
-                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent
+                Write-ScubaRunDetails -ConfiguredOPAPath $nonExistent -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Match "OPA Executable NOT found at configured path"
@@ -495,11 +528,56 @@ InModuleScope ScubaLogging {
             }
 
             It "Should skip ConfiguredOPAPath check when parameter is not provided" {
-                Write-ScubaRunDetails
+                Write-ScubaRunDetails -TestNetworkConnectivity:$false
 
                 $logContent = Get-Content $Script:ScubaLogPath -Raw
                 $logContent | Should -Not -Match "OPA Executable at configured path"
                 $logContent | Should -Not -Match "OPA Executable NOT found at configured path"
+            }
+
+            It "Should log default-location OPA absence as Info (not Warning) and not flag errors when a valid custom OPAPath is configured" {
+                # Point the default location at an EMPTY Tools folder so the default-location check misses.
+                $fakeProfile = Join-Path $script:TestLogPath "profile-$(Get-Date -Format 'fffffff')"
+                New-Item -ItemType Directory (Join-Path $fakeProfile ".scubagear\Tools") -Force | Out-Null
+                $originalUserProfile = $env:USERPROFILE
+                $env:USERPROFILE = $fakeProfile
+
+                # Provide a valid custom OPAPath (directory containing an opa binary).
+                $customOpaDir = Join-Path $script:TestLogPath "customopa-$(Get-Date -Format 'fffffff')"
+                New-Item -ItemType Directory $customOpaDir -Force | Out-Null
+                Set-Content (Join-Path $customOpaDir "opa_windows_amd64.exe") "fake" -Encoding UTF8
+
+                $Script:ScubaHasErrors = $false
+                try {
+                    Write-ScubaRunDetails -ConfiguredOPAPath $customOpaDir -TestNetworkConnectivity:$false
+                }
+                finally {
+                    $env:USERPROFILE = $originalUserProfile
+                }
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                # The default-location miss must be Info, not a Warning that would trip the auto error report.
+                $logContent | Should -Match "\[Info\s*\].*RunDetails.*No OPA executable found in default location"
+                $logContent | Should -Not -Match "\[Warning\s*\].*RunDetails.*No OPA executable found in"
+                $Script:ScubaHasErrors | Should -Be $false
+            }
+
+            It "Should log default-location OPA absence as Warning when no valid custom OPAPath is configured" {
+                # Empty default Tools folder and NO configured path -> genuine warning expected.
+                $fakeProfile = Join-Path $script:TestLogPath "profile-$(Get-Date -Format 'fffffff')"
+                New-Item -ItemType Directory (Join-Path $fakeProfile ".scubagear\Tools") -Force | Out-Null
+                $originalUserProfile = $env:USERPROFILE
+                $env:USERPROFILE = $fakeProfile
+
+                try {
+                    Write-ScubaRunDetails -TestNetworkConnectivity:$false
+                }
+                finally {
+                    $env:USERPROFILE = $originalUserProfile
+                }
+
+                $logContent = Get-Content $Script:ScubaLogPath -Raw
+                $logContent | Should -Match "\[Warning\s*\].*RunDetails.*No OPA executable found in"
             }
         }
 
@@ -570,10 +648,10 @@ InModuleScope ScubaLogging {
                 )
 
                 # Mock Test-Path so the ValidateScript on LogPath passes without a real file on disk
-                Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Test-Path { $true } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
 
                 # Mock Get-Content to always return $script:TestLines (which tests can modify)
-                Mock Get-Content { return $script:TestLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Get-Content { return $script:TestLines } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
             }
 
             BeforeEach {
@@ -883,10 +961,10 @@ InModuleScope ScubaLogging {
                 $script:FakeLogPath = 'C:\fake\ScubaGear-DebugLog-redaction-test.log'
 
                 # Mock Test-Path so ValidateScript passes
-                Mock Test-Path { $true } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Test-Path { $true } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
 
                 # Mock Get-Content to return test log content
-                Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { $Path -eq $script:FakeLogPath }
+                Mock Get-Content { return $script:TestRedactionLines } -ParameterFilter { ($Path -eq $script:FakeLogPath) -or ($LiteralPath -eq $script:FakeLogPath) }
 
                 # Override Get-Content for the redaction schema to return the real file as-is
                 Mock Get-Content {

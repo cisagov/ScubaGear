@@ -66,6 +66,16 @@ InModuleScope Utility {
             }
         }
 
+        # Paths containing [ ] are treated as wildcards by -Path; the function must read them literally.
+        Context 'Wildcard characters in path' {
+            It 'Reads a file whose path contains square brackets' {
+                [void][System.IO.Directory]::CreateDirectory("$TestDrive\wc\2185test[test]\lab")
+                $TestFile = "$TestDrive\wc\2185test[test]\lab\output.json"
+                Set-Content -LiteralPath $TestFile -Value 'x'
+                Get-Utf8NoBom -FilePath $TestFile | Should -Be "Pass"
+            }
+        }
+
         # Uses default system drive share to test building UNC paths that exist
         # Assumes TestDrive is on system drive
         Context 'UNC path' {
