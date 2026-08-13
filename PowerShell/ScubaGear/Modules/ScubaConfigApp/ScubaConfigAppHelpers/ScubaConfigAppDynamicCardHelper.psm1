@@ -1245,7 +1245,11 @@ Function New-FieldListCard {
     }
 
     [void]$buttonPanel.Children.Add($saveButton)
-    if ($baselinePolicyButton) { [void]$buttonPanel.Children.Add($baselinePolicyButton) }
+    # Per-policy baseline viewer button is gated by EnablePolicyViewer (shown unless explicitly false).
+    $showBaselineButton = -not ($syncHash.UIConfigs.PSObject.Properties['EnablePolicyViewer'] -and $syncHash.UIConfigs.EnablePolicyViewer -eq $false)
+    if ($showBaselineButton) {
+        [void]$buttonPanel.Children.Add($baselinePolicyButton)
+    }
     [void]$buttonPanel.Children.Add($removeButton)
 
     # Dismiss Review button — only shown on migration-pending cards
@@ -1310,18 +1314,33 @@ Function New-FieldListCard {
         # Persist each line into ExclusionComments (ordered array) keyed by this policy id.
         $commentBox.Add_TextChanged({
             if ([string]::IsNullOrWhiteSpace($this.Text)) {
-                if ($syncHash.ExclusionComments.Contains($PolicyId)) { [void]$syncHash.ExclusionComments.Remove($PolicyId) }
+                if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) { [void]$syncHash.ExclusionComments.Remove($PolicyId) }
+                $commentButton.Content = 'Add comment'
             } else {
                 $syncHash.ExclusionComments[$PolicyId] = @($this.Text -split "`r?`n")
+                $commentButton.Content = 'Remove comment'
             }
         }.GetNewClosure())
 
         # Toggle the box; focus it when shown.
         $commentButton.Add_Click({
             if ($commentPanel.Visibility -eq [System.Windows.Visibility]::Visible) {
-                $commentPanel.Visibility = 'Collapsed'
+                if (-not [string]::IsNullOrWhiteSpace($commentBox.Text)) {
+                    $commentBox.Text = ''
+                    if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) { [void]$syncHash.ExclusionComments.Remove($PolicyId) }
+                    $commentPanel.Visibility = 'Collapsed'
+                    $commentButton.Content = 'Add comment'
+                } else {
+                    $commentPanel.Visibility = 'Collapsed'
+                    $commentButton.Content = 'Add comment'
+                }
             } else {
                 $commentPanel.Visibility = 'Visible'
+                if (-not [string]::IsNullOrWhiteSpace($commentBox.Text)) {
+                    $commentButton.Content = 'Remove comment'
+                } else {
+                    $commentButton.Content = 'Add comment'
+                }
                 [void]$commentBox.Focus()
             }
         }.GetNewClosure())
@@ -1330,7 +1349,7 @@ Function New-FieldListCard {
         if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) {
             $commentBox.Text = (@($syncHash.ExclusionComments[$PolicyId]) -join [Environment]::NewLine)
             $commentPanel.Visibility = 'Visible'
-            $commentButton.Content = 'Edit comment'
+            $commentButton.Content = 'Remove comment'
         }
     }
 

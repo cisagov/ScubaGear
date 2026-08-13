@@ -1,5 +1,6 @@
-﻿# ScubaConfigApp Baseline Policy UI Viewer Helper - Runspace Version
-# This module provides a runspace-based baseline policy viewer with proper isolation
+﻿# ScubaGear Baseline Policy Viewer Helper - Runspace Version
+# App-independent: shared by Start-SCuBAConfigApp and Start-SCuBAConfigAnalyzer via Show-SCuBABaselinePolicyViewer.
+# Provides a runspace-based baseline policy viewer with proper isolation.
 
 Function Show-ScubaBaselinePolicyHelper {
     <#
@@ -13,7 +14,8 @@ Function Show-ScubaBaselinePolicyHelper {
     Optional policy ID to navigate to automatically.
 
     .PARAMETER ControlConfigPath
-    The path to the ScubaConfigApp control JSON file for configuration mappings.
+    Optional override for the viewer control JSON (window chrome + product/section mappings).
+    Defaults to this module's own ScubaBaselineViewer_Control_en-US.json, so the viewer is self-contained.
     #>
     [CmdletBinding()]
     param(
@@ -40,6 +42,13 @@ Function Show-ScubaBaselinePolicyHelper {
             return
         }
 
+        # Self-resolve the viewer's own control file (window chrome + product/section mappings) when the
+        # caller didn't override it. It lives at the module root next to the other *_Control_*.json files.
+        # $PSScriptRoot is valid here (module scope); it is empty in the runspace.
+        if ([string]::IsNullOrWhiteSpace($ControlConfigPath)) {
+            $ControlConfigPath = Join-Path $PSScriptRoot "..\ScubaBaselineViewer_Control_en-US.json"
+        }
+
         # Create a new runspace for the baseline viewer UI
         $viewerRunspace = [runspacefactory]::CreateRunspace()
         $viewerRunspace.ApartmentState = "STA"
@@ -51,6 +60,11 @@ Function Show-ScubaBaselinePolicyHelper {
         $viewerRunspace.SessionStateProxy.SetVariable("BaselineData", $BaselineData)
         $viewerRunspace.SessionStateProxy.SetVariable("NavigateToPolicyId", $NavigateToPolicyId)
         $viewerRunspace.SessionStateProxy.SetVariable("ControlConfigPath", $ControlConfigPath)
+
+        # External XAML lives in the shared resources folder. Resolve it here - $PSScriptRoot is
+        # empty inside the runspace scriptblock, so the path must be passed in.
+        $viewerXamlPath = Join-Path $PSScriptRoot "..\ScubaConfigAppResources\ScubaBaselinePolicyViewerUI.xaml"
+        $viewerRunspace.SessionStateProxy.SetVariable("ViewerXamlPath", $viewerXamlPath)
 
         # Create synchronized hashtable for cross-thread communication
         $syncHash = [hashtable]::Synchronized(@{
@@ -151,233 +165,9 @@ Function Show-ScubaBaselinePolicyHelper {
                     }
                 }
 
-                # Create XAML window definition
-                $xaml = @'
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ScubaGear Baseline Policies"
-        Height="900"
-        Width="1400"
-        WindowStartupLocation="CenterScreen"
-        Background="#F8FAFC"
-        Foreground="#1F2937"
-        ShowInTaskbar="True"
-        Topmost="False">
-
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <Border Grid.Row="0" Background="#2C5282" CornerRadius="8" Margin="0,0,0,16" Padding="20">
-            <StackPanel Orientation="Vertical">
-                <TextBlock x:Name="HeaderTitle" Text="ScubaGear Baseline Policies" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,8"/>
-                <TextBlock x:Name="HeaderSubtitle" Text="Security baseline policies and implementation guidance for Microsoft 365"
-                           FontSize="14" Foreground="#E0E7FF" TextWrapping="Wrap"/>
-            </StackPanel>
-        </Border>
-
-        <!-- Main Content -->
-        <Grid Grid.Row="1" Margin="16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="350" MinWidth="200" MaxWidth="600"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Left Navigation - Simple ListBox with Search Filter -->
-            <Border Grid.Column="0" BorderBrush="#D0D5E0" BorderThickness="1" CornerRadius="4" Margin="0,0,8,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <TextBlock Grid.Row="0" Text="Select Policy" FontSize="16" FontWeight="Bold"
-                               Background="#E8F4FD" Padding="12" Margin="0"/>
-
-                    <!-- Search and Filters -->
-                    <Border Grid.Row="1" Background="White" BorderBrush="#D0D5E0" BorderThickness="0,1,0,1" Padding="8">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <!-- Search Row -->
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBox x:Name="FilterTextBox" Grid.Column="0"
-                                         FontSize="12" Padding="8,4"
-                                         BorderBrush="#D0D5E0" BorderThickness="1"
-                                         VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="0" Text="Search policies..."
-                                           FontSize="12" Foreground="#9CA3AF"
-                                           Margin="12,0,0,0" VerticalAlignment="Center"
-                                           IsHitTestVisible="False"
-                                           x:Name="PlaceholderText"/>
-                                <Button x:Name="ClearFilterButton" Grid.Column="1"
-                                        Content="×" FontSize="16" FontWeight="Bold"
-                                        Background="Transparent" BorderThickness="0"
-                                        Foreground="#6B7280" Padding="8,4"
-                                        Margin="4,0,0,0" VerticalAlignment="Center"
-                                        Visibility="Collapsed"/>
-                            </Grid>
-
-                            <!-- Filter Row -->
-                            <Grid Grid.Row="1" Margin="0,8,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Criticality:"
-                                           FontSize="12" Foreground="#6B7280"
-                                           VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <ComboBox x:Name="CriticalityFilter" Grid.Column="1"
-                                          FontSize="12" Padding="8,4"
-                                          BorderBrush="#D0D5E0" BorderThickness="1"
-                                          Background="White"
-                                          SelectedIndex="0">
-                                    <ComboBoxItem Content="All" Tag="all"/>
-                                    <ComboBoxItem Content="Shall" Tag="shall"/>
-                                    <ComboBoxItem Content="Should" Tag="should"/>
-                                </ComboBox>
-                            </Grid>
-                        </Grid>
-                    </Border>
-
-                    <ListBox Grid.Row="2" x:Name="PolicySelector_ListBox"
-                             Background="White"
-                             Foreground="#333333"
-                             FontFamily="Segoe UI"
-                             FontSize="12"
-                             Padding="4"
-                             BorderThickness="0"
-                             SelectionMode="Single"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Margin" Value="4,2"/>
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Background" Value="#F0F9FF"/>
-                                    </Trigger>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="Background" Value="#DBEAFE"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="6"
-                                        Padding="12,8" Margin="0">
-                                    <Border.Style>
-                                        <Style TargetType="Border">
-                                            <Setter Property="Background" Value="White"/>
-                                            <Style.Triggers>
-                                                <!-- Product Header styling -->
-                                                <DataTrigger Binding="{Binding Type}" Value="ProductHeader">
-                                                    <Setter Property="Background" Value="#2C5282"/>
-                                                </DataTrigger>
-                                                <!-- Hover effects -->
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True"/>
-                                                        <Condition Binding="{Binding Type}" Value="ProductHeader"/>
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#3182CE"/>
-                                                    <Setter Property="BorderBrush" Value="#2B6CB0"/>
-                                                </MultiDataTrigger>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True"/>
-                                                        <Condition Binding="{Binding IsPolicy}" Value="True"/>
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#E6FFFA"/>
-                                                    <Setter Property="BorderBrush" Value="#2C5282"/>
-                                                </MultiDataTrigger>
-                                                <!-- Selection effects -->
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True"/>
-                                                        <Condition Binding="{Binding Type}" Value="ProductHeader"/>
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#1A365D"/>
-                                                    <Setter Property="BorderBrush" Value="#2C5282"/>
-                                                    <Setter Property="BorderThickness" Value="2"/>
-                                                </MultiDataTrigger>
-                                                <MultiDataTrigger>
-                                                    <MultiDataTrigger.Conditions>
-                                                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True"/>
-                                                        <Condition Binding="{Binding IsPolicy}" Value="True"/>
-                                                    </MultiDataTrigger.Conditions>
-                                                    <Setter Property="Background" Value="#BEE3F8"/>
-                                                    <Setter Property="BorderBrush" Value="#2C5282"/>
-                                                    <Setter Property="BorderThickness" Value="2"/>
-                                                </MultiDataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Border.Style>
-                                    <StackPanel Orientation="Vertical">
-                                        <TextBlock Text="{Binding DisplayText}"
-                                                  Foreground="{Binding TextColor}" FontWeight="{Binding FontWeight}"
-                                                  TextWrapping="NoWrap" FontSize="13"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </Grid>
-            </Border>
-
-            <!-- GridSplitter -->
-            <GridSplitter Grid.Column="1" Width="8" HorizontalAlignment="Center"
-                         VerticalAlignment="Stretch" Background="#E5E7EB"
-                         ShowsPreview="False" ResizeBehavior="PreviousAndCurrent"/>
-
-            <!-- Right Content -->
-            <Border Grid.Column="2" Background="White"
-                    BorderBrush="#E5E7EB" BorderThickness="1"
-                    CornerRadius="8" Padding="16">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Policy Header -->
-                    <StackPanel Grid.Row="0" x:Name="PolicyHeader" Margin="0,0,0,16">
-                        <TextBlock x:Name="PolicyTitle" Text="Select a policy to view details"
-                                   FontSize="20" FontWeight="Bold" Foreground="#111827"/>
-                        <TextBlock x:Name="PolicyDescription" Text=""
-                                   FontSize="14" Foreground="#6B7280"
-                                   TextWrapping="Wrap" Margin="0,8,0,8"/>
-                        <StackPanel x:Name="BadgesPanel" Orientation="Horizontal" Margin="0,8,0,0"/>
-                    </StackPanel>
-
-                    <!-- Policy Content Accordion -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel x:Name="PolicyContent">
-                            <!-- Expanders will be dynamically created here -->
-                        </StackPanel>
-                    </ScrollViewer>
-                </Grid>
-            </Border>
-        </Grid>
-    </Grid>
-</Window>
-'@
+                # Load the viewer window from the external XAML resource. Raw load keeps x:Name
+                # intact for FindName - no ScubaConfigApp-style x:Name->Name normalization needed.
+                $xaml = Get-Content $ViewerXamlPath -Raw
 
                 # Load XAML
                 $reader = [System.Xml.XmlNodeReader]([xml]$xaml)
