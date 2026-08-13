@@ -1,5 +1,5 @@
 {
-  "Version": "2.6.1 (build 1400)",
+  "Version": "2.8.12 (build 1500)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
@@ -14,6 +14,9 @@
   "LocalBaselineSchemaPath": "..\\..\\schemas\\ScubaBaselines.json",
   "DefaultConfigsSchemaPath": "..\\ScubaConfig\\ScubaConfigDefaults.json",
   "PolicyMigrationsCSVPath": "..\\..\\mappings\\scuba-baseline-policy-migrations.csv",
+  "WalkthroughMarkdownPath": "..\\..\\..\\..\\docs\\configuration\\scubaconfigapp-walkthrough.md",
+  "WalkthroughGitHubUrl": "https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfigapp-walkthrough.md",
+  "GitHubRepoUrl": "https://github.com/cisagov/ScubaGear",
   "policyMigration": {
     "cacheFileName": "ScubaConfigApp_PolicyMigrationMap.json",
     "csvColumns": {
@@ -298,56 +301,49 @@
       "name": "Microsoft Entra ID",
       "displayName": "Microsoft Entra ID (aad)",
       "supportsExclusions": true,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     },
     {
       "id": "SecuritySuite",
       "name": "SecuritySuite",
       "displayName": "Security Suite (defender)",
       "supportsExclusions": true,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     },
     {
       "id": "Exo",
       "name": "Exchange Online",
       "displayName": "Exchange Online (exo)",
       "supportsExclusions": true,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     },
     {
       "id": "PowerBI",
       "name": "Power BI",
       "displayName": "Power BI (powerbi)",
       "supportsExclusions": false,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     },
     {
       "id": "PowerPlatform",
       "name": "Power Platform",
       "displayName": "Power Platform (powerplatform)",
       "supportsExclusions": false,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     },
     {
       "id": "Sharepoint",
       "name": "SharePoint & OneDrive",
       "displayName": "SharePoint & OneDrive (sharepoint)",
       "supportsExclusions": false,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     },
     {
       "id": "Teams",
       "name": "Microsoft Teams",
       "displayName": "Microsoft Teams (teams)",
       "supportsExclusions": false,
-      "showInApp": true,
-      "showInViewer": true
+      "showInApp": true
     }
   ],
   "M365Environment": [
@@ -1023,91 +1019,6 @@
       "invalidScriptMessage": "",
       "invalidScriptChecks": [],
       "sensitive": false
-    }
-  },
-  "policyViewerSettings": {
-    "windowHeader": {
-      "windowTitle": "CISA M365 Secure Configuration Baseline Viewer",
-      "headerTitle": "CISA M365 Secure Configuration Baseline",
-      "headerSubtitle": "Secure baseline policies and implementation guidance for Microsoft 365"
-    },
-    "defaultContentHeaders": {
-      "title": "CISA M365 Secure Configuration Baseline",
-      "description": "Introduction and Key Terminology"
-    },
-    "mainMarkdownMappings": {
-      "rationale": {
-        "displayName": "Introduction",
-        "jsonProperty": ["introduction"]
-      },
-      "implementation": {
-        "displayName": "Key Terminology",
-        "jsonProperty": ["keyTerminology"]
-      },
-      "licenseRequirements": {
-        "displayName": "License Compliance",
-        "jsonProperty": ["licenseCompliance"]
-      },
-      "resources": {
-        "displayName": "Assumptions",
-        "jsonProperty": ["assumptions"]
-      }
-    },
-    "policyMarkdownMappings": {
-      "section": {
-        "displayName": "policySection",
-        "containerIndex": 0,
-        "jsonProperty": ["sectionDescription"],
-        "headerBackground": "#E8E8E8",
-        "borderColor": "#C0C0C0",
-        "contentBackground": "#E8E8E8",
-        "isExpanded": false
-      },
-      "rationale": {
-        "displayName": "Rationale",
-        "containerIndex": 2,
-        "jsonProperty": ["rationale"],
-        "headerBackground": "#F8F9FA",
-        "borderColor": "#E5E7EB",
-        "contentBackground": "#F8F9FA",
-        "isExpanded": true
-      },
-      "mitreMapping": {
-        "displayName": "MITRE ATT&CK Mappings",
-        "containerIndex": 3,
-        "jsonProperty": ["mitreMapping"],
-        "headerBackground": "#FEE2E2",
-        "borderColor": "#EF4444",
-        "contentBackground": "#FEF2F2",
-        "isExpanded": false
-      },
-      "implementation": {
-        "displayName": "Implementation Instructions",
-        "containerIndex": 5,
-        "jsonProperty": ["implementation"],
-        "headerBackground": "#F8F9FA",
-        "borderColor": "#E5E7EB",
-        "contentBackground": "#F8F9FA",
-        "isExpanded": true
-      },
-      "licenseRequirements": {
-        "displayName": "License Requirements",
-        "containerIndex": 6,
-        "jsonProperty": ["licenseRequirements"],
-        "headerBackground": "#FEF3C7",
-        "borderColor": "#F59E0B",
-        "contentBackground": "#FEF3C7",
-        "isExpanded": false
-      },
-      "resources": {
-        "displayName": "Additional Resources",
-        "containerIndex": 4,
-        "jsonProperty": ["resources"],
-        "headerBackground": "#DBEAFE",
-        "borderColor": "#3B82F6",
-        "contentBackground": "#EFF6FF",
-        "isExpanded": false
-      }
     }
   },
   "graphQueries": {

@@ -1,0 +1,410 @@
+{
+  "version": "1.8.12",
+  "ScubaConfigAppModulePath": "ScubaConfigApp.psm1",
+  "EXORestHelperPath": "..\\Providers\\ProviderHelpers\\EXORestHelper.psm1",
+  "ConnectHelpersPath": "..\\Connection\\ConnectHelpers.psm1",
+  "BaselineSchemaPath": "..\\..\\schemas\\ScubaGearResultsBaselineSchema.json",
+  "ApiCatalogPath": "..\\..\\schemas\\ScubaGearApiCatalog.json",
+  "ConfigSchemaPath": "..\\ScubaConfig\\ScubaConfigSchema.json",
+  "PullOnlineBaselines": false,
+  "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json",
+  "OnlineApiCatalogURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearApiCatalog.json",
+
+  "localeWindow": {
+    "Title": "ScubaGear Config Analyzer"
+  },
+  "localeContext": {
+    "Title_TextBlock": "ScubaGear Config Analyzer",
+    "Subtitle_TextBlock": "Scan your M365 tenant and see exactly what to change to pass ScubaGear",
+    "Environment_TextBlock": "Environment:",
+    "Products_TextBlock": "Products:",
+    "Search_TextBlock": "Search:",
+    "Run_Button": "Connect & Scan Tenant",
+    "Load_Button": "Load Results JSON...",
+    "IssuesOnly_CheckBox": "Issues only",
+    "ConfigurableOnly_CheckBox": "Configurable only",
+    "FindingsTab": "Findings",
+    "ConfigYamlTab": "Configuration YAML",
+    "ActivityLogTab": "Activity Log",
+    "RootCauseHeader": "Root cause",
+    "RecommendationsHeader": "Recommendations",
+    "PoliciesHeader": "Matching Conditional Access policies",
+    "RemediationHeader": "Step-by-step remediation",
+    "ControlYamlHeader": "Control YAML",
+    "CopyControlYaml_Button": "Copy",
+    "ViewBaseline_Button": "View baseline policy",
+    "ConfigYamlInfo_TextBlock": "Open the ScubaConfig app with this configuration pre-loaded, copy it, or export a .yaml file.",
+    "OpenConfigApp_Button": "Open ScubaConfig App",
+    "ExportYaml_Button": "Export YAML...",
+    "CopyAllYaml_Button": "Copy all",
+    "SummaryText": "Run or load results to begin.",
+    "EmptyDetailText": "Welcome to the ScubaGear Config Analyzer.\n\nThis tool scans your Microsoft 365 tenant (or an existing ScubaGear results file) against the ScubaGear baselines and shows you exactly what to change - and which users, groups, or domains to exclude in your ScubaGear configuration - so each control can pass.\n\nHow to use it:\n1. Select the products to check (only products that support exclusions are listed).\n2. Choose your M365 environment, then click 'Connect & Scan Tenant' to sign in and scan the live tenant - or click 'Load Results JSON...' to analyze an existing ScubaResults file instead.\n3. Review the findings on the left. Use 'Issues only' and 'Configurable only' to focus the list, or the Search box to find a specific control.\n4. Click a finding to see its root cause, the best-matching Conditional Access policy, step-by-step remediation, and the exact exclusions to add to your config.\n5. Open the 'Configuration YAML' tab to copy or export the generated configuration - or click 'Open ScubaConfig App' to load it straight into the editor.\n\nSelect a finding on the left to begin.",
+    "TenantText": "Tenant: (none loaded)"
+  },
+  "localeToolTips": {
+    "Run_Button": "Connect to your tenant and scan it live against the ScubaGear baselines",
+    "Load_Button": "Optional: analyze an existing ScubaGear results JSON instead of scanning live",
+    "Product_ListBox": "Select one or more configurable products (only products that support exclusions are listed)",
+    "IssuesOnly_CheckBox": "Hide controls that already pass",
+    "ConfigurableOnly_CheckBox": "Show only policies a ScubaGear config file can make pass (exclusions/allow-lists)",
+    "ViewBaseline_Button": "Open the ScubaGear baseline policy viewer at this control",
+    "OpenConfigApp_Button": "Open the ScubaConfig app in this session with this configuration pre-loaded"
+  },
+  "localeStatusMessages": {
+    "Ready": "Ready. Connect & scan your tenant, or load an existing ScubaResults JSON, to begin.",
+    "UsingPolicy": "Using policy '{0}' for {1}.",
+    "ResultsFileNotFound": "Results file not found: {0}",
+    "AnalyzingFile": "Analyzing {0} ...",
+    "LoadFileError": "Could not open file: {0}",
+    "ControlYamlCopied": "Control YAML copied to clipboard.",
+    "ConfigYamlCopied": "Configuration YAML copied to clipboard.",
+    "BaselineViewerUnavailable": "Baseline policy viewer is not available in this session.",
+    "OpeningBaselineViewer": "Opening baseline policy viewer at {0}...",
+    "BaselineViewerError": "Could not open baseline viewer: {0}",
+    "AnalysisComplete": "Analysis complete - {0} control(s) need attention.",
+    "AnalysisFailed": "Analysis failed: {0}",
+    "ScanFailed": "Scan failed: {0}",
+    "ScanComplete": "Scan complete - {0} baseline(s) need action to pass ScubaGear.",
+    "ScanError": "Scan error: {0}",
+    "NothingToExport": "Nothing to export yet - run or load results first.",
+    "ConfigExported": "Configuration exported to {0}",
+    "ExportFailed": "Export failed: {0}",
+    "ConfigAppNotFound": "ScubaConfig app module not found.",
+    "ConfigAppOpenedWithConfig": "ScubaConfig app opened with the configuration pre-loaded{0}.",
+    "ConfigAppOpened": "ScubaConfig app opened{0}.",
+    "ConfigAppOpenError": "Could not open ScubaConfig app: {0}",
+    "ConnectingGraphAppOnly": "Connecting to Microsoft Graph (appid & certificate)...",
+    "ConnectingGraphInteractive": "Connecting to Microsoft Graph - complete sign-in in the browser...",
+    "RetrievingTenantConfig": "Retrieving tenant configuration...",
+    "ConnectingExoAppOnly": "Connecting to Exchange Online (appid & certificate)...",
+    "ConnectingExo": "Connecting to Exchange Online...",
+    "RetrievingFromGraph": "Retrieving tenant configuration from Microsoft Graph...",
+    "AnalyzingPolicies": "Analyzing {0} policies against the baselines..."
+  },
+
+  "productMap": {
+    "_comment": "Maps analyzer keys to ScubaGear results/config/UI names.",
+    "aad": {
+      "resultsKey": "AAD",
+      "configKey": "Aad",
+      "displayName": "Microsoft Entra ID (aad)"
+    },
+    "securitysuite": {
+      "resultsKey": "SecuritySuite",
+      "configKey": "SecuritySuite",
+      "displayName": "Security Suite (securitysuite)"
+    },
+    "exo": {
+      "resultsKey": "EXO",
+      "configKey": "Exo",
+      "displayName": "Exchange Online (exo)"
+    },
+    "powerplatform": {
+      "resultsKey": "PowerPlatform",
+      "configKey": "Powerplatform",
+      "displayName": "Power Platform (powerplatform)"
+    },
+    "sharepoint": {
+      "resultsKey": "SharePoint",
+      "configKey": "Sharepoint",
+      "displayName": "SharePoint & OneDrive (sharepoint)"
+    },
+    "teams": {
+      "resultsKey": "Teams",
+      "configKey": "Teams",
+      "displayName": "Microsoft Teams (teams)"
+    },
+    "powerbi": {
+      "resultsKey": "PowerBI",
+      "configKey": "Powerbi",
+      "displayName": "Power BI (powerbi)"
+    }
+  },
+
+  "apiOperations": {
+    "_comment": "Named Graph operations used by the analyzer; resolve URLs via ScubaGearApiCatalog.json.",
+    "conditionalAccessPolicies": {
+      "cmdlet": "Get-MgBetaIdentityConditionalAccessPolicy",
+      "resultKind": "collection"
+    },
+    "organization": {
+      "cmdlet": "Get-MgBetaOrganization",
+      "resultKind": "collection"
+    },
+    "userLookup": {
+      "cmdlet": "Get-MgBetaUser",
+      "resultKind": "byId",
+      "select": "displayName,userPrincipalName",
+      "nameProperties": [
+        "displayName",
+        "userPrincipalName"
+      ]
+    },
+    "groupLookup": {
+      "cmdlet": "Get-MgBetaGroup",
+      "resultKind": "byId",
+      "select": "displayName",
+      "nameProperties": [
+        "displayName"
+      ]
+    },
+    "servicePrincipalLookup": {
+      "cmdlet": "Get-MgServicePrincipal",
+      "resultKind": "byAppId",
+      "select": "displayName",
+      "nameProperties": [
+        "displayName"
+      ]
+    }
+  },
+
+  "exclusionDefinitions": {
+    "_comment": "Each exclusion type defines its YAML shape AND (for non-CA types) its analysis. The engine picks the analysis by exclusion type via the config-schema policyExclusionMappings, so a new type is added here + a mapping only. Operators read the item value at 'path': equals, notEquals, exists(bool), in[], notIn[], greaterThan, lessThan, matches(regex), contains; combine with allOf[]/anyOf[].",
+    "CapExclusions": {
+      "valueShape": "principal",
+      "fields": [
+        { "name": "Users", "value": "Users" },
+        { "name": "Groups", "value": "Groups" },
+        { "name": "Applications", "value": "Applications" },
+        { "name": "GuestUserTypes", "value": "GuestUserTypes" }
+      ]
+    },
+    "RoleExclusions": {
+      "valueShape": "principal",
+      "fields": [
+        { "name": "Users", "value": "Users" },
+        { "name": "Groups", "value": "Groups" }
+      ]
+    },
+    "SensitiveAccounts": {
+      "valueShape": "principal",
+      "fields": [
+        { "name": "IncludedUsers", "value": "IncludedUsers" },
+        { "name": "IncludedGroups", "value": "IncludedGroups" },
+        { "name": "IncludedDomains", "value": "IncludedDomains" },
+        { "name": "ExcludedUsers", "value": "ExcludedUsers" },
+        { "name": "ExcludedGroups", "value": "ExcludedGroups" }
+      ]
+    },
+    "SensitiveUsers": {
+      "valueShape": "list",
+      "fieldName": "SensitiveUsers",
+      "description": "Accounts to protect from user impersonation (anti-phish targeted users)",
+      "analysis": {
+        "rawKey": "anti_phish_policies",
+        "itemLabel": "anti-phish policy",
+        "fetch": {
+          "module": "ExchangeOnlineManagement",
+          "connectCmdlet": "Connect-ExchangeOnline",
+          "cmdlet": "Get-AntiPhishPolicy"
+        },
+        "detectors": [
+          {
+            "flagWhen": { "path": "EnableTargetedUserProtection", "equals": true },
+            "valueFrom": "TargetedUsersToProtect",
+            "issueLabel": "user protected by anti-phish impersonation protection",
+            "suggestion": "Add your sensitive accounts here so ScubaGear can confirm they are protected from impersonation."
+          }
+        ]
+      }
+    },
+    "AllowedForwardingDomains": {
+      "valueShape": "list",
+      "fieldName": "AllowedForwardingDomains",
+      "description": "Allow-list entries for forwarding domains",
+      "analysis": {
+        "rawKey": "remote_domains",
+        "itemLabel": "remote domain",
+        "fetch": {
+          "module": "ExchangeOnlineManagement",
+          "connectCmdlet": "Connect-ExchangeOnline",
+          "cmdlet": "Get-RemoteDomain"
+        },
+        "detectors": [
+          {
+            "flagWhen": { "path": "AutoForwardEnabled", "equals": true },
+            "valueFrom": "DomainName",
+            "issueLabel": "remote domain allows automatic forwarding",
+            "suggestion": "If forwarding to this domain is approved, add it to AllowedForwardingDomains; otherwise set AutoForwardEnabled to false on the remote domain."
+          }
+        ]
+      }
+    },
+    "PartnerDomains": {
+      "valueShape": "list",
+      "fieldName": "PartnerDomains",
+      "description": "Partner domain allow-list",
+      "analysis": {
+        "rawKey": "anti_phish_policies",
+        "itemLabel": "anti-phish policy",
+        "fetch": {
+          "module": "ExchangeOnlineManagement",
+          "connectCmdlet": "Connect-ExchangeOnline",
+          "cmdlet": "Get-AntiPhishPolicy"
+        },
+        "detectors": [
+          {
+            "flagWhen": { "path": "EnableTargetedDomainsProtection", "equals": true },
+            "valueFrom": "TargetedDomainsToProtect",
+            "issueLabel": "domain protected by anti-phish impersonation protection",
+            "suggestion": "Add key supplier/partner domains here for impersonation protection."
+          }
+        ]
+      }
+    },
+    "AgencyDomains": {
+      "valueShape": "list",
+      "fieldName": "AgencyDomains",
+      "description": "Agency domain allow-list"
+    }
+  },
+
+  "conditionalAccessAnalysis": {
+    "_comment": "Rules for evaluating CA policies against baseline requirements.",
+
+    "policyStateProperty": "state",
+    "enabledStateValue": "enabled",
+
+    "scopeGates": {
+      "_comment": "Only policies matching the required scope count as candidates.",
+      "rules": [
+        {
+          "conditionPath": "conditions.users.includeUsers",
+          "policyPath": "conditions.users.includeUsers",
+          "requiredValue": "All"
+        },
+        {
+          "conditionPath": "conditions.applications.includeApplications",
+          "policyPath": "conditions.applications.includeApplications",
+          "requiredValue": "All"
+        }
+      ]
+    },
+
+    "relevanceSignals": {
+      "_comment": "Keep only CA policies relevant to each control.",
+      "rules": [
+        {
+          "kind": "arrayMatch",
+          "conditionPath": "conditions.clientAppTypes",
+          "policyPath": "conditions.clientAppTypes",
+          "match": "all"
+        },
+        {
+          "kind": "arrayMatch",
+          "conditionPath": "conditions.userRiskLevels",
+          "policyPath": "conditions.userRiskLevels",
+          "match": "any"
+        },
+        {
+          "kind": "arrayMatch",
+          "conditionPath": "conditions.signInRiskLevels",
+          "policyPath": "conditions.signInRiskLevels",
+          "match": "any"
+        },
+        {
+          "kind": "grantControls",
+          "conditionPath": "grantControls",
+          "useWhenAnyOf": true,
+          "useWhenAuthenticationStrength": true,
+          "useWhenBuiltInControls": false
+        }
+      ]
+    },
+
+    "exclusionDetectors": {
+      "_comment": "Detect waivable CA exclusions and convert them into config warnings/errors.",
+      "rules": [
+        {
+          "field": "Users",
+          "issueLabel": "user",
+          "detailLabel": "User IDs",
+          "policyPath": "conditions.users.excludeUsers",
+          "valueKind": "idList",
+          "requiresExclusionType": "CapExclusions",
+          "suggestion": "If justified (break-glass accounts): Add to CapExclusions Users in ScubaConfig"
+        },
+        {
+          "field": "Groups",
+          "issueLabel": "group",
+          "detailLabel": "Group IDs",
+          "policyPath": "conditions.users.excludeGroups",
+          "valueKind": "idList",
+          "requiresExclusionType": "CapExclusions",
+          "suggestion": "If justified: Add to CapExclusions Groups in ScubaConfig"
+        },
+        {
+          "field": "Applications",
+          "issueLabel": "application",
+          "detailLabel": "Application IDs",
+          "policyPath": "conditions.applications.excludeApplications",
+          "valueKind": "idList",
+          "requiresExclusionType": "CapExclusions",
+          "suggestion": "If justified: Add to CapExclusions Applications in ScubaConfig",
+          "scopeRequirement": {
+            "conditionPath": "conditions.applications.includeApplications",
+            "requiredValue": "All"
+          }
+        },
+        {
+          "field": "GuestUserTypes",
+          "issueLabel": "guest/external user type",
+          "detailLabel": "Guest user types",
+          "policyPath": "conditions.users.excludeGuestsOrExternalUsers.guestOrExternalUserTypes",
+          "valueKind": "csvOrArray",
+          "requiresExclusionType": "CapExclusions",
+          "suggestion": "If justified: Add to CapExclusions GuestUserTypes in ScubaConfig",
+          "scopeRequirement": {
+            "conditionPath": "conditions.users.includeUsers",
+            "requiredValue": "All"
+          },
+          "unsupportedIsError": true,
+          "unsupportedMessage": "Policy excludes guest/external user types ({values}); this control does not support guest exclusions - remove them from the policy."
+        }
+      ]
+    },
+
+    "displayNameLookup": {
+      "_comment": "Resolve friendly names for excluded users/groups/apps for generated YAML.",
+      "rules": [
+        {
+          "policyPath": "conditions.users.excludeUsers",
+          "operation": "userLookup"
+        },
+        {
+          "policyPath": "conditions.users.excludeGroups",
+          "operation": "groupLookup"
+        },
+        {
+          "policyPath": "conditions.applications.excludeApplications",
+          "operation": "servicePrincipalLookup"
+        }
+      ]
+    }
+  },
+
+  "RequirementFriendlyNames": {
+    "_comment": "Friendly names for requirement keys (should align to Conditional Access Policies values)",
+    "state": "Policy State",
+    "conditions.users.includeUsers": "Users > Include",
+    "conditions.users.excludeUsers": "Users > Exclude",
+    "conditions.users.includeGroups": "Groups > Include",
+    "conditions.users.excludeGroups": "Groups > Exclude",
+    "conditions.users.includeRoles": "Roles > Include",
+    "conditions.users.excludeRoles": "Roles > Exclude",
+    "conditions.users.excludeGuestsOrExternalUsers": "Guest / External Users > Exclude",
+    "conditions.applications.includeApplications": "Applications > Include",
+    "conditions.applications.excludeApplications": "Applications > Exclude",
+    "conditions.applications.includeUserActions": "User Actions > Include",
+    "conditions.clientAppTypes": "Client App Types",
+    "conditions.userRiskLevels": "User Risk Levels",
+    "conditions.signInRiskLevels": "Sign-in Risk Levels",
+    "conditions.authenticationFlows.transferMethods": "Authentication Flows",
+    "grantControls": "Grant Controls",
+    "grantControls.builtInControls": "Grant Controls",
+    "grantControls.operator": "Grant Controls Operator",
+    "grantControls.authenticationStrength": "Authentication Strength",
+    "grantControls.authenticationStrength.id": "Authentication Strength",
+    "grantControls.authenticationStrength.displayName": "Authentication Strength Name"
+  }
+}
