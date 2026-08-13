@@ -57,58 +57,77 @@ function Initialize-Msal {
     [CmdletBinding()]
     param()
 
-    # Test if MSAL is already resolvable.
+    # ------------------------------------------------------------------
+    # 1. See if the MSAL types are already resolvable
+    # ------------------------------------------------------------------
     try {
+        # If the MSAL types are already loaded, this will succeed and we can skip the rest of this function.
         $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
-        # It is resolvable so do nothing.
         return
     }
     catch {
-        Write-Information "MSAL types not yet resolvable. Calling cmdlet from Microsoft.Graph.Authentication to implicitly load them." -InformationAction Continue
+        Write-Information "MSAL types not yet resolvable so ScubaGear is loading them..." -InformationAction Continue
     }
 
-    # Call Connect-MgGraph with bogus thumbprint, client and tenant parameters to get MSAL to load.
-    # The call will fail locally before it sends an authentication request to the server. This is just to get the C# type to load.
-    try {
-        Connect-MgGraph `
-            -CertificateThumbprint '2A0268B04B9F22EFA77A0EFF01930ADE279AC072' `
-            -ClientId 'ad1cb53b92084abeb99c3acf35c91c2a' `
-            -TenantId 'bogus.onmicrosoft.com' `
-            -ErrorAction Stop
-    }
-    catch {
-        if ($_.Exception.Message -like '*was not found in certificate store*') {
-            # Do nothing - this is the expected error, and it means MSAL was loaded successfully.
+    # ------------------------------------------------------------------
+    # 2. Load the MSAL types so that they are resolvable
+    # ------------------------------------------------------------------
+
+    # We have a different solution for PowerShell 5.1 vs PowerShell 7 because the same solution didn't work for both based on testing.
+    $RuntimeVersion = if ($PSVersionTable.PSEdition -eq 'Core') { 'Core' } else { 'Desktop' }
+
+    # PowerShell 5.1 solution
+    if ($RuntimeVersion -eq 'Desktop') {
+        # Call Connect-MgGraph with a bogus thumbprint purely to force MSAL to load.
+        # We expect this to fail we just want the side effect of loading Microsoft.Identity.Client.dll.
+        try {
+            Connect-MgGraph `
+                -CertificateThumbprint '2A0268B04B9F22EFA77A0EFF01930ADE279AC072' `
+                -ClientId 'ad1cb53b92084abeb99c3acf35c91c2a' `
+                -TenantId 'bogus.onmicrosoft.com' `
+                -ErrorAction Stop
         }
-        # Some unrelated error occurred so we can't be sure MSAL was loaded. Rethrow the error so calling functions can handle it.
-        else {
-            throw
+        catch {
+            if ($_.Exception.Message -like '*was not found in certificate store*') {
+                # Do nothing - this is the expected error, and it means MSAL was loaded successfully.
+            }
+            # Some unrelated error occurred so we can't be sure MSAL was loaded. Rethrow the error so the user can see it.
+            else {
+                throw
+            }
         }
     }
+    # PowerShell 7 solution
+    else {
+        # If Graph auth module is not already loaded, load it so we can find the MSAL assembly.
+        $GraphModule = Get-Module Microsoft.Graph.Authentication
+        if (-not $GraphModule) {
+            Import-Module Microsoft.Graph.Authentication
+            $GraphModule = Get-Module Microsoft.Graph.Authentication
+        }
 
-    # $GraphModule = Get-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
-    # if (-not $GraphModule) {
-    #     throw "Microsoft.Graph.Authentication module is not loaded. Ensure Connect-MgGraph has been called before acquiring tokens."
-    # }
+        $ModulePath = $GraphModule.Path | Split-Path
+        # $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+        $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue |
+                Where-Object { $_.Directory.Name -eq $RuntimeVersion } |
+                Select-Object -First 1
 
-    # $ModulePath = $GraphModule.Path | Split-Path
-    # $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $MsalDll) {
+            throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+        }
 
-    # if (-not $MsalDll) {
-    #     throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
-    # }
+        Write-Information "Loading MSAL from path: $($MsalDll.FullName)" -InformationAction Continue
+        Add-Type -Path $MsalDll.FullName
+    }
 
-    # $Sig = Get-AuthenticodeSignature -FilePath $MsalDll.FullName
-    # if ($Sig.Status -ne 'Valid') {
-    #     throw "Microsoft.Identity.Client.dll signature is not valid (status: $($Sig.Status)). Aborting MSAL load."
-    # }
+    # ------------------------------------------------------------------
+    # 3. Verify the type is now loaded and resolvable
+    # ------------------------------------------------------------------
 
-    # Add-Type -Path $MsalDll.FullName
-
-    # Test if MSAL is resolvable now.
     try {
         $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
         # It is resolvable so we succeeded.
+        Write-Information "Successfully loaded MSAL types." -InformationAction Continue
         return
     }
     catch {

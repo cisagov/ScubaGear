@@ -7,22 +7,6 @@ InModuleScope Orchestrator {
         Mock -ModuleName Orchestrator Get-AADTenantDetail {
             '{"DisplayName": "displayName"}'
         }
-        function Get-TeamsTenantDetail {}
-        Mock -ModuleName Orchestrator Get-TeamsTenantDetail {
-            '{"DisplayName": "displayName"}'
-        }
-        function Get-PowerPlatformTenantDetail {}
-        Mock -ModuleName Orchestrator Get-PowerPlatformTenantDetail {
-            '{"DisplayName": "displayName"}'
-        }
-        function Get-EXOTenantDetail {}
-        Mock -ModuleName Orchestrator Get-PowerPlatformTenantDetail {
-            '{"DisplayName": "displayName"}'
-        }
-        function Get-EXOTenantDetailFromConnection {}
-        Mock -ModuleName Orchestrator Get-EXOTenantDetailFromConnection {
-            '{"DisplayName": "displayName"}'
-        }
         function Test-SCuBAValidJson {
             param (
                 [string]

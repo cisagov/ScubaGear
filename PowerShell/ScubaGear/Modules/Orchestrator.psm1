@@ -1746,57 +1746,6 @@ function Invoke-ReportCreation {
     }
 }
 
-function Get-EXOTenantDetailFromConnection {
-    <#
-    .Description
-    Gets tenant details through EXO Admin API using existing Defender/EXO connection context.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [hashtable]
-        $ConnectionResult
-    )
-
-    $EXORestHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers/ProviderHelpers/EXORestHelper.psm1"
-    Import-Module -Name $EXORestHelperPath -Function Invoke-EXORestMethod -ErrorAction Stop
-
-    if ([string]::IsNullOrWhiteSpace($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrWhiteSpace($ConnectionResult.EXOApiEndpoint)) {
-        throw "Missing EXO token or endpoint in ConnectionResult."
-    }
-
-    $OrgConfigResponse = Invoke-EXORestMethod `
-        -CmdletName "Get-OrganizationConfig" `
-        -ApiEndpoint $ConnectionResult.EXOApiEndpoint `
-        -AccessToken $ConnectionResult.EXOAccessToken
-
-    $OrgConfig = if ($OrgConfigResponse -is [System.Array]) { $OrgConfigResponse | Select-Object -First 1 } else { $OrgConfigResponse }
-    if (-not $OrgConfig) {
-        throw "Get-OrganizationConfig returned no data."
-    }
-
-    $TenantId = "Error retrieving Tenant ID"
-    $TenantIdMatch = [regex]::Match($ConnectionResult.EXOApiEndpoint, '/adminapi/(?:beta|v1\.0)/([^/]+)/InvokeCommand')
-    if ($TenantIdMatch.Success) {
-        $TenantId = $TenantIdMatch.Groups[1].Value
-    }
-
-    $DomainName = if ($OrgConfig.Name) { [string]$OrgConfig.Name } else { "Error retrieving Domain name" }
-    $DisplayName = if ($OrgConfig.DisplayName) { [string]$OrgConfig.DisplayName } else { $DomainName }
-
-    $TenantInfo = @{
-        "DisplayName" = $DisplayName;
-        "DomainName" = $DomainName;
-        "TenantId" = $TenantId;
-        "EXOAdditionalData" = "Retrieved via EXO REST Admin API";
-    }
-
-    ConvertTo-Json @($TenantInfo) -Depth 4
-}
-
 function Get-TenantDetail {
     <#
     .Description
@@ -1825,42 +1774,7 @@ function Get-TenantDetail {
         $ConnectionResult
     )
 
-    # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerbi")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("teams")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerplatform")) {
-        Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("exo")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    elseif ($ProductNames.Contains("securitysuite")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    else {
-        $TenantInfo = @{
-            "DisplayName" = "Orchestrator Error retrieving Display name";
-            "DomainName" = "Orchestrator Error retrieving Domain name";
-            "TenantId" = "Orchestrator Error retrieving Tenant ID";
-            "AdditionalData" = "Orchestrator Error retrieving additional data";
-        }
-        $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 3
-        $TenantInfo
-    }
+    Get-AADTenantDetail -M365Environment $M365Environment
 }
 
 function Invoke-Connection {
