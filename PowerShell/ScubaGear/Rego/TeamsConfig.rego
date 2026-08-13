@@ -550,7 +550,7 @@ GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest"],
     "ActualValue": {"Policies": NonCompliantPoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
@@ -717,7 +717,7 @@ GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest"],
     "ActualValue": {"Policies": NonCompliantPoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
@@ -884,7 +884,7 @@ GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-TeamsAppPermissionPolicyRest"],
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest"],
     "ActualValue": {"Policies": NonCompliantPoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status

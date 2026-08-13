@@ -66,6 +66,8 @@ GCC HIGH or DOD environment detected.
 - Unified app settings cannot be retrieved in these environments (Teams unified app settings REST API is unavailable).
 "@
         $TenantAppSettingsJson = ConvertTo-Json @([PSCustomObject]@{ })
+        # Manually add the respective API to successful commands since the unified app settings REST API is not available in these environments
+        $Tracker.AddSuccessfulCommand("Get-TeamsM365UnifiedTenantSettingsRest")
     }
     elseif ($CertificateBasedAuth) {
         # Scenario 2: Certificate-based auth: Use legacy settings only (Teams unified app settings REST API only works in Delegated (on-behalf-of) flow)
@@ -80,6 +82,8 @@ Certificate-based authentication detected.
         $TenantAppSettingsJson = ConvertTo-Json @([PSCustomObject]@{
             CertificateBasedAuth = $true
         })
+        # Manually add the respective API to successful commands since the unified app settings REST API is not available for non-interactive auth
+        $Tracker.AddSuccessfulCommand("Get-TeamsM365UnifiedTenantSettingsRest")
     }
     else {
         # Scenario 3: Interactive auth: Commercial and GCC environments: Call Teams unified app settings REST API
