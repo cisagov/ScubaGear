@@ -117,13 +117,9 @@ other row also claims. Across the table the mapping is one-to-one:
 
 | Old (EXO) | New (Security Suite) |
 |---|---|
+| `MS.EXO.11.2v1` | `MS.SECURITYSUITE.2.4v1` |
 | `MS.EXO.12.1v1` | `MS.SECURITYSUITE.8.1v1` |
 | `MS.EXO.12.2v1` | `MS.SECURITYSUITE.8.2v1` |
-| `MS.EXO.14.2v1` | `MS.SECURITYSUITE.6.1v1` |
-| `MS.EXO.14.3v2` | `MS.SECURITYSUITE.6.2v1` |
-| `MS.EXO.15.1v1` | `MS.SECURITYSUITE.7.1v1` |
-| `MS.EXO.15.2v1` | `MS.SECURITYSUITE.7.2v1` |
-| `MS.EXO.15.3v1` | `MS.SECURITYSUITE.7.3v1` |
 
 For a migrated pair:
 
@@ -175,20 +171,25 @@ These fall through to the normal presence rules, i.e. `RemovedPolicy`:
   Security Suite policies (`MS.SECURITYSUITE.1.1v1` – `MS.SECURITYSUITE.1.4v1`),
   so there is no single target to align to.
 - **`MS.DEFENDER.4.5v1`**, retired outright (New ID `None` in the mapping CSV).
-- **`MS.EXO.14.1v2`** ("A spam filter SHALL be enabled"), which shares the
-  `MS.SECURITYSUITE.6.1v1` target with `MS.EXO.14.2v1`. Only one source policy
-  can own a target, and `MS.SECURITYSUITE.6.1v1` ("Emails detected as spam and
-  phishing SHALL NOT be delivered to the user's inbox") restates `MS.EXO.14.2v1`,
-  so 14.2 owns it.
+- **The whole `MS.EXO.14` (anti-spam) and `MS.EXO.15` (Safe Links) groups.** The
+  spam rows are ambiguous at the source — `MS.EXO.14.1v2` and `MS.EXO.14.2v1`
+  both claim `MS.SECURITYSUITE.6.1v1` — and the Safe Links rows are ambiguous at
+  the target, since `MS.TEAMS.8.1v1` / `MS.TEAMS.8.2v1` claim
+  `MS.SECURITYSUITE.7.1v1` / `MS.SECURITYSUITE.7.3v1` alongside `MS.EXO.15.1v1` /
+  `MS.EXO.15.3v1`. Rather than pick a winner per row, the two groups are excluded
+  together, so the reworked anti-spam and Safe Links policies are read on their
+  own terms.
 - **Every remaining EXO row and every Teams row in the mapping CSV.** Most
   collapse many-to-one onto a target a Defender row already claims
   (`MS.EXO.16.1v1` and `MS.DEFENDER.5.1v1` both map to `MS.SECURITYSUITE.4.1v1`,
-  for instance); the rest are manual checks that only ever produced `N/A`, so an
-  aligned before/after comparison would carry no signal.
+  and `MS.EXO.11.1v1` maps to `MS.SECURITYSUITE.2.1v1`, which `MS.DEFENDER.2.1v1`
+  owns); the rest are either retired outright (New ID `None`, e.g.
+  `MS.EXO.11.3v1`) or manual checks that only ever produced `N/A`, so an aligned
+  before/after comparison would carry no signal.
 
 As a result, the Security Suite policies with no aligned source
-(`1.1`, `1.2`, `1.3`, `2.4`) report as `NewPolicy`, and the unaligned EXO and
-Teams originals as `RemovedPolicy`.
+(`1.1`, `1.2`, `1.3`, `6.1`, `6.2`, `7.1`, `7.2`, `7.3`) report as `NewPolicy`,
+and the unaligned EXO and Teams originals as `RemovedPolicy`.
 
 > **Note:** a product left with no records at all is dropped from the output
 > rather than rendered as an empty section. Migration no longer empties a

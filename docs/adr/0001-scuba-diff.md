@@ -91,7 +91,7 @@ operator-relevant change the diff exists to surface.
 
 ### 3. One-to-one-only alignment of the Security Suite migration (vs. mapping the whole CSV)
 
-**Decision:** Carry a fixed 20-entry table, embedded in `Diff.psm1` and keyed by
+**Decision:** Carry a fixed 16-entry table, embedded in `Diff.psm1` and keyed by
 source product and then by base control ID, that aligns retired Defender and EXO
 policies with the Security Suite policies that replaced them. A matched
 before-side control is relocated into the Security Suite product and compared
@@ -115,13 +115,16 @@ classification, so it gets a summary column and a filter checkbox, and — unlik
 `Unchanged` — is visible without toggling anything.
 
 The table is the one-to-one subset of
-`mappings\scuba-baseline-policy-migrations.csv`: 13 Defender rows and the 7 EXO
-rows covering baseline groups 12, 14, and 15 (Security Suite groups 8, 6, and 7).
-Four groups of rows are deliberately excluded and fall through to
-`RemovedPolicy`: `MS.DEFENDER.1.1v1`–`1.5v1` (each split across several Security
-Suite policies, so no single target exists), `MS.DEFENDER.4.5v1` (retired
-outright), `MS.EXO.14.1v2` (shares the `MS.SECURITYSUITE.6.1v1` target with
-`MS.EXO.14.2v1`, whose text 6.1 restates), and every remaining EXO/Teams row.
+`mappings\scuba-baseline-policy-migrations.csv`: 13 Defender rows and 3 EXO rows
+(`MS.EXO.11.2v1` onto `MS.SECURITYSUITE.2.4v1`, plus baseline group 12 onto
+Security Suite group 8). Four groups of rows are deliberately excluded and fall
+through to `RemovedPolicy`: `MS.DEFENDER.1.1v1`–`1.5v1` (each split across
+several Security Suite policies, so no single target exists),
+`MS.DEFENDER.4.5v1` (retired outright), the `MS.EXO.14` and `MS.EXO.15` groups
+(ambiguous at the source, where `MS.EXO.14.1v2` and `MS.EXO.14.2v1` both claim
+`MS.SECURITYSUITE.6.1v1`, and at the target, where `MS.TEAMS.8.1v1`/`8.2v1`
+claim `MS.SECURITYSUITE.7.1v1`/`7.3v1` alongside `MS.EXO.15.1v1`/`15.3v1`), and
+every remaining EXO/Teams row.
 
 **Alternative considered — mapping every row in the CSV.** Rejected because the
 remaining EXO and Teams rows are many-to-one (five old IDs collapse onto
@@ -135,14 +138,14 @@ skips a target base already claimed by an earlier entry, so a future collision
 degrades to `RemovedPolicy` rather than silently dropping a control.
 
 **Alternative considered — a dedicated `PolicyMigration` classification**
-(parallel to `PolicyVersionUpdate`). Rejected because it would collapse all 20
+(parallel to `PolicyVersionUpdate`). Rejected because it would collapse all 16
 into one informational bucket, hiding a genuine `Pass → Fail` across the
 migration — exactly the posture change the diff exists to surface. The marker
 fields keep both signals.
 
 **Alternative considered — reading the CSV at runtime.** Rejected for v1: it
 would add a file dependency and range/`None` parsing to a module the ADR
-deliberately keeps self-contained, to express 20 pairs that are reviewable in a
+deliberately keeps self-contained, to express 16 pairs that are reviewable in a
 PR diff. The table must be updated by hand if the CSV grows.
 
 ## Consequences

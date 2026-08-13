@@ -621,14 +621,14 @@ InModuleScope Diff {
         }
 
         It 'Aligns a retired EXO policy with its Security Suite replacement' {
-            $b = & $NewSide 'EXO' @(@{ Id = 'MS.EXO.15.1v1'; Result = 'Fail' })
-            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.7.1v1'; Result = 'Pass' })
+            $b = & $NewSide 'EXO' @(@{ Id = 'MS.EXO.11.2v1'; Result = 'Fail' })
+            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.2.4v1'; Result = 'Pass' })
             $diff = Compare-ScubaResults -Before $b -After $a
             $rec = $diff.Diff.SecuritySuite[0]
             $rec.Migrated | Should -BeTrue
-            $rec.MigratedFromId | Should -Be 'MS.EXO.15.1v1'
+            $rec.MigratedFromId | Should -Be 'MS.EXO.11.2v1'
             $rec.MigratedFromProduct | Should -Be 'EXO'
-            $rec.'Control ID (After)' | Should -Be 'MS.SECURITYSUITE.7.1v1'
+            $rec.'Control ID (After)' | Should -Be 'MS.SECURITYSUITE.2.4v1'
             $rec.Classification | Should -Be 'NewPass'
         }
 
@@ -661,24 +661,53 @@ InModuleScope Diff {
             $diff.Summary.SecuritySuite['NewFail'] | Should -Be 2
         }
 
-        It 'Migrates MS.EXO.14.2v1 onto MS.SECURITYSUITE.6.1 and leaves MS.EXO.14.1v2 removed' {
-            # Both CSV rows point at MS.SECURITYSUITE.6.1v1; only 14.2 is in the table.
+        It 'Leaves the whole MS.EXO.14 anti-spam group unmigrated' {
+            # MS.EXO.14.1v2 and MS.EXO.14.2v1 both claim MS.SECURITYSUITE.6.1v1 in
+            # the CSV, so neither is in the table and the group falls through.
             $b = & $NewSide 'EXO' @(
                 @{ Id = 'MS.EXO.14.1v2'; Result = 'Pass' },
-                @{ Id = 'MS.EXO.14.2v1'; Result = 'Pass' }
+                @{ Id = 'MS.EXO.14.2v1'; Result = 'Pass' },
+                @{ Id = 'MS.EXO.14.3v2'; Result = 'Pass' }
             )
-            $a = & $NewSide 'SecuritySuite' @(@{ Id = 'MS.SECURITYSUITE.6.1v1'; Result = 'Fail' })
+            $a = & $NewSide 'SecuritySuite' @(
+                @{ Id = 'MS.SECURITYSUITE.6.1v1'; Result = 'Fail' },
+                @{ Id = 'MS.SECURITYSUITE.6.2v1'; Result = 'Fail' }
+            )
             $diff = Compare-ScubaResults -Before $b -After $a
-            @($diff.Diff.EXO).Count | Should -Be 2
-            $removed = $diff.Diff.EXO | Where-Object { $_.'Control ID (Before)' -eq 'MS.EXO.14.1v2' }
-            $removed.Classification | Should -Be 'RemovedPolicy'
-            $removed.PSObject.Properties['MigratedToId'] | Should -BeNullOrEmpty
-            $stub = $diff.Diff.EXO | Where-Object { $_.'Control ID (Before)' -eq 'MS.EXO.14.2v1' }
-            $stub.Classification | Should -Be 'Migrated'
-            $stub.MigratedToId | Should -Be 'MS.SECURITYSUITE.6.1v1'
-            $ss = $diff.Diff.SecuritySuite[0]
-            $ss.MigratedFromId | Should -Be 'MS.EXO.14.2v1'
-            $ss.Classification | Should -Be 'NewFail'
+            @($diff.Diff.EXO).Count | Should -Be 3
+            foreach ($rec in $diff.Diff.EXO) {
+                $rec.Classification | Should -Be 'RemovedPolicy'
+                $rec.PSObject.Properties['MigratedToId'] | Should -BeNullOrEmpty
+            }
+            foreach ($rec in $diff.Diff.SecuritySuite) {
+                $rec.Classification | Should -Be 'NewPolicy'
+                $rec.PSObject.Properties['MigratedFromId'] | Should -BeNullOrEmpty
+            }
+        }
+
+        It 'Leaves the whole MS.EXO.15 Safe Links group unmigrated' {
+            # MS.TEAMS.8.1v1/8.2v1 claim MS.SECURITYSUITE.7.1v1/7.3v1 alongside
+            # MS.EXO.15.1v1/15.3v1, so the group is excluded rather than split.
+            $b = & $NewSide 'EXO' @(
+                @{ Id = 'MS.EXO.15.1v1'; Result = 'Pass' },
+                @{ Id = 'MS.EXO.15.2v1'; Result = 'Pass' },
+                @{ Id = 'MS.EXO.15.3v1'; Result = 'Pass' }
+            )
+            $a = & $NewSide 'SecuritySuite' @(
+                @{ Id = 'MS.SECURITYSUITE.7.1v1'; Result = 'Fail' },
+                @{ Id = 'MS.SECURITYSUITE.7.2v1'; Result = 'Fail' },
+                @{ Id = 'MS.SECURITYSUITE.7.3v1'; Result = 'Fail' }
+            )
+            $diff = Compare-ScubaResults -Before $b -After $a
+            @($diff.Diff.EXO).Count | Should -Be 3
+            foreach ($rec in $diff.Diff.EXO) {
+                $rec.Classification | Should -Be 'RemovedPolicy'
+                $rec.PSObject.Properties['MigratedToId'] | Should -BeNullOrEmpty
+            }
+            foreach ($rec in $diff.Diff.SecuritySuite) {
+                $rec.Classification | Should -Be 'NewPolicy'
+                $rec.PSObject.Properties['MigratedFromId'] | Should -BeNullOrEmpty
+            }
         }
 
         It 'Does not align in reverse (Security Suite before, EXO after)' {
@@ -700,7 +729,7 @@ InModuleScope Diff {
             ($sources | Select-Object -Unique).Count | Should -Be $sources.Count
             ($targets | Select-Object -Unique).Count | Should -Be $targets.Count
             $script:PolicyMigrationMap['Defender'].Count | Should -Be 13
-            $script:PolicyMigrationMap['EXO'].Count | Should -Be 7
+            $script:PolicyMigrationMap['EXO'].Count | Should -Be 3
         }
 
         It 'Excludes the split and retired Defender policies from the migration map' {
@@ -709,11 +738,20 @@ InModuleScope Diff {
             }
         }
 
-        It 'Carries only the EXO 12, 14, and 15 groups, with MS.EXO.14.1 excluded' {
-            $script:PolicyMigrationMap['EXO'].Contains('MS.EXO.14.1') | Should -BeFalse
-            $script:PolicyMigrationMap['EXO']['MS.EXO.14.2'] | Should -Be 'MS.SECURITYSUITE.6.1'
+        It 'Carries only MS.EXO.11.2 and the EXO 12 group' {
+            $script:PolicyMigrationMap['EXO']['MS.EXO.11.2'] | Should -Be 'MS.SECURITYSUITE.2.4'
+            $script:PolicyMigrationMap['EXO']['MS.EXO.12.1'] | Should -Be 'MS.SECURITYSUITE.8.1'
+            $script:PolicyMigrationMap['EXO']['MS.EXO.12.2'] | Should -Be 'MS.SECURITYSUITE.8.2'
+            $excluded = @(
+                'MS.EXO.11.1', 'MS.EXO.11.3',
+                'MS.EXO.14.1', 'MS.EXO.14.2', 'MS.EXO.14.3',
+                'MS.EXO.15.1', 'MS.EXO.15.2', 'MS.EXO.15.3'
+            )
+            foreach ($key in $excluded) {
+                $script:PolicyMigrationMap['EXO'].Contains($key) | Should -BeFalse
+            }
             foreach ($key in @($script:PolicyMigrationMap['EXO'].Keys)) {
-                $key | Should -Match '^MS\.EXO\.(12|14|15)\.\d+$'
+                $key | Should -Match '^MS\.EXO\.(11\.2|12\.\d+)$'
             }
         }
 

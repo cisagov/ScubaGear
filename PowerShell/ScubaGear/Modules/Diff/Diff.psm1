@@ -81,15 +81,20 @@ $script:ClassificationLabelMap = @{
 #     Suite policies (MS.SECURITYSUITE.1.1v1 - MS.SECURITYSUITE.1.4v1), so no
 #     single target exists to align to.
 #   - MS.DEFENDER.4.5v1, retired outright (New ID "None").
-#   - MS.EXO.14.1v2 ("A spam filter SHALL be enabled"), which shares the
-#     MS.SECURITYSUITE.6.1v1 target with MS.EXO.14.2v1. Only one source policy can
-#     own a target, and 6.1 ("Emails detected as spam and phishing SHALL NOT be
-#     delivered to the user's inbox") restates 14.2, so 14.2 owns it.
+#   - The whole MS.EXO.14 (anti-spam) and MS.EXO.15 (Safe Links) groups. The spam
+#     rows are ambiguous at the source -- MS.EXO.14.1v2 and MS.EXO.14.2v1 both
+#     claim MS.SECURITYSUITE.6.1v1 -- and the Safe Links rows are ambiguous at the
+#     target, since MS.TEAMS.8.1v1/8.2v1 claim MS.SECURITYSUITE.7.1v1/7.3v1
+#     alongside MS.EXO.15.1v1/15.3v1. Rather than pick a winner per row, the two
+#     groups are excluded together so the reworked anti-spam and Safe Links
+#     policies are read on their own terms.
 #   - Every remaining EXO row and every Teams row. Most collapse many-to-one onto
 #     a target a Defender row already claims (MS.EXO.16.1v1 and MS.DEFENDER.5.1v1
-#     both map to MS.SECURITYSUITE.4.1v1, for instance); the rest are manual
-#     checks that only ever produced N/A, so an aligned before/after comparison
-#     would carry no signal.
+#     both map to MS.SECURITYSUITE.4.1v1, and MS.EXO.11.1v1 maps to
+#     MS.SECURITYSUITE.2.1v1, which MS.DEFENDER.2.1v1 owns); the rest are either
+#     retired outright (New ID "None", e.g. MS.EXO.11.3v1) or manual checks that
+#     only ever produced N/A, so an aligned before/after comparison would carry no
+#     signal.
 $script:PolicyMigrationMap = [ordered]@{
     'Defender' = [ordered]@{
         'MS.DEFENDER.2.1' = 'MS.SECURITYSUITE.2.1'
@@ -107,13 +112,9 @@ $script:PolicyMigrationMap = [ordered]@{
         'MS.DEFENDER.6.3' = 'MS.SECURITYSUITE.5.2'
     }
     'EXO'      = [ordered]@{
+        'MS.EXO.11.2' = 'MS.SECURITYSUITE.2.4'
         'MS.EXO.12.1' = 'MS.SECURITYSUITE.8.1'
         'MS.EXO.12.2' = 'MS.SECURITYSUITE.8.2'
-        'MS.EXO.14.2' = 'MS.SECURITYSUITE.6.1'
-        'MS.EXO.14.3' = 'MS.SECURITYSUITE.6.2'
-        'MS.EXO.15.1' = 'MS.SECURITYSUITE.7.1'
-        'MS.EXO.15.2' = 'MS.SECURITYSUITE.7.2'
-        'MS.EXO.15.3' = 'MS.SECURITYSUITE.7.3'
     }
 }
 
