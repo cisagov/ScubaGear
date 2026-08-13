@@ -1,0 +1,98 @@
+{
+  "version": "1.0.0",
+  "_comment": "Control file for the app-independent ScubaGear Baseline Policy Viewer. Only holds the window chrome (products shown + policyViewerSettings header/section mappings); the policy body is generated from the baseline markdown/JSON. A different *_<lang>.json swaps the text.",
+  "products": [
+    { "id": "Aad", "name": "Microsoft Entra ID", "showInViewer": true },
+    { "id": "SecuritySuite", "name": "SecuritySuite", "showInViewer": true },
+    { "id": "Exo", "name": "Exchange Online", "showInViewer": true },
+    { "id": "PowerBI", "name": "Power BI", "showInViewer": true },
+    { "id": "PowerPlatform", "name": "Power Platform", "showInViewer": true },
+    { "id": "Sharepoint", "name": "SharePoint & OneDrive", "showInViewer": true },
+    { "id": "Teams", "name": "Microsoft Teams", "showInViewer": true }
+  ],
+  "policyViewerSettings": {
+    "windowHeader": {
+      "windowTitle": "CISA M365 Secure Configuration Baseline Viewer",
+      "headerTitle": "CISA M365 Secure Configuration Baseline",
+      "headerSubtitle": "Secure baseline policies and implementation guidance for Microsoft 365"
+    },
+    "defaultContentHeaders": {
+      "title": "CISA M365 Secure Configuration Baseline",
+      "description": "Introduction and Key Terminology"
+    },
+    "mainMarkdownMappings": {
+      "rationale": {
+        "displayName": "Introduction",
+        "jsonProperty": ["introduction"]
+      },
+      "implementation": {
+        "displayName": "Key Terminology",
+        "jsonProperty": ["keyTerminology"]
+      },
+      "licenseRequirements": {
+        "displayName": "License Compliance",
+        "jsonProperty": ["licenseCompliance"]
+      },
+      "resources": {
+        "displayName": "Assumptions",
+        "jsonProperty": ["assumptions"]
+      }
+    },
+    "policyMarkdownMappings": {
+      "section": {
+        "displayName": "policySection",
+        "containerIndex": 0,
+        "jsonProperty": ["sectionDescription"],
+        "headerBackground": "#E8E8E8",
+        "borderColor": "#C0C0C0",
+        "contentBackground": "#E8E8E8",
+        "isExpanded": false
+      },
+      "rationale": {
+        "displayName": "Rationale",
+        "containerIndex": 2,
+        "jsonProperty": ["rationale"],
+        "headerBackground": "#F8F9FA",
+        "borderColor": "#E5E7EB",
+        "contentBackground": "#F8F9FA",
+        "isExpanded": true
+      },
+      "mitreMapping": {
+        "displayName": "MITRE ATT&CK Mappings",
+        "containerIndex": 3,
+        "jsonProperty": ["mitreMapping"],
+        "headerBackground": "#FEE2E2",
+        "borderColor": "#EF4444",
+        "contentBackground": "#FEF2F2",
+        "isExpanded": false
+      },
+      "implementation": {
+        "displayName": "Implementation Instructions",
+        "containerIndex": 5,
+        "jsonProperty": ["implementation"],
+        "headerBackground": "#F8F9FA",
+        "borderColor": "#E5E7EB",
+        "contentBackground": "#F8F9FA",
+        "isExpanded": true
+      },
+      "licenseRequirements": {
+        "displayName": "License Requirements",
+        "containerIndex": 6,
+        "jsonProperty": ["licenseRequirements"],
+        "headerBackground": "#FEF3C7",
+        "borderColor": "#F59E0B",
+        "contentBackground": "#FEF3C7",
+        "isExpanded": false
+      },
+      "resources": {
+        "displayName": "Additional Resources",
+        "containerIndex": 4,
+        "jsonProperty": ["resources"],
+        "headerBackground": "#DBEAFE",
+        "borderColor": "#3B82F6",
+        "contentBackground": "#EFF6FF",
+        "isExpanded": false
+      }
+    }
+  }
+}

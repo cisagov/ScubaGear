@@ -917,7 +917,54 @@
         "notes": "SMTP AUTH is a legacy protocol that should be disabled to improve security"
       }
     ],
-    "securitysuite": [],
+    "securitysuite": [
+      {
+        "id": "MS.SECURITYSUITE.2.1v1",
+        "name": "User impersonation protection SHOULD be enabled for sensitive accounts",
+        "exclusionField": "SensitiveUsers",
+        "apiPermissionRef": "Get-AntiPhishPolicy",
+        "validationLogic": {
+          "type": "exchangeAntiPhish",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {}
+        },
+        "buildInstructions": {
+          "description": "Enable user impersonation protection and list sensitive accounts",
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Open the Microsoft Defender portal (or connect to Exchange Online PowerShell)",
+            "Edit the anti-phishing policy (or preset) applied to your users",
+            "Enable 'Enable users to protect' and add your sensitive accounts",
+            "Add those accounts to SensitiveUsers in your ScubaGear config"
+          ]
+        },
+        "notes": "Uses Exchange Online / Defender anti-phishing policies (Get-AntiPhishPolicy), not Microsoft Graph."
+      },
+      {
+        "id": "MS.SECURITYSUITE.2.3v1",
+        "name": "Domain impersonation protection SHOULD be added for key suppliers and partners",
+        "exclusionField": "PartnerDomains",
+        "apiPermissionRef": "Get-AntiPhishPolicy",
+        "validationLogic": {
+          "type": "exchangeAntiPhish",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {}
+        },
+        "buildInstructions": {
+          "description": "Enable domain impersonation protection for partner/supplier domains",
+          "manualConfiguration": true,
+          "configurationSteps": [
+            "Open the Microsoft Defender portal (or connect to Exchange Online PowerShell)",
+            "Edit the anti-phishing policy (or preset) applied to your users",
+            "Enable 'Enable domains to protect' and add key supplier/partner domains",
+            "Add those domains to PartnerDomains in your ScubaGear config"
+          ]
+        },
+        "notes": "Uses Exchange Online / Defender anti-phishing policies (Get-AntiPhishPolicy), not Microsoft Graph."
+      }
+    ],
     "powerbi": [],
     "powerplatform": [],
     "sharepoint": [],

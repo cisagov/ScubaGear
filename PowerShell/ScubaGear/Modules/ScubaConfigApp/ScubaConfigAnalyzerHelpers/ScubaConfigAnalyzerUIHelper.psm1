@@ -1,7 +1,6 @@
 ﻿<#
 .SYNOPSIS
     UI wiring + multithreaded orchestration for the ScubaGear Config Analyzer window
-    (launched by Start-SCuBAConfigAnalyzer in ScubaConfigApp.psm1).
 
 .DESCRIPTION
     This module is imported INSIDE the analyzer's STA runspace. It:
@@ -98,6 +97,23 @@
 # ------------------------------------------------------------------------------------
 # Small helpers
 # ------------------------------------------------------------------------------------
+function Get-ScubaAnalyzerText {
+    <#
+    .SYNOPSIS
+    Returns a localized status-bar string from the control JSON (localeStatusMessages), applying
+    -f formatting. Falls back to the key name if the locale is missing so nothing is silently blank.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$Key,
+        [object[]]$FormatArgs
+    )
+    $text = $null
+    try { $text = [string]$syncHash.Locale.localeStatusMessages.$Key } catch { $text = $null }
+    if ([string]::IsNullOrEmpty($text)) { return $Key }
+    if ($FormatArgs) { return ($text -f $FormatArgs) }
+    return $text
+}
+
 function Set-ScubaAnalyzerStatus {
     <#
     .SYNOPSIS
@@ -121,22 +137,27 @@ function Set-ScubaAnalyzerStatus {
 function Write-ScubaAnalyzerLog {
     <#
     .SYNOPSIS
-    Appends a timestamped line to the "Run Output" tab's log box.
+    Appends a timestamped line to the "Run Output" activity log (and records it for -Passthru).
     .DESCRIPTION
-    Like Set-ScubaAnalyzerStatus, this is thread-safe (marshals onto the UI thread) and
-    swallows its own errors. Use it for progress the user should be able to scroll back
-    through; use Set-ScubaAnalyzerStatus for the single current-state line.
+    Mirrors ScubaConfigApp's Write-DebugOutput: records the entry in $syncHash.LogEntries and
+    writes the Activity Log directly via the window dispatcher. -Level tags Warning/Error lines.
     .EXAMPLE
     Write-ScubaAnalyzerLog "Connected as admin@contoso (tenant 1234)."
-    # Appends:  [14:03:22] Connected as admin@contoso (tenant 1234).
+    .EXAMPLE
+    Write-ScubaAnalyzerLog "Graph read failed: ..." -Level Error
     #>
-    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'Message', Justification = 'Used inside the dispatcher [Action] scriptblock, which the analyzer does not inspect.')]
-    param([string]$Message)
+    param(
+        [string]$Message,
+        [ValidateSet('Info','Warning','Error')]
+        [string]$Level = 'Info'
+    )
     try {
-        $ts = Get-Date -Format 'HH:mm:ss'
+        $prefix = if ($Level -ne 'Info') { "[$($Level.ToUpper())] " } else { "" }
+        $line   = "[$(Get-Date -Format 'HH:mm:ss')] $prefix$Message"
+        if ($syncHash.LogEntries) { [void]$syncHash.LogEntries.Add([pscustomobject]@{ Time = Get-Date; Level = $Level; Message = $Message }) }
         if ($syncHash.RunOutput_TextBox) {
             $syncHash.Window.Dispatcher.Invoke([Action] {
-                $syncHash.RunOutput_TextBox.AppendText("[$ts] $Message`r`n")
+                $syncHash.RunOutput_TextBox.AppendText("$line`r`n")
                 $syncHash.RunOutput_TextBox.ScrollToEnd()   # keep the newest line visible
             })
         }
@@ -202,15 +223,12 @@ function New-ScubaAnalyzerControlYamlText {
     #>
     param(
         [Parameter(Mandatory)]$Finding,
-        [array]$Users = @(),
-        [array]$Groups = @(),
-        [array]$Applications = @(),
-        [array]$GuestUserTypes = @(),
+        $ExclusionValues = @{},                # field name -> @(values); covers principal AND list shapes
         [hashtable]$DisplayNameLookup = @{}   # object id -> friendly name, for '# name' comments
     )
 
     # Controls that don't support config exclusions get a comment, not a config block.
-    if ($Finding.ExclusionField -eq 'none') {
+    if (-not $Finding.ExclusionField -or $Finding.ExclusionField -eq 'none') {
         return "# $($Finding.ControlId) does not support exclusions.`n# Remediate by creating or fixing the policy (see remediation steps)."
     }
 
@@ -226,24 +244,42 @@ function New-ScubaAnalyzerControlYamlText {
     if ($caName) { [void]$sb.AppendLine("  # CA policy: $caName") }
     [void]$sb.AppendLine("  $($Finding.ControlId):")
     [void]$sb.AppendLine("    $($Finding.ExclusionField):")
-    if (@($Users).Count -gt 0) {
-        [void]$sb.AppendLine("      Users:")
-        foreach ($id in $Users) { $c = if ($DisplayNameLookup.ContainsKey($id)) { "  # $($DisplayNameLookup[$id])" } else { "" }; [void]$sb.AppendLine("        - $id$c") }
-    }
-    if (@($Groups).Count -gt 0) {
-        [void]$sb.AppendLine("      Groups:")
-        foreach ($id in $Groups) { $c = if ($DisplayNameLookup.ContainsKey($id)) { "  # $($DisplayNameLookup[$id])" } else { "" }; [void]$sb.AppendLine("        - $id$c") }
-    }
-    if (@($Applications).Count -gt 0) {
-        [void]$sb.AppendLine("      Applications:")
-        foreach ($app in $Applications) { $c = if ($DisplayNameLookup.ContainsKey($app)) { "  # $($DisplayNameLookup[$app])" } else { "" }; [void]$sb.AppendLine("        - $app$c") }
-    }
-    if (@($GuestUserTypes).Count -gt 0) {
-        [void]$sb.AppendLine("      GuestUserTypes:")
-        foreach ($gt in $GuestUserTypes) { [void]$sb.AppendLine("        - $gt") }
-    }
-    if (@($Users).Count -eq 0 -and @($Groups).Count -eq 0 -and @($Applications).Count -eq 0 -and @($GuestUserTypes).Count -eq 0) {
-        [void]$sb.AppendLine("      # No exclusions. Add Users/Groups/Applications/GuestUserTypes only if justified (e.g. break-glass).")
+
+    # Principal-shape types (CapExclusions/RoleExclusions) expose named fields; list-shape
+    # types (AllowedForwardingDomains, PartnerDomains, ...) have none and render as a flat list.
+    $fieldDefs = @(Get-ScAExclusionFieldDefinitions -ExclusionField $Finding.ExclusionField)
+    $didEmit = $false
+
+    if (@($fieldDefs).Count -gt 0) {
+        foreach ($fieldDef in $fieldDefs) {
+            $fieldName = if ($fieldDef.value) { [string]$fieldDef.value } else { [string]$fieldDef.name }
+            $fieldList = if ($ExclusionValues.Contains($fieldName)) { @($ExclusionValues[$fieldName]) } else { @() }
+            if (@($fieldList).Count -eq 0) { continue }
+
+            $didEmit = $true
+            [void]$sb.AppendLine("      $($fieldName):")
+            foreach ($item in @($fieldList)) {
+                $key = [string]$item
+                $comment = if ($DisplayNameLookup.ContainsKey($key)) { "  # $($DisplayNameLookup[$key])" } else { "" }
+                [void]$sb.AppendLine("        - $item$comment")
+            }
+        }
+        if (-not $didEmit) {
+            $hint = @($fieldDefs | ForEach-Object { $_.value }) -join '/'
+            [void]$sb.AppendLine("      # No exclusions. Add $hint only if justified.")
+        }
+    } else {
+        $list = if ($ExclusionValues.Contains($Finding.ExclusionField)) { @($ExclusionValues[$Finding.ExclusionField]) } else { @() }
+        if (@($list).Count -gt 0) {
+            $didEmit = $true
+            foreach ($v in @($list)) {
+                $key = [string]$v
+                $comment = if ($DisplayNameLookup.ContainsKey($key)) { "  # $($DisplayNameLookup[$key])" } else { "" }
+                [void]$sb.AppendLine("      - $v$comment")
+            }
+        } else {
+            [void]$sb.AppendLine("      # No entries detected. Add approved $($Finding.ExclusionField) here.")
+        }
     }
     return $sb.ToString()
 }
@@ -259,14 +295,24 @@ function Update-ScubaAnalyzerControlYaml {
     #>
     param([Parameter(Mandatory)]$Finding)
     try {
-        # Split the detected exclusions into the four lists the YAML builder expects.
-        $users  = @($Finding.DetectedExclusions.Users)
-        $groups = @($Finding.DetectedExclusions.Groups)
-        $apps   = @($Finding.DetectedExclusions.Applications)
-        $guests = @($Finding.DetectedExclusions.GuestUserTypes)
+        # Build one schema-keyed value map covering both principal and list exclusion shapes.
+        $vals = [ordered]@{}
+        if ($Finding.DetectedExclusions) {
+            foreach ($k in @($Finding.DetectedExclusions.Keys)) {
+                $v = $Finding.DetectedExclusions[$k]
+                if ($null -ne $v -and @($v).Count -gt 0) { $vals[$k] = @($v) }
+            }
+        }
+        if ($Finding.DetectedExclusionValues) {
+            foreach ($k in @($Finding.DetectedExclusionValues.Keys)) {
+                if (-not $vals.Contains($k) -and @($Finding.DetectedExclusionValues[$k]).Count -gt 0) {
+                    $vals[$k] = @($Finding.DetectedExclusionValues[$k])
+                }
+            }
+        }
         # DisplayNameLookup lets the snippet annotate each id with '# Friendly Name'.
         $lookup = if ($syncHash.Analysis -and $syncHash.Analysis.DisplayNameLookup) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
-        $syncHash.Detail_Yaml.Text = New-ScubaAnalyzerControlYamlText -Finding $Finding -Users $users -Groups $groups -Applications $apps -GuestUserTypes $guests -DisplayNameLookup $lookup
+        $syncHash.Detail_Yaml.Text = New-ScubaAnalyzerControlYamlText -Finding $Finding -ExclusionValues $vals -DisplayNameLookup $lookup
     } catch { Write-Verbose "Update-ScubaAnalyzerControlYaml failed: $($_.Exception.Message)" }
 }
 
@@ -289,7 +335,7 @@ function Update-ScubaAnalyzerFullYaml {
         $lookup = if ($syncHash.Analysis.DisplayNameLookup) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
         $syncHash.FullYaml_TextBox.Text = Get-ScubaAnalyzerConfigYaml -Analysis $syncHash.Analysis -M365Environment $env -DisplayNameLookup $lookup -AppId $syncHash.AppId -CertificateThumbprint $syncHash.CertificateThumbprint -Organization $syncHash.Organization
     } catch {
-        Write-ScubaAnalyzerLog "Failed to build configuration YAML: $($_.Exception.Message)"
+        Write-ScubaAnalyzerLog "Failed to build configuration YAML: $($_.Exception.Message)" -Level Error
     }
 }
 
@@ -371,11 +417,15 @@ function Select-ScubaAnalyzerPolicy {
         # don't mutate the candidate). This is what the YAML builders read.
         $ex = if ($chosen.DetectedExclusions) { $chosen.DetectedExclusions } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
         $finding.DetectedExclusions = @{ Users = @($ex.Users); Groups = @($ex.Groups); Applications = @($ex.Applications); GuestUserTypes = @($ex.GuestUserTypes) }
+        # Keep the schema-keyed value map in sync so both YAML views follow the choice.
+        $dv = [ordered]@{}
+        foreach ($k in 'Users','Groups','Applications','GuestUserTypes') { if (@($finding.DetectedExclusions[$k]).Count -gt 0) { $dv[$k] = @($finding.DetectedExclusions[$k]) } }
+        $finding.DetectedExclusionValues = $dv
         Show-ScubaAnalyzerDetail        # re-render cards (updates which one is "in use")
         Update-ScubaAnalyzerFullYaml    # aggregate YAML follows the new choice
-        Set-ScubaAnalyzerStatus "Using policy '$($chosen.DisplayName)' for $($finding.ControlId)."
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'UsingPolicy' @($chosen.DisplayName, $finding.ControlId))
     } catch {
-        Write-ScubaAnalyzerLog "Use policy failed: $($_.Exception.Message)"
+        Write-ScubaAnalyzerLog "Use policy failed: $($_.Exception.Message)" -Level Error
     }
 }
 
@@ -479,7 +529,7 @@ function Show-ScubaAnalyzerDetail {
         # --- Per-control YAML box (reflects the currently-selected policy's exclusions)
         Update-ScubaAnalyzerControlYaml -Finding $finding
     } catch {
-        Write-ScubaAnalyzerLog "Failed to render finding: $($_.Exception.Message)"
+        Write-ScubaAnalyzerLog "Failed to render finding: $($_.Exception.Message)" -Level Error
     }
 }
 
@@ -506,7 +556,7 @@ function Start-ScubaAnalyzerAnalysis {
     param([Parameter(Mandatory)][string]$ResultsPath)
 
     if (-not (Test-Path $ResultsPath)) {
-        Set-ScubaAnalyzerStatus "Results file not found: $ResultsPath"
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ResultsFileNotFound' $ResultsPath)
         return
     }
 
@@ -520,7 +570,7 @@ function Start-ScubaAnalyzerAnalysis {
     # Loading a results file is NOT a live tenant connection - reflect that in the header.
     $syncHash.ConnectedTenant = $false
     if ($syncHash.ConnectionText) { $syncHash.ConnectionText.Text = 'Offline - results file' }
-    Set-ScubaAnalyzerStatus "Analyzing $(Split-Path $ResultsPath -Leaf) ..."
+    Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'AnalyzingFile' (Split-Path $ResultsPath -Leaf))
     Write-ScubaAnalyzerLog "Analyzing results: $ResultsPath (products: $($products -join ', '))"
 
     # STEP 1: the "mailbox" - a synchronized hashtable both threads can see. The worker
@@ -535,23 +585,31 @@ function Start-ScubaAnalyzerAnalysis {
     $bgRunspace.ThreadOptions = "ReuseThread"
     $bgRunspace.Open()
     $bgRunspace.SessionStateProxy.SetVariable("analysisSync", $analysisSync)
-    $bgRunspace.SessionStateProxy.SetVariable("enginePath", $syncHash.AnalyzerEnginePath)
+    # Share the REAL synchronized $syncHash (same as Start-ScubaAnalyzerTenantScan) so the engine's
+    # Import-ScAAnalyzerRules populates the ScA* caches the UI thread later reads when rendering the
+    # per-control YAML (Get-ScAExclusionFieldDefinitions). A separate worker cache left the UI thread's
+    # ScAExclusionDefinitions empty, so imported findings rendered "No entries detected".
+    $bgRunspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
+    $bgRunspace.SessionStateProxy.SetVariable("helpersPath", $syncHash.HelperModulesPath)
     $bgRunspace.SessionStateProxy.SetVariable("resultsPath", $ResultsPath)
     $bgRunspace.SessionStateProxy.SetVariable("product", $products)
     $bgRunspace.SessionStateProxy.SetVariable("baselineSchemaPath", $syncHash.BaselineSchemaPath)
-    $bgRunspace.SessionStateProxy.SetVariable("analyzerSchemaPath", $syncHash.AnalyzerSchemaPath)
+    $bgRunspace.SessionStateProxy.SetVariable("AnalyzerControlPath", $syncHash.AnalyzerControlPath)
     $bgRunspace.SessionStateProxy.SetVariable("configSchemaPath", $syncHash.ConfigSchemaPath)
 
     $bgPS = [powershell]::Create()
     $bgPS.Runspace = $bgRunspace
-    # The worker script: import the engine fresh (runspaces don't share module state),
-    # run the analysis, and record the outcome in the mailbox. try/finally guarantees
+    # The worker script: import the analyzer helper modules fresh (runspaces don't share module
+    # state), run the analysis, and record the outcome in the mailbox. try/finally guarantees
     # IsComplete flips even on error, so the UI timer can never wait forever.
     [void]$bgPS.AddScript({
         try {
-            Import-Module $enginePath -Force -ErrorAction Stop
+            # Import every analyzer helper module (engine + helpers), excluding the UI helper.
+            Get-ChildItem -Path $helpersPath -Filter '*.psm1' | Where-Object { $_.Name -ne 'ScubaConfigAnalyzerUIHelper.psm1' } | ForEach-Object {
+                Import-Module $_.FullName -Force -ErrorAction Stop
+            }
             $analysisSync.Result = Invoke-ScubaConfigAnalysis -ResultsPath $resultsPath -Product $product `
-                -BaselineSchemaPath $baselineSchemaPath -AnalyzerSchemaPath $analyzerSchemaPath -ConfigSchemaPath $configSchemaPath -IncludePassing
+                -BaselineSchemaPath $baselineSchemaPath -AnalyzerControlPath $AnalyzerControlPath -ConfigSchemaPath $configSchemaPath -IncludePassing
         } catch {
             $analysisSync.Error = $_.Exception.Message
         } finally {
@@ -581,8 +639,8 @@ function Start-ScubaAnalyzerAnalysis {
 
         # If the worker recorded an error, surface it and stop.
         if ($syncHash.AnalysisSync.Error) {
-            Set-ScubaAnalyzerStatus "Analysis failed: $($syncHash.AnalysisSync.Error)"
-            Write-ScubaAnalyzerLog "Analysis failed: $($syncHash.AnalysisSync.Error)"
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'AnalysisFailed' $syncHash.AnalysisSync.Error)
+            Write-ScubaAnalyzerLog "Analysis failed: $($syncHash.AnalysisSync.Error)" -Level Error
             return
         }
 
@@ -591,7 +649,7 @@ function Start-ScubaAnalyzerAnalysis {
         Update-ScubaAnalyzerFindings
         Update-ScubaAnalyzerFullYaml
         $count = @($syncHash.Analysis.Findings | Where-Object { $_.Result -ne 'Pass' }).Count
-        Set-ScubaAnalyzerStatus "Analysis complete - $count control(s) need attention."
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'AnalysisComplete' $count)
         Write-ScubaAnalyzerLog "Analysis complete."
     })
     $syncHash.AnalysisTimer = $timer
@@ -604,180 +662,197 @@ function Start-ScubaAnalyzerAnalysis {
 function Start-ScubaAnalyzerTenantScan {
     <#
     .SYNOPSIS
-    Connects to Microsoft Graph (on the UI thread) then scans the live tenant on a
-    background runspace, marshaling the findings back via a DispatcherTimer so the UI
-    stays responsive. No ScubaGear run - the schema drives what to query.
+    Connects to Microsoft Graph + Exchange Online, reads the live tenant, and validates it
+    against the baselines - all on a BACKGROUND runspace - marshaling status/findings back via a
+    DispatcherTimer so the UI never freezes during the (blocking) sign-in and Graph reads.
     .DESCRIPTION
-    This is the "Connect & Scan" button handler. It runs in three phases:
-      PHASE A - Connect to Graph ON THE UI THREAD. Interactive sign-in needs the UI
-                thread; app-only cert auth is non-interactive. Either way the Graph
-                session lives on this thread, so the reads in Phase B must run here too.
-      PHASE B - Read tenant data (CA policies + display names) from Graph, still on the
-                UI thread where the session is valid. This is quick relative to Phase C.
-      PHASE C - Validate the policies against the baselines on a BACKGROUND runspace
-                (pure CPU, no Graph), using the standard mailbox + DispatcherTimer
-                pattern from the file header, then repaint the findings + YAML.
-    Contrast with Start-ScubaAnalyzerAnalysis, which skips Phases A/B (data is on disk).
+    The "Connect & Scan" button handler. The UI thread only flips the button/progress and starts
+    the worker; every blocking step runs off-thread:
+      Worker  - Connect Graph (A), connect Exchange Online if needed (A2), read tenant data (B),
+                then validate against the baselines (C). It reports progress + the result through
+                the synchronized $connectSync mailbox and never touches WPF controls.
+      UI tick - a DispatcherTimer drains $connectSync (status, log lines, header) and, on
+                completion, repaints the findings + YAML and re-enables the button.
     #>
     try {
         # Products + environment come straight from the toolbar selections.
         $products = @($syncHash.Product_ListBox.SelectedItems | ForEach-Object { [string]$_.Key })
         if (@($products).Count -eq 0) { $products = @('aad') }
         $env     = if ($syncHash.Environment_ComboBox.SelectedItem) { [string]$syncHash.Environment_ComboBox.SelectedItem } else { 'commercial' }
+        # App-only = both an AppId and a cert thumbprint were supplied at launch.
+        $appOnly = [bool]($syncHash.AppId -and $syncHash.CertificateThumbprint)
 
-        # ===== PHASE A: connect to Microsoft Graph (on the UI thread) =================
+        # UI-thread setup only (fast): disable the button, show progress, jump to Run Output.
         $syncHash.Run_Button.IsEnabled = $false
         $syncHash.Run_Progress.IsIndeterminate = $true
         $syncHash.Run_Progress.Visibility = 'Visible'
         $syncHash.MainTabs.SelectedIndex = 2   # Run Output tab (shows sign-in progress)
-        # App-only = both an AppId and a cert thumbprint were supplied at launch.
-        $appOnly = [bool]($syncHash.AppId -and $syncHash.CertificateThumbprint)
-        $connectStatus = if ($appOnly) { "Connecting to Microsoft Graph (appid & certificate)..." } else { "Connecting to Microsoft Graph - complete sign-in in the browser..." }
-        Set-ScubaAnalyzerStatus $connectStatus
-        Write-ScubaAnalyzerLog "Connecting to Microsoft Graph ($env) for products '$($products -join ', ')'$(if ($appOnly) { " - using noninteractive appid ($($syncHash.AppId))" })..."
-        # Force the UI to paint the status before the (blocking) sign-in / connect.
-        $syncHash.Window.Dispatcher.Invoke([action] {}, [System.Windows.Threading.DispatcherPriority]::Render)
+        $syncHash.LastConnectStatus = $null
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText $(if ($appOnly) { 'ConnectingGraphAppOnly' } else { 'ConnectingGraphInteractive' }))
 
-        # Connect on the UI thread. App-only cert auth is non-interactive; otherwise use
-        # interactive auth with the delegated scopes resolved from the API catalog.
-        try {
-            # The baseline schema tells Get-ScubaAnalyzerScopes which Graph scopes each product needs.
-            $baseline = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
-            if ($appOnly) {
-                # Service-principal + certificate: no browser, no scopes to request.
-                $ctx = Connect-ScubaAnalyzerGraph -M365Environment $env -AppId $syncHash.AppId -CertificateThumbprint $syncHash.CertificateThumbprint -Organization $syncHash.Organization
-            } else {
-                # Delegated: gather the minimal scope set for the selected products, then sign in.
-                $scopes = @()
-                foreach ($p in $products) { $scopes += Get-ScubaAnalyzerScopes -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerSchemaPath $syncHash.AnalyzerSchemaPath }
-                $scopes = @($scopes | Select-Object -Unique)
-                Write-ScubaAnalyzerLog "Requesting Graph scopes: $($scopes -join ', ')"
-                $ctx = Connect-ScubaAnalyzerGraph -Scopes $scopes -M365Environment $env
-            }
-        } catch {
-            $syncHash.Run_Button.IsEnabled = $true
-            $syncHash.Run_Progress.Visibility = 'Collapsed'; $syncHash.Run_Progress.IsIndeterminate = $false
-            Set-ScubaAnalyzerStatus "Graph sign-in failed: $($_.Exception.Message)"
-            Write-ScubaAnalyzerLog "Graph sign-in failed: $($_.Exception.Message)"
-            return
-        }
-        Write-ScubaAnalyzerLog "Connected as $($ctx.Account) (tenant $($ctx.TenantId))."
-        $syncHash.ConnectedTenant = $true
-        $syncHash.ConnectedEnvironment = $env
-        if ($syncHash.ConnectionText) {
-            $connMode = if ($appOnly) { 'Connected (app-only)' } else { 'Connected' }
-            $connWho  = if ($appOnly) { [string]$syncHash.AppId } elseif ($ctx.Account) { [string]$ctx.Account } else { [string]$ctx.ClientId }
-            $syncHash.ConnectionText.Text = "${connMode}: $connWho ($env)"
-            $syncHash.ConnectionText.Foreground = [System.Windows.Media.Brushes]::LightGreen
-        }
-        Set-ScubaAnalyzerStatus "Connected. Retrieving tenant configuration from Microsoft Graph..."
-        # Paint the status before the (blocking) Graph read.
-        $syncHash.Window.Dispatcher.Invoke([action] {}, [System.Windows.Threading.DispatcherPriority]::Render)
+        # Mailbox: the worker writes Status/Log/connection info/Result; the UI timer only reads it.
+        $connectSync = [hashtable]::Synchronized(@{
+            IsComplete = $false; Error = $null; Result = $null; Status = $null
+            Log = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
+            Connected = $false; HeaderApplied = $false
+            ConnMode = $null; ConnWho = $null; Environment = $null; TenantLabel = $null
+        })
+        $syncHash.ConnectSync = $connectSync
 
-        # ===== PHASE B: read tenant data (still on the UI/sign-in thread) =============
-        # Read tenant data on THIS (sign-in) thread, where the Graph session is valid,
-        # using only Microsoft Graph auth + raw Graph API calls. Then validate on a
-        # background runspace so the UI stays responsive.
-        try {
-            # Accumulate across all selected products into one tenant-data bag.
-            $tenantData = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{} }
-            foreach ($p in $products) {
-                # Get-ScubaTenantGraphData issues the raw Graph calls the schema declares for $p.
-                $d = Get-ScubaTenantGraphData -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerSchemaPath $syncHash.AnalyzerSchemaPath
-                if (@($d.conditional_access_policies).Count -gt 0) { $tenantData.conditional_access_policies = $d.conditional_access_policies }
-                if ($d.OrgDisplayName) { $tenantData.OrgDisplayName = $d.OrgDisplayName }
-                if ($d.Organization)  { $tenantData.Organization  = $d.Organization }
-                if ($d.TenantId)      { $tenantData.TenantId      = $d.TenantId }
-                # Merge each product's id->name map so YAML comments can show friendly names.
-                if ($d.DisplayNameLookup) { foreach ($k in @($d.DisplayNameLookup.Keys)) { $tenantData.DisplayNameLookup[$k] = $d.DisplayNameLookup[$k] } }
-            }
-            Write-ScubaAnalyzerLog "Retrieved $(@($tenantData.conditional_access_policies).Count) Conditional Access policy/policies."
-            # Update the header tenant to the verified primary domain once it's known.
-            if ($syncHash.TenantText) {
-                $tenantLabel = if ($tenantData.Organization) { $tenantData.Organization }
-                               elseif ($tenantData.OrgDisplayName) { $tenantData.OrgDisplayName }
-                               elseif ($syncHash.Organization) { $syncHash.Organization } else { $null }
-                if ($tenantLabel) { $syncHash.TenantText.Text = "Tenant: $tenantLabel" }
-            }
-        } catch {
-            $syncHash.Run_Button.IsEnabled = $true
-            $syncHash.Run_Progress.Visibility = 'Collapsed'; $syncHash.Run_Progress.IsIndeterminate = $false
-            Set-ScubaAnalyzerStatus "Failed to read tenant configuration: $($_.Exception.Message)"
-            Write-ScubaAnalyzerLog "Graph read failed: $($_.Exception.Message)"
-            return
-        }
-        Set-ScubaAnalyzerStatus "Analyzing $(@($tenantData.conditional_access_policies).Count) policies against the baselines..."
-
-        # ===== PHASE C: validate on a background runspace (no Graph calls here) =======
-        # Same mailbox + DispatcherTimer pattern as Start-ScubaAnalyzerAnalysis.
-        # STEP 1: the mailbox.
-        $scanSync = [hashtable]::Synchronized(@{ IsComplete = $false; Result = $null; Error = $null })
-        $syncHash.ScanSync = $scanSync
-        # STEP 2: worker runspace. tenantData (already fetched from Graph) is passed in as
-        # plain data, so the worker never needs a Graph session of its own.
+        # Background runspace. It shares the real (synchronized) $syncHash for the ScA caches, paths
+        # and launch params, imports the analyzer helpers (not the UI helper), and runs A -> C.
         $bg = [runspacefactory]::CreateRunspace(); $bg.ApartmentState = 'MTA'; $bg.ThreadOptions = 'ReuseThread'; $bg.Open()
-        $bg.SessionStateProxy.SetVariable('scanSync', $scanSync)
-        $bg.SessionStateProxy.SetVariable('enginePath', $syncHash.AnalyzerEnginePath)
-        $bg.SessionStateProxy.SetVariable('product', $products)
+        $bg.SessionStateProxy.SetVariable('syncHash', $syncHash)
+        $bg.SessionStateProxy.SetVariable('connectSync', $connectSync)
+        $bg.SessionStateProxy.SetVariable('helpersPath', $syncHash.HelperModulesPath)
+        $bg.SessionStateProxy.SetVariable('products', $products)
         $bg.SessionStateProxy.SetVariable('env', $env)
-        $bg.SessionStateProxy.SetVariable('tenantData', $tenantData)
-        $bg.SessionStateProxy.SetVariable('baselineSchemaPath', $syncHash.BaselineSchemaPath)
-        $bg.SessionStateProxy.SetVariable('analyzerSchemaPath', $syncHash.AnalyzerSchemaPath)
-        $bg.SessionStateProxy.SetVariable('configSchemaPath', $syncHash.ConfigSchemaPath)
+        $bg.SessionStateProxy.SetVariable('appOnly', $appOnly)
         $bgPS = [powershell]::Create(); $bgPS.Runspace = $bg
-        # Worker: import engine, validate the fetched policies, record outcome in the mailbox.
         [void]$bgPS.AddScript({
             try {
-                Import-Module $enginePath -Force -ErrorAction Stop
-                $scanSync.Result = Invoke-ScubaTenantScan -Product $product -M365Environment $env -TenantData $tenantData -BaselineSchemaPath $baselineSchemaPath -AnalyzerSchemaPath $analyzerSchemaPath -ConfigSchemaPath $configSchemaPath
-            } catch { $scanSync.Error = $_.Exception.Message } finally { $scanSync.IsComplete = $true }
-        })
-        $syncHash.ScanBgPS = $bgPS
-        $syncHash.ScanBgHandle = $bgPS.BeginInvoke()
-        $syncHash.ScanBgRunspace = $bg
+                Get-ChildItem -Path $helpersPath -Filter '*.psm1' | Where-Object { $_.Name -ne 'ScubaConfigAnalyzerUIHelper.psm1' } | ForEach-Object {
+                    Import-Module $_.FullName -Force -ErrorAction Stop
+                }
+                $baseline = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
 
-        # STEP 3: poll from the UI thread; marshal the result back when the worker finishes.
+                # --- Phase A: Microsoft Graph ---
+                [void]$connectSync.Log.Add(@{ Message = "Connecting to Microsoft Graph ($env) for products '$($products -join ', ')'$(if ($appOnly) { " - noninteractive appid ($($syncHash.AppId))" })..."; Level = 'Info' })
+                if ($appOnly) {
+                    $ctx = Connect-ScubaAnalyzerGraph -M365Environment $env -AppId $syncHash.AppId -CertificateThumbprint $syncHash.CertificateThumbprint -Organization $syncHash.Organization
+                } else {
+                    $scopes = @()
+                    foreach ($p in $products) { $scopes += Get-ScubaAnalyzerScopes -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerControlPath $syncHash.AnalyzerControlPath }
+                    $scopes = @($scopes | Select-Object -Unique)
+                    [void]$connectSync.Log.Add(@{ Message = "Requesting Graph scopes: $($scopes -join ', ')"; Level = 'Info' })
+                    $ctx = Connect-ScubaAnalyzerGraph -Scopes $scopes -M365Environment $env
+                }
+                $connectSync.ConnMode    = if ($appOnly) { 'Connected (app-only)' } else { 'Connected' }
+                $connectSync.ConnWho     = if ($appOnly) { [string]$syncHash.AppId } elseif ($ctx.Account) { [string]$ctx.Account } else { [string]$ctx.ClientId }
+                $connectSync.Environment = $env
+                $connectSync.Connected   = $true
+                [void]$connectSync.Log.Add(@{ Message = "Connected as $($ctx.Account) (tenant $($ctx.TenantId))."; Level = 'Info' })
+
+                # --- Phase A2: Exchange Online (only if a selected product needs it) ---
+                $connectSync.Status = "Retrieving tenant configuration..."
+                try {
+                    $fetchConns = @(Get-ScubaAnalyzerFetchConnections -Products $products -BaselineSchema $baseline -AnalyzerControlPath $syncHash.AnalyzerControlPath)
+                    if (@($fetchConns | Where-Object { $_.connectCmdlet -eq 'Connect-ExchangeOnline' }).Count -gt 0) {
+                        $connectSync.Status = if ($appOnly) { "Connecting to Exchange Online (appid & certificate)..." } else { "Connecting to Exchange Online..." }
+                        [void]$connectSync.Log.Add(@{ Message = $connectSync.Status; Level = 'Info' })
+                        if ($appOnly) {
+                            Connect-ScubaAnalyzerExchange -M365Environment $env -AppId $syncHash.AppId -CertificateThumbprint $syncHash.CertificateThumbprint -Organization $syncHash.Organization | Out-Null
+                        } else {
+                            Connect-ScubaAnalyzerExchange -M365Environment $env -Organization $syncHash.Organization | Out-Null
+                        }
+                        [void]$connectSync.Log.Add(@{ Message = "Connected to Exchange Online."; Level = 'Info' })
+                    }
+                } catch {
+                    # Non-fatal: affected controls report 'could not collect data' instead of a false pass.
+                    [void]$connectSync.Log.Add(@{ Message = "Exchange Online connect failed: $($_.Exception.Message). EXO/SecuritySuite checks will be marked for review."; Level = 'Error' })
+                }
+
+                # --- Phase B: read tenant data ---
+                $connectSync.Status = "Retrieving tenant configuration from Microsoft Graph..."
+                $tenantData = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{} }
+                foreach ($p in $products) {
+                    $d = Get-ScubaTenantGraphData -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerControlPath $syncHash.AnalyzerControlPath
+                    if (@($d.conditional_access_policies).Count -gt 0) { $tenantData.conditional_access_policies = $d.conditional_access_policies }
+                    if ($d.OrgDisplayName) { $tenantData.OrgDisplayName = $d.OrgDisplayName }
+                    if ($d.Organization)  { $tenantData.Organization  = $d.Organization }
+                    if ($d.TenantId)      { $tenantData.TenantId      = $d.TenantId }
+                    if ($d.DisplayNameLookup) { foreach ($k in @($d.DisplayNameLookup.Keys)) { $tenantData.DisplayNameLookup[$k] = $d.DisplayNameLookup[$k] } }
+                    foreach ($k in @($d.Keys)) {
+                        if ($k -in @('conditional_access_policies','OrgDisplayName','Organization','TenantId','DisplayNameLookup')) { continue }
+                        if ($null -ne $d[$k]) { $tenantData[$k] = $d[$k] }
+                    }
+                }
+                $connectSync.TenantLabel = if ($tenantData.Organization) { $tenantData.Organization } elseif ($tenantData.OrgDisplayName) { $tenantData.OrgDisplayName } elseif ($syncHash.Organization) { $syncHash.Organization } else { $null }
+                [void]$connectSync.Log.Add(@{ Message = "Retrieved $(@($tenantData.conditional_access_policies).Count) Conditional Access policy/policies."; Level = 'Info' })
+
+                # --- Phase C: validate against the baselines ---
+                $connectSync.Status = "Analyzing $(@($tenantData.conditional_access_policies).Count) policies against the baselines..."
+                $connectSync.Result = Invoke-ScubaTenantScan -Product $products -M365Environment $env -TenantData $tenantData -BaselineSchemaPath $syncHash.BaselineSchemaPath -AnalyzerControlPath $syncHash.AnalyzerControlPath -ConfigSchemaPath $syncHash.ConfigSchemaPath
+            } catch {
+                $connectSync.Error = $_.Exception.Message
+            } finally {
+                $connectSync.IsComplete = $true
+            }
+        })
+        $syncHash.ConnectBgPS = $bgPS
+        $syncHash.ConnectBgHandle = $bgPS.BeginInvoke()
+        $syncHash.ConnectBgRunspace = $bg
+
+        # UI timer: reflect status/log/header and, on completion, repaint findings + re-enable.
         $timer = New-Object System.Windows.Threading.DispatcherTimer
         $timer.Interval = [TimeSpan]::FromMilliseconds(250)
         $timer.Add_Tick({
-            if (-not $syncHash.ScanSync.IsComplete) { return }   # wait for the worker
-            $syncHash.ScanTimer.Stop()
+            $cs = $syncHash.ConnectSync
+            if (-not $cs) { return }
+
+            # Drain queued log lines (worker only appends; the UI only removes from the front).
+            while ($cs.Log.Count -gt 0) {
+                $item = $null
+                try { $item = $cs.Log[0]; $cs.Log.RemoveAt(0) } catch { break }
+                if ($item) { Write-ScubaAnalyzerLog $item.Message -Level $item.Level }
+            }
+            # Current status line.
+            if ($cs.Status -and $cs.Status -ne $syncHash.LastConnectStatus) {
+                Set-ScubaAnalyzerStatus $cs.Status
+                $syncHash.LastConnectStatus = $cs.Status
+            }
+            # Header: apply the connected badge once, then keep the tenant label current.
+            if ($cs.Connected -and -not $cs.HeaderApplied) {
+                $cs.HeaderApplied = $true
+                $syncHash.ConnectedTenant = $true
+                $syncHash.ConnectedEnvironment = $cs.Environment
+                if ($syncHash.ConnectionText -and $cs.ConnMode) {
+                    $syncHash.ConnectionText.Text = "$($cs.ConnMode): $($cs.ConnWho) ($($cs.Environment))"
+                    $syncHash.ConnectionText.Foreground = [System.Windows.Media.Brushes]::LightGreen
+                }
+            }
+            if ($cs.TenantLabel -and $syncHash.TenantText -and $syncHash.TenantText.Text -ne "Tenant: $($cs.TenantLabel)") {
+                $syncHash.TenantText.Text = "Tenant: $($cs.TenantLabel)"
+            }
+
+            if (-not $cs.IsComplete) { return }
+            $syncHash.ConnectTimer.Stop()
             # Drain + dispose the worker (guarded so one failure can't abort the others).
-            try { [void]$syncHash.ScanBgPS.EndInvoke($syncHash.ScanBgHandle) } catch { Write-Verbose "Scan EndInvoke cleanup: $($_.Exception.Message)" }
-            try { $syncHash.ScanBgPS.Dispose() } catch { Write-Verbose "Scan PS dispose cleanup: $($_.Exception.Message)" }
-            try { $syncHash.ScanBgRunspace.Close(); $syncHash.ScanBgRunspace.Dispose() } catch { Write-Verbose "Scan runspace dispose cleanup: $($_.Exception.Message)" }
+            try { [void]$syncHash.ConnectBgPS.EndInvoke($syncHash.ConnectBgHandle) } catch { Write-Verbose "Connect EndInvoke cleanup: $($_.Exception.Message)" }
+            try { $syncHash.ConnectBgPS.Dispose() } catch { Write-Verbose "Connect PS dispose cleanup: $($_.Exception.Message)" }
+            try { $syncHash.ConnectBgRunspace.Close(); $syncHash.ConnectBgRunspace.Dispose() } catch { Write-Verbose "Connect runspace dispose cleanup: $($_.Exception.Message)" }
 
             $syncHash.Run_Progress.Visibility = 'Collapsed'; $syncHash.Run_Progress.IsIndeterminate = $false
             $syncHash.Run_Button.IsEnabled = $true
 
-            if ($syncHash.ScanSync.Error) {
-                Set-ScubaAnalyzerStatus "Scan failed: $($syncHash.ScanSync.Error)"
-                Write-ScubaAnalyzerLog "Scan failed: $($syncHash.ScanSync.Error)"
+            if ($cs.Error) {
+                Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ScanFailed' $cs.Error)
+                Write-ScubaAnalyzerLog "Scan failed: $($cs.Error)" -Level Error
                 return
             }
             # Success: publish, repaint, and jump back to the Findings tab.
-            $syncHash.Analysis = $syncHash.ScanSync.Result
+            $syncHash.Analysis = $cs.Result
             Update-ScubaAnalyzerFindings
             Update-ScubaAnalyzerFullYaml
             $syncHash.MainTabs.SelectedIndex = 0
             $count = @($syncHash.Analysis.Findings | Where-Object { $_.Result -ne 'Pass' }).Count
-            Set-ScubaAnalyzerStatus "Scan complete - $count baseline(s) need action to pass ScubaGear."
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ScanComplete' $count)
             Write-ScubaAnalyzerLog "Scan complete."
         })
-        $syncHash.ScanTimer = $timer
+        $syncHash.ConnectTimer = $timer
         $timer.Start()
     } catch {
         $syncHash.Run_Button.IsEnabled = $true
         $syncHash.Run_Progress.Visibility = 'Collapsed'; $syncHash.Run_Progress.IsIndeterminate = $false
-        Set-ScubaAnalyzerStatus "Scan error: $($_.Exception.Message)"
-        Write-ScubaAnalyzerLog "Scan error: $($_.Exception.Message)"
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ScanError' $_.Exception.Message)
+        Write-ScubaAnalyzerLog "Scan error: $($_.Exception.Message)" -Level Error
     }
 }
 
 # ------------------------------------------------------------------------------------
 # Open the ScubaConfig app in-process (no new console / window-process)
 # ------------------------------------------------------------------------------------
-function Start-ScubaAnalyzerConfigApp {
+function Open-ScubaConfigAppFromAnalyzer {
     <#
     .SYNOPSIS
     Opens Start-SCuBAConfigApp inside this process (its own runspace, no extra console
@@ -795,7 +870,7 @@ function Start-ScubaAnalyzerConfigApp {
     #>
     try {
         if (-not $syncHash.ScubaConfigAppModulePath -or -not (Test-Path $syncHash.ScubaConfigAppModulePath)) {
-            Set-ScubaAnalyzerStatus "ScubaConfig app module not found."
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigAppNotFound')
             return
         }
 
@@ -851,11 +926,11 @@ function Start-ScubaAnalyzerConfigApp {
         [void]$syncHash.ConfigAppInstances.Add(@{ Runspace = $rs; PowerShell = $ps })
 
         $mode = if ($appOnly) { " (Online, app-only: $envName)" } elseif ($online) { " (Online: $envName)" } else { "" }
-        if ($configFile) { Set-ScubaAnalyzerStatus "ScubaConfig app opened with the configuration pre-loaded$mode." }
-        else { Set-ScubaAnalyzerStatus "ScubaConfig app opened$mode." }
+        if ($configFile) { Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigAppOpenedWithConfig' $mode) }
+        else { Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigAppOpened' $mode) }
     } catch {
-        Set-ScubaAnalyzerStatus "Could not open ScubaConfig app: $($_.Exception.Message)"
-        Write-ScubaAnalyzerLog "Open ScubaConfig app failed: $($_.Exception.Message)"
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigAppOpenError' $_.Exception.Message)
+        Write-ScubaAnalyzerLog "Open ScubaConfig app failed: $($_.Exception.Message)" -Level Error
     }
 }
 
@@ -870,7 +945,7 @@ function Export-ScubaAnalyzerYaml {
     #>
     try {
         if ([string]::IsNullOrWhiteSpace($syncHash.FullYaml_TextBox.Text)) {
-            Set-ScubaAnalyzerStatus "Nothing to export yet - run or load results first."
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'NothingToExport')
             return
         }
         $dlg = New-Object Microsoft.Win32.SaveFileDialog
@@ -879,11 +954,11 @@ function Export-ScubaAnalyzerYaml {
         $dlg.Title = "Export ScubaGear configuration"
         if ($dlg.ShowDialog() -eq $true) {
             [System.IO.File]::WriteAllText($dlg.FileName, $syncHash.FullYaml_TextBox.Text, [System.Text.Encoding]::UTF8)
-            Set-ScubaAnalyzerStatus "Configuration exported to $($dlg.FileName)"
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigExported' $dlg.FileName)
             Write-ScubaAnalyzerLog "Configuration exported to $($dlg.FileName)"
         }
     } catch {
-        Set-ScubaAnalyzerStatus "Export failed: $($_.Exception.Message)"
+        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ExportFailed' $_.Exception.Message)
     }
 }
 
@@ -906,7 +981,7 @@ function Initialize-ScubaConfigAnalyzerUI {
       6. Filters                - Issues-only / Configurable-only / search -> refilter.
       7. YAML copy/export buttons.
       8. "View baseline" button  - jumps into the shared policy viewer.
-      9. "Open ConfigApp" button - hands the generated YAML to Start-ScubaAnalyzerConfigApp.
+      9. "Open ConfigApp" button - hands the generated YAML to Open-ScubaConfigAppFromAnalyzer.
      10. "Use this policy"       - one routed handler on the policy list catches every
                                   card's button (see the AddHandler note below).
     Every handler is a closure over $syncHash, so it can still reach the controls long
@@ -946,7 +1021,7 @@ function Initialize-ScubaConfigAnalyzerUI {
     } catch { Write-Verbose "Configurable products load failed: $($_.Exception.Message)" }
     $displayMap = @{}
     try {
-        $as = Get-Content $syncHash.AnalyzerSchemaPath -Raw | ConvertFrom-Json
+        $as = Get-Content $syncHash.AnalyzerControlPath -Raw | ConvertFrom-Json
         foreach ($p in $as.productMap.PSObject.Properties) {
             if ($p.Name -match '^_') { continue }
             $displayMap[([string]$p.Name).ToLower()] = if ($p.Value.displayName) { [string]$p.Value.displayName } else { [string]$p.Name }
@@ -975,7 +1050,7 @@ function Initialize-ScubaConfigAnalyzerUI {
             $dlg.Filter = "ScubaGear results (*.json)|*.json|All files (*.*)|*.*"
             $dlg.Title = "Select a ScubaResults JSON"
             if ($dlg.ShowDialog() -eq $true) { Start-ScubaAnalyzerAnalysis -ResultsPath $dlg.FileName }
-        } catch { Set-ScubaAnalyzerStatus "Could not open file: $($_.Exception.Message)" }
+        } catch { Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'LoadFileError' $_.Exception.Message) }
     })
 
     # Filters
@@ -991,10 +1066,10 @@ function Initialize-ScubaConfigAnalyzerUI {
 
     # YAML copy/export
     $syncHash.CopyControlYaml_Button.Add_Click({
-        try { [System.Windows.Clipboard]::SetText($syncHash.Detail_Yaml.Text); Set-ScubaAnalyzerStatus "Control YAML copied to clipboard." } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
+        try { [System.Windows.Clipboard]::SetText($syncHash.Detail_Yaml.Text); Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ControlYamlCopied') } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
     })
     $syncHash.CopyAllYaml_Button.Add_Click({
-        try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus "Configuration YAML copied to clipboard." } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
+        try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigYamlCopied') } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
     })
     $syncHash.ExportYaml_Button.Add_Click({ Export-ScubaAnalyzerYaml })
 
@@ -1004,19 +1079,19 @@ function Initialize-ScubaConfigAnalyzerUI {
             $f = $syncHash.Findings_List.SelectedItem
             if (-not $f) { return }
             if (-not $syncHash.ShowBaselinePolicyViewer) {
-                Set-ScubaAnalyzerStatus "Baseline policy viewer is not available in this session."
+                Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'BaselineViewerUnavailable')
                 return
             }
-            Set-ScubaAnalyzerStatus "Opening baseline policy viewer at $($f.ControlId)..."
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'OpeningBaselineViewer' $f.ControlId)
             & $syncHash.ShowBaselinePolicyViewer -NavigateToPolicyId $f.ControlId | Out-Null
         } catch {
-            Set-ScubaAnalyzerStatus "Could not open baseline viewer: $($_.Exception.Message)"
-            Write-ScubaAnalyzerLog "Baseline viewer error: $($_.Exception.Message)"
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'BaselineViewerError' $_.Exception.Message)
+            Write-ScubaAnalyzerLog "Baseline viewer error: $($_.Exception.Message)" -Level Error
         }
     })
 
     # Open the ScubaConfig app (in-process) with the detected exclusions pre-loaded
-    $syncHash.OpenConfigApp_Button.Add_Click({ Start-ScubaAnalyzerConfigApp })
+    $syncHash.OpenConfigApp_Button.Add_Click({ Open-ScubaConfigAppFromAnalyzer })
 
     # "Use this policy" buttons live inside the policy-card template; catch their clicks
     # at the container via the bubbling Button.Click routed event.
@@ -1035,14 +1110,9 @@ function Initialize-ScubaConfigAnalyzerUI {
         )
     }
 
-    Set-ScubaAnalyzerStatus "Ready. Connect & scan your tenant, or load an existing ScubaResults JSON, to begin."
+    Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'Ready')
 }
 
-Export-ModuleMember -Function @(
-    'Initialize-ScubaConfigAnalyzerUI',
-    'Start-ScubaAnalyzerAnalysis',
-    'Start-ScubaAnalyzerTenantScan',
-    'Show-ScubaAnalyzerDetail',
-    'Update-ScubaAnalyzerFindings',
-    'Update-ScubaAnalyzerFullYaml'
-)
+# No Export-ModuleMember: like the other analyzer helper modules, all functions are exported
+# so the launcher runspace can call them (Set-ScubaAnalyzerStatus, Write-ScubaAnalyzerLog,
+# Export-ScubaAnalyzerYaml, Select-ScubaAnalyzerPolicy, etc.).
