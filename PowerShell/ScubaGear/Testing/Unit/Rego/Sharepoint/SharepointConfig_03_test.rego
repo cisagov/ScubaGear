@@ -4,7 +4,6 @@ import data.sharepoint
 import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 import data.utils.key.PASS
-import data.utils.key.FAIL
 
 
 #
