@@ -1,4 +1,4 @@
-# Restrict Access to Specific Users from an Approved Location
+# Entra Conditional Access: Restrict Access to Specific Users from an Approved Location
 
 ## Overview
 
@@ -29,8 +29,8 @@ Teams Rooms and experience from the Scuba program.
 
 
 This walkthrough focuses on **creating a Conditional Access policy that
-uses named locations**. Scuba also has a complementary policy for
-compliant devices that matches Microsoft's recommendations. Reference the link below for the Scuba policy with instructions. Teams Rooms
+uses named locations**. Scuba also has a complementary policy which requires
+compliant devices that matches Microsoft's recommendations and will help to mitigate the risks of allowing access to specific accounts without MFA. Reference the link below for the Scuba policy with instructions. Teams Rooms
 phones and devices must be enrolled in Intune to use that policy.
 
 -   [Scuba Entra ID policy
