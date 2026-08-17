@@ -1,52 +1,21 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility/ScubaLogging.psm1")
 
-function ConvertTo-ScubaProductNames {
-    <#
-    .SYNOPSIS
-    Normalizes a list of ScubaGear product names.
-    .DESCRIPTION
-    Centralizes ScubaGear product-name normalization so the value is handled identically
-    regardless of whether it originates from the -ProductNames parameter or an imported
-    configuration file. It:
-      1. Expands the '*' wildcard to the full list of supported products.
-      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
-         (adding 'securitysuite' only if not already present).
-      3. Returns a sorted, de-duplicated array.
-    .PARAMETER ProductNames
-    The array of product names to normalize.
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [AllowEmptyCollection()]
-        [string[]]
-        $ProductNames
-    )
+# Core helper modules (ScubaConfig is loaded above via 'using module')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility\ScubaLogging.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Connection")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "RunRego")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "CreateReport")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Support")
 
-    if ($null -eq $ProductNames) {
-        return @()
-    }
-
-    # Expand the wildcard to all supported products
-    if ($ProductNames -contains '*') {
-        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
-        Write-Debug "Setting ProductNames to all products because of wildcard"
-    }
-
-    # 'defender' is a deprecated alias for 'securitysuite'
-    if ($ProductNames -contains 'defender') {
-        if (-not ($ProductNames -contains 'securitysuite')) {
-            $ProductNames = @($ProductNames) + "securitysuite"
-        }
-        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
-        Write-Debug "Substituting defender with securitysuite in ProductNames"
-    }
-
-    return @($ProductNames | Sort-Object -Unique)
-}
+# Providers
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportAADProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportEXOProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerBIProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerPlatformProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSecuritySuiteProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSharePointProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportTeamsProvider.psm1")
 
 function Invoke-SCuBA {
     <#
@@ -396,9 +365,6 @@ function Invoke-SCuBA {
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
         }
-
-        Remove-Resources # Unload helper modules if they are still in the PowerShell session
-        Import-Resources # Imports Providers, RunRego, etc.
 
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
@@ -1920,77 +1886,6 @@ function Compare-ProductList {
     }
 }
 
-function Import-Resources {
-    <#
-    .Description
-    This function imports all of the various helper Provider,
-    Rego, and Reporter modules to the runtime
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param()
-    try {
-        $ProvidersPath = Join-Path -Path $PSScriptRoot `
-        -ChildPath "Providers" `
-        -Resolve `
-        -ErrorAction 'Stop'
-        $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
-        if (!$ProviderResources)
-        {
-            throw "Provider files were not found, aborting this run"
-        }
-
-        foreach ($Provider in $ProviderResources.Name) {
-            $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers" -ErrorAction 'Stop'
-            $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider -ErrorAction 'Stop'
-            Import-Module $ModulePath
-        }
-
-        @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support', 'Utility') | ForEach-Object {
-            $ModulePath = Join-Path -Path $PSScriptRoot -ChildPath $_ -ErrorAction 'Stop'
-            Write-Debug "Importing $_ module $ModulePath"
-            Import-Module -Name $ModulePath
-        }
-
-        # Import ScubaLogging explicitly (not part of Utility folder import)
-        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
-        Import-Module -Name $ScubaLoggingPath -Force
-    }
-    catch {
-        Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
-            Error = $_.Exception.Message
-            StackTrace = $_.ScriptStackTrace
-        }
-        $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
-            Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            `n$($_.ScriptStackTrace)"
-            throw $ImportResourcesErrorMessage
-    }
-}
-
-function Remove-Resources {
-    <#
-    .Description
-    This function cleans up all of the various imported modules
-    Mostly meant for dev work
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportSecuritySuiteProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
-    foreach ($Provider in $Providers) {
-        Remove-Module $Provider -ErrorAction "SilentlyContinue"
-    }
-
-    Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
-    Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
-    Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
-    Remove-Module "Connection" -ErrorAction "SilentlyContinue"
-    Remove-Module "ScubaLogging" -ErrorAction "SilentlyContinue"
-}
-
 function Invoke-SCuBACached {
     <#
     .SYNOPSIS
@@ -2269,9 +2164,6 @@ function Invoke-SCuBACached {
             }
             $OutFolderPath = $OutPath
             $ProductNames = $ProductNames | Sort-Object -Unique
-
-            Remove-Resources
-            Import-Resources # Imports Providers, RunRego, etc.
 
             # Initialize logging for troubleshooting - debug logs are ALWAYS created
             # Logs are placed in a DebugLogs subfolder within the output folder
@@ -2749,6 +2641,53 @@ After correcting the JSON file, rerun ScubaGear but use Invoke-ScubaCached since
 "@
         }
     }
+}
+
+function ConvertTo-ScubaProductNames {
+    <#
+    .SYNOPSIS
+    Normalizes a list of ScubaGear product names.
+    .DESCRIPTION
+    Centralizes ScubaGear product-name normalization so the value is handled identically
+    regardless of whether it originates from the -ProductNames parameter or an imported
+    configuration file. It:
+      1. Expands the '*' wildcard to the full list of supported products.
+      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
+         (adding 'securitysuite' only if not already present).
+      3. Returns a sorted, de-duplicated array.
+    .PARAMETER ProductNames
+    The array of product names to normalize.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [string[]]
+        $ProductNames
+    )
+
+    if ($null -eq $ProductNames) {
+        return @()
+    }
+
+    # Expand the wildcard to all supported products
+    if ($ProductNames -contains '*') {
+        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+        Write-Debug "Setting ProductNames to all products because of wildcard"
+    }
+
+    # 'defender' is a deprecated alias for 'securitysuite'
+    if ($ProductNames -contains 'defender') {
+        if (-not ($ProductNames -contains 'securitysuite')) {
+            $ProductNames = @($ProductNames) + "securitysuite"
+        }
+        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
+        Write-Debug "Substituting defender with securitysuite in ProductNames"
+    }
+
+    return @($ProductNames | Sort-Object -Unique)
 }
 
 Export-ModuleMember -Function @(
