@@ -2065,6 +2065,10 @@ function Remove-Resources {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
 
+    # CommandTracker imports ScubaLogging functions into its module scope. It must
+    # be unloaded before the logging module is reloaded or providers keep stale
+    # function references on subsequent Invoke-SCuBA calls in the same session.
+    Remove-Module "CommandTracker" -ErrorAction "SilentlyContinue"
     Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
     Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
     Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
