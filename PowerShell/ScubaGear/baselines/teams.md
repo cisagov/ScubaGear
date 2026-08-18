@@ -30,8 +30,7 @@ The **License Requirements** sections of this document assume the organization i
 ## Key Terminology
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-Access to Teams can be controlled by the user type. In this baseline,
-the types of users are defined as follows:
+**User Types**: Access to Teams can be controlled by the user type. In this baseline, the types of users are defined as follows:
 
 1.  **Internal users**: Members of the agency's M365 tenant.
 
@@ -52,6 +51,8 @@ the types of users are defined as follows:
     users, external users (except for B2B guests), and true anonymous
     users (i.e., users who are not logged in to any Microsoft or
     organization account, such as dial-in users[^1]).
+
+[^1]: Note that B2B guest users and all anonymous users except for external users appear in Teams calls as _John Doe (Guest)_. To avoid potential confusion, true guest users are always referred to as B2B guest users in this document.
 
 **BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
 
@@ -349,7 +350,7 @@ Unmanaged users SHALL NOT be enabled to initiate contact with internal users.
 <!--Policy: MS.TEAMS.2.2v2; Criticality: SHALL -->
 - _Rationale:_ Allowing contact from unmanaged users can expose users to email and contact address harvesting. This policy provides protection against this type of harvesting.
 - _Last modified:_ August 2026
-- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
+- _Note:_ This policy's availability may vary by Microsoft 365 environment and tenant, particularly within Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -363,7 +364,7 @@ Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.
 <!--Policy: MS.TEAMS.2.3v2; Criticality: SHOULD -->
 - _Rationale:_ Contact with unmanaged users can pose the risk of data leakage and other security threats. This policy provides protection by disabling internal user access to unmanaged users.
 - _Last modified:_ August 2026
-- _Note:_ This policy is not applicable to Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
+- _Note:_ This policy's availability may vary by Microsoft 365 environment and tenant, particularly within Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -504,15 +505,13 @@ To ensure users cannot send emails and their contents to a channel email address
 
 ## 5. App Management
 
-This section helps reduce security risks related to app integration with Microsoft Teams. Teams can integrate with the following classes of apps:
+This section helps reduce security risks associated with applications integrated with Microsoft Teams. Apps can introduce additional access to organizational data and resources, increasing risk if they are not appropriately restricted. Teams can integrate with the following classes of apps:
 
-- *Microsoft apps*: apps published by Microsoft.
+- *Microsoft apps*: Apps authored and published by Microsoft (First party, Official).
 
-- *Third-party apps*: apps not authored by Microsoft, published to the
-Teams store.
+- *Third-party apps*: Apps not authored by Microsoft, published to the Teams store (External).
 
-- *Custom apps*: apps not published to the Teams store, such as apps under
-development, that users sideload into Teams.
+- *Custom apps*: Apps not published to the Teams store, such as internal apps under development, that users sideload into Teams.
 
 ### Policies
 
@@ -523,7 +522,7 @@ Agencies SHOULD only allow installation of Microsoft apps approved by the agency
 
 <!--Policy: MS.TEAMS.5.1v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing Teams integration with all Microsoft apps can expose the agency to potential vulnerabilities present in those apps. By only allowing specific apps and blocking all others, the agency can better manage app integration and potential exposure points.
-- _Last modified:_ August 2025
+- _Last modified:_ August 2026
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
@@ -536,8 +535,8 @@ Agencies SHOULD only allow installation of third-party apps approved by the agen
 
 <!--Policy: MS.TEAMS.5.2v2; Criticality: SHOULD -->
 - _Rationale:_ Allowing Teams integration with third-party apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to third-party app vulnerabilities.
-- _Last modified:_ August 2025
-- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps are not available in GCC, GCC High, or DoD regions.
+- _Last modified:_ August 2026
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps may not be available in the Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) regions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
@@ -549,9 +548,9 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.3v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing custom apps integration can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.
-- _Last modified:_ August 2025
-- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps are not available in GCC, GCC High, or DoD regions.
+- _Rationale:_ Allowing Teams integration with custom apps can expose the agency to potential vulnerabilities present in an app not managed by the agency. By allowing only specific apps approved by the agency and blocking all others, the agency can limit its exposure to custom app vulnerabilities.
+- _Last modified:_ August 2026
+- _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps may not be available in the Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) regions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1195: Supply Chain Compromise](https://attack.mitre.org/techniques/T1195/)
@@ -569,13 +568,15 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 ### Implementation
 
-**NOTE:** The Teams admin portal has been updated and the manner in which applications are controlled has changed. The MS.TEAMS.5.#v2 policies follow the new manner of implementing the policies. Newer Tenants, created within 2024 and newer will follow the newer version 2 policy implementation steps while older tenants will follow the legacy implementation steps.
+**INTERFACE NOTE:** The Teams admin portal interface has been updated, and the manner in which applications are controlled has changed. The MS.TEAMS.5.x v2 policies now follow the new manner of implementing the policies. Newer Tenants created after 2024 should follow the v2 policy implementation steps, while older tenants should follow the legacy implementation steps, only if the newer settings are not available.
 
-**ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather the data for the newer portal based settings.**
+Legacy implementation instructions for this section are now located in Appendix B at the end of this document. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions. These instructions will remain only until they are fully depreciated.
 
-**NOTE:** Legacy implementation instructions are below the Version 2 intructions. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions.
+**ScubaGear will continue to look for and gather the legacy policies when running in any mode.  However, there a limitation in the API when gathering the data for the report. Users must utilize "interactive mode" to allow ScubaGear to gather the data for the newer portal based settings.**
 
 #### MS.TEAMS.5.1v2 Instructions
+
+To ensure users can only install Microsoft apps approved by the agency:
 
 1.  Sign in to the **Microsoft Teams admin center**.
 
@@ -585,78 +586,124 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 4.  Select **Org-wide app settings**.
 
-5.  Under **Microsoft apps** > Select **On**.
+5.  Under the **Microsoft apps** section, ensure it is set to the **On** position.
 
-6.  Click **Save**.
+6.  Click **Save** (if applicable).
 
-    **NOTE:** This will make Microsoft apps in the application list available to "Everyone." If adjustments are needed follow the remaining instructions
+    **NOTE:** This will make all "Microsoft apps" in the application list available to "Everyone." If custom adjustments are needed, on an app by app basis, follow the remaining instructions below. Additionally, previously configured availability settings for individual apps may persist after changing the global toggle and should be reviewed to ensure they remain appropriate.
 
-7. Select **Teams apps** > **Manage apps**.
+##### Optional:
 
-8. Select each individual app.
+7. Close the **Org-wide app settings** settings screen.
 
-9. Select **Users and groups** > **Edit availability**
+8. Select the individual app.
 
-10. Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+    **NOTE:** To filter out the application list so it is easier to see the relevant apps, click on the **Filter** icon to the left of the search bar. In this screen set **App type** to the **Microsoft apps**, then click **Apply** to save your choices. You can press **Add more** to consider other criteria, such as **App status** (Blocked, Unblocked). 
 
-11. Repeat steps 7 to 10 for each application
+9. Press the **Edit availability** button at the top of the app list, while the app is selected.
+
+10. Ensure the correct app is reflecting on the edit screen and then change the value in the **Available to** dropdown box to the appropriate setting for your organization (**Everyone, Specific users or groups, or No one**).
+
+11. Click **Apply** (if applicable).
+
+12. Repeat steps 8 to 11 for each application.
 
 #### MS.TEAMS.5.2v2 Instructions
 
+To ensure users can only install third-party apps approved by the agency:
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  In the upper right-hand corner select **Actions**
+3.  In the upper right-hand corner select **Actions**.
 
 4.  Select **Org-wide app settings**.
 
-5.  Under **Third-party apps** > Select **Off**
+5.  Under the **Third-party apps** section, ensure it is set to the **Off** position.
 
-6.  Click **Save**.
+6.  Click **Save** (if applicable).
 
-    **NOTE:** This will make third party apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
+    **NOTE:** This will make all "Third-party" apps in the application list available to "No one." If custom adjustments are needed, on an app by app basis, follow the remaining instructions below. Additionally, previously configured availability settings for individual apps may persist after changing the global toggle and should be reviewed to ensure they remain appropriate.
 
-7.  Select **Teams apps** > **Manage apps**.
+##### Optional:
 
-8.  Select each individual app.
+7. Close the **Org-wide app settings** settings screen.
 
-9.  Select **Users and groups** > **Edit availability**
+8. Select the individual app.
 
-10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+    **NOTE:** To filter out the application list so it is easier to see the relevant apps, click on the **Filter** icon to the left of the search bar. In this screen set **App type** to the **Third-party apps**, then click **Apply** to save your choices. You can press **Add more** to consider other criteria, such as **App status** (Blocked, Unblocked).
 
-11.  Repeat steps 7 to 10 for each application
+9. Press the **Edit availability** button at the top of the app list, while the app is selected.
+
+10. Ensure the correct app is reflecting on the edit screen and then change the value in the **Available to** dropdown box to the appropriate setting for your organization (**Everyone, Specific users or groups, or No one**).
+
+11. Click **Apply** (if applicable).
+
+12. Repeat steps 8 to 11 for each application.
 
 #### MS.TEAMS.5.3v2 Instructions
 
+To ensure users can only install custom apps approved by the agency:
+
 1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  In the upper right-hand corner select **Actions**
+3.  In the upper right-hand corner select **Actions**.
 
 4.  Select **Org-wide app settings**.
 
-5.  Under **Custom apps** > Select **Off**
+5.  Under the **Custom apps** section, ensure it is set to the **Off** position.
 
-6.  Click **Save**.
+6.  Click **Save** (if applicable).
 
-    **NOTE:** This will make Custom apps in the application list available to "No one." If adjustments are needed follow the remaining                     instructions
+    **NOTE:** This will make all "Custom apps" in the application list available to "No one." If custom adjustments are needed, on an app by app basis, follow the remaining instructions below. Additionally, previously configured availability settings for individual apps may persist after changing the global toggle and should be reviewed to ensure they remain appropriate.
 
-7.  Select **Teams apps** > **Manage apps**.
+##### Optional:
 
-8.  Select each individual app.
+7. Close the **Org-wide app settings** settings screen.
 
-9.  Select **Users and groups** > **Edit availability**
+8. Select the individual app.
 
-10.  Change **Available to** to the appropriate setting for your organization. (Everyone, Specific users or groups, or No one)
+    **NOTE:** To filter out the application list so it is easier to see the relevant apps, click on the **Filter** icon to the left of the search bar. In this screen set **App type** to the **Custom apps**, then click **Apply** to save your choices. You can press **Add more** to consider other criteria, such as **App status** (Blocked, Unblocked).
 
-11.  Repeat steps 7 to 10 for each application
+9. Press the **Edit availability** button at the top of the app list, while the app is selected.
 
+10. Ensure the correct app is reflecting on the edit screen and then change the value in the **Available to** dropdown box to the appropriate setting for your organization (**Everyone, Specific users or groups, or No one**).
+
+11. Click **Apply** (if applicable).
+
+12. Repeat steps 8 to 11 for each application.
+
+
+
+# Appendix A - Custom Meeting Policies (Recordings)
+
+If there is a legitimate business need, custom meeting policies can be defined with _specific_ users assigned to them for narrowly scoped purposes. For example, custom meeting policies can be configured for _specific_ users granting them permission to record meetings. To allow _specific_ users the ability to record meetings:
+
+1.  Sign in to the **Microsoft Teams admin center**.
+
+2.  Select **Meetings** > **Meeting policies**.
+
+3.  Create a new policy by selecting the **Add** button. Give this new policy a name and an appropriate description (inclusion of the scoped users is recommended).
+
+4.  Under the **Recording & transcription** section, set **Meeting recording** to the **On** position.
+
+5.  Select **Save** (if applicable).
+
+6.  After selecting **Save**, you're returned to the table displaying all of your tenant's policies. Select the checkbox on the row containing the new policy you just created, then select **Manage users** in the actions area above the table.
+
+7.  On the **Manage users** screen, assign the users to this policy who need the ability to record meetings.
+
+8.  Select **Apply**. Once saved, your custom policy will go into effect following a short delay.
+
+
+# Appendix B - Legacy Policy Implementation (App Management)
 
 ### Legacy Policy Implementation
 
-**NOTE:** Only Implement these settings if the v2 settings above are not available in your tenant.
+**NOTE:** Only Implement these settings if the MS.TEAMS.5.x v2 settings in section 5 are not available in your tenant.
 
 #### Legacy MS.TEAMS.5.1v1 Instructions
 
@@ -666,18 +713,17 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 3.  Select **Global (Org-wide default)**.
 
-4.  Under **Microsoft apps**, select **Allow specific apps and block all others** or **Block all apps**.
+4.  Under the **Microsoft apps** section, select **Allow specific apps and block all others** or **Block all apps**.
 
 5.  Click **Allow apps**.
 
-6.  Search and Click **Add** to all appropriate Microsoft Apps.
+6.  Search and click **Add** to all appropriate Microsoft Apps.
 
 7.  Click **Allow**.
 
 8.  Click **Save**.
 
-9.  If custom policies have been created, repeat these steps for each
-    policy, selecting the appropriate policy in step 3.
+9.  If custom policies have been created, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### Legacy MS.TEAMS.5.2v1 Instructions
 
@@ -685,22 +731,19 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Third-party apps** turn off **Third-party apps**.
+3.  Select the **Org-wide app settings** button to access pop-up options.
+    - Under **Third-party apps**, turn off **Third-party apps**.
     - Click **Save**.
 
 4.  Select **Teams apps** > **Permission policies**.
 
 5.  Select **Global (Org-wide default)**.
 
-6.  Set **Third-party apps** to **Block all apps**, unless specific apps
-    have been approved by the agency, in which case select **Allow
-    specific apps and block all others**.
+6.  Set **Third-party apps** to **Block all apps**, unless specific apps have been approved by the agency, in which case select **Allow specific apps and block all others**.
 
 7.  Click **Save**.
 
-8.   If custom policies have been created, repeat steps 4 to 7 for each
-    policy, selecting the appropriate policy in step 5.
+8.  If custom policies have been created, repeat steps 4 to 7 for each policy, selecting the appropriate policy in step 5.
 
 #### Legacy MS.TEAMS.5.3v1 Instructions
 
@@ -708,51 +751,18 @@ Agencies SHOULD only allow installation of custom apps approved by the agency.
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  Select **Org-wide app settings** button to access pop-up options.
-    - Under **Custom apps** turn off **Interaction with custom apps**.
+3.  Select the **Org-wide app settings** button to access pop-up options.
+    - Under **Custom apps**, turn off **Interaction with custom apps**.
     - Click **Save**.
 
 4.  Select **Teams apps** > **Permission policies**.
 
 5.  Select **Global (Org-wide default)**.
 
-6.  Set **Custom apps** to **Block all apps**, unless specific apps have
-    been approved by the agency, in which case select **Allow specific apps and block all others**.
+6.  Set **Custom apps** to **Block all apps**, unless specific apps have been approved by the agency, in which case select **Allow specific apps and block all others**.
 
 7.  Click **Save**.
 
-8.  If custom policies have been created, repeat steps 4 to 7 for each
-    policy, selecting the appropriate policy in step 5.
-
-
-[^1]: Note that B2B guest users and all anonymous users except for
-    external users appear in Teams calls as _John Doe (Guest)_. To avoid
-    potential confusion, true guest users are always referred to as B2B guest users in this document.
-
-# Appendix A - Custom Meeting Policies
-
-If there is a legitimate business need, custom meeting policies can be defined with _specific_ users assigned to them. For example, custom meeting policies can be configured with _specific_ users having
-permission to record meetings. To allow specific users the ability to
-record meetings:
-
-1.  Sign in to the **Microsoft Teams admin center**.
-
-2.  Select **Meetings** > **Meeting policies**.
-
-3.  Create a new policy by selecting **Add**. Give this new policy a
-    name and appropriate description.
-
-4.  Under the **Recording & transcription** section, set **Cloud
-    recording** to **On**.
-
-5.  Select **Save**.
-
-6.  After selecting **Save**, a table displays the set of policies.
-    Select the row containing the new policy, then select **Manage
-    users**.
-
-7.  Assign the users who need the ability to record to this policy.
-
-8.  Select **Apply**.
+8.  If custom policies have been created, repeat steps 4 to 7 for each policy, selecting the appropriate policy in step 5.
 
 **`TLP:CLEAR`**
