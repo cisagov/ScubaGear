@@ -61,6 +61,14 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             }
             Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
                 switch ($CmdletName) {
+                    'Get-AntiPhishRule' {
+                        @(
+                            [pscustomobject]@{ Name = 'Custom policy 10'; Priority = 10 }
+                            [pscustomobject]@{ Name = 'Standard Preset Security Policy'; Priority = 99 }
+                            [pscustomobject]@{ Name = 'Custom policy 0'; Priority = 0 }
+                            [pscustomobject]@{ Name = 'Strict Preset Security Policy'; Priority = 99 }
+                        )
+                    }
                     'Get-DlpComplianceRule' {
                         [pscustomobject]@{
                             Name = $CmdletName
@@ -103,6 +111,18 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AdminAuditLogConfig'
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-EOPProtectionPolicyRule'
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AntiPhishPolicy'
+        }
+
+        It "When called with -M365Environment '<_>', orders policy tables by preset and priority" {
+            $Json = Export-SecuritySuiteProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
+            $Parsed = ('{' + $Json.TrimEnd(',') + '}') | ConvertFrom-Json
+
+            $Parsed.anti_phish_rules.Name | Should -Be @(
+                'Strict Preset Security Policy'
+                'Standard Preset Security Policy'
+                'Custom policy 0'
+                'Custom policy 10'
+            )
         }
     }
 }

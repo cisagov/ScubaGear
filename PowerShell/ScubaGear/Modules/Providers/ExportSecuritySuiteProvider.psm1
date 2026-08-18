@@ -49,6 +49,51 @@ function Export-SecuritySuiteProvider {
     Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Trace-ScubaFunction
     $Tracker = Get-CommandTracker
 
+    function Sort-SecuritySuitePolicyTable {
+        <#
+        .SYNOPSIS
+        Orders policy and policy-rule tables for consistent SecuritySuite output.
+
+        .DESCRIPTION
+        Preset policies do not follow the usual custom-policy priority convention.
+        Keep Strict and Standard at the top of every relevant table, then order
+        remaining entries by their numeric Priority (where supplied by EXO).
+        #>
+        param(
+            [Parameter()]
+            [AllowEmptyCollection()]
+            [object[]]$InputObject
+        )
+
+        $SortProperties = @(
+            @{ Expression = {
+                    $Name = [string]$_.Name
+                    if ([string]::IsNullOrWhiteSpace($Name)) {
+                        $Name = [string]$_.Identity
+                    }
+
+                    if ($Name -like 'Strict Preset Security Policy*') { return 0 }
+                    if ($Name -like 'Standard Preset Security Policy*') { return 1 }
+                    return 2
+                }
+            }
+            @{ Expression = {
+                    $Priority = 0
+                    if ([int]::TryParse([string]$_.Priority, [ref]$Priority)) {
+                        return $Priority
+                    }
+                    return [int]::MaxValue
+                }
+            }
+            @{ Expression = {
+                    if ($null -ne $_.Name) { return [string]$_.Name }
+                    return [string]$_.Identity
+                }
+            }
+        )
+        $InputObject | Sort-Object -Property $SortProperties
+    }
+
     function Invoke-SecuritySuiteTrackedCommand {
         param(
             [Parameter(Mandatory = $true)]
@@ -126,19 +171,19 @@ function Export-SecuritySuiteProvider {
     $ServicePlans = ConvertTo-Json -Depth 3 @($ServicePlans)
 
     $AdminAuditLogConfig = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AdminAuditLogConfig")
-    $ProtectionPolicyRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule")
-    $AntiPhishPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishPolicy")
-    $AntiPhishRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishRule")
+    $ProtectionPolicyRule = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-EOPProtectionPolicyRule"))
+    $AntiPhishPolicy = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishPolicy"))
+    $AntiPhishRule = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AntiPhishRule"))
     $AcceptedDomains = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AcceptedDomain")
     $ConnectionFilter = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedConnectionFilterPolicy")
-    $SafeLinksPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksPolicy")
-    $SafeLinksRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksRule")
-    $HostedContentFilterPolicies = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterPolicy")
-    $HostedContentFilterRules = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterRule")
-    $AntiMalwarePolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterPolicy")
-    $AntiMalwareRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterRule")
-    $SafeAttachmentPolicy = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentPolicy")
-    $SafeAttachmentRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentRule")
+    $SafeLinksPolicy = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksPolicy"))
+    $SafeLinksRule = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeLinksRule"))
+    $HostedContentFilterPolicies = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterPolicy"))
+    $HostedContentFilterRules = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedContentFilterRule"))
+    $AntiMalwarePolicy = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterPolicy"))
+    $AntiMalwareRule = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-MalwareFilterRule"))
+    $SafeAttachmentPolicy = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentPolicy"))
+    $SafeAttachmentRule = ConvertTo-Json @(Sort-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentRule"))
     $BuiltInProtectionRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPBuiltInProtectionRule")
 
     $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
@@ -157,8 +202,8 @@ function Export-SecuritySuiteProvider {
         $DefenderLicense = ConvertTo-Json $true
     }
 
-    $ATPPolicy = ConvertTo-Json @($ATPPolicyResult)
-    $ATPProtectionPolicyRule = ConvertTo-Json @($ATPProtectionPolicyRuleResult)
+    $ATPPolicy = ConvertTo-Json @(Sort-SecuritySuitePolicyTable $ATPPolicyResult)
+    $ATPProtectionPolicyRule = ConvertTo-Json @(Sort-SecuritySuitePolicyTable $ATPProtectionPolicyRuleResult)
 
     $DLPCompliancePolicyResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpCompliancePolicy" -SuppressWarning $true)
     $DLPComplianceRulesResult = @(Invoke-ComplianceTrackedCommand -CmdletName "Get-DlpComplianceRule" -SuppressWarning $true)
@@ -185,8 +230,8 @@ function Export-SecuritySuiteProvider {
         }
     }
 
-    $DLPCompliancePolicy = ConvertTo-Json @($DLPCompliancePolicyResult)
-    $DLPComplianceRules = ConvertTo-Json -Depth 3 $DLPComplianceRulesResult
+    $DLPCompliancePolicy = ConvertTo-Json @(Sort-SecuritySuitePolicyTable $DLPCompliancePolicyResult)
+    $DLPComplianceRules = ConvertTo-Json -Depth 3 @(Sort-SecuritySuitePolicyTable $DLPComplianceRulesResult)
     $ProtectionAlert = ConvertTo-Json @($ProtectionAlertResult)
 
 

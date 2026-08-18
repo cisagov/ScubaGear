@@ -74,6 +74,13 @@ const getNonEmptyValues = (value) => normalizeToArray(value)
     .map(item => String(item ?? "").trim())
     .filter(item => item.length > 0);
 
+const getPresetPolicyType = (policy) => {
+    const policyName = String(policy?.Name ?? policy?.Identity ?? policy?.Id ?? "").trim();
+    if (policyName.startsWith("Strict Preset Security Policy")) return "Strict";
+    if (policyName.startsWith("Standard Preset Security Policy")) return "Standard";
+    return null;
+};
+
 const ruleMatchesPolicy = (rule, policy) => {
     const policyIdentifiers = [policy.Name, policy.Identity, policy.Id]
         .map(value => String(value ?? "").trim().toLowerCase())
@@ -84,6 +91,9 @@ const ruleMatchesPolicy = (rule, policy) => {
 
     return rulePolicyIdentifiers.some(identifier => policyIdentifiers.includes(identifier));
 };
+
+const isProtectionPolicyRuleEnabled = (rule) =>
+    isEnabled(rule?.Enabled) || String(rule?.State ?? "").toLowerCase() === "enabled";
 
 const ruleAppliesToAllUsers = (rule, tenantDomains) => {
     const hasNoRecipientScope = RECIPIENT_SCOPE_FIELDS
@@ -121,6 +131,14 @@ const formatScopeCounts = (rules) => {
 };
 
 const getPolicyApplicability = (policy, antiPhishRules, protectionPolicyRules, acceptedDomains) => {
+    const presetPolicyType = getPresetPolicyType(policy);
+    const matchingProtectionPolicyRules = normalizeToArray(protectionPolicyRules)
+        .filter(rule => rule && typeof rule === "object")
+        .filter(rule => ruleMatchesPolicy(rule, policy));
+    if (presetPolicyType && !matchingProtectionPolicyRules.some(isProtectionPolicyRuleEnabled)) {
+        return "Not assigned";
+    }
+
     const rules = [...normalizeToArray(antiPhishRules), ...normalizeToArray(protectionPolicyRules)]
         .filter(rule => rule && typeof rule === "object")
         .filter(rule => ruleMatchesPolicy(rule, policy));
@@ -136,7 +154,25 @@ const getPolicyApplicability = (policy, antiPhishRules, protectionPolicyRules, a
     return policy.IsDefault ? "All Users" : "Not available";
 };
 
+const getPolicyEnabledState = (policy, protectionPolicyRules) => {
+    if (!getPresetPolicyType(policy)) return isEnabled(policy.Enabled);
+
+    return normalizeToArray(protectionPolicyRules)
+        .filter(rule => rule && typeof rule === "object")
+        .filter(rule => ruleMatchesPolicy(rule, policy))
+        .some(isProtectionPolicyRuleEnabled);
+};
+
 const getPolicyPriority = (policy, antiPhishRules, protectionPolicyRules) => {
+    const presetPolicyType = getPresetPolicyType(policy);
+    if (presetPolicyType) {
+        return "--";
+    }
+    const policyName = String(policy?.Name ?? policy?.Identity ?? policy?.Id ?? "").trim();
+    if (policyName === "Office365 AntiPhish Default") {
+        return "Lowest";
+    }
+
     const priorities = [...normalizeToArray(antiPhishRules), ...normalizeToArray(protectionPolicyRules)]
         .filter(rule => rule && typeof rule === "object")
         .filter(rule => ruleMatchesPolicy(rule, policy))
@@ -146,6 +182,15 @@ const getPolicyPriority = (policy, antiPhishRules, protectionPolicyRules) => {
     return priorities.length > 0
         ? [...new Set(priorities)].sort((first, second) => Number(first) - Number(second)).join(", ")
         : "N/A";
+};
+
+const getAntiPhishPolicySortKey = (row) => {
+    if (row.Policy.startsWith("Strict Preset Security Policy")) return [0, 0];
+    if (row.Policy.startsWith("Standard Preset Security Policy")) return [1, 0];
+    if (row.Policy === "Office365 AntiPhish Default") return [3, 0];
+
+    const priority = Number(String(row.Priority).split(",")[0].trim());
+    return [2, Number.isFinite(priority) ? priority : Number.MAX_SAFE_INTEGER];
 };
 
 /**
@@ -162,7 +207,7 @@ const getAntiPhishPolicyRows = (
 ) => {
     const seenPolicies = new Set();
 
-    return normalizeToArray(antiPhishPolicies).reduce((rows, policy) => {
+    const rows = normalizeToArray(antiPhishPolicies).reduce((rows, policy) => {
         if (!policy || typeof policy !== "object") return rows;
 
         const policyName = String(policy.Name ?? policy.Identity ?? "Unnamed policy").trim() || "Unnamed policy";
@@ -172,7 +217,7 @@ const getAntiPhishPolicyRows = (
 
         rows.push({
             "Policy": policyName,
-            "Enabled": isEnabled(policy.Enabled),
+            "Enabled": getPolicyEnabledState(policy, protectionPolicyRules),
             "Priority": getPolicyPriority(policy, antiPhishRules, protectionPolicyRules),
             "Applicability": getPolicyApplicability(
                 policy,
@@ -190,6 +235,14 @@ const getAntiPhishPolicyRows = (
         });
         return rows;
     }, []);
+
+    return rows.sort((first, second) => {
+        const firstKey = getAntiPhishPolicySortKey(first);
+        const secondKey = getAntiPhishPolicySortKey(second);
+        return firstKey[0] - secondKey[0] ||
+            firstKey[1] - secondKey[1] ||
+            first.Policy.localeCompare(second.Policy);
+    });
 };
 
 /**
@@ -370,7 +423,8 @@ const buildSecuritySuiteConfigTables = (
     const configNote = document.createElement("p");
     configNote.textContent =
         "Sensitive Users and Partner Domains are configured in the SecuritySuite config file. " +
-        "Anti-Phish Protection Policies are exported from the tenant.";
+        "Anti-Phish Protection Policies are exported from the tenant, and are shown in priority " +
+        "order with the highest priority policies listed first. ";
     section.appendChild(configNote);
 
     appendSecuritySuiteTableSection(
