@@ -711,19 +711,22 @@ If there is a legitimate business need, custom meeting policies can be defined w
 
 2.  Select **Teams apps** > **Permission policies**.
 
-3.  Select **Global (Org-wide default)**.
+3.  Select the **Global (Org-wide default)** table entry.
 
-4.  Under the **Microsoft apps** section, select **Allow specific apps and block all others** or **Block all apps**.
+4.  Under the **Microsoft apps** section, select **Allow specific apps and block all others** (a whitelist) or **Block all apps** (global block).
+    - If you chose to "**Block all apps**", then you can simply click **Save** to finish. Otherwise, proceed to "Optional (if whitelisting)".
 
-5.  Click **Allow apps**.
+##### Optional (if whitelisting):
 
-6.  Search and click **Add** to all appropriate Microsoft Apps.
+5.  Click on the **Allow apps** button.
 
-7.  Click **Allow**.
+6.  Search for your specific apps and click on **Select** for each to add the Microsoft App to your list.
 
-8.  Click **Save**.
+7.  Review the list for correctness and then click **Allow**.
 
-9.  If custom policies have been created, repeat these steps for each policy, selecting the appropriate policy in step 3.
+8.  Click **Save**. Your policy will go into effect following a short delay.
+
+9.  If custom policies exist on the tenant, repeat these steps for each policy, selecting the appropriate policy in step 3.
 
 #### Legacy MS.TEAMS.5.2v1 Instructions
 
@@ -731,19 +734,34 @@ If there is a legitimate business need, custom meeting policies can be defined w
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  Select the **Org-wide app settings** button to access pop-up options.
-    - Under **Third-party apps**, turn off **Third-party apps**.
+3.  Select the **Org-wide app settings** button on the top right of the screen to access pop-up options.
+    - Under the **Third-party apps** section, set **Third-party apps** to the **Off** position.
     - Click **Save**.
 
-4.  Select **Teams apps** > **Permission policies**.
+4.  On the left navigation bar, select **Teams apps** > **Permission policies**.
 
-5.  Select **Global (Org-wide default)**.
+5.  Select the **Global (Org-wide default)** table entry and proceed with the "Optional" path that is relevant to your tenant.
 
-6.  Set **Third-party apps** to **Block all apps**, unless specific apps have been approved by the agency, in which case select **Allow specific apps and block all others**.
+##### Optional (if blocking all apps):
 
-7.  Click **Save**.
+6.  Confirm the dropdown in the **Third-party apps** section is set to **Block all apps**.
+    - If **Third-party apps** is set to **Off** in the **Org-wide app settings** pop-up, this option will actually be greyed out and not modifiable.
+    - Click **Save** (if applicable). Your policy will go into effect following a short delay.
+    - **NOTE:** Temporarily setting it to **On** will allow you to modify this setting/list, if needed. 
 
-8.  If custom policies have been created, repeat steps 4 to 7 for each policy, selecting the appropriate policy in step 5.
+##### Optional (if allowing specific apps):
+
+7.  If specific apps have been approved by the agency for use, press the **Org-wide app settings** button at the top of the page.
+    - Under the **Third-party apps** section, set **Third-party apps** to the **On** position.
+    - Click **Save**.
+    - In the **Third-party apps** section on the policy screen, click on the dropdown and select **Allow specific apps and block all others**.
+    - Click on the **Allow apps** button.
+    - Search for your specific apps and click on **Select** for each to add the Third-party App to your list.
+    - Review the list for correctness and then click **Allow**.
+    - Click **Save**. Your policy will go into effect following a short delay.
+    - **NOTE:** In some instances, the app might also need to be enabled on its individual page in **Teams apps** > **Manage apps** to function. This is a manual setting that must be toggled on or off with any org-wide changes.
+
+8. If custom policies exist on the tenant, repeat this process from step 4 for each policy, selecting the appropriate policy in step 5.
 
 #### Legacy MS.TEAMS.5.3v1 Instructions
 
@@ -751,18 +769,31 @@ If there is a legitimate business need, custom meeting policies can be defined w
 
 2.  Select **Teams apps** > **Manage apps**.
 
-3.  Select the **Org-wide app settings** button to access pop-up options.
-    - Under **Custom apps**, turn off **Interaction with custom apps**.
+3.  Select the **Org-wide app settings** button on the top right of the screen to access pop-up options.
+    - Under the **Custom apps** section, set **Interaction with custom apps** to the **Off** position.
     - Click **Save**.
 
-4.  Select **Teams apps** > **Permission policies**.
+4.  On the left navigation bar, select **Teams apps** > **Permission policies**.
 
-5.  Select **Global (Org-wide default)**.
+5.  Select the **Global (Org-wide default)** table entry and proceed with the "Optional" path that is relevant to your tenant.
 
-6.  Set **Custom apps** to **Block all apps**, unless specific apps have been approved by the agency, in which case select **Allow specific apps and block all others**.
+##### Optional (if blocking all apps):
 
-7.  Click **Save**.
+6.  Confirm the dropdown in the **Custom apps** section is set to **Block all apps**.
+    - Click **Save**. Your policy will go into effect following a short delay.
 
-8.  If custom policies have been created, repeat steps 4 to 7 for each policy, selecting the appropriate policy in step 5.
+##### Optional (if allowing specific apps):
+
+7.  If specific apps have been approved by the agency for use, press the **Org-wide app settings** button at the top of the page.
+    - Under the **Custom apps** section, set **Let users interact with custom apps in preview** to the **On** position.
+    - Click **Save**.
+    - In the **Custom apps** section on the policy screen, click on the dropdown and select **Allow specific apps and block all others**.
+    - Click on the **Allow apps** button.
+    - Search for your specific apps and click on **Select** for each to add the Custom App to your list.
+    - Review the list for correctness and then click **Allow**.
+    - Click **Save**. Your policy will go into effect following a short delay.
+    - **NOTE:** In some instances, the app might also need to be enabled on its individual page in **Teams apps** > **Manage apps** to function. This is a manual setting that must be toggled on or off with any org-wide changes.
+
+8.  If custom policies exist on the tenant, repeat this process from step 4 for each policy, selecting the appropriate policy in step 5.
 
 **`TLP:CLEAR`**
