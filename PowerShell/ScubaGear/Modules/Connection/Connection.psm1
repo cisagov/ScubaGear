@@ -369,51 +369,6 @@ function Connect-Tenant {
                        }
                    }
                }
-               "sharepoint" {
-                   if ($AADAuthRequired) {
-                       $LimitedGraphParams = @{
-                           'M365Environment' = $M365Environment;
-                           'ErrorAction' = 'Stop';
-                       }
-                       if ($ServicePrincipalParams) {
-                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
-                       }
-                       Connect-GraphHelper @LimitedGraphParams
-                       $AADAuthRequired = $false
-                   }
-                   if ($SPOAuthRequired) {
-                       # Resolve tenant info if not already cached from a previous product
-                       if ([string]::IsNullOrEmpty($TenantName)) {
-                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                           $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                           $TenantName = $InitialDomain.Name
-                           $InitialDomainPrefix = $TenantName.split(".")[0]
-                       }
-
-                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
-                       $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
-
-                       if ($ServicePrincipalParams.CertThumbprintParams) {
-                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                               -Scope $SPOScope `
-                               -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                               -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                               -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                               -M365Environment $M365Environment
-                       }
-                       else {
-                           # SharePoint Online Management Shell app ID
-                           $SPOClientId = "9bc3ab49-b65d-410a-85ad-de819febfddc"
-                           $TokenData.SPOAccessToken = Get-MsalAccessToken `
-                               -Scope $SPOScope `
-                               -ClientId $SPOClientId `
-                               -Tenant $TenantName `
-                               -M365Environment $M365Environment
-                       }
-                       Write-Verbose "SharePoint token acquired successfully"
-                       $SPOAuthRequired = $false
-                   }
-               }
                "teams" {
                    $TeamsParams = @{'ErrorAction'= 'Stop'}
                    if ($ServicePrincipalParams.CertThumbprintParams) {
