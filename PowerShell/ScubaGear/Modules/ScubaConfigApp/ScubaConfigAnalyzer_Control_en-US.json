@@ -1,15 +1,16 @@
 {
   "version": "1.8.12",
+  "PullOnlineBaselines": false,
+  "GenerateTenantGovernanceConfig": false,
   "ScubaConfigAppModulePath": "ScubaConfigApp.psm1",
   "EXORestHelperPath": "..\\Providers\\ProviderHelpers\\EXORestHelper.psm1",
   "ConnectHelpersPath": "..\\Connection\\ConnectHelpers.psm1",
   "BaselineSchemaPath": "..\\..\\schemas\\ScubaGearResultsBaselineSchema.json",
   "ApiCatalogPath": "..\\..\\schemas\\ScubaGearApiCatalog.json",
   "ConfigSchemaPath": "..\\ScubaConfig\\ScubaConfigSchema.json",
-  "PullOnlineBaselines": false,
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json",
   "OnlineApiCatalogURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearApiCatalog.json",
-
+  "tenantGovernanceSchemaURL": "https://www.schemastore.org/utcm-monitor.json",
   "localeWindow": {
     "Title": "ScubaGear Config Analyzer"
   },
@@ -25,6 +26,7 @@
     "ConfigurableOnly_CheckBox": "Configurable only",
     "FindingsTab": "Findings",
     "ConfigYamlTab": "Configuration YAML",
+    "TenantGovernanceTab": "Tenant Governance Monitor JSON",
     "ActivityLogTab": "Activity Log",
     "RootCauseHeader": "Root cause",
     "RecommendationsHeader": "Recommendations",
@@ -37,6 +39,9 @@
     "OpenConfigApp_Button": "Open ScubaConfig App",
     "ExportYaml_Button": "Export YAML...",
     "CopyAllYaml_Button": "Copy all",
+    "TenantGovernanceInfo_TextBlock": "Copy or export an Entra ID tenant governance monitor JSON generated from the collected Conditional Access policies",
+    "ExportTenantGovernance_Button": "Export JSON...",
+    "CopyTenantGovernance_Button": "Copy all",
     "SummaryText": "Run or load results to begin.",
     "EmptyDetailText": "Welcome to the ScubaGear Config Analyzer.\n\nThis tool scans your Microsoft 365 tenant (or an existing ScubaGear results file) against the ScubaGear baselines and shows you exactly what to change - and which users, groups, or domains to exclude in your ScubaGear configuration - so each control can pass.\n\nHow to use it:\n1. Select the products to check (only products that support exclusions are listed).\n2. Choose your M365 environment, then click 'Connect & Scan Tenant' to sign in and scan the live tenant - or click 'Load Results JSON...' to analyze an existing ScubaResults file instead.\n3. Review the findings on the left. Use 'Issues only' and 'Configurable only' to focus the list, or the Search box to find a specific control.\n4. Click a finding to see its root cause, the best-matching Conditional Access policy, step-by-step remediation, and the exact exclusions to add to your config.\n5. Open the 'Configuration YAML' tab to copy or export the generated configuration - or click 'Open ScubaConfig App' to load it straight into the editor.\n\nSelect a finding on the left to begin.",
     "TenantText": "Tenant: (none loaded)"
@@ -58,6 +63,9 @@
     "LoadFileError": "Could not open file: {0}",
     "ControlYamlCopied": "Control YAML copied to clipboard.",
     "ConfigYamlCopied": "Configuration YAML copied to clipboard.",
+    "TenantGovernanceCopied": "Tenant governance configuration copied to clipboard.",
+    "TenantGovernanceCopyFailed": "Could not copy tenant governance configuration: {0}",
+    "TenantGovernanceExported": "Tenant governance configuration exported to {0}",
     "BaselineViewerUnavailable": "Baseline policy viewer is not available in this session.",
     "OpeningBaselineViewer": "Opening baseline policy viewer at {0}...",
     "BaselineViewerError": "Could not open baseline viewer: {0}",

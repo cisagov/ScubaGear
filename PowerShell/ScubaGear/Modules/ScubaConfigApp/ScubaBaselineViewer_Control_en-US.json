@@ -1,6 +1,8 @@
 {
   "version": "1.0.0",
   "_comment": "Control file for the app-independent ScubaGear Baseline Policy Viewer. Only holds the window chrome (products shown + policyViewerSettings header/section mappings); the policy body is generated from the baseline markdown/JSON. A different *_<lang>.json swaps the text.",
+  "configurationSampleMarkdownRawOnlinePath": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/main/docs/configuration/configuration.md",
+  "configurationBaselineJsonRawOnlinePath": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json",
   "products": [
     { "id": "Aad", "name": "Microsoft Entra ID", "showInViewer": true },
     { "id": "SecuritySuite", "name": "SecuritySuite", "showInViewer": true },
@@ -93,6 +95,34 @@
         "contentBackground": "#EFF6FF",
         "isExpanded": false
       }
+    },
+    "sampleConfigurationSettings": {
+      "_comment": "Builds 'Configuration Example' expander and resolves the Configurable badge link. 'samples' maps each documented YAML example.",
+      "displayName": "Configuration Example",
+      "introText": "Example ScubaGear configuration for this policy (from the ScubaGear configuration documentation):",
+      "headerBackground": "#ECFDF5",
+      "borderColor": "#10B981",
+      "contentBackground": "#F0FDF4",
+      "isExpanded": false,
+      "samples": [
+        {
+          "sampleName": "Example Entra ID configuration:",
+          "policyIds": [
+            "MS.AAD.1.1v1", "MS.AAD.2.1v1", "MS.AAD.2.3v1",
+            "MS.AAD.3.1v1", "MS.AAD.3.2v2", "MS.AAD.3.6v1",
+            "MS.AAD.3.7v1", "MS.AAD.3.8v1", "MS.AAD.3.9v1",
+            "MS.AAD.7.4v1"
+          ]
+        },
+        {
+          "sampleName": "Example Security Suite configuration:",
+          "policyIds": [ "MS.SECURITYSUITE.2.1v1", "MS.SECURITYSUITE.2.3v1" ]
+        },
+        {
+          "sampleName": "Example Exchange Online configuration:",
+          "policyIds": [ "MS.EXO.1.1v2" ]
+        }
+      ]
     }
   }
 }

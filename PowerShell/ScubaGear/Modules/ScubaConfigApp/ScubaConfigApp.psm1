@@ -1409,6 +1409,12 @@ Function Show-SCuBABaselinePolicyViewer {
     .PARAMETER NavigateToPolicyId
         If specified, the baseline viewer will automatically navigate to and highlight this specific policy ID.
 
+    .PARAMETER Online
+        When specified, the viewer pulls the latest baseline artifacts from the ScubaGear GitHub repo
+        (ScubaBaselines.json and the configuration.md sample markdown) instead of using the local schemas
+        copy, so developers can preview not-yet-published baselines. This is a plain HTTPS download of the
+        raw files - it does not connect to Microsoft Graph or any tenant.
+
     .EXAMPLE
         Show-SCuBABaselinePolicyViewer
         Launches the baseline policy viewer using default settings.
@@ -1420,6 +1426,10 @@ Function Show-SCuBABaselinePolicyViewer {
     .EXAMPLE
         Show-SCuBABaselinePolicyViewer -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
         Launches the viewer using baselines downloaded from GitHub.
+
+    .EXAMPLE
+        Show-SCuBABaselinePolicyViewer -Online
+        Launches the viewer against the latest baselines pulled from the ScubaGear GitHub repo.
 
     .EXAMPLE
         Show-SCuBABaselinePolicyViewer -NavigateToPolicyId "MS.DEFENDER.1.1v1"
@@ -1434,13 +1444,13 @@ Function Show-SCuBABaselinePolicyViewer {
         [string]$GitHubDirectoryUrl,
 
         [Parameter(Mandatory=$false)]
-        # Only used when generating baselines from markdown (-BaselineDirectory/-GitHubDirectoryUrl).
-        # In the normal path this default is overridden to the local schemas copy (PullOnlineBaselines=false)
-        # or online baseline data is used in-memory (PullOnlineBaselines=true).
         [string]$BaselineFilePath = "$env:TEMP\ScubaBaselines.json",
 
         [Parameter(Mandatory=$false)]
         [string]$NavigateToPolicyId,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Online,
 
         [Parameter(Mandatory=$false)]
         [switch]$PassThru
@@ -1512,8 +1522,31 @@ Function Show-SCuBABaselinePolicyViewer {
         $localSchemaPath = if ($hasLocalSchemaPath) { $uiConfig.LocalBaselineSchemaPath } else { "..\..\schemas\ScubaBaselines.json" }
         $SchemaBaselinePath = Join-Path $PSScriptRoot $localSchemaPath
 
+        # The -Online switch is the viewer's own developer toggle: pull the latest ScubaBaselines.json
+        # straight from the ScubaGear GitHub repo (raw URL in the viewer control file). It is a plain
+        # HTTPS download - no Graph/tenant connection - and takes precedence over PullOnlineBaselines.
+        $onlineBaselineJsonUrl = $null
+        if ($Online) {
+            $viewerControlPath = Join-Path $PSScriptRoot "ScubaBaselineViewer_Control_en-US.json"
+            if (Test-Path $viewerControlPath) {
+                $viewerControl = (Get-Content -Path $viewerControlPath -Raw | ConvertFrom-Json)
+                if ($viewerControl.PSObject.Properties.Name -contains 'configurationBaselineJsonRawOnlinePath') {
+                    $onlineBaselineJsonUrl = $viewerControl.configurationBaselineJsonRawOnlinePath
+                }
+            }
+            if (-not $onlineBaselineJsonUrl) {
+                throw "The -Online switch requires 'configurationBaselineJsonRawOnlinePath' in ScubaBaselineViewer_Control_en-US.json."
+            }
+        }
+
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
-            if ($pullOnline) {
+            if ($Online) {
+                # -Online: download the latest ScubaBaselines.json from GitHub, parse into memory
+                Write-Output "-Online specified. Downloading latest baseline from: $onlineBaselineJsonUrl"
+                $onlineBaselineData = Invoke-RestMethod -Uri $onlineBaselineJsonUrl -ErrorAction Stop
+                Write-Output "Online baseline loaded into memory."
+            }
+            elseif ($pullOnline) {
                 # PullOnlineBaselines = true: download from OnlineBaselineSchemaURL, parse into memory
                 Write-Output "PullOnlineBaselines=true. Downloading baseline from: $($uiConfig.OnlineBaselineSchemaURL)"
                 $onlineBaselineData = Invoke-RestMethod -Uri $uiConfig.OnlineBaselineSchemaURL -ErrorAction Stop
@@ -1903,6 +1936,8 @@ Function Start-SCuBAConfigAnalyzer {
     $syncHash.ScubaConfigAppModulePath = & $resolveScAPath $analyzerControl.ScubaConfigAppModulePath
     $syncHash.EXORestHelperPath        = & $resolveScAPath $analyzerControl.EXORestHelperPath
     $syncHash.ConnectHelpersPath       = & $resolveScAPath $analyzerControl.ConnectHelpersPath
+    $syncHash.GenerateTenantGovernanceConfig = [bool]$analyzerControl.GenerateTenantGovernanceConfig
+    $syncHash.TenantGovernanceSchemaUrl = [string]$analyzerControl.tenantGovernanceSchemaURL
 
     # Shared analyzer caches - the helper modules are Import-Module'd separately (same pattern
     # as ScubaConfigApp), so they share state via the synchronized $syncHash, not $script:.
@@ -2130,6 +2165,11 @@ Function Start-SCuBAConfigAnalyzer {
                 try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigYamlCopied') } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
             })
             $syncHash.ExportYaml_Button.Add_Click({ Export-ScubaAnalyzerYaml })
+            if ($syncHash.TenantGovernanceTab) {
+                $syncHash.TenantGovernanceTab.Visibility = if ($syncHash.GenerateTenantGovernanceConfig) { 'Visible' } else { 'Collapsed' }
+                $syncHash.CopyTenantGovernance_Button.Add_Click({ Copy-ScubaAnalyzerTenantGovernanceJson })
+                $syncHash.ExportTenantGovernance_Button.Add_Click({ Export-ScubaAnalyzerTenantGovernanceJson })
+            }
 
             # Jump to the current control in the ScubaGear baseline policy viewer
             $syncHash.ViewBaseline_Button.Add_Click({
