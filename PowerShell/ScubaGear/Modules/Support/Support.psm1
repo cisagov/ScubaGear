@@ -326,6 +326,10 @@ function Get-ScubaOpaDependencyStatus {
         VersionsToRemove     = @()
         InProgramFiles       = $false
         Action               = 'Install'
+        OperatingSystem      = $OperatingSystem
+        ExecutableName       = $opaExeName
+        InstallPath          = $opaDirectory
+        HashVerificationError = $null
     }
 
     if (-not (Test-Path -Path $opaFullPath -PathType Leaf)) {
@@ -347,6 +351,7 @@ function Get-ScubaOpaDependencyStatus {
         }
         catch {
             # Could not verify the hash (e.g. offline) - treat OPA as present but unverified
+            $status.HashVerificationError = $_.Exception.Message
             Write-Verbose "Could not verify OPA hash: $($_.Exception.Message)"
         }
     }
@@ -1487,6 +1492,7 @@ function Test-ScubaGearVersion {
 
         # ScubaGear Status Object
         $scubaGearStatus = [PSCustomObject]@{
+            PSTypeName = 'ScubaGear.VersionCheckResult'
             Component = "ScubaGear"
             CurrentVersion = $null
             LatestVersion = $null
@@ -1563,6 +1569,7 @@ function Test-ScubaGearVersion {
         $dependencyStatus = Get-DependencyStatus
         # Create dependency component with enhanced properties (always include detailed information)
         $dependencyComponent = [PSCustomObject]@{
+            PSTypeName = 'ScubaGear.VersionCheckResult'
             Component = "Dependencies"
             ModulesInstalled = "$($dependencyStatus.Installed)/$($dependencyStatus.TotalRequired)"
             Status = $dependencyStatus.Status
@@ -2094,51 +2101,34 @@ function Reset-ScubaGearDependencies {
             }
         }
 
-        # Analyze OPA executable
+        # Analyze OPA executable using the shared status helper.
         Write-Information -MessageData "Checking OPA..." -InformationAction Continue
-        $OperatingSystem = "Windows"
-        if ($PSVersionTable.PSEdition -eq "Core") {
-            if ($IsMacOS)  { $OperatingSystem = "MacOS" }
-            elseif ($IsLinux) { $OperatingSystem = "Linux" }
-        }
-        $OpaExpectedVersion = [ScubaConfig]::GetOpaVersion()
-        $OpaExeName         = [ScubaConfig]::GetOpaExecutable($OperatingSystem)
-        $OpaDirectory       = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
-        $OpaFullPath        = Join-Path -Path $OpaDirectory -ChildPath $OpaExeName
+        $opaStatus         = Get-ScubaOpaDependencyStatus
+        $OperatingSystem   = $opaStatus.OperatingSystem
+        $OpaExpectedVersion = $opaStatus.MinimumVersion
 
         $opaInfo = [PSCustomObject]@{
             Name            = "OPA"
             ExpectedVersion = $OpaExpectedVersion
-            ExecutableName  = $OpaExeName
-            InstallPath     = $OpaDirectory
+            ExecutableName  = $opaStatus.ExecutableName
+            InstallPath     = $opaStatus.InstallPath
             Action          = $null
         }
 
-        if (-not (Test-Path -Path $OpaFullPath -PathType Leaf)) {
+        if ($opaStatus.Action -eq 'Install') {
             $opaInfo.Action      = "Install OPA v$OpaExpectedVersion"
             $result.OpaToInstall = $opaInfo
         }
+        elseif ($opaStatus.Action -eq 'Update') {
+            $opaInfo.Action     = "Update to v$OpaExpectedVersion (hash mismatch)"
+            $result.OpaToUpdate = $opaInfo
+        }
         else {
-            $hashVerified = $false
-            $hashCorrect  = $false
-            try {
-                $ExpectedHash = Get-ExeHash -name $OpaExeName -version $OpaExpectedVersion
-                $ActualHash   = (Get-FileHash -Path $OpaFullPath -Algorithm SHA256).Hash
-                $hashVerified = $true
-                $hashCorrect  = ($ActualHash -ieq $ExpectedHash)
+            if ($opaStatus.HashVerificationError) {
+                $result.Warnings += "Could not verify OPA hash: $($opaStatus.HashVerificationError)"
             }
-            catch {
-                $result.Warnings += "Could not verify OPA hash: $($_.Exception.Message)"
-            }
-
-            if ($hashVerified -and -not $hashCorrect) {
-                $opaInfo.Action     = "Update to v$OpaExpectedVersion (hash mismatch)"
-                $result.OpaToUpdate = $opaInfo
-            }
-            else {
-                $opaInfo.Action     = if ($hashVerified) { "Already up to date" } else { "Present (hash unverifiable)" }
-                $result.OpaUpToDate = $opaInfo
-            }
+            $opaInfo.Action     = if ($opaStatus.HighestVersionStatus -eq 'OK') { "Already up to date" } else { "Present (hash unverifiable)" }
+            $result.OpaUpToDate = $opaInfo
         }
 
         # Calculate totals
