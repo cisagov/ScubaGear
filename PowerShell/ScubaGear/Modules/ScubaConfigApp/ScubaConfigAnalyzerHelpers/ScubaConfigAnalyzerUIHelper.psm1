@@ -648,6 +648,7 @@ function Start-ScubaAnalyzerAnalysis {
         $syncHash.Analysis = $syncHash.AnalysisSync.Result
         Update-ScubaAnalyzerFindings
         Update-ScubaAnalyzerFullYaml
+        Update-ScubaAnalyzerTenantGovernanceJson
         $count = @($syncHash.Analysis.Findings | Where-Object { $_.Result -ne 'Pass' }).Count
         Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'AnalysisComplete' $count)
         Write-ScubaAnalyzerLog "Analysis complete."
@@ -686,7 +687,7 @@ function Start-ScubaAnalyzerTenantScan {
         $syncHash.Run_Button.IsEnabled = $false
         $syncHash.Run_Progress.IsIndeterminate = $true
         $syncHash.Run_Progress.Visibility = 'Visible'
-        $syncHash.MainTabs.SelectedIndex = 2   # Run Output tab (shows sign-in progress)
+        $syncHash.MainTabs.SelectedItem = $syncHash.ActivityLogTab
         $syncHash.LastConnectStatus = $null
         Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText $(if ($appOnly) { 'ConnectingGraphAppOnly' } else { 'ConnectingGraphInteractive' }))
 
@@ -834,6 +835,7 @@ function Start-ScubaAnalyzerTenantScan {
             $syncHash.Analysis = $cs.Result
             Update-ScubaAnalyzerFindings
             Update-ScubaAnalyzerFullYaml
+            Update-ScubaAnalyzerTenantGovernanceJson
             $syncHash.MainTabs.SelectedIndex = 0
             $count = @($syncHash.Analysis.Findings | Where-Object { $_.Result -ne 'Pass' }).Count
             Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ScanComplete' $count)
@@ -1072,6 +1074,11 @@ function Initialize-ScubaConfigAnalyzerUI {
         try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigYamlCopied') } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
     })
     $syncHash.ExportYaml_Button.Add_Click({ Export-ScubaAnalyzerYaml })
+    if ($syncHash.TenantGovernanceTab) {
+        $syncHash.TenantGovernanceTab.Visibility = if ($syncHash.GenerateTenantGovernanceConfig) { 'Visible' } else { 'Collapsed' }
+        $syncHash.CopyTenantGovernance_Button.Add_Click({ Copy-ScubaAnalyzerTenantGovernanceJson })
+        $syncHash.ExportTenantGovernance_Button.Add_Click({ Export-ScubaAnalyzerTenantGovernanceJson })
+    }
 
     # Jump to the current control in the ScubaGear baseline policy viewer
     $syncHash.ViewBaseline_Button.Add_Click({

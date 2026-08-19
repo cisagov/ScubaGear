@@ -151,8 +151,24 @@ Function Show-ScubaBaselinePolicyHelper {
                 }
 
                 # Extract policy viewer settings and product mappings
+                $configSampleRawOnlinePath = $null
+                $repoDocsBaseUrl           = $null
                 if ($controlConfig) {
                     $policyViewerSettings = $controlConfig.policyViewerSettings
+
+                    # Single doc source: the raw online markdown path (always current with main). It is
+                    # used to read the sample YAML content and to resolve the Configurable badge links.
+                    $configSampleRawOnlinePath = $controlConfig.configurationSampleMarkdownRawOnlinePath
+                    if ($configSampleRawOnlinePath) {
+                        $rawDocsIndex = $configSampleRawOnlinePath.IndexOf("docs/")
+                        if ($rawDocsIndex -ge 0) {
+                            # Convert the raw base (raw.githubusercontent.com/<owner>/<repo>/refs/heads/<branch>/)
+                            # to the human github.com/<owner>/<repo>/blob/<branch>/ form so badge links open a
+                            # readable rendered page instead of raw markdown.
+                            $rawDocsBase     = $configSampleRawOnlinePath.Substring(0, $rawDocsIndex)
+                            $repoDocsBaseUrl = $rawDocsBase -replace 'raw\.githubusercontent\.com', 'github.com' -replace '/refs/heads/', '/blob/'
+                        }
+                    }
 
                     # Build product names mapping and allowed product id set from control config
                     if ($controlConfig.products) {
@@ -162,6 +178,44 @@ Function Show-ScubaBaselinePolicyHelper {
                                 $allowedProductIds[$product.id.ToLower()] = $true
                             }
                         }
+                    }
+                }
+
+                # Build the JSON-driven sample-configuration map (policyId -> YAML) from the docs markdown.
+                # The policy-id -> sample mapping lives in the control JSON so the docs can be reorganized
+                # without editing this module.
+                $sampleConfigSettings = $null
+                $sampleConfigMap = @{}
+                if ($policyViewerSettings -and ($policyViewerSettings.PSObject.Properties.Name -contains 'sampleConfigurationSettings')) {
+                    $sampleConfigSettings = $policyViewerSettings.sampleConfigurationSettings
+                }
+                if ($sampleConfigSettings -and $sampleConfigSettings.samples) {
+                    try {
+                        # Pull the docs markdown from the raw online source (always current with main).
+                        $sampleMarkdownText = $null
+                        if ($configSampleRawOnlinePath) {
+                            try {
+                                $sampleMarkdownText = (Invoke-WebRequest -Uri $configSampleRawOnlinePath -UseBasicParsing -TimeoutSec 15).Content
+                            } catch {
+                                if ($syncHash.LoggingEnabled) { Write-ViewerLog "Sample configuration online fetch failed: $($_.Exception.Message)" -Level "Warning" }
+                            }
+                        }
+                        if (-not [string]::IsNullOrWhiteSpace($sampleMarkdownText)) {
+                            foreach ($sample in $sampleConfigSettings.samples) {
+                                if (-not $sample.sampleName -or -not $sample.policyIds) { continue }
+                                $nameIndex = $sampleMarkdownText.IndexOf($sample.sampleName)
+                                if ($nameIndex -lt 0) { continue }
+                                $afterName = $sampleMarkdownText.Substring($nameIndex + $sample.sampleName.Length)
+                                $fenceMatch = [regex]::Match($afterName, '```(?:ya?ml)?[ \t]*\r?\n([\s\S]*?)\r?\n```')
+                                if (-not $fenceMatch.Success) { continue }
+                                $sampleYamlText = $fenceMatch.Groups[1].Value
+                                foreach ($policyId in $sample.policyIds) {
+                                    $sampleConfigMap[$policyId] = $sampleYamlText
+                                }
+                            }
+                        }
+                    } catch {
+                        if ($syncHash.LoggingEnabled) { Write-ViewerLog "Sample configuration parse failed: $($_.Exception.Message)" -Level "Warning" }
                     }
                 }
 
@@ -343,6 +397,55 @@ Function Show-ScubaBaselinePolicyHelper {
 
                 # Create dynamic expanders
                 & $createDynamicExpanders
+
+                # Create the JSON-driven "Configuration Example" expander (populated per-policy from docs markdown).
+                $sampleConfigExpander = $null
+                $sampleConfigPanel = $null
+                if ($sampleConfigSettings) {
+                    $sampleConfigExpander = New-Object System.Windows.Controls.Expander
+                    $sampleConfigExpander.Header = if ($sampleConfigSettings.displayName) { $sampleConfigSettings.displayName } else { "Configuration Example" }
+                    $sampleConfigExpander.IsExpanded = if ($null -ne $sampleConfigSettings.isExpanded) { [bool]$sampleConfigSettings.isExpanded } else { $false }
+                    $sampleConfigExpander.Margin = [System.Windows.Thickness]::new(0,0,0,8)
+                    $sampleConfigExpander.Visibility = "Collapsed"
+                    if ($sampleConfigSettings.headerBackground) {
+                        $sampleConfigExpander.Background = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.ColorConverter]::ConvertFromString($sampleConfigSettings.headerBackground))
+                    }
+                    if ($sampleConfigSettings.borderColor) {
+                        $sampleConfigExpander.BorderBrush = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.ColorConverter]::ConvertFromString($sampleConfigSettings.borderColor))
+                    }
+
+                    $sampleHeaderTemplate = New-Object System.Windows.DataTemplate
+                    $sampleHeaderFactory = New-Object System.Windows.FrameworkElementFactory([System.Windows.Controls.TextBlock])
+                    $sampleHeaderFactory.SetValue([System.Windows.Controls.TextBlock]::TextProperty, [System.Windows.Data.Binding]::new())
+                    $sampleHeaderFactory.SetValue([System.Windows.Controls.TextBlock]::FontWeightProperty, [System.Windows.FontWeights]::SemiBold)
+                    $sampleHeaderFactory.SetValue([System.Windows.Controls.TextBlock]::FontSizeProperty, 16.0)
+                    $sampleHeaderFactory.SetValue([System.Windows.Controls.TextBlock]::ForegroundProperty, [System.Windows.Media.Brushes]::Black)
+                    $sampleHeaderFactory.SetValue([System.Windows.Controls.TextBlock]::PaddingProperty, [System.Windows.Thickness]::new(8))
+                    $sampleHeaderTemplate.VisualTree = $sampleHeaderFactory
+                    $sampleConfigExpander.HeaderTemplate = $sampleHeaderTemplate
+
+                    $sampleContentBorder = New-Object System.Windows.Controls.Border
+                    $sampleContentBorder.Padding = [System.Windows.Thickness]::new(16)
+                    $sampleContentBorder.BorderThickness = [System.Windows.Thickness]::new(1,0,1,1)
+                    if ($sampleConfigSettings.contentBackground) {
+                        $sampleContentBorder.Background = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.ColorConverter]::ConvertFromString($sampleConfigSettings.contentBackground))
+                    }
+                    if ($sampleConfigSettings.borderColor) {
+                        $sampleContentBorder.BorderBrush = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.ColorConverter]::ConvertFromString($sampleConfigSettings.borderColor))
+                    }
+                    $sampleConfigPanel = New-Object System.Windows.Controls.StackPanel
+                    $sampleContentBorder.Child = $sampleConfigPanel
+                    $sampleConfigExpander.Content = $sampleContentBorder
+
+                    # Insert the Configuration Example expander directly after the Implementation Instructions
+                    # section (falls back to appending at the end if that expander isn't present).
+                    $sampleInsertIndex = $policyContent.Children.Count
+                    if ($dynamicExpanders.ContainsKey("implementation")) {
+                        $implExpanderIndex = $policyContent.Children.IndexOf($dynamicExpanders["implementation"])
+                        if ($implExpanderIndex -ge 0) { $sampleInsertIndex = $implExpanderIndex + 1 }
+                    }
+                    $policyContent.Children.Insert($sampleInsertIndex, $sampleConfigExpander)
+                }
 
                 # Criticality filter functionality
                 $criticalityFilter.Add_SelectionChanged({
@@ -917,6 +1020,42 @@ Function Show-ScubaBaselinePolicyHelper {
                                 }
                             }
                         }
+
+                        # Populate the JSON-driven Configuration Example expander for this policy.
+                        if ($sampleConfigExpander -and $sampleConfigPanel) {
+                            [void]$sampleConfigPanel.Children.Clear()
+                            $sampleYaml = $sampleConfigMap[$selectedPolicy.id]
+                            if (-not [string]::IsNullOrWhiteSpace($sampleYaml)) {
+                                if ($sampleConfigSettings.introText) {
+                                    $sampleIntro = New-Object System.Windows.Controls.TextBlock
+                                    $sampleIntro.Text = $sampleConfigSettings.introText
+                                    $sampleIntro.TextWrapping = "Wrap"
+                                    $sampleIntro.Margin = "0,0,0,8"
+                                    [void]$sampleConfigPanel.Children.Add($sampleIntro)
+                                }
+                                $sampleCodeBorder = New-Object System.Windows.Controls.Border
+                                $sampleCodeBorder.Background = [System.Windows.Media.Brushes]::WhiteSmoke
+                                $sampleCodeBorder.BorderBrush = [System.Windows.Media.Brushes]::Gainsboro
+                                $sampleCodeBorder.BorderThickness = "1"
+                                $sampleCodeBorder.Padding = "12"
+                                $sampleCodeBorder.CornerRadius = "4"
+                                $sampleScroll = New-Object System.Windows.Controls.ScrollViewer
+                                $sampleScroll.HorizontalScrollBarVisibility = "Auto"
+                                $sampleScroll.VerticalScrollBarVisibility = "Disabled"
+                                $sampleCodeText = New-Object System.Windows.Controls.TextBlock
+                                $sampleCodeText.FontFamily = New-Object System.Windows.Media.FontFamily("Consolas,Monaco,Lucida Console,monospace")
+                                $sampleCodeText.FontSize = 12
+                                $sampleCodeText.TextWrapping = "NoWrap"
+                                $sampleCodeText.Text = $sampleYaml
+                                $sampleScroll.Content = $sampleCodeText
+                                $sampleCodeBorder.Child = $sampleScroll
+                                [void]$sampleConfigPanel.Children.Add($sampleCodeBorder)
+                                $sampleConfigExpander.Visibility = "Visible"
+                            } else {
+                                $sampleConfigExpander.Visibility = "Collapsed"
+                            }
+                        }
+
                         if ($selectedPolicy.badges -and $selectedPolicy.badges.Count -gt 0) {
                             foreach ($badge in $selectedPolicy.badges) {
                                 $badgeButton = New-Object System.Windows.Controls.Button
@@ -940,6 +1079,24 @@ Function Show-ScubaBaselinePolicyHelper {
                                         } catch { $null}
                                     }.GetNewClosure())
                                     $badgeButton.Tag = $badge
+                                } elseif ($badge.linkUrl) {
+                                    # Resolve relative doc links (e.g. ../../../docs/configuration/configuration.md#anchor)
+                                    # to a clickable URL using the repo docs base derived from the control JSON, so the
+                                    # Configurable badge navigates to the right documentation section.
+                                    $docsBaseUrl = $repoDocsBaseUrl
+                                    $docsIndex = $badge.linkUrl.IndexOf("docs/")
+                                    if ($docsBaseUrl -and $docsIndex -ge 0) {
+                                        $resolvedBadgeUrl = $docsBaseUrl.TrimEnd('/') + "/" + $badge.linkUrl.Substring($docsIndex)
+                                        $badgeButton.Tag = [PSCustomObject]@{ linkUrl = $resolvedBadgeUrl }
+                                        $badgeButton.Add_Click({
+                                            param($eventsender, $eventData)
+                                            try {
+                                                $badgeData = $eventsender.Tag
+                                                [System.Diagnostics.Process]::Start($badgeData.linkUrl)
+                                                $eventData.Handled = $true
+                                            } catch { $null}
+                                        }.GetNewClosure())
+                                    }
                                 }
 
                                 [void]$badgesPanel.Children.Add($badgeButton)
@@ -961,6 +1118,12 @@ Function Show-ScubaBaselinePolicyHelper {
                     [void]$badgesPanel.Children.Clear()
                     foreach ($panel in $dynamicContentPanels.Values) {
                         [void]$panel.Children.Clear()
+                    }
+
+                    # Hide the per-policy Configuration Example expander on the default (non-policy) view.
+                    if ($sampleConfigExpander) {
+                        $sampleConfigExpander.Visibility = "Collapsed"
+                        if ($sampleConfigPanel) { [void]$sampleConfigPanel.Children.Clear() }
                     }
 
                     # Update expander headers and visibility for main content
