@@ -34,6 +34,11 @@ function Add-ScATenantGovernanceProperty {
 }
 
 function ConvertTo-ScATenantGovernancePolicy {
+    <#
+    .SYNOPSIS
+    Maps one Conditional Access policy to a tenant governance resource
+    (microsoft.entra.conditionalaccesspolicy). Returns $null when the policy has no display name.
+    #>
     param([Parameter(Mandatory)]$Policy)
 
     $displayName = [string](Get-ScATenantGovernanceValue -InputObject $Policy -Path 'DisplayName')
@@ -109,7 +114,13 @@ function ConvertTo-ScATenantGovernancePolicy {
 }
 
 function ConvertTo-ScATenantGovernanceJson {
+    <#
+    .SYNOPSIS
+    Builds the tenant governance baseline JSON document from the collected Conditional Access policies.
+    #>
     [CmdletBinding()]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'TenantId', Justification = 'Kept for signature/caller compatibility; the baseline document is tenant-agnostic.')]
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'SchemaUrl', Justification = 'Kept for signature/caller compatibility; the governance API expects the baseline object without a $schema wrapper.')]
     param(
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ConditionalAccessPolicies,
         [string]$TenantId,
@@ -129,6 +140,10 @@ function ConvertTo-ScATenantGovernanceJson {
 }
 
 function Update-ScubaAnalyzerTenantGovernanceJson {
+    <#
+    .SYNOPSIS
+    Refreshes the Tenant Governance JSON text box from the current analysis; no-op unless generation is enabled.
+    #>
     if (-not $syncHash.GenerateTenantGovernanceConfig -or -not $syncHash.TenantGovernanceJson_TextBox -or -not $syncHash.Analysis) { return }
     $syncHash.TenantGovernanceJson_TextBox.Text = ConvertTo-ScATenantGovernanceJson `
         -ConditionalAccessPolicies @($syncHash.Analysis.ConditionalAccessPolicies) `
@@ -137,6 +152,10 @@ function Update-ScubaAnalyzerTenantGovernanceJson {
 }
 
 function Copy-ScubaAnalyzerTenantGovernanceJson {
+    <#
+    .SYNOPSIS
+    Copies the generated Tenant Governance JSON to the clipboard.
+    #>
     try {
         [System.Windows.Clipboard]::SetText($syncHash.TenantGovernanceJson_TextBox.Text)
         Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'TenantGovernanceCopied')
@@ -146,6 +165,10 @@ function Copy-ScubaAnalyzerTenantGovernanceJson {
 }
 
 function Export-ScubaAnalyzerTenantGovernanceJson {
+    <#
+    .SYNOPSIS
+    Prompts for a path and writes the generated Tenant Governance JSON to a UTF-8 (no BOM) file.
+    #>
     try {
         if ([string]::IsNullOrWhiteSpace($syncHash.TenantGovernanceJson_TextBox.Text)) {
             Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'NothingToExport')

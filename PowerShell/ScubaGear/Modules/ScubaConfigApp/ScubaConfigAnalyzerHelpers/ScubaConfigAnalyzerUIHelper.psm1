@@ -717,6 +717,10 @@ function Start-ScubaAnalyzerTenantScan {
                 }
                 $baseline = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
 
+                # Point the engine's activity sink at this run's log mailbox so the data-collection
+                # helpers (Get-ScubaTenantGraphData, etc.) can report what they pull to the Activity Log.
+                $syncHash.ScAActivitySink = $connectSync.Log
+
                 # --- Phase A: Microsoft Graph ---
                 [void]$connectSync.Log.Add(@{ Message = "Connecting to Microsoft Graph ($env) for products '$($products -join ', ')'$(if ($appOnly) { " - noninteractive appid ($($syncHash.AppId))" })..."; Level = 'Info' })
                 if ($appOnly) {
@@ -777,6 +781,7 @@ function Start-ScubaAnalyzerTenantScan {
             } catch {
                 $connectSync.Error = $_.Exception.Message
             } finally {
+                $syncHash.ScAActivitySink = $null
                 $connectSync.IsComplete = $true
             }
         })
