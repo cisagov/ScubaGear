@@ -284,6 +284,7 @@ function Invoke-ScubaConfigAnalysis {
         }
         Products = @($Product | ForEach-Object { $_.ToLower() })
         Findings = @($findings)
+        ConditionalAccessPolicies = @($results.Raw.conditional_access_policies)
         DisplayNameLookup = @{}
     }
 }
@@ -329,7 +330,7 @@ function Invoke-ScubaTenantScan {
 
     $findings = @()
     $summary  = @{ Passes = 0; Failures = 0; Warnings = 0; Errors = 0; Manual = 0 }
-    $orgName  = $null; $tenantId = $null; $organization = $null; $displayNameLookup = @{}
+    $orgName  = $null; $tenantId = $null; $organization = $null; $displayNameLookup = @{}; $conditionalAccessPolicies = @()
 
     foreach ($prod in $Product) {
         $prodLower = $prod.ToLower()
@@ -340,6 +341,7 @@ function Invoke-ScubaTenantScan {
         $configKey = $syncHash.ScAProductMap[$prodLower].ConfigKey
 
         $data = if ($TenantData) { $TenantData } else { Get-ScubaTenantGraphData -Product $prodLower -BaselineSchema $baselineSchema }
+        if (@($data.conditional_access_policies).Count -gt 0) { $conditionalAccessPolicies = @($data.conditional_access_policies) }
         if ($data.OrgDisplayName) { $orgName = $data.OrgDisplayName }
         if ($data.Organization) { $organization = $data.Organization }
         if ($data.TenantId) { $tenantId = $data.TenantId }
@@ -507,6 +509,7 @@ function Invoke-ScubaTenantScan {
         }
         Products = @($Product | ForEach-Object { $_.ToLower() })
         Findings = @($findings)
+        ConditionalAccessPolicies = @($conditionalAccessPolicies)
         DisplayNameLookup = $displayNameLookup
     }
 }

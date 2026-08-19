@@ -331,6 +331,26 @@
                 </DockPanel>
             </TabItem>
 
+            <!-- Tenant governance configuration tab (feature-gated by analyzer control JSON) -->
+            <TabItem x:Name="TenantGovernanceTab" Header="Tenant Governance Configuration" Visibility="Collapsed">
+                <DockPanel Margin="2">
+                    <Border DockPanel.Dock="Top" Background="#EEF3FA" Padding="10,8" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <DockPanel LastChildFill="False">
+                            <TextBlock x:Name="TenantGovernanceInfo_TextBlock" DockPanel.Dock="Left" VerticalAlignment="Center" TextWrapping="Wrap" Foreground="#444444"
+                                       Text="Copy or export an Entra ID tenant governance baseline generated from the collected Conditional Access policies."/>
+                            <Button x:Name="ExportTenantGovernance_Button" Content="Export JSON..." Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right"/>
+                            <Button x:Name="CopyTenantGovernance_Button" Content="Copy all" Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right"/>
+                        </DockPanel>
+                    </Border>
+                    <Border Background="#1E272E" Margin="0,8,0,0" CornerRadius="4" Padding="4">
+                        <TextBox x:Name="TenantGovernanceJson_TextBox" IsReadOnly="True" Background="#1E272E" Foreground="#E6EDF3"
+                                 BorderThickness="0" FontFamily="Consolas, Courier New" FontSize="13"
+                                 AcceptsReturn="True" TextWrapping="NoWrap"
+                                 VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    </Border>
+                </DockPanel>
+            </TabItem>
+
             <!-- Activity log tab -->
             <TabItem x:Name="ActivityLogTab" Header="Activity Log">
                 <Border Background="#1E272E" Margin="2" CornerRadius="4" Padding="4">

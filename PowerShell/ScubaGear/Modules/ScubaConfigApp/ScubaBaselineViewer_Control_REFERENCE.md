@@ -21,6 +21,23 @@ self-resolves this file from the module root; callers no longer pass a control p
 
 ---
 
+## Online doc/baseline sources
+
+The viewer is self-contained: both online source URLs live here (no dependency on
+`ScubaConfigApp_Control` for these). Only the **raw** GitHub URLs are used.
+
+```json
+"configurationSampleMarkdownRawOnlinePath": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/main/docs/configuration/configuration.md",
+"configurationBaselineJsonRawOnlinePath": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json"
+```
+
+| Key | Purpose |
+| --- | --- |
+| `configurationSampleMarkdownRawOnlinePath` | Raw URL to `configuration.md`. Read to populate the per-policy Configuration Example section, and (converted to the `github.com/.../blob/...` form) to resolve the Configurable badge links. Always fetched from the raw source so the samples stay current with `main`. |
+| `configurationBaselineJsonRawOnlinePath` | Raw URL to the published `ScubaBaselines.json`. Downloaded into memory only when the viewer is launched with `-Online` (`Show-SCuBABaselinePolicyViewer -Online`), so developers can preview not-yet-published baselines. It is a plain HTTPS download — no Graph/tenant connection. |
+
+---
+
 ## products
 
 Which products the viewer lists, and their display names. This is the viewer's own copy — it no
@@ -50,5 +67,5 @@ Everything the viewer needs to render headers and map baseline JSON fields into 
 | `policyMarkdownMappings` | Per-policy accordion sections (Rationale, MITRE ATT&CK, Implementation Instructions, License Requirements, Additional Resources, etc.). Each entry defines the `displayName`, source `jsonProperty`, colors, and default expanded state. |
 
 > The baseline **content** (policy text, links, MITRE data) is not in this file — it comes from the
-> baseline source (`ScubaBaselines.json` locally, or the online copy when
-> `ScubaConfigApp_Control.PullOnlineBaselines` is `true`; the viewer honours that same app toggle).
+> baseline source (`ScubaBaselines.json` locally by default, or the online copy from
+> `configurationBaselineJsonRawOnlinePath` when the viewer is launched with `-Online`).
