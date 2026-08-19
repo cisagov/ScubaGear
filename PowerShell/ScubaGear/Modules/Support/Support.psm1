@@ -807,7 +807,7 @@ function New-SCuBAConfig {
         [ValidateNotNullOrEmpty()]
         [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "powerbi", "sharepoint", '*', IgnoreCase = $false)]
         [string[]]
-        $ProductNames = @("aad", "exo", "sharepoint", "teams"),
+        $ProductNames,
 
         [Parameter(Mandatory = $false)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
@@ -1025,6 +1025,30 @@ function New-SCuBAConfig {
         }
     }
 
+    # Discover schema-defined product namespaces before validating policy parameters so that the
+    # ProductNames wildcard can be expanded for all subsequent product membership checks.
+    $Schema = $null
+    $NamespaceExclusionFields = @{}
+    $ShortNameToNamespace = @{}
+    $SelectedProducts = $ProductNames
+    if (Test-Path -Path $SchemaPath) {
+        $Schema = Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json
+        foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
+            $PropertyNode = $Schema.properties.$PropertyName
+            if (-not $PropertyNode.patternProperties) { continue }
+            foreach ($Pattern in $PropertyNode.patternProperties.PSObject.Properties.Name) {
+                $PatternNode = $PropertyNode.patternProperties.$Pattern
+                if (-not $PatternNode.properties) { continue }
+                $NamespaceExclusionFields[$PropertyName] = $PatternNode.properties
+                if ($Pattern -match 'MS\\\.([A-Za-z]+)\\\.') {
+                    $ShortNameToNamespace[$Matches[1].ToLower()] = $PropertyName
+                }
+            }
+        }
+
+        $SelectedProducts = if ($ProductNames -contains '*') { $ShortNameToNamespace.Keys } else { $ProductNames }
+    }
+
     $OmissionNamespace = "OmitPolicy"
 
     # List to track which policies the user specified in $OmitPolicy are properly formatted
@@ -1036,8 +1060,7 @@ function New-SCuBAConfig {
     foreach ($Policy in $OmitPolicy) {
         if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
             # Note that -match is a case insensitive match
-            # Note that the regex does not validate the product name, this will be done
-            # later
+            # Note that the regex does not validate the product name
             $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not a valid "
             $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
             $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Skipping."
@@ -1046,7 +1069,7 @@ function New-SCuBAConfig {
         }
         $Product = ($Policy -Split "\.")[1]
         # Here's where the product name is validated
-        if (-not ($ProductNames -Contains $Product)) {
+        if (-not ($SelectedProducts -Contains $Product)) {
             $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not encompassed by "
             $Warning += "the products specified in the ProductName parameter. Skipping."
             Write-Warning $Warning
@@ -1089,7 +1112,7 @@ function New-SCuBAConfig {
             Continue
         }
         $Product = ($Policy -Split "\.")[1]
-        if (-not ($ProductNames -Contains $Product)) {
+        if (-not ($SelectedProducts -Contains $Product)) {
             $Warning = "The policy, $Policy, in the AnnotatePolicy parameter, is not encompassed by "
             $Warning += "the products specified in the ProductName parameter. Skipping."
             Write-Warning $Warning
@@ -1115,31 +1138,7 @@ function New-SCuBAConfig {
     }
 
     # Build the per-product exclusion sections directly from the configuration schema.
-    if (Test-Path -Path $SchemaPath) {
-        $Schema = Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json
-
-        # Discover the exclusion namespaces (e.g. "Aad", "SecuritySuite") from the schema, capturing the
-        # exclusion fields each one allows and mapping each product's short name (parsed from its policy-ID
-        # pattern, e.g. "aad") to that namespace.
-        $NamespaceExclusionFields = @{}
-        $ShortNameToNamespace = @{}
-        foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
-            $PropertyNode = $Schema.properties.$PropertyName
-            if (-not $PropertyNode.patternProperties) { continue }
-            foreach ($Pattern in $PropertyNode.patternProperties.PSObject.Properties.Name) {
-                $PatternNode = $PropertyNode.patternProperties.$Pattern
-                # Only product namespaces that define exclusion fields have a nested "properties" object.
-                if (-not $PatternNode.properties) { continue }
-                $NamespaceExclusionFields[$PropertyName] = $PatternNode.properties
-                if ($Pattern -match 'MS\\\.([A-Za-z]+)\\\.') {
-                    $ShortNameToNamespace[$Matches[1].ToLower()] = $PropertyName
-                }
-            }
-        }
-
-        # Expand '*' to every product the schema defines an exclusion namespace for.
-        $SelectedProducts = if ($ProductNames -contains '*') { $ShortNameToNamespace.Keys } else { $ProductNames }
-
+    if ($null -ne $Schema) {
         # policyExclusionMappings is the authoritative list of concrete policy IDs and the exclusion
         # type(s) each supports. Emit an empty template for every selected policy. When specific
         # ExclusionPolicy IDs are requested, only those are generated.
