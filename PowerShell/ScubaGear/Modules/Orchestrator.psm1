@@ -1552,12 +1552,87 @@ function Get-RiskyAppsRiskLevel {
     return $HighestRiskLevel
 }
 
+function Get-RiskyAppsPermissionList {
+    <#
+    .Description
+    Formats an application's risky permissions as a semicolon-separated list ordered
+    from highest risk level to lowest so remediating admins know which grants to review.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Object
+    )
+
+    $RiskLevelPriority = @{ Critical = 4; High = 3; Medium = 2; Low = 1 }
+    $RiskyPermissions = @($Object.Permissions) | Where-Object {
+        $null -ne $_ -and $_.IsRisky -eq $true
+    }
+
+    if (@($RiskyPermissions).Count -eq 0) {
+        return ""
+    }
+
+    $SortedPermissions = @(
+        $RiskyPermissions | Sort-Object -Property @{
+            Expression = {
+                $Priority = $RiskLevelPriority[$_.RiskLevel]
+                if ($null -eq $Priority) { 0 } else { $Priority }
+            }
+            Descending = $true
+        }, @{
+            Expression = {
+                if (-not [string]::IsNullOrEmpty("$($_.RoleDisplayName)")) {
+                    "$($_.RoleDisplayName)"
+                }
+                elseif (-not [string]::IsNullOrEmpty("$($_.RoleId)")) {
+                    "$($_.RoleId)"
+                }
+                else {
+                    ""
+                }
+            }
+            Descending = $false
+        }
+    )
+
+    $FormattedPermissions = foreach ($Permission in $SortedPermissions) {
+        $PermissionName = "$($Permission.RoleDisplayName)"
+        if ([string]::IsNullOrEmpty($PermissionName)) {
+            $PermissionName = "$($Permission.RoleId)"
+        }
+        if ([string]::IsNullOrEmpty($PermissionName)) {
+            $PermissionName = "Unknown"
+        }
+
+        $Details = @()
+        if (-not [string]::IsNullOrEmpty("$($Permission.RiskLevel)")) {
+            $Details += "$($Permission.RiskLevel)"
+        }
+        if (-not [string]::IsNullOrEmpty("$($Permission.RoleType)")) {
+            $Details += "$($Permission.RoleType)"
+        }
+
+        if ($Details.Count -gt 0) {
+            "$PermissionName ($($Details -join ', '))"
+        }
+        else {
+            $PermissionName
+        }
+    }
+
+    return ($FormattedPermissions -join "; ")
+}
+
 function ConvertTo-RiskyAppsCsv {
     <#
     .Description
     Creates a CSV in the ScubaGear output directory to assist remediation of risky
     applications and third-party service principals. Rows are ordered by severity score
-    (highest first).
+    (highest first). Each row includes the app's risky permissions ordered from
+    highest risk level to lowest.
     .Functionality
     Internal
     #>
@@ -1645,6 +1720,7 @@ function ConvertTo-RiskyAppsCsv {
                     "Display Name" = $App.DisplayName
                     "Severity Score" = $(if ($null -ne $App.SeverityScore) { $App.SeverityScore } else { 0 })
                     "Risk Level" = Get-RiskyAppsRiskLevel -Object $App
+                    "Risky Permissions" = Get-RiskyAppsPermissionList -Object $App
                     "Multi-Tenant" = [bool]$App.IsMultiTenantEnabled
                     "Third-Party Service Principal" = $false
                     "Assigned Privileged Roles" = ($PrivilegedRoles -join "; ")
@@ -1686,6 +1762,7 @@ function ConvertTo-RiskyAppsCsv {
                         if ($null -ne $ServicePrincipal.SeverityScore) { $ServicePrincipal.SeverityScore } else { 0 }
                     )
                     "Risk Level" = Get-RiskyAppsRiskLevel -Object $ServicePrincipal
+                    "Risky Permissions" = Get-RiskyAppsPermissionList -Object $ServicePrincipal
                     "Multi-Tenant" = $IsMultiTenant
                     "Third-Party Service Principal" = $true
                     "Assigned Privileged Roles" = ($PrivilegedRoles -join "; ")
@@ -1712,6 +1789,7 @@ function ConvertTo-RiskyAppsCsv {
                     "Display Name",
                     "Severity Score",
                     "Risk Level",
+                    "Risky Permissions",
                     "Multi-Tenant",
                     "Third-Party Service Principal",
                     "Assigned Privileged Roles",

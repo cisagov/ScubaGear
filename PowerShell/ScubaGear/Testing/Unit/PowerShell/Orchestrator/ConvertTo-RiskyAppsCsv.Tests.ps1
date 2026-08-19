@@ -54,6 +54,7 @@ InModuleScope Orchestrator {
             $CsvContent.Count | Should -Be 1
             $CsvContent[0] | Should -Match 'Display Name'
             $CsvContent[0] | Should -Match 'Severity Score'
+            $CsvContent[0] | Should -Match 'Risky Permissions'
             $CsvContent[0] | Should -Match 'Active Password Credentials Exceeding 180 Days'
             $CsvContent[0] | Should -Match 'Active Key Credentials Exceeding 365 Days'
         }
@@ -78,7 +79,14 @@ InModuleScope Orchestrator {
                             PrivilegedRoles = @()
                             PasswordCredentials = @()
                             KeyCredentials = @()
-                            Permissions = @()
+                            Permissions = @(
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "User.Read"
+                                    RoleType = "Delegated"
+                                    RiskLevel = "Low"
+                                    IsRisky = $true
+                                }
+                            )
                         },
                         [PSCustomObject]@{
                             DisplayName = "Higher Risk App"
@@ -102,7 +110,32 @@ InModuleScope Orchestrator {
                                     EndDateTime = $ActiveLongKeyEnd
                                 }
                             )
-                            Permissions = @()
+                            Permissions = @(
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "User.Read.All"
+                                    RoleType = "Application"
+                                    RiskLevel = "High"
+                                    IsRisky = $true
+                                },
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "Application.ReadWrite.All"
+                                    RoleType = "Application"
+                                    RiskLevel = "Critical"
+                                    IsRisky = $true
+                                },
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "Files.Read.All"
+                                    RoleType = "Delegated"
+                                    RiskLevel = "Medium"
+                                    IsRisky = $true
+                                },
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "User.Read"
+                                    RoleType = "Delegated"
+                                    RiskLevel = "Low"
+                                    IsRisky = $false
+                                }
+                            )
                         }
                     )
                     risky_third_party_service_principals = @(
@@ -114,7 +147,20 @@ InModuleScope Orchestrator {
                             PrivilegedRoles = @("Global Administrator", "Application Administrator")
                             PasswordCredentials = $null
                             KeyCredentials = $null
-                            Permissions = @()
+                            Permissions = @(
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "Mail.ReadWrite"
+                                    RoleType = "Delegated"
+                                    RiskLevel = "Medium"
+                                    IsRisky = $true
+                                },
+                                [PSCustomObject]@{
+                                    RoleDisplayName = "Directory.Read.All"
+                                    RoleType = "Application"
+                                    RiskLevel = "High"
+                                    IsRisky = $true
+                                }
+                            )
                         }
                     )
                 }
@@ -134,6 +180,7 @@ InModuleScope Orchestrator {
             $Rows[0].'Display Name' | Should -Be "Higher Risk App"
             $Rows[0].'Severity Score' | Should -Be "80"
             $Rows[0].'Risk Level' | Should -Be "High"
+            $Rows[0].'Risky Permissions' | Should -Be "Application.ReadWrite.All (Critical, Application); User.Read.All (High, Application); Files.Read.All (Medium, Delegated)"
             $Rows[0].'Multi-Tenant' | Should -Be "True"
             $Rows[0].'Third-Party Service Principal' | Should -Be "False"
             $Rows[0].'Active Password Credentials' | Should -Be "1"
@@ -146,9 +193,11 @@ InModuleScope Orchestrator {
             $Rows[1].'Third-Party Service Principal' | Should -Be "True"
             $Rows[1].'Multi-Tenant' | Should -Be "True"
             $Rows[1].'Assigned Privileged Roles' | Should -Be "Global Administrator; Application Administrator"
+            $Rows[1].'Risky Permissions' | Should -Be "Directory.Read.All (High, Application); Mail.ReadWrite (Medium, Delegated)"
 
             $Rows[2].'Display Name' | Should -Be "Lower Risk App"
             $Rows[2].'Severity Score' | Should -Be "10"
+            $Rows[2].'Risky Permissions' | Should -Be "User.Read (Low, Delegated)"
         }
 
         It 'Falls back to ProviderSettingsExport when ScubaResults is missing' {
