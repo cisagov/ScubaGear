@@ -9,6 +9,27 @@
     Part of the ScubaGear project - https://github.com/cisagov/ScubaGear
 #>
 
+function Write-ScAEngineActivity {
+    <#
+    .SYNOPSIS
+    Reports a data-collection step to the analyzer Activity Log from engine (non-UI) code.
+    .DESCRIPTION
+    Engine helpers never touch WPF. Instead they append to the shared activity sink
+    ($syncHash.ScAActivitySink) that the "Connect & Scan" worker points at $connectSync.Log;
+    the UI's DispatcherTimer drains it onto the Activity Log tab. When no sink is present
+    (headless unit tests, or the load-file path) it degrades to Write-Verbose only, so the
+    engine stays UI-free and testable.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$Message,
+        [ValidateSet('Info','Warning','Error')][string]$Level = 'Info'
+    )
+    Write-Verbose $Message
+    try {
+        if ($syncHash -and $syncHash.ScAActivitySink) { [void]$syncHash.ScAActivitySink.Add(@{ Message = $Message; Level = $Level }) }
+    } catch { Write-Verbose "Write-ScAEngineActivity sink failed: $($_.Exception.Message)" }
+}
+
 function Get-ScubaAnalyzerScopes {
     <#
     .SYNOPSIS
@@ -197,6 +218,7 @@ function Get-ScubaTenantGraphData {
     try {
         $orgUri = Resolve-ScAApiResource -Operation 'organization'
         if ($orgUri) {
+            Write-ScAEngineActivity "[$prod] Reading organization details ($orgUri)."
             $org = @(Invoke-ScubaGraphGet -Uri $orgUri)
             if (@($org).Count -gt 0) {
                 $data.OrgDisplayName = $org[0].displayName
@@ -208,9 +230,10 @@ function Get-ScubaTenantGraphData {
                 if (@($primary).Count -eq 0) { $primary = @($domains | Where-Object { $_.isInitial -eq $true }) }
                 if (@($primary).Count -eq 0) { $primary = $domains }
                 if (@($primary).Count -gt 0) { $data.Organization = $primary[0].name }
+                Write-ScAEngineActivity "[$prod] Organization '$($data.OrgDisplayName)' (primary domain: $($data.Organization); $(@($domains).Count) verified domain(s); tenant $($data.TenantId))."
             }
         }
-    } catch { Write-Verbose "Organization lookup failed: $($_.Exception.Message)" }
+    } catch { Write-ScAEngineActivity "Organization lookup failed: $($_.Exception.Message)" -Level Warning }
 
     # Conditional Access policies: read only when a control uses the CA operation's cmdlet.
     $caOp = if ($syncHash.ScAApiOperations.ContainsKey('conditionalAccessPolicies')) { $syncHash.ScAApiOperations['conditionalAccessPolicies'] } else { $null }
@@ -224,9 +247,22 @@ function Get-ScubaTenantGraphData {
             if ($caControl) { $uri = $caControl.buildInstructions.apiResourceCreate }
         }
         if ($uri) {
+            Write-ScAEngineActivity "[$prod] Reading Conditional Access policies ($uri)."
             $data.conditional_access_policies = @(Invoke-ScubaGraphGet -Uri $uri)
+            $caCount = @($data.conditional_access_policies).Count
+            Write-ScAEngineActivity "[$prod] Retrieved $caCount Conditional Access policy/policies."
+            foreach ($pol in @($data.conditional_access_policies)) {
+                $pName  = if ($pol.displayName) { [string]$pol.displayName } else { [string]$pol.id }
+                $pState = if ($pol.state) { [string]$pol.state } else { 'unknown' }
+                Write-ScAEngineActivity "[$prod]   - CA policy '$pName' (state: $pState)."
+            }
             # Resolve display names for excluded principals/apps so the generated YAML can be annotated.
-            try { $data.DisplayNameLookup = Get-ScADisplayNameLookup -Policies $data.conditional_access_policies } catch { Write-Verbose "Display-name resolution skipped: $($_.Exception.Message)" }
+            try {
+                $data.DisplayNameLookup = Get-ScADisplayNameLookup -Policies $data.conditional_access_policies
+                if (@($data.DisplayNameLookup.Keys).Count -gt 0) {
+                    Write-ScAEngineActivity "[$prod] Resolved $(@($data.DisplayNameLookup.Keys).Count) excluded principal/app display name(s)."
+                }
+            } catch { Write-ScAEngineActivity "Display-name resolution skipped: $($_.Exception.Message)" -Level Warning }
         }
     }
 
@@ -245,10 +281,14 @@ function Get-ScubaTenantGraphData {
         if (@($controls | Where-Object { $_.apiPermissionRef -eq $cmdName }).Count -eq 0) { continue }
 
         try {
+            Write-ScAEngineActivity "[$prod] Reading provider data via $cmdName (-> $rawKey)."
             $items = Get-ScAExchangeData -Fetch $an.fetch -Organization $data.Organization
-            if ($null -ne $items) { $data[$rawKey] = @($items); $fetched[$rawKey] = $true }
+            if ($null -ne $items) {
+                $data[$rawKey] = @($items); $fetched[$rawKey] = $true
+                Write-ScAEngineActivity "[$prod] Retrieved $(@($items).Count) record(s) from $cmdName."
+            }
         } catch {
-            Write-Warning "Provider fetch '$cmdName' failed: $($_.Exception.Message)"
+            Write-ScAEngineActivity "Provider fetch '$cmdName' failed: $($_.Exception.Message)" -Level Warning
         }
     }
 
