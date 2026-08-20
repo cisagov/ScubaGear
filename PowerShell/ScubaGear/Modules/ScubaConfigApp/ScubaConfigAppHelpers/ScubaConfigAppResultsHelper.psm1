@@ -419,7 +419,11 @@ Function New-ResultsReportTab {
 
     # Load content immediately instead of lazy loading
     try {
-        if (Test-Path $Report.JsonResultsPath) {
+        # Guard against an empty/missing JSON path - a report folder can match the
+        # folder-name pattern yet contain no ScubaResults JSON (e.g. an interrupted
+        # or partial run). Passing an empty string to Test-Path throws a parameter
+        # binding error, so check for content before probing the filesystem.
+        if (-not [string]::IsNullOrWhiteSpace($Report.JsonResultsPath) -and (Test-Path $Report.JsonResultsPath)) {
             $jsonContent = Get-Content $Report.JsonResultsPath -Raw
             $scubaData = $jsonContent | ConvertFrom-Json
 
@@ -435,7 +439,12 @@ Function New-ResultsReportTab {
                 $newTab.Content = $errorTab
             }
         } else {
-            $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message "JSON file not found: $($Report.JsonResultsPath)"
+            $missingJsonMessage = if ([string]::IsNullOrWhiteSpace($Report.JsonResultsPath)) {
+                "No ScubaResults JSON file was found in this report folder:`n`n$($Report.ReportPath)`n`nThis folder may be from an interrupted or incomplete scan."
+            } else {
+                "JSON file not found: $($Report.JsonResultsPath)"
+            }
+            $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message $missingJsonMessage
             $newTab.Content = $errorTab
         }
     } catch {
