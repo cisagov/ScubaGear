@@ -600,7 +600,7 @@ function Invoke-SCuBA {
             M365Environment = $ScubaConfig.M365Environment
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment -ConnectionResult $ConnectionResult
+        $TenantDetails = Get-TenantDetail -M365Environment $ScubaConfig.M365Environment
         Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
 
         # Generate a GUID to uniquely identify the output JSON
@@ -1781,22 +1781,11 @@ function Get-TenantDetail {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string[]]
-        $ProductNames,
-
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [hashtable]
-        $ConnectionResult
+        $M365Environment
     )
 
     Get-AADTenantDetail -M365Environment $M365Environment
@@ -2318,7 +2307,7 @@ function Invoke-SCuBACached {
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
-                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment -ConnectionResult $ConnectionResult
+                $TenantDetails = Get-TenantDetail -M365Environment $TempScubaConfig.M365Environment
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'

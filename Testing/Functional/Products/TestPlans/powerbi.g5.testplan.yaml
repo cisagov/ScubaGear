@@ -175,7 +175,7 @@ TestPlan:
                     enabled: true
                     canSpecifySecurityGroups: true
                     tenantSettingGroup: "Developer settings"
-                    enabledSecurityGroups: 
+                    enabledSecurityGroups:
                       - graphId: = "532def94-d877-4c90-b7f0-466a7eeafb5e"
         Postconditions: []
         ExpectedResult: true
@@ -235,7 +235,7 @@ TestPlan:
                     enabled: true
                     canSpecifySecurityGroups: true
                     tenantSettingGroup: "Developer settings"
-                    enabledSecurityGroups: 
+                    enabledSecurityGroups:
                       - graphId: = "532def94-d877-4c90-b7f0-466a7eeafb5e"
         Postconditions: []
         ExpectedResult: true
