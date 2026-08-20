@@ -740,6 +740,9 @@ function New-SCuBAConfig {
     .Parameter OmitPolicy
     A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.DEFENDER.1.1v1.
     Note that the rationales will need to be manually added to the resulting config file.
+    .Parameter ConfigLocation
+    The folder path where the generated SampleConfig.yaml file will be saved.
+    Defaults to the current user's Desktop. The folder will be created if it does not exist.
     .Functionality
     Public
     #>
@@ -824,7 +827,7 @@ function New-SCuBAConfig {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $ConfigLocation = "./",
+        $ConfigLocation = [Environment]::GetFolderPath('Desktop'),
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
@@ -846,6 +849,11 @@ function New-SCuBAConfig {
         # We don't want to immediately save this parameter to the config, as it's not in the right
         # format yet.
         $config.Remove("OmitPolicy")
+    }
+
+    if ($config.Contains("ConfigLocation")) {
+        # ConfigLocation only controls where the file is saved; it is not a ScubaGear config field.
+        $config.Remove("ConfigLocation")
     }
 
     $CapExclusionNamespace = @(
@@ -966,7 +974,18 @@ function New-SCuBAConfig {
                 }
         }
     }
-    convertto-yaml $Config | set-content "$($ConfigLocation)/SampleConfig.yaml"
+    # Some platforms (e.g., headless Linux) return an empty Desktop path; fall back to the home directory.
+    if ([string]::IsNullOrWhiteSpace($ConfigLocation)) {
+        $ConfigLocation = $HOME
+    }
+
+    if (-not (Test-Path -LiteralPath $ConfigLocation)) {
+        [System.IO.Directory]::CreateDirectory($ConfigLocation) | Out-Null
+    }
+
+    $ConfigOutputPath = Join-Path -Path $ConfigLocation -ChildPath "SampleConfig.yaml"
+    ConvertTo-Yaml $Config | Set-Content -LiteralPath $ConfigOutputPath
+    Write-Information -MessageData "Configuration file created at: $ConfigOutputPath" -InformationAction Continue
 }
 
 function Test-ScubaGearVersion {
