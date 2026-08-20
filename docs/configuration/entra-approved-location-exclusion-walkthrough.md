@@ -66,7 +66,7 @@ Phones](../images/approvedexclusionwalkthrough-step-01.png)
 
 ## Create an Approved Location in Conditional Access
 
-In **Entra \> Conditional Access**, go to **Manage \> Named locations**.
+In **Microsoft Entra ID \> Security \> Protect \> Conditional Access**, go to **Manage \> Named locations**.
 
 Create an IP ranges location named **Approved Location Conference
 Phones**.
