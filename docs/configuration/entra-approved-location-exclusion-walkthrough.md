@@ -57,7 +57,7 @@ phones and devices must be enrolled in Intune to use that policy.
 
 ## Create a Security Group for the Special User Accounts
 
-In **Microsoft Entra ID \> Manage \> Groups**, create a new security group named Conference
+In **Microsoft Entra ID \> Manage \> Groups**, create a new security group named **Conference
 Room Phones**. Under **Members**, select the Teams Rooms resource user
 accounts associated with the phones.
 
