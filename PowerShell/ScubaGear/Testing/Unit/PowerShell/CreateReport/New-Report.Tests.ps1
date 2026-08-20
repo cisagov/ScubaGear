@@ -80,6 +80,19 @@ InModuleScope CreateReport {
                         throw "Global Administrator user found after non-Global Administrator user in privileged users table"
                     }
                 }
+
+                # Each JSON data island embedded in the AAD report must be non-empty, valid JSON,
+                # even when the provider settings export lacks the corresponding key (as the stub
+                # does for the risky app keys). If any island fails to parse, the report scripts
+                # abort before applying the pass/fail background colors (issue #2242).
+                $JsonDataIslandIds = @('cap-json', 'risky-apps-json', 'risky-third-party-sp-json', 'severity-score-weights-json')
+                foreach ($IslandId in $JsonDataIslandIds) {
+                    $IslandMatch = [regex]::Match($ReportContent, "<script type='application/json' id='$IslandId'>(.*?)</script>", 'Singleline')
+                    $IslandMatch.Success | Should -Be $true -Because "the report should embed a '$IslandId' data island"
+                    $IslandJson = $IslandMatch.Groups[1].Value
+                    $IslandJson.Trim() | Should -Not -BeNullOrEmpty -Because "the '$IslandId' data island should not be empty"
+                    { $IslandJson | ConvertFrom-Json -ErrorAction Stop } | Should -Not -Throw -Because "the '$IslandId' data island should be valid JSON"
+                }
             }
         }
     }
