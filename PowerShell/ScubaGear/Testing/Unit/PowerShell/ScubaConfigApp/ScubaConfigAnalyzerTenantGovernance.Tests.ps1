@@ -9,9 +9,10 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer tenant governance configurat
 
         Import-Module $helperPath -Force
         $control = Get-Content $controlPath -Raw | ConvertFrom-Json
-        [xml]$xaml = Get-Content $xamlPath -Raw
+        # $script: scope so the It blocks (separate scriptblocks) can read these without tripping PSUseDeclaredVarsMoreThanAssignments.
+        [xml]$script:xaml = Get-Content $xamlPath -Raw
         $policies = @(Get-Content $policyStubPath -Raw | ConvertFrom-Json | Select-Object -ExpandProperty conditional_access_policies)
-        $document = ConvertTo-ScATenantGovernanceJson -ConditionalAccessPolicies $policies -TenantId 'test-tenant' `
+        $script:document = ConvertTo-ScATenantGovernanceJson -ConditionalAccessPolicies $policies -TenantId 'test-tenant' `
             -SchemaUrl $control.tenantGovernanceSchemaURL | ConvertFrom-Json
     }
 
