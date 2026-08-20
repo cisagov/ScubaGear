@@ -794,7 +794,7 @@ function Invoke-ScubaRestMethod {
         if ($null -eq $WebResponse) {
             [void]$ErrorBuffer.AppendLine("No HTTP response object was returned.")
             $LogText = $ErrorBuffer.ToString()
-            Write-Host $LogText
+            Write-Information $LogText -InformationAction Continue
             return
         }
 

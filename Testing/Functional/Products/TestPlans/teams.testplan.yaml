@@ -13,6 +13,7 @@ TestPlan:
           - Command: "Get-CsTeamsMeetingPolicyRest | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicyRest -Identity $($_.Identity) -Settings @{ AllowExternalParticipantGiveRequestControl = $false }}"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.1.2v2
     TestDriver: RunScuba
     Tests:
@@ -26,6 +27,7 @@ TestPlan:
           - Command: "Get-CsTeamsMeetingPolicyRest | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicyRest -Identity $($_.Identity) -Settings @{ AllowAnonymousUsersToStartMeeting = $false }}"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.1.4v1
     TestDriver: RunScuba
     Tests:
@@ -61,6 +63,7 @@ TestPlan:
           - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AutoAdmittedUsers = "EveryoneInCompanyExcludingGuests" }
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.1.5v1
     TestDriver: RunScuba
     Tests:
@@ -124,6 +127,7 @@ TestPlan:
           - Command: "Get-CsTeamsMeetingPolicyRest | Where-Object {$_.Identity -notin @('Tag:AllOn','Tag:AllOff','Tag:Kiosk','Tag:default','Tag:RestrictedAnonymousAccess','Tag:RestrictedAnonymousNoRecording')} | % {Set-CsTeamsMeetingPolicyRest -Identity $($_.Identity) -Settings @{ AllowPSTNUsersToBypassLobby = $false }}"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.1.6v1
     TestDriver: RunScuba
     Tests:
@@ -137,6 +141,7 @@ TestPlan:
           - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AllowCloudRecording = $false }
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.1.7v2
     TestDriver: RunScuba
     Tests:
@@ -155,6 +160,7 @@ TestPlan:
           - Command: Set-CsTeamsMeetingBroadcastPolicyRest -Identity Global -Settings @{ BroadcastRecordingMode = "UserOverride" }
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.2.1v2
     TestDriver: RunScuba
     Tests:
@@ -173,6 +179,7 @@ TestPlan:
           - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowFederatedUsers = $false }"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.5.1v2
     TestDriver: RunScuba
     Tests:
@@ -186,6 +193,7 @@ TestPlan:
           - Command: "Get-CsTeamsAppPermissionPolicyRest | % {Set-CsTeamsAppPermissionPolicyRest -Identity ($_.Identity) -Settings @{ DefaultCatalogAppsType = 'AllowedAppList'; DefaultCatalogApps = @() }}"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.5.2v2
     TestDriver: RunScuba
     Tests:
@@ -199,6 +207,7 @@ TestPlan:
           - Command: "Get-CsTeamsAppPermissionPolicyRest | % {Set-CsTeamsAppPermissionPolicyRest -Identity ($_.Identity) -Settings @{ GlobalCatalogAppsType = 'AllowedAppList'; GlobalCatalogApps = @() }}"
         Postconditions: []
         ExpectedResult: true
+
   - PolicyId: MS.TEAMS.5.3v2
     TestDriver: RunScuba
     Tests:

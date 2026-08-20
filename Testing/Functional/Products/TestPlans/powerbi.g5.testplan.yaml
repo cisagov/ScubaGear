@@ -1,0 +1,361 @@
+ProductName: powerbi
+TestPlan:
+  - PolicyId: MS.POWERBI.1.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.1.1v1 Non-compliant - Publish to web is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: PublishToWeb
+                    title: "Publish to web"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Export and sharing settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.1.1v1 Non-compliant - Publish to web is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: PublishToWeb
+                    title: "Publish to web"
+                    enabled: false
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Export and sharing settings"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.2.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.2.1v1 Non-compliant - Guest access to shared content is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: AllowGuestUserToAccessSharedContent
+                    title: "Allow guest users to access shared content"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Export and sharing settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.2.1v1 Compliant - Guest access to shared content is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: AllowGuestUserToAccessSharedContent
+                    title: "Allow guest users to access shared content"
+                    enabled: false
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Export and sharing settings"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.3.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.3.1v1 Non-compliant - External sharing is enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: ExternalSharingV2
+                    title: "Users can invite guest users to collaborate through item sharing and permissions"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Export and sharing settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.3.1v1 Compliant - External sharing is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: ExternalSharingV2
+                    title: "Users can invite guest users to collaborate through item sharing and permissions"
+                    enabled: false
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Export and sharing settings"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.4.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.4.1v1 Non-compliant - Service principal API access is enabled org-wide (not restricted to security groups)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: ServicePrincipalAccessPermissionAPIs
+                    title: "Service principals can call Fabric public APIs"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Developer settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.4.1v1 Compliant - Service principal API access is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: ServicePrincipalAccessPermissionAPIs
+                    title: "Service principals can call Fabric public APIs"
+                    enabled: false
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Developer settings"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERBI.4.1v1 Compliant - Service principal API access is enabled and restricted to security groups
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: ServicePrincipalAccessPermissionAPIs
+                    title: "Service principals can call Fabric public APIs"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Developer settings"
+                    enabledSecurityGroups: 
+                      - graphId: = "532def94-d877-4c90-b7f0-466a7eeafb5e"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.4.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.4.2v1 Non-compliant - Service principal profile creation is enabled org-wide (not restricted to security groups)
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: AllowServicePrincipalsCreateAndUseProfiles
+                    title: "Allow service principals to create and use profiles"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Developer settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.4.2v1 Compliant - Service principal profile creation is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: AllowServicePrincipalsCreateAndUseProfiles
+                    title: "Allow service principals to create and use profiles"
+                    enabled: false
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Developer settings"
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.POWERBI.4.2v1 Compliant - Service principal profile creation is enabled and restricted to security groups
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: AllowServicePrincipalsCreateAndUseProfiles
+                    title: "Allow service principals to create and use profiles"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Developer settings"
+                    enabledSecurityGroups: 
+                      - graphId: = "532def94-d877-4c90-b7f0-466a7eeafb5e"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.5.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.5.1v1 Non-compliant - ResourceKey authentication is not blocked
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: BlockResourceKeyAuthentication
+                    title: "Block ResourceKey authentication"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Developer settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.5.1v1 Compliant - ResourceKey authentication is blocked
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: BlockResourceKeyAuthentication
+                    title: "Block ResourceKey authentication"
+                    enabled: true
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Developer settings"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.6.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.6.1v1 Non-compliant - R and Python visuals are enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: RScriptVisual
+                    title: "Interact with and share R and Python visuals"
+                    enabled: true
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "R and Python visuals settings"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.6.1v1 Compliant - R and Python visuals are disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: RScriptVisual
+                    title: "Interact with and share R and Python visuals"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "R and Python visuals settings"
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.POWERBI.7.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.7.1v1 Non-compliant - Sensitivity labels are disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: EimInformationProtectionEdit
+                    title: "Allow users to apply sensitivity labels for content"
+                    enabled: false
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Information protection"
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.POWERBI.7.1v1 Non-compliant - Sensitivity labels are enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                powerbi_tenant_settings:
+                  - settingName: setting1
+                    title: "fake setting"
+                    enabled: false
+                    canSpecifySecurityGroups: false
+                    tenantSettingGroup: "Admin API settings"
+                  - settingName: EimInformationProtectionEdit
+                    title: "Allow users to apply sensitivity labels for content"
+                    enabled: true
+                    canSpecifySecurityGroups: true
+                    tenantSettingGroup: "Information protection"
+        Postconditions: []
+        ExpectedResult: true
