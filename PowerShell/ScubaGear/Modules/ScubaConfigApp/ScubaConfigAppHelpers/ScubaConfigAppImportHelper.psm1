@@ -843,6 +843,8 @@ Function Invoke-PolicyMigration {
         if ($policiesToMigrate.Count -eq 0) { continue }
 
         foreach ($oldPolicyId in $policiesToMigrate) {
+            # Isolate each policy so a failure on one does not abort migration of the rest.
+            try {
             $entry = $migrationMap[$oldPolicyId]
 
             if (-not $entry.newPolicyId -or -not $entry.newProduct) {
@@ -890,6 +892,14 @@ Function Invoke-PolicyMigration {
                 Write-DebugOutput -Message "Migration skipped - target already configured: [$newProductKey][$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
             }
             $productData.Remove($oldPolicyId)
+            }
+            catch {
+                # Leave the offending policy in place and keep migrating the others.
+                [void]$syncHash.MigrationLog.Add(
+                    "$pfxDropped exclusion [$productKey][$oldPolicyId] - migration error, left in place: $($_.Exception.Message)")
+                Write-DebugOutput -Message "Error migrating exclusion [$productKey][$oldPolicyId]; skipping this policy and continuing: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                continue
+            }
         }
 
         # Remove the old product key if it is now empty (e.g., an old Defender section)
@@ -919,6 +929,8 @@ Function Invoke-PolicyMigration {
         $policiesToMigrate = @($controlData.Keys) | Where-Object { $migrationMap.ContainsKey($_) }
 
         foreach ($oldPolicyId in $policiesToMigrate) {
+            # Isolate each policy so a failure on one does not abort migration of the rest.
+            try {
             $entry = $migrationMap[$oldPolicyId]
 
             if (-not $entry.newPolicyId) {
@@ -952,6 +964,14 @@ Function Invoke-PolicyMigration {
                 Write-DebugOutput -Message "Migration skipped - ${yamlValue} target exists: [$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
             }
             $controlData.Remove($oldPolicyId)
+            }
+            catch {
+                # Leave the offending policy in place and keep migrating the others.
+                [void]$syncHash.MigrationLog.Add(
+                    "$pfxDropped $yamlValue [$oldPolicyId] - migration error, left in place: $($_.Exception.Message)")
+                Write-DebugOutput -Message "Error migrating ${yamlValue} [$oldPolicyId]; skipping this policy and continuing: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                continue
+            }
         }
     }
 
