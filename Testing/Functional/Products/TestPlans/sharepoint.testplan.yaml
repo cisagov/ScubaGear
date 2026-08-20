@@ -1,5 +1,4 @@
 ProductName: sharepoint
-Description: This test plan is for use with a user login.  It will use SharePoint Online Service module as primary provided setting export tool.
 TestPlan:
   - PolicyId: MS.SHAREPOINT.1.1v1
     TestDriver: RunScuba
@@ -36,36 +35,36 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.1.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.1.2v1 Non-compliant - SharingCapability = ExternalUserSharingOnly (New and existing guests)
-        Preconditions:
-          - Command: Set-SPOTenant
-            Splat:
-              SharingCapability: ExternalUserSharingOnly
-          - Command: 'Set-SPOSite -Identity $(Get-SpoSite -Filter "Url -like ''-my.sharepoint.''") -SharingCapability ExternalUserSharingOnly'
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.2v1 Non-compliant SharingCapability = ExternalUserAndGuestSharing (2)
+      - TestDescription: MS.SHAREPOINT.1.2v1 Non-compliant - ExternalUserAndGuestSharing (Anyone)
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: ExternalUserAndGuestSharing
-          - Command: 'Set-SPOSite -Identity $(Get-SpoSite -Filter "Url -like ''-my.sharepoint.''") -SharingCapability ExternalUserAndGuestSharing'
+              ODBSharingCapability: ExternalUserAndGuestSharing
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.1.2v1 Compliant - SharingCapability = Disabled (0)
+      - TestDescription: MS.SHAREPOINT.1.2v1 Non-compliant - ExternalUserSharingOnly (New and existing guests)
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
-              SharingCapability: Disabled
-          - Command: 'Set-SPOSite -Identity $(Get-SpoSite -Filter "Url -like ''-my.sharepoint.''") -SharingCapability Disabled'
+              SharingCapability: ExternalUserSharingOnly
+              ODBSharingCapability: ExternalUserSharingOnly
         Postconditions: []
-        ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.1.2v1 SharingCapability = ExistingExternalUserSharingOnly (New and existing guests)
+        ExpectedResult: false
+      - TestDescription: MS.SHAREPOINT.1.2v1 Compliant - ExistingExternalUserSharingOnly (Existing guests)
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: ExistingExternalUserSharingOnly
-          - Command: 'Set-SPOSite -Identity $(Get-SpoSite -Filter "Url -like ''-my.sharepoint.''") -SharingCapability ExistingExternalUserSharingOnly'
+              ODBSharingCapability: ExistingExternalUserSharingOnly
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.1.2v1 Compliant - Disabled (Only people in org)
+        Preconditions:
+          - Command: Set-SPOTenant
+            Splat:
+              SharingCapability: Disabled
+              ODBSharingCapability: Disabled
         Postconditions: []
         ExpectedResult: true
 
@@ -99,6 +98,8 @@ TestPlan:
               SharingAllowedDomainList: good.org admirable.us
         Postconditions: []
         ExpectedResult: true
+      # The Rego returns RequirementMet = true with a "not applicable" detail string for the
+      # N/A cases below, so the report shows Pass rather than N/A. IsNotChecked does not apply.
       - TestDescription: MS.SHAREPOINT.1.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization);
         Preconditions:
           - Command: Set-SPOTenant
@@ -106,8 +107,7 @@ TestPlan:
               SharingCapability: Disabled
               SharingDomainRestrictionMode: None
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.1.3v1 Non-Applicable - SharingCapability = Disabled (Only people in organization); SharingDomainRestrictionMode = AllowList
         Preconditions:
           - Command: Set-SPOTenant
@@ -116,8 +116,7 @@ TestPlan:
               SharingDomainRestrictionMode: AllowList
               SharingAllowedDomainList: good.org admirable.us
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.2.1v1
     TestDriver: RunScuba
@@ -151,6 +150,8 @@ TestPlan:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: Disabled
+          - Command: Set-SPOTenant
+            Splat:
               DefaultSharingLinkType: Direct
         Postconditions: []
         ExpectedResult: true
@@ -176,7 +177,7 @@ TestPlan:
   - PolicyId: MS.SHAREPOINT.3.1v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.1v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); RequireAnonymousLinksExpireInDays > 30
+      - TestDescription: MS.SHAREPOINT.3.1v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing; RequireAnonymousLinksExpireInDays > 30
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -215,8 +216,7 @@ TestPlan:
               RequireAnonymousLinksExpireInDays: 30
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant
@@ -224,8 +224,7 @@ TestPlan:
               RequireAnonymousLinksExpireInDays: 30
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
       - TestDescription: MS.SHAREPOINT.3.1v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization); RequireAnonymousLinksExpireInDays = 30
         Preconditions:
           - Command: Set-SPOTenant
@@ -233,13 +232,12 @@ TestPlan:
               RequireAnonymousLinksExpireInDays: 30
               SharingCapability: Disabled
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.3.2v1
     TestDriver: RunScuba
     Tests:
-      - TestDescription: MS.SHAREPOINT.3.2v1 Compliant FileAnonymousLinkType = View; FolderAnonymousLinkType = View
+      - TestDescription: MS.SHAREPOINT.3.2v1 Compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = View; FolderAnonymousLinkType = View
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -248,7 +246,7 @@ TestPlan:
               FolderAnonymousLinkType: View
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = Edit; FolderAnonymousLinkType = Edit
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = Edit; FolderAnonymousLinkType = Edit
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -257,7 +255,7 @@ TestPlan:
               FolderAnonymousLinkType: Edit
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = Edit; FolderAnonymousLinkType = View
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = Edit; FolderAnonymousLinkType = View
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -266,7 +264,7 @@ TestPlan:
               FolderAnonymousLinkType: View
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant FileAnonymousLinkType = View; FolderAnonymousLinkType = Edit
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-compliant - SharingCapability = ExternalUserAndGuestSharing (Anyone); FileAnonymousLinkType = View; FolderAnonymousLinkType = Edit
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
@@ -275,30 +273,27 @@ TestPlan:
               FolderAnonymousLinkType: Edit
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization); FileAnonymousLinkType = View; FolderAnonymousLinkType = View
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = Disabled (Only people in your organization)
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: Disabled
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests); FileAnonymousLinkType = View; FolderAnonymousLinkType = View
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExistingExternalUserSharingOnly (Existing guests)
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: ExistingExternalUserSharingOnly
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
-      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests); FileAnonymousLinkType = View; FolderAnonymousLinkType = View
+        ExpectedResult: true
+      - TestDescription: MS.SHAREPOINT.3.2v1 Non-Applicable - SharingCapability = ExternalUserSharingOnly (New and existing guests)
         Preconditions:
           - Command: Set-SPOTenant
             Splat:
               SharingCapability: ExternalUserSharingOnly
         Postconditions: []
-        IsNotChecked: true
-        ExpectedResult: false
+        ExpectedResult: true
 
   - PolicyId: MS.SHAREPOINT.3.3v2
     TestDriver: RunScuba
