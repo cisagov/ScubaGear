@@ -435,18 +435,16 @@ jobs:
             }
       - name: Get Key Vault info
         id: key-vault-info
-        env:
-          KEY_VAULT_INFO: ${{ secrets.SCUBA_KEY_VAULT_PROD}}
-        run: |
-          $KeyVaultInfo = ${env:KEY_VAULT_INFO} | ConvertFrom-Json
-          echo "KeyVaultUrl=$($KeyVaultInfo.KeyVault.URL)" >> $env:GITHUB_OUTPUT
-          echo "KeyVaultCertificateName=$($KeyVaultInfo.KeyVault.CertificateName)" >> $env:GITHUB_OUTPUT
+        uses: ./.github/actions/get-keyvault-info
+        with:
+          key-vault-info: ${{ secrets.SCUBA_KEY_VAULT_PROD }}
+          checkout-path: repo
       - name: Sign Module
         run: |
           . repo/utils/workflow/Build-SignRelease.ps1
           New-ModuleSignature `
-            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.KeyVaultUrl }} `
-            -CertificateName ${{ steps.key-vault-info.outputs.KeyVaultCertificateName }} `
+            -AzureKeyVaultUrl ${{ steps.key-vault-info.outputs.key-vault-url }} `
+            -CertificateName ${{ steps.key-vault-info.outputs.certificate-name }} `
             -ReleaseVersion ${{ inputs.version }} `
             -RootFolderName "repo"
       - name: Create Release
