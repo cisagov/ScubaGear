@@ -1,4 +1,6 @@
-﻿# Helper function to show message boxes on top of the main window
+﻿using module '..\ScubaConfig\ScubaConfig.psm1'
+
+# Helper function to show message boxes on top of the main window
 function Show-ScubaMessageBox {
     param(
         [string]$Message,
@@ -117,7 +119,7 @@ Function Start-SCuBAConfigApp {
         [switch]$Online,
 
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
-        [ValidateSet('commercial', 'dod', 'gcc', 'gcchigh')]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment = 'commercial',
 
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
