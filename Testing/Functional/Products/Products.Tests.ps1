@@ -99,15 +99,6 @@ param (
 $script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
 BeforeDiscovery {
-    $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
-    $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
-    $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
-    Import-Module $ScubaModule
-    Import-Module $ConnectionModule
-
-    # Convert product name to execution name (defender -> securitysuite mapping)
-    $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
-
     if ($Variant) {
         $TestPlanFileName = "TestPlans/$ExecutionProductName.$Variant.testplan.yaml"
     }
@@ -121,47 +112,21 @@ BeforeDiscovery {
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Tests', Justification = 'Variable is used in ScriptBlock')]
     $Tests = $TestPlan.Tests
-
-    # Convert product name to execution name (defender -> securitysuite mapping)
-    $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
-
-    if ($ExecutionProductName -eq "securitysuite") {
-        $ProductNames = @($ExecutionProductName, "exo")
-    }
-    else {
-        $ProductNames = @($ExecutionProductName)
-    }
-
-    if (-Not [string]::IsNullOrEmpty($AppId)) {
-        $TempScubaConfig = New-Object -Type PSObject -Property @{
-            'AppID' = $AppId;
-            'CertificateThumbprint' = $Thumbprint;
-            'Organization' = $TenantDomain;
-        }
-        $null = Get-ServicePrincipalParams -ScubaConfig $TempScubaConfig
-        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantDomain
-
-        $ServicePrincipalParams = @{CertThumbprintParams = @{
-            CertificateThumbprint = $Thumbprint;
-            AppID = $AppId;
-            Organization = $TenantDomain;
-        }}
-        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
-    }
-    else {
-        Write-Debug "Manual Connect to Tenant"
-        Connect-Tenant -ProductNames $ProductNames -M365Environment $M365Environment
-    }
 }
 
 BeforeAll {
-    # Shared Data for functional test
+    # Import commonly used modules like Connection and Selenium for functional tests.
     $ScubaModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules"
     $ScubaModule = Join-Path -Path $ScubaModulePath -ChildPath "../ScubaGear.psd1"
     $ConnectionModule = Join-Path -Path $ScubaModulePath -ChildPath "Connection/Connection.psm1"
+    $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
     Import-Module $ScubaModule
     Import-Module $ConnectionModule
+    Import-Module $ConnectHelpersPath
     Import-Module Selenium
+
+    # Dot source utility functions
+    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
 
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
@@ -175,71 +140,11 @@ BeforeAll {
         teams = "Microsoft Teams"
     }
 
-    # Dot source utility functions
-    . (Join-Path -Path $PSScriptRoot -ChildPath "FunctionalTestUtils.ps1")
-
-    # EXO functional tests use REST-backed helper wrappers from FunctionalTestUtils.
-    # Initialize EXO REST auth context for test pre/postconditions.
-    # SecuritySuite/Defender tests also need EXO REST for live preconditions (6.x tests).
-    if ($ProductName -in @("exo", "securitysuite", "defender")) {
-        $EXOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/EXORestHelper.psm1"
-        Import-Module $EXOHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
-
-        $EXOScope = Get-ExchangeOnlineScope -M365Environment $M365Environment
-        if (-Not [string]::IsNullOrEmpty($AppId)) {
-            $script:EXOAccessToken = Get-MsalAccessToken `
-                -CertificateThumbprint $Thumbprint `
-                -AppID $AppId `
-                -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -Scope $EXOScope
-        }
-        else {
-            # Microsoft Exchange Online Remote PowerShell well-known client ID
-            $EXOClientId = "fb78d390-0c51-40cd-8e17-fdbfab77341b"
-            $script:EXOAccessToken = Get-MsalAccessToken `
-                -Tenant $TenantDomain `
-                -M365Environment $M365Environment `
-                -ClientId $EXOClientId `
-                -Scope $EXOScope
-        }
-
-        $TokenParts = $script:EXOAccessToken.Split('.')
-        if ($TokenParts.Count -lt 2) {
-            throw 'Unable to parse EXO access token for tenant id.'
-        }
-
-        $JwtPayload = $TokenParts[1].Replace('-', '+').Replace('_', '/')
-        switch ($JwtPayload.Length % 4) {
-            2 { $JwtPayload += '==' }
-            3 { $JwtPayload += '=' }
-        }
-
-        $PayloadJson = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($JwtPayload))
-        $Payload = $PayloadJson | ConvertFrom-Json
-        $script:EXOTenantId = $Payload.tid
-
-        if ([string]::IsNullOrWhiteSpace($script:EXOTenantId)) {
-            throw 'Unable to resolve tenant id (tid) from EXO access token.'
-        }
-
-        $script:EXOApiEndpoint = Get-ExchangeOnlineApiEndpoint `
-            -TenantId $script:EXOTenantId `
-            -TenantDomain $TenantDomain `
-            -M365Environment $M365Environment `
-            -AccessToken $script:EXOAccessToken
-
-    }
-
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "sharepoint") {
         $SPOHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/SPORestHelper.psm1"
         Import-Module $SPOHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
         $DomainPrefix = $TenantDomain.Split(".")[0]
         $script:SPOAdminUrl = switch ($M365Environment) {
             "gcchigh" { "https://$DomainPrefix-admin.sharepoint.us" }
@@ -269,8 +174,6 @@ BeforeAll {
     if ($ProductName -eq "powerplatform") {
         $PPHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerPlatformRestHelper.psm1"
         Import-Module $PPHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
         $script:PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
         $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
         if (-Not [string]::IsNullOrEmpty($AppId)) {
@@ -290,14 +193,37 @@ BeforeAll {
         }
     }
 
+    # Teams functional tests: acquire REST token for precondition helper calls.
+    # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
+    # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
+    if ($ProductName -eq "teams") {
+        $TeamsHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/TeamsRestHelper.psm1"
+        Import-Module $TeamsHelperPath -Force
+        $script:TeamsBaseUrl = Get-TeamsBaseUrl -M365Environment $M365Environment
+        $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
+        if (-Not [string]::IsNullOrEmpty($AppId)) {
+            $script:TeamsAccessToken = Get-MsalAccessToken `
+                -CertificateThumbprint $Thumbprint `
+                -AppID $AppId `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -Scope $TeamsScope
+        }
+        else {
+            $script:TeamsAccessToken = Get-MsalAccessToken `
+                -Tenant $TenantDomain `
+                -M365Environment $M365Environment `
+                -ClientId "12128f48-ec9e-42f0-b203-ea49fb6af367" `
+                -Scope $TeamsScope
+        }
+    }
+
     # Power BI functional tests: acquire REST token for precondition helper calls.
     # Must be in BeforeAll (not InModuleScope) so $script: refers to this file's scope,
     # which is visible to functions dot-sourced from FunctionalTestUtils.ps1.
     if ($ProductName -eq "powerbi") {
         $PBIHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Providers/ProviderHelpers/PowerBIRestHelper.psm1"
         Import-Module $PBIHelperPath -Force
-        $ConnectHelpersPath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1"
-        Import-Module $ConnectHelpersPath -Force
         $script:PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
         $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
         if (-Not [string]::IsNullOrEmpty($AppId)) {

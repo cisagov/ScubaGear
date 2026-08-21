@@ -27,7 +27,7 @@ MeetingsAllowingExternalControl contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": MeetingsAllowingExternalControl,
     "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingExternalControl, String),
     "RequirementMet": Status
@@ -52,7 +52,7 @@ MeetingsAllowingAnonStart contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.2v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": MeetingsAllowingAnonStart,
     "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingAnonStart, String),
     "RequirementMet": Status
@@ -88,7 +88,7 @@ ReportDetails1_3(Policy) := Description if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": [
         Policy.AutoAdmittedUsers,
         Policy.AllowPSTNUsersToBypassLobby
@@ -112,7 +112,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.3v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -129,7 +129,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.4v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": Policy.AutoAdmittedUsers,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -150,7 +150,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.4v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -174,7 +174,7 @@ MeetingsAllowingPSTNBypass contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": MeetingsAllowingPSTNBypass,
     "ReportDetails": ReportDetailsArray(Status, MeetingsAllowingPSTNBypass, String),
     "RequirementMet": Status
@@ -187,7 +187,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.5v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -204,7 +204,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.6v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": Policy.AllowCloudRecording,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -220,7 +220,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.6v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingPolicy"],
+    "Commandlet": ["Get-TeamsMeetingPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -237,7 +237,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingBroadcastPolicy"],
+    "Commandlet": ["Get-TeamsMeetingBroadcastPolicyRest"],
     "ActualValue": Policy.BroadcastRecordingMode,
     "ReportDetails": ReportDetailsBoolean(Status),
     "RequirementMet": Status
@@ -257,7 +257,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.1.7v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsMeetingBroadcastPolicy"],
+    "Commandlet": ["Get-TeamsMeetingBroadcastPolicyRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
@@ -291,7 +291,7 @@ ExternalAccessConfig contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.2.1v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
     "ActualValue": ExternalAccessConfig,
     "ReportDetails": ReportDetailsArray(Status, ExternalAccessConfig, String),
     "RequirementMet": Status
@@ -309,8 +309,11 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": [],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
+    "ActualValue": {
+        "FederationConfiguration": FederationConfiguration,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.2v2", Reason),
     "RequirementMet": true
 } if {
@@ -346,8 +349,11 @@ FederationConfiguration contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.2.2v2",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": FederationConfiguration,
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
+    "ActualValue": {
+        "FederationConfiguration": FederationConfiguration,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": ReportDetailsArray(Status, FederationConfiguration, String),
     "RequirementMet": Status
 } if {
@@ -365,8 +371,11 @@ tests contains {
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": [],
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
+    "ActualValue": {
+        "InternalCannotEnable": InternalCannotEnable,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.2.3v2", Reason),
     "RequirementMet": true
 } if {
@@ -385,8 +394,11 @@ InternalCannotEnable contains Policy.Identity if {
 tests contains {
     "PolicyId": "MS.TEAMS.2.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTenantFederationConfiguration"],
-    "ActualValue": InternalCannotEnable,
+    "Commandlet": ["Get-TeamsTenantFederationConfigurationRest"],
+    "ActualValue": {
+        "InternalCannotEnable": InternalCannotEnable,
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
+    },
     "ReportDetails": ReportDetailsArray(Status, InternalCannotEnable, String),
     "RequirementMet": Status
 } if {
@@ -411,31 +423,19 @@ ConfigsAllowingEmail contains Policy.Identity if {
     Policy.AllowEmailIntoChannel == true
 }
 
-# Concat the AssignedPlan for each tenant in one comma separated string
-AssignedPlans := concat(", ", TenantConfig.AssignedPlan) if {
-    some TenantConfig in input.teams_tenant_info
-}
-
-# If AssignedPlan (one of the tenant configs) contain the string
-# "GCC" and/or "DOD", return true, else return false
 default IsUSGovTenantRegion := false
 IsUSGovTenantRegion := true if {
-    GCCConditions := [
-        contains(AssignedPlans, "GCC"),
-        contains(AssignedPlans, "GCCHIGH"),
-        contains(AssignedPlans, "DOD")
-    ]
-    count(FilterArray(GCCConditions, true)) > 0
+    input.scuba_config.M365Environment in {"gcc", "gcchigh", "dod"}
 }
 
 # GCC/GCC High/DoD environments: Not applicable
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
+    "Commandlet": ["Get-TeamsClientConfigurationRest"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
-        "AssignedPlans": AssignedPlans
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
     },
     "ReportDetails": CheckedSkippedDetails("MS.TEAMS.4.1v1", Reason),
     "RequirementMet": true
@@ -453,10 +453,10 @@ ReportDetails4_1(false) := FAIL
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration", "Get-CsTenant"],
+    "Commandlet": ["Get-TeamsClientConfigurationRest"],
     "ActualValue": {
         "ClientConfig": input.client_configuration,
-        "AssignedPlans": AssignedPlans
+        "IsUSGovTenantRegion": IsUSGovTenantRegion
     },
     "ReportDetails": ReportDetails4_1(IsEnabled),
     "RequirementMet": IsEnabled
@@ -465,16 +465,16 @@ tests contains {
     IsEnabled := count(ConfigsAllowingEmail) == 0
 }
 
-# Edge case where pulling configuration from tenant fails
+# Edge case where client_configuration field is empty array
 tests contains {
     "PolicyId": "MS.TEAMS.4.1v1",
     "Criticality": "Shall",
-    "Commandlet": ["Get-CsTeamsClientConfiguration"],
+    "Commandlet": ["Get-TeamsClientConfigurationRest"],
     "ActualValue": "PowerShell Error",
     "ReportDetails": "PowerShell Error",
     "RequirementMet": false
 } if {
-    count(input.teams_tenant_info) == 0
+    count(input.client_configuration) == 0
 }
 #--
 
@@ -487,9 +487,12 @@ tests contains {
 # MS.TEAMS.5.1v2
 #--
 
+# Possible values for DefaultCatalogAppsType are:
+# AllowedAppList - this blocks all Microsoft apps unless added to the allow list.
+# BlockedAppList - this allows all Microsoft apps by default, with no apps blocked unless explicitly added to the block list.
 # Iterate through all app permission policies. For each, check if DefaultCatalogAppsType
-# is BlockedAppList. If so, save the policy Identity to the PoliciesBlockingDefaultApps list.
-PoliciesBlockingDefaultApps contains Policy.Identity if {
+# is BlockedAppList. If so, save the policy Identity to the return set.
+NonCompliantPoliciesBlockingDefaultApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.DefaultCatalogAppsType == "BlockedAppList"
 }
@@ -547,18 +550,18 @@ GetDefaultAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.1v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": {"Policies": PoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest"],
+    "ActualValue": {"Policies": NonCompliantPoliciesBlockingDefaultApps, "TenantSetting": DefaultAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    LegacyCompliant := count(PoliciesBlockingDefaultApps) == 0
+    LegacyCompliant := count(NonCompliantPoliciesBlockingDefaultApps) == 0
 
     # Determine compliance based on what's available
     Status := GetDefaultAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesBlockingDefaultApps, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, NonCompliantPoliciesBlockingDefaultApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "Microsoft Apps by default:"
     ]))
@@ -651,9 +654,12 @@ GetDefaultAppTenantDetails := concat("", [
 # MS.TEAMS.5.2v2
 #--
 
+# Possible values for GlobalCatalogAppsType are:
+# AllowedAppList - this blocks all third party apps unless added to the allow list.
+# BlockedAppList - this allows all third party apps by default, with no apps blocked unless explicitly added to the block list.
 # Iterate through all app permission policies. For each, check if GlobalCatalogAppsType
-# is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingGlobalApps list.
-PoliciesAllowingGlobalApps contains Policy.Identity if {
+# is BlockedAppList. If so, save the policy Identity to the return set.
+NonCompliantPoliciesAllowingGlobalApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.GlobalCatalogAppsType == "BlockedAppList"
 }
@@ -711,18 +717,18 @@ GetGlobalAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.2v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": {"Policies": PoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest"],
+    "ActualValue": {"Policies": NonCompliantPoliciesAllowingGlobalApps, "TenantSetting": GlobalAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    LegacyCompliant := count(PoliciesAllowingGlobalApps) == 0
+    LegacyCompliant := count(NonCompliantPoliciesAllowingGlobalApps) == 0
 
     # Determine compliance based on what's available
     Status := GetGlobalAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesAllowingGlobalApps, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, NonCompliantPoliciesAllowingGlobalApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "third-party apps by default:"
     ]))
@@ -815,9 +821,12 @@ GetGlobalAppTenantDetails := concat("", [
 # MS.TEAMS.5.3v2
 #--
 
+# Possible values for PrivateCatalogAppsType are:
+# AllowedAppList - this blocks all custom apps unless added to the allow list.
+# BlockedAppList - this allows all custom apps by default, with no apps blocked unless explicitly added to the block list.
 # Iterate through all app permission policies. For each, check if PrivateCatalogAppsType
-# is BlockedAppList. If so, save the policy Identity to the PoliciesAllowingCustomApps list.
-PoliciesAllowingCustomApps contains Policy.Identity if {
+# is BlockedAppList. If so, save the policy Identity to the return set.
+NonCompliantPoliciesAllowingCustomApps contains Policy.Identity if {
     some Policy in input.app_policies
     Policy.PrivateCatalogAppsType == "BlockedAppList"
 }
@@ -875,18 +884,18 @@ GetPrivateAppComplianceStatus(LegacyCompliant) := LegacyCompliant if {
 tests contains {
     "PolicyId": "MS.TEAMS.5.3v2",
     "Criticality": "Should",
-    "Commandlet": ["Get-CsTeamsAppPermissionPolicy"],
-    "ActualValue": {"Policies": PoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
+    "Commandlet": ["Get-TeamsAppPermissionPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest"],
+    "ActualValue": {"Policies": NonCompliantPoliciesAllowingCustomApps, "TenantSetting": PrivateAppSettingValue},
     "ReportDetails": Details,
     "RequirementMet": Status
 } if {
-    LegacyCompliant := count(PoliciesAllowingCustomApps) == 0
+    LegacyCompliant := count(NonCompliantPoliciesAllowingCustomApps) == 0
 
     # Determine compliance based on what's available
     Status := GetPrivateAppComplianceStatus(LegacyCompliant)
 
     # Build detailed report
-    LegacyDetails := ReportDetailsArray(LegacyCompliant, PoliciesAllowingCustomApps, concat("", [
+    LegacyDetails := ReportDetailsArray(LegacyCompliant, NonCompliantPoliciesAllowingCustomApps, concat("", [
         "app permission policy(ies) found that does not restrict installation of ",
         "custom apps by default:"
     ]))

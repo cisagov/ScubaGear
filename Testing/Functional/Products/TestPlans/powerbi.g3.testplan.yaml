@@ -1,0 +1,65 @@
+ProductName: powerbi
+TestPlan:
+  - PolicyId: MS.POWERBI.1.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.1.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.2.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.2.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.3.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.3.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.4.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.4.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.4.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.4.2v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.5.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.5.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.6.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.6.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false
+
+  - PolicyId: MS.POWERBI.7.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.POWERBI.7.1v1 No license case
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: false

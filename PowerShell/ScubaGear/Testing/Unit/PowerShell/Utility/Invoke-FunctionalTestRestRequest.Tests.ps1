@@ -1,23 +1,19 @@
-Describe 'Invoke-FunctionalTestRestRequest' {
+Describe -Tag 'FunctionalTestUtils' -Name 'Invoke-FunctionalTestRestRequest' {
     BeforeAll {
         $FunctionalTestUtilsPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../../../Testing/Functional/Products/FunctionalTestUtils.ps1'
         . $FunctionalTestUtilsPath
-
-        $script:PPBaseUrl = 'https://api.contoso.test'
-        $script:PPAccessToken = 'pp-token'
-        $script:PBIBaseUrl = 'https://fabric.contoso.test'
-        $script:PBIAccessToken = 'pbi-token'
     }
 
     BeforeEach {
         $script:InvokeWebRequestCalls = @()
         $script:SleepCalls = @()
 
-        Mock Write-Warning { }
         Mock Start-Sleep {
             param([int] $Seconds)
             $script:SleepCalls += $Seconds
         }
+
+        Mock Get-HttpResponseDetails { return "Bogus HTTP error response details" }
     }
 
     It 'polls a location URL after a 202 response until the request completes' {
@@ -68,15 +64,23 @@ Describe 'Invoke-FunctionalTestRestRequest' {
         $script:InvokeWebRequestCalls[1].Uri | Should -Be 'https://api.contoso.test/operations/tenant-isolation/123'
     }
 
-    It 'retries and throws when a Power BI update returns a non-success status code' {
+    It 'throws forbidden error when a Power BI update throws a 403 status code' {
         Mock Invoke-WebRequest {
             $exception = [System.Exception]::new('Forbidden')
             $exception | Add-Member -NotePropertyName Response -NotePropertyValue ([PSCustomObject]@{ StatusCode = 403 })
             throw $exception
         }
 
-        { Set-PowerBITenantSetting -SettingName 'ExportData' -Enabled $true } | Should -Throw '*403*'
-        Should -Invoke Invoke-WebRequest -Times 3 -Exactly
-        $script:SleepCalls | Should -Be @(5, 5)
+        { Set-PowerBITenantSetting -SettingName 'ExportData' -Settings @{ Enabled = $true; } } | Should -Throw '*Forbidden*'
+    }
+
+    It 'throws generic error when a Power BI update returns a 300 non-success status code but does not error' {
+        Mock Invoke-WebRequest {
+            return [PSCustomObject]@{
+                StatusCode = 300
+            }
+        }
+
+        { Set-PowerBITenantSetting -SettingName 'ExportData' -Settings @{ Enabled = $true; } } | Should -Throw '*unexpected HTTP status code*'
     }
 }
