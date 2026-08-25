@@ -10,8 +10,8 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -ModuleName Orchestrator Export-AADProvider {}
         function Export-EXOProvider {}
         Mock -ModuleName Orchestrator Export-EXOProvider {}
-        function Export-SecuritySuiteProvider {}
-        Mock -ModuleName Orchestrator Export-SecuritySuiteProvider {}
+        function Export-DefenderProvider {}
+        Mock -ModuleName Orchestrator Export-DefenderProvider {}
         function Export-PowerPlatformProvider {}
         Mock -ModuleName Orchestrator Export-PowerPlatformProvider {}
         function Export-SharePointProvider {}
@@ -50,34 +50,39 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
               $OutFolderPath = "./output"
               [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Guid')]
               $Guid = "00000000-0000-0000-0000-000000000000"
+                            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConnectionResult')]
+                            $ConnectionResult = @{
+                                    EXOAccessToken = "mock-access-token"
+                                    EXOApiEndpoint = "https://outlook.office365.com/adminapi/beta/mock-tenant/InvokeCommand"
+                            }
         }
         It 'With -ProductNames "aad", should not throw' {
               $ScubaConfig.ProductNames = @("aad")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
         It 'With -ProductNames "securitysuite", should not throw' {
               $ScubaConfig.ProductNames = @("securitysuite")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
         It 'With -ProductNames "exo", should not throw' {
               $ScubaConfig.ProductNames = @("exo")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
         It 'With -ProductNames "powerplatform", should not throw' {
               $ScubaConfig.ProductNames = @("powerplatform")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
         It 'With -ProductNames "sharepoint", should not throw' {
               $ScubaConfig.ProductNames = @("sharepoint")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
         It 'With -ProductNames "teams", should not throw' {
               $ScubaConfig.ProductNames = @("teams")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
         It 'With all products, should not throw' {
               $ScubaConfig.ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
-            { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid } | Should -Not -Throw
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
     }
 }

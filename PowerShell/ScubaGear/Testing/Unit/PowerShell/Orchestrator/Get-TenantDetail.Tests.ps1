@@ -19,6 +19,10 @@ InModuleScope Orchestrator {
         Mock -ModuleName Orchestrator Get-PowerPlatformTenantDetail {
             '{"DisplayName": "displayName"}'
         }
+        function Get-EXOTenantDetailFromConnection {}
+        Mock -ModuleName Orchestrator Get-EXOTenantDetailFromConnection {
+            '{"DisplayName": "displayName"}'
+        }
         function Test-SCuBAValidJson {
             param (
                 [string]
@@ -39,6 +43,11 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'M365Environment')]
                 $M365Environment = 'commercial'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConnectionResult')]
+                $ConnectionResult = @{
+                    EXOAccessToken = 'mock-access-token'
+                    EXOApiEndpoint = 'https://outlook.office365.com/adminapi/beta/mock-tenant/InvokeCommand'
+                }
             }
             It 'With -ProductNames "aad", returns valid JSON' {
                 $ProductNames = @('aad')
@@ -54,7 +63,7 @@ InModuleScope Orchestrator {
             }
             It 'With -ProductNames "securitysuite", returns valid JSON' {
                 $ProductNames = @('securitysuite')
-                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
+                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames -ConnectionResult $ConnectionResult
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
@@ -87,6 +96,11 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'M365Environment')]
                 $M365Environment = 'gcc'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConnectionResult')]
+                $ConnectionResult = @{
+                    EXOAccessToken = 'mock-access-token'
+                    EXOApiEndpoint = 'https://outlook.office365.com/adminapi/beta/mock-tenant/InvokeCommand'
+                }
             }
             It 'With -ProductNames "aad", returns valid JSON' {
                 $ProductNames = @('aad')
@@ -102,7 +116,7 @@ InModuleScope Orchestrator {
             }
             It 'With -ProductNames "securitysuite", returns valid JSON' {
                 $ProductNames = @('securitysuite')
-                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
+                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames -ConnectionResult $ConnectionResult
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
@@ -135,6 +149,11 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'M365Environment')]
                 $M365Environment = 'gcchigh'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConnectionResult')]
+                $ConnectionResult = @{
+                    EXOAccessToken = 'mock-access-token'
+                    EXOApiEndpoint = 'https://outlook.office365.com/adminapi/beta/mock-tenant/InvokeCommand'
+                }
             }
             It 'With -ProductNames "aad", returns valid JSON' {
                 $ProductNames = @('aad')
@@ -150,7 +169,7 @@ InModuleScope Orchestrator {
             }
             It 'With -ProductNames "securitysuite", returns valid JSON' {
                 $ProductNames = @('securitysuite')
-                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
+                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames -ConnectionResult $ConnectionResult
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }
@@ -183,6 +202,11 @@ InModuleScope Orchestrator {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'M365Environment')]
                 $M365Environment = 'dod'
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ConnectionResult')]
+                $ConnectionResult = @{
+                    EXOAccessToken = 'mock-access-token'
+                    EXOApiEndpoint = 'https://outlook.office365.com/adminapi/beta/mock-tenant/InvokeCommand'
+                }
             }
             It 'With -ProductNames "aad", returns valid JSON' {
                 $ProductNames = @('aad')
@@ -198,7 +222,7 @@ InModuleScope Orchestrator {
             }
             It 'With -ProductNames "securitysuite", returns valid JSON' {
                 $ProductNames = @('securitysuite')
-                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames
+                $Json = Get-TenantDetail -M365Environment $M365Environment -ProductNames $ProductNames -ConnectionResult $ConnectionResult
                 $ValidJson = Test-SCuBAValidJson -Json $Json | Select-Object -Last 1
                 $ValidJson | Should -Be $true
             }

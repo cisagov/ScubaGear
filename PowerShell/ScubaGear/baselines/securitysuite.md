@@ -189,7 +189,7 @@ For users not added to the standard or strict preset policies:
     3. Click **Edit protection settings**
     4. Check **Enable zero-hour auto purge for malware (Recommended)**. (_MS.SECURITYSUITE.1.2v1_)
     5. Check **Enable the common attachments filter**.
-    6. Click **Customize file types** and ensure that at a minimum .exe, .cmd, and .vba are selected.
+    6. Click **Customize file types** and ensure that at a minimum .exe, .cmd, and .vbe are selected.
     7. Click **Save**.
 6.  If creating a new policy:
     1. Click **Create**.
@@ -201,7 +201,7 @@ For users not added to the standard or strict preset policies:
     5. Click **Next**.
     6. Check **Enable zero-hour auto purge for malware (Recommended)**. (_MS.SECURITYSUITE.1.2v1_)
     7. Check **Enable the common attachments filter**.
-    8. Click **Select file types** and ensure that at a minimum .exe, .cmd, and .vba are selected, then click **Done**.
+    8. Click **Select file types** and ensure that at a minimum .exe, .cmd, and .vbe are selected, then click **Done**.
     9. Click **Next** then **Submit**.
 
 #### MS.SECURITYSUITE.1.2v1 Instructions

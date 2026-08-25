@@ -48,7 +48,7 @@ The **Main** tab collects organization information and product selection. It mus
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| Tenant Domain | **Yes** | Your M365 tenant domain, e.g. `contoso.onmicrosoft.com` |
+| Tenant Domain | **Yes** | Your M365 tenant primary domain, e.g. `contoso.onmicrosoft.com` or a verified custom domain such as `example.com` |
 | Organization Name | **Yes** (BOD submissions) | Human-readable org name, e.g. `Department of Example` |
 | Org Unit Name | No | Sub-unit, e.g. `Office of IT` |
 | Description | No | Free-text note about this configuration |

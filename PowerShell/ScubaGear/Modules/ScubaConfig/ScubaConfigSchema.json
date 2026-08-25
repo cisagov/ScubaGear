@@ -23,7 +23,9 @@
       "OPAExecutable",
       "Quiet",
       "SilenceBODWarnings",
-      "DarkMode"
+      "DarkMode",
+      "Verbose",
+      "Debug"
       ],
 
     "policyExclusionMappings": {

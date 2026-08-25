@@ -1,4 +1,52 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility/ScubaLogging.psm1")
+
+function ConvertTo-ScubaProductNames {
+    <#
+    .SYNOPSIS
+    Normalizes a list of ScubaGear product names.
+    .DESCRIPTION
+    Centralizes ScubaGear product-name normalization so the value is handled identically
+    regardless of whether it originates from the -ProductNames parameter or an imported
+    configuration file. It:
+      1. Expands the '*' wildcard to the full list of supported products.
+      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
+         (adding 'securitysuite' only if not already present).
+      3. Returns a sorted, de-duplicated array.
+    .PARAMETER ProductNames
+    The array of product names to normalize.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [string[]]
+        $ProductNames
+    )
+
+    if ($null -eq $ProductNames) {
+        return @()
+    }
+
+    # Expand the wildcard to all supported products
+    if ($ProductNames -contains '*') {
+        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+        Write-Debug "Setting ProductNames to all products because of wildcard"
+    }
+
+    # 'defender' is a deprecated alias for 'securitysuite'
+    if ($ProductNames -contains 'defender') {
+        if (-not ($ProductNames -contains 'securitysuite')) {
+            $ProductNames = @($ProductNames) + "securitysuite"
+        }
+        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
+        Write-Debug "Substituting defender with securitysuite in ProductNames"
+    }
+
+    return @($ProductNames | Sort-Object -Unique)
+}
 
 function Invoke-SCuBA {
     <#
@@ -11,7 +59,7 @@ function Invoke-SCuBA {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Security Suite: securitysuite
+    - Defender for Office 365: defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -38,8 +86,7 @@ function Invoke-SCuBA {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: When assessing the Security Suite baseline, Defender will ask for authentication even if
-    this variable is set to `$false`
+    Note: defender will ask for authentication even if this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -63,7 +110,7 @@ function Invoke-SCuBA {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "RegoOutput".
+    Defaults to "TestResults".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -109,7 +156,7 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Security Suite, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformance_*.
     .Example
     Invoke-SCuBA -Version
@@ -118,8 +165,8 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ConfigFilePath MyConfig.json
     This example uses the specified configuration file when executing SCuBAGear.
     .Example
-    Invoke-SCuBA -ProductNames aad, securitysuite -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Security Suite security
+    Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Defender security
     baselines.
     .Example
     Invoke-SCuBA -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -140,7 +187,6 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        # Both defender and securitysuite are options, as defender is an alias for securitysuite
         [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
@@ -316,20 +362,11 @@ function Invoke-SCuBA {
         # Initialize logging flag - actual initialization happens after output folder is created
         $Script:ScubaLoggingEnabled = $false
 
-        # Transform ProductNames into list of all products if it contains wildcard
-        if ($ProductNames.Contains('*')){
-            $ProductNames = $PSBoundParameters['ProductNames'] = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
-            Write-Debug "Setting ProductName to all products because of wildcard"
-        }
-
-        # defender is an alias for securitysuite, substitute securitysuite in for defender if specified
-        if ($ProductNames.Contains('defender')){
-            if (-not $ProductNames.Contains('securitysuite')) {
-                $ProductNames = $PSBoundParameters['ProductNames'] = $ProductNames + "securitysuite"
-            }
-            $ProductNames = $PSBoundParameters['ProductNames'] = @($ProductNames | Where-Object {$_ -ne "defender" })
-            Write-Debug "Substituting defender with securitysuite in ProductNames"
-        }
+        # ProductNames normalization (wildcard expansion and the deprecated 'defender' ->
+        # 'securitysuite' substitution) is centralized in ConvertTo-ScubaProductNames and
+        # applied once to the resolved $ScubaConfig.ProductNames below, after the command-line
+        # parameters and any configuration file have been merged. Handling it at that single
+        # convergence point ensures products from either source are normalized identically.
 
         # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
@@ -439,6 +476,14 @@ function Invoke-SCuBA {
             }
         }
 
+        # Normalize the fully-resolved product list once, after command-line parameters and
+        # any configuration file have been merged into $ScubaConfig. This is the single point
+        # where products from the -ProductNames parameter and from an imported config file
+        # converge, so normalizing here expands the '*' wildcard and substitutes the deprecated
+        # 'defender' alias with 'securitysuite' for both sources. It runs after
+        # ValidateConfiguration so the Defender deprecation warning is still emitted first.
+        $ScubaConfig.ProductNames = ConvertTo-ScubaProductNames -ProductNames $ScubaConfig.ProductNames
+
         if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgName) {
             $Warning = "Config file option OrgName not provided. This option is required for BOD "
             $Warning += "submissions. See https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/configuration.md#scuba-compliance-use for more details. "
@@ -457,8 +502,11 @@ function Invoke-SCuBA {
         $FormattedTimeStamp = $Date.ToString("yyyy_MM_dd_HH_mm_ss")
         $OutFolderPath = $ScubaConfig.OutPath
         $FolderName = "$($ScubaConfig.OutFolderName)_$($FormattedTimeStamp)"
-        New-Item -Path $OutFolderPath -Name $($FolderName) -ItemType Directory -ErrorAction 'Stop' | Out-Null
         $OutFolderPath = Join-Path -Path $OutFolderPath -ChildPath $FolderName -ErrorAction 'Stop'
+        # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+        $OutFolderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFolderPath)
+        # New-Item has no -LiteralPath; use .NET so output paths with wildcard chars (e.g. []) are created literally.
+        [System.IO.Directory]::CreateDirectory($OutFolderPath) | Out-Null
 
         # Initialize logging for troubleshooting - debug logs are ALWAYS created
         # Logs are placed in a DebugLogs subfolder within the output folder
@@ -481,7 +529,7 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $true
             Write-ScubaLog -Message "ScubaGear logging initialized" -Level "Info" -Source "InvokeScuba" -Data @{
                 Version = $ModuleVersion
-                ProductNames = ($ProductNames -join ', ')
+                ProductNames = ($ScubaConfig.ProductNames -join ', ')
                 UserPassedEnvironment = $M365Environment
                 OutputFolder = $OutFolderPath
                 LogFolder = $ScubaLogFolder
@@ -608,12 +656,13 @@ function Invoke-SCuBA {
                     ModuleVersion = $ModuleVersion
                     OutFolderPath = $OutFolderPath
                     Guid = $Guid
+                    ConnectionResult = "[ConnectionResult Object]"
                 } -LogReturnValue $true -ScriptBlock {
-                    Invoke-ProviderList -ScubaConfig $ScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                    Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
                 }
             }
             else {
-                Invoke-ProviderList -ScubaConfig $ScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
             }
 
             if ($ProdProviderFailed.Count -gt 0) {
@@ -789,10 +838,6 @@ function Invoke-ProviderList {
         [object]
         $ScubaConfig,
 
-        [Parameter(Mandatory = $false)]
-        [hashtable]
-        $ConnectionResult = @{},
-
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -811,7 +856,11 @@ function Invoke-ProviderList {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Guid
+        $Guid,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]
+        $ConnectionResult
     )
     process {
         try {
@@ -820,9 +869,12 @@ function Invoke-ProviderList {
             $ProviderJSON = @"
 "@
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             $ProdProviderFailed = @()
             $ConnectTenantParams = @{
+                'M365Environment' = $ScubaConfig.M365Environment
+            }
+            $SPOProviderParams = @{
                 'M365Environment' = $ScubaConfig.M365Environment
             }
 
@@ -831,6 +883,7 @@ function Invoke-ProviderList {
                 $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
                 $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams; }
                 $ServicePrincipalAuth = $true
+                $SPOProviderParams += @{ServicePrincipalParams = $ServicePrincipalParams }
             }
 
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -863,7 +916,17 @@ function Invoke-ProviderList {
                             $RetVal = Export-EXOProvider @EXOProviderParams | Select-Object -Last 1
                         }
                         "securitysuite" {
-                            $RetVal = Export-SecuritySuiteProvider @ConnectTenantParams  | Select-Object -Last 1
+                            if ([string]::IsNullOrEmpty($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrEmpty($ConnectionResult.EXOApiEndpoint)) {
+                                throw "Missing EXO token or endpoint for SecuritySuite provider. Re-run with -LogIn or check authentication."
+                            }
+                            $SecuritySuiteProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken' = $ConnectionResult.EXOAccessToken
+                                'ApiEndpoint' = $ConnectionResult.EXOApiEndpoint
+                                'ComplianceAccessToken' = $ConnectionResult.ComplianceAccessToken
+                                'ComplianceApiEndpoint' = $ConnectionResult.ComplianceApiEndpoint
+                            }
+                            $RetVal = Export-SecuritySuiteProvider @SecuritySuiteProviderParams | Select-Object -Last 1
                         }
                         "powerplatform" {
                             $PPProviderParams = @{
@@ -999,7 +1062,7 @@ function Invoke-RunRego {
     This function runs the RunRego module.
     Which runs the various rego files against the
     ProviderSettings.json using the specified OPA executable
-    Output will be stored as a RegoOutput.json in the OutPath Folder
+    Output will be stored as a TestResults.json in the OutPath Folder
     .Functionality
     Internal
     #>
@@ -1023,7 +1086,7 @@ function Invoke-RunRego {
     process {
         try {
             $ProdRegoFailed = @()
-            $RegoOutput = @()
+            $TestResults = @()
             $N = 0
             $Len = $ScubaConfig.ProductNames.Length
             foreach ($Product in $ScubaConfig.ProductNames) {
@@ -1055,12 +1118,12 @@ function Invoke-RunRego {
                     OPAPath     = $resolvedOPAPath
                     InputFile   = $InputFile
                     RegoFile    = $RegoFile
-                    InputExists = (Test-Path $InputFile)
-                    RegoExists  = (Test-Path $RegoFile)
+                    InputExists = (Test-Path -LiteralPath $InputFile)
+                    RegoExists  = (Test-Path -LiteralPath $RegoFile)
                 }
                 try {
                     $RetVal = Invoke-Rego @params
-                    $RegoOutput += $RetVal
+                    $TestResults += $RetVal
                     Write-ScubaLog -Message "Rego evaluation succeeded: $BaselineName" -Level "Debug" -Source "RunRego" -Data @{ Product = $Product }
                 }
                 catch {
@@ -1078,9 +1141,14 @@ function Invoke-RunRego {
                 }
             }
 
-            $RegoOutputJson = $RegoOutput | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            # Guard against an empty $TestResults so ConvertTo-Json emits '[]' rather than $null
+            if ($null -eq $TestResults -or $TestResults.Count -eq 0) {
+                $TestResultsJson = '[]'
+            } else {
+                $TestResultsJson = $TestResults | ConvertTo-Json -Depth 5 -ErrorAction 'Stop'
+            }
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
-            $RegoOutputJson | Set-Content -Path $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
+            $TestResultsJson | Set-Content -LiteralPath $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
 
             $ProdRegoFailed
         }
@@ -1235,7 +1303,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1263,9 +1331,9 @@ function ConvertTo-ResultsCsv {
         try {
             $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName
 
-            if (Test-Path $ScubaResultsPath -PathType Leaf) {
+            if (Test-Path -LiteralPath $ScubaResultsPath -PathType Leaf) {
                 # The ScubaResults file exists, no need to look for the individual json files
-                $ScubaResults = Get-Content -Encoding UTF8 (Get-ChildItem $ScubaResultsPath).FullName | ConvertFrom-Json
+                $ScubaResults = Get-Content -Encoding UTF8 -LiteralPath $ScubaResultsPath | ConvertFrom-Json
             }
             else {
                 # The ScubaResults file does not exists, so we need to look inside the IndividualReports
@@ -1275,7 +1343,7 @@ function ConvertTo-ResultsCsv {
                 foreach ($Product in $ProductNames) {
                     $BaselineName = $ArgToProd[$Product]
                     $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
-                    $IndividualResults = Get-Content -Encoding UTF8 $FileName | ConvertFrom-Json
+                    $IndividualResults = Get-Content -Encoding UTF8 -LiteralPath $FileName | ConvertFrom-Json
                     $ScubaResults.Results | Add-Member -NotePropertyName $BaselineName `
                         -NotePropertyValue $IndividualResults.Results
                 }
@@ -1308,16 +1376,16 @@ function ConvertTo-ResultsCsv {
             $ResultsCsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
             $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutActionPlanFileName.csv"
             $Encoding = Get-FileEncoding
-            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $ResultsCsvFileName -Encoding $Encoding
+            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $ResultsCsvFileName -Encoding $Encoding
             if ($ActionPlanCsv.Length -eq 0) {
                 # If no tests failed, add the column names to ensure a file is still output
                 $Headers = $ScubaResultsCsv[0].psobject.Properties.Name -Join '","'
                 $Headers = "`"$Headers`""
                 $Headers += '"Non-Compliance Reason","Remediation Completion Date","Justification"'
-                $Headers | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+                $Headers | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
             }
             else {
-                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -Path $PlanCsvFileName -Encoding $Encoding
+                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
             }
         }
         catch {
@@ -1341,7 +1409,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1387,7 +1455,7 @@ function Merge-JsonOutput {
             # Load the raw provider output
             $SettingsExportPath = Join-Path $OutFolderPath -ChildPath "$($OutProviderFileName).json"
             $DeletionList += $SettingsExportPath
-            $SettingsExport =  Get-Content -Encoding UTF8 $SettingsExportPath -Raw
+            $SettingsExport =  Get-Content -Encoding UTF8 -LiteralPath $SettingsExportPath -Raw
             $SettingsExportObject = $(ConvertFrom-Json $SettingsExport)
             $TimestampZulu = $SettingsExportObject.timestamp_zulu
 
@@ -1408,8 +1476,6 @@ function Merge-JsonOutput {
                 "TenantId" = $TenantDetails.TenantId;
                 "DisplayName" = $TenantDetails.DisplayName;
                 "DomainName" = $TenantDetails.DomainName;
-                "OrgName" = $SettingsExportObject.scuba_config.OrgName;
-                "OrgUnitName" = $SettingsExportObject.scuba_config.OrgUnitName;
                 "ProductSuite" = "Microsoft 365";
                 "ProductsAssessed" = $FullNames;
                 "ProductAbbreviationMapping" = $ProductAbbreviationMapping
@@ -1427,7 +1493,7 @@ function Merge-JsonOutput {
                 $BaselineName = $ArgToProd[$Product]
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
                 $DeletionList += $FileName
-                $IndividualResults = Get-Content -Encoding UTF8 $FileName | ConvertFrom-Json
+                $IndividualResults = Get-Content -Encoding UTF8 -LiteralPath $FileName | ConvertFrom-Json
 
                 $Results | Add-Member -NotePropertyName $BaselineName `
                     -NotePropertyValue $IndividualResults.Results
@@ -1484,11 +1550,11 @@ function Merge-JsonOutput {
             $ReportJson = $ReportJson.replace("\u0027", "'")
 
             $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName -ErrorAction 'Stop'
-            $ReportJson | Set-Content -Path $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
+            $ReportJson | Set-Content -LiteralPath $ScubaResultsPath -Encoding $(Get-FileEncoding) -ErrorAction 'Stop'
 
             # Delete the now redundant files
             foreach ($File in $DeletionList) {
-                Remove-Item $File
+                Remove-Item -LiteralPath $File
             }
         }
         catch {
@@ -1525,7 +1591,7 @@ function Invoke-ReportCreation {
     <#
     .Description
     This function runs the CreateReport Module
-    which creates an HTML report using the RegoOutput.json.
+    which creates an HTML report using the TestResults.json.
     Output will be stored as various HTML files in the OutPath Folder.
     The report Home page will be named BaselineReports.html
     .Functionality
@@ -1569,7 +1635,10 @@ function Invoke-ReportCreation {
             $Len = $ScubaConfig.ProductNames.Length
             $Fragment = @()
             $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
-            New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
+            # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+            $IndividualReportPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($IndividualReportPath)
+            # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+            [System.IO.Directory]::CreateDirectory($IndividualReportPath) | Out-Null
 
             $ReporterPath = Join-Path -Path $PSScriptRoot -ChildPath "CreateReport" -ErrorAction 'Stop'
             $Images = Join-Path -Path $ReporterPath -ChildPath "images" -ErrorAction 'Stop'
@@ -1675,7 +1744,8 @@ function Invoke-ReportCreation {
             $TenantMetaData = $TenantMetaData -replace '^(.*?)<table>','<table class ="tenantdata" style = "text-align:center;">'
             $Fragment = $Fragment | ConvertTo-Html -Fragment -ErrorAction 'Stop'
 
-            $ProviderJSONFilePath = Join-Path -Path $OutFolderPath -ChildPath "$($ScubaConfig.OutProviderFileName).json" -Resolve
+            # No -Resolve: it expands wildcard chars (e.g. []); Get-Utf8NoBom resolves the path literally.
+            $ProviderJSONFilePath = Join-Path -Path $OutFolderPath -ChildPath "$($ScubaConfig.OutProviderFileName).json"
             $ReportUuid = $(Get-Utf8NoBom -FilePath $ProviderJSONFilePath | ConvertFrom-Json).report_uuid
 
             $ReportHtmlPath = Join-Path -Path $ReporterPath -ChildPath "ParentReport" -ErrorAction 'Stop'
@@ -1701,21 +1771,20 @@ function Invoke-ReportCreation {
             $ScriptsPath = Join-Path -Path $ReporterPath -ChildPath "scripts" -ErrorAction "Stop"
             $ParentReportJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "ParentReport.js") -Raw
             $UtilsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "Utils.js") -Raw
-            $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
 
             $JSFiles = @(
                 $ParentReportJS
                 $UtilsJS
-                $TableFunctionsJS
             ) -join "`n"
 
             $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
             Add-Type -AssemblyName System.Web -ErrorAction 'Stop'
             $ReportFileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutReportName).html" -ErrorAction 'Stop'
-            [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $ReportFileName -ErrorAction 'Stop'
+            [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File -LiteralPath $ReportFileName -ErrorAction 'Stop'
 
             if (-Not $Quiet) {
-                Invoke-Item $ReportFileName
+                # LiteralPath so a report path with wildcard chars (e.g. []) opens instead of failing to resolve
+                Invoke-Item -LiteralPath $ReportFileName
             }
         }
         catch {
@@ -1731,6 +1800,57 @@ function Invoke-ReportCreation {
     }
 }
 
+function Get-EXOTenantDetailFromConnection {
+    <#
+    .Description
+    Gets tenant details through EXO Admin API using existing Defender/EXO connection context.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [hashtable]
+        $ConnectionResult
+    )
+
+    $EXORestHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers/ProviderHelpers/EXORestHelper.psm1"
+    Import-Module -Name $EXORestHelperPath -Function Invoke-EXORestMethod -ErrorAction Stop
+
+    if ([string]::IsNullOrWhiteSpace($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrWhiteSpace($ConnectionResult.EXOApiEndpoint)) {
+        throw "Missing EXO token or endpoint in ConnectionResult."
+    }
+
+    $OrgConfigResponse = Invoke-EXORestMethod `
+        -CmdletName "Get-OrganizationConfig" `
+        -ApiEndpoint $ConnectionResult.EXOApiEndpoint `
+        -AccessToken $ConnectionResult.EXOAccessToken
+
+    $OrgConfig = if ($OrgConfigResponse -is [System.Array]) { $OrgConfigResponse | Select-Object -First 1 } else { $OrgConfigResponse }
+    if (-not $OrgConfig) {
+        throw "Get-OrganizationConfig returned no data."
+    }
+
+    $TenantId = "Error retrieving Tenant ID"
+    $TenantIdMatch = [regex]::Match($ConnectionResult.EXOApiEndpoint, '/adminapi/(?:beta|v1\.0)/([^/]+)/InvokeCommand')
+    if ($TenantIdMatch.Success) {
+        $TenantId = $TenantIdMatch.Groups[1].Value
+    }
+
+    $DomainName = if ($OrgConfig.Name) { [string]$OrgConfig.Name } else { "Error retrieving Domain name" }
+    $DisplayName = if ($OrgConfig.DisplayName) { [string]$OrgConfig.DisplayName } else { $DomainName }
+
+    $TenantInfo = @{
+        "DisplayName" = $DisplayName;
+        "DomainName" = $DomainName;
+        "TenantId" = $TenantId;
+        "EXOAdditionalData" = "Retrieved via EXO REST Admin API";
+    }
+
+    ConvertTo-Json @($TenantInfo) -Depth 4
+}
+
 function Get-TenantDetail {
     <#
     .Description
@@ -1742,7 +1862,7 @@ function Get-TenantDetail {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string[]]
         $ProductNames,
@@ -1754,8 +1874,9 @@ function Get-TenantDetail {
         $M365Environment,
 
         [Parameter(Mandatory = $false)]
+        [AllowNull()]
         [hashtable]
-        $ConnectionResult = @{}
+        $ConnectionResult
     )
 
     # organized by best tenant details information
@@ -1765,14 +1886,14 @@ function Get-TenantDetail {
     elseif ($ProductNames.Contains("sharepoint")) {
         Get-AADTenantDetail -M365Environment $M365Environment
     }
+    elseif ($ProductNames.Contains("powerbi")) {
+        Get-AADTenantDetail -M365Environment $M365Environment
+    }
     elseif ($ProductNames.Contains("teams")) {
         Get-TeamsTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("powerplatform")) {
         Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerbi")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
     }
     elseif ($ProductNames.Contains("exo")) {
         Get-EXOTenantDetail -M365Environment $M365Environment `
@@ -1824,24 +1945,17 @@ function Invoke-Connection {
         $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
     }
 
+    $ConnectionResult = @{
+        ProdAuthFailed = @()
+        EXOAccessToken = $null
+        EXOApiEndpoint = $null
+    }
+
     if ($ScubaConfig.LogIn) {
         $ConnectionResult = Connect-Tenant @ConnectTenantParams
-        $ConnectionResult
     }
-    else {
-        # Return empty result when not logging in
-        @{
-            ProdAuthFailed  = @()
-            PBILicenseFound = $true
-            PBILicenseReason = ""
-            SPOAccessToken  = $null
-            SPOAdminUrl     = $null
-            PPAccessToken   = $null
-            PPBaseUrl       = $null
-            PBIAccessToken  = $null
-            PBIBaseUrl      = $null
-        }
-    }
+
+    $ConnectionResult
 }
 
 function Compare-ProductList {
@@ -1856,13 +1970,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -1898,14 +2012,10 @@ function Import-Resources {
     [CmdletBinding()]
     param()
     try {
-        # Import logging first and make exported functions visible outside Orchestrator module scope
-        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
-        Import-Module -Name $ScubaLoggingPath -Global
-
         $ProvidersPath = Join-Path -Path $PSScriptRoot `
-            -ChildPath "Providers" `
-            -Resolve `
-            -ErrorAction 'Stop'
+        -ChildPath "Providers" `
+        -Resolve `
+        -ErrorAction 'Stop'
         $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
         if (!$ProviderResources)
         {
@@ -1923,6 +2033,10 @@ function Import-Resources {
             Write-Debug "Importing $_ module $ModulePath"
             Import-Module -Name $ModulePath
         }
+
+        # Import ScubaLogging explicitly (not part of Utility folder import)
+        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
+        Import-Module -Name $ScubaLoggingPath -Force
     }
     catch {
         Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
@@ -1946,7 +2060,7 @@ function Remove-Resources {
     #>
     [CmdletBinding()]
     $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportDefenderProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
+    "ExportSecuritySuiteProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
     foreach ($Provider in $Providers) {
         Remove-Module $Provider -ErrorAction "SilentlyContinue"
     }
@@ -1989,7 +2103,7 @@ function Invoke-SCuBACached {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Security Suite: securitysuite
+    - Defender for Office 365: defender
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -2039,7 +2153,7 @@ function Invoke-SCuBACached {
     Defaults to "ProviderSettingsExport".
     .Parameter OutRegoFileName
     The name of the Rego output JSON and CSV created in the folder created in OutPath.
-    Defaults to "RegoOutput".
+    Defaults to "TestResults".
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
@@ -2065,14 +2179,14 @@ function Invoke-SCuBACached {
     .Example
     Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Security Suite, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
     Invoke-SCuBACached -Version
     This example returns the version of SCuBAGear.
     .Example
-    Invoke-SCuBACached -ProductNames aad, securitysuite -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Security Suite security
+    Invoke-SCuBACached -ProductNames aad, defender -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Defender security
     baselines.
     .Example
     Invoke-SCuBACached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -2093,7 +2207,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -2217,7 +2331,7 @@ function Invoke-SCuBACached {
             $Script:ScubaLoggingEnabled = $false
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "teams", "exo", "securitysuite", "aad", "sharepoint", "powerplatform"
+                $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {
@@ -2227,9 +2341,12 @@ function Invoke-SCuBACached {
             }
 
             # Create outpath if $Outpath does not exist
-            if(-not (Test-Path -PathType "container" $OutPath))
+            if(-not (Test-Path -LiteralPath $OutPath -PathType "container"))
             {
-                New-Item -ItemType "Directory" -Path $OutPath | Out-Null
+                # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
+                $OutPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutPath)
+                # New-Item has no -LiteralPath; use .NET so paths with wildcard chars (e.g. []) are created literally.
+                [System.IO.Directory]::CreateDirectory($OutPath) | Out-Null
             }
             $OutFolderPath = $OutPath
             $ProductNames = $ProductNames | Sort-Object -Unique
@@ -2337,10 +2454,10 @@ function Invoke-SCuBACached {
 
                     # Check if there is a previous ScubaResults file
                     # delete if found
-                    $PreviousResultsFiles = Get-ChildItem -Path $OutPath -Filter "$($OutJsonFileName)*.json"
+                    $PreviousResultsFiles = Get-ChildItem -LiteralPath $OutPath -Filter "$($OutJsonFileName)*.json"
                     if ($PreviousResultsFiles) {
                         $PreviousResultsFiles | ForEach-Object {
-                            Remove-Item $_.FullName -Force
+                            Remove-Item -LiteralPath $_.FullName -Force
                         }
                         Write-ScubaLog -Message "Removed $($PreviousResultsFiles.Count) previous result file(s)" -Level "Debug" -Source "ScubaCached"
                     }
@@ -2390,7 +2507,7 @@ function Invoke-SCuBACached {
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
-                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment
+                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment -ConnectionResult $ConnectionResult
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
@@ -2400,7 +2517,7 @@ function Invoke-SCuBACached {
                     ModuleVersion = $ModuleVersion
                     Guid = $Guid
                 }
-                Invoke-ProviderList -ScubaConfig $TempScubaConfig -ConnectionResult $ConnectionResult -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid
+                Invoke-ProviderList -ScubaConfig $TempScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
                 Write-ScubaLog -Message "Provider execution completed" -Level "Info" -Source "ScubaCached"
             }
             else {
@@ -2410,11 +2527,11 @@ function Invoke-SCuBACached {
             #####################################
             # If a ScubaResults file exists we grab its System.IO.FileInfo object which is referenced further down.
             #####################################
-            $ScubaResultsFileNameWildcard = Join-Path -Path $OutPath -ChildPath "$($OutJsonFileName)*.json"
             $ScubaResultsFileFound = $false
             $ScubaResultsFileObject = $null
-            if (Test-Path $ScubaResultsFileNameWildcard) {
-                $ScubaResultsFilesArray = @(Get-ChildItem $ScubaResultsFileNameWildcard)
+            # -LiteralPath on the folder (handles wildcard chars like [] in OutPath) + -Filter for the file wildcard.
+            $ScubaResultsFilesArray = @(Get-ChildItem -LiteralPath $OutPath -Filter "$($OutJsonFileName)*.json" -ErrorAction SilentlyContinue)
+            if ($ScubaResultsFilesArray.Count -gt 0) {
                 if ($ScubaResultsFilesArray.Count -gt 1) {
                     throw "You must only have a single ScubaResults file in this folder: $OutPath"
                 }
@@ -2430,7 +2547,7 @@ function Invoke-SCuBACached {
             # ProjectSettingsObject keeps a PowerShell object of the provider JSON in memory so we can reference its properties such as tenant_details further down.
             $ProviderSettingsObject = $null
             # If the provider output does not exist as a file, extract it from the ScubaResults file .Raw section so downstream functions that rely on it can execute.
-            if (-not (Test-Path $ProviderJSONFilePath)) {
+            if (-not (Test-Path -LiteralPath $ProviderJSONFilePath)) {
                 Write-ScubaLog -Message "Provider JSON file not found so extracting from ScubaResults" -Level "Info" -Source "ScubaCached"
                 if (-not $ScubaResultsFileFound) {
                     throw "No provider JSON or ScubaResults JSON file was found in folder: $OutPath. Double check the values you passed for -OutPath or -OutProviderFileName to ensure one of those file exists in that folder."
@@ -2466,10 +2583,10 @@ function Invoke-SCuBACached {
             if ($ScubaResultsFileFound -and $KeepIndividualJSON) {
                 $NewScubaResultsName = "Unused-$($ScubaResultsFileObject.Name)"
                 $NewScubaResultsPath = Join-Path $ScubaResultsFileObject.DirectoryName $NewScubaResultsName
-                if (Test-Path $NewScubaResultsPath) {
-                    Remove-Item $NewScubaResultsPath -Force
+                if (Test-Path -LiteralPath $NewScubaResultsPath) {
+                    Remove-Item -LiteralPath $NewScubaResultsPath -Force
                 }
-                Rename-Item -Path $ScubaResultsFileObject.FullName -NewName $NewScubaResultsName
+                Rename-Item -LiteralPath $ScubaResultsFileObject.FullName -NewName $NewScubaResultsName
                 Write-Warning "Detected a ScubaResults file along with a ProviderSettingsExport file when calling with the -KeepIndividualJSON parameter."
                 Write-Warning "Renamed the ScubaResults to $NewScubaResultsName to avoid ambiguous results. ScubaCached will use the ProviderSettingsExport file since that takes priority."
             }
@@ -2573,7 +2690,7 @@ function Repair-ScubaGearJson {
     if ($ReturnObject.RepairedJson) {
         Write-Warning "The provider JSON file required automatic repair."
     }
-    
+
     $ProviderJsonObject = $ProviderSettingsObject.JsonObject
 
     .EXAMPLE
@@ -2612,7 +2729,7 @@ function Repair-ScubaGearJson {
     # We are parsing a JSON file
     if ($FilePath) {
         # The -Raw parameter returns a large string instead of an array of strings which makes the pipeline processing faster for ConvertFrom-Json
-        $JsonString = Get-Content $FilePath -Encoding UTF8 -Raw
+        $JsonString = Get-Content -LiteralPath $FilePath -Encoding UTF8 -Raw
     }
     # We are parsing a JSON string
     else {
@@ -2631,7 +2748,7 @@ function Repair-ScubaGearJson {
         else {
             $ReturnObject.JsonString = $JsonInputString
         }
-       
+
         return $ReturnObject
     }
     catch {
@@ -2650,7 +2767,7 @@ function Repair-ScubaGearJson {
         else {
             Write-Warning "Repair-ScubaGearJson: ScubaGear detected an invalid JSON object"
         }
-        
+
         Write-Warning "Please report this to the ScubaGear team as a bug report either by GitHub or the Scuba mailbox."
         Write-Warning "Attempting to auto repair the JSON..."
 

@@ -143,6 +143,7 @@ InModuleScope Orchestrator {
                     AppID = "a"
                     CertificateThumbprint = "b"
                     Organization = "c"
+                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
                 Should -Invoke -CommandName Invoke-Connection -Exactly -Times 1 -ParameterFilter {$ScubaConfig.AppID -eq 'a'}
@@ -150,12 +151,14 @@ InModuleScope Orchestrator {
             It 'Items given as empty string'{
                 $SplatParams += @{
                     AppID = ""
+                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Throw
             }
             It 'Items given as null'{
                 $SplatParams += @{
                     AppID = $null
+                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Throw
             }
@@ -169,12 +172,14 @@ InModuleScope Orchestrator {
             It 'Given -OutCsvFileName should not throw' {
                 $SplatParams += @{
                     OutCsvFileName = "a"
+                    SilenceBODWarnings = $true
                 }
-                {Invoke-Scuba -Version} | Should -Not -Throw
+                {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
             It 'Given -OutActionPlanFileName should not throw' {
                 $SplatParams += @{
                     OutActionPlanFileName = "a"
+                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
@@ -182,6 +187,7 @@ InModuleScope Orchestrator {
                 $SplatParams += @{
                     OutCsvFileName = "a"
                     OutActionPlanFileName = "b"
+                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Not -Throw
             }
@@ -189,6 +195,7 @@ InModuleScope Orchestrator {
                 $SplatParams += @{
                     OutCsvFileName = "a"
                     OutActionPlanFileName = "a"
+                    SilenceBODWarnings = $true
                 }
                 {Invoke-Scuba @SplatParams} | Should -Throw
             }

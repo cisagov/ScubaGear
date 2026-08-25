@@ -198,6 +198,7 @@ const handleSortClick = (data, tableType, column, severityScoreWeights) => {
                         title: `Show more info for row ${rowIndex + 1}`,
                         className: "chevron",
                         rowIndex,
+                        expanded: false,
                         onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                         contentBuilder: () => createChevronIcon("right", 10)
                     })
@@ -229,49 +230,6 @@ const normalizeColumnNames = (name) => {
         case "FederatedCredentials": return "Federated Credentials";
         default: return name;
     }
-};
-
-/**
- * Creates a chevron <img> icon for right/down arrows.
- * 
- * @param {string} direction - Direction of the chevron arrow.
- * @param {number} width - Icon width in pixels.
- * @returns {HTMLImageElement} - An <img> element.
- */
-const createChevronIcon = (direction, width) => {
-    const img = document.createElement("img");
-    const map = {
-        right: { src: "images/angle-right-solid.svg", alt: "Chevron arrow pointing right" },
-        down:  { src: "images/angle-down-solid.svg",  alt: "Chevron arrow pointing down" }
-    };
-
-    const metadata = map[direction] || map.right;
-    img.setAttribute("src", metadata.src);
-    img.setAttribute("alt", metadata.alt);
-    img.style.width = `${width}px`;
-    return img;
-};
-
-/**
- * Creates a generic row-action button with custom content (img/span/etc.).
- * contentBuilder must return a Node that will be appended inside the button.
- * 
- * @param {string} title - Title for the button.
- * @param {string} className - Optional CSS class for the button.
- * @param {number} rowIndex - The row index (0-indexed, not counting the header row).
- * @param {function} onClick - Click event handler for the button.
- * @param {function} contentBuilder - Function that returns inner Node content.
- */
-const createRowActionButton = ({ title, className, rowIndex, onClick, contentBuilder }) => {
-    const btn = document.createElement("button");
-    btn.title = title;
-    btn.rowNumber = rowIndex;
-    btn.addEventListener("click", onClick);
-    if (className) btn.classList.add(className);
-
-    const content = contentBuilder();
-    if (content) btn.appendChild(content);
-    return btn;
 };
 
 /**
@@ -414,6 +372,7 @@ const buildExpandableTable = (data, tableType, severityScoreWeights) => {
                             title: `Show more info for row ${rowIndex + 1}`,
                             className: "chevron",
                             rowIndex,
+                            expanded: false,
                             onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                             contentBuilder: () => createChevronIcon("right", 10)
                         })
@@ -502,6 +461,7 @@ const fillTruncatedCell = (data, tableType, td, rowIndex, colIndex, severityScor
                 title: `Expand row ${rowIndex + 1}`,
                 className: "truncated-dots",
                 rowIndex,
+                expanded: false,
                 onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
                 contentBuilder: () => {
                     const span = document.createElement("span");
@@ -536,11 +496,12 @@ const fillExpandedRow = (data, tableType, row, rowIndex, severityScoreWeights) =
 
         if (colIndex === 0) {
             td.appendChild(
-                createRowActionButton({
-                    title: `Show less info for row ${rowIndex + 1}`,
-                    className: "chevron",
-                    rowIndex,
-                    onClick: (event) => collapseRow(data, tableType, event, severityScoreWeights),
+                    createRowActionButton({
+                        title: `Show less info for row ${rowIndex + 1}`,
+                        className: "chevron",
+                        rowIndex,
+                        expanded: true,
+                        onClick: (event) => collapseRow(data, tableType, event, severityScoreWeights),
                     contentBuilder: () => createChevronIcon("down", 14)
                 })
             );
@@ -649,6 +610,7 @@ const fillCollapsedRow = (data, tableType, row, rowIndex, severityScoreWeights) 
             title: `Show more info for row ${rowIndex + 1}`,
             className: "chevron",
             rowIndex,
+            expanded: false,
             onClick: (event) => expandRow(data, tableType, event, severityScoreWeights),
             contentBuilder: () => createChevronIcon("right", 10)
         })

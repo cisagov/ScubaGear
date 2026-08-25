@@ -223,6 +223,9 @@ class ScubaConfig {
         # The validator has already converted YAML to PowerShell objects safely
         $this.Configuration = $ValidationResult.ParsedContent
 
+        # Properties that solely host a YAML anchor definition
+        $this.AnchorDefinedProperties = $ValidationResult.AnchorDefinedProperties
+
         # IMPORTANT: Validate required fields BEFORE converting to hashtable
         # PSCustomObject preserves case-sensitive property names, hashtable doesn't
         # This ensures minRequired check validates exact property names from YAML
@@ -322,7 +325,7 @@ class ScubaConfig {
         # Phase 1: Perform JSON Schema validation (structure, types, constraints)
         # This validates against the formal schema definition including data types, patterns, and structural requirements
         # Schema validation catches fundamental issues like wrong data types, missing required fields, invalid formats
-        $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $false)
+        $SchemaValidation = [ScubaConfigValidator]::ValidateAgainstSchema($ConfigObject, $false, $this.AnchorDefinedProperties)
 
         # Phase 2: Perform Scuba configuration rule validation (paths, content quality, cross-field validation)
         # This layer adds domain-specific validation beyond what JSON Schema can express
@@ -457,6 +460,7 @@ class ScubaConfig {
     # Clears configuration data from singleton instance. Used by ResetInstance() for clean state.
     hidden [void]ClearConfiguration(){
         $this.Configuration = $null
+        $this.AnchorDefinedProperties = @()
     }
 
     # Recursively converts PSCustomObject to hashtable for internal storage compatibility.
@@ -619,6 +623,11 @@ class ScubaConfig {
 
     # Internal configuration storage as hashtable
     hidden [hashtable]$Configuration
+
+    # Top-level property names (detected from the raw YAML text at load time) that solely
+    # host a YAML anchor definition, e.g. 'SensitiveUsers: &CommonSensitiveUsers'. Retained
+    # so deferred schema validation can exclude them from "unknown property" warnings.
+    hidden [array]$AnchorDefinedProperties = @()
 
     # Applies default values and processes special configuration properties (wildcards, path expansion).
     # This method ensures all required properties have values and handles special cases like path resolution.

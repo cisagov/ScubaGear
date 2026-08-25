@@ -55,6 +55,25 @@ InModuleScope CreateReport {
                 'SecureBaselines' = Import-SecureBaseline -ProductNames $Product -BaselinePath (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve)
             }
 
+            if ($Product -eq 'securitysuite') {
+                $ProviderSettingsPath = Join-Path -Path $TestOutPath -ChildPath "ProviderSettingsExport.json"
+                $ProviderSettings = Get-Content -Path $ProviderSettingsPath -Raw | ConvertFrom-Json
+                $ProviderSettings.scuba_config = [pscustomobject]@{
+                    SecuritySuite = [pscustomobject]@{
+                        'MS.SECURITYSUITE.2.1v1' = [pscustomobject]@{
+                            SensitiveUsers = @(
+                                "jdoe@first.example.com",
+                                "John Doe;jdoe@second.example.com"
+                            )
+                        }
+                        'MS.SECURITYSUITE.2.3v1' = [pscustomobject]@{
+                            PartnerDomains = @("random.mail.example.com")
+                        }
+                    }
+                }
+                $ProviderSettings | ConvertTo-Json -Depth 20 | Set-Content -Path $ProviderSettingsPath
+            }
+
             { New-Report @CreateReportParams } | Should -Not -Throw
             Should -Invoke -CommandName Write-Warning -Exactly -Times $WarningCount
 
@@ -80,6 +99,34 @@ InModuleScope CreateReport {
                         throw "Global Administrator user found after non-Global Administrator user in privileged users table"
                     }
                 }
+            }
+
+            if ($Product -eq 'securitysuite') {
+                $ReportContent = Get-Content -Path $ReportPath -Raw
+                $ReportContent | Should -Match "id='securitysuite-sensitive-users-json'"
+                $ReportContent | Should -Match "id='securitysuite-partner-domains-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-phish-policies-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-phish-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-protection-policy-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-accepted-domains-json'"
+                $ReportContent | Should -Match "jdoe@first.example.com"
+                $ReportContent | Should -Match "John Doe;jdoe@second.example.com"
+                $ReportContent | Should -Match "random.mail.example.com"
+                $ReportContent | Should -Match '"EnableFirstContactSafetyTips"'
+                $ReportContent | Should -Match "buildSecuritySuiteConfigTables"
+                $ReportContent | Should -Match 'document\.createElement\("ul"\)'
+                $ReportContent | Should -Match '"Applicability"'
+                $ReportContent | Should -Match '"Users included"'
+                $ReportContent | Should -Match '"Groups included"'
+                $ReportContent | Should -Match '"Domains included"'
+                $ReportContent | Should -Match '"Users excluded"'
+                $ReportContent | Should -Match '"Groups excluded"'
+                $ReportContent | Should -Match '"Domains excluded"'
+                $ReportContent | Should -Match 'createRowActionButton\(\{'
+                $ReportContent | Should -Match 'contentBuilder: \(\) => document\.createTextNode\("\.\.\."\)'
+                $ReportContent | Should -Match "Sensitive Users and Partner Domains are configured in the SecuritySuite config file\."
+                $ReportContent | Should -Match "Anti-Phish Protection Policies are exported from the tenant, and are shown in priority"
+                $ReportContent | Should -Match "order with the highest priority policies listed first\."
             }
         }
     }
