@@ -60,7 +60,7 @@
     "Products_TextBlock": "Select at least one product:",
     "ExclusionsProducts_TextBlock": "Products supporting exclusions:",
     "ExclusionsInfo_TextBlock": "Exclusions are supported for the following products: {0}",
-    "Organization_Required_TextBlock": "Required. Must be in format: name.onmicrosoft.com or name.onmicrosoft.us",
+    "Organization_Required_TextBlock": "Required. Enter your tenant's primary domain, e.g. name.onmicrosoft.com or a verified custom domain such as example.com",
     "OrgName_Required_TextBlock": "This option is required for BOD submissions.",
     "ExclusionsTabInfo_TextBlock": "Configure exclusions for specific policies. Exclusions allow you to customize policy behavior by excluding specific users, groups, domains, or other entities from policy evaluation. Products must be selected on the main page before configuring exclusions.",
     "AnnotationsTabInfo_TextBlock": "Add comments and annotations to policies for documentation and tracking purposes. Products must be selected on the main page before configuring annotations.",
@@ -134,7 +134,7 @@
   "localeErrorMessages": {
     "CertificateNotFound": "No suitable certificates found in the current user's personal certificate store.",
     "WindowError": "Error loading screen",
-    "OrganizationValidation": "Organization Name is required and must be in format: example.onmicrosoft.com or example.onmicrosoft.us",
+    "OrganizationValidation": "Organization is required and must be a valid domain, e.g. example.onmicrosoft.com or a verified custom domain such as example.com",
     "OrgNameValidation": "Org Name is required. Please specify a valid organization name.",
     "AppIdValidation": "Application ID must be in GUID format (e.g., 12345678-1234-1234-1234-123456789abc)",
     "CertificateValidation": "Certificate Thumbprint must be 40 hexadecimal characters",
@@ -240,11 +240,11 @@
   "localeHelpTips": {
     "Organization_HelpLabel": {
         "Title" : "Organization Domain",
-        "Content" : "Enter your organization's domain (e.g., example.onmicrosoft.com). This is used to connect to your Microsoft 365 tenant.",
+        "Content" : "Enter your organization's primary domain (e.g., example.onmicrosoft.com or a verified custom domain such as example.com). This is used to connect to your Microsoft 365 tenant.",
         "AdditionalSections": {
-            "Example" : "example.onmicrosoft.com",
+            "Example" : "example.onmicrosoft.com or example.com",
             "Required" : "Yes, this field is mandatory",
-            "Note" : "Must be a valid Microsoft 365 tenant domain"
+            "Note" : "Must be your tenant's primary domain (the initial .onmicrosoft.com domain or a verified custom domain)"
         },
         "Placement": "Right"
     },
@@ -1001,9 +1001,9 @@
       "sensitive": false
     },
     "tenantDomain": {
-      "pattern": "^(.*\\.)?(onmicrosoft\\.com|onmicrosoft\\.us)$",
+      "pattern": "^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$",
       "sample": "example.onmicrosoft.com",
-      "format": "example.onmicrosoft.com",
+      "format": "example.com",
       "invalidScriptMessage": "",
       "invalidScriptChecks": [],
       "sensitive": false
