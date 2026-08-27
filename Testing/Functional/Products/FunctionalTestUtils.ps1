@@ -165,6 +165,8 @@ function Invoke-FunctionalTestRestRequest {
       if ($StatusCode -eq 202) {
         $PollAttempts++
         if ($PollAttempts -gt $MaxPollAttempts) {
+          $DetailedHttpMessage = Get-HttpResponseDetails $Response
+          Write-Warning $DetailedHttpMessage
           throw "Request to $Uri did not complete after $MaxPollAttempts polling attempt(s)."
         }
 
@@ -176,6 +178,8 @@ function Invoke-FunctionalTestRestRequest {
           $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Azure-AsyncOperation'
         }
         if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+          $DetailedHttpMessage = Get-HttpResponseDetails $Response
+          Write-Warning $DetailedHttpMessage
           throw "Request to $RequestUri returned HTTP 202 without a polling location."
         }
 

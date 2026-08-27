@@ -54,6 +54,17 @@ function Connect-Tenant {
    $TenantName = $null
    $InitialDomainPrefix = $null
 
+   #####
+   # The variables below are used to dynamically determine the M365Environment for interactive auth.
+   # For non-interactive auth, the environment is dynamically determined in the Orchestrator not here in Connect-Tenant.
+   # String that holds the tenant identifiter GUID
+   $TenantId = $null
+   # String that holds the M365Environment value that was auto detected.
+   $DetectedM365Environment = $null
+   # Boolean that ensures we only auto detect once during execution.
+   $AutodetectEnvironmentCompleted = $false
+   #####
+
    # Token data for REST-based products (populated during connection)
    $TokenData = @{
        SPOAccessToken     = $null
@@ -92,12 +103,32 @@ function Connect-Tenant {
                    $GraphScopes = Get-ScubaGearEntraMinimumPermissions
                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes $GraphScopes
                    $MsGraphAuthRequired = $false
+
+                    # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $M365Environment = $DetectedM365Environment
+                        $AutodetectEnvironmentCompleted = $true
+                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                    }
                }
                {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
                        #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for EXO / Security Suite auth
                        Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                        $MsGraphAuthRequired = $false
+
+                        # Dynamically determine the M365Environment for interactive auth
+                        if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                            $UserAuthInfo = Get-MgContext
+                            $TenantId = $UserAuthInfo.TenantId
+                            $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                            $M365Environment = $DetectedM365Environment
+                            $AutodetectEnvironmentCompleted = $true
+                            Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                        }
 
                        # Resolve tenant info if not already cached
                        if ([string]::IsNullOrEmpty($TenantName)) {
@@ -175,6 +206,16 @@ function Connect-Tenant {
                     Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                     $MsGraphAuthRequired = $false
 
+                    # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $M365Environment = $DetectedM365Environment
+                        $AutodetectEnvironmentCompleted = $true
+                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                    }
+
                    # Acquire Power Platform access token
                    $PPScope = Get-PowerPlatformScope -M365Environment $M365Environment
                    $TokenData.PPBaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
@@ -211,6 +252,16 @@ function Connect-Tenant {
                     Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                     $MsGraphAuthRequired = $false
 
+                    # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $M365Environment = $DetectedM365Environment
+                        $AutodetectEnvironmentCompleted = $true
+                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                    }
+
                     # Resolve tenant info if not already cached from a previous product
                     if ([string]::IsNullOrEmpty($TenantName)) {
                         $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
@@ -246,6 +297,16 @@ function Connect-Tenant {
                    # /subscribedSkus API requires the Organization.Read.All permission.
                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes @("Organization.Read.All")
                    $MsGraphAuthRequired = $false
+
+                   # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $M365Environment = $DetectedM365Environment
+                        $AutodetectEnvironmentCompleted = $true
+                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                    }
 
                    # Check for Power BI license before attempting token acquisition.
                    # This prevents triggering a second consent/browser window for the
@@ -335,6 +396,16 @@ function Connect-Tenant {
                     #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Teams auth
                     Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                     $MsGraphAuthRequired = $false
+
+                    # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $M365Environment = $DetectedM365Environment
+                        $AutodetectEnvironmentCompleted = $true
+                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                    }
 
                     # Get access tokens for Teams Admin API and Teams Unified settings API
                     # The Teams Unified settings API is used for some operations that are not available in the standard Teams Admin API
@@ -436,6 +507,7 @@ function Connect-Tenant {
        TeamsBaseUrl = $TokenData.TeamsBaseUrl
        TeamsUnifiedAccessToken   = $TokenData.TeamsUnifiedAccessToken
        TeamsUnifiedBaseUrl     = $TokenData.TeamsUnifiedBaseUrl
+       DetectedM365Environment = $DetectedM365Environment
    }
 }
 

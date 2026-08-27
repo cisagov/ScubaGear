@@ -44,7 +44,27 @@
             $GraphParams += @{'Environment' = "USGovDoD"; }
         }
     }
-    Connect-MgGraph @GraphParams | Out-Null
+
+    ################### If we receive a very specific error from Connect-MgGraph, we will retry with the GCC High environment.
+    try {
+        $null = Connect-MgGraph @GraphParams
+    }
+    catch {
+        $ErrorText = $_.Exception.Message
+
+        $IsWrongCloudError =
+            $ErrorText -match "AADSTS900384" -and
+            $ErrorText -match "determine the corresponding service endpoint"
+
+        if (-not $IsWrongCloudError) {
+            throw
+        }
+
+        Write-Information "Detected a login to a tenant that is not Commercial or GCC. Retrying with GCC High environment login page..." -InformationAction Continue
+        $GraphParams += @{'Environment' = "USGov"; }
+        $null = Connect-MgGraph @GraphParams
+    }
+    ###################
 }
 
 function Initialize-Msal {
@@ -235,7 +255,7 @@ function Get-MsalAccessToken {
                 if (-not $TokenResult) {
                     $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                         WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                        WithUseEmbeddedWebView($false).
+                        WithUseEmbeddedWebView($true).
                         ExecuteAsync().GetAwaiter().GetResult()
                 }
             }
