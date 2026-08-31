@@ -15,9 +15,7 @@ function Get-TeamsScope {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        default { return Get-ScubaGearPermissions -Product teams -OutAs oauthScope -Environment $M365Environment }
-    }
+    return Get-ScubaGearPermissions -Product teams -OutAs oauthScope -Environment $M365Environment
 }
 
 function Get-TeamsBaseUrl {
@@ -34,9 +32,7 @@ function Get-TeamsBaseUrl {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        default { return Get-ScubaGearPermissions -Product teams -OutAs endpoint -Environment $M365Environment }
-    }
+    return Get-ScubaGearPermissions -Product teams -OutAs endpoint -Environment $M365Environment
 }
 
 function Get-TeamsUnifiedScope {
@@ -53,9 +49,7 @@ function Get-TeamsUnifiedScope {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        default { return Get-ScubaGearPermissions -Product teamsunified -OutAs oauthScope -Environment $M365Environment }
-    }
+    return Get-ScubaGearPermissions -Product teamsunified -OutAs oauthScope -Environment $M365Environment
 }
 
 function Get-TeamsUnifiedBaseUrl {
@@ -72,9 +66,7 @@ function Get-TeamsUnifiedBaseUrl {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        default { return Get-ScubaGearPermissions -Product teamsunified -OutAs endpoint -Environment $M365Environment }
-    }
+    return Get-ScubaGearPermissions -Product teamsunified -OutAs endpoint -Environment $M365Environment
 }
 
 function Get-TeamsMeetingPolicyRest {

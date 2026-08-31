@@ -96,6 +96,19 @@ Function Get-ScubaGearPermissions {
         2024-12-20 - Added version and changelog. Added support for pipeline and for multiple products. Fixed issue with role output for null values
         2024-12-23 - Adjusted endpoint output based on structure changes in the permissions file
         2026-06-19 - Added SecuritySuite and removed ScubaTank to product list
+
+        DEVELOPER EXPLANATION OF the possible OutAs parameter values since they is hard to discern from the code alone:
+        perms       - Returns the value in the leastPermissions field
+        api         - Returns a conglomerate set of values from  the apiResource field
+                        Pass the -id field with this and it will place the value into the URI "/v1.0/roleManagement/directory/roleDefinitions/{id}"
+        role        - Returns the values in the spRolePermissions field (these are the roles that the service principal needs to be assigned) (details in /docs/prerequisites/noninteractive.md).
+        oauthScope  - Returns the values in the oauthScope field (used to mint tokens by MSAL for the various products)
+        endpoint    - Returns the value in the apiResource field where $_.moduleCmdlet -like 'Connect-*' -or $_.moduleCmdlet -like '*REST API' (this is the base URI used by the Export Providers to call REST APIs)
+        apiHeader   - Returns the apiHeader value based on the CmdletName (currently only /beta/users/ has a value). Used for the HTTP header in REST API calls.
+        all         - Returns all the fields from every record in the JSON that matches the product name
+        The following OutAs parameter values are currently not used anywhere in ScubaGear:
+        modules     - Returns the values in the poshModule field 
+        appId       - Returns the resourceAPIAppId
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'CmdletName')]
@@ -142,8 +155,8 @@ Function Get-ScubaGearPermissions {
             Write-Error -Message "Parameter [-Domain] is required when OutAs is endpoint"
         }
 
-        if($OutAs -eq 'api' -and $Product -match 'aad|teams' -and !$Id){
-            Write-Error -Message "Parameter [-id] is required when OutAs is api or endpoint and Product is aad or teams"
+        if($OutAs -eq 'api' -and $Product -match 'aad' -and !$Id){
+            Write-Error -Message "Parameter [-id] is required when OutAs is api or endpoint and Product is aad"
         }
 
         [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
@@ -151,6 +164,9 @@ Function Get-ScubaGearPermissions {
         $permissionSet = Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json
         Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json"
 
+        # This hashtable contains the Entra AppId values for MS Graph (aad), Office 365 Exchange Online and SharePoint.
+        # The New-ScubaGearServicePrincipal cmdlet references these AppIds and their respective permissions from ScubaGearApiCatalog.json to
+        #   create the service principal permissions in the tenant.
         $ResourceAPIHash = @{
             'aad'        = '00000003-0000-0000-c000-000000000000'
             'exo'        = @(
@@ -162,6 +178,7 @@ Function Get-ScubaGearPermissions {
                 '00000007-0000-0ff1-ce00-000000000000'
             )
             'sharepoint' = '00000003-0000-0ff1-ce00-000000000000'
+            'teams' = '48ac35b8-9aa8-4d74-927d-1f4a14a0b239'
         }
 
         # Start with an empty array to build the filter
@@ -193,16 +210,21 @@ Function Get-ScubaGearPermissions {
                 $conditions += $productCondition
                 $conditionsmsg += '`$_.scubaGearProduct -contains any of "' + ($Product -join '", "') + '"'
 
-                # Don't add resourceAPIAppId filters when querying for roles or endpoints
-                If($OutAs -ne 'role' -and $OutAs -ne 'endpoint'){
+                # # Don't add resourceAPIAppId filters when querying for roles or endpoints
+                # # If($OutAs -ne 'role' -and $OutAs -ne 'endpoint'){
+                If($OutAs -eq 'perms'){
                     Foreach($ProductItem in $Product){
-                        If($ServicePrincipal -and $ProductItem -ne 'teams'){
-                            # Filter the resourceAPIAppId based on the product
+                        If($ServicePrincipal -or $ProductItem -eq 'aad'){
+                            # When running non-interactive, fetch the permissions associated with with the product's REST API record in the JSON (e.g. "Teams admin REST API").
+                            # These are the permissions that a service principal needs and are listed in /docs/prerequisites/noninteractive.md for the specific product.
+                            # aad is the only exception. For aad for both interactive and non-interactive we need to fetch the Graph permissions.
                             $conditions += {$_.resourceAPIAppId -match ($ResourceAPIHash[$ProductItem] -join '|')}
                             $conditionsmsg += '`$_.resourceAPIAppId -match "' + ($ResourceAPIHash[$ProductItem] -Join '|') + '"'
-                        }elseif($ProductItem -match 'exo|sharepoint|securitysuite'){
-                            # If the product is exo or SharePoint, then the resourceAPIAppId should not match the Exchange/SharePoint resourceAPIAppId
-                            # This accounts for interactive permissions needed for Exchange when running the SCuBAGear, and doesn't list SharePoint interactive permissions
+                        }
+                        else{
+                            # When running interactive, the permissions returned are only the minimum necessary to run
+                            #   the MS Graph API /organization to get information about the tenant which is called by all of the products.
+                            # This logic fetches the permissions from the /beta/organization record in the JSON.
                             $conditions += {$_.resourceAPIAppId -notmatch ($ResourceAPIHash[$ProductItem] -join '|')}
                             $conditionsmsg += '`$_.resourceAPIAppId -notmatch "' + ($ResourceAPIHash[$ProductItem] -join '|') + '"'
                         }

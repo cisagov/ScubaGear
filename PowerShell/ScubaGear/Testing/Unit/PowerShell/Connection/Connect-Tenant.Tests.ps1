@@ -22,8 +22,8 @@ InModuleScope Connection {
                 return [pscustomobject]@{
                     Value = [pscustomobject]@{
                         DisplayName     = "DisplayName";
-                        Name            = "DomainName";
-                        Id              = "TenantId";
+                        Name            = "contoso.onmicrosoft.com";
+                        Id              = "305102d0-7ccc-4007-83bb-ac1f44f8d620";
                         VerifiedDomains = @(
                             @{ isInitial = $false; Name = "example.onmicrosoft.com" },
                             @{ isInitial = $true; Name = "contoso.onmicrosoft.com" }
@@ -34,6 +34,12 @@ InModuleScope Connection {
             function Get-MsalAccessToken {throw 'this will be mocked'}
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
+            }
+            function Get-MgContext {throw 'this will be mocked'}
+            Mock Get-MgContext -MockWith { return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" } }
+            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
+            Mock Get-M365EnvironmentByDomain -MockWith {
+                return (Get-Random -InputObject @('commercial', 'gcc', 'gcchigh', 'dod'))
             }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
