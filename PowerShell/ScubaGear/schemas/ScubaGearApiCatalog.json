@@ -1716,7 +1716,7 @@
         "leastPermissions":  [],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "teams"
@@ -1744,7 +1744,7 @@
         "leastPermissions":  [],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "teams"
@@ -1960,7 +1960,7 @@
         ],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "exo"
@@ -1992,7 +1992,7 @@
         ],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "exo"
@@ -2025,7 +2025,7 @@
         ],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "exo"
@@ -2058,7 +2058,7 @@
         ],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "securitysuite"
@@ -2090,7 +2090,7 @@
         ],
         "higherPermissions":  [],
         "spRolePermissions":  [
-            "GLobal Reader"
+            "Global Reader"
         ],
         "scubaGearProduct":  [
             "securitysuite"

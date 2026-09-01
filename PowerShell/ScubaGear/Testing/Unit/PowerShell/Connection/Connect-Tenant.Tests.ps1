@@ -16,7 +16,11 @@ InModuleScope Connection {
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
             Mock Get-ExchangeOnlineApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
             function Get-ExchangeOnlineScope {throw 'this will be mocked'}
-            Mock Get-ExchangeOnlineScope -MockWith { return "https://outlook.office365.com/.default" }
+            Mock Get-ExchangeOnlineScope -MockWith { return "https://mock.outlook.office365.com/.default" }
+            function Get-ComplianceApiEndpoint {throw 'this will be mocked'}
+            Mock Get-ComplianceApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
+            function Get-ComplianceScope {throw 'this will be mocked'}
+            Mock Get-ComplianceScope -MockWith { return "https://mock.outlook.office365.com/.default" }
             function Invoke-GraphDirectly {throw 'this will be mocked'}
             Mock Invoke-GraphDirectly -MockWith {
                 return [pscustomobject]@{
@@ -84,5 +88,6 @@ InModuleScope Connection {
 }
 AfterAll {
     Remove-Module Connection -ErrorAction SilentlyContinue
-    Remove-Module ConnectHelper -ErrorAction SilentlyContinue
+    Remove-Module ConnectHelpers -ErrorAction SilentlyContinue
+    Remove-Module PermissionsHelper -ErrorAction SilentlyContinue
 }
