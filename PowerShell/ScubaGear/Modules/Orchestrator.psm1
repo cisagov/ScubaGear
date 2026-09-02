@@ -541,15 +541,17 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $false
         }
 
+        # If user supplied the $M365Environment parameter, let them know that it is no longer necessary
+        if ($PSBoundParameters.ContainsKey('M365Environment')) {
+            Write-Information "`nStarting in ScubaGear v2.0.0 the -M365Environment parameter is no longer necessary.`n" -InformationAction Continue
+        }
+
         # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
         # This overrides any user provided command line value for M365Environment and the default value of "commercial"
         if ($ScubaConfig.CertificateThumbprint -or $ScubaConfig.AppID) {
             # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
             $null = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
             $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
-        }
-        else {
-            Write-Information "`nIf you are running v2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the -M365Environment parameter. In a future release ScubaGear will auto-detect the M365 environment and this won't be necessary.`n" -InformationAction Continue
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
