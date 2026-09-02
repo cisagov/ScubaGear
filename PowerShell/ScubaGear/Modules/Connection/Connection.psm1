@@ -523,6 +523,17 @@ function Disconnect-SCuBATenant {
    .Functionality
    Public
    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string[]]
+        $ProductNames
+    )
+
+    if ($PSBoundParameters.ContainsKey('ProductNames')) {
+        Write-Warning "-ProductNames is deprecated and ignored; Disconnect-SCuBATenant now always disconnects the full tenant session."
+    }
+
     try {
         Write-Information "Disconnecting from tenant..." -InformationAction Continue
         Disconnect-MgGraph -ErrorAction Stop | Out-Null
