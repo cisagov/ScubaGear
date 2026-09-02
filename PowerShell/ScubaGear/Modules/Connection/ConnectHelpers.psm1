@@ -64,6 +64,10 @@
         $GraphParams += @{'Environment' = "USGov"; }
         $null = Connect-MgGraph @GraphParams
     }
+        Write-Information "Detected a login to a tenant that is not Commercial or GCC. Retrying with GCC High environment login page..." -InformationAction Continue
+        $GraphParams += @{'Environment' = "USGov"; }
+        $null = Connect-MgGraph @GraphParams
+    }
     ###################
 }
 
