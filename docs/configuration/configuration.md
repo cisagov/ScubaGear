@@ -96,9 +96,9 @@ For more details on setting up service principal authentication, see the [Non-In
 
 ## Generate Configuration Files
 
-ScubaGear provides two methods for creating configuration files: a command-line utility and a graphical user interface.
+ScubaGear provides two methods for creating configuration files: a graphical user interface and a command-line utility.
 
-### Method 1: Configuration UI (Recommended)
+### Method 1: Configuration UI (Recommended, Windows only)
 
 The **Configuration UI** provides an intuitive graphical interface for creating and managing ScubaGear configuration files:
 
@@ -107,13 +107,11 @@ The **Configuration UI** provides an intuitive graphical interface for creating 
 Start-SCuBAConfigApp
 ```
 
-This is the **recommended method** for users who prefer visual interfaces or are new to ScubaGear configuration.
+This is the **recommended method** for Windows users. For complete documentation on using the Configuration UI, see the [Configuration UI Guide](scubaconfigapp.md).
 
-For complete documentation on using the Configuration UI, see the [Configuration UI Guide](scubaconfigapp.md).
+### Method 2: Command-Line Generation (Cross-platform)
 
-### Method 2: Command-Line Generation
-
-You can also generate an empty sample configuration file using the command line. The `New-SCuBAConfig` cmdlet will create a template configuration file called `SampleConfig.yaml`:
+The Configuration UI currently supports Windows only. On macOS and Linux, use the `New-SCuBAConfig` cmdlet to generate a template configuration file called `SampleConfig.yaml`. The template is built from the current ScubaGear baselines, so it automatically includes the configurable exclusion sections for the products you specify:
 
 ```powershell
 # Create an empty config file
@@ -124,7 +122,7 @@ Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values 
 
 ```powershell
 # Create config with pre-set values
-New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,securitysuite"
+New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad","exo"
 ```
 
 The generated file can then be manually edited to add your specific configuration settings.
