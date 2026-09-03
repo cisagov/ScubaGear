@@ -246,7 +246,6 @@ InModuleScope Orchestrator {
             Should -Invoke -CommandName Write-Warning -Exactly -Times 1
         }
     }
-}
 
     Describe -Tag 'Orchestrator' -Name 'ConvertFrom-CsvValue' {
         It 'Returns null/empty values unchanged' {
@@ -274,7 +273,7 @@ InModuleScope Orchestrator {
             ConvertFrom-CsvValue -Value 'MyApp' | Should -BeExactly 'MyApp'
         }
     }
-
+}
 AfterAll {
     Remove-Module Orchestrator -ErrorAction SilentlyContinue
 }
