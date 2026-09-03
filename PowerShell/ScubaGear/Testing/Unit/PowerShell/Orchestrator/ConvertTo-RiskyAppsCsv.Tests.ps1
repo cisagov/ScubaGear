@@ -248,6 +248,33 @@ InModuleScope Orchestrator {
     }
 }
 
+    Describe -Tag 'Orchestrator' -Name 'ConvertFrom-CsvValue' {
+        It 'Returns null/empty values unchanged' {
+            ConvertFrom-CsvValue -Value $null | Should -BeNullOrEmpty
+            ConvertFrom-CsvValue -Value ''    | Should -BeNullOrEmpty
+        }
+
+        It 'Prefixes single quote for values starting with =' {
+            ConvertFrom-CsvValue -Value '=1+1' | Should -BeExactly "'=1+1"
+        }
+
+        It 'Prefixes single quote for values starting with +' {
+            ConvertFrom-CsvValue -Value '+cmd' | Should -BeExactly "'+cmd"
+        }
+
+        It 'Prefixes single quote for values starting with -' {
+            ConvertFrom-CsvValue -Value '-data' | Should -BeExactly "'-data"
+        }
+
+        It 'Prefixes single quote for values starting with @' {
+            ConvertFrom-CsvValue -Value '@SUM(A1)' | Should -BeExactly "'@SUM(A1)"
+        }
+
+        It 'Does not modify safe values' {
+            ConvertFrom-CsvValue -Value 'MyApp' | Should -BeExactly 'MyApp'
+        }
+    }
+
 AfterAll {
     Remove-Module Orchestrator -ErrorAction SilentlyContinue
 }

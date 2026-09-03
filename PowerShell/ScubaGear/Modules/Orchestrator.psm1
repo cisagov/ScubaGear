@@ -1626,6 +1626,35 @@ function Get-RiskyAppsPermissionList {
     return ($FormattedPermissions -join "; ")
 }
 
+function ConvertFrom-CsvValue {
+    <#
+    .Description
+    Prefixes a single quote to values that spreadsheet applications would otherwise
+    evaluate as a formula. Tenant-controlled text such as an application display name
+    can begin with =, +, -, or @, which Excel executes on open even when the field is
+    CSV-quoted.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]
+        $Value
+    )
+
+    if ([string]::IsNullOrEmpty($Value)) {
+        return $Value
+    }
+
+    if ($Value -match '^[=+\-@\t\r]') {
+        return "'$Value"
+    }
+
+    return $Value
+}
+
 function ConvertTo-RiskyAppsCsv {
     <#
     .Description
@@ -1717,7 +1746,7 @@ function ConvertTo-RiskyAppsCsv {
                 }
 
                 $RiskyAppsCsv += [PSCustomObject]@{
-                    "Display Name" = $App.DisplayName
+                    "Display Name" = ConvertFrom-CsvValue -Value $App.DisplayName
                     "Severity Score" = $(if ($null -ne $App.SeverityScore) { $App.SeverityScore } else { 0 })
                     "Risk Level" = Get-RiskyAppsRiskLevel -Object $App
                     "Risky Permissions" = Get-RiskyAppsPermissionList -Object $App
@@ -1757,7 +1786,7 @@ function ConvertTo-RiskyAppsCsv {
                 }
 
                 $RiskyAppsCsv += [PSCustomObject]@{
-                    "Display Name" = $ServicePrincipal.DisplayName
+                    "Display Name" = ConvertFrom-CsvValue -Value $ServicePrincipal.DisplayName
                     "Severity Score" = $(
                         if ($null -ne $ServicePrincipal.SeverityScore) { $ServicePrincipal.SeverityScore } else { 0 }
                     )
