@@ -99,17 +99,37 @@ function Export-SecuritySuiteProvider {
     # API failure.
     $CommandErrors = @{}
 
+    # Signals that the caller was refused the cmdlet itself rather than told the
+    # request was bad. The Admin API answers a failed call with an OData error
+    # whose details carry the Exchange exception name, and a product the tenant is
+    # not entitled to is enforced by leaving the cmdlet out of the caller's role
+    # scope, so an authorization refusal is what a missing license looks like here.
+    # That also matches what the flag drives in the report, a note covering both
+    # insufficient permissions and a missing license. A Bad Request raised for any
+    # other reason names a different exception and is reported as an API error.
+    $MissingLicenseSignals = @(
+        'CmdletAccessDeniedException'
+        'not licensed'
+        'is not recognized as the name of a cmdlet'
+    )
+
     function Test-MissingLicenseError {
         param(
             [Parameter(Mandatory = $false)]
             [string]$Message
         )
 
-        # A tenant without the required license does not have the cmdlet
-        # provisioned, so the Admin API rejects the call with HTTP 400 and an
-        # unrecognized cmdlet message. Any other failure is an API error, not
-        # evidence that the license is missing.
-        return (-not [string]::IsNullOrWhiteSpace($Message)) -and ($Message -match '\b400\b|not recognized')
+        if ([string]::IsNullOrWhiteSpace($Message)) {
+            return $false
+        }
+
+        foreach ($Signal in $MissingLicenseSignals) {
+            if ($Message -match $Signal) {
+                return $true
+            }
+        }
+
+        return $false
     }
 
     function Invoke-SecuritySuiteTrackedCommand {

@@ -231,7 +231,9 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
         It "Reports a missing defender license without a warning when ATP cmdlets fail with a license error" {
             Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
                 if ($CmdletName -in @('Get-AtpPolicyForO365', 'Get-ATPProtectionPolicyRule')) {
-                    throw "Exchange Online API call '$CmdletName' failed: The remote server returned an error: (400) Bad Request."
+                    $Detail = 'Ex4F2A01|Microsoft.Exchange.Configuration.Authorization.CmdletAccessDeniedException|The user is not authorized to run the cmdlet ' + $CmdletName + '.'
+                    $Body = '{"error":{"code":"BadRequest","message":"Error executing cmdlet","details":[{"code":"Context","message":"' + $Detail + '"}]}}'
+                    throw "Exchange Online API call '$CmdletName' failed: Response status code does not indicate success: 400 (Bad Request). $Body"
                 }
                 if ($CmdletName -eq 'Get-DlpComplianceRule') {
                     [pscustomobject]@{
@@ -250,6 +252,33 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-ATPProtectionPolicyRule'
             Should -Invoke -ModuleName ExportSecuritySuiteProvider Write-Warning -Exactly -Times 0 -ParameterFilter {
                 $Message -match 'Get-AtpPolicyForO365'
+            }
+        }
+
+        It "Does not report a missing defender license when ATP cmdlets fail with a bad request that is not about licensing" {
+            Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
+                if ($CmdletName -in @('Get-AtpPolicyForO365', 'Get-ATPProtectionPolicyRule')) {
+                    $Detail = 'Ex3B1C77|Microsoft.Exchange.Configuration.Tasks.ParameterBindingException|A parameter cannot be found that matches parameter name Identity.'
+                    $Body = '{"error":{"code":"BadRequest","message":"Error executing cmdlet","details":[{"code":"Context","message":"' + $Detail + '"}]}}'
+                    throw "Exchange Online API call '$CmdletName' failed: Response status code does not indicate success: 400 (Bad Request). $Body"
+                }
+                if ($CmdletName -eq 'Get-DlpComplianceRule') {
+                    [pscustomobject]@{
+                        Name = $CmdletName
+                        ContentContainsSensitiveInformation = @()
+                    }
+                }
+                else {
+                    [pscustomobject]@{ Name = $CmdletName }
+                }
+            }
+
+            $Parsed = Invoke-ProviderExport
+            $Parsed.defender_license | Should -Be $true
+            $Parsed.securitysuite_unsuccessful_commands | Should -Contain 'Get-AtpPolicyForO365'
+            $Parsed.securitysuite_successful_commands | Should -Not -Contain 'Get-AtpPolicyForO365'
+            Should -Invoke -ModuleName ExportSecuritySuiteProvider Write-Warning -ParameterFilter {
+                $Message -match 'Get-AtpPolicyForO365' -and $Message -match 'ParameterBindingException'
             }
         }
 
@@ -280,7 +309,9 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
         It "Reports a missing DLP license without a warning when DLP cmdlets fail with a license error" {
             Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
                 if ($CmdletName -in @('Get-DlpCompliancePolicy', 'Get-DlpComplianceRule', 'Get-ProtectionAlert')) {
-                    throw "Exchange Online API call '$CmdletName' failed: The remote server returned an error: (400) Bad Request."
+                    $Detail = 'Ex4F2A01|Microsoft.Exchange.Configuration.Authorization.CmdletAccessDeniedException|The user is not authorized to run the cmdlet ' + $CmdletName + '.'
+                    $Body = '{"error":{"code":"BadRequest","message":"Error executing cmdlet","details":[{"code":"Context","message":"' + $Detail + '"}]}}'
+                    throw "Exchange Online API call '$CmdletName' failed: Response status code does not indicate success: 400 (Bad Request). $Body"
                 }
                 if ($CmdletName -eq 'Get-DlpComplianceRule') {
                     [pscustomobject]@{
@@ -298,6 +329,25 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-DlpCompliancePolicy'
             Should -Invoke -ModuleName ExportSecuritySuiteProvider Write-Warning -Exactly -Times 0 -ParameterFilter {
                 $Message -match 'Get-DlpCompliancePolicy'
+            }
+        }
+
+        It "Does not report a missing DLP license when DLP cmdlets fail with a bad request that is not about licensing" {
+            Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
+                if ($CmdletName -in @('Get-DlpCompliancePolicy', 'Get-DlpComplianceRule', 'Get-ProtectionAlert')) {
+                    $Detail = 'Ex3B1C77|Microsoft.Exchange.Configuration.Tasks.ParameterBindingException|A parameter cannot be found that matches parameter name Identity.'
+                    $Body = '{"error":{"code":"BadRequest","message":"Error executing cmdlet","details":[{"code":"Context","message":"' + $Detail + '"}]}}'
+                    throw "Exchange Online API call '$CmdletName' failed: Response status code does not indicate success: 400 (Bad Request). $Body"
+                }
+                [pscustomobject]@{ Name = $CmdletName }
+            }
+
+            $Parsed = Invoke-ProviderExport
+            $Parsed.defender_dlp_license | Should -Be $true
+            $Parsed.securitysuite_unsuccessful_commands | Should -Contain 'Get-DlpCompliancePolicy'
+            $Parsed.securitysuite_successful_commands | Should -Not -Contain 'Get-DlpCompliancePolicy'
+            Should -Invoke -ModuleName ExportSecuritySuiteProvider Write-Warning -ParameterFilter {
+                $Message -match 'Get-DlpCompliancePolicy' -and $Message -match 'ParameterBindingException'
             }
         }
 
