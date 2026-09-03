@@ -161,14 +161,14 @@ function New-Report {
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateScript({Test-Path -LiteralPath $_ -PathType Container})]
         [ValidateNotNullOrEmpty()]
         [string]
         $IndividualReportPath,
 
         # The location to save the html report in.
         [Parameter(Mandatory=$true)]
-        [ValidateScript({Test-Path -PathType Container $_})]
+        [ValidateScript({Test-Path -LiteralPath $_ -PathType Container})]
         [ValidateScript({Test-Path -IsValid $_})]
         [string]
         $OutPath,
@@ -198,10 +198,16 @@ function New-Report {
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json" -Resolve
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutProviderFileName).json"
+    if (-not (Test-Path -LiteralPath $FileName -PathType Leaf)) {
+        throw "Provider settings file not found at '$FileName'. Verify the output path is accessible and does not contain issues (e.g., Some paths with spaces may require specifying an explicit -OutPath)."
+    }
     $SettingsExport =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
-    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json" -Resolve
+    $FileName = Join-Path -Path $OutPath -ChildPath "$($OutRegoFileName).json"
+    if (-not (Test-Path -LiteralPath $FileName -PathType Leaf)) {
+        throw "Rego output file not found at '$FileName'. The OPA evaluation may have failed for all products. If the module is installed in a folder with spaces in the path, try specifying an explicit -OutPath to a local directory without spaces."
+    }
     $RegoOutput =  Get-Utf8NoBom -FilePath $FileName | ConvertFrom-Json
 
     $Fragments = @()
@@ -425,7 +431,7 @@ function New-Report {
     $ReportJson = $ReportJson.replace("\u003c", "<")
     $ReportJson = $ReportJson.replace("\u003e", ">")
     $ReportJson = $ReportJson.replace("\u0027", "'")
-    $ReportJson | Out-File $JsonFileName
+    $ReportJson | Out-File -LiteralPath $JsonFileName
 
     # Finish building the html report
     $Title = "$($FullName) Baseline Report"
@@ -515,13 +521,29 @@ function New-Report {
         # This allows us to dynamically inject generated HTML sections into the final report output.
         $ReportHTML = $ReportHTML.Replace("{AADWARNING}", $AADWarning)
 
-        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null
-        $CapJson = ConvertTo-Json $SettingsExport.cap_table_data
+        # Only the AAD baseline will contain CAP data, otherwise $CapJson is set to null.
+        # Provider exports created by older versions of ScubaGear may lack these keys. ConvertTo-Json
+        # cannot serialize $null in PowerShell 5.1; it writes an error and leaves the variable empty,
+        # which produces an empty JSON data island that breaks the report's JavaScript. Fall back to
+        # the JSON literal "null", which the report scripts already handle.
+        $CapJson = if ($null -ne $SettingsExport.cap_table_data) {
+            ConvertTo-Json $SettingsExport.cap_table_data
+        }
+        else { "null" }
 
         # Same for risky applications, third-party service principals, and severity score weights
-        $RiskyAppsJson = ConvertTo-Json $SettingsExport.risky_applications -Depth 5
-        $RiskyThirdPartySPJson = ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
-        $SeverityScoreWeightsJson = ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
+        $RiskyAppsJson = if ($null -ne $SettingsExport.risky_applications) {
+            ConvertTo-Json $SettingsExport.risky_applications -Depth 5
+        }
+        else { "null" }
+        $RiskyThirdPartySPJson = if ($null -ne $SettingsExport.risky_third_party_service_principals) {
+            ConvertTo-Json $SettingsExport.risky_third_party_service_principals -Depth 5
+        }
+        else { "null" }
+        $SeverityScoreWeightsJson = if ($null -ne $SettingsExport.severity_score_weights) {
+            ConvertTo-Json $SettingsExport.severity_score_weights -Depth 5
+        }
+        else { "null" }
 
         # Load the CSV file
         $csvPath = Join-Path -Path $PSScriptRoot -ChildPath "MicrosoftLicenseToProductNameMappings.csv"
@@ -615,6 +637,47 @@ function New-Report {
         $SeverityScoreWeightsJson = "null"
     }
 
+    # Handle SecuritySuite-specific reporting
+    if ($BaselineName -eq "securitysuite") {
+        $SecuritySuiteConfig = $SettingsExport.scuba_config.SecuritySuite
+        $DefenderConfig = $SettingsExport.scuba_config.Defender
+
+        $SensitiveUserConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.1v1'
+        if ($null -eq $SensitiveUserConfig) {
+            $SensitiveUserConfig = $DefenderConfig.'MS.DEFENDER.2.1v1'
+        }
+
+        $PartnerDomainConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.3v1'
+        if ($null -eq $PartnerDomainConfig) {
+            $PartnerDomainConfig = $DefenderConfig.'MS.DEFENDER.2.3v1'
+        }
+
+        $SensitiveUsers = @()
+        if ($null -ne $SensitiveUserConfig -and $null -ne $SensitiveUserConfig.SensitiveUsers) {
+            $SensitiveUsers = @($SensitiveUserConfig.SensitiveUsers)
+        }
+
+        $PartnerDomains = @()
+        if ($null -ne $PartnerDomainConfig -and $null -ne $PartnerDomainConfig.PartnerDomains) {
+            $PartnerDomains = @($PartnerDomainConfig.PartnerDomains)
+        }
+
+        $SensitiveUsersJson = ConvertTo-Json @($SensitiveUsers)
+        $PartnerDomainsJson = ConvertTo-Json @($PartnerDomains)
+        $AntiPhishPoliciesJson = ConvertTo-Json @($SettingsExport.anti_phish_policies) -Depth 5
+        $AntiPhishRulesJson = ConvertTo-Json @($SettingsExport.anti_phish_rules) -Depth 5
+        $ProtectionPolicyRulesJson = ConvertTo-Json @($SettingsExport.protection_policy_rules) -Depth 5
+        $AcceptedDomainsJson = ConvertTo-Json @($SettingsExport.accepted_domains) -Depth 5
+    }
+    else {
+        $SensitiveUsersJson = "null"
+        $PartnerDomainsJson = "null"
+        $AntiPhishPoliciesJson = "null"
+        $AntiPhishRulesJson = "null"
+        $ProtectionPolicyRulesJson = "null"
+        $AcceptedDomainsJson = "null"
+    }
+
     # Handle EXO-specific reporting
     if ($BaselineName -eq "exo") {
         $LogHtml = "<hr><h2 id=`"dns-logs`">DNS Logs</h2>"
@@ -671,6 +734,12 @@ function New-Report {
         "<script type='application/json' id='risky-apps-json'> $($RiskyAppsJson) </script>"
         "<script type='application/json' id='risky-third-party-sp-json'> $($RiskyThirdPartySPJson) </script>"
         "<script type='application/json' id='severity-score-weights-json'> $($SeverityScoreWeightsJson) </script>"
+        "<script type='application/json' id='securitysuite-sensitive-users-json'> $($SensitiveUsersJson) </script>"
+        "<script type='application/json' id='securitysuite-partner-domains-json'> $($PartnerDomainsJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-phish-policies-json'> $($AntiPhishPoliciesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-phish-rules-json'> $($AntiPhishRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-protection-policy-rules-json'> $($ProtectionPolicyRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-accepted-domains-json'> $($AcceptedDomainsJson) </script>"
     ) -join "`n"
     $ReportHTML = $ReportHTML.Replace("{JSON_SCRIPT_TAGS}", $JsonScriptTags)
 
@@ -681,6 +750,7 @@ function New-Report {
     $TableFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "TableFunctions.js") -Raw
     $EXOFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "EXOTableFunctions.js") -Raw
     $AADFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "AADTableFunctions.js") -Raw
+    $SecuritySuiteFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "SecuritySuiteTableFunctions.js") -Raw
     $KeyValueListFunctionsJS = Get-Content (Join-Path -Path $ScriptsPath -ChildPath "KeyValueListFunctions.js") -Raw
 
     $JSFiles = @(
@@ -689,13 +759,14 @@ function New-Report {
         $TableFunctionsJS
         $EXOFunctionsJS
         $AADFunctionsJS
+        $SecuritySuiteFunctionsJS
         $KeyValueListFunctionsJS
     ) -join "`n"
 
     $ReportHTML = $ReportHTML.Replace("{JS_FILES}", "<script>`n $($JSFiles) `n</script>")
     $ReportHTML = $ReportHTML.Replace("{TABLES}", $Fragments)
     $FileName = Join-Path -Path $IndividualReportPath -ChildPath "$($BaselineName)Report.html"
-    [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File $FileName
+    [System.Web.HttpUtility]::HtmlDecode($ReportHTML) | Out-File -LiteralPath $FileName
 
     $ReportSummary
 }
