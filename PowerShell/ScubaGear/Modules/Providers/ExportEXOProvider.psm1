@@ -740,15 +740,98 @@ function Get-ScubaDmarcRecord {
         $Response = Invoke-RobustDnsTxt "_dmarc.$DomainName" -PreferredDnsResolvers $PreferredDnsResolvers `
             -SkipDoH $SkipDoH
         $LogEntries += $Response.LogEntries
-        if ($Response.Answers.Length -eq 0) {
-            # The domain does not exist. If the record is not available at the full domain
-            # level, we need to check at the organizational domain level.
-            $Labels = $d.DomainName.Split(".")
-            $Labels = $d.DomainName.Split(".")
-            $OrgDomain = $Labels[-2] + "." + $Labels[-1]
-            $Response = Invoke-RobustDnsTxt "_dmarc.$OrgDomain" -PreferredDnsResolvers $PreferredDnsResolvers `
-                -SkipDoH $SkipDoH
-            $LogEntries += $Response.LogEntries
+        # RFC 9989 step 2 applies to the starting target as well as every
+        # subsequent tree-walk target. Do not let unrelated TXT records or an
+        # ambiguous set of DMARC records suppress parent-domain discovery.
+        $ValidAnswers = @($Response.Answers | Where-Object { $_ -match '^v=DMARC1' })
+
+        if ($ValidAnswers.Length -eq 1) {
+            $Response = [PSCustomObject]@{
+                "Answers"    = @($ValidAnswers)
+                "Errors"     = $Response.Errors
+                "NXDomain"   = $Response.NXDomain
+                "LogEntries" = $Response.LogEntries
+            }
+        }
+        else {
+            $Response = [PSCustomObject]@{
+                "Answers"    = @()
+                "Errors"     = $Response.Errors
+                "NXDomain"   = $Response.NXDomain
+                "LogEntries" = $Response.LogEntries
+            }
+
+            # RFC 9989 replaces Public Suffix List organizational-domain discovery with
+            # a bounded DNS Tree Walk. Keep the author-domain query above, then walk
+            # parent domains without exceeding eight total DNS queries.
+            $AuthorDomainLabels = @($d.DomainName.Split(".") | Where-Object { $_ -ne "" })
+            $Labels = @($AuthorDomainLabels)
+            $Queries = 1
+            $CandidateResponse = $null
+            $PolicyResponse = $null
+            $PolicyDomain = $null
+
+            while ($Labels.Length -gt 1 -and $Queries -lt 8) {
+                if ($Labels.Length -ge 8) {
+                    $Labels = @($Labels[($Labels.Length - 7)..($Labels.Length - 1)])
+                }
+                else {
+                    $Labels = @($Labels[1..($Labels.Length - 1)])
+                }
+
+                $TreeWalkDomain = $Labels -join "."
+                $CandidateResponse = Invoke-RobustDnsTxt "_dmarc.$TreeWalkDomain" `
+                    -PreferredDnsResolvers $PreferredDnsResolvers `
+                    -SkipDoH $SkipDoH
+                $Queries += 1
+                $LogEntries += $CandidateResponse.LogEntries
+
+                # RFC 9989 tree-walk steps 2 and 6: an answer only counts as this
+                # target's DMARC policy if it is itself a valid DMARC record (begins
+                # with the version tag). Multiple valid records at the same target are
+                # ambiguous per RFC 7489 6.6.3 and are treated as no usable record
+                # there, same as zero answers. A single valid record carrying the psd
+                # tag marks the walk boundary explicitly, so stop there instead of
+                # continuing unconditionally through the remaining labels.
+                $ValidAnswers = @($CandidateResponse.Answers | Where-Object { $_ -match '^v=DMARC1' })
+
+                if ($ValidAnswers.Length -eq 1) {
+                    $ValidatedResponse = [PSCustomObject]@{
+                        "Answers"    = @($ValidAnswers)
+                        "Errors"     = $CandidateResponse.Errors
+                        "NXDomain"   = $CandidateResponse.NXDomain
+                        "LogEntries" = $CandidateResponse.LogEntries
+                    }
+
+                    if ($ValidAnswers[0] -match 'psd=y\b') {
+                        # The Organizational Domain is exactly one label below the PSD.
+                        # Prefer its record over the PSD record when one was discovered.
+                        $OrganizationalDomainStart = $AuthorDomainLabels.Length - $Labels.Length - 1
+                        $OrganizationalDomain = if ($OrganizationalDomainStart -ge 0) {
+                            $AuthorDomainLabels[$OrganizationalDomainStart..($AuthorDomainLabels.Length - 1)] -join "."
+                        }
+                        else {
+                            $null
+                        }
+
+                        $Response = if ($PolicyDomain -eq $OrganizationalDomain) {
+                            $PolicyResponse
+                        }
+                        else {
+                            $ValidatedResponse
+                        }
+                        break
+                    }
+
+                    $Response = $ValidatedResponse
+                    $PolicyResponse = $ValidatedResponse
+                    $PolicyDomain = $TreeWalkDomain
+
+                    if ($ValidAnswers[0] -match 'psd=n\b') {
+                        break
+                    }
+                }
+            }
         }
 
         $DomainName = $d.DomainName
