@@ -77,6 +77,26 @@ InModuleScope Connection {
 
         }
     }
+
+    Describe -Tag 'Connection' -Name 'Connect-Tenant exception handling' {
+        BeforeAll {
+            function Connect-MicrosoftTeams {throw 'this will be mocked'}
+            Mock Connect-MicrosoftTeams -MockWith {
+                $InnerException = [System.InvalidOperationException]::new('Application does not exist in the tenant')
+                throw [System.AggregateException]::new('One or more errors occurred.', $InnerException)
+            }
+            Mock Write-Progress {}
+        }
+
+        It 'Reports the underlying aggregate exception' {
+            $Output = Connect-Tenant -ProductNames teams -M365Environment commercial 3>&1
+            $Warnings = @($Output | Where-Object { $_ -is [System.Management.Automation.WarningRecord] })
+            $ConnectionWarningLines = $Warnings[0].Message -split '\r?\n'
+
+            $Warnings.Count | Should -Be 2
+            $ConnectionWarningLines | Should -Contain 'Application does not exist in the tenant'
+        }
+    }
 }
 AfterAll {
     Remove-Module Connection -ErrorAction SilentlyContinue
