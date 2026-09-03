@@ -53,7 +53,7 @@ jobs:
           enable-AzPSSession: true
       - name: Get Key Vault info
         id: key-vault-info
-        uses: ./.github/actions/get-keyvault-info
+        uses: ./repo/.github/actions/get-keyvault-info
         with:
           key-vault-info: ${{ secrets.SCUBA_KEY_VAULT_PROD }}
           checkout-path: repo

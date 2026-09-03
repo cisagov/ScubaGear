@@ -54,7 +54,7 @@ jobs:
       - name: Get Key Vault Info
         id: key-vault-info
         if: ${{ success() }}
-        uses: ./.github/actions/get-keyvault-info
+        uses: ./repo/.github/actions/get-keyvault-info
         with:
           key-vault-info: ${{ secrets.KeyVaultInfo }}
           checkout-path: repo

@@ -50,7 +50,7 @@ function Get-KeyVaultInfo {
             KeyVaultCertificateName = $KeyVaultData.KeyVault.CertificateName
         }
 
-        Write-Verbose "Successfully parsed Key Vault info: URL=$($Result.KeyVaultUrl), Cert=$($Result.KeyVaultCertificateName)"
+        Write-Verbose "Successfully parsed Key Vault info"
         return $Result
     }
     catch {
