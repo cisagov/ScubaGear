@@ -16,6 +16,8 @@ permissions:
 jobs:
   bump-dependencies:
     runs-on: windows-latest
+    outputs:
+      pr_url: ${{ steps.create_pr.outputs.pr_url }}
 
     steps:
       - name: Checkout repository
@@ -185,13 +187,16 @@ jobs:
           }
 
       - name: Create pull request
+        id: create_pr
         if: env.HAS_CHANGES == 'true' && env.SHOULD_CREATE_PR == 'true' && env.SMOKE_TEST_PASSED == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH_NAME: ${{ env.BRANCH_NAME }}
+        shell: pwsh
         run: |
           echo $env:GITHUB_TOKEN | gh auth login --with-token
-          gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
+          $PrUrl = gh pr create --base main --head $env:BRANCH_NAME --title "Bump PowerShell Dependencies" --body-file .github/pull_request_template.md
+          echo "pr_url=$PrUrl" >> $env:GITHUB_OUTPUT
 
       - name: Skip pull request creation
         if: env.HAS_CHANGES == 'false' || env.SHOULD_CREATE_PR == 'false' || env.SMOKE_TEST_PASSED == 'false'
@@ -205,3 +210,15 @@ jobs:
           if ($env:SMOKE_TEST_PASSED -eq 'false') {
             Write-Host "Skipped pull request creation because smoke test failed"
           }
+
+  auto-approve:
+    name: Auto-approve PR
+    needs: bump-dependencies
+    if: needs.bump-dependencies.outputs.pr_url
+    permissions:
+      id-token: write
+      pull-requests: write
+    uses: ./.github/workflows/auto-approve-pr.yaml
+    with:
+      pr-url: ${{ needs.bump-dependencies.outputs.pr_url }}
+    secrets: inherit

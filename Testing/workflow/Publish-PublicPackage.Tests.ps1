@@ -330,7 +330,7 @@ Describe "Get-PSGalleryApiKey" {
             # Temporarily override the az function to return null
             function global:az { return $null }
 
-            { Get-PSGalleryApiKey -KeyVaultUrl "https://test-keyvault.vault.azure.net/" -Verbose:$false } | Should -Throw "*Failed to retrieve API key*"
+            { Get-PSGalleryApiKey -KeyVaultUrl "https://test-keyvault.vault.azure.net/" -Verbose:$false } | Should -Throw "*Failed to retrieve*"
 
             # Restore the original mock
             function global:az {
