@@ -1,17 +1,24 @@
 /**
- * Retrieves JSON data derived from the text content of a <script> element with the specified ID.
- * 
+ * Retrieves and parses JSON data from the text content of a <script> element with the specified ID.
+ *
+ * A missing element or invalid JSON is logged and returns null rather than throwing, so one bad
+ * data island cannot abort the rest of report rendering (e.g. colorRows), which would leave the
+ * report without its pass/fail color coding.
+ *
  * @param {string} id The ID of the <script> element.
- * @returns {any} The parsed JSON data.
- * @throws {Error} If the element with the specified ID is not found or if the JSON parsing fails.
+ * @returns {any} The parsed JSON data, or null if the element is missing or the JSON is invalid.
  */
 const getJsonData = (id) => {
     const el = document.getElementById(id);
-    if (!el) throw new Error(`Element with id "${id} not found`);
+    if (!el) {
+        console.error(`Element with id "${id}" not found`);
+        return null;
+    }
     try {
         return JSON.parse(el.textContent);
     } catch (error) {
-        throw new Error(`Failed to parse JSON from element with id "${id}": ${error.message}`);
+        console.error(`Failed to parse JSON from element with id "${id}":`, error);
+        return null;
     }
 }
 
