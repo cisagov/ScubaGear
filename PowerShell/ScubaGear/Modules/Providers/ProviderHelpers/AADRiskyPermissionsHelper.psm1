@@ -465,7 +465,7 @@ function Format-Credentials {
         else {
             $RequiredKeys = @("KeyId", "DisplayName", "StartDateTime", "EndDateTime")
         }
-        
+
         foreach ($Credential in $AccessKeys) {
             # Only format credentials with the correct keys
             $MissingKeys = $RequiredKeys | Where-Object { -not ($Credential.PSObject.Properties.Name -contains $_) }
@@ -1101,7 +1101,7 @@ function Get-SeverityScoreWeights {
     -------------------------------------------------------------------------------------------------------------------------------------------
     Privileged roles              | +8 per privileged role assigned to a service principal
     -------------------------------------------------------------------------------------------------------------------------------------------
-    Credential context weights    | Base points are added to a credential based on the highest level permission assigned to the application. 
+    Credential context weights    | Base points are added to a credential based on the highest level permission assigned to the application.
                                   | +50/cred for critical, +35/cred for high, +15/cred for medium, +5/cred for low
     -------------------------------------------------------------------------------------------------------------------------------------------
     Credential type discounts     | Key credentials are discounted by 50% and federated credentials are discounted by 75%
@@ -1300,7 +1300,7 @@ function Set-SeverityScore {
     - Third-party service principal (owned externally)
     - Privileged roles assigned to risky service principals
     - Existence of password/key/federated credentials (considers Long-lived credentials)
-    
+
     The total severity score is normalized to 100 to factor in different weight distributions for each of the above risk factors.
     .Functionality
     #Internal
