@@ -5,8 +5,8 @@ function Initialize-ScubaGearForTesting {
   #>
 
   $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..' -Resolve
-  Import-Module (Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear') -Function Initialize-Scuba
+  Import-Module (Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear') -Function Install-ScubaDependencies
   Write-Debug 'Calling Initialize ScubaGear...'
-  $Outputs = Initialize-SCuBA
+  $Outputs = Install-ScubaDependencies
   return $Outputs
 }

@@ -105,7 +105,7 @@ Install-Module -Name ScubaGear
 
 ```powershell
 # Install the minimum required dependencies
-Initialize-SCuBA
+Install-ScubaDependencies
 ```
 
 ### 3. Verify Installation
