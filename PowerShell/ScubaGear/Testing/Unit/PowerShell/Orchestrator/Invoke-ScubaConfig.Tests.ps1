@@ -85,6 +85,7 @@ InModuleScope Orchestrator {
 
         # Define stub functions that will be mocked
         function ConvertTo-ResultsCsv {throw 'this will be mocked'}
+        function ConvertTo-RiskyAppsCsv {throw 'this will be mocked'}
         function Disconnect-SCuBATenant {throw 'this will be mocked'}
 
         Mock -ModuleName Orchestrator Invoke-Connection {
@@ -119,6 +120,7 @@ InModuleScope Orchestrator {
             if ($ScubaConfig) { $script:TestSplat['OutJsonFileName'] = $ScubaConfig.OutJsonFileName }
         }
         Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
+        Mock -ModuleName Orchestrator ConvertTo-RiskyAppsCsv {}
         Mock -ModuleName Orchestrator Disconnect-SCuBATenant {
             if ($ScubaConfig) { $script:TestSplat['DisconnectOnExit'] = $ScubaConfig.DisconnectOnExit }
         }

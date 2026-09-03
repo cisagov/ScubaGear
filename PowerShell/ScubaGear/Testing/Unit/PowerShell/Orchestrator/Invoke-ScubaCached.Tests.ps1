@@ -20,6 +20,8 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant
             function ConvertTo-ResultsCsv {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
+            function ConvertTo-RiskyAppsCsv {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator ConvertTo-RiskyAppsCsv {}
             function Set-Utf8NoBom {}
             Mock -ModuleName Orchestrator Set-Utf8NoBom
 
