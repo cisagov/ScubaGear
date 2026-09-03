@@ -111,11 +111,8 @@ BeforeDiscovery {
     $DefaultTestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.testplan.yaml"
     if ($Variant) {
         $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.$Variant.testplan.yaml"
-        # A variant plan can be retired once its test cases are folded into the default plan,
-        # while the tenant parameters secret still supplies the old variant name.
         if (-not (Test-Path -Path $TestPlanPath -PathType Leaf)) {
-            Write-Warning "No '$Variant' test plan for $ExecutionProductName; falling back to the default test plan."
-            $TestPlanPath = $DefaultTestPlanPath
+            throw "Variant test plan not found: $TestPlanPath. Verify the Variant parameter '$Variant' is correct."
         }
     }
     else {
