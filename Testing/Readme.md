@@ -107,7 +107,7 @@ The development teams for each product are responsible for maintaining these tes
 ```
 product.<variant>.testplan.yaml
 ```
-The optional variant can have values like: `g5`, `e5`, `gcc`, `pnp`, `spo`, `e#` etc. These `variant` test plans capture test cases unique to that tenant type and/or powershell type. 
+The optional variant can have values like: `g3`, `g5`, `e5`, `gcc`, `e#` etc. These `variant` test plans capture test cases unique to that tenant type and/or powershell type. If a variant is supplied but no matching test plan exists, the default `product.testplan.yaml` is used instead. 
 
 
 
