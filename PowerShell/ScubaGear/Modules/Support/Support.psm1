@@ -55,7 +55,7 @@ function Get-ScubaRequiredModuleList {
         that the other packages can be properly evaluated and installed.
 
     .OUTPUTS
-        System.Object[]
+        ScubaGear.RequiredModule[]
 
     .EXAMPLE
         Get-ScubaRequiredModuleList
@@ -115,10 +115,127 @@ function Get-ScubaRequiredModuleList {
             ModuleName = 'PowerShellGet'
             ModuleVersion = [version] '2.1.0'
             MaximumVersion = [version] '2.99.99999'
+            Purpose = 'PowerShell module installation and management'
         } + $ModuleList
     }
 
-    return $ModuleList
+    # Project the raw hashtables into typed objects so every dependency cmdlet emits a
+    # consistent, formattable object rather than a bare hashtable. IsPinned is deliberately
+    # not surfaced; it only exists for the BumpPsDependencies workflow.
+    $requiredModules = foreach ($Module in $ModuleList) {
+        [PSCustomObject]@{
+            PSTypeName     = 'ScubaGear.RequiredModule'
+            ModuleName     = $Module.ModuleName
+            ModuleVersion  = [version]$Module.ModuleVersion
+            MaximumVersion = [version]$Module.MaximumVersion
+            Purpose        = $Module.Purpose
+        }
+    }
+
+    return @($requiredModules)
+}
+
+function New-ScubaDependencyStatus {
+    <#
+    .SYNOPSIS
+        Creates a ScubaGear.DependencyStatus object seeded with the "not installed" defaults.
+
+    .DESCRIPTION
+        Every dependency reported by Get-ScubaGearDependencyStatus - required PowerShell modules,
+        the OPA executable, and the ScubaGear module itself - is described by the same object
+        shape so a single format view and a single set of pipeline filters work across all of
+        them. This factory owns that shape so it is defined once rather than repeated in each
+        status helper; callers only supply the analysis that is unique to them.
+
+        When InstalledModules is supplied, the facts that derive purely from the installed module
+        objects (count, versions, install location, highest version) are populated as well. The
+        acceptable-version comparison is left to the caller because it differs per dependency:
+        modules use a min/max range, ScubaGear uses the latest published version, and OPA uses a
+        file hash.
+
+    .PARAMETER ModuleName
+        The name of the dependency, e.g. 'powershell-yaml', 'OPA' or 'ScubaGear'.
+
+    .PARAMETER MinimumVersion
+        The minimum acceptable version, when the dependency has one.
+
+    .PARAMETER MaximumVersion
+        The maximum acceptable version, when the dependency has one.
+
+    .PARAMETER InstalledModules
+        Get-Module -ListAvailable results for the dependency. Pass $null when it is not installed.
+
+    .PARAMETER AdditionalProperties
+        Extra properties to attach for dependencies that need them (for example OPA's
+        ExecutableName and InstallPath).
+
+    .OUTPUTS
+        PSCustomObject
+
+    .NOTES
+        Internal helper used by the ScubaGear dependency status functions.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$ModuleName,
+
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [object]$MinimumVersion,
+
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [object]$MaximumVersion,
+
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [object[]]$InstalledModules,
+
+        [Parameter(Mandatory = $false)]
+        [System.Collections.IDictionary]$AdditionalProperties
+    )
+
+    $status = [PSCustomObject]@{
+        PSTypeName           = 'ScubaGear.DependencyStatus'
+        ModuleName           = $ModuleName
+        MinimumVersion       = $MinimumVersion
+        MaximumVersion       = $MaximumVersion
+        Installed            = $false
+        Modules              = @()
+        VersionCount         = 0
+        InstalledVersions    = @()
+        VersionsInRange      = @()
+        VersionsBelowMinimum = @()
+        VersionsAboveMaximum = @()
+        VersionsOutOfRange   = @()
+        HighestVersion       = $null
+        HighestVersionStatus = 'MISSING'
+        BestVersionToKeep    = $null
+        VersionsToRemove     = @()
+        InProgramFiles       = $false
+        Action               = 'Install'
+    }
+
+    if ($AdditionalProperties) {
+        foreach ($PropertyName in $AdditionalProperties.Keys) {
+            $status | Add-Member -NotePropertyName $PropertyName -NotePropertyValue $AdditionalProperties[$PropertyName]
+        }
+    }
+
+    if ($InstalledModules) {
+        $status.Installed         = $true
+        $status.Modules           = @($InstalledModules)
+        # Wrap in @() so a single returned module counts as 1.
+        $status.VersionCount      = @($InstalledModules).Count
+        $status.InstalledVersions = @($InstalledModules | ForEach-Object { $_.Version })
+        $status.InProgramFiles    = @($InstalledModules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }).Count -gt 0
+        $status.HighestVersion    = ($InstalledModules | Sort-Object -Property Version -Descending | Select-Object -First 1).Version
+    }
+
+    return $status
 }
 
 function Get-ScubaModuleDependencyStatus {
@@ -180,27 +297,6 @@ function Get-ScubaModuleDependencyStatus {
         [object[]]$InstalledModules
     )
 
-    $status = [PSCustomObject]@{
-        PSTypeName           = 'ScubaGear.DependencyStatus'
-        ModuleName           = $ModuleName
-        MinimumVersion       = $MinimumVersion
-        MaximumVersion       = $MaximumVersion
-        Installed            = $false
-        Modules              = @()
-        VersionCount         = 0
-        InstalledVersions    = @()
-        VersionsInRange      = @()
-        VersionsBelowMinimum = @()
-        VersionsAboveMaximum = @()
-        VersionsOutOfRange   = @()
-        HighestVersion       = $null
-        HighestVersionStatus = "MISSING"
-        BestVersionToKeep    = $null
-        VersionsToRemove     = @()
-        InProgramFiles       = $false
-        Action               = "Install"
-    }
-
     # Use pre-fetched modules when supplied (e.g. from a batched Get-Module call); otherwise
     # query Get-Module for this single module.
     if ($PSBoundParameters.ContainsKey('InstalledModules')) {
@@ -215,17 +311,15 @@ function Get-ScubaModuleDependencyStatus {
         }
     }
 
+    $status = New-ScubaDependencyStatus -ModuleName $ModuleName `
+        -MinimumVersion $MinimumVersion `
+        -MaximumVersion $MaximumVersion `
+        -InstalledModules $modules
+
     if (-not $modules) {
         # Module not installed at all
         return $status
     }
-
-    $status.Installed         = $true
-    $status.Modules           = $modules
-    # Wrap in @() so a single returned module counts as 1.
-    $status.VersionCount      = @($modules).Count
-    $status.InstalledVersions = @($modules | ForEach-Object { $_.Version })
-    $status.InProgramFiles    = @($modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }).Count -gt 0
 
     $status.VersionsInRange      = @($modules | Where-Object { $_.Version -ge $MinimumVersion -and $_.Version -le $MaximumVersion } | ForEach-Object { $_.Version })
     $status.VersionsBelowMinimum = @($modules | Where-Object { $_.Version -lt $MinimumVersion } | ForEach-Object { $_.Version })
@@ -233,8 +327,7 @@ function Get-ScubaModuleDependencyStatus {
     $status.VersionsOutOfRange   = @($status.VersionsBelowMinimum + $status.VersionsAboveMaximum)
 
     # Highest installed version is the one PowerShell will load by default
-    $highestVersion = ($modules | Sort-Object -Property Version -Descending | Select-Object -First 1).Version
-    $status.HighestVersion = $highestVersion
+    $highestVersion = $status.HighestVersion
     if ($highestVersion -lt $MinimumVersion) {
         $status.HighestVersionStatus = "BELOW MIN"
     }
@@ -307,30 +400,15 @@ function Get-ScubaOpaDependencyStatus {
     $opaDirectory    = [ScubaConfig]::ScubaDefault('DefaultOPAPath')
     $opaFullPath     = Join-Path -Path $opaDirectory -ChildPath $opaExeName
 
-    $status = [PSCustomObject]@{
-        PSTypeName           = 'ScubaGear.DependencyStatus'
-        ModuleName           = 'OPA'
-        MinimumVersion       = $expectedVersion
-        MaximumVersion       = $expectedVersion
-        Installed            = $false
-        Modules              = @()
-        VersionCount         = 0
-        InstalledVersions    = @()
-        VersionsInRange      = @()
-        VersionsBelowMinimum = @()
-        VersionsAboveMaximum = @()
-        VersionsOutOfRange   = @()
-        HighestVersion       = $null
-        HighestVersionStatus = 'MISSING'
-        BestVersionToKeep    = $null
-        VersionsToRemove     = @()
-        InProgramFiles       = $false
-        Action               = 'Install'
-        OperatingSystem      = $OperatingSystem
-        ExecutableName       = $opaExeName
-        InstallPath          = $opaDirectory
-        HashVerificationError = $null
-    }
+    $status = New-ScubaDependencyStatus -ModuleName 'OPA' `
+        -MinimumVersion $expectedVersion `
+        -MaximumVersion $expectedVersion `
+        -AdditionalProperties ([ordered]@{
+            OperatingSystem       = $OperatingSystem
+            ExecutableName        = $opaExeName
+            InstallPath           = $opaDirectory
+            HashVerificationError = $null
+        })
 
     if (-not (Test-Path -Path $opaFullPath -PathType Leaf)) {
         # OPA executable is not installed
@@ -372,6 +450,85 @@ function Get-ScubaOpaDependencyStatus {
     return $status
 }
 
+function Get-ScubaGearModuleStatus {
+    <#
+    .SYNOPSIS
+        Returns the status of the installed ScubaGear module itself.
+
+    .DESCRIPTION
+        Compares the installed ScubaGear version(s) against the latest version published to
+        PSGallery and returns a ScubaGear.DependencyStatus object so ScubaGear can be reported
+        alongside its dependencies. Unlike the dependency modules, ScubaGear has no maximum
+        version - the latest published version is always the target - so the remediation is
+        Update-ScubaGear rather than Reset-ScubaGearDependencies.
+
+        Note that ScubaGear is deliberately absent from RequiredVersions.ps1: the install and
+        cleanup loops in Install-ScubaDependencies and Reset-ScubaGearDependencies must never
+        try to uninstall the module they are currently executing from.
+
+    .PARAMETER SkipGalleryCheck
+        Do not query PSGallery for the latest version. ScubaGear is reported as installed but
+        unverified. Use this for a fast, network-free presence check.
+
+    .OUTPUTS
+        PSCustomObject
+
+    .NOTES
+        Internal helper used by Get-ScubaGearDependencyStatus.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [switch]$SkipGalleryCheck
+    )
+
+    $latestVersion = $null
+    if (-not $SkipGalleryCheck) {
+        try {
+            $latestVersion = [version](Find-Module -Name ScubaGear -Repository PSGallery -ErrorAction Stop).Version
+        }
+        catch {
+            Write-Verbose "Could not determine the latest ScubaGear version: $($_.Exception.Message)"
+        }
+    }
+
+    $modules = Get-Module -Name ScubaGear -ListAvailable -ErrorAction SilentlyContinue
+
+    # ScubaGear has no maximum version; the latest published version is the target.
+    $status = New-ScubaDependencyStatus -ModuleName 'ScubaGear' `
+        -MinimumVersion $latestVersion `
+        -InstalledModules $modules
+
+    if (-not $modules) {
+        return $status
+    }
+
+    $highestVersion           = $status.HighestVersion
+    $status.BestVersionToKeep = $highestVersion
+
+    if ($null -eq $latestVersion) {
+        # Without the gallery version there is nothing to compare against.
+        $status.HighestVersionStatus = 'UNVERIFIED'
+        $status.Action               = 'None'
+        return $status
+    }
+
+    if ($highestVersion -lt $latestVersion) {
+        $status.HighestVersionStatus = 'OUTDATED'
+        $status.VersionsOutOfRange   = @($status.InstalledVersions)
+        $status.Action               = 'Update'
+    }
+    else {
+        $status.HighestVersionStatus = 'OK'
+        $status.VersionsInRange      = @($highestVersion)
+        # Extra copies still shadow each other on import, so flag them for cleanup.
+        $status.VersionsToRemove     = @($modules | Where-Object { $_.Version -ne $highestVersion } | ForEach-Object { $_.Version })
+        $status.Action               = if ($status.VersionCount -gt 1) { 'Update' } else { 'None' }
+    }
+
+    return $status
+}
+
 function Get-ScubaDependencyActionAdvice {
     <#
     .SYNOPSIS
@@ -391,6 +548,11 @@ function Get-ScubaDependencyActionAdvice {
     .PARAMETER NeedsReset
         There is at least one dependency that needs updating or version cleanup.
 
+    .PARAMETER NeedsScubaGearUpdate
+        The ScubaGear module itself is missing, outdated, or has multiple versions installed.
+        This is reported separately because Reset-ScubaGearDependencies cannot remediate the
+        module it is running from.
+
     .OUTPUTS
         System.String[]
 
@@ -403,7 +565,10 @@ function Get-ScubaDependencyActionAdvice {
         [switch]$NeedsInstall,
 
         [Parameter(Mandatory = $false)]
-        [switch]$NeedsReset
+        [switch]$NeedsReset,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$NeedsScubaGearUpdate
     )
 
     $advice = @()
@@ -413,6 +578,9 @@ function Get-ScubaDependencyActionAdvice {
     }
     elseif ($NeedsInstall) {
         $advice += "Run 'Install-ScubaDependencies' to install missing dependencies."
+    }
+    if ($NeedsScubaGearUpdate) {
+        $advice += "Run 'Update-ScubaGear' to update the ScubaGear module itself."
     }
     return $advice
 }
@@ -426,7 +594,8 @@ function Get-ScubaGearDependencyStatus {
         Iterates the supplied module list (or loads it via Get-ScubaRequiredModuleList when
         not provided) and returns an array of status objects produced by the internal
         Get-ScubaModuleDependencyStatus helper - one for each required module. By default the
-        status of the OPA (Open Policy Agent) executable is appended as well.
+        status of the OPA (Open Policy Agent) executable and of the ScubaGear module itself are
+        appended as well.
 
     .PARAMETER ModuleList
         The list of required modules to evaluate. Each entry must expose ModuleName,
@@ -435,6 +604,9 @@ function Get-ScubaGearDependencyStatus {
 
     .PARAMETER ExcludeOpa
         Do not include the OPA executable status in the results (report PowerShell modules only).
+
+    .PARAMETER ExcludeScubaGear
+        Do not include the ScubaGear module's own status in the results.
 
     .PARAMETER Quiet
         Suppress the informational advice to run Reset-ScubaGearDependencies when an action is needed.
@@ -458,6 +630,9 @@ function Get-ScubaGearDependencyStatus {
 
         [Parameter(Mandatory = $false)]
         [switch]$ExcludeOpa,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$ExcludeScubaGear,
 
         [Parameter(Mandatory = $false)]
         [switch]$Quiet
@@ -492,14 +667,27 @@ function Get-ScubaGearDependencyStatus {
         $statuses += Get-ScubaOpaDependencyStatus
     }
 
+    # Report ScubaGear itself last so a single call shows the full picture. It is kept out of
+    # $ModuleList so the install/cleanup loops never target the running module.
+    if (-not $ExcludeScubaGear) {
+        $statuses += Get-ScubaGearModuleStatus
+    }
+
     # Advise the user how to resolve any required actions. Missing items are best handled by
-    # Install-ScubaDependencies; updates/cleanups by Reset-ScubaGearDependencies. Written to the
-    # Information stream so it stays out of the object output/pipeline
-    # (e.g. Get-ScubaGearDependencyStatus | Where-Object ...).
+    # Install-ScubaDependencies; updates/cleanups by Reset-ScubaGearDependencies; ScubaGear itself
+    # only by Update-ScubaGear. Written to the Information stream so it stays out of the object
+    # output/pipeline (e.g. Get-ScubaGearDependencyStatus | Where-Object ...).
     if (-not $Quiet) {
-        $needsInstall = [bool]@($statuses | Where-Object { $_.Action -eq 'Install' })
-        $needsReset   = [bool]@($statuses | Where-Object { $_.Action -in 'Update', 'Cleanup' })
-        foreach ($line in (Get-ScubaDependencyActionAdvice -NeedsInstall:$needsInstall -NeedsReset:$needsReset)) {
+        $dependencyStatuses = @($statuses | Where-Object { $_.ModuleName -ne 'ScubaGear' })
+        $needsInstall = [bool]@($dependencyStatuses | Where-Object { $_.Action -eq 'Install' })
+        $needsReset   = [bool]@($dependencyStatuses | Where-Object { $_.Action -in 'Update', 'Cleanup' })
+        $needsScubaGearUpdate = [bool]@($statuses | Where-Object { $_.ModuleName -eq 'ScubaGear' -and $_.Action -ne 'None' })
+        $adviceArgs = @{
+            NeedsInstall         = $needsInstall
+            NeedsReset           = $needsReset
+            NeedsScubaGearUpdate = $needsScubaGearUpdate
+        }
+        foreach ($line in (Get-ScubaDependencyActionAdvice @adviceArgs)) {
             Write-Information -MessageData $line -InformationAction Continue
         }
     }
@@ -557,6 +745,75 @@ function Install-ScubaModule {
         -Scope $Scope `
         -Force `
         -AllowClobber
+}
+
+function Remove-ScubaModuleVersion {
+    <#
+    .SYNOPSIS
+        Removes a single installed version of a ScubaGear dependency module.
+
+    .DESCRIPTION
+        Uninstalls the specified version with Uninstall-Module and, when that fails (for example
+        because the module was not installed via PowerShellGet), falls back to deleting the module
+        folder. Returns the outcome rather than writing to the caller's result object so both the
+        update and cleanup paths in Reset-ScubaGearDependencies can share this logic.
+
+    .PARAMETER ModuleName
+        The name of the module to remove a version of.
+
+    .PARAMETER Version
+        The specific version to remove.
+
+    .OUTPUTS
+        PSCustomObject with Removed (bool) and Warning (string, or $null on success).
+
+    .NOTES
+        Internal helper used by Reset-ScubaGearDependencies. The caller is responsible for the
+        ShouldProcess gate.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$ModuleName,
+
+        [Parameter(Mandatory = $true)]
+        [version]$Version
+    )
+
+    $outcome = [PSCustomObject]@{
+        Removed = $false
+        Warning = $null
+    }
+
+    try {
+        Uninstall-Module -Name $ModuleName -RequiredVersion $Version -Force -ErrorAction Stop
+        $outcome.Removed = $true
+        return $outcome
+    }
+    catch {
+        Write-Verbose "Uninstall-Module failed for $ModuleName v${Version}: $($_.Exception.Message)"
+    }
+
+    # Fall back to deleting the module folder (e.g. modules not installed via PowerShellGet).
+    try {
+        $modulePath = (Get-Module -Name $ModuleName -ListAvailable |
+            Where-Object { $_.Version -eq $Version } |
+            Select-Object -First 1).ModuleBase
+
+        if ($modulePath -and (Test-Path -Path $modulePath)) {
+            Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
+            $outcome.Removed = $true
+        }
+        else {
+            $outcome.Warning = "Could not locate module path for $ModuleName v$Version"
+        }
+    }
+    catch {
+        $outcome.Warning = "Failed to remove $ModuleName v$Version from file system: $($_.Exception.Message)"
+    }
+
+    return $outcome
 }
 
 function Install-ScubaDependencies {
@@ -1698,9 +1955,9 @@ function Get-DependencyStatus {
 
     # Load the centralized dependency status for every required module. This uses the
     # common helpers so RequiredVersions.ps1 remains the single source of truth and the
-    # per-module version analysis is not duplicated here. OPA is reported separately by
-    # Test-ScubaGearVersion, so exclude it here and suppress the interactive advice.
-    $statuses = Get-ScubaGearDependencyStatus -ExcludeOpa -Quiet
+    # per-module version analysis is not duplicated here. OPA and ScubaGear itself are reported
+    # separately by Test-ScubaGearVersion, so exclude them here and suppress the interactive advice.
+    $statuses = Get-ScubaGearDependencyStatus -ExcludeOpa -ExcludeScubaGear -Quiet
 
     $dependencyStatus = [PSCustomObject]@{
         TotalRequired = $statuses.Count
@@ -1968,9 +2225,10 @@ function Reset-ScubaGearDependencies {
     .DESCRIPTION
         Checks each dependency against RequiredVersions.ps1 and only removes/updates when necessary:
         - Installs missing modules
+        - Updates modules when a newer version is available within the acceptable range
         - Updates outdated modules (outside acceptable range)
         - Cleans up multiple versions (keeps best version in range)
-        - Preserves modules that are already in acceptable range
+        - Preserves modules that are already at the newest acceptable version (unless -Force is specified)
         Also checks the OPA executable against the version configured in ScubaConfigDefaults.json:
         - Installs OPA if the executable is missing
         - Updates OPA if the executable hash does not match the expected version
@@ -1979,11 +2237,30 @@ function Reset-ScubaGearDependencies {
     .PARAMETER Scope
         Specifies the installation scope for dependencies. Default is CurrentUser.
 
+    .PARAMETER Force
+        Reinstall every dependency at the highest version in its acceptable range, even when an
+        acceptable version is already installed, then remove any version left behind. Matches the
+        -Force switch on Install-ScubaDependencies and is useful for repairing a corrupted or
+        partially removed module. Note that this does not suppress the confirmation prompt; use
+        -Confirm:$false for that.
+
+    .PARAMETER SkipUpdate
+        Do not query PSGallery for newer versions. Only the versions already installed are
+        considered, so the cmdlet cleans up and repairs without needing network access.
+
     .EXAMPLE
         Reset-ScubaGearDependencies
 
     .EXAMPLE
         Reset-ScubaGearDependencies -Scope AllUsers
+
+    .EXAMPLE
+        Reset-ScubaGearDependencies -Force
+        Reinstalls every dependency at the top of its acceptable range.
+
+    .EXAMPLE
+        Reset-ScubaGearDependencies -SkipUpdate
+        Cleans up duplicate/out-of-range versions without querying PSGallery.
 
     .EXAMPLE
         Reset-ScubaGearDependencies -WhatIf
@@ -1993,7 +2270,13 @@ function Reset-ScubaGearDependencies {
     param(
         [Parameter(Mandatory = $false)]
         [ValidateSet('CurrentUser','AllUsers')]
-        [string]$Scope = 'CurrentUser'
+        [string]$Scope = 'CurrentUser',
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Force,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$SkipUpdate
     )
 
     $result = [PSCustomObject]@{
@@ -2008,6 +2291,7 @@ function Reset-ScubaGearDependencies {
         # Module status by action needed
         ModulesUpToDate = @()
         ModulesToInstall = @()
+        ModulesToReinstall = @()
         ModulesToUpdate = @()
         ModulesToCleanup = @()
 
@@ -2034,7 +2318,9 @@ function Reset-ScubaGearDependencies {
         # Load the centralized dependency status for every required module. RequiredVersions.ps1
         # remains the single source of truth and the per-module analysis is not duplicated here.
         # OPA is analyzed separately below, so exclude it and suppress the interactive advice.
-        $moduleStatuses = Get-ScubaGearDependencyStatus -ExcludeOpa -Quiet
+        # ScubaGear itself is excluded because this cmdlet must never uninstall the module it is
+        # running from - use Update-ScubaGear for that.
+        $moduleStatuses = Get-ScubaGearDependencyStatus -ExcludeOpa -ExcludeScubaGear -Quiet
 
         $result.TotalModules = $moduleStatuses.Count
 
@@ -2054,6 +2340,7 @@ function Reset-ScubaGearDependencies {
                     MinimumVersion = $minVersion
                     MaximumVersion = $maxVersion
                     CurrentVersions = @()
+                    LatestAvailableVersion = $null
                     Action = "Install latest in range"
                 }
             }
@@ -2066,32 +2353,57 @@ function Reset-ScubaGearDependencies {
                     MaximumVersion = $maxVersion
                     CurrentVersions = $moduleStatus.InstalledVersions
                     InProgramFiles = $moduleStatus.InProgramFiles
+                    LatestAvailableVersion = $null
                     Action = $null
                     VersionToKeep = $null
                     VersionsToRemove = @()
+                    RemoveBeforeInstall = $false
                 }
 
-                switch ($moduleStatus.Action) {
-                    "Update" {
-                        # No acceptable versions - need update
-                        $moduleInfo.Action = "Update to acceptable version"
-                        if ($moduleStatus.VersionsToRemove.Count -gt 0) {
-                            $moduleInfo.VersionsToRemove = $moduleStatus.VersionsToRemove
-                        }
-                        $result.ModulesToUpdate += $moduleInfo
+                # The installed-version analysis alone cannot tell whether a newer release exists
+                # within the range, so ask the gallery. Without this the cmdlet would only ever
+                # keep the best *installed* version and users would need a second command to update.
+                $latestAcceptable = $null
+                if (-not $SkipUpdate) {
+                    try {
+                        $latestAcceptable = [version](Find-Module -Name $moduleName -MinimumVersion $minVersion -MaximumVersion $maxVersion -Repository PSGallery -ErrorAction Stop).Version
                     }
-                    "Cleanup" {
-                        # Multiple versions or cleanup needed
-                        $moduleInfo.Action = "Keep v$($moduleStatus.BestVersionToKeep), remove others"
-                        $moduleInfo.VersionToKeep = $moduleStatus.BestVersionToKeep
-                        $moduleInfo.VersionsToRemove = $moduleStatus.VersionsToRemove
-                        $result.ModulesToCleanup += $moduleInfo
+                    catch {
+                        $result.Warnings += "Could not determine the latest acceptable version for ${moduleName}: $($_.Exception.Message)"
                     }
-                    default {
-                        # Perfect state
-                        $moduleInfo.Action = "Already optimal"
-                        $result.ModulesUpToDate += $moduleInfo
-                    }
+                }
+                $updateAvailable = ($null -ne $latestAcceptable) -and
+                                   ($null -ne $moduleStatus.BestVersionToKeep) -and
+                                   ([version]$moduleStatus.BestVersionToKeep -lt $latestAcceptable)
+                $moduleInfo.LatestAvailableVersion = $latestAcceptable
+
+                if ($moduleStatus.Action -eq 'Update') {
+                    # Nothing acceptable is installed, so the unusable versions go first.
+                    $moduleInfo.Action = "Update to acceptable version"
+                    $moduleInfo.VersionsToRemove = $moduleStatus.VersionsToRemove
+                    $moduleInfo.RemoveBeforeInstall = $true
+                    $result.ModulesToUpdate += $moduleInfo
+                }
+                elseif ($updateAvailable) {
+                    # A usable version is installed, so install the newer one first and only then
+                    # remove what it replaces.
+                    $moduleInfo.Action = "Update to v$latestAcceptable"
+                    $moduleInfo.VersionToKeep = $latestAcceptable
+                    $result.ModulesToUpdate += $moduleInfo
+                }
+                elseif ($Force) {
+                    $moduleInfo.Action = "Reinstall highest version in range"
+                    $result.ModulesToReinstall += $moduleInfo
+                }
+                elseif ($moduleStatus.Action -eq 'Cleanup') {
+                    $moduleInfo.Action = "Keep v$($moduleStatus.BestVersionToKeep), remove others"
+                    $moduleInfo.VersionToKeep = $moduleStatus.BestVersionToKeep
+                    $moduleInfo.VersionsToRemove = $moduleStatus.VersionsToRemove
+                    $result.ModulesToCleanup += $moduleInfo
+                }
+                else {
+                    $moduleInfo.Action = "Already optimal"
+                    $result.ModulesUpToDate += $moduleInfo
                 }
 
                 # Check admin requirements
@@ -2133,11 +2445,41 @@ function Reset-ScubaGearDependencies {
 
         # Calculate totals
         $opaActionNeeded  = ($null -ne $result.OpaToInstall) -or ($null -ne $result.OpaToUpdate)
-        $result.ActionsNeeded = $result.ModulesToInstall.Count + $result.ModulesToUpdate.Count + $result.ModulesToCleanup.Count + [int]$opaActionNeeded
+        $result.ActionsNeeded = $result.ModulesToInstall.Count + $result.ModulesToReinstall.Count + $result.ModulesToUpdate.Count + $result.ModulesToCleanup.Count + [int]$opaActionNeeded
 
         # Admin check
         if ($result.AdminRequired -and -not $result.AdminAvailable) {
             $result.Warnings += "Administrator privileges required for some operations"
+        }
+
+        # Show the plan before any ShouldProcess prompt so the user can see why each action was
+        # chosen (what is installed vs. what the range allows vs. what the gallery offers).
+        $planRows = foreach ($module in @($result.ModulesToInstall) + @($result.ModulesToUpdate) + @($result.ModulesToReinstall) + @($result.ModulesToCleanup) + @($result.ModulesUpToDate)) {
+            [PSCustomObject]@{
+                Dependency = $module.Name
+                Installed  = if ($module.CurrentVersions) { (@($module.CurrentVersions) | Sort-Object) -join ', ' } else { '(none)' }
+                Required   = $module.RequiredRange
+                Available  = if ($module.LatestAvailableVersion) { $module.LatestAvailableVersion } elseif ($SkipUpdate) { '(not checked)' } else { '(unknown)' }
+                Action     = $module.Action
+            }
+        }
+
+        $opaPlan = @($result.OpaToInstall, $result.OpaToUpdate, $result.OpaUpToDate) | Where-Object { $null -ne $_ }
+        $planRows = @($planRows) + @($opaPlan | ForEach-Object {
+            [PSCustomObject]@{
+                Dependency = $_.Name
+                Installed  = if ($opaStatus.Installed) { "$($opaStatus.HighestVersion)" } else { '(none)' }
+                Required   = "$($_.ExpectedVersion)"
+                Available  = "$($_.ExpectedVersion)"
+                Action     = $_.Action
+            }
+        })
+
+        Write-Information -MessageData (($planRows | Format-Table -AutoSize -Wrap | Out-String).Trim()) -InformationAction Continue
+        Write-Information -MessageData "" -InformationAction Continue
+
+        foreach ($warning in $result.Warnings) {
+            Write-Warning $warning
         }
 
         # Early return for WhatIf or no actions needed
@@ -2170,37 +2512,64 @@ function Reset-ScubaGearDependencies {
             }
         }
 
+        # Reinstall modules that are already acceptable (-Force only)
+        foreach ($module in $result.ModulesToReinstall) {
+            if ($PSCmdlet.ShouldProcess($module.Name, "Reinstall module")) {
+                try {
+                    Install-ScubaModule -ModuleName $module.Name -MinimumVersion $module.MinimumVersion -MaximumVersion $module.MaximumVersion -Scope $Scope
+
+                    # The reinstall can pull a newer in-range version, leaving the previous one
+                    # behind, so re-evaluate and drop anything that is no longer the best version.
+                    $postStatus = Get-ScubaModuleDependencyStatus -ModuleName $module.Name -MinimumVersion $module.MinimumVersion -MaximumVersion $module.MaximumVersion
+                    $cleanedVersions = @()
+                    foreach ($version in $postStatus.VersionsToRemove) {
+                        $removal = Remove-ScubaModuleVersion -ModuleName $module.Name -Version $version
+                        if ($removal.Removed) { $cleanedVersions += "v$version" }
+                        if ($removal.Warning) { $result.Warnings += $removal.Warning }
+                    }
+
+                    $reinstallMessage = "[OK] Reinstalled $($module.Name) v$($postStatus.BestVersionToKeep)"
+                    if ($cleanedVersions.Count -gt 0) {
+                        $reinstallMessage += ", removed $($cleanedVersions -join ', ')"
+                    }
+                    $result.ActionsPerformed += $reinstallMessage
+                    $result.ActionsCompleted++
+                }
+                catch {
+                    $result.Errors += "[FAIL] Failed to reinstall $($module.Name): $($_.Exception.Message)"
+                    $result.ActionsFailed++
+                }
+            }
+        }
+
         # Update modules
         foreach ($module in $result.ModulesToUpdate) {
             if ($PSCmdlet.ShouldProcess($module.Name, "Update module")) {
                 try {
-                    # Remove old versions if any
-                    if ($null -ne $module.VersionsToRemove) {
+                    # Only clear the way first when nothing usable is installed; otherwise the
+                    # existing version stays put until its replacement is on disk.
+                    if ($module.RemoveBeforeInstall) {
                         foreach ($version in $module.VersionsToRemove) {
-                            try {
-                                Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction Stop
-                            }
-                            catch{
-                                # Remove the module from file path if uninstall fails
-                                try {
-                                    $modulePath = (Get-Module -Name $module.Name -ListAvailable | Where-Object { $_.Version -eq $version } | Select-Object -First 1).ModuleBase
-                                    if ($modulePath) {
-                                        Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
-                                    }
-                                    else {
-                                        $result.Warnings += "Could not locate module path for $($module.Name) v$version"
-                                    }
-                                }
-                                catch {
-                                    $result.Warnings += "Failed to remove $($module.Name) v$version from file system: $($_.Exception.Message)"
-                                }
-                            }
+                            $removal = Remove-ScubaModuleVersion -ModuleName $module.Name -Version $version
+                            if ($removal.Warning) { $result.Warnings += $removal.Warning }
                         }
                     }
 
                     Install-ScubaModule -ModuleName $module.Name -MinimumVersion $module.MinimumVersion -MaximumVersion $module.MaximumVersion -Scope $Scope
 
-                    $result.ActionsPerformed += "[OK] Updated $($module.Name)"
+                    $postStatus = Get-ScubaModuleDependencyStatus -ModuleName $module.Name -MinimumVersion $module.MinimumVersion -MaximumVersion $module.MaximumVersion
+                    $cleanedVersions = @()
+                    foreach ($version in $postStatus.VersionsToRemove) {
+                        $removal = Remove-ScubaModuleVersion -ModuleName $module.Name -Version $version
+                        if ($removal.Removed) { $cleanedVersions += "v$version" }
+                        if ($removal.Warning) { $result.Warnings += $removal.Warning }
+                    }
+
+                    $updateMessage = "[OK] Updated $($module.Name) to v$($postStatus.BestVersionToKeep)"
+                    if ($cleanedVersions.Count -gt 0) {
+                        $updateMessage += ", removed $($cleanedVersions -join ', ')"
+                    }
+                    $result.ActionsPerformed += $updateMessage
                     $result.ActionsCompleted++
                 }
                 catch {
@@ -2218,28 +2587,13 @@ function Reset-ScubaGearDependencies {
                 $failedVersions = @()
 
                 foreach ($version in $module.VersionsToRemove) {
-                    try {
-                        Uninstall-Module -Name $module.Name -RequiredVersion $version -Force -ErrorAction Stop
-                        # Only add to cleanedVersions if we get here (uninstall succeeded)
+                    $removal = Remove-ScubaModuleVersion -ModuleName $module.Name -Version $version
+                    if ($removal.Warning) { $result.Warnings += $removal.Warning }
+                    if ($removal.Removed) {
                         $cleanedVersions += "v$version"
                     }
-                    catch{
-                        # Remove the module from file path if uninstall fails
-                        try {
-                            $modulePath = (Get-Module -Name $module.Name -ListAvailable | Where-Object { $_.Version -eq $version } | Select-Object -First 1).ModuleBase
-                            if (Test-Path $modulePath) {
-                                Remove-Item -Path $modulePath -Recurse -Force -ErrorAction Stop
-                                $cleanedVersions += "v$version"
-                            }
-                            else {
-                                $result.Warnings += "Could not locate module path for $($module.Name) v$version"
-                                $failedVersions += "v$version"
-                            }
-                        }
-                        catch {
-                            $result.Warnings += "Failed to remove $($module.Name) v$version from file system: $($_.Exception.Message)"
-                            $failedVersions += "v$version"
-                        }
+                    else {
+                        $failedVersions += "v$version"
                     }
                 }
 

@@ -2,13 +2,57 @@
 <!--
     Display formatting for ScubaGear objects.
 
+    Get-ScubaRequiredModuleList emits ScubaGear.RequiredModule objects and
     Get-ScubaGearDependencyStatus (and the internal Get-ScubaModuleDependencyStatus
-    helper) emit ScubaGear.DependencyStatus objects. The table view below renders a
+    helper) emit ScubaGear.DependencyStatus objects. The table views below render a
     concise, user-friendly summary in the console while the full objects remain
     available for the pipeline (e.g. Get-ScubaGearDependencyStatus | Where-Object ...).
 -->
 <Configuration>
   <ViewDefinitions>
+    <View>
+      <Name>ScubaGear.RequiredModule</Name>
+      <ViewSelectedBy>
+        <TypeName>ScubaGear.RequiredModule</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>ModuleName</Label>
+            <Width>32</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>ModuleVersion</Label>
+            <Width>15</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>MaximumVersion</Label>
+            <Width>15</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Purpose</Label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>ModuleName</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>ModuleVersion</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>MaximumVersion</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Purpose</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
     <View>
       <Name>ScubaGear.DependencyStatus</Name>
       <ViewSelectedBy>

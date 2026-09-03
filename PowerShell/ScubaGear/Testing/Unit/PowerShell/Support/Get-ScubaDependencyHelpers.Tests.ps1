@@ -123,18 +123,43 @@ InModuleScope 'Support' {
                         MaximumVersion       = $null
                     }
                 }
+
+                # Deterministic ScubaGear status so these tests do not query PSGallery.
+                Mock Get-ScubaGearModuleStatus {
+                    [PSCustomObject]@{
+                        PSTypeName           = 'ScubaGear.DependencyStatus'
+                        ModuleName           = 'ScubaGear'
+                        Installed            = $true
+                        VersionCount         = 1
+                        HighestVersion       = '1.8.0'
+                        HighestVersionStatus = 'OK'
+                        Action               = 'None'
+                        Modules              = @()
+                        InstalledVersions    = @()
+                        VersionsInRange      = @()
+                        VersionsBelowMinimum = @()
+                        VersionsAboveMaximum = @()
+                        VersionsOutOfRange   = @()
+                        BestVersionToKeep    = '1.8.0'
+                        VersionsToRemove     = @()
+                        InProgramFiles       = $false
+                        MinimumVersion       = $null
+                        MaximumVersion       = $null
+                    }
+                }
             }
 
-            It "Should return a status object for every module plus OPA" {
+            It "Should return a status object for every module plus OPA and ScubaGear" {
                 Mock Get-Module { return $null }
 
                 $statuses = Get-ScubaGearDependencyStatus -ModuleList $script:RealModuleList
 
-                $statuses.Count | Should -Be ($script:RealModuleList.Count + 1)
+                $statuses.Count | Should -Be ($script:RealModuleList.Count + 2)
                 foreach ($module in $script:RealModuleList) {
                     ($statuses | Where-Object { $_.ModuleName -eq $module.ModuleName }) | Should -Not -BeNullOrEmpty
                 }
                 ($statuses | Where-Object { $_.ModuleName -eq 'OPA' }) | Should -Not -BeNullOrEmpty
+                ($statuses | Where-Object { $_.ModuleName -eq 'ScubaGear' }) | Should -Not -BeNullOrEmpty
             }
 
             It "Should load the module list itself when none is provided" {
@@ -142,7 +167,7 @@ InModuleScope 'Support' {
 
                 $statuses = Get-ScubaGearDependencyStatus
 
-                $statuses.Count | Should -Be ($script:RealModuleList.Count + 1)
+                $statuses.Count | Should -Be ($script:RealModuleList.Count + 2)
             }
 
             It "Should exclude OPA when -ExcludeOpa is specified" {
@@ -150,9 +175,19 @@ InModuleScope 'Support' {
 
                 $statuses = Get-ScubaGearDependencyStatus -ModuleList $script:RealModuleList -ExcludeOpa
 
-                $statuses.Count | Should -Be $script:RealModuleList.Count
+                $statuses.Count | Should -Be ($script:RealModuleList.Count + 1)
                 ($statuses | Where-Object { $_.ModuleName -eq 'OPA' }) | Should -BeNullOrEmpty
                 Should -Invoke -CommandName Get-ScubaOpaDependencyStatus -Times 0
+            }
+
+            It "Should exclude ScubaGear when -ExcludeScubaGear is specified" {
+                Mock Get-Module { return $null }
+
+                $statuses = Get-ScubaGearDependencyStatus -ModuleList $script:RealModuleList -ExcludeOpa -ExcludeScubaGear
+
+                $statuses.Count | Should -Be $script:RealModuleList.Count
+                ($statuses | Where-Object { $_.ModuleName -eq 'ScubaGear' }) | Should -BeNullOrEmpty
+                Should -Invoke -CommandName Get-ScubaGearModuleStatus -Times 0
             }
 
             It "Should advise Install-ScubaDependencies when a dependency is missing" {
@@ -239,6 +274,56 @@ InModuleScope 'Support' {
 
                 Should -Invoke -CommandName Write-Information -Times 0 -ParameterFilter {
                     $MessageData -like "*Install-ScubaDependencies*" -or $MessageData -like "*Reset-ScubaGearDependencies*"
+                }
+            }
+
+            It "Should advise Update-ScubaGear when ScubaGear itself is outdated" {
+                Mock Get-Module {
+                    param($Name)
+                    @($Name) | ForEach-Object {
+                        $reqName = $_
+                        $match = $script:RealModuleList | Where-Object { $_.ModuleName -eq $reqName } | Select-Object -First 1
+                        if ($match) {
+                            [PSCustomObject]@{
+                                Name = $reqName
+                                Version = $match.ModuleVersion
+                                ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\$reqName\$($match.ModuleVersion)"
+                            }
+                        }
+                    }
+                }
+                Mock Get-ScubaGearModuleStatus {
+                    [PSCustomObject]@{
+                        PSTypeName           = 'ScubaGear.DependencyStatus'
+                        ModuleName           = 'ScubaGear'
+                        Installed            = $true
+                        VersionCount         = 1
+                        HighestVersion       = '1.7.0'
+                        HighestVersionStatus = 'OUTDATED'
+                        Action               = 'Update'
+                        Modules              = @()
+                        InstalledVersions    = @()
+                        VersionsInRange      = @()
+                        VersionsBelowMinimum = @()
+                        VersionsAboveMaximum = @()
+                        VersionsOutOfRange   = @()
+                        BestVersionToKeep    = '1.7.0'
+                        VersionsToRemove     = @()
+                        InProgramFiles       = $false
+                        MinimumVersion       = '1.8.0'
+                        MaximumVersion       = $null
+                    }
+                }
+                Mock Write-Information { }
+
+                $null = Get-ScubaGearDependencyStatus -ModuleList $script:RealModuleList
+
+                Should -Invoke -CommandName Write-Information -ParameterFilter {
+                    $MessageData -like "*Update-ScubaGear*"
+                }
+                # ScubaGear must never route users to the dependency cmdlets.
+                Should -Invoke -CommandName Write-Information -Times 0 -ParameterFilter {
+                    $MessageData -like "*Reset-ScubaGearDependencies*"
                 }
             }
         }
