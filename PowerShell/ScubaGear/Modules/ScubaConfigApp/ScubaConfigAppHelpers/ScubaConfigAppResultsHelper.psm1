@@ -20,8 +20,68 @@
         Open-ResultsFolder
     })
 
+    $syncHash.ResultsDefaultScanPath_Button.Add_Click({
+        Set-DefaultResultsScanPath
+    })
+
+    $syncHash.ResultsBrowseScanPath_Button.Add_Click({
+        $folderDialog = New-Object System.Windows.Forms.FolderBrowserDialog
+        $folderDialog.Description = "Select the folder to scan for existing ScubaGear results"
+        $folderDialog.ShowNewFolderButton = $true
+        $folderDialog.RootFolder = [System.Environment+SpecialFolder]::MyComputer
+
+        $currentPath = $syncHash.ResultsScanPath_TextBox.Text
+        $defaultPath = Get-ResolvedOutputPath
+
+        if (-not [string]::IsNullOrWhiteSpace($currentPath) -and $currentPath.Trim() -ne "." -and (Test-Path $currentPath) -and $currentPath.Trim() -ne $defaultPath.Trim()) {
+            $folderDialog.SelectedPath = $currentPath
+        }
+
+        $result = $folderDialog.ShowDialog()
+        if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+            $syncHash.ResultsScanPath_TextBox.Text = $folderDialog.SelectedPath
+            Update-ResultsTab
+        }
+    })
+
+    # Initialize the scan path to the current output path.
+    Set-DefaultResultsScanPath -NoRefresh
+
     # Initial scan for existing results
     Update-ResultsTab
+}
+
+Function Get-ResolvedOutputPath {
+    <#
+    .SYNOPSIS
+    Resolves the configured ScubaGear output path to the same runtime value used for generating reports.
+    #>
+    $configuredPath = $syncHash.AdvancedSettingsData["OutPath"]
+    if ([string]::IsNullOrEmpty($configuredPath)) { $configuredPath = $syncHash.OutPath_TextBox.Text }
+    if ([string]::IsNullOrEmpty($configuredPath)) { $configuredPath = $syncHash.ScubaDefaults.OutPath }
+
+    if ([string]::IsNullOrEmpty($configuredPath) -or $configuredPath.Trim() -eq ".") {
+        $configuredPath = [Environment]::GetFolderPath('MyDocuments')
+    }
+
+    return $configuredPath
+}
+
+Function Set-DefaultResultsScanPath {
+    <#
+    .SYNOPSIS
+    Resets the Results scan path back to the current output path without changing the actual report output settings.
+    #>
+    param(
+        [switch]$NoRefresh
+    )
+
+    $outputPath = Get-ResolvedOutputPath
+    $syncHash.ResultsScanPath_TextBox.Text = $outputPath
+
+    if (-not $NoRefresh) {
+        Update-ResultsTab
+    }
 }
 
 Function Update-ResultsTab {
@@ -105,26 +165,35 @@ Function Update-ResultsTab {
     if (-not $jsonfilename) { $jsonfilename = $syncHash.ScubaDefaults.OutJsonFileName }
     if (-not $jsonfilename) { $jsonfilename = $syncHash.UIConfigs.defaultAdvancedSettings.OutJsonFileName_TextBox }
 
-    $configuredPath = $syncHash.AdvancedSettingsData["OutPath"]
-    if ([string]::IsNullOrEmpty($configuredPath)) { $configuredPath = $syncHash.OutPath_TextBox.Text }
-    if ([string]::IsNullOrEmpty($configuredPath)) { $configuredPath = $syncHash.ScubaDefaults.OutPath }
+    $configuredPath = Get-ResolvedOutputPath
 
-    # Resolve "." to the user's Documents folder - matches how the settings helper resolves it
-    # so the Results Reader always searches the same location ScubaGear wrote to.
-    if ([string]::IsNullOrEmpty($configuredPath) -or $configuredPath.Trim() -eq ".") {
-        $configuredPath = [Environment]::GetFolderPath('MyDocuments')
+    $scanPathText = $syncHash.ResultsScanPath_TextBox.Text
+    $scanPath = $null
+    if (-not [string]::IsNullOrWhiteSpace($scanPathText)) {
+        $scanPath = $scanPathText.Trim()
+        if ($scanPath -eq ".") {
+            $scanPath = [Environment]::GetFolderPath('MyDocuments')
+        }
     }
 
-    Write-DebugOutput -Message "Results scan: folder='$folderName', json='$jsonfilename', outPath='$configuredPath'" -Source $MyInvocation.MyCommand -Level "Info"
+    if ([string]::IsNullOrWhiteSpace($scanPath)) {
+        $scanPath = $configuredPath
+    }
+
+    Write-DebugOutput -Message "Results scan: folder='$folderName', json='$jsonfilename', outPath='$configuredPath', scanPath='$scanPath'" -Source $MyInvocation.MyCommand -Level "Info"
 
     # Build a deduplicated list of paths to search:
-    #   1. The configured/resolved OutPath (highest priority - where the last run saved)
-    #   2. Shell-resolved Documents (handles OneDrive redirection automatically)
-    #   3. Any additional OneDrive\Documents variants found under USERPROFILE
-    #   4. $env:USERPROFILE home dir (PSGallery default CWD when run standalone)
+    #   1. The explicit Results scan path override (if set)
+    #   2. The configured/resolved OutPath (where ScubaGear wrote the last run)
+    #   3. Shell-resolved Documents (handles OneDrive redirection automatically)
+    #   4. Any additional OneDrive\Documents variants found under USERPROFILE
+    #   5. $env:USERPROFILE home dir (PSGallery default CWD when run standalone)
     $searchPaths = [System.Collections.Generic.List[string]]::new()
 
-    if (![string]::IsNullOrEmpty($configuredPath) -and (Test-Path $configuredPath)) {
+    if (![string]::IsNullOrEmpty($scanPath) -and (Test-Path $scanPath)) {
+        $searchPaths.Add($scanPath)
+    }
+    if (![string]::IsNullOrEmpty($configuredPath) -and (Test-Path $configuredPath) -and !$searchPaths.Contains($configuredPath)) {
         $searchPaths.Add($configuredPath)
     }
 
@@ -423,8 +492,9 @@ Function New-ResultsReportTab {
         # folder-name pattern yet contain no ScubaResults JSON (e.g. an interrupted
         # or partial run). Passing an empty string to Test-Path throws a parameter
         # binding error, so check for content before probing the filesystem.
-        if (-not [string]::IsNullOrWhiteSpace($Report.JsonResultsPath) -and (Test-Path $Report.JsonResultsPath)) {
-            $jsonContent = Get-Content $Report.JsonResultsPath -Raw
+        $jsonResultsPath = [string]$Report.JsonResultsPath
+        if (-not [string]::IsNullOrWhiteSpace($jsonResultsPath) -and (Test-Path -LiteralPath $jsonResultsPath)) {
+            $jsonContent = Get-Content -LiteralPath $jsonResultsPath -Raw
             $scubaData = $jsonContent | ConvertFrom-Json
 
             # Validate the data
@@ -439,10 +509,10 @@ Function New-ResultsReportTab {
                 $newTab.Content = $errorTab
             }
         } else {
-            $missingJsonMessage = if ([string]::IsNullOrWhiteSpace($Report.JsonResultsPath)) {
+            $missingJsonMessage = if ([string]::IsNullOrWhiteSpace($jsonResultsPath)) {
                 "No ScubaResults JSON file was found in this report folder:`n`n$($Report.ReportPath)`n`nThis folder may be from an interrupted or incomplete scan."
             } else {
-                "JSON file not found: $($Report.JsonResultsPath)"
+                "JSON file not found or unavailable: $jsonResultsPath"
             }
             $errorTab = New-ResultsNoDataTab -ReportPath $Report.ReportPath -Message $missingJsonMessage
             $newTab.Content = $errorTab

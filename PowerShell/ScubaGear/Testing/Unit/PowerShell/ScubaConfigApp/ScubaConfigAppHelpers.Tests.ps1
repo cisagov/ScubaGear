@@ -11,6 +11,7 @@
                 'ScubaConfigAppDebugHelper.psm1',
                 'ScubaConfigAppResultsHelper.psm1',
                 'ScubaConfigAppChangeLogHelper.psm1',
+                'ScubaConfigAppWalkthroughHelper.psm1',
                 'ScubaConfigAppScubaRunHelper.psm1',
                 'ScubaConfigAppDynamicCardHelper.psm1',
                 'ScubaConfigAppResetHelper.psm1',
@@ -164,6 +165,9 @@
                 )
                 'ScubaConfigAppChangeLogHelper.psm1' = @(
                     'Show-ChangelogWindow'
+                )
+                'ScubaConfigAppWalkthroughHelper.psm1' = @(
+                    'Show-ScubaConfigWalkthroughWindow'
                 )
                 'ScubaConfigAppDebugHelper.psm1' = @(
                     'Get-DebugSanitizedValue',

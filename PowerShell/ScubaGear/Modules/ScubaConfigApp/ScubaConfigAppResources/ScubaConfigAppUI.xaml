@@ -1824,6 +1824,23 @@
                                         Height="32"/>
                                 </StackPanel>
 
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                    <TextBlock Text="Scan Path:" Width="80" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox x:Name="ResultsScanPath_TextBox" Width="380" ToolTip="Default is the configured output path. Change this only for results scanning."/>
+                                    <Button x:Name="ResultsBrowseScanPath_Button"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Content="Browse..."
+                                        Margin="8,0,0,0"
+                                        Width="80"
+                                        Height="24"/>
+                                    <Button x:Name="ResultsDefaultScanPath_Button"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Content="Default"
+                                        Margin="8,0,0,0"
+                                        Width="80"
+                                        Height="24"/>
+                                </StackPanel>
+
                                 <!-- Progress Bar for Scanning -->
                                 <StackPanel x:Name="ResultsScanProgress" Visibility="Collapsed" Margin="0,12,0,0">
                                     <TextBlock x:Name="ResultsScanStatus"
@@ -1894,6 +1911,17 @@
                         BorderBrush="LightGray"
                         BorderThickness="1"
                         Cursor="Hand"/>
+                <Button x:Name="WalkthroughButton"
+                        Content="Help / Walkthrough"
+                        FontSize="10"
+                        Padding="8,2"
+                        Margin="8,0,0,0"
+                        VerticalAlignment="Center"
+                        Background="#EAF3FF"
+                        BorderBrush="#5B8DEF"
+                        BorderThickness="1"
+                        Foreground="#123A7A"
+                        Cursor="Hand"/>
             </StackPanel>
 
             <!-- Centered Content -->
@@ -1903,7 +1931,7 @@
                     TextAlignment="Center">
                 <Run Text="ScubaConfigApp" FontWeight="SemiBold" Foreground="{StaticResource PrimaryBrush}"/>
                 <Run Text=" | "/>
-                <Hyperlink NavigateUri="https://github.com/cisagov/ScubaGear">
+                <Hyperlink x:Name="GitHubRepo_Hyperlink" NavigateUri="https://github.com/cisagov/ScubaGear">
                     GitHub Repository
                 </Hyperlink>
             </TextBlock>

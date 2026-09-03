@@ -390,6 +390,12 @@ Function New-YamlPreview {
                         if ($PolicyDetails) {
                             $yamlPreview += "`n  # $($PolicyDetails.Name)"
                         }
+                        # User documentation comments for this exclusion policy (one # line each).
+                        if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($policyId)) {
+                            foreach ($commentLine in @($syncHash.ExclusionComments[$policyId])) {
+                                $yamlPreview += "`n  # $commentLine"
+                            }
+                        }
                         $yamlPreview += "`n  $policyId`:"
 
                         $policyData = $OutputData[$productName][$policyId]

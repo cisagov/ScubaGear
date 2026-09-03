@@ -1,5 +1,4 @@
-﻿# Add this function after the other window functions (around line 1500)
-Function Show-ChangelogWindow {
+﻿Function Show-ChangelogWindow {
     <#
     .SYNOPSIS
     Opens a window displaying the latest ScubaConfigApp changelog entry.
