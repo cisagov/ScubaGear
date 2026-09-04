@@ -27,3 +27,20 @@ jobs:
         run: |
           $PSVersionTable
           Invoke-Pester PowerShell\ScubaGear\Testing\Unit\PowerShell\CreateReport -Output Detailed
+  baseline-link-check:
+    name: Baseline Link Checks
+    runs-on: ubuntu-latest
+    # This condition prevents duplicate runs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo code
+        uses: actions/checkout@v6
+      - name: Validate baseline links
+        uses: tcort/github-action-markdown-link-check@e7c7a18363c842693fadde5d41a3bd3573a7a225 # v1.1.2
+        with:
+          config-file: .github/markdown-link-check.json
+          folder-path: PowerShell/ScubaGear/baselines
+          max-depth: '1'
+          use-quiet-mode: 'yes'

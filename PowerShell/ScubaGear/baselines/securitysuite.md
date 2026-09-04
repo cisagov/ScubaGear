@@ -916,7 +916,7 @@ One option for controlling how long logs are retained in M365 is to create one o
 retention policies. For more details, see [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy)
 instructions.
 
-As noted in the [License Requirements](https://github.com/cisagov/ScubaGear/baselines/securitysuite.md#license-requirements-1)
+As noted in the [License Requirements](#license-requirements-1)
 section above, the creation of a custom audit log retention policy and its retention in the M365
 environment requires E5/G5 licenses or E3/G3 licenses with add-on compliance licenses. However, no
 additional license is required to export logs. To export audit logs, follow

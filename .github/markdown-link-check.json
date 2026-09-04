@@ -1,0 +1,40 @@
+{
+  "projectBaseUrl": ".",
+  "ignorePatterns": [
+    {
+      "pattern": "^https://admin\\.microsoft\\.com"
+    },
+    {
+      "pattern": "^https://graph\\.microsoft\\.com"
+    },
+    {
+      "pattern": "^https://[^/]+\\.safelinks\\.protection\\.outlook\\.com"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/",
+      "replacement": "{{BASEURL}}/"
+    }
+  ],
+  "httpHeaders": [
+    {
+      "urls": [
+        "https://attack.mitre.org",
+        "https://learn.microsoft.com",
+        "https://www.cisa.gov"
+      ],
+      "headers": {
+        "User-Agent": "Mozilla/5.0 (compatible; ScubaGearLinkCheck/1.0)"
+      }
+    }
+  ],
+  "timeout": "20s",
+  "retryOn429": true,
+  "retryCount": 3,
+  "fallbackRetryDelay": "10s",
+  "aliveStatusCodes": [
+    200,
+    206
+  ]
+}

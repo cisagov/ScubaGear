@@ -159,7 +159,7 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 ### Resources
 
 - [Binding Operational Directive 18-01 - Enhance Email and Web Security
-  \| DHS](https://cyber.dhs.gov/bod/18-01/)
+  \| CISA](https://www.cisa.gov/news-events/directives/bod-18-01-enhance-email-and-web-security)
 
 - [Trustworthy Email \| NIST 800-177 Rev.
   1](https://csrc.nist.gov/publications/detail/sp/800-177/rev-1/final)
@@ -232,7 +232,7 @@ recipients to detect spoofed emails and verify the integrity of email content.
 ### Resources
 
 - [Binding Operational Directive 18-01 - Enhance Email and Web Security
-  \| DHS](https://cyber.dhs.gov/bod/18-01/)
+  \| CISA](https://www.cisa.gov/news-events/directives/bod-18-01-enhance-email-and-web-security)
 
 - [Trustworthy Email \| NIST 800-177 Rev.
   1](https://csrc.nist.gov/publications/detail/sp/800-177/rev-1/final)
@@ -341,7 +341,7 @@ to spoof their domains.
 ### Resources
 
 - [Binding Operational Directive 18-01 - Enhance Email and Web Security
-  \| DHS](https://cyber.dhs.gov/bod/18-01/)
+  \| CISA](https://www.cisa.gov/news-events/directives/bod-18-01-enhance-email-and-web-security)
 
 - [Trustworthy Email \| NIST 800-177 Rev.
   1](https://csrc.nist.gov/publications/detail/sp/800-177/rev-1/final)
