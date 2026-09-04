@@ -1,13 +1,6 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ModuleList')]
 $ModuleList = @(
     @{
-        ModuleName = 'MicrosoftTeams'
-        ModuleVersion = [version] '4.9.3'
-        MaximumVersion = [version] '7.8.0'
-        Purpose = 'Microsoft Teams configuration management'
-        IsPinned = "False"
-    },
-    @{
         ModuleName = 'Microsoft.Graph.Authentication'
         ModuleVersion = [version] '2.0.0'
         MaximumVersion = [version] '2.25.0'

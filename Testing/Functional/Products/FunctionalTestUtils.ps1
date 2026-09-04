@@ -49,6 +49,80 @@ function Get-FunctionalTestHeaderValue {
   # return [string]$Property.Value
 }
 
+# This function will parse an HTTP response object returned from a call to Invoke-WebRequest and return a nicely formatted string with
+#   the status code, headers and response body to aid in troubleshooting.
+# Handles three distinct shapes: the WebResponseObject Invoke-WebRequest returns directly on success,
+#   System.Net.HttpWebResponse (PS 5.1 exception .Response), and System.Net.Http.HttpResponseMessage (PS 7+ exception .Response).
+function Get-HttpResponseDetails {
+  param(
+    [Parameter(Mandatory = $true)] $HttpResponseObject,
+    # Only used for HttpResponseMessage: PS 7+ disposes the content stream by the time we get here,
+    # so the body (when parseable) has to come from the caller's $ErrorRecord.ErrorDetails.Message instead.
+    [string] $ErrorDetailsMessage
+  )
+
+  $StringBuffer = [System.Text.StringBuilder]::new()
+  [void]$StringBuffer.AppendLine("`nResponse Type : $($HttpResponseObject.GetType().FullName)")
+
+  if ($HttpResponseObject -is [Microsoft.PowerShell.Commands.WebResponseObject]) {
+    # Direct return value of Invoke-WebRequest (e.g. HTTP 202/3xx) - Content is already a string.
+    [void]$StringBuffer.AppendLine("Status Code   : $([int]$HttpResponseObject.StatusCode)")
+    [void]$StringBuffer.AppendLine("Status Text   : $($HttpResponseObject.StatusDescription)")
+    [void]$StringBuffer.AppendLine("")
+    [void]$StringBuffer.AppendLine("=== Response Headers ===")
+    foreach ($HeaderName in $HttpResponseObject.Headers.Keys) {
+      [void]$StringBuffer.AppendLine("${HeaderName}: $($HttpResponseObject.Headers[$HeaderName])")
+    }
+    [void]$StringBuffer.AppendLine("")
+    [void]$StringBuffer.AppendLine("=== Raw Response Body ===")
+    [void]$StringBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($HttpResponseObject.Content)) { "Empty response body." } else { $HttpResponseObject.Content }))
+  }
+  elseif ($HttpResponseObject.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
+    # PowerShell 7+ HttpResponseException.Response
+    [void]$StringBuffer.AppendLine("Status Code   : $([int]$HttpResponseObject.StatusCode)")
+    [void]$StringBuffer.AppendLine("Status Text   : $($HttpResponseObject.ReasonPhrase)")
+    [void]$StringBuffer.AppendLine("")
+    [void]$StringBuffer.AppendLine("=== Response Headers ===")
+    foreach ($Header in $HttpResponseObject.Headers) {
+      [void]$StringBuffer.AppendLine("$($Header.Key): $($Header.Value -join ', ')")
+    }
+    [void]$StringBuffer.AppendLine("")
+    [void]$StringBuffer.AppendLine("=== Raw Response Body ===")
+    [void]$StringBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ErrorDetailsMessage)) { "Empty response body." } else { $ErrorDetailsMessage }))
+  }
+  else {
+    # PowerShell 5.1 WebException.Response (System.Net.HttpWebResponse)
+    [void]$StringBuffer.AppendLine("Status Code   : $([int]$HttpResponseObject.StatusCode)")
+    [void]$StringBuffer.AppendLine("Status Text   : $($HttpResponseObject.StatusDescription)")
+    [void]$StringBuffer.AppendLine("Content Type  : $($HttpResponseObject.ContentType)")
+    [void]$StringBuffer.AppendLine("Content Length: $($HttpResponseObject.ContentLength)")
+    [void]$StringBuffer.AppendLine("")
+    [void]$StringBuffer.AppendLine("=== Response Headers ===")
+    foreach ($HeaderName in $HttpResponseObject.Headers.AllKeys) {
+      [void]$StringBuffer.AppendLine("${HeaderName}: $($HttpResponseObject.Headers[$HeaderName])")
+    }
+    [void]$StringBuffer.AppendLine("")
+    [void]$StringBuffer.AppendLine("=== Raw Response Body ===")
+    $HttpResponseStream = $HttpResponseObject.GetResponseStream()
+    if ($null -eq $HttpResponseStream) {
+      [void]$StringBuffer.AppendLine("No response stream in Error.Exception.Response object.")
+    }
+    else {
+      $HttpResponseReader = New-Object System.IO.StreamReader($HttpResponseStream)
+      try {
+        $ResponseBody = $HttpResponseReader.ReadToEnd()
+      }
+      finally {
+        $HttpResponseReader.Dispose()
+        $HttpResponseStream.Dispose()
+      }
+      [void]$StringBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
+    }
+  }
+
+  return $StringBuffer.ToString()
+}
+
 function Resolve-FunctionalTestPollingUri {
   param(
     [Parameter(Mandatory = $true)] [string] $RequestUri,
@@ -58,6 +132,7 @@ function Resolve-FunctionalTestPollingUri {
   return [System.Uri]::new([System.Uri]$RequestUri, $PollingUri).AbsoluteUri
 }
 
+# This function is a wrapper around Invoke-WebRequest that handles HTTP 202 (processing not completed) responses with polling.
 function Invoke-FunctionalTestRestRequest {
   [CmdletBinding()]
   param(
@@ -74,89 +149,110 @@ function Invoke-FunctionalTestRestRequest {
   $RequestMethod = $Method
   $PollAttempts = 0
 
+  # Keep looping until we get an HTTP response code indicating that the API endpoint completed processing.
   while ($true) {
-    $RequestParams = @{
-      Uri = $RequestUri
-      Method = $RequestMethod
-      Headers = $Headers
-      ErrorAction = 'Stop'
-    }
-
-    # PowerShell 5.1 can throw parser null-reference errors for Invoke-WebRequest
-    # unless -UseBasicParsing is explicitly supplied.
-    if ($null -ne (Get-Command Invoke-WebRequest).Parameters['UseBasicParsing']) {
-      $RequestParams.UseBasicParsing = $true
-    }
-
-    if (-not [string]::IsNullOrWhiteSpace($Body) -and $RequestMethod -ne 'GET') {
-      $RequestParams.Body = $Body
-    }
-
-    if (-not [string]::IsNullOrWhiteSpace($ContentType) -and $RequestMethod -ne 'GET') {
-      $RequestParams.ContentType = $ContentType
-    }
-
     try {
+      $RequestParams = @{
+        Uri = $RequestUri
+        Method = $RequestMethod
+        Headers = $Headers
+        ErrorAction = 'Stop'
+      }
+
+      # PowerShell 5.1 can throw parser null-reference errors for Invoke-WebRequest
+      # unless -UseBasicParsing is explicitly supplied.
+      if ($null -ne (Get-Command Invoke-WebRequest).Parameters['UseBasicParsing']) {
+        $RequestParams.UseBasicParsing = $true
+      }
+
+      if (-not [string]::IsNullOrWhiteSpace($Body) -and $RequestMethod -ne 'GET') {
+        $RequestParams.Body = $Body
+      }
+
+      if (-not [string]::IsNullOrWhiteSpace($ContentType) -and $RequestMethod -ne 'GET') {
+        $RequestParams.ContentType = $ContentType
+      }
+
+      # Output the HTTP method, URI and Body to aid in debugging
+      Write-Information "$RequestMethod $RequestUri" -InformationAction Continue
+      if ($RequestParams.Body) {
+        Write-Information $RequestParams.Body -InformationAction Continue
+      }
+
+      # Call the API endpoint. This is where the fun happens.
       $Response = Invoke-WebRequest @RequestParams
+      $StatusCode = [int] $Response.StatusCode
+
+      if ($StatusCode -eq 202) {
+        $PollAttempts++
+        if ($PollAttempts -gt $MaxPollAttempts) {
+          $DetailedHttpMessage = Get-HttpResponseDetails $Response
+          Write-Warning $DetailedHttpMessage
+          throw "Request to $Uri did not complete after $MaxPollAttempts polling attempt(s)."
+        }
+
+        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Location'
+        if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+          $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Operation-Location'
+        }
+        if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+          $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Azure-AsyncOperation'
+        }
+        if ([string]::IsNullOrWhiteSpace($PollingUri)) {
+          $DetailedHttpMessage = Get-HttpResponseDetails $Response
+          Write-Warning $DetailedHttpMessage
+          throw "Request to $RequestUri returned HTTP 202 without a polling location."
+        }
+
+        $RetryAfter = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Retry-After'
+        $RetryAfterSeconds = 0
+        if (-not [int]::TryParse([string] $RetryAfter, [ref] $RetryAfterSeconds) -or $RetryAfterSeconds -lt 1) {
+          $RetryAfterSeconds = $DefaultRetryAfterSeconds
+        }
+
+        Write-Information "Request to $RequestUri is still processing." -InformationAction Continue
+        Write-Information "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)" -InformationAction Continue
+        Start-Sleep -Seconds $RetryAfterSeconds
+        $RequestUri = Resolve-FunctionalTestPollingUri -RequestUri $RequestUri -PollingUri $PollingUri
+        $RequestMethod = 'GET'
+        continue
+      }
+
+      if ($StatusCode -lt 200 -or $StatusCode -ge 300) {
+        # Write the HTTP details so we can troubleshoot
+        $DetailedHttpMessage = Get-HttpResponseDetails $Response
+        Write-Warning $DetailedHttpMessage
+        throw "Request to $RequestUri returned unexpected HTTP status code $StatusCode."
+      }
+
+      if ([string]::IsNullOrWhiteSpace($Response.Content)) {
+        return $null
+      }
+
+      try {
+        return $Response.Content | ConvertFrom-Json
+      }
+      catch {
+        return $Response.Content
+      }
     }
     catch {
-      $StatusCode = $null
-      if ($null -ne $_.Exception.Response -and $null -ne $_.Exception.Response.StatusCode) {
-        $StatusCode = [int] $_.Exception.Response.StatusCode
+      $ErrorRecord = $_
+
+      # No HTTP response object (network, dns or other non HTTP status errors)
+      if ($null -eq $ErrorRecord.Exception.Response) {
+        Write-Warning "Non-HTTP status related error occurred."
+        throw
       }
 
-      if ($null -ne $StatusCode) {
-        throw "Request to $RequestUri failed with HTTP status code $StatusCode. $($_.Exception.Message)"
-      }
-
+      $ErrorBuffer = [System.Text.StringBuilder]::new()
+      [void]$ErrorBuffer.AppendLine("`nException Type: $($ErrorRecord.Exception.GetType().FullName)")
+      [void]$ErrorBuffer.AppendLine("Message       : $($ErrorRecord.Exception.Message)")
+      Write-Warning $ErrorBuffer.ToString()
+      # Pull the detailed HTTP error information
+      $DetailedHttpErrorMessage = Get-HttpResponseDetails $ErrorRecord.Exception.Response -ErrorDetailsMessage $ErrorRecord.ErrorDetails.Message
+      Write-Warning $DetailedHttpErrorMessage
       throw
-    }
-
-    $StatusCode = [int] $Response.StatusCode
-    if ($StatusCode -eq 202) {
-      $PollAttempts++
-      if ($PollAttempts -gt $MaxPollAttempts) {
-        throw "Request to $Uri did not complete after $MaxPollAttempts polling attempt(s)."
-      }
-
-      $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Location'
-      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
-        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Operation-Location'
-      }
-      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
-        $PollingUri = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Azure-AsyncOperation'
-      }
-      if ([string]::IsNullOrWhiteSpace($PollingUri)) {
-        throw "Request to $RequestUri returned HTTP 202 without a polling location."
-      }
-
-      $RetryAfter = Get-FunctionalTestHeaderValue -Headers $Response.Headers -Name 'Retry-After'
-      $RetryAfterSeconds = 0
-      if (-not [int]::TryParse([string] $RetryAfter, [ref] $RetryAfterSeconds) -or $RetryAfterSeconds -lt 1) {
-        $RetryAfterSeconds = $DefaultRetryAfterSeconds
-      }
-
-      Write-Information "Request to $RequestUri is still processing." -InformationAction Continue
-      Write-Information "Polling $PollingUri in $RetryAfterSeconds seconds... (Attempt $PollAttempts of $MaxPollAttempts)" -InformationAction Continue
-      Start-Sleep -Seconds $RetryAfterSeconds
-      $RequestUri = Resolve-FunctionalTestPollingUri -RequestUri $RequestUri -PollingUri $PollingUri
-      $RequestMethod = 'GET'
-      continue
-    }
-
-    if ($StatusCode -lt 200 -or $StatusCode -ge 300) {
-      throw "Request to $RequestUri returned unexpected HTTP status code $StatusCode."
-    }
-
-    if ([string]::IsNullOrWhiteSpace($Response.Content)) {
-      return $null
-    }
-
-    try {
-      return $Response.Content | ConvertFrom-Json
-    }
-    catch {
-      return $Response.Content
     }
   }
 }
@@ -1578,6 +1674,110 @@ function Set-PowerAppTenantIsolationPolicy {
 }
 
 # -----------------------------------------------------------------------
+# Teams REST wrappers for functional test preconditions
+# These replace the removed MicrosoftTeams PowerShell cmdlets.
+# $script:TeamsBaseUrl and $script:TeamsAccessToken must be set by
+# Products.Tests.ps1 BeforeAll before these functions are called.
+# -----------------------------------------------------------------------
+
+function Set-CsTeamsMeetingPolicyRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Information $Body -InformationAction Continue
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsMeetingPolicy/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Get-CsTeamsMeetingPolicyRest {
+  $response = Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsMeetingPolicy" `
+    -Method 'GET' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" }
+  return $response
+}
+
+function Set-CsTeamsMeetingBroadcastPolicyRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Information $Body -InformationAction Continue
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsMeetingBroadcastPolicy/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Set-CsTenantFederationConfigurationRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Information $Body -InformationAction Continue
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TenantFederationSettings/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Get-CsTeamsAppPermissionPolicyRest {
+  $response = Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsAppPermissionPolicy" `
+    -Method 'GET' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" }
+  return $response
+}
+
+function Set-CsTeamsAppPermissionPolicyRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Information $Body -InformationAction Continue
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsAppPermissionPolicy/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+function Set-CsTeamsClientConfigurationRest {
+  param(
+      [string]$Identity,
+      [hashtable]$Settings
+  )
+
+  $BodyObject = [ordered]@{ Identity = $Identity }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+  Write-Information $Body -InformationAction Continue
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:TeamsBaseUrl/Skype.Policy/configurations/TeamsClientConfiguration/configuration/$Identity" `
+      -Method 'PATCH' -Headers @{ Authorization = "Bearer $script:TeamsAccessToken" } -Body $Body -ContentType 'application/json'
+}
+
+# -----------------------------------------------------------------------
 # Power BI REST wrapper for functional test preconditions.
 # Uses the Fabric/Power BI Admin API to toggle individual tenant settings.
 # $script:PBIBaseUrl and $script:PBIAccessToken must be set by
@@ -1585,25 +1785,18 @@ function Set-PowerAppTenantIsolationPolicy {
 # Endpoint: POST {base}/v1/admin/tenantsettings/{settingName}/update
 # -----------------------------------------------------------------------
 function Set-PowerBITenantSetting {
-    param(
-        [Parameter(Mandatory = $true)] [string]$SettingName,
-        [Parameter(Mandatory = $true)] [bool]$Enabled
-    )
-    $Body = @{ enabled = $Enabled } | ConvertTo-Json
-    $MaxAttempts = 3
-    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
-        try {
-        Invoke-FunctionalTestRestRequest -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
-          -Method 'POST' -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } `
-          -Body $Body -ContentType 'application/json' | Out-Null
-            return
-        }
-        catch {
-            if ($Attempt -ge $MaxAttempts) { throw }
-            Write-Warning "Set-PowerBITenantSetting attempt $Attempt failed: $($_.Exception.Message). Retrying in 5 seconds..."
-            Start-Sleep -Seconds 5
-        }
-    }
+  param(
+      [Parameter(Mandatory = $true)] [string]$SettingName,
+      [Parameter(Mandatory = $true)] [hashtable]$Settings
+  )
+  $BodyObject = [ordered]@{ }
+  foreach ($Key in $Settings.Keys) {
+      $BodyObject[$Key] = $Settings[$Key]
+  }
+  $Body = $BodyObject | ConvertTo-Json -Depth 10
+
+  Invoke-FunctionalTestRestRequest -Uri "$script:PBIBaseUrl/v1/admin/tenantsettings/$SettingName/update" `
+    -Method 'POST' -Headers @{ Authorization = "Bearer $script:PBIAccessToken" } -Body $Body -ContentType 'application/json'
 }
 
 # -----------------------------------------------------------------------

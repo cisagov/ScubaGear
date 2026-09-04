@@ -1,7 +1,7 @@
 package securitysuite_test
 import rego.v1
 import data.securitysuite
-import data.utils.defender.DEFLICENSEWARNSTR
+import data.utils.securitysuite.DEFLICENSEWARNSTR
 import data.utils.key.TestResult
 import data.utils.key.PASS
 

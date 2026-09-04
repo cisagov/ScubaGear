@@ -88,8 +88,6 @@ InModuleScope Orchestrator {
         function ConvertTo-RiskyAppsCsv {throw 'this will be mocked'}
         function Disconnect-SCuBATenant {throw 'this will be mocked'}
 
-        Mock -ModuleName Orchestrator Remove-Resources {}
-        Mock -ModuleName Orchestrator Import-Resources {}
         Mock -ModuleName Orchestrator Invoke-Connection {
             if ($ScubaConfig) { $script:TestSplat['LogIn'] = $ScubaConfig.LogIn }
             return @{ PBILicenseFound = $true }
