@@ -210,8 +210,6 @@ Function Get-ScubaGearPermissions {
                 $conditions += $productCondition
                 $conditionsmsg += '`$_.scubaGearProduct -contains any of "' + ($Product -join '", "') + '"'
 
-                # # Don't add resourceAPIAppId filters when querying for roles or endpoints
-                # # If($OutAs -ne 'role' -and $OutAs -ne 'endpoint'){
                 If($OutAs -eq 'perms'){
                     Foreach($ProductItem in $Product){
                         If($ServicePrincipal -or $ProductItem -eq 'aad'){
