@@ -89,6 +89,26 @@ DisabledRetentionPolicy := {
     "Enabled": false
 }
 
+# Non-compliant: highest priority (Priority=1) policy keeps logs only 7 days.
+# Per the Microsoft Purview audit retention documentation, a lower numeric
+# Priority value indicates a higher precedence, so this policy supersedes
+# any other configured retention policy and therefore drives the result.
+HighPriorityNonCompliantRetentionPolicy := {
+    "Name": "7 day retention (highest priority)",
+    "RetentionDuration": "SevenDays",
+    "Enabled": true,
+    "Priority": 1
+}
+
+# Compliant: 12 month retention, but lower priority than
+# HighPriorityNonCompliantRetentionPolicy.
+LowerPriorityCompliantRetentionPolicy := {
+    "Name": "12 month retention (lower priority)",
+    "RetentionDuration": "TwelveMonths",
+    "Enabled": true,
+    "Priority": 2
+}
+
 # E5-level service plans, includes the advanced auditing plan required to
 # retain audit logs beyond 180 days (E5 / E5 Compliance / E5 eDiscovery and Audit)
 ServicePlansWithAdvancedAuditing := [
