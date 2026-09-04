@@ -274,6 +274,57 @@ function Get-ExchangeOnlineApiEndpoint {
     }
 }
 
+function Get-EXORestErrorBody {
+    <#
+    .SYNOPSIS
+        Returns the HTTP response body of a failed web request, or an empty string.
+    .DESCRIPTION
+        The Admin API reports why a call failed in an OData error object in the
+        response body rather than in the HTTP status line. PowerShell puts that
+        body on the error record, and the response stream is read directly when
+        it does not.
+    .PARAMETER ErrorRecord
+        The error record caught from the failed request.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.ErrorRecord]$ErrorRecord
+    )
+
+    if ($ErrorRecord.ErrorDetails -and (-not [string]::IsNullOrWhiteSpace($ErrorRecord.ErrorDetails.Message))) {
+        return $ErrorRecord.ErrorDetails.Message
+    }
+
+    $WebResponse = $ErrorRecord.Exception.Response
+    if ($null -eq $WebResponse) {
+        return ""
+    }
+
+    try {
+        $ResponseStream = $WebResponse.GetResponseStream()
+        if ($null -eq $ResponseStream) {
+            return ""
+        }
+
+        $Reader = New-Object System.IO.StreamReader($ResponseStream)
+        try {
+            return $Reader.ReadToEnd()
+        }
+        finally {
+            $Reader.Dispose()
+            $ResponseStream.Dispose()
+        }
+    }
+    catch {
+        # PowerShell 7 hands back a response object with no readable stream, and
+        # the body has already been placed on ErrorDetails in that case.
+        return ""
+    }
+}
+
 function Invoke-EXORestMethod {
     <#
     .SYNOPSIS
@@ -364,7 +415,15 @@ function Invoke-EXORestMethod {
                 continue
             }
 
-            throw "Exchange Online API call '$CmdletName' failed: $($_.Exception.Message)"
+            # Invoke-WebRequest puts only the status line in Exception.Message, while
+            # the Admin API explains the failure in the response body. Carry the body
+            # along the same way Invoke-ScubaRestMethod does, so callers can tell one
+            # Bad Request apart from another.
+            $ResponseBody = Get-EXORestErrorBody -ErrorRecord $_
+            if ([string]::IsNullOrWhiteSpace($ResponseBody)) {
+                throw "Exchange Online API call '$CmdletName' failed: $($_.Exception.Message)"
+            }
+            throw "Exchange Online API call '$CmdletName' failed: $($_.Exception.Message) $ResponseBody"
         }
     }
 }
