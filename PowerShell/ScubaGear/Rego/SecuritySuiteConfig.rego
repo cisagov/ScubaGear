@@ -852,6 +852,19 @@ EnabledPrioritizedRetentionPolicies contains Policy if {
     is_number(Policy.Priority)
 }
 
+# Enabled retention policies without a usable numeric Priority value. When any
+# prioritized policy exists, these policies have unknown precedence relative to
+# it; silently dropping them from the evaluation could produce a false Pass,
+# so the mixed case must fail closed instead. Priority is read through
+# object.get because a bare `not is_number(Policy.Priority)` does not hold for
+# policies whose Priority key is absent. See issue #2374.
+EnabledUnprioritizedRetentionPolicies contains Policy if {
+    some Policy in input.unified_audit_log_retention_policies
+    not Policy.Enabled == false
+    Priority := object.get(Policy, "Priority", null)
+    not is_number(Priority)
+}
+
 # Save audit log retention policies that retain logs for at least 12 months
 # and are not disabled.
 CompliantRetentionPolicies contains {
@@ -878,7 +891,10 @@ CompliantRetentionPolicies contains {
 # false Pass. When several enabled policies tie on the smallest Priority
 # value, all of them must comply (fail closed): Purview does not define tie
 # semantics, and a complete rule selecting a single tied policy would abort
-# the whole evaluation with eval_conflict_error. See issue #2374.
+# the whole evaluation with eval_conflict_error. When enabled policies mix
+# numeric and missing Priority values, precedence is undefined and the rule
+# fails closed rather than silently excluding the unprioritized policies.
+# See issue #2374.
 default AuditRetentionRequirementMet := false
 AuditRetentionRequirementMet if {
     count(AdvancedAuditingLicenses) > 0
@@ -889,6 +905,7 @@ AuditRetentionRequirementMet if {
 AuditRetentionRequirementMet if {
     count(AdvancedAuditingLicenses) > 0
     count(EnabledPrioritizedRetentionPolicies) > 0
+    count(EnabledUnprioritizedRetentionPolicies) == 0
     MinPriority := min({P.Priority | some P in EnabledPrioritizedRetentionPolicies})
     every Policy in EnabledPrioritizedRetentionPolicies {
         MinPriorityPolicyCompliant(Policy, MinPriority)

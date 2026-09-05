@@ -216,4 +216,30 @@ test_AuditLogRetention_TieOneNonCompliant if {
     ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
     TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
 }
+
+# Mixed priority data must fail closed: one duration-compliant policy with a
+# numeric Priority alongside an enabled policy whose Priority is missing. The
+# unprioritized policy's precedence is unknown, so it cannot silently vanish
+# from the decision even though the prioritized policy complies.
+test_AuditLogRetention_Incorrect_MixedPriorityDataFailsClosed if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [LowerPriorityCompliantRetentionPolicy, EnabledUnprioritizedRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
+
+# Fail closed even when the unprioritized policy would itself be
+# duration-compliant: with mixed priority data the precedence cannot be
+# established, so the evaluation must not report a Pass.
+test_AuditLogRetention_Incorrect_MixedPriorityAllCompliantStillFailsClosed if {
+    UnprioritizedCompliant := json.patch(LowerPriorityCompliantRetentionPolicy, [
+        {"op": "remove", "path": "Priority"},
+    ])
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [LowerPriorityCompliantRetentionPolicy, UnprioritizedCompliant]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
 #--

@@ -109,6 +109,15 @@ LowerPriorityCompliantRetentionPolicy := {
     "Priority": 2
 }
 
+# Non-compliant: enabled policy without a usable numeric Priority value. Its
+# precedence relative to any prioritized policy is unknown, so mixing it with
+# a prioritized policy must fail closed instead of silently ignoring it.
+EnabledUnprioritizedRetentionPolicy := {
+    "Name": "7 day retention (no priority)",
+    "RetentionDuration": "SevenDays",
+    "Enabled": true
+}
+
 # E5-level service plans, includes the advanced auditing plan required to
 # retain audit logs beyond 180 days (E5 / E5 Compliance / E5 eDiscovery and Audit)
 ServicePlansWithAdvancedAuditing := [
