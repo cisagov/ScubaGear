@@ -842,6 +842,29 @@ AdvancedAuditingLicenses contains ServicePlan.ServicePlanId if {
     ServicePlan.ServicePlanName == "M365_ADVANCED_AUDITING"
 }
 
+# Enabled retention policies that supply a numeric Priority value. Per the
+# Microsoft Purview documentation, a lower numeric Priority value indicates a
+# higher precedence, so the smallest Priority value supersedes all others.
+# See issue #2374.
+EnabledPrioritizedRetentionPolicies contains Policy if {
+    some Policy in input.unified_audit_log_retention_policies
+    not Policy.Enabled == false
+    is_number(Policy.Priority)
+}
+
+# Enabled retention policies without a usable numeric Priority value. When any
+# prioritized policy exists, these policies have unknown precedence relative to
+# it; silently dropping them from the evaluation could produce a false Pass,
+# so the mixed case must fail closed instead. Priority is read through
+# object.get because a bare `not is_number(Policy.Priority)` does not hold for
+# policies whose Priority key is absent. See issue #2374.
+EnabledUnprioritizedRetentionPolicies contains Policy if {
+    some Policy in input.unified_audit_log_retention_policies
+    not Policy.Enabled == false
+    Priority := object.get(Policy, "Priority", null)
+    not is_number(Priority)
+}
+
 # Save audit log retention policies that retain logs for at least 12 months
 # and are not disabled.
 CompliantRetentionPolicies contains {
@@ -860,10 +883,45 @@ CompliantRetentionPolicies contains {
 # Get-MgBetaSubscribedSku is intentionally omitted from the Commandlet list: when
 # the license data is unavailable the policy must report non-compliant rather
 # than a "command did not execute" dependency error.
+#
+# When at least one retention policy reports a numeric Priority value the
+# highest-priority (lowest numeric Priority value) policies must all be
+# duration-compliant. A lower-priority 12 month policy cannot mask a
+# higher-priority non-compliant policy; otherwise ScubaGear would produce a
+# false Pass. When several enabled policies tie on the smallest Priority
+# value, all of them must comply (fail closed): Purview does not define tie
+# semantics, and a complete rule selecting a single tied policy would abort
+# the whole evaluation with eval_conflict_error. When enabled policies mix
+# numeric and missing Priority values, precedence is undefined and the rule
+# fails closed rather than silently excluding the unprioritized policies.
+# See issue #2374.
 default AuditRetentionRequirementMet := false
 AuditRetentionRequirementMet if {
     count(AdvancedAuditingLicenses) > 0
     count(CompliantRetentionPolicies) >= 1
+    count(EnabledPrioritizedRetentionPolicies) == 0
+}
+
+AuditRetentionRequirementMet if {
+    count(AdvancedAuditingLicenses) > 0
+    count(EnabledPrioritizedRetentionPolicies) > 0
+    count(EnabledUnprioritizedRetentionPolicies) == 0
+    MinPriority := min({P.Priority | some P in EnabledPrioritizedRetentionPolicies})
+    every Policy in EnabledPrioritizedRetentionPolicies {
+        MinPriorityPolicyCompliant(Policy, MinPriority)
+    }
+}
+
+# A policy at the smallest Priority value must itself be duration-compliant;
+# policies at a lower precedence are ignored because they cannot mask a
+# higher-priority policy.
+MinPriorityPolicyCompliant(Policy, MinPriority) if {
+    Policy.Priority != MinPriority
+}
+
+MinPriorityPolicyCompliant(Policy, MinPriority) if {
+    Policy.Priority == MinPriority
+    Policy.RetentionDuration in CompliantRetentionDurations
 }
 
 tests contains {

@@ -154,4 +154,92 @@ test_AuditLogRetention_Incorrect_NoServicePlans if {
     ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
     TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
 }
+
+# A lower-priority compliant policy (12 months) must NOT override a higher-priority
+# non-compliant policy (7 days). Per Microsoft, lower numeric Priority means higher
+# precedence, so the 7 day policy wins and the tenant fails. See issue #2374.
+test_AuditLogRetention_Incorrect_HigherPriorityNonCompliant if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [LowerPriorityCompliantRetentionPolicy, HighPriorityNonCompliantRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
+
+# Symmetric case: the non-compliant policy has the lower priority (Priority=2)
+# while the compliant 12 month policy has the higher priority (Priority=1).
+# Here the compliant policy wins and the tenant should pass.
+test_AuditLogRetention_Correct_HigherPriorityCompliant if {
+    HighPriorityCompliant := json.patch(LowerPriorityCompliantRetentionPolicy, [
+        {"op": "replace", "path": "Priority", "value": 1},
+    ])
+    LowPriorityNonCompliant := json.patch(HighPriorityNonCompliantRetentionPolicy, [
+        {"op": "replace", "path": "Priority", "value": 2},
+    ])
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [LowPriorityNonCompliant, HighPriorityCompliant]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [PASS, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, true) == true
+}
+
+# Tie on the smallest Priority value (two enabled policies, both Priority=1):
+# Purview does not define tie semantics, so the evaluation fails closed — all
+# highest-priority policies must comply for the tenant to pass.
+test_AuditLogRetention_TieBothCompliant if {
+    PolicyA := json.patch(LowerPriorityCompliantRetentionPolicy, [
+        {"op": "replace", "path": "Priority", "value": 1},
+    ])
+    PolicyB := json.patch(LowerPriorityCompliantRetentionPolicy, [
+        {"op": "replace", "path": "Name", "value": "Second compliant policy"},
+        {"op": "replace", "path": "Priority", "value": 1},
+    ])
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [PolicyA, PolicyB]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [PASS, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, true) == true
+}
+
+# A tie where one of the smallest-priority policies is non-compliant must fail:
+# a compliant policy at the same priority cannot mask the non-compliant one.
+test_AuditLogRetention_TieOneNonCompliant if {
+    TieNonCompliant := json.patch(HighPriorityNonCompliantRetentionPolicy, [
+        {"op": "replace", "path": "Priority", "value": 1},
+    ])
+    TieCompliant := json.patch(LowerPriorityCompliantRetentionPolicy, [
+        {"op": "replace", "path": "Priority", "value": 1},
+    ])
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [TieNonCompliant, TieCompliant]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
+
+# Mixed priority data must fail closed: one duration-compliant policy with a
+# numeric Priority alongside an enabled policy whose Priority is missing. The
+# unprioritized policy's precedence is unknown, so it cannot silently vanish
+# from the decision even though the prioritized policy complies.
+test_AuditLogRetention_Incorrect_MixedPriorityDataFailsClosed if {
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [LowerPriorityCompliantRetentionPolicy, EnabledUnprioritizedRetentionPolicy]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
+
+# Fail closed even when the unprioritized policy would itself be
+# duration-compliant: with mixed priority data the precedence cannot be
+# established, so the evaluation must not report a Pass.
+test_AuditLogRetention_Incorrect_MixedPriorityAllCompliantStillFailsClosed if {
+    UnprioritizedCompliant := json.patch(LowerPriorityCompliantRetentionPolicy, [
+        {"op": "remove", "path": "Priority"},
+    ])
+    Output := securitysuite.tests with input.unified_audit_log_retention_policies as [LowerPriorityCompliantRetentionPolicy, UnprioritizedCompliant]
+        with input.service_plans as ServicePlansWithAdvancedAuditing
+
+    ReportDetailString := concat(": ", [FAIL, RetentionLicenseNote])
+    TestResult("MS.SECURITYSUITE.5.2v1", Output, ReportDetailString, false) == true
+}
 #--
