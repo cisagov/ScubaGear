@@ -27,6 +27,8 @@ InModuleScope Orchestrator {
 
             function ConvertTo-ResultsCsv {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
+            function ConvertTo-RiskyAppsCsv {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator ConvertTo-RiskyAppsCsv {}
 
             Mock -CommandName New-Item {}
             Mock -CommandName Copy-Item {}

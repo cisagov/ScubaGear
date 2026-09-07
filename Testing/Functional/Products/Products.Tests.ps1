@@ -108,14 +108,19 @@ BeforeDiscovery {
     # Convert product name to execution name (defender -> securitysuite mapping)
     $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
+    $DefaultTestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.testplan.yaml"
     if ($Variant) {
-        $TestPlanFileName = "TestPlans/$ExecutionProductName.$Variant.testplan.yaml"
+        $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.$Variant.testplan.yaml"
+        if (-not (Test-Path -Path $TestPlanPath -PathType Leaf)) {
+            throw "Variant test plan not found: $TestPlanPath. Verify the Variant parameter '$Variant' is correct."
+        }
     }
     else {
-        $TestPlanFileName = "TestPlans/$ExecutionProductName.testplan.yaml"
+        $TestPlanPath = $DefaultTestPlanPath
     }
-    $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath $TestPlanFileName
-    Test-Path -Path $TestPlanPath -PathType Leaf
+    if (-not (Test-Path -Path $TestPlanPath -PathType Leaf)) {
+        throw "Test plan not found: $TestPlanPath"
+    }
     $YamlString = Get-Content -Path $TestPlanPath | Out-String
     $ProductTestPlan = ConvertFrom-Yaml $YamlString
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
