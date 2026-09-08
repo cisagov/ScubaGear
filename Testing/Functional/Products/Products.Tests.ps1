@@ -99,6 +99,8 @@ param (
 $script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
 
 BeforeDiscovery {
+    $DefaultTestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.testplan.yaml"
+
     if ($Variant) {
         $TestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.$Variant.testplan.yaml"
         if (-not (Test-Path -Path $TestPlanPath -PathType Leaf)) {
@@ -108,9 +110,11 @@ BeforeDiscovery {
     else {
         $TestPlanPath = $DefaultTestPlanPath
     }
+
     if (-not (Test-Path -Path $TestPlanPath -PathType Leaf)) {
         throw "Test plan not found: $TestPlanPath"
     }
+
     $YamlString = Get-Content -Path $TestPlanPath | Out-String
     $ProductTestPlan = ConvertFrom-Yaml $YamlString
     $TestPlan = $ProductTestPlan.TestPlan.ToArray()
