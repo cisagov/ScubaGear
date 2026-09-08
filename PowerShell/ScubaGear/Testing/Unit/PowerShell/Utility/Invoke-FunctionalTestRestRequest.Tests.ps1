@@ -68,6 +68,38 @@ Describe 'Invoke-FunctionalTestRestRequest' {
         $script:InvokeWebRequestCalls[1].Uri | Should -Be 'https://api.contoso.test/operations/tenant-isolation/123'
     }
 
+    It 'sends a partial nested tenant settings update' {
+        $script:TenantSettingsRequest = $null
+        Mock Invoke-FunctionalTestRestRequest {
+            param(
+                [string] $Uri,
+                [string] $Method,
+                [string] $Body,
+                [string] $ContentType
+            )
+            $script:TenantSettingsRequest = [PSCustomObject]@{
+                Uri = $Uri
+                Method = $Method
+                Body = $Body
+                ContentType = $ContentType
+            }
+        }
+
+        Set-TenantSettings -RequestBody @{
+            powerPlatform = @{
+                powerApps = @{
+                    disableShareWithEveryone = $true
+                }
+            }
+        }
+
+        $requestBody = $script:TenantSettingsRequest.Body | ConvertFrom-Json
+        $requestBody.powerPlatform.powerApps.disableShareWithEveryone | Should -BeTrue
+        $script:TenantSettingsRequest.Uri | Should -Be 'https://api.contoso.test/providers/Microsoft.BusinessAppPlatform/scopes/admin/updateTenantSettings?api-version=2023-06-01'
+        $script:TenantSettingsRequest.Method | Should -Be 'POST'
+        $script:TenantSettingsRequest.ContentType | Should -Be 'application/json'
+    }
+
     It 'retries and throws when a Power BI update returns a non-success status code' {
         Mock Invoke-WebRequest {
             $exception = [System.Exception]::new('Forbidden')
