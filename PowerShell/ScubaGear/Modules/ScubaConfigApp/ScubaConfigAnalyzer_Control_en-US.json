@@ -42,6 +42,8 @@
     "TenantGovernanceInfo_TextBlock": "Copy or export an Entra ID tenant governance monitor JSON generated from the collected Conditional Access policies",
     "ExportTenantGovernance_Button": "Export JSON...",
     "CopyTenantGovernance_Button": "Copy all",
+    "TenantGovernanceScubaOnly_CheckBox": "ScubaGear baseline policies only",
+    "TenantGovernanceScubaOnlyNote_TextBlock": "Rescan or import to apply.",
     "SummaryText": "Run or load results to begin.",
     "EmptyDetailText": "Welcome to the ScubaGear Config Analyzer.\n\nThis tool scans your Microsoft 365 tenant (or an existing ScubaGear results file) against the ScubaGear baselines and shows you exactly what to change - and which users, groups, or domains to exclude in your ScubaGear configuration - so each control can pass.\n\nHow to use it:\n1. Select the products to check (only products that support exclusions are listed).\n2. Choose your M365 environment, then click 'Connect & Scan Tenant' to sign in and scan the live tenant - or click 'Load Results JSON...' to analyze an existing ScubaResults file instead.\n3. Review the findings on the left. Use 'Issues only' and 'Configurable only' to focus the list, or the Search box to find a specific control.\n4. Click a finding to see its root cause, the best-matching Conditional Access policy, step-by-step remediation, and the exact exclusions to add to your config.\n5. Open the 'Configuration YAML' tab to copy or export the generated configuration - or click 'Open ScubaConfig App' to load it straight into the editor.\n\nSelect a finding on the left to begin.",
     "TenantText": "Tenant: (none loaded)"
@@ -159,6 +161,22 @@
     "servicePrincipalLookup": {
       "cmdlet": "Get-MgServicePrincipal",
       "resultKind": "byAppId",
+      "select": "displayName",
+      "nameProperties": [
+        "displayName"
+      ]
+    },
+    "roleLookup": {
+      "cmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
+      "resultKind": "byId",
+      "select": "displayName",
+      "nameProperties": [
+        "displayName"
+      ]
+    },
+    "namedLocationLookup": {
+      "cmdlet": "Get-MgBetaIdentityConditionalAccessNamedLocation",
+      "resultKind": "byId",
       "select": "displayName",
       "nameProperties": [
         "displayName"
@@ -373,10 +391,14 @@
     },
 
     "displayNameLookup": {
-      "_comment": "Resolve friendly names for excluded users/groups/apps for generated YAML.",
+      "_comment": "Resolve friendly names for referenced users/groups/roles/apps. Used for generated YAML '# name' comments AND to emit display names (not object ids) in the tenant governance monitor JSON, which compares those references by name.",
       "rules": [
         {
           "policyPath": "conditions.users.excludeUsers",
+          "operation": "userLookup"
+        },
+        {
+          "policyPath": "conditions.users.includeUsers",
           "operation": "userLookup"
         },
         {
@@ -384,8 +406,32 @@
           "operation": "groupLookup"
         },
         {
+          "policyPath": "conditions.users.includeGroups",
+          "operation": "groupLookup"
+        },
+        {
+          "policyPath": "conditions.users.excludeRoles",
+          "operation": "roleLookup"
+        },
+        {
+          "policyPath": "conditions.users.includeRoles",
+          "operation": "roleLookup"
+        },
+        {
           "policyPath": "conditions.applications.excludeApplications",
           "operation": "servicePrincipalLookup"
+        },
+        {
+          "policyPath": "conditions.applications.includeApplications",
+          "operation": "servicePrincipalLookup"
+        },
+        {
+          "policyPath": "conditions.locations.includeLocations",
+          "operation": "namedLocationLookup"
+        },
+        {
+          "policyPath": "conditions.locations.excludeLocations",
+          "operation": "namedLocationLookup"
         }
       ]
     }

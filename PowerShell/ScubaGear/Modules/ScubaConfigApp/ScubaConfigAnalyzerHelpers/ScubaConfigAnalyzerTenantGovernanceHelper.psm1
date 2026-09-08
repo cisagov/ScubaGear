@@ -38,8 +38,13 @@ function ConvertTo-ScATenantGovernancePolicy {
     .SYNOPSIS
     Maps one Conditional Access policy to a tenant governance resource
     (microsoft.entra.conditionalaccesspolicy). Returns $null when the policy has no display name.
+    Object ids (users/groups/roles/apps) are translated to display names via -DisplayNameLookup
+    because the governance monitor compares those references by name, not by id.
     #>
-    param([Parameter(Mandatory)]$Policy)
+    param(
+        [Parameter(Mandatory)]$Policy,
+        [System.Collections.IDictionary]$DisplayNameLookup = @{}
+    )
 
     $displayName = [string](Get-ScATenantGovernanceValue -InputObject $Policy -Path 'DisplayName')
     if ([string]::IsNullOrWhiteSpace($displayName)) { return $null }
@@ -87,7 +92,7 @@ function ConvertTo-ScATenantGovernancePolicy {
         SignInFrequencyInterval                  = 'SessionControls.SignInFrequency.FrequencyInterval'
         PersistentBrowserIsEnabled               = 'SessionControls.PersistentBrowser.IsEnabled'
         PersistentBrowserMode                    = 'SessionControls.PersistentBrowser.Mode'
-        AuthenticationStrength                   = 'GrantControls.AuthenticationStrength.Id'
+        AuthenticationStrength                   = 'GrantControls.AuthenticationStrength.DisplayName'
         AuthenticationContexts                   = 'Conditions.Applications.IncludeAuthenticationContextClassReferences'
     }
 
@@ -104,6 +109,32 @@ function ConvertTo-ScATenantGovernancePolicy {
         if ($null -ne $value -and $arrayProperties -contains $entry.Key) { $value = @($value) }
         Add-ScATenantGovernanceProperty -Properties $properties -Name $entry.Key -Value $value
     }
+
+    # AuthenticationStrength maps to the embedded DisplayName above (the monitor compares by
+    # name); fall back to the id only when the policy exposes no strength display name.
+    if (-not $properties.Contains('AuthenticationStrength')) {
+        $authStrengthId = Get-ScATenantGovernanceValue -InputObject $Policy -Path 'GrantControls.AuthenticationStrength.Id'
+        Add-ScATenantGovernanceProperty -Properties $properties -Name 'AuthenticationStrength' -Value $authStrengthId
+    }
+
+    # The governance monitor represents principals, roles, and apps by DISPLAY NAME, so
+    # translate the collected object ids through the resolved lookup. Unresolved ids and
+    # non-id literals ('All', 'None', 'GuestsOrExternalUsers', ...) are left unchanged.
+    if ($DisplayNameLookup -and $DisplayNameLookup.Count -gt 0) {
+        $nameTranslatedFields = @(
+            'IncludeUsers', 'ExcludeUsers', 'IncludeGroups', 'ExcludeGroups',
+            'IncludeRoles', 'ExcludeRoles', 'IncludeApplications', 'ExcludeApplications',
+            'IncludeLocations', 'ExcludeLocations'
+        )
+        foreach ($field in $nameTranslatedFields) {
+            if (-not $properties.Contains($field)) { continue }
+            $properties[$field] = @(@($properties[$field]) | ForEach-Object {
+                $key = [string]$_
+                if ($DisplayNameLookup.Contains($key)) { $DisplayNameLookup[$key] } else { $_ }
+            })
+        }
+    }
+
     $properties.Ensure = 'Present'
 
     return [ordered]@{
@@ -125,10 +156,21 @@ function ConvertTo-ScATenantGovernanceJson {
         [Parameter(Mandatory)][AllowEmptyCollection()][object[]]$ConditionalAccessPolicies,
         [string]$TenantId,
         [string]$DisplayName = 'ScubaGear Entra ID tenant governance baseline',
-        [string]$SchemaUrl = 'https://www.schemastore.org/utcm-monitor.json'
+        [string]$SchemaUrl = 'https://www.schemastore.org/utcm-monitor.json',
+        [System.Collections.IDictionary]$DisplayNameLookup = @{},
+        [string[]]$IncludePolicyId = @()
     )
 
-    $resources = @($ConditionalAccessPolicies | ForEach-Object { ConvertTo-ScATenantGovernancePolicy -Policy $_ } | Where-Object { $null -ne $_ })
+    # When policy ids are supplied, scope the document to just those (the analyzer passes the
+    # policies it matched to a ScubaGear baseline); otherwise every collected policy is emitted.
+    $policies = @($ConditionalAccessPolicies)
+    if (@($IncludePolicyId).Count -gt 0) {
+        $idSet = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
+        foreach ($id in $IncludePolicyId) { if (-not [string]::IsNullOrWhiteSpace([string]$id)) { [void]$idSet.Add([string]$id) } }
+        $policies = @($policies | Where-Object { $_ -and $idSet.Contains([string]$_.Id) })
+    }
+
+    $resources = @($policies | ForEach-Object { ConvertTo-ScATenantGovernancePolicy -Policy $_ -DisplayNameLookup $DisplayNameLookup } | Where-Object { $null -ne $_ })
     # The tenant governance API expects the baseline object itself (parameters as an array), not a wrapper.
     $document = [ordered]@{
         displayName = $DisplayName
@@ -139,16 +181,46 @@ function ConvertTo-ScATenantGovernanceJson {
     return ($document | ConvertTo-Json -Depth 30)
 }
 
+function Get-ScATenantGovernanceMatchedPolicyId {
+    <#
+    .SYNOPSIS
+    Returns the distinct Conditional Access policy ids the analysis identified as the best
+    match for a ScubaGear baseline (one per finding), so the governance monitor JSON can be
+    scoped to just the ScubaGear-mapped policies.
+    #>
+    param([Parameter(Mandatory)][AllowNull()]$Findings)
+
+    $ids = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($finding in @($Findings)) {
+        # The single policy ScubaGear identified as implementing (or closest to) this baseline -
+        # its best match. Merely-relevant candidates are excluded so the set stays the mapped
+        # policies, not every policy that touches a baseline area.
+        $matchId = if (-not [string]::IsNullOrWhiteSpace([string]$finding.SelectedPolicyId)) { [string]$finding.SelectedPolicyId }
+                   elseif ($finding.BestMatch -and $finding.BestMatch.Id) { [string]$finding.BestMatch.Id }
+                   else { $null }
+        if ($matchId) { [void]$ids.Add($matchId) }
+    }
+    return @($ids)
+}
+
 function Update-ScubaAnalyzerTenantGovernanceJson {
     <#
     .SYNOPSIS
     Refreshes the Tenant Governance JSON text box from the current analysis; no-op unless generation is enabled.
+    The 'ScubaGear baseline policies only' checkbox scopes the output to the analyzer-matched policies.
     #>
     if (-not $syncHash.GenerateTenantGovernanceConfig -or -not $syncHash.TenantGovernanceJson_TextBox -or -not $syncHash.Analysis) { return }
+    $displayNameLookup = if ($syncHash.Analysis.DisplayNameLookup -is [System.Collections.IDictionary]) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
+    $includePolicyId = @()
+    if ($syncHash.TenantGovernanceScubaOnly_CheckBox -and $syncHash.TenantGovernanceScubaOnly_CheckBox.IsChecked) {
+        $includePolicyId = @(Get-ScATenantGovernanceMatchedPolicyId -Findings $syncHash.Analysis.Findings)
+    }
     $syncHash.TenantGovernanceJson_TextBox.Text = ConvertTo-ScATenantGovernanceJson `
         -ConditionalAccessPolicies @($syncHash.Analysis.ConditionalAccessPolicies) `
         -TenantId ([string]$syncHash.Analysis.MetaData.TenantId) `
-        -SchemaUrl ([string]$syncHash.TenantGovernanceSchemaUrl)
+        -SchemaUrl ([string]$syncHash.TenantGovernanceSchemaUrl) `
+        -DisplayNameLookup $displayNameLookup `
+        -IncludePolicyId $includePolicyId
 }
 
 function Copy-ScubaAnalyzerTenantGovernanceJson {
@@ -157,6 +229,9 @@ function Copy-ScubaAnalyzerTenantGovernanceJson {
     Copies the generated Tenant Governance JSON to the clipboard.
     #>
     try {
+        # Rebuild first so Copy always reflects the current 'ScubaGear baseline policies only'
+        # selection, even if the checkbox toggle didn't refresh the preview.
+        Update-ScubaAnalyzerTenantGovernanceJson
         [System.Windows.Clipboard]::SetText($syncHash.TenantGovernanceJson_TextBox.Text)
         Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'TenantGovernanceCopied')
     } catch {
@@ -170,6 +245,9 @@ function Export-ScubaAnalyzerTenantGovernanceJson {
     Prompts for a path and writes the generated Tenant Governance JSON to a UTF-8 (no BOM) file.
     #>
     try {
+        # Rebuild first so the export always reflects the current 'ScubaGear baseline policies
+        # only' selection, even if the checkbox toggle didn't refresh the preview.
+        Update-ScubaAnalyzerTenantGovernanceJson
         if ([string]::IsNullOrWhiteSpace($syncHash.TenantGovernanceJson_TextBox.Text)) {
             Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'NothingToExport')
             return
@@ -189,6 +267,7 @@ function Export-ScubaAnalyzerTenantGovernanceJson {
 Export-ModuleMember -Function @(
     'ConvertTo-ScATenantGovernancePolicy',
     'ConvertTo-ScATenantGovernanceJson',
+    'Get-ScATenantGovernanceMatchedPolicyId',
     'Update-ScubaAnalyzerTenantGovernanceJson',
     'Copy-ScubaAnalyzerTenantGovernanceJson',
     'Export-ScubaAnalyzerTenantGovernanceJson'
