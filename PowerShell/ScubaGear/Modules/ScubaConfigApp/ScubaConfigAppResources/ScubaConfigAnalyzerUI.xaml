@@ -340,6 +340,12 @@
                                        Text="Copy or export an Entra ID tenant governance baseline generated from the collected Conditional Access policies."/>
                             <Button x:Name="ExportTenantGovernance_Button" Content="Export JSON..." Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right"/>
                             <Button x:Name="CopyTenantGovernance_Button" Content="Copy all" Style="{StaticResource SecondaryButton}" DockPanel.Dock="Right"/>
+                            <StackPanel DockPanel.Dock="Right" VerticalAlignment="Center" Margin="0,0,16,0">
+                                <CheckBox x:Name="TenantGovernanceScubaOnly_CheckBox" IsChecked="True"
+                                          Content="ScubaGear baseline policies only"
+                                          ToolTip="Only include Conditional Access policies the analyzer matched to a ScubaGear baseline. Uncheck to export all tenant CA policies."/>
+                                <TextBlock x:Name="TenantGovernanceScubaOnlyNote_TextBlock" Text="Rescan or import to apply." FontSize="10" FontStyle="Italic" Foreground="#8A94A0" Margin="0,1,0,0"/>
+                            </StackPanel>
                         </DockPanel>
                     </Border>
                     <Border Background="#1E272E" Margin="0,8,0,0" CornerRadius="4" Padding="4">

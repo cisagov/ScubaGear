@@ -1083,6 +1083,11 @@ function Initialize-ScubaConfigAnalyzerUI {
         $syncHash.TenantGovernanceTab.Visibility = if ($syncHash.GenerateTenantGovernanceConfig) { 'Visible' } else { 'Collapsed' }
         $syncHash.CopyTenantGovernance_Button.Add_Click({ Copy-ScubaAnalyzerTenantGovernanceJson })
         $syncHash.ExportTenantGovernance_Button.Add_Click({ Export-ScubaAnalyzerTenantGovernanceJson })
+        if ($syncHash.TenantGovernanceScubaOnly_CheckBox) {
+            # Click fires on every user toggle (IsChecked is already updated) - more reliable than
+            # Checked/Unchecked in this runspace. Rebuild the JSON so the filter applies both ways.
+            $syncHash.TenantGovernanceScubaOnly_CheckBox.Add_Click({ Update-ScubaAnalyzerTenantGovernanceJson })
+        }
     }
 
     # Jump to the current control in the ScubaGear baseline policy viewer
