@@ -656,15 +656,26 @@ function Write-ScubaRunDetails {
         # 1. System OS and Build Information
         Write-ScubaLog -Message "Collecting system OS information..." -Level "Debug" -Source "RunDetails"
         try {
-            $osInfo = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
-            if ($osInfo) {
+            # Win32_OperatingSystem (CIM/WMI) is Windows-only; use .NET runtime info elsewhere.
+            if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+                $osInfo = Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue
+                if ($osInfo) {
+                    $osData = @{
+                        OS = $osInfo.Caption
+                        Version = $osInfo.Version
+                        Build = $osInfo.BuildNumber
+                        Architecture = $osInfo.OSArchitecture
+                        InstallDate = $osInfo.InstallDate.ToString()
+                        LastBootUpTime = $osInfo.LastBootUpTime.ToString()
+                    }
+                    Write-ScubaLog -Message "System OS Information captured" -Level "Info" -Source "RunDetails" -Data $osData
+                }
+            }
+            else {
                 $osData = @{
-                    OS = $osInfo.Caption
-                    Version = $osInfo.Version
-                    Build = $osInfo.BuildNumber
-                    Architecture = $osInfo.OSArchitecture
-                    InstallDate = $osInfo.InstallDate.ToString()
-                    LastBootUpTime = $osInfo.LastBootUpTime.ToString()
+                    OS = [System.Runtime.InteropServices.RuntimeInformation]::OSDescription
+                    Version = [System.Environment]::OSVersion.VersionString
+                    Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
                 }
                 Write-ScubaLog -Message "System OS Information captured" -Level "Info" -Source "RunDetails" -Data $osData
             }

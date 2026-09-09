@@ -29,17 +29,32 @@ function Invoke-Rego {
         [string]
         $OPAPath = $PSScriptRoot
     )
-    # For MacOS/Linux give OPA execute permissions: chmod 755 ./opa
-    $OPAFileName = if ("Windows_NT" -eq $Env:OS) {"opa_windows_amd64.exe"} else {"opa"}
-    $Cmd = Join-Path -Path $OPAPath -ChildPath $OPAFileName  -ErrorAction 'Stop'
-
-    # Set backup execution path to be current directory if ScubaTools path fails
-    if (-not (Test-Path -LiteralPath $Cmd -PathType Leaf)) {
-        $Cmd = Join-Path -Path (Get-Location | Select-Object -ExpandProperty Path) -ChildPath $OPAFileName -ErrorAction 'Stop'
+    # Resolve the OPA executable name for the current platform. Names match Install-OPAforSCuBA downloads.
+    if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+        $OPACandidates = @("opa_windows_amd64.exe", "opa.exe", "opa")
+    }
+    elseif ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::OSX)) {
+        $OPACandidates = @("opa_darwin_amd64", "opa_darwin_arm64_static", "opa")
+    }
+    else {
+        $OPACandidates = @("opa_linux_amd64_static", "opa_linux_arm64_static", "opa")
     }
 
-    # See if the OPA executable is in the current executing directory
-    if (-not (Test-Path -LiteralPath $Cmd)) {
+    # Locate the first existing OPA binary, preferring the provided OPAPath then the current directory.
+    $Cmd = $null
+    foreach ($SearchDir in @($OPAPath, (Get-Location | Select-Object -ExpandProperty Path))) {
+        foreach ($Candidate in $OPACandidates) {
+            $Probe = Join-Path -Path $SearchDir -ChildPath $Candidate -ErrorAction 'Stop'
+            if (Test-Path -LiteralPath $Probe -PathType Leaf) {
+                $Cmd = $Probe
+                break
+            }
+        }
+        if ($Cmd) { break }
+    }
+
+    # See if the OPA executable was found
+    if (-not $Cmd) {
         throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and which directory it should be placed."
     }
 
