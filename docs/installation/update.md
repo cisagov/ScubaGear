@@ -211,7 +211,7 @@ Removing old modules and ensuring different versions don't exist minimizes poten
 1. Open PowerShell.
 2. Run the following command to install all ScubaGear dependencies.
    ```powershell
-   PS C:\Users\ScubaGear> Initialize-SCuBA -Scope CurrentUser
+   PS C:\Users\ScubaGear> Install-ScubaDependencies -Scope CurrentUser
    ```
 
 # 3. Support and Resources

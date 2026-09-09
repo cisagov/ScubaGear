@@ -143,15 +143,21 @@ InModuleScope 'Support' {
                     }
                     return $module
                 }
-                # OPA executable does not exist
-                Mock Test-Path {
-                    param($Path)
-                    if ($Path -like '*RequiredVersions.ps1') { return $true }
-                    return $false
+                Mock Get-ScubaOpaDependencyStatus {
+                    return [PSCustomObject]@{
+                        Action                = 'Install'
+                        MinimumVersion        = [version]'1.2.3'
+                        OperatingSystem       = 'Windows'
+                        ExecutableName        = 'opa_windows_amd64.exe'
+                        InstallPath           = 'C:\ScubaGear\Tools'
+                        HashVerificationError = $null
+                        HighestVersionStatus  = 'MISSING'
+                    }
                 }
 
                 $result = Reset-ScubaGearDependencies -Scope CurrentUser -WhatIf
 
+                Should -Invoke -CommandName Get-ScubaOpaDependencyStatus -Times 1
                 $result.OpaToInstall | Should -Not -BeNullOrEmpty
                 $result.OpaToInstall.Name | Should -Be "OPA"
                 $result.OpaUpToDate | Should -BeNullOrEmpty
