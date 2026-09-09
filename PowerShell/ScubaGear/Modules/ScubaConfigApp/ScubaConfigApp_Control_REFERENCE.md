@@ -1,8 +1,40 @@
 # ScubaConfigApp Control JSON Reference
 
-This document describes every top-level key in `ScubaConfigApp_Control_en-US.json`.
+This document describes every top-level key in `ScubaConfigApp_Control.json`.
 The file is loaded into `$syncHash.UIConfigs` at application startup and is the
-single source of truth for all runtime behavior, locale strings, and UI structure.
+single source of truth for runtime behavior and UI structure. English UI content
+and fallback strings are maintained in `ScubaConfigApp_Language_en-US.json`, with
+other locales using the `ScubaConfigApp_Language_<locale>.json` naming pattern.
+
+---
+
+## Localized Control Metadata
+
+Language files may include a `localizedControl` object for labels and descriptions
+associated with dynamic control data. Array items are addressed by stable control
+identifiers rather than duplicated in each language file. For example:
+
+```json
+"localizedControl": {
+  "products": {
+    "Aad": { "displayName": "Microsoft Entra ID (aad)" }
+  },
+  "inputTypes": {
+    "CapExclusions": {
+      "description": "Exclude specific identities...",
+      "fields": {
+        "Groups": { "description": "Group IDs to exclude..." }
+      }
+    }
+  }
+}
+```
+
+The keys `Aad`, `CapExclusions`, and `Groups` correspond to the control file's
+product `id`, input-type property, and field `value`. Language files must not
+override contract properties such as `id`, `value`, `type`, `required`,
+`controlType`, `yamlValue`, validation rules, paths, commands, or feature flags.
+Missing translations fall back to `ScubaConfigApp_Language_en-US.json`.
 
 ---
 
@@ -114,209 +146,6 @@ Used when processing `VersionBump` entries to reconstruct the new ID with the up
 Maximum number of bullet lines shown in the MIGRATED section of the migration report popup.
 If more entries exist they are collapsed to a `... and N more` line. The DROPPED and NEEDS REVIEW
 sections are not capped and always show all entries.
-
-### localeReportWindow
-
-The full text content for the migration report popup shown after a YAML import that contained
-legacy policy IDs.
-
-```json
-"localeReportWindow": {
-  "title":  "Legacy Policy Migration Applied",
-  "intro":  "This configuration file contained {0} legacy policy setting(s).",
-  "outro":  "Please review the updated settings before saving.",
-  "sections": { ... }
-}
-```
-
-| Field | Purpose |
-|-------|---------|
-| `title` | Popup window title bar text |
-| `intro` | First line of the popup body. `{0}` is replaced with the total count of migrated entries. |
-| `outro` | Last line of the popup body, shown after all sections. |
-| `sections` | One entry per log category. Each section drives both the log prefix written during migration and the popup section display. |
-
-#### sections
-
-Each section entry has a `prefix` (the token prepended to every `MigrationLog` entry of that type)
-and, for displayed sections, a `heading` and optional `body`.
-
-| Section | prefix | Shown in popup | Notes |
-|---------|--------|----------------|-------|
-| `migrated` | `MIGRATED` | Yes | Auto-migrated settings. Subject to `reportMaxLinesPerSection` cap. |
-| `decoupled` | `DECOUPLED` | Yes | Policies split into multiple targets. Always shown in full with the `body` guidance text. |
-| `dropped` | `DROPPED` | Yes | Removed policies with no replacement. Always shown in full. |
-| `skipped` | `SKIPPED` | No | Entries where the migration target was already configured. Written to the log only; never appears in the popup. |
-
-The `prefix` values are the single source of truth for log token strings. The writer
-(`Invoke-PolicyMigration`) and the reader (popup builder in `Invoke-YamlImportWithProgress`)
-both reference `sections.*.prefix` so the tokens only need to be defined here.
-
----
-
-## localeContext
-
-UI label strings for static TextBlocks throughout the application.
-
-```json
-"localeContext": {
-  "Title_TextBlock": "SCuBAGear Configuration Editor",
-  ...
-}
-```
-
-Each key matches a named WPF TextBlock control. The values are bound at load time. Changing a
-value here updates the displayed label without touching XAML or code.
-
----
-
-## localePlaceholder
-
-Placeholder (watermark) text for TextBox and ComboBox controls.
-
-```json
-"localePlaceholder": {
-  "Organization_TextBox": "Enter tenant name (e.g., example.onmicrosoft.com)",
-  ...
-}
-```
-
-Each key matches a named WPF input control. The values appear as grayed hint text when the
-control is empty.
-
----
-
-## localeTitles
-
-Short title strings used as popup dialog titles and confirmation dialog headers.
-
-```json
-"localeTitles": {
-  "DuplicateEntry": "Duplicate Entry",
-  "Error": "Error",
-  ...
-}
-```
-
-Referenced from code by key so the same title string is used consistently across all
-dialogs of the same type.
-
----
-
-## localeInfoMessages
-
-Informational message templates written to the debug log during normal operations.
-
-```json
-"localeInfoMessages": {
-  "PolicySaving": "Saving {0} for policy: {1}",
-  ...
-}
-```
-
-`{0}`, `{1}` etc. are replaced at runtime with context-specific values using the PowerShell
-`-f` format operator. These messages are not shown to the user -- they appear only in the
-debug panel.
-
----
-
-## localeErrorMessages
-
-Error message templates surfaced to the user or written to the debug log on failure conditions.
-
-```json
-"localeErrorMessages": {
-  "OrganizationValidation": "Organization Name is required...",
-  ...
-}
-```
-
-Used by validation logic and error handlers. Format tokens are substituted at the call site.
-
----
-
-## localePopupMessages
-
-Full message strings for confirmation dialogs, success notifications, and warning popups shown
-directly to the user via `ShowMessageBox`.
-
-```json
-"localePopupMessages": {
-  "NewSessionConfirmation": "Are you sure you want to reset the session?...",
-  ...
-}
-```
-
----
-
-## localeStatusMessages
-
-Short status bar and status label strings that reflect the current application state.
-
-```json
-"localeStatusMessages": {
-  "GraphConnected": "Graph Connected",
-  "GraphDisconnected": "Graph Disconnected",
-  ...
-}
-```
-
----
-
-## localeYamlComments
-
-Comment strings written into generated YAML output files as header annotations.
-
-```json
-"localeYamlComments": {
-  "ConfigurationFile": "# ScubaGear Configuration File",
-  "GeneratedOn": "# Generated on: {0}",
-  ...
-}
-```
-
----
-
-## localeProgressMessages
-
-Longer multi-line message strings shown in progress or completion dialogs.
-
-```json
-"localeProgressMessages": {
-  "SessionRestoreSuccess": "Previous session restored successfully!...",
-  ...
-}
-```
-
-Distinct from `localePopupMessages` in that these may span multiple lines and are typically
-shown after an operation finishes rather than before it starts.
-
----
-
-## localeHelpTips
-
-Structured tooltip definitions for help labels throughout the UI. Each entry defines what appears
-when the user hovers or clicks a help icon next to a field.
-
-```json
-"localeHelpTips": {
-  "Organization_HelpLabel": {
-    "Title": "Organization Domain",
-    "Content": "...",
-    "AdditionalSections": { "Example": "...", "Required": "...", "Note": "..." },
-    "Placement": "Right"
-  }
-}
-```
-
-| Field | Purpose |
-|-------|---------|
-| `Title` | Bold heading in the tooltip popup |
-| `Content` | Main description text |
-| `AdditionalSections` | Key-value pairs rendered as labeled sub-sections below the main content |
-| `Placement` | Which side of the control the tooltip appears on (`Right`, `Left`, `Top`, `Bottom`) |
-
----
 
 ## defaultAdvancedSettings
 
