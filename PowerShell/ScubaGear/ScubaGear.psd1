@@ -15,7 +15,7 @@ RootModule = './ScubaGear.psm1'
 ModuleVersion = '1.8.0'
 
 # Supported PSEditions
-CompatiblePSEditions = 'Desktop'
+CompatiblePSEditions = 'Core', 'Desktop'
 
 # ID used to uniquely identify this module
 GUID = '83a07295-7ec3-44cd-95d7-d49cdfa05199'

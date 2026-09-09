@@ -75,8 +75,9 @@ class ScubaConfig {
             # Expand tilde (~) to user's home directory if present
             if ($Path -eq "~/.scubagear/Tools") {
                 try {
-                    # Convert Unix-style path to Windows path in user's profile
-                    $ExpandedPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                    # Resolve the user's home directory across Windows, Linux, and macOS.
+                    $HomeDirectory = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::UserProfile)
+                    $ExpandedPath = Join-Path -Path (Join-Path -Path $HomeDirectory -ChildPath ".scubagear") -ChildPath "Tools"
                     # Check if expanded path exists, fallback to current directory if not
                     if (Test-Path -LiteralPath $ExpandedPath) {
                         return $ExpandedPath
@@ -155,6 +156,19 @@ class ScubaConfig {
         }
 
         return $OPAExecutables.$matchedKey
+    }
+
+    # Returns whether the current user has elevated (administrator/root) privileges across Windows, Linux, and macOS.
+    static [bool] IsAdministrator() {
+        if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+            return ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")
+        }
+        try {
+            return ((& id -u) -eq '0')
+        }
+        catch {
+            return $false
+        }
     }
 
     # Loads configuration file with full validation enabled (delegates to main LoadConfig with SkipValidation=false).
@@ -685,9 +699,9 @@ class ScubaConfig {
         # Convert tilde (~) to actual Windows user profile path for cross-platform compatibility
         if ($this.Configuration.OPAPath -eq "~/.scubagear/Tools") {
             try {
-                # Build the full path using Windows conventions
-                # This allows Unix-style path notation to work on Windows systems
-                $ExpandedPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+                # Resolve the user's home directory across Windows, Linux, and macOS.
+                $HomeDirectory = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::UserProfile)
+                $ExpandedPath = Join-Path -Path (Join-Path -Path $HomeDirectory -ChildPath ".scubagear") -ChildPath "Tools"
                 # Check if expanded path exists, fallback to current directory if not (legacy behavior)
                 if (Test-Path -LiteralPath $ExpandedPath) {
                     $this.Configuration.OPAPath = $ExpandedPath
