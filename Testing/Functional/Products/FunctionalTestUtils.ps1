@@ -1857,8 +1857,9 @@ function Set-SPOTenant {
             "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" }
             SharingCapability = $SharingCapabilityMap[$SharingCapability]
         }
-        Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-            -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+
+        Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+            -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5)
 
         # Second call: remaining fields (skip SharingCapability)
         $RestBody = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
@@ -1875,9 +1876,10 @@ function Set-SPOTenant {
             }
             $RestBody[$Param] = $Mapped
         }
+
         if ($RestBody.Count -gt 1) {
-            Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-                -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+            Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+                -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5)
         }
         return
     }
@@ -1898,8 +1900,9 @@ function Set-SPOTenant {
         }
         $Body[$Param] = $Mapped
     }
-    Invoke-RestMethod -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-        -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5) -ErrorAction Stop | Out-Null
+
+    Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
+        -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5)
 }
 
 # Helper functions for functional test
