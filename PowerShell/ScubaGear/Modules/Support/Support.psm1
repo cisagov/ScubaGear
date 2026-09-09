@@ -1,5 +1,29 @@
 using module '..\ScubaConfig\ScubaConfig.psm1'
 
+function Test-ScubaIsWindows {
+    <#
+    .SYNOPSIS
+        Returns whether the current platform is Windows.
+    .DESCRIPTION
+        Works on Windows PowerShell 5.1 and PowerShell 7+ on Windows, Linux, and macOS.
+    .FUNCTIONALITY
+        Internal
+    #>
+    return [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)
+}
+
+function Get-ScubaHomeDirectory {
+    <#
+    .SYNOPSIS
+        Returns the current user's home directory across platforms.
+    .FUNCTIONALITY
+        Internal
+    #>
+    if ($env:USERPROFILE) { return $env:USERPROFILE }
+    if ($HOME) { return $HOME }
+    return (Get-Location).ProviderPath
+}
+
 function Copy-SCuBABaselineDocument {
     <#
     .SYNOPSIS
@@ -20,7 +44,7 @@ function Copy-SCuBABaselineDocument {
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -Path $_ -IsValid})]
         [string]
-        $Destination = (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear"),
+        $Destination = (Join-Path -Path (Get-ScubaHomeDirectory) -ChildPath "ScubaGear"),
         [Parameter(Mandatory = $false)]
         [switch]
         $Force
@@ -884,7 +908,7 @@ function Install-ScubaDependencies {
         [Parameter(Mandatory=$false)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
-        $ScubaParentDirectory = $env:USERPROFILE,
+        $ScubaParentDirectory = (Get-ScubaHomeDirectory),
         [Parameter(Mandatory=$false)]
         [ValidateSet('CurrentUser','AllUsers')]
         [string]
@@ -1111,7 +1135,7 @@ function Install-OPAforSCuBA {
         [Parameter(Mandatory=$false)]
         [ValidateScript({Test-Path -Path $_ -PathType Container})]
         [string]
-        $ScubaParentDirectory = $env:USERPROFILE
+        $ScubaParentDirectory = (Get-ScubaHomeDirectory)
     )
 
     # Constants
@@ -1194,8 +1218,16 @@ function Get-OPAFile {
     $OutFile = ( Join-Path $ScubaTools $OPAExe ) #(Join-Path (Get-Location).Path $OPAExe)
 
     try {
-        $Display = "Downloading OPA executable"
-        Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display -MaxDownloadTime 300
+        # Start-BitsTransfer is Windows-only; fall back to Invoke-WebRequest on Linux/macOS.
+        if (Test-ScubaIsWindows) {
+            $Display = "Downloading OPA executable"
+            Start-BitsTransfer -Source $InstallUrl -Destination $OutFile -DisplayName $Display -MaxDownloadTime 300
+        }
+        else {
+            Invoke-WebRequest -Uri $InstallUrl -OutFile $OutFile -UseBasicParsing
+            # Mark the downloaded OPA binary as executable so it can run on Linux/macOS.
+            & chmod +x $OutFile
+        }
         Write-Information -MessageData "Installed the specified OPA version (${ExpectedVersion}) to ${OutFile}" | Out-Host
     }
     catch {
@@ -1315,7 +1347,7 @@ function Copy-SCuBASampleReport {
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -Path $_ -IsValid})]
         [string]
-        $DestinationDirectory = (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/reports"),
+        $DestinationDirectory = (Join-Path -Path (Get-ScubaHomeDirectory) -ChildPath "ScubaGear/samples/reports"),
         [Parameter(Mandatory = $false)]
         [switch]
         $Force
@@ -1345,7 +1377,7 @@ function Copy-SCuBASampleConfigFile {
         [Parameter(Mandatory = $false)]
         [ValidateScript({Test-Path -Path $_ -IsValid})]
         [string]
-        $DestinationDirectory = (Join-Path -Path $env:USERPROFILE -ChildPath "ScubaGear/samples/config-files"),
+        $DestinationDirectory = (Join-Path -Path (Get-ScubaHomeDirectory) -ChildPath "ScubaGear/samples/config-files"),
         [Parameter(Mandatory = $false)]
         [switch]
         $Force
@@ -1776,9 +1808,9 @@ function Test-ScubaGearVersion {
             $newestModule = $modules | Sort-Object Version -Descending | Select-Object -First 1
             $scubaGearStatus.CurrentVersion = [version]$newestModule.Version
 
-            # Check if admin rights needed
-            $programFilesModules = $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
-            $scubaGearStatus.AdminRequired = $programFilesModules -and -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+            # Check if admin rights needed (Program Files only exists on Windows)
+            $programFilesModules = if ($env:ProgramFiles) { $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" } } else { @() }
+            $scubaGearStatus.AdminRequired = [bool]$programFilesModules -and -not ([ScubaConfig]::IsAdministrator())
 
             if ($scubaGearStatus.CurrentVersion -lt $scubaGearStatus.LatestVersion) {
                 $scubaGearStatus.Status = "Update Available"
@@ -1971,7 +2003,7 @@ function Get-DependencyStatus {
         Recommendations = @()
     }
 
-    $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+    $isAdmin = [ScubaConfig]::IsAdministrator()
 
     foreach ($moduleStatus in $statuses) {
         $moduleName = $moduleStatus.ModuleName
@@ -2286,7 +2318,7 @@ function Reset-ScubaGearDependencies {
         WhatIfMode = $WhatIfPreference
         Scope = $Scope
         AdminRequired = $false
-        AdminAvailable = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+        AdminAvailable = [ScubaConfig]::IsAdministrator()
 
         # Module status by action needed
         ModulesUpToDate = @()
@@ -2678,9 +2710,9 @@ function Update-ScubaGearFromPSGallery {
         return
     }
 
-    # Check admin requirements
-    $programFilesModules = $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
-    $adminNeeded = $programFilesModules -and -not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+    # Check admin requirements (Program Files only exists on Windows)
+    $programFilesModules = if ($env:ProgramFiles) { $modules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" } } else { @() }
+    $adminNeeded = [bool]$programFilesModules -and -not ([ScubaConfig]::IsAdministrator())
 
     if ($adminNeeded) {
         throw "Administrator privileges required to update modules in Program Files. Please run as Administrator."
@@ -2754,7 +2786,7 @@ function Update-ScubaGearFromGitHub {
         $latestRelease = (Invoke-RestMethod -Uri "https://api.github.com/repos/cisagov/ScubaGear/releases/latest").tag_name.replace("v","")
 
         # Check admin requirements for AllUsers scope
-        $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+        $isAdmin = [ScubaConfig]::IsAdministrator()
         if ($Scope -eq 'AllUsers' -and -not $isAdmin) {
             throw "Administrator privileges required for AllUsers scope installation."
         }
@@ -2764,7 +2796,7 @@ function Update-ScubaGearFromGitHub {
 
         # Check if existing Program Files modules require admin rights
         if ($installedModules) {
-            $programFilesModules = $installedModules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" }
+            $programFilesModules = if ($env:ProgramFiles) { $installedModules | Where-Object { $_.ModuleBase -like "$env:ProgramFiles*" } } else { @() }
             if ($programFilesModules -and -not $isAdmin) {
                 throw "Administrator privileges required to remove modules from Program Files."
             }
