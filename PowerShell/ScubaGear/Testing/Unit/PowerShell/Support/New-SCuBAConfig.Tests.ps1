@@ -169,8 +169,4 @@ InModuleScope Support {
             }
         }
     }
-
-    AfterAll {
-        Remove-Module Support -ErrorAction SilentlyContinue
-    }
 }
