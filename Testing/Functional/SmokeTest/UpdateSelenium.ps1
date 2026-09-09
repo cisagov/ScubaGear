@@ -79,7 +79,7 @@ function DownLoadDriver{
     Write-Debug -Message "Downloading $DownloadUrl"
 
     try {
-        Invoke-WebRequest $DownloadUrl -OutFile "$DriverTempPath\chromeNewDriver.zip" -ErrorAction 'Stop' 2>&1 | Out-Null
+        (New-Object System.Net.WebClient).DownloadFile($DownloadUrl, "$DriverTempPath\chromeNewDriver.zip")
 
         Expand-Archive "$DriverTempPath\chromeNewDriver.zip" -DestinationPath $DriverTempPath -Force
 

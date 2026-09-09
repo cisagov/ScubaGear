@@ -4,8 +4,6 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba' {
         BeforeAll {
-            Mock -ModuleName Orchestrator Remove-Resources {}
-            Mock -ModuleName Orchestrator Import-Resources {}
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
             function Get-TenantDetail {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }

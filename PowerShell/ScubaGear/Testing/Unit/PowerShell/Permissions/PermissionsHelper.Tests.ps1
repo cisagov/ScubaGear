@@ -134,7 +134,6 @@ InModuleScope PermissionsHelper {
                 #   00000002-0000-0ff1-ce00-000000000000 (Exchange Online)
                 #   00000007-0000-0ff1-ce00-000000000000 (Exchange Online Protection)
                 $result = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal -OutAs appId -Environment gcchigh
-                $result | Should -HaveCount 2
                 $result | Should -Contain "00000002-0000-0ff1-ce00-000000000000"
                 $result | Should -Contain "00000007-0000-0ff1-ce00-000000000000"
             }

@@ -1,52 +1,21 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility/ScubaLogging.psm1")
 
-function ConvertTo-ScubaProductNames {
-    <#
-    .SYNOPSIS
-    Normalizes a list of ScubaGear product names.
-    .DESCRIPTION
-    Centralizes ScubaGear product-name normalization so the value is handled identically
-    regardless of whether it originates from the -ProductNames parameter or an imported
-    configuration file. It:
-      1. Expands the '*' wildcard to the full list of supported products.
-      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
-         (adding 'securitysuite' only if not already present).
-      3. Returns a sorted, de-duplicated array.
-    .PARAMETER ProductNames
-    The array of product names to normalize.
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [AllowEmptyCollection()]
-        [string[]]
-        $ProductNames
-    )
+# Core helper modules (ScubaConfig is loaded above via 'using module')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility\ScubaLogging.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Connection")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "RunRego")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "CreateReport")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Support")
 
-    if ($null -eq $ProductNames) {
-        return @()
-    }
-
-    # Expand the wildcard to all supported products
-    if ($ProductNames -contains '*') {
-        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
-        Write-Debug "Setting ProductNames to all products because of wildcard"
-    }
-
-    # 'defender' is a deprecated alias for 'securitysuite'
-    if ($ProductNames -contains 'defender') {
-        if (-not ($ProductNames -contains 'securitysuite')) {
-            $ProductNames = @($ProductNames) + "securitysuite"
-        }
-        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
-        Write-Debug "Substituting defender with securitysuite in ProductNames"
-    }
-
-    return @($ProductNames | Sort-Object -Unique)
-}
+# Providers
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportAADProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportEXOProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerBIProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerPlatformProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSecuritySuiteProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSharePointProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportTeamsProvider.psm1")
 
 function Invoke-SCuBA {
     <#
@@ -397,9 +366,6 @@ function Invoke-SCuBA {
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
         }
 
-        Remove-Resources # Unload helper modules if they are still in the PowerShell session
-        Import-Resources # Imports Providers, RunRego, etc.
-
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             [ScubaConfig]::ResetInstance()
@@ -575,15 +541,17 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $false
         }
 
+        # If user supplied the $M365Environment parameter, let them know that it is no longer necessary
+        if ($PSBoundParameters.ContainsKey('M365Environment')) {
+            Write-Information "`nStarting in ScubaGear v2.0.0 the -M365Environment parameter is no longer necessary.`n" -InformationAction Continue
+        }
+
         # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
         # This overrides any user provided command line value for M365Environment and the default value of "commercial"
         if ($ScubaConfig.CertificateThumbprint -or $ScubaConfig.AppID) {
             # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
             $null = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
             $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
-        }
-        else {
-            Write-Information "`nIf you are running v2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the -M365Environment parameter. In a future release ScubaGear will auto-detect the M365 environment and this won't be necessary.`n" -InformationAction Continue
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
@@ -594,6 +562,11 @@ function Invoke-SCuBA {
         }
 
         $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig
+        # If Connect-Tenant automatically detected the M365Environment during interactive auth, change the ScubaConfig value to the detected value.
+        if ($ConnectionResult.DetectedM365Environment) {
+            $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
+        }
+
         $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
         if ($ProdAuthFailed.Count -gt 0) {
             Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
@@ -634,7 +607,7 @@ function Invoke-SCuBA {
             M365Environment = $ScubaConfig.M365Environment
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment -ConnectionResult $ConnectionResult
+        $TenantDetails = Get-TenantDetail -M365Environment $ScubaConfig.M365Environment
         Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
 
         # Generate a GUID to uniquely identify the output JSON
@@ -961,12 +934,17 @@ function Invoke-ProviderList {
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
                         "teams" {
+                            $TeamsProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken' = $ConnectionResult.TeamsAccessToken
+                                'BaseUrl' = $ConnectionResult.TeamsBaseUrl
+                                'UnifiedAccessToken' = $ConnectionResult.TeamsUnifiedAccessToken
+                                'UnifiedBaseUrl' = $ConnectionResult.TeamsUnifiedBaseUrl
+                            }
                             if ($ServicePrincipalAuth) {
-                                $RetVal = Export-TeamsProvider -CertificateBasedAuth | Select-Object -Last 1
+                                $TeamsProviderParams['CertificateBasedAuth'] = $true
                             }
-                            else {
-                                $RetVal = Export-TeamsProvider | Select-Object -Last 1
-                            }
+                            $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"
@@ -2248,57 +2226,6 @@ function Invoke-ReportCreation {
     }
 }
 
-function Get-EXOTenantDetailFromConnection {
-    <#
-    .Description
-    Gets tenant details through EXO Admin API using existing Defender/EXO connection context.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [hashtable]
-        $ConnectionResult
-    )
-
-    $EXORestHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers/ProviderHelpers/EXORestHelper.psm1"
-    Import-Module -Name $EXORestHelperPath -Function Invoke-EXORestMethod -ErrorAction Stop
-
-    if ([string]::IsNullOrWhiteSpace($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrWhiteSpace($ConnectionResult.EXOApiEndpoint)) {
-        throw "Missing EXO token or endpoint in ConnectionResult."
-    }
-
-    $OrgConfigResponse = Invoke-EXORestMethod `
-        -CmdletName "Get-OrganizationConfig" `
-        -ApiEndpoint $ConnectionResult.EXOApiEndpoint `
-        -AccessToken $ConnectionResult.EXOAccessToken
-
-    $OrgConfig = if ($OrgConfigResponse -is [System.Array]) { $OrgConfigResponse | Select-Object -First 1 } else { $OrgConfigResponse }
-    if (-not $OrgConfig) {
-        throw "Get-OrganizationConfig returned no data."
-    }
-
-    $TenantId = "Error retrieving Tenant ID"
-    $TenantIdMatch = [regex]::Match($ConnectionResult.EXOApiEndpoint, '/adminapi/(?:beta|v1\.0)/([^/]+)/InvokeCommand')
-    if ($TenantIdMatch.Success) {
-        $TenantId = $TenantIdMatch.Groups[1].Value
-    }
-
-    $DomainName = if ($OrgConfig.Name) { [string]$OrgConfig.Name } else { "Error retrieving Domain name" }
-    $DisplayName = if ($OrgConfig.DisplayName) { [string]$OrgConfig.DisplayName } else { $DomainName }
-
-    $TenantInfo = @{
-        "DisplayName" = $DisplayName;
-        "DomainName" = $DomainName;
-        "TenantId" = $TenantId;
-        "EXOAdditionalData" = "Retrieved via EXO REST Admin API";
-    }
-
-    ConvertTo-Json @($TenantInfo) -Depth 4
-}
-
 function Get-TenantDetail {
     <#
     .Description
@@ -2309,60 +2236,14 @@ function Get-TenantDetail {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string[]]
-        $ProductNames,
-
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [hashtable]
-        $ConnectionResult
+        $M365Environment
     )
 
-    # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerbi")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("teams")) {
-        Get-TeamsTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerplatform")) {
-        Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("exo")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    elseif ($ProductNames.Contains("securitysuite")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    else {
-        $TenantInfo = @{
-            "DisplayName" = "Orchestrator Error retrieving Display name";
-            "DomainName" = "Orchestrator Error retrieving Domain name";
-            "TenantId" = "Orchestrator Error retrieving Tenant ID";
-            "AdditionalData" = "Orchestrator Error retrieving additional data";
-        }
-        $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 3
-        $TenantInfo
-    }
+    Get-AADTenantDetail -M365Environment $M365Environment
 }
 
 function Invoke-Connection {
@@ -2447,77 +2328,6 @@ function Compare-ProductList {
     else {
         $Difference
     }
-}
-
-function Import-Resources {
-    <#
-    .Description
-    This function imports all of the various helper Provider,
-    Rego, and Reporter modules to the runtime
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param()
-    try {
-        $ProvidersPath = Join-Path -Path $PSScriptRoot `
-        -ChildPath "Providers" `
-        -Resolve `
-        -ErrorAction 'Stop'
-        $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
-        if (!$ProviderResources)
-        {
-            throw "Provider files were not found, aborting this run"
-        }
-
-        foreach ($Provider in $ProviderResources.Name) {
-            $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers" -ErrorAction 'Stop'
-            $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider -ErrorAction 'Stop'
-            Import-Module $ModulePath
-        }
-
-        @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support', 'Utility') | ForEach-Object {
-            $ModulePath = Join-Path -Path $PSScriptRoot -ChildPath $_ -ErrorAction 'Stop'
-            Write-Debug "Importing $_ module $ModulePath"
-            Import-Module -Name $ModulePath
-        }
-
-        # Import ScubaLogging explicitly (not part of Utility folder import)
-        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
-        Import-Module -Name $ScubaLoggingPath -Force
-    }
-    catch {
-        Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
-            Error = $_.Exception.Message
-            StackTrace = $_.ScriptStackTrace
-        }
-        $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
-            Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            `n$($_.ScriptStackTrace)"
-            throw $ImportResourcesErrorMessage
-    }
-}
-
-function Remove-Resources {
-    <#
-    .Description
-    This function cleans up all of the various imported modules
-    Mostly meant for dev work
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportSecuritySuiteProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
-    foreach ($Provider in $Providers) {
-        Remove-Module $Provider -ErrorAction "SilentlyContinue"
-    }
-
-    Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
-    Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
-    Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
-    Remove-Module "Connection" -ErrorAction "SilentlyContinue"
-    Remove-Module "ScubaLogging" -ErrorAction "SilentlyContinue"
 }
 
 function Invoke-SCuBACached {
@@ -2799,9 +2609,6 @@ function Invoke-SCuBACached {
             $OutFolderPath = $OutPath
             $ProductNames = $ProductNames | Sort-Object -Unique
 
-            Remove-Resources
-            Import-Resources # Imports Providers, RunRego, etc.
-
             # Initialize logging for troubleshooting - debug logs are ALWAYS created
             # Logs are placed in a DebugLogs subfolder within the output folder
             # Transcript logging is optional and enabled only when -Transcript is specified
@@ -2955,7 +2762,7 @@ function Invoke-SCuBACached {
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
-                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment -ConnectionResult $ConnectionResult
+                $TenantDetails = Get-TenantDetail -M365Environment $TempScubaConfig.M365Environment
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
@@ -3287,6 +3094,53 @@ After correcting the JSON file, rerun ScubaGear but use Invoke-ScubaCached since
 "@
         }
     }
+}
+
+function ConvertTo-ScubaProductNames {
+    <#
+    .SYNOPSIS
+    Normalizes a list of ScubaGear product names.
+    .DESCRIPTION
+    Centralizes ScubaGear product-name normalization so the value is handled identically
+    regardless of whether it originates from the -ProductNames parameter or an imported
+    configuration file. It:
+      1. Expands the '*' wildcard to the full list of supported products.
+      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
+         (adding 'securitysuite' only if not already present).
+      3. Returns a sorted, de-duplicated array.
+    .PARAMETER ProductNames
+    The array of product names to normalize.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [string[]]
+        $ProductNames
+    )
+
+    if ($null -eq $ProductNames) {
+        return @()
+    }
+
+    # Expand the wildcard to all supported products
+    if ($ProductNames -contains '*') {
+        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+        Write-Debug "Setting ProductNames to all products because of wildcard"
+    }
+
+    # 'defender' is a deprecated alias for 'securitysuite'
+    if ($ProductNames -contains 'defender') {
+        if (-not ($ProductNames -contains 'securitysuite')) {
+            $ProductNames = @($ProductNames) + "securitysuite"
+        }
+        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
+        Write-Debug "Substituting defender with securitysuite in ProductNames"
+    }
+
+    return @($ProductNames | Sort-Object -Unique)
 }
 
 Export-ModuleMember -Function @(

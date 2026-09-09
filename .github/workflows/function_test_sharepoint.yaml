@@ -96,7 +96,7 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Shr_Tenant1_PNP
+          Alias: Shr_Tenant1
           TestParams: ${{ secrets.TestParams }}
   Shr_Tenant2_PNP:
     name: Shr_Tenant2_PNP
@@ -148,7 +148,7 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Shr_Tenant2_PNP
+          Alias: Shr_Tenant2
           TestParams: ${{ secrets.TestParams }}
   Shr_Tenant6_PNP:
     name: Shr_Tenant6_PNP
@@ -200,7 +200,7 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Shr_Tenant6_PNP
+          Alias: Shr_Tenant6
           TestParams: ${{ secrets.TestParams }}
   Shr_Tenant7_PNP:
     name: Shr_Tenant7_PNP
@@ -252,7 +252,7 @@ jobs:
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
-          Alias: Shr_Tenant7_PNP
+          Alias: Shr_Tenant7
           TestParams: ${{ secrets.TestParams }}
   email:
     name: Email
