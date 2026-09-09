@@ -1025,7 +1025,7 @@ function Invoke-RunRego {
             $ProdRegoFailed = @()
             $RegoOutput = @()
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             foreach ($Product in $ScubaConfig.ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $N += 1
@@ -1566,7 +1566,7 @@ function Invoke-ReportCreation {
     process {
         try {
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             $Fragment = @()
             $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
             New-Item -Path $IndividualReportPath -ItemType "Directory" -ErrorAction "SilentlyContinue" | Out-Null
