@@ -97,7 +97,7 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer tenant governance configurat
             Should -Be '00000000-0000-0000-0000-000000000004'
     }
 
-    It 'translates group, role, user, app, and named-location object ids to display names via the lookup' {
+    It 'emits users by UPN and groups/roles/apps/locations by display name' {
         $policy = [pscustomobject]@{
             DisplayName = 'CA-Refs'
             Id          = '33333333-3333-3333-3333-333333333333'
@@ -120,24 +120,43 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer tenant governance configurat
                 }
             }
         }
-        $lookup = @{
+        $names = @{
             '44444444-4444-4444-4444-444444444444' = 'My App'
-            '55555555-5555-5555-5555-555555555555' = 'breakglass@contoso.com'
+            '55555555-5555-5555-5555-555555555555' = 'Break Glass Account'   # display name - must NOT win for users
             '66666666-6666-6666-6666-666666666666' = 'All Employees'
             '77777777-7777-7777-7777-777777777777' = 'Exclude Group'
             '88888888-8888-8888-8888-888888888888' = 'Global Administrator'
             'a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1' = 'Corporate Network'
         }
-        $doc = ConvertTo-ScATenantGovernanceJson -ConditionalAccessPolicies @($policy) -TenantId 't' -DisplayNameLookup $lookup | ConvertFrom-Json
+        $upns = @{ '55555555-5555-5555-5555-555555555555' = 'breakglass@contoso.com' }
+        $doc = ConvertTo-ScATenantGovernanceJson -ConditionalAccessPolicies @($policy) -TenantId 't' -DisplayNameLookup $names -UserPrincipalNameLookup $upns | ConvertFrom-Json
         $res = $doc.resources | Where-Object { $_.properties.DisplayName -eq 'CA-Refs' }
+        $res.properties.ExcludeUsers        | Should -Be 'breakglass@contoso.com'   # UPN, not display name
         $res.properties.ExcludeApplications | Should -Be 'My App'
-        $res.properties.ExcludeUsers        | Should -Be 'breakglass@contoso.com'
         $res.properties.IncludeGroups       | Should -Be 'All Employees'
         $res.properties.ExcludeGroups       | Should -Be 'Exclude Group'
         $res.properties.IncludeRoles        | Should -Be 'Global Administrator'
         $res.properties.IncludeLocations    | Should -Be 'Corporate Network'
         $res.properties.ExcludeLocations    | Should -Be 'AllTrusted'   # non-id literals are preserved
         $res.properties.IncludeUsers        | Should -Be 'All'          # non-id literals are preserved
+    }
+
+    It 'falls back to display name for a user with no UPN entry, and keeps the id when unresolved' {
+        $policy = [pscustomobject]@{
+            DisplayName = 'CA-UserFallback'
+            Id          = 'b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2'
+            State       = 'enabled'
+            Conditions  = [pscustomobject]@{
+                Users = [pscustomobject]@{
+                    ExcludeUsers = @('cccccccc-cccc-cccc-cccc-cccccccccccc', 'dddddddd-dddd-dddd-dddd-dddddddddddd')
+                }
+            }
+        }
+        $names = @{ 'cccccccc-cccc-cccc-cccc-cccccccccccc' = 'Named User' }
+        $doc = ConvertTo-ScATenantGovernanceJson -ConditionalAccessPolicies @($policy) -TenantId 't' -DisplayNameLookup $names -UserPrincipalNameLookup @{} | ConvertFrom-Json
+        $res = $doc.resources | Where-Object { $_.properties.DisplayName -eq 'CA-UserFallback' }
+        @($res.properties.ExcludeUsers) | Should -Contain 'Named User'
+        @($res.properties.ExcludeUsers) | Should -Contain 'dddddddd-dddd-dddd-dddd-dddddddddddd'
     }
 
     It 'leaves object ids unchanged when the lookup has no matching entry' {

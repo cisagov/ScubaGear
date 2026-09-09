@@ -131,7 +131,7 @@ function Set-ScubaAnalyzerStatus {
             # Dispatcher.Invoke hops onto the UI thread before setting the text.
             $syncHash.Window.Dispatcher.Invoke([Action] { $syncHash.Status_Text.Text = $Message })
         }
-    } catch { Write-Verbose "Set-ScubaAnalyzerStatus failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Set-ScubaAnalyzerStatus failed: $($_.Exception.Message)" -Level Error }
 }
 
 function Write-ScubaAnalyzerLog {
@@ -154,14 +154,14 @@ function Write-ScubaAnalyzerLog {
     try {
         $prefix = if ($Level -ne 'Info') { "[$($Level.ToUpper())] " } else { "" }
         $line   = "[$(Get-Date -Format 'HH:mm:ss')] $prefix$Message"
-        if ($syncHash.LogEntries) { [void]$syncHash.LogEntries.Add([pscustomobject]@{ Time = Get-Date; Level = $Level; Message = $Message }) }
+        if ($null -ne $syncHash.LogEntries) { [void]$syncHash.LogEntries.Add([pscustomobject]@{ Time = Get-Date; Level = $Level; Message = $Message }) }
         if ($syncHash.RunOutput_TextBox) {
             $syncHash.Window.Dispatcher.Invoke([Action] {
                 $syncHash.RunOutput_TextBox.AppendText("$line`r`n")
                 $syncHash.RunOutput_TextBox.ScrollToEnd()   # keep the newest line visible
             })
         }
-    } catch { Write-Verbose "Write-ScubaAnalyzerLog failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Write-ScubaAnalyzerLog failed: $($_.Exception.Message)" -Level Error }
 }
 
 function Format-ScubaAnalyzerIssues {
@@ -313,7 +313,7 @@ function Update-ScubaAnalyzerControlYaml {
         # DisplayNameLookup lets the snippet annotate each id with '# Friendly Name'.
         $lookup = if ($syncHash.Analysis -and $syncHash.Analysis.DisplayNameLookup) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
         $syncHash.Detail_Yaml.Text = New-ScubaAnalyzerControlYamlText -Finding $Finding -ExclusionValues $vals -DisplayNameLookup $lookup
-    } catch { Write-Verbose "Update-ScubaAnalyzerControlYaml failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Update-ScubaAnalyzerControlYaml failed: $($_.Exception.Message)" -Level Error }
 }
 
 function Update-ScubaAnalyzerFullYaml {
@@ -475,7 +475,7 @@ function Show-ScubaAnalyzerDetail {
         }
 
         # --- Matching-policy cards ---------------------------------------------------
-        # Each card = one CA policy that relates to this control. The user can pick which
+        # Each card; one CA policy that relates to this control. The user can pick which
         # candidate the config follows ("Use this policy"); the selected one is expanded
         # and drives the YAML. We project each PolicyCandidate into a flat view-model with
         # pre-computed Visibility flags (WPF binds to these; it can't run logic itself).
@@ -759,7 +759,7 @@ function Start-ScubaAnalyzerTenantScan {
 
                 # --- Phase B: read tenant data ---
                 $connectSync.Status = "Retrieving tenant configuration from Microsoft Graph..."
-                $tenantData = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{} }
+                $tenantData = @{ conditional_access_policies = @(); OrgDisplayName = $null; Organization = $null; TenantId = $null; DisplayNameLookup = @{}; UserUpnLookup = @{} }
                 foreach ($p in $products) {
                     $d = Get-ScubaTenantGraphData -Product $p -BaselineSchema $baseline -ApiCatalogPath $syncHash.ApiCatalogPath -AnalyzerControlPath $syncHash.AnalyzerControlPath
                     if (@($d.conditional_access_policies).Count -gt 0) { $tenantData.conditional_access_policies = $d.conditional_access_policies }
@@ -767,9 +767,20 @@ function Start-ScubaAnalyzerTenantScan {
                     if ($d.Organization)  { $tenantData.Organization  = $d.Organization }
                     if ($d.TenantId)      { $tenantData.TenantId      = $d.TenantId }
                     if ($d.DisplayNameLookup) { foreach ($k in @($d.DisplayNameLookup.Keys)) { $tenantData.DisplayNameLookup[$k] = $d.DisplayNameLookup[$k] } }
+                    if ($d.UserUpnLookup) { foreach ($k in @($d.UserUpnLookup.Keys)) { $tenantData.UserUpnLookup[$k] = $d.UserUpnLookup[$k] } }
                     foreach ($k in @($d.Keys)) {
-                        if ($k -in @('conditional_access_policies','OrgDisplayName','Organization','TenantId','DisplayNameLookup')) { continue }
+                        if ($k -in @('conditional_access_policies','OrgDisplayName','Organization','TenantId','DisplayNameLookup','UserUpnLookup')) { continue }
                         if ($null -ne $d[$k]) { $tenantData[$k] = $d[$k] }
+                    }
+                }
+                if (@($tenantData.conditional_access_policies).Count -gt 0 -and $tenantData.UserUpnLookup.Count -eq 0) {
+                    try {
+                        [void]$connectSync.Log.Add(@{ Message = "Resolving user principal names from $(@($tenantData.conditional_access_policies).Count) Conditional Access policies..."; Level = 'Info' })
+                        $resolvedUserUpns = Get-ScAUserPrincipalNameLookup -Policies @($tenantData.conditional_access_policies)
+                        foreach ($key in @($resolvedUserUpns.Keys)) { $tenantData.UserUpnLookup[$key] = $resolvedUserUpns[$key] }
+                        [void]$connectSync.Log.Add(@{ Message = "Resolved $($tenantData.UserUpnLookup.Count) user principal name(s) for Tenant Governance."; Level = 'Info' })
+                    } catch {
+                        [void]$connectSync.Log.Add(@{ Message = "User principal-name resolution skipped: $($_.Exception.Message)"; Level = 'Warning' })
                     }
                 }
                 $connectSync.TenantLabel = if ($tenantData.Organization) { $tenantData.Organization } elseif ($tenantData.OrgDisplayName) { $tenantData.OrgDisplayName } elseif ($syncHash.Organization) { $syncHash.Organization } else { $null }
@@ -780,6 +791,7 @@ function Start-ScubaAnalyzerTenantScan {
                 $connectSync.Result = Invoke-ScubaTenantScan -Product $products -M365Environment $env -TenantData $tenantData -BaselineSchemaPath $syncHash.BaselineSchemaPath -AnalyzerControlPath $syncHash.AnalyzerControlPath -ConfigSchemaPath $syncHash.ConfigSchemaPath
             } catch {
                 $connectSync.Error = $_.Exception.Message
+                Write-ScubaAnalyzerLog "Error occurred during tenant scan: $($_.Exception.Message)" -Level Error
             } finally {
                 $syncHash.ScAActivitySink = $null
                 $connectSync.IsComplete = $true
@@ -1012,7 +1024,7 @@ function Initialize-ScubaConfigAnalyzerUI {
     try {
         $cs = Get-Content $syncHash.ConfigSchemaPath -Raw | ConvertFrom-Json
         foreach ($e in @($cs.properties.M365Environment.enum)) { [void]$syncHash.Environment_ComboBox.Items.Add($e) }
-    } catch { Write-Verbose "Could not load M365Environment enum from schema: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Could not load M365Environment enum from schema: $($_.Exception.Message)" -Level Error }
     if ($syncHash.Environment_ComboBox.Items.Count -gt 0) { $syncHash.Environment_ComboBox.SelectedIndex = 0 }
 
     # Products list: only configurable products (supportsExclusions=true in
@@ -1025,7 +1037,7 @@ function Initialize-ScubaConfigAnalyzerUI {
         foreach ($p in $cs.schemaMetadata.productCapabilities.PSObject.Properties) {
             if ($p.Value.supportsExclusions -eq $true) { $configurable += ([string]$p.Name).ToLower() }
         }
-    } catch { Write-Verbose "Configurable products load failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Configurable products load failed: $($_.Exception.Message)" -Level Error }
     $displayMap = @{}
     try {
         $as = Get-Content $syncHash.AnalyzerControlPath -Raw | ConvertFrom-Json
@@ -1033,13 +1045,13 @@ function Initialize-ScubaConfigAnalyzerUI {
             if ($p.Name -match '^_') { continue }
             $displayMap[([string]$p.Name).ToLower()] = if ($p.Value.displayName) { [string]$p.Value.displayName } else { [string]$p.Name }
         }
-    } catch { Write-Verbose "Product display-name load failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Product display-name load failed: $($_.Exception.Message)" -Level Error }
     $products = @()
     try {
         $bs = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
         $baselineProducts = @($bs.baselineValidations.PSObject.Properties.Name)
         $products = @($baselineProducts | Where-Object { $configurable -contains ([string]$_).ToLower() })
-    } catch { Write-Verbose "Baseline products load failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog "Baseline products load failed: $($_.Exception.Message)" -Level Error }
     if (@($products).Count -eq 0) { $products = @($configurable) }
     if (@($products).Count -eq 0) { $products = @('aad') }
     foreach ($p in $products) {
@@ -1122,7 +1134,7 @@ function Initialize-ScubaConfigAnalyzerUI {
                     $btn = ($e.Source -as [System.Windows.Controls.Button])
                     if (-not $btn) { $btn = ($e.OriginalSource -as [System.Windows.Controls.Button]) }
                     if ($btn -and $btn.Tag) { Select-ScubaAnalyzerPolicy -PolicyId ([string]$btn.Tag) }
-                } catch { Write-Verbose "Use-policy click handler failed: $($_.Exception.Message)" }
+                } catch { Write-ScubaAnalyzerLog "Use-policy click handler failed: $($_.Exception.Message)" -Level Error }
             }
         )
     }

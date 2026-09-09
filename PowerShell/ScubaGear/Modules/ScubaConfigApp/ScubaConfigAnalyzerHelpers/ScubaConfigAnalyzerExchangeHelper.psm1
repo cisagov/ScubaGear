@@ -35,6 +35,8 @@ function Connect-ScubaAnalyzerExchange {
     $ctx = Get-MgContext
     $tenantId     = if ($ctx) { [string]$ctx.TenantId } else { $null }
     $tenantDomain = $Organization
+    # If the organization parameter is not provided, fall back to the tenant domain from the Graph context.
+    # This ensures that the Exchange Online connection uses the correct tenant context.
     try {
         $org = @((Invoke-MgGraphRequest -Method GET -Uri 'v1.0/organization' -OutputType PSObject).value)
         if (@($org).Count -gt 0) {
@@ -42,10 +44,12 @@ function Connect-ScubaAnalyzerExchange {
             $initial = @($org[0].verifiedDomains | Where-Object { $_.isInitial })
             if (@($initial).Count -gt 0) { $tenantDomain = [string]$initial[0].name }
         }
-    } catch { Write-Verbose "Organization lookup for the EXO endpoint failed: $($_.Exception.Message)" }
+    } catch { Write-ScubaAnalyzerLog  "Organization lookup for the EXO endpoint failed: $($_.Exception.Message)" -Level 'Warning' }
+    # Ensure that we have both a tenant ID and a tenant domain before proceeding with the Exchange Online connection.
     if (-not $tenantId)     { throw "Cannot acquire an Exchange Online token: no Graph tenant context (connect to Graph first)." }
     if (-not $tenantDomain) { $tenantDomain = $Organization }
 
+    # Acquire an access token for Exchange Online using either app-only certificate auth or delegated auth.
     $scope = Get-ExchangeOnlineScope -M365Environment $M365Environment
     if ($AppId -and $CertificateThumbprint) {
         # App-only certificate auth (non-interactive).
@@ -55,6 +59,7 @@ function Connect-ScubaAnalyzerExchange {
         $token = Get-MsalAccessToken -Scope $scope -ClientId 'fb78d390-0c51-40cd-8e17-fdbfab77341b' -Tenant $tenantDomain -M365Environment $M365Environment
     }
 
+    # Store the acquired access token and API endpoint in the shared hash for later use.
     $syncHash.EXOAccessToken = $token
     $syncHash.EXOApiEndpoint = Get-ExchangeOnlineApiEndpoint -TenantId $tenantId -TenantDomain $tenantDomain -M365Environment $M365Environment -AccessToken $token
     return $true
@@ -73,11 +78,15 @@ function Get-ScAExchangeData {
         [string]$Organization
     )
 
+    # Ensure that the Exchange Online REST session is available before attempting to run the cmdlet.
     $cmdlet = [string]$Fetch.cmdlet
     if (-not $syncHash.EXOAccessToken -or -not $syncHash.EXOApiEndpoint) {
         throw "No Exchange Online REST session - Connect-ScubaAnalyzerExchange did not run or failed."
     }
+    # Import the helper module for making REST calls to Exchange Online.
     Import-Module $syncHash.EXORestHelperPath -Force -ErrorAction Stop
+    
+    # Invoke the specified Exchange Online cmdlet via the REST API and return the results.
     return @(Invoke-EXORestMethod -CmdletName $cmdlet -ApiEndpoint $syncHash.EXOApiEndpoint -AccessToken $syncHash.EXOAccessToken)
 }
 
