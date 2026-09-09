@@ -1,0 +1,343 @@
+{
+  "Language": "de-DE",
+  "localeContext": {
+    "Title_TextBlock": "SCuBAGear Konfigurationseditor",
+    "SubTitle_TextBlock": "Erstellen Sie eine Konfigurationsdatei für SCuBAGear-Ausnahmen, Anmerkungen und Auslassungen von Basiskontrollen",
+    "M365Environment_TextBlock": "Wählen Sie Ihre M365-Umgebung aus",
+    "Products_TextBlock": "Wählen Sie mindestens ein Produkt aus:",
+    "ExclusionsProducts_TextBlock": "Produkte mit Ausnahmeunterstützung:",
+    "ExclusionsInfo_TextBlock": "Ausnahmen werden für die folgenden Produkte unterstützt: {0}",
+    "Organization_Required_TextBlock": "Erforderlich. Muss das Format haben: name.onmicrosoft.com oder name.onmicrosoft.us",
+    "OrgName_Required_TextBlock": "Diese Option ist für BOD-Einsendungen erforderlich.",
+    "ExclusionsTabInfo_TextBlock": "Konfigurieren Sie Ausnahmen für bestimmte Richtlinien. Ausnahmen ermöglichen es Ihnen, das Richtlinienverhalten anzupassen, indem bestimmte Benutzer, Gruppen, Domänen oder andere Entitäten von der Richtlinienbewertung ausgeschlossen werden. Produkte müssen auf der Hauptseite ausgewählt werden, bevor Ausnahmen konfiguriert werden.",
+    "AnnotationsTabInfo_TextBlock": "Fügen Sie Richtlinien Kommentare und Anmerkungen für Dokumentations- und Nachverfolgungszwecke hinzu. Produkte müssen auf der Hauptseite ausgewählt werden, bevor Anmerkungen konfiguriert werden.",
+    "OmissionsTabInfo_TextBlock": "Wählen Sie Richtlinien aus, die von der Bewertung ausgelassen werden sollen, und geben Sie eine Begründung an. Produkte müssen auf der Hauptseite ausgewählt werden, bevor Auslassungen konfiguriert werden.",
+    "PreviewTabInfo_TextBlock": "Zeigen Sie Ihre Konfiguration vor dem Speichern in der Vorschau an. Stellen Sie sicher, dass alle Ausnahmen und Auslassungen korrekt festgelegt sind.",
+    "ScubaRunDescription_TextBlock": "Führen Sie die ScubaGear-Bewertung mit der aktuellen Konfiguration aus. Stellen Sie sicher, dass Sie vor der Ausführung eine gültige YAML-Konfiguration erstellt haben."
+  },
+  "localePlaceholder": {
+    "Organization_TextBox": "Mandantennamen eingeben (z. B. beispiel.onmicrosoft.com)",
+    "OrgName_TextBox": "Organisationsnamen eingeben",
+    "OrgUnitName_TextBox": "Organisationseinheitsname eingeben",
+    "Description_TextBox": "Beschreibung für diese Konfiguration eingeben (optional)",
+    "AppId_TextBox": "Anwendungs-ID eingeben (GUID-Format)",
+    "CertificateThumbprint_TextBox": "Zertifikatfingerabdruck eingeben (40 hexadezimale Zeichen)",
+    "SearchPlaceholder_TextBox": "Richtlinien nach Name oder ID suchen...",
+    "ClearSearch_Button": "Suche löschen",
+    "AllCriticality_ComboBox": "Alle Kritikalitätsstufen",
+    "CriticalityFilter_ComboBox": "Nur {0}",
+    "ResultCount_TextBlock": "{0} Richtlinien"
+  },
+  "localeTitles": {
+    "DuplicateEntry": "Doppelter Eintrag",
+    "Success": "Erfolg",
+    "ValidationError": "Validierungsfehler",
+    "ConfirmRemove": "Entfernen bestätigen",
+    "Error": "Fehler",
+    "Information": "Information",
+    "Warning": "Warnung",
+    "Confirmation": "Bestätigung",
+    "RequiredFieldsMissing": "Pflichtfelder fehlen",
+    "GraphError": "Graph-Fehler",
+    "ExportDebugLog": "Debug-Protokoll exportieren",
+    "ExportSanitizedDebugLog": "Bereinigtes Debug-Protokoll exportieren",
+    "ExportSuccessful": "Export erfolgreich",
+    "ExportError": "Exportfehler",
+    "SessionRestored": "Sitzung wiederhergestellt",
+    "ConfigurationViewer": "Konfigurationsanzeige",
+    "ReportNotFound": "Bericht nicht gefunden",
+    "ConfigurationViewerError": "Fehler in der Konfigurationsanzeige",
+    "ConnectionError": "Verbindungsfehler",
+    "NoSelection": "Keine Auswahl",
+    "DebugWindowError": "Fehler im Debug-Fenster",
+    "NewSession": "Neue Sitzung",
+    "ImportComplete": "Import abgeschlossen",
+    "ImportError": "Importfehler",
+    "ValidationErrors": "Validierungsfehler",
+    "CopyComplete": "Kopieren abgeschlossen",
+    "NothingToCopy": "Nichts zu kopieren",
+    "CopyError": "Kopierfehler",
+    "NothingToDownload": "Nichts zum Herunterladen",
+    "SaveComplete": "Speichern abgeschlossen",
+    "SaveError": "Speicherfehler",
+    "CertificateStoreError": "Zertifikatspeicherfehler",
+    "NoCertificates": "Keine Zertifikate",
+    "RestoreError": "Wiederherstellungsfehler",
+    "ConfirmClose": "Schließen bestätigen"
+  },
+  "localeInfoMessages": {
+    "NoPoliciesAvailable": "Keine Richtlinien für dieses Produkt verfügbar.",
+    "PolicySaving": "{0} für Richtlinie wird gespeichert: {1}",
+    "CollectedArrayField": "Array-Feld erfasst [{0}][{1}]: {2}",
+    "CollectedBooleanField": "Boolesches Feld erfasst [{0}][{1}]: {2}",
+    "CollectedStringField": "Zeichenfolgenfeld erfasst [{0}][{1}]: {2}",
+    "MergedCardField": "{0} zusammengeführt für [{1}][{2}][{3}]: {4}",
+    "SelectedCertificateThumbprint": "Ausgewählter Zertifikatfingerabdruck: {0}",
+    "FilterApplied": "Filter angewendet: {0} Richtlinien sichtbar",
+    "SearchCleared": "Suchkriterien gelöscht",
+    "ScubaRunReady": "Bereit zur Ausführung von ScubaGear {0}",
+    "PowerShellVersionRequired": "PowerShell {0} erforderlich"
+  },
+  "localeErrorMessages": {
+    "CertificateNotFound": "Im persönlichen Zertifikatspeicher des aktuellen Benutzers wurden keine geeigneten Zertifikate gefunden.",
+    "WindowError": "Fehler beim Laden des Bildschirms",
+    "OrganizationValidation": "Organisationsname ist erforderlich und muss das Format haben: beispiel.onmicrosoft.com oder beispiel.onmicrosoft.us",
+    "OrgNameValidation": "Organisationsname ist erforderlich. Bitte geben Sie einen gültigen Organisationsnamen an.",
+    "AppIdValidation": "Die Anwendungs-ID muss im GUID-Format vorliegen (z. B. 12345678-1234-1234-1234-123456789abc)",
+    "CertificateValidation": "Der Zertifikatfingerabdruck muss 40 hexadezimale Zeichen enthalten",
+    "CertificateStoreAccessError": "Fehler beim Zugriff auf den Zertifikatspeicher: {0}",
+    "OpaPathValidation": "OPA-Ausführungsdatei nicht gefunden. Stellen Sie sicher, dass 'opa_windows_amd64.exe' oder 'opa.exe' im angegebenen Pfad vorhanden ist: {0}",
+    "OpaFileNotExist": "OPA-Pfad existiert nicht: {0}",
+    "PreviewValidation": "Bitte überprüfen Sie alle Felder auf Fehler, bevor Sie fortfahren.",
+    "CopyError": "Kein YAML-Inhalt zum Kopieren vorhanden. Bitte generieren Sie zuerst die Konfiguration.",
+    "DownloadNullError": "Kein YAML-Inhalt zum Herunterladen vorhanden. Bitte generieren Sie zuerst die Konfiguration.",
+    "NewFieldCardWarning": "Warnung: Feld '{0}' nicht in {1}-Daten für {2} gefunden",
+    "InvalidEmailFormat": "Ungültiges E-Mail-Format. Bitte verwenden Sie das Format: benutzer@domäne.com",
+    "InvalidGuidFormat": "Ungültiges GUID-Format. Bitte verwenden Sie das Format: 12345678-1234-1234-1234-123456789abc",
+    "InvalidDomainFormat": "Ungültiges Domänenformat. Bitte verwenden Sie das Format: beispiel.com",
+    "InvalidIpAddressFormat": "Ungültiges IP-Adressformat. Bitte verwenden Sie das Format: 192.168.1.1",
+    "FieldSelectionError": "Fehler beim Auswählen von {0}: {1}",
+    "RequiredFieldValidation": "Das Pflichtfeld '{0}' darf nicht leer sein",
+    "RequiredFieldsValidation": "Die folgenden Pflichtfelder dürfen nicht leer sein: {0}",
+    "SkippingNullCard": "Null-Karte für Richtlinie wird übersprungen: {0}",
+    "RemoveEventHandlerError": "Fehler beim Entfernen des Ereignishandlers für: {0}",
+    "CertificateSelectionError": "Fehler bei der Zertifikatauswahl: {0}",
+    "ProductSelection": "Es muss mindestens {0} Produkt(e) ausgewählt werden, damit die Konfiguration gültig ist.",
+    "ScubRunIncomplete": "Konfiguration unvollständig - Hauptregisterkarte prüfen",
+    "ScubRunConfigFailed": "Fehler beim Generieren der temporären Konfiguration",
+    "ScubRunInteractiveNotAllowed": "ScubaGear kann nicht interaktiv ausgeführt werden. Aktivieren Sie die Anwendungseinstellungen auf der Registerkarte 'Erweitert' und geben Sie eine App-ID und einen Zertifikatfingerabdruck an.",
+    "GraphConnectionError": "Microsoft Graph ist nicht verbunden. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "PleaseSelectItem": "Bitte wählen Sie ein Element aus.",
+    "ConfigurationFileNotFound": "Konfigurationsdatei nicht gefunden: {0}",
+    "ConfigurationViewerError": "Fehler beim Öffnen der Konfigurationsanzeige: {0}",
+    "ConfigurationFileNotFoundInResults": "Konfigurationsdatei im Ergebnisordner nicht gefunden: {0}",
+    "NoConfigurationFileAvailable": "Keine Konfigurationsdatei verfügbar. Führen Sie zuerst ScubaGear aus, um eine Konfigurationsdatei zu generieren.",
+    "HtmlReportNotFound": "HTML-Bericht nicht im Ordner gefunden.",
+    "FailedToOpenDebugWindow": "Fehler beim Öffnen des Debug-Fensters: {0}",
+    "ConfigurationCopiedToClipboard": "Konfiguration in Zwischenablage kopiert",
+    "FailedToCopyToClipboard": "Fehler beim Kopieren in die Zwischenablage: {0}",
+    "ImportConfigFileError": "Fehler beim Importieren der Konfigurationsdatei: {0}",
+    "ImportConfigError": "Fehler beim Importieren der Konfiguration: {0}",
+    "RestoreSessionError": "Beim Wiederherstellen der Sitzung ist ein Fehler aufgetreten: {0}",
+    "ValidationErrorsPrefix": "Folgende Validierungsfehler sind aufgetreten: {0}"
+  },
+  "localePopupMessages": {
+    "NewSessionConfirmation": "Möchten Sie die Sitzung wirklich zurücksetzen? Dadurch werden alle aktuellen Auswahlen und Konfigurationen gelöscht.",
+    "ImportSuccess": "Konfiguration erfolgreich importiert.",
+    "CopySuccess": "YAML-Konfiguration erfolgreich in die Zwischenablage kopiert.",
+    "AnnotationSavedSuccess": "Anmerkung für [{0}] erfolgreich gespeichert.",
+    "AnnotationRemoveSuccess": "Anmerkung für [{0}] erfolgreich entfernt.",
+    "AnnotationRemoveConfirmation": "Möchten Sie die Anmerkung für [{0}] wirklich entfernen?",
+    "DuplicateEntry": "Wert ist bereits in der Liste vorhanden.",
+    "FieldSelectionError": "Fehler beim Auswählen von {0}: {1}",
+    "CardSavedSuccess": "[{0}] {1} erfolgreich gespeichert für: {2}",
+    "NoEntriesFound": "Keine {0}-Einträge eingegeben. Bitte füllen Sie mindestens ein Feld in den verfügbaren {0}-Feldern aus.",
+    "RemoveCardPolicyConfirmation": "Möchten Sie wirklich alle {0} für [{1}] entfernen?",
+    "RemoveCardEntrySuccess": "[{0}] {1} erfolgreich entfernt.",
+    "YamlClipboardComplete": "YAML-Vorschau erfolgreich in die Zwischenablage kopiert.",
+    "YamlClipboardNoPreview": "Keine YAML-Vorschau zum Kopieren vorhanden.",
+    "YamlClipboardError": "Fehler beim Kopieren der YAML-Vorschau in die Zwischenablage: {0}",
+    "YamlSaveSuccess": "Konfiguration erfolgreich gespeichert unter: {0}",
+    "YamlSaveError": "Fehler beim Speichern der Konfiguration als YAML: {0}",
+    "DebugLogsCopied": "Debug-Protokolle erfolgreich in die Zwischenablage kopiert.",
+    "DebugLogsNoEntries": "Keine Debug-Protokolle zum Kopieren vorhanden.",
+    "DebugLogsError": "Fehler beim Kopieren der Debug-Protokolle in die Zwischenablage: {0}",
+    "ProductSelectionError": "Es muss mindestens {0} Produkt(e) ausgewählt werden, damit die Konfiguration gültig ist.",
+    "NoUsersSelected": "Bitte wählen Sie mindestens einen Benutzer aus.",
+    "AtLeastOneSelectionRequired": "Bitte treffen Sie mindestens eine Auswahl.",
+    "InvalidPolicyId": "Ungültiges Richtlinien-ID-Format.",
+    "ConfirmRemovalOfCard": "Möchten Sie dieses Element wirklich entfernen?",
+    "ValidationErrors": "Bitte korrigieren Sie die Validierungsfehler, bevor Sie fortfahren.",
+    "GraphError": "Fehler beim Abrufen von Daten aus Graph: {0}",
+    "CloseConfirmation": "Möchten Sie den SCuBAGear Konfigurationseditor wirklich schließen?\n\nAlle eingegebenen Informationen gehen verloren.\n\nUm Ihre Daten zu speichern, klicken Sie auf 'Vorschau & Generieren' und dann auf 'YAML herunterladen'.",
+    "GraphNotConnected": "Microsoft Graph ist nicht verbunden.`n`nUm Graph zu verbinden, starten Sie die Anwendung mit dem Parameter -Online neu oder verwenden Sie Connect-MgGraph manuell."
+  },
+  "localeStatusMessages": {
+    "GraphConnected": "Graph verbunden",
+    "GraphDisconnected": "Graph getrennt",
+    "DebugLogExported": "Debug-Protokoll exportiert nach: {0}",
+    "SanitizedLogExported": "Bereinigtes Debug-Protokoll exportiert nach {0}, Zuordnungsdatei: {1}",
+    "DebugLogExportedNoSensitiveData": "Debug-Protokoll exportiert (keine sensiblen Daten): {0}",
+    "ExportFailed": "Export fehlgeschlagen: {0}",
+    "SessionRestored": "Sitzung erfolgreich wiederhergestellt von: {0}",
+    "SessionRestoreCompleted": "Sitzungswiederherstellung abgeschlossen.",
+    "NoSearchText": "Kein Text zum Suchen",
+    "RestoreFrom": "Wiederherstellen von: {0}",
+    "ChangelogSource": "Quelle: {0}"
+  },
+  "localeYamlComments": {
+    "ConfigurationFile": "# ScubaGear-Konfigurationsdatei",
+    "GeneratedOn": "# Erstellt am: {0}",
+    "OrganizationConfiguration": "# Organisationskonfiguration",
+    "ConfigurationDetails": "# Konfigurationsdetails",
+    "AdvancedSettings": "# Erweiterte Einstellungen",
+    "GlobalSettings": "# Globale Einstellungen",
+    "BaselineControl": "#  Basislinienkontrolle: {0}"
+  },
+  "localeProgressMessages": {
+    "SanitizedDebugLogExportSuccess": "Bereinigtes Debug-Protokoll erfolgreich exportiert!\n\nProtokolldatei: {0}\nZuordnungsdatei: {1}\n\nDie Zuordnungsdatei enthält die Korrelation zwischen Original- und bereinigten Werten zur Fehlerbehebung.",
+    "DebugLogExportSuccess": "Debug-Protokoll erfolgreich exportiert nach:\n{0}",
+    "DebugLogExportNoSensitiveData": "Debug-Protokoll erfolgreich exportiert nach:\n{0}\n\nEs wurden keine sensiblen Daten zur Bereinigung gefunden.",
+    "DebugLogExportError": "Fehler beim Exportieren des Debug-Protokolls: {0}",
+    "SessionRestoreSuccess": "Vorherige Sitzung erfolgreich wiederhergestellt! {0} Richtlinien und {1} Einstellungskonfigurationen wiederhergestellt.",
+    "SessionRestoreFinalize": "Wiederherstellung wird abgeschlossen...",
+    "SessionRestoreStatus": "Sitzung erfolgreich wiederhergestellt"
+  },
+  "localeHelpTips": {
+    "Organization_HelpLabel": {
+      "Title": "Organisationsdomäne",
+      "Content": "Geben Sie die Domäne Ihrer Organisation ein (z. B. beispiel.onmicrosoft.com). Diese wird verwendet, um eine Verbindung zu Ihrem Microsoft 365-Mandanten herzustellen.",
+      "AdditionalSections": {
+        "Example": "beispiel.onmicrosoft.com",
+        "Required": "Ja, dieses Feld ist Pflicht",
+        "Note": "Muss eine gültige Microsoft 365-Mandantendomäne sein"
+      },
+      "Placement": "Right"
+    },
+    "OrgName_HelpLabel": {
+      "Title": "Organisationsname",
+      "Content": "Geben Sie den Namen Ihrer Organisation ein. Dieser wird zu Dokumentationszwecken verwendet.",
+      "AdditionalSections": {
+        "Example": "Beispiel GmbH",
+        "Required": "Diese Option ist für SCuBA-Konformitäts- und BOD-Einsendungen erforderlich",
+        "Note": "Dieser wird in der Konfigurationsdatei enthalten sein"
+      },
+      "Placement": "Right"
+    },
+    "OrgUnitName_HelpLabel": {
+      "Title": "Organisationseinheitsname",
+      "Content": "Geben Sie den Namen der Untereinheit Ihrer Organisation ein. Dieser wird zu Dokumentationszwecken verwendet.",
+      "AdditionalSections": {
+        "Example": "IT-Abteilung",
+        "Required": "Diese Option ist für SCuBA-Konformitäts- und BOD-Einsendungen nicht erforderlich",
+        "Note": "Dieser wird in der Konfigurationsdatei enthalten sein"
+      },
+      "Placement": "Right"
+    },
+    "ProductNames_HelpLabel": {
+      "Title": "Produktnamen",
+      "Content": "Wählen Sie die Produkte aus, die in die Konfiguration aufgenommen werden sollen.",
+      "AdditionalSections": {
+        "Required": "Es muss mindestens ein Produkt ausgewählt werden.",
+        "Note": "Diese werden in der Konfigurationsdatei enthalten sein"
+      },
+      "Placement": "Right"
+    }
+  },
+  "localizedControl": {
+    "products": {
+      "Aad": { "displayName": "Microsoft Entra ID (aad)" },
+      "SecuritySuite": { "displayName": "Security Suite (defender)" },
+      "Exo": { "displayName": "Exchange Online (exo)" },
+      "PowerBI": { "displayName": "Power BI (powerbi)" },
+      "PowerPlatform": { "displayName": "Power Platform (powerplatform)" },
+      "Sharepoint": { "displayName": "SharePoint & OneDrive (sharepoint)" },
+      "Teams": { "displayName": "Microsoft Teams (teams)" }
+    },
+    "M365Environment": {
+      "commercial": {
+        "displayName": "Kommerziell",
+        "rationale": "Produktionsumgebung für öffentliche Mandanten."
+      },
+      "gcc": {
+        "displayName": "Government Community Cloud",
+        "rationale": "Produktionsumgebung für Behördenmandanten."
+      },
+      "gcchigh": {
+        "displayName": "Government Community Cloud High",
+        "rationale": "Produktionsumgebung für GCC High-Mandanten."
+      },
+      "dod": {
+        "displayName": "Department of Defense",
+        "rationale": "Produktionsumgebung für DoD-Mandanten."
+      }
+    },
+    "settingsControl": {
+      "MainTab": { "name": "Allgemein" },
+      "AdvancedTab": {
+        "name": "Erweitert",
+        "sectionControl": {
+          "ApplicationSection_Toggle": { "sectionName": "Anwendungsauthentifizierung" },
+          "OutputSection_Toggle": { "sectionName": "Ausgabekonfiguration" },
+          "OpaSection_Toggle": { "sectionName": "OPA-Konfiguration" },
+          "GeneralSection_Toggle": { "sectionName": "Allgemeine Einstellungen" }
+        }
+      },
+      "GlobalTab": {
+        "name": "Globale Einstellungen",
+        "description": "Konfigurieren Sie globale Einstellungen, die für alle Richtlinien und Konfigurationen gelten.",
+        "sectionControl": {
+          "GlobalSettingsContainer": { "sectionName": "Globale Einstellungen" }
+        }
+      }
+    },
+    "baselineControls": {
+      "Exclusions": {
+        "tabName": "Ausnahmen",
+        "filterAllLabel": "Alle Ausnahmerichtlinien",
+        "filterConfiguredLabel": "Konfigurierte Ausnahmen",
+        "filterNotConfiguredLabel": "Nicht konfigurierte Ausnahmen"
+      },
+      "Annotations": {
+        "tabName": "Richtlinien annotieren",
+        "filterAllLabel": "Alle Anmerkungsrichtlinien",
+        "filterConfiguredLabel": "Annotierte Richtlinien",
+        "filterNotConfiguredLabel": "Nicht annotierte Richtlinien"
+      },
+      "Omissions": {
+        "tabName": "Richtlinien auslassen",
+        "filterAllLabel": "Alle Auslassungsrichtlinien",
+        "filterConfiguredLabel": "Ausgelassene Richtlinien",
+        "filterNotConfiguredLabel": "Nicht ausgelassene Richtlinien"
+      }
+    },
+    "ScubaRunConfig": {
+      "sectionName": "ScubaGear-Konfiguration ausführen",
+      "description": "In diesem Abschnitt können Sie ScubaGear mit der aktuellen Konfiguration ausführen.",
+      "parameters": {
+        "SilenceBODWarnings": {
+          "name": "BOD-Warnungen unterdrücken",
+          "description": "BOD-Warnungen unterdrücken."
+        },
+        "DarkMode": {
+          "name": "Dunkler Modus",
+          "description": "ScubaGear-Bericht im dunklen Modus anzeigen."
+        },
+        "Quiet": {
+          "name": "Stiller Modus",
+          "description": "ScubaGear im stillen Modus ausführen und die Berichtsausgabe unterdrücken."
+        },
+        "NumberOfUUIDCharactersToTruncate": {
+          "name": "Anzahl der zu kürzenden UUID-Zeichen",
+          "description": "Geben Sie die Anzahl der Zeichen an, um die die UUID gekürzt werden soll."
+        }
+      }
+    },
+    "Reports": { "tabName": "Berichtszusammenfassung" }
+  },
+  "policyMigration": {
+    "localeReportWindow": {
+      "title": "Migration von Legacy-Richtlinien angewendet",
+      "intro": "Diese Konfigurationsdatei enthielt {0} Legacy-Richtlinieneinstellung(en).",
+      "outro": "Bitte überprüfen Sie die aktualisierten Einstellungen vor dem Speichern.",
+      "sections": {
+        "migrated": {
+          "prefix": "MIGRIERT",
+          "heading": "AUTOMATISCH MIGRIERT ({0}):"
+        },
+        "decoupled": {
+          "prefix": "ENTKOPPELT",
+          "heading": "ÜBERPRÜFUNG ERFORDERLICH - RICHTLINIE AUFGETEILT ({0}):",
+          "body": "Diese Richtlinien wurden in mehrere neue Richtlinien aufgeteilt. Einstellungen wurden nur auf das erste aufgeführte Ziel angewendet.\nBitte konfigurieren Sie die verbleibenden neuen Richtlinien manuell in der Anwendung."
+        },
+        "dropped": {
+          "prefix": "ENTFERNT",
+          "heading": "ENTFERNT - KEIN ERSATZ ({0}):"
+        },
+        "skipped": {
+          "prefix": "ÜBERSPRUNGEN"
+        }
+      }
+    }
+  }
+}

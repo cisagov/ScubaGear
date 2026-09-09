@@ -5,7 +5,89 @@ InModuleScope ScubaConfigApp {
     Describe -tag "Config" -name 'ScubaConfigApp JSON Configuration Validation' {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'uiConfigPath')]
-            $uiConfigPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp\ScubaConfigApp_Control_en-US.json"
+            # The config is split into a language-neutral control file and per-language
+            # string files. Merge control + en-US so the assertions below validate the
+            # same complete schema the app builds at runtime.
+            $moduleConfigDir = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp"
+            function Merge-TestLocaleConfig {
+                param($Base, $Override)
+                if ($null -eq $Override) { return $Base }
+                if ($null -eq $Base) { return $Override }
+                if (($Base -is [System.Management.Automation.PSCustomObject]) -and ($Override -is [System.Management.Automation.PSCustomObject])) {
+                    foreach ($prop in $Override.PSObject.Properties) {
+                        if ($Base.PSObject.Properties.Name -contains $prop.Name) {
+                            $Base.($prop.Name) = Merge-TestLocaleConfig -Base $Base.($prop.Name) -Override $prop.Value
+                        } else {
+                            $Base | Add-Member -NotePropertyName $prop.Name -NotePropertyValue $prop.Value -Force
+                        }
+                    }
+                    return $Base
+                }
+                return $Override
+            }
+            function Set-TestLocalizedControlMetadata {
+                param($Config)
+                $metadata = $Config.localizedControl
+                function Set-TestProperties {
+                    param($Target, $Source, [string[]]$Names)
+                    foreach ($name in $Names) {
+                        if ($Source.PSObject.Properties.Name -contains $name) {
+                            $Target | Add-Member -NotePropertyName $name -NotePropertyValue $Source.$name -Force
+                        }
+                    }
+                }
+                foreach ($item in $metadata.products.PSObject.Properties) {
+                    Set-TestProperties ($Config.products | Where-Object id -eq $item.Name) $item.Value @('name', 'displayName')
+                }
+                foreach ($item in $metadata.M365Environment.PSObject.Properties) {
+                    Set-TestProperties ($Config.M365Environment | Where-Object id -eq $item.Name) $item.Value @('displayName', 'rationale')
+                }
+                foreach ($item in $metadata.settingsControl.PSObject.Properties) {
+                    $tab = $Config.settingsControl.($item.Name)
+                    Set-TestProperties $tab $item.Value @('name', 'description')
+                    foreach ($section in $item.Value.sectionControl.PSObject.Properties) {
+                        Set-TestProperties $tab.sectionControl.($section.Name) $section.Value @('sectionName')
+                    }
+                }
+                foreach ($item in $metadata.baselineControls.PSObject.Properties) {
+                    $control = $Config.baselineControls | Where-Object controlType -eq $item.Name
+                    Set-TestProperties $control $item.Value @('tabName', 'filterAllLabel', 'filterConfiguredLabel', 'filterNotConfiguredLabel')
+                }
+                Set-TestProperties $Config.ScubaRunConfig $metadata.ScubaRunConfig @('sectionName', 'description')
+                foreach ($item in $metadata.ScubaRunConfig.parameters.PSObject.Properties) {
+                    Set-TestProperties $Config.ScubaRunConfig.powershell.parameters.($item.Name) $item.Value @('name', 'description')
+                }
+                Set-TestProperties $Config.Reports $metadata.Reports @('tabName')
+                foreach ($item in $metadata.inputTypes.PSObject.Properties) {
+                    $inputType = $Config.inputTypes.($item.Name)
+                    Set-TestProperties $inputType $item.Value @('name', 'description')
+                    foreach ($field in $item.Value.fields.PSObject.Properties) {
+                        Set-TestProperties ($inputType.fields | Where-Object value -CEQ $field.Name) $field.Value @('name', 'description')
+                    }
+                }
+                Set-TestProperties $Config.policyViewerSettings.windowHeader $metadata.policyViewerSettings.windowHeader @('windowTitle', 'headerTitle', 'headerSubtitle')
+                Set-TestProperties $Config.policyViewerSettings.defaultContentHeaders $metadata.policyViewerSettings.defaultContentHeaders @('title', 'description')
+                foreach ($item in $metadata.policyViewerSettings.mainMarkdownMappings.PSObject.Properties) {
+                    Set-TestProperties $Config.policyViewerSettings.mainMarkdownMappings.($item.Name) $item.Value @('displayName')
+                }
+                foreach ($item in $metadata.policyViewerSettings.policyMarkdownMappings.PSObject.Properties) {
+                    Set-TestProperties $Config.policyViewerSettings.policyMarkdownMappings.($item.Name) $item.Value @('displayName')
+                }
+                foreach ($item in $metadata.graphQueries.PSObject.Properties) {
+                    $query = $Config.graphQueries.($item.Name)
+                    Set-TestProperties $query $item.Value @('windowTitle', 'name')
+                    foreach ($column in $item.Value.columns.PSObject.Properties) {
+                        Set-TestProperties ($query.displayColumnOrder | Where-Object value -eq $column.Name) $column.Value @('name')
+                    }
+                }
+                $Config.PSObject.Properties.Remove('localizedControl')
+            }
+            $controlObj = Get-Content (Join-Path $moduleConfigDir 'ScubaConfigApp_Control.json') -Raw | ConvertFrom-Json
+            $localeObj  = Get-Content (Join-Path $moduleConfigDir 'ScubaConfigApp_Language_en-US.json') -Raw | ConvertFrom-Json
+            $mergedObj  = Merge-TestLocaleConfig -Base $controlObj -Override $localeObj
+            Set-TestLocalizedControlMetadata -Config $mergedObj
+            $uiConfigPath = Join-Path $TestDrive 'ScubaConfigApp_Merged.json'
+            ($mergedObj | ConvertTo-Json -Depth 40) | Set-Content -Path $uiConfigPath -Encoding UTF8
 
             # Create mock baseline data structure instead of loading from JSON file
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'mockBaselineData')]
@@ -578,6 +660,121 @@ InModuleScope ScubaConfigApp {
         }
 
         Context 'Module Function Availability' {
+            BeforeAll {
+                $localizedConfigDirectory = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp"
+            }
+
+            It 'Should keep localized control metadata presentation-only' {
+                $allowedLeafNames = @(
+                    'name', 'displayName', 'description', 'rationale', 'sectionName', 'tabName',
+                    'filterAllLabel', 'filterConfiguredLabel', 'filterNotConfiguredLabel',
+                    'invalidScriptMessage', 'windowTitle', 'headerTitle', 'headerSubtitle', 'title'
+                )
+
+                function Get-LocalizedMetadataLeaves {
+                    param($Node, [string]$Path = 'localizedControl')
+                    foreach ($property in $Node.PSObject.Properties) {
+                        $propertyPath = "$Path.$($property.Name)"
+                        if ($property.Value -is [System.Management.Automation.PSCustomObject]) {
+                            Get-LocalizedMetadataLeaves -Node $property.Value -Path $propertyPath
+                        } elseif (($property.Value -is [System.Collections.IEnumerable]) -and
+                                  -not ($property.Value -is [string])) {
+                            [PSCustomObject]@{ Name = '__array__'; Path = $propertyPath }
+                        } else {
+                            [PSCustomObject]@{ Name = $property.Name; Path = $propertyPath }
+                        }
+                    }
+                }
+
+                Get-ChildItem $localizedConfigDirectory -Filter 'ScubaConfigApp_Language_*.json' | ForEach-Object {
+                    $languageConfig = Get-Content $_.FullName -Raw | ConvertFrom-Json
+                    if ($languageConfig.localizedControl) {
+                        foreach ($leaf in Get-LocalizedMetadataLeaves $languageConfig.localizedControl) {
+                            $allowedLeafNames | Should -Contain $leaf.Name -Because "$($leaf.Path) must be presentation text, not a control contract"
+                        }
+                    }
+                }
+            }
+
+            It 'Should resolve English metadata through stable control identifiers' {
+                $control = Get-Content (Join-Path $localizedConfigDirectory 'ScubaConfigApp_Control.json') -Raw | ConvertFrom-Json
+                $metadata = (Get-Content (Join-Path $localizedConfigDirectory 'ScubaConfigApp_Language_en-US.json') -Raw | ConvertFrom-Json).localizedControl
+
+                foreach ($key in $metadata.products.PSObject.Properties.Name) {
+                    $control.products.id | Should -Contain $key
+                }
+                foreach ($key in $metadata.M365Environment.PSObject.Properties.Name) {
+                    $control.M365Environment.id | Should -Contain $key
+                }
+                foreach ($key in $metadata.baselineControls.PSObject.Properties.Name) {
+                    $control.baselineControls.controlType | Should -Contain $key
+                }
+                foreach ($key in $metadata.ScubaRunConfig.parameters.PSObject.Properties.Name) {
+                    $control.ScubaRunConfig.powershell.parameters.PSObject.Properties.Name | Should -Contain $key
+                }
+                foreach ($inputTypeMetadata in $metadata.inputTypes.PSObject.Properties) {
+                    $control.inputTypes.PSObject.Properties.Name | Should -Contain $inputTypeMetadata.Name
+                    $controlFieldValues = $control.inputTypes.($inputTypeMetadata.Name).fields.value
+                    foreach ($fieldKey in $inputTypeMetadata.Value.fields.PSObject.Properties.Name) {
+                        $controlFieldValues | Should -Contain $fieldKey
+                    }
+                }
+                foreach ($mappingKey in $metadata.policyViewerSettings.mainMarkdownMappings.PSObject.Properties.Name) {
+                    $control.policyViewerSettings.mainMarkdownMappings.PSObject.Properties.Name | Should -Contain $mappingKey
+                }
+                foreach ($mappingKey in $metadata.policyViewerSettings.policyMarkdownMappings.PSObject.Properties.Name) {
+                    $control.policyViewerSettings.policyMarkdownMappings.PSObject.Properties.Name | Should -Contain $mappingKey
+                }
+                foreach ($queryMetadata in $metadata.graphQueries.PSObject.Properties) {
+                    $control.graphQueries.PSObject.Properties.Name | Should -Contain $queryMetadata.Name
+                    $columnValues = $control.graphQueries.($queryMetadata.Name).displayColumnOrder.value
+                    foreach ($columnKey in $queryMetadata.Value.columns.PSObject.Properties.Name) {
+                        $columnValues | Should -Contain $columnKey
+                    }
+                }
+            }
+
+            It 'Should keep moved presentation fields out of the control contract' {
+                $control = Get-Content (Join-Path $localizedConfigDirectory 'ScubaConfigApp_Control.json') -Raw | ConvertFrom-Json
+
+                foreach ($product in $control.products) {
+                    $product.PSObject.Properties.Name | Should -Not -Contain 'displayName'
+                }
+                foreach ($environment in $control.M365Environment) {
+                    $environment.PSObject.Properties.Name | Should -Not -Contain 'displayName'
+                    $environment.PSObject.Properties.Name | Should -Not -Contain 'rationale'
+                }
+                foreach ($baselineControl in $control.baselineControls) {
+                    $baselineControl.PSObject.Properties.Name | Should -Not -Contain 'tabName'
+                    $baselineControl.PSObject.Properties.Name | Should -Not -Contain 'filterAllLabel'
+                    $baselineControl.PSObject.Properties.Name | Should -Not -Contain 'filterConfiguredLabel'
+                    $baselineControl.PSObject.Properties.Name | Should -Not -Contain 'filterNotConfiguredLabel'
+                }
+                foreach ($parameter in $control.ScubaRunConfig.powershell.parameters.PSObject.Properties.Value) {
+                    $parameter.PSObject.Properties.Name | Should -Not -Contain 'name'
+                    $parameter.PSObject.Properties.Name | Should -Not -Contain 'description'
+                }
+                foreach ($inputType in $control.inputTypes.PSObject.Properties.Value) {
+                    $inputType.PSObject.Properties.Name | Should -Not -Contain 'description'
+                    foreach ($field in $inputType.fields) {
+                        $field.PSObject.Properties.Name | Should -Not -Contain 'description'
+                    }
+                }
+                foreach ($mapping in $control.policyViewerSettings.mainMarkdownMappings.PSObject.Properties.Value) {
+                    $mapping.PSObject.Properties.Name | Should -Not -Contain 'displayName'
+                }
+                foreach ($mapping in $control.policyViewerSettings.policyMarkdownMappings.PSObject.Properties.Value) {
+                    $mapping.PSObject.Properties.Name | Should -Not -Contain 'displayName'
+                }
+                foreach ($query in $control.graphQueries.PSObject.Properties.Value) {
+                    $query.PSObject.Properties.Name | Should -Not -Contain 'windowTitle'
+                    $query.PSObject.Properties.Name | Should -Not -Contain 'name'
+                    foreach ($column in $query.displayColumnOrder) {
+                        $column.PSObject.Properties.Name | Should -Not -Contain 'name'
+                    }
+                }
+            }
+
             It 'Should have Start-ScubaConfigApp function available' {
                 Get-Command Start-ScubaConfigApp -ErrorAction SilentlyContinue | Should -Not -BeNullOrEmpty -Because "Start-ScubaConfigApp function should be exported from module"
             }

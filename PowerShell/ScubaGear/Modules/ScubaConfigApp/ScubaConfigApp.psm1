@@ -190,7 +190,11 @@ Function Start-SCuBAConfigApp {
         $GraphConnected = $false
     }
 
-    $UIConfigPath = "$PSScriptRoot\ScubaConfigApp_Control_$Language.json"
+    # Language-neutral control config (schema, validations, structure) is a single file.
+    # Translatable strings live in per-language files and are overlaid at load time.
+    $UIConfigPath = "$PSScriptRoot\ScubaConfigApp_Control.json"
+    $LanguageBasePath = "$PSScriptRoot\ScubaConfigApp_Language_en-US.json"
+    $LanguagePath = "$PSScriptRoot\ScubaConfigApp_Language_$Language.json"
     $VersionInfo = (Get-Content -Path $UIConfigPath -Raw | ConvertFrom-Json).Version
 
     Write-Output "Launching ScubaConfigApp [$VersionInfo]...please wait."
@@ -222,6 +226,8 @@ Function Start-SCuBAConfigApp {
     $syncHash.ImgPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
     $syncHash.IcoPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.ico"
     $syncHash.UIConfigPath = $UIConfigPath
+    $syncHash.LanguageBasePath = $LanguageBasePath
+    $syncHash.LanguagePath = $LanguagePath
     $syncHash.HelperModulesPath = "$PSScriptRoot\ScubaConfigAppHelpers"
     $syncHash.ConfigImportPath = $ConfigFilePath
     $syncHash.GraphEndpoint = $GraphEndpoint
@@ -350,6 +356,127 @@ Function Start-SCuBAConfigApp {
 
         $syncHash.UIConfigs = (Get-Content -Path $syncHash.UIConfigPath -Raw) | ConvertFrom-Json
         Write-DebugOutput -Message "UIConfigs loaded: $($syncHash.UIConfigPath)" -Source $source -Level "Info"
+
+        # Overlay translatable strings onto the control config. en-US is the canonical
+        # base, so any key missing from the selected language falls back to English.
+        function Merge-LocaleConfig {
+            param($Base, $Override)
+            if ($null -eq $Override) { return $Base }
+            if ($null -eq $Base) { return $Override }
+            if (($Base -is [System.Management.Automation.PSCustomObject]) -and ($Override -is [System.Management.Automation.PSCustomObject])) {
+                foreach ($prop in $Override.PSObject.Properties) {
+                    if ($Base.PSObject.Properties.Name -contains $prop.Name) {
+                        $Base.($prop.Name) = Merge-LocaleConfig -Base $Base.($prop.Name) -Override $prop.Value
+                    } else {
+                        $Base | Add-Member -NotePropertyName $prop.Name -NotePropertyValue $prop.Value -Force
+                    }
+                }
+                return $Base
+            }
+            # Scalars and arrays: the language value wins
+            return $Override
+        }
+
+        function Set-LocalizedControlMetadata {
+            param($Config)
+
+            $metadata = $Config.localizedControl
+            if (-not $metadata) { return }
+
+            function Set-AllowedProperties {
+                param($Target, $Source, [string[]]$AllowedProperties)
+                if (-not $Target -or -not $Source) { return }
+                foreach ($propertyName in $AllowedProperties) {
+                    if ($Source.PSObject.Properties.Name -contains $propertyName) {
+                        if ($Target.PSObject.Properties.Name -contains $propertyName) {
+                            $Target.$propertyName = $Source.$propertyName
+                        } else {
+                            $Target | Add-Member -NotePropertyName $propertyName -NotePropertyValue $Source.$propertyName
+                        }
+                    }
+                }
+            }
+
+            foreach ($productMetadata in $metadata.products.PSObject.Properties) {
+                $target = $Config.products | Where-Object { $_.id -eq $productMetadata.Name } | Select-Object -First 1
+                Set-AllowedProperties $target $productMetadata.Value @('name', 'displayName')
+            }
+
+            foreach ($environmentMetadata in $metadata.M365Environment.PSObject.Properties) {
+                $target = $Config.M365Environment | Where-Object { $_.id -eq $environmentMetadata.Name } | Select-Object -First 1
+                Set-AllowedProperties $target $environmentMetadata.Value @('displayName', 'rationale')
+            }
+
+            foreach ($tabMetadata in $metadata.settingsControl.PSObject.Properties) {
+                $targetTab = $Config.settingsControl.($tabMetadata.Name)
+                Set-AllowedProperties $targetTab $tabMetadata.Value @('name', 'description')
+                foreach ($sectionMetadata in $tabMetadata.Value.sectionControl.PSObject.Properties) {
+                    $targetSection = $targetTab.sectionControl.($sectionMetadata.Name)
+                    Set-AllowedProperties $targetSection $sectionMetadata.Value @('sectionName')
+                }
+            }
+
+            foreach ($controlMetadata in $metadata.baselineControls.PSObject.Properties) {
+                $target = $Config.baselineControls | Where-Object { $_.controlType -eq $controlMetadata.Name } | Select-Object -First 1
+                Set-AllowedProperties $target $controlMetadata.Value @('tabName', 'filterAllLabel', 'filterConfiguredLabel', 'filterNotConfiguredLabel')
+            }
+
+            Set-AllowedProperties $Config.ScubaRunConfig $metadata.ScubaRunConfig @('sectionName', 'description')
+            foreach ($parameterMetadata in $metadata.ScubaRunConfig.parameters.PSObject.Properties) {
+                $target = $Config.ScubaRunConfig.powershell.parameters.($parameterMetadata.Name)
+                Set-AllowedProperties $target $parameterMetadata.Value @('name', 'description')
+            }
+
+            Set-AllowedProperties $Config.Reports $metadata.Reports @('tabName')
+
+            foreach ($inputTypeMetadata in $metadata.inputTypes.PSObject.Properties) {
+                $targetInputType = $Config.inputTypes.($inputTypeMetadata.Name)
+                Set-AllowedProperties $targetInputType $inputTypeMetadata.Value @('name', 'description')
+                foreach ($fieldMetadata in $inputTypeMetadata.Value.fields.PSObject.Properties) {
+                    $targetField = $targetInputType.fields | Where-Object { $_.value -ceq $fieldMetadata.Name } | Select-Object -First 1
+                    Set-AllowedProperties $targetField $fieldMetadata.Value @('name', 'description')
+                }
+            }
+
+            foreach ($validationMetadata in $metadata.valueValidations.PSObject.Properties) {
+                $target = $Config.valueValidations.($validationMetadata.Name)
+                Set-AllowedProperties $target $validationMetadata.Value @('invalidScriptMessage')
+            }
+
+            Set-AllowedProperties $Config.policyViewerSettings.windowHeader $metadata.policyViewerSettings.windowHeader @('windowTitle', 'headerTitle', 'headerSubtitle')
+            Set-AllowedProperties $Config.policyViewerSettings.defaultContentHeaders $metadata.policyViewerSettings.defaultContentHeaders @('title', 'description')
+            foreach ($mappingMetadata in $metadata.policyViewerSettings.mainMarkdownMappings.PSObject.Properties) {
+                $target = $Config.policyViewerSettings.mainMarkdownMappings.($mappingMetadata.Name)
+                Set-AllowedProperties $target $mappingMetadata.Value @('displayName')
+            }
+            foreach ($mappingMetadata in $metadata.policyViewerSettings.policyMarkdownMappings.PSObject.Properties) {
+                $target = $Config.policyViewerSettings.policyMarkdownMappings.($mappingMetadata.Name)
+                Set-AllowedProperties $target $mappingMetadata.Value @('displayName')
+            }
+
+            foreach ($queryMetadata in $metadata.graphQueries.PSObject.Properties) {
+                $targetQuery = $Config.graphQueries.($queryMetadata.Name)
+                Set-AllowedProperties $targetQuery $queryMetadata.Value @('windowTitle', 'name')
+                foreach ($columnMetadata in $queryMetadata.Value.columns.PSObject.Properties) {
+                    $targetColumn = $targetQuery.displayColumnOrder | Where-Object { $_.value -eq $columnMetadata.Name } | Select-Object -First 1
+                    Set-AllowedProperties $targetColumn $columnMetadata.Value @('name')
+                }
+            }
+
+            $Config.PSObject.Properties.Remove('localizedControl')
+        }
+
+        foreach ($localePath in @($syncHash.LanguageBasePath, $syncHash.LanguagePath | Select-Object -Unique)) {
+            if ($localePath -and (Test-Path $localePath)) {
+                $localeData = (Get-Content -Path $localePath -Raw) | ConvertFrom-Json
+                $syncHash.UIConfigs = Merge-LocaleConfig -Base $syncHash.UIConfigs -Override $localeData
+                Write-DebugOutput -Message "Locale strings merged: $localePath" -Source $source -Level "Info"
+            } else {
+                Write-DebugOutput -Message "Locale file not found, skipped: $localePath" -Source $source -Level "Warning"
+            }
+        }
+
+        Set-LocalizedControlMetadata -Config $syncHash.UIConfigs
 
         # Base path for all relative paths in the control config (sibling of the JSON itself)
         $ModuleBasePath = Split-Path $syncHash.UIConfigPath -Parent
@@ -1393,7 +1520,7 @@ Function Show-SCuBABaselinePolicyViewer {
 
     try {
         # Load UI config to honour PullOnlineBaselines and OnlineBaselineSchemaURL
-        $uiConfigPath = Join-Path $PSScriptRoot "ScubaConfigApp_Control_en-US.json"
+        $uiConfigPath = Join-Path $PSScriptRoot "ScubaConfigApp_Control.json"
         $uiConfig = $null
         if (Test-Path $uiConfigPath) {
             $uiConfig = (Get-Content -Path $uiConfigPath -Raw | ConvertFrom-Json)
@@ -1613,7 +1740,7 @@ Function Show-SCuBABaselinePolicyViewer {
 
         # Find required files
         $helperUIModulePath = Join-Path $PSScriptRoot "ScubaConfigAppHelpers\ScubaConfigAppBaselineUIViewerHelper.psm1"
-        $controlConfigPath = Join-Path $PSScriptRoot "ScubaConfigApp_Control_en-US.json"
+        $controlConfigPath = Join-Path $PSScriptRoot "ScubaConfigApp_Control.json"
 
         # Import the baseline UI helper module
         Import-Module $helperUIModulePath -Force

@@ -271,8 +271,9 @@ Invoke-SCuBA -ConfigFilePath "path\to\generated\example.onmicrosoft.com.yaml"
 
 ### Configuration Files
 
-- **ScubaConfigApp_Control_en-US.json**: English localization and configuration settings
-- Additional language files can be added following the same naming pattern
+- **ScubaConfigApp_Control.json**: Language-neutral UI behavior, structure, and configuration settings
+- **ScubaConfigApp_Language_en-US.json**: English UI content and fallback strings
+- Additional UI languages can be added using the `ScubaConfigApp_Language_<locale>.json` naming pattern
 
 ## Requirements
 
@@ -296,7 +297,7 @@ Use debug window to get detailed information about:
 
 This is enabled by default. However if your not seeing the debug button, follow these steps:
 
-1. Edit `ScubaConfigApp\ScubaConfigApp_Control_en-US.json` in the module directory.
+1. Edit `ScubaConfigApp\ScubaConfigApp_Control.json` in the module directory.
 2. Change `"DebugMode": true` to enable.
 3. Restart the UI application. There will be a debug button in the bottom right corner.
 
@@ -349,7 +350,7 @@ Instead, it is recommended to:
 - The UI does not support YAML anchors or aliases at this time. Use `-Online` parameter to help build exclusions
 - The UI does not support JSON export at this time.
 - The `-Online` parameter does not support using a service principal at this time when running the UI; it must be interactive. A service principal can be configured within the UI (see Advanced Section) and will be used to ScubaGear within UI.
-- If no baselines are showing after selecting product names, it could be a communication issue with the GitHub repository. Change `PullOnlineBaselines` to `false` within the `ScubaConfigApp_Control_en-US.json` app configuration file
+- If no baselines are showing after selecting product names, it could be a communication issue with the GitHub repository. Change `PullOnlineBaselines` to `false` within the `ScubaConfigApp_Control.json` app configuration file
 
 ### Run ScubaGear and Report Summary Notes
 
@@ -362,9 +363,15 @@ Instead, it is recommended to:
 
 ### Adding Localization
 
-1. Create new configuration file following naming pattern: `ScubaConfigApp_Control_<locale>.json`
-2. Translate all text elements in the localeContext section
+1. Create a language file following the naming pattern `ScubaConfigApp_Language_<locale>.json`.
+2. Translate the UI content and `localizedControl` presentation metadata from `ScubaConfigApp_Language_en-US.json` without changing the language-neutral `ScubaConfigApp_Control.json` file.
 3. Create new baseline configuration file following naming pattern: `ScubaBaselines_<locale>.json`
 4. Translate text elements: _name, rationale_ for each baseline item
-5. Set `PullOnlineBaselines:false` within the `ScubaConfigApp_Control_en-US.json` app configuration file
+5. Set `PullOnlineBaselines:false` within the `ScubaConfigApp_Control.json` app configuration file
 6. Update root module (`ScubaConfigApp.psm1`) to support new locale.
+
+The `localizedControl` object is keyed by stable identifiers such as product `id`,
+environment `id`, baseline `controlType`, input-type property name, and field `value`.
+It may contain presentation properties only. Do not add identifiers, YAML values,
+types, required flags, validation rules, paths, commands, or feature settings to a
+language file.

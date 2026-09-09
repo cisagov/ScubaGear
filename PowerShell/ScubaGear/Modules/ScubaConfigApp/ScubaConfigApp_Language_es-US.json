@@ -1,0 +1,343 @@
+{
+  "Language": "es-US",
+  "localeContext": {
+    "Title_TextBlock": "Editor de Configuración de SCuBAGear",
+    "SubTitle_TextBlock": "Cree un archivo de configuración para los controles de exclusión, anotación y omisión de SCuBAGear",
+    "M365Environment_TextBlock": "Seleccione su entorno de M365",
+    "Products_TextBlock": "Seleccione al menos un producto:",
+    "ExclusionsProducts_TextBlock": "Productos compatibles con exclusiones:",
+    "ExclusionsInfo_TextBlock": "Las exclusiones son compatibles con los siguientes productos: {0}",
+    "Organization_Required_TextBlock": "Obligatorio. Debe tener el formato: nombre.onmicrosoft.com o nombre.onmicrosoft.us",
+    "OrgName_Required_TextBlock": "Esta opción es obligatoria para los envíos de BOD.",
+    "ExclusionsTabInfo_TextBlock": "Configure exclusiones para directivas específicas. Las exclusiones le permiten personalizar el comportamiento de las directivas excluyendo usuarios, grupos, dominios u otras entidades de la evaluación. Los productos deben seleccionarse en la página principal antes de configurar las exclusiones.",
+    "AnnotationsTabInfo_TextBlock": "Agregue comentarios y anotaciones a las directivas para fines de documentación y seguimiento. Los productos deben seleccionarse en la página principal antes de configurar las anotaciones.",
+    "OmissionsTabInfo_TextBlock": "Seleccione las directivas que desea omitir de la evaluación y proporcione una justificación. Los productos deben seleccionarse en la página principal antes de configurar las omisiones.",
+    "PreviewTabInfo_TextBlock": "Previsualice su configuración antes de guardarla. Asegúrese de que todas las exclusiones y omisiones estén correctamente configuradas.",
+    "ScubaRunDescription_TextBlock": "Ejecute la evaluación de ScubaGear con la configuración actual. Asegúrese de haber generado una configuración YAML válida antes de ejecutar."
+  },
+  "localePlaceholder": {
+    "Organization_TextBox": "Ingrese el nombre del inquilino (p. ej., ejemplo.onmicrosoft.com)",
+    "OrgName_TextBox": "Ingrese el nombre de la organización",
+    "OrgUnitName_TextBox": "Ingrese el nombre de la unidad organizacional",
+    "Description_TextBox": "Ingrese una descripción para esta configuración (opcional)",
+    "AppId_TextBox": "Ingrese el ID de la aplicación (formato GUID)",
+    "CertificateThumbprint_TextBox": "Ingrese la huella digital del certificado (40 caracteres hexadecimales)",
+    "SearchPlaceholder_TextBox": "Buscar directivas por nombre o ID...",
+    "ClearSearch_Button": "Borrar búsqueda",
+    "AllCriticality_ComboBox": "Toda la criticidad",
+    "CriticalityFilter_ComboBox": "Solo {0}",
+    "ResultCount_TextBlock": "{0} directivas"
+  },
+  "localeTitles": {
+    "DuplicateEntry": "Entrada duplicada",
+    "Success": "Éxito",
+    "ValidationError": "Error de validación",
+    "ConfirmRemove": "Confirmar eliminación",
+    "Error": "Error",
+    "Information": "Información",
+    "Warning": "Advertencia",
+    "Confirmation": "Confirmación",
+    "RequiredFieldsMissing": "Faltan campos obligatorios",
+    "GraphError": "Error de Graph",
+    "ExportDebugLog": "Exportar registro de depuración",
+    "ExportSanitizedDebugLog": "Exportar registro de depuración saneado",
+    "ExportSuccessful": "Exportación correcta",
+    "ExportError": "Error de exportación",
+    "SessionRestored": "Sesión restaurada",
+    "ConfigurationViewer": "Visor de configuración",
+    "ReportNotFound": "Informe no encontrado",
+    "ConfigurationViewerError": "Error del visor de configuración",
+    "ConnectionError": "Error de conexión",
+    "NoSelection": "Sin selección",
+    "DebugWindowError": "Error de ventana de depuración",
+    "NewSession": "Nueva sesión",
+    "ImportComplete": "Importación completa",
+    "ImportError": "Error de importación",
+    "ValidationErrors": "Errores de validación",
+    "CopyComplete": "Copia completa",
+    "NothingToCopy": "Nada que copiar",
+    "CopyError": "Error al copiar",
+    "NothingToDownload": "Nada que descargar",
+    "SaveComplete": "Guardado completo",
+    "SaveError": "Error al guardar",
+    "CertificateStoreError": "Error del almacén de certificados",
+    "NoCertificates": "Sin certificados",
+    "RestoreError": "Error de restauración",
+    "ConfirmClose": "Confirmar cierre"
+  },
+  "localeInfoMessages": {
+    "NoPoliciesAvailable": "No hay directivas disponibles para este producto.",
+    "PolicySaving": "Guardando {0} para la directiva: {1}",
+    "CollectedArrayField": "Campo de matriz recopilado [{0}][{1}]: {2}",
+    "CollectedBooleanField": "Campo booleano recopilado [{0}][{1}]: {2}",
+    "CollectedStringField": "Campo de cadena recopilado [{0}][{1}]: {2}",
+    "MergedCardField": "{0} combinado para [{1}][{2}][{3}]: {4}",
+    "SelectedCertificateThumbprint": "Huella digital del certificado seleccionado: {0}",
+    "FilterApplied": "Filtro aplicado: {0} directivas visibles",
+    "SearchCleared": "Criterios de búsqueda borrados",
+    "ScubaRunReady": "Listo para ejecutar ScubaGear {0}",
+    "PowerShellVersionRequired": "Se requiere PowerShell {0}"
+  },
+  "localeErrorMessages": {
+    "CertificateNotFound": "No se encontraron certificados adecuados en el almacén de certificados personales del usuario actual.",
+    "WindowError": "Error al cargar la pantalla",
+    "OrganizationValidation": "El nombre de la organización es obligatorio y debe tener el formato: ejemplo.onmicrosoft.com o ejemplo.onmicrosoft.us",
+    "OrgNameValidation": "El nombre de la organización es obligatorio. Especifique un nombre de organización válido.",
+    "AppIdValidation": "El ID de la aplicación debe tener formato GUID (p. ej., 12345678-1234-1234-1234-123456789abc)",
+    "CertificateValidation": "La huella digital del certificado debe tener 40 caracteres hexadecimales",
+    "CertificateStoreAccessError": "Error al acceder al almacén de certificados: {0}",
+    "OpaPathValidation": "No se encontró el ejecutable de OPA. Asegúrese de que 'opa_windows_amd64.exe' u 'opa.exe' exista en la ruta especificada: {0}",
+    "OpaFileNotExist": "La ruta de OPA no existe: {0}",
+    "PreviewValidation": "Revise todos los campos en busca de errores antes de continuar.",
+    "CopyError": "No hay contenido YAML para copiar. Genere la configuración primero.",
+    "DownloadNullError": "No hay contenido YAML para descargar. Genere la configuración primero.",
+    "NewFieldCardWarning": "Advertencia: el campo '{0}' no se encontró en los datos de {1} para {2}",
+    "InvalidEmailFormat": "Formato de correo electrónico no válido. Use el formato: usuario@dominio.com",
+    "InvalidGuidFormat": "Formato GUID no válido. Use el formato: 12345678-1234-1234-1234-123456789abc",
+    "InvalidDomainFormat": "Formato de dominio no válido. Use el formato: ejemplo.com",
+    "InvalidIpAddressFormat": "Formato de dirección IP no válido. Use el formato: 192.168.1.1",
+    "FieldSelectionError": "Error al seleccionar {0}: {1}",
+    "RequiredFieldValidation": "El campo obligatorio '{0}' no puede estar vacío",
+    "RequiredFieldsValidation": "Los siguientes campos obligatorios no pueden estar vacíos: {0}",
+    "SkippingNullCard": "Omitiendo tarjeta nula para la directiva: {0}",
+    "RemoveEventHandlerError": "Error al eliminar el controlador de eventos para: {0}",
+    "CertificateSelectionError": "Error al seleccionar el certificado: {0}",
+    "ProductSelection": "Se deben seleccionar al menos {0} producto(s) para que la configuración sea válida.",
+    "ScubRunIncomplete": "Configuración incompleta - verifique la pestaña Principal",
+    "ScubRunConfigFailed": "Error al generar la configuración temporal",
+    "ScubRunInteractiveNotAllowed": "ScubaGear no puede ejecutarse de forma interactiva. Habilite la Configuración de la aplicación en la pestaña Avanzado y proporcione un ID de aplicación y una huella digital de certificado.",
+    "GraphConnectionError": "Microsoft Graph no está conectado. Verifique su conexión e inténtelo de nuevo.",
+    "PleaseSelectItem": "Seleccione un elemento.",
+    "ConfigurationFileNotFound": "Archivo de configuración no encontrado: {0}",
+    "ConfigurationViewerError": "Error al abrir el visor de configuración: {0}",
+    "ConfigurationFileNotFoundInResults": "Archivo de configuración no encontrado en la carpeta de resultados: {0}",
+    "NoConfigurationFileAvailable": "No hay ningún archivo de configuración disponible. Ejecute ScubaGear primero para generar un archivo de configuración.",
+    "HtmlReportNotFound": "Informe HTML no encontrado en la carpeta.",
+    "FailedToOpenDebugWindow": "Error al abrir la ventana de depuración: {0}",
+    "ConfigurationCopiedToClipboard": "Configuración copiada al portapapeles",
+    "FailedToCopyToClipboard": "Error al copiar al portapapeles: {0}",
+    "ImportConfigFileError": "Error al importar el archivo de configuración: {0}",
+    "ImportConfigError": "Error al importar la configuración: {0}",
+    "RestoreSessionError": "Se produjo un error al restaurar la sesión: {0}",
+    "ValidationErrorsPrefix": "Se produjeron los siguientes errores de validación: {0}"
+  },
+  "localePopupMessages": {
+    "NewSessionConfirmation": "¿Está seguro de que desea restablecer la sesión? Se borrarán todas las selecciones y configuraciones actuales.",
+    "ImportSuccess": "Configuración importada correctamente.",
+    "CopySuccess": "Configuración YAML copiada al portapapeles correctamente.",
+    "AnnotationSavedSuccess": "Anotación de [{0}] guardada correctamente.",
+    "AnnotationRemoveSuccess": "Anotación de [{0}] eliminada correctamente.",
+    "AnnotationRemoveConfirmation": "¿Está seguro de que desea eliminar la anotación de [{0}]?",
+    "DuplicateEntry": "El valor ya existe en la lista.",
+    "FieldSelectionError": "Se produjo un error al seleccionar {0}: {1}",
+    "CardSavedSuccess": "[{0}] {1} guardado correctamente para: {2}",
+    "NoEntriesFound": "No se ingresaron entradas de {0}. Complete al menos un campo en los campos de {0} disponibles.",
+    "RemoveCardPolicyConfirmation": "¿Está seguro de que desea eliminar todos los {0} de [{1}]?",
+    "RemoveCardEntrySuccess": "[{0}] {1} eliminado correctamente.",
+    "YamlClipboardComplete": "Vista previa YAML copiada al portapapeles correctamente.",
+    "YamlClipboardNoPreview": "No hay vista previa YAML para copiar.",
+    "YamlClipboardError": "Error al copiar la vista previa YAML al portapapeles: {0}",
+    "YamlSaveSuccess": "Configuración guardada correctamente en: {0}",
+    "YamlSaveError": "Error al guardar la configuración en YAML: {0}",
+    "DebugLogsCopied": "Registros de depuración copiados al portapapeles correctamente.",
+    "DebugLogsNoEntries": "No hay registros de depuración para copiar.",
+    "DebugLogsError": "Error al copiar registros de depuración al portapapeles: {0}",
+    "ProductSelectionError": "Se deben seleccionar al menos {0} producto(s) para que la configuración sea válida.",
+    "NoUsersSelected": "Seleccione al menos un usuario.",
+    "AtLeastOneSelectionRequired": "Realice al menos una selección.",
+    "InvalidPolicyId": "Formato de ID de directiva no válido.",
+    "ConfirmRemovalOfCard": "¿Está seguro de que desea eliminar este elemento?",
+    "ValidationErrors": "Corrija los errores de validación antes de continuar.",
+    "GraphError": "Error al recuperar datos de Graph: {0}",
+    "CloseConfirmation": "¿Está seguro de que desea cerrar el Editor de Configuración de SCuBAGear?\n\nPerderá toda la información ingresada.\n\nPara guardar sus datos, haga clic en el botón 'Vista previa y generar' y luego en 'Descargar YAML'.",
+    "GraphNotConnected": "Microsoft Graph no está conectado.`n`nPara conectar Graph, reinicie la aplicación con el parámetro -Online o use Connect-MgGraph manualmente."
+  },
+  "localeStatusMessages": {
+    "GraphConnected": "Graph conectado",
+    "GraphDisconnected": "Graph desconectado",
+    "DebugLogExported": "Registro de depuración exportado a: {0}",
+    "SanitizedLogExported": "Registro de depuración saneado exportado a {0}, archivo de asignación: {1}",
+    "DebugLogExportedNoSensitiveData": "Registro de depuración exportado (sin datos confidenciales): {0}",
+    "ExportFailed": "Error en la exportación: {0}",
+    "SessionRestored": "Sesión restaurada correctamente desde: {0}",
+    "SessionRestoreCompleted": "Restauración de sesión completada.",
+    "NoSearchText": "Sin texto para buscar",
+    "RestoreFrom": "Restaurar desde: {0}",
+    "ChangelogSource": "Fuente: {0}"
+  },
+  "localeYamlComments": {
+    "ConfigurationFile": "# Archivo de configuración de ScubaGear",
+    "GeneratedOn": "# Generado el: {0}",
+    "OrganizationConfiguration": "# Configuración de la organización",
+    "ConfigurationDetails": "# Detalles de configuración",
+    "AdvancedSettings": "# Configuración avanzada",
+    "GlobalSettings": "# Configuración global",
+    "BaselineControl": "#  Control de línea base: {0}"
+  },
+  "localeProgressMessages": {
+    "SanitizedDebugLogExportSuccess": "¡Registro de depuración saneado exportado correctamente!\n\nArchivo de registro: {0}\nArchivo de asignación: {1}\n\nEl archivo de asignación contiene la correlación entre los valores originales y saneados para fines de resolución de problemas.",
+    "DebugLogExportSuccess": "Registro de depuración exportado correctamente a:\n{0}",
+    "DebugLogExportNoSensitiveData": "Registro de depuración exportado correctamente a:\n{0}\n\nNo se detectaron datos confidenciales para saneamiento.",
+    "DebugLogExportError": "Error al exportar el registro de depuración: {0}",
+    "SessionRestoreSuccess": "¡Sesión anterior restaurada correctamente! Se restauraron {0} directivas y {1} configuraciones.",
+    "SessionRestoreFinalize": "Finalizando la restauración...",
+    "SessionRestoreStatus": "Sesión restaurada correctamente"
+  },
+  "localeHelpTips": {
+    "Organization_HelpLabel": {
+      "Title": "Dominio de la organización",
+      "Content": "Ingrese el dominio de su organización (p. ej., ejemplo.onmicrosoft.com). Se utiliza para conectarse a su inquilino de Microsoft 365.",
+      "AdditionalSections": {
+        "Example": "ejemplo.onmicrosoft.com",
+        "Required": "Sí, este campo es obligatorio",
+        "Note": "Debe ser un dominio de inquilino válido de Microsoft 365"
+      },
+      "Placement": "Right"
+    },
+    "OrgName_HelpLabel": {
+      "Title": "Nombre de la organización",
+      "Content": "Ingrese el nombre de su organización. Se utiliza con fines de documentación.",
+      "AdditionalSections": {
+        "Example": "Organización de Ejemplo, S.A.",
+        "Required": "Esta opción es obligatoria para los envíos de conformidad SCuBA y BOD",
+        "Note": "Se incluirá en el archivo de configuración"
+      },
+      "Placement": "Right"
+    },
+    "OrgUnitName_HelpLabel": {
+      "Title": "Nombre de la unidad organizacional",
+      "Content": "Ingrese el nombre de la subunidad de su organización. Se utiliza con fines de documentación.",
+      "AdditionalSections": {
+        "Example": "Oficina de TI",
+        "Required": "Esta opción no es obligatoria para los envíos de conformidad SCuBA y BOD",
+        "Note": "Se incluirá en el archivo de configuración"
+      },
+      "Placement": "Right"
+    },
+    "ProductNames_HelpLabel": {
+      "Title": "Nombres de productos",
+      "Content": "Seleccione los productos que se incluirán en la configuración.",
+      "AdditionalSections": {
+        "Required": "Se debe seleccionar al menos un producto.",
+        "Note": "Se incluirá en el archivo de configuración"
+      },
+      "Placement": "Right"
+    }
+  },
+  "localizedControl": {
+    "products": {
+      "Aad": { "displayName": "Microsoft Entra ID (aad)" },
+      "SecuritySuite": { "displayName": "Conjunto de seguridad (defender)" },
+      "Exo": { "displayName": "Exchange Online (exo)" },
+      "PowerBI": { "displayName": "Power BI (powerbi)" },
+      "PowerPlatform": { "displayName": "Power Platform (powerplatform)" },
+      "Sharepoint": { "displayName": "SharePoint y OneDrive (sharepoint)" },
+      "Teams": { "displayName": "Microsoft Teams (teams)" }
+    },
+    "M365Environment": {
+      "commercial": {
+        "displayName": "Comercial",
+        "rationale": "Entorno de producción para inquilinos públicos."
+      },
+      "gcc": {
+        "displayName": "Government Community Cloud",
+        "rationale": "Entorno de producción para inquilinos gubernamentales."
+      },
+      "gcchigh": {
+        "displayName": "Government Community Cloud High",
+        "rationale": "Entorno de producción para inquilinos de GCC High."
+      },
+      "dod": {
+        "displayName": "Departamento de Defensa",
+        "rationale": "Entorno de producción para inquilinos del Departamento de Defensa."
+      }
+    },
+    "settingsControl": {
+      "MainTab": { "name": "Principal" },
+      "AdvancedTab": {
+        "name": "Avanzado",
+        "sectionControl": {
+          "ApplicationSection_Toggle": { "sectionName": "Autenticación de aplicaciones" },
+          "OutputSection_Toggle": { "sectionName": "Configuración de salida" },
+          "OpaSection_Toggle": { "sectionName": "Configuración de OPA" },
+          "GeneralSection_Toggle": { "sectionName": "Configuración general" }
+        }
+      },
+      "GlobalTab": {
+        "name": "Configuración global",
+        "description": "Configure los ajustes globales que se aplican a todas las directivas y configuraciones.",
+        "sectionControl": {
+          "GlobalSettingsContainer": { "sectionName": "Configuración global" }
+        }
+      }
+    },
+    "baselineControls": {
+      "Exclusions": {
+        "tabName": "Exclusiones",
+        "filterAllLabel": "Todas las directivas de exclusión",
+        "filterConfiguredLabel": "Exclusiones configuradas",
+        "filterNotConfiguredLabel": "Exclusiones no configuradas"
+      },
+      "Annotations": {
+        "tabName": "Anotar directivas",
+        "filterAllLabel": "Todas las directivas de anotación",
+        "filterConfiguredLabel": "Directivas anotadas",
+        "filterNotConfiguredLabel": "Directivas no anotadas"
+      },
+      "Omissions": {
+        "tabName": "Omitir directivas",
+        "filterAllLabel": "Todas las directivas de omisión",
+        "filterConfiguredLabel": "Directivas omitidas",
+        "filterNotConfiguredLabel": "Directivas no omitidas"
+      }
+    },
+    "ScubaRunConfig": {
+      "sectionName": "Ejecutar configuración de ScubaGear",
+      "description": "Esta sección permite ejecutar ScubaGear con la configuración actual.",
+      "parameters": {
+        "SilenceBODWarnings": {
+          "name": "Silenciar advertencias de BOD",
+          "description": "Suprimir las advertencias de BOD."
+        },
+        "DarkMode": {
+          "name": "Modo oscuro",
+          "description": "Mostrar el informe de ScubaGear en modo oscuro."
+        },
+        "Quiet": {
+          "name": "Modo silencioso",
+          "description": "Ejecutar ScubaGear en modo silencioso y suprimir la salida del informe."
+        },
+        "NumberOfUUIDCharactersToTruncate": {
+          "name": "Número de caracteres UUID que se truncarán",
+          "description": "Especifique el número de caracteres que se truncarán del UUID."
+        }
+      }
+    },
+    "Reports": { "tabName": "Resumen del informe" }
+  },
+  "policyMigration": {
+    "localeReportWindow": {
+      "title": "Migración de directivas heredadas aplicada",
+      "intro": "Este archivo de configuración contenía {0} configuración(es) de directivas heredadas.",
+      "outro": "Revise la configuración actualizada antes de guardar.",
+      "sections": {
+        "migrated": {
+          "prefix": "MIGRADO",
+          "heading": "MIGRADO AUTOMÁTICAMENTE ({0}):"
+        },
+        "decoupled": {
+          "prefix": "DESACOPLADO",
+          "heading": "REQUIERE REVISIÓN - DIRECTIVA DIVIDIDA ({0}):",
+          "body": "Estas directivas fueron desacopladas en múltiples directivas nuevas. La configuración se aplicó únicamente al primer destino de la lista.\nRevise y configure manualmente las demás directivas nuevas en la aplicación."
+        },
+        "dropped": {
+          "prefix": "ELIMINADO",
+          "heading": "ELIMINADO - SIN REEMPLAZO ({0}):"
+        },
+        "skipped": {
+          "prefix": "OMITIDO"
+        }
+      }
+    }
+  }
+}

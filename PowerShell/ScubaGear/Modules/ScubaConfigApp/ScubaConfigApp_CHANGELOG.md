@@ -13,7 +13,8 @@
 - Import now detects legacy policy IDs and auto-migrates them to current equivalents; a migration report popup summarizes migrated, split, and removed policies.
 - Required input fields that fail validation on save are now highlighted with a red border, which clears automatically as soon as the user interacts with the field.
 - YAML export header now includes the ScubaGear version.
-- Externalized all migration behavior, locale strings, and popup content for the migration report into the JSON control file under `policyMigration` and `localeReportWindow`.
+- Externalized migration behavior into the control file and migration report text into per-language files under `policyMigration.localeReportWindow`.
+- Split language-neutral control contracts from localized presentation metadata; dynamic labels and descriptions now use stable-keyed `localizedControl` overlays.
 - Removed `productCodeMap` from the JSON config; the product code map is now derived at runtime from the `products` array so adding new products requires no code changes.
 - Unified log prefix tokens under `localeReportWindow.sections` as the single source of truth, removing the redundant `logPrefixes` block.
 - Renamed `reportWindow` to `localeReportWindow` to align with the existing locale naming convention used throughout the config file.

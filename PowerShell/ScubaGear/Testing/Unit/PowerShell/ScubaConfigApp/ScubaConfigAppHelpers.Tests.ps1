@@ -384,7 +384,7 @@
     Context 'Policy Migration Functions' {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'uiCfgPath')]
-            $uiCfgPath = (Resolve-Path (Join-Path $helpersPath '..\ScubaConfigApp_Control_en-US.json')).Path
+            $uiCfgPath = (Resolve-Path (Join-Path $helpersPath '..\ScubaConfigApp_Control.json')).Path
 
             Import-Module (Join-Path $helpersPath 'ScubaConfigAppDebugHelper.psm1')  -Force
             Import-Module (Join-Path $helpersPath 'ScubaConfigAppImportHelper.psm1') -Force

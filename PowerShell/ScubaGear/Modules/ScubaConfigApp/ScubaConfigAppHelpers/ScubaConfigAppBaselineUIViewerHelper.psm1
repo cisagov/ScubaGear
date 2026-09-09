@@ -125,8 +125,8 @@ Function Show-ScubaBaselinePolicyHelper {
                 } else {
                     # Try to find the control config relative to the baseline file
                     $possiblePaths = @(
-                        (Join-Path (Split-Path $BaselineFilePath -Parent) "ScubaConfigApp_Control_en-US.json"),
-                        (Join-Path (Split-Path $BaselineFilePath -Parent) "..\ScubaConfigApp_Control_en-US.json")
+                        (Join-Path (Split-Path $BaselineFilePath -Parent) "ScubaConfigApp_Control.json"),
+                        (Join-Path (Split-Path $BaselineFilePath -Parent) "..\ScubaConfigApp_Control.json")
                     )
                     foreach ($path in $possiblePaths) {
                         if (Test-Path $path) {
