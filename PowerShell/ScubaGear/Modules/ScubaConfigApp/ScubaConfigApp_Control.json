@@ -1,0 +1,1000 @@
+{
+  "Version": "2.6.1 (build 1400)",
+  "DebugMode": true,
+  "AutoSaveProgress": false,
+  "EnableSearchAndFilter": true,
+  "EnableScubaRun": true,
+  "AllowScubaRunInteractive": false,
+  "EnableResultReader": true,
+  "MinimumProductsRequired": 1,
+  "MaximumResults": 10,
+  "PullOnlineBaselines": false,
+  "EnablePolicyViewer": true,
+  "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json",
+  "LocalBaselineSchemaPath": "..\\..\\schemas\\ScubaBaselines.json",
+  "DefaultConfigsSchemaPath": "..\\ScubaConfig\\ScubaConfigDefaults.json",
+  "PolicyMigrationsCSVPath": "..\\..\\mappings\\scuba-baseline-policy-migrations.csv",
+  "policyMigration": {
+    "cacheFileName": "ScubaConfigApp_PolicyMigrationMap.json",
+    "csvColumns": {
+      "oldId": "Old ID",
+      "newId": "New ID",
+      "rationale": "Removal Rationale"
+    },
+    "migrationTypes": {
+      "removed": "Removed",
+      "decoupled": "Decoupled",
+      "direct": "Direct",
+      "versionBump": "VersionBump"
+    },
+    "versionBumpPattern": "^(?<stem>MS\\.[A-Z]+\\.\\d+\\.\\d+)v(?<ver>\\d+)$",
+    "reportMaxLinesPerSection": 15
+  },
+  "defaultAdvancedSettings": {
+    "OutPath_TextBox": ".",
+    "OutFolderName_TextBox": "M365BaselineConformance",
+    "OutProviderFileName_TextBox": "ProviderSettingsExport",
+    "OutRegoFileName_TextBox": "RegoOutput",
+    "OutReportName_TextBox": "BaselineReports",
+    "OutJsonFileName_TextBox": "ScubaResults",
+    "OutCsvFileName_TextBox": "ScubaResults",
+    "OutActionPlanFileName_TextBox": "ActionPlan",
+    "OutReportsName_TextBox": "ScubaReports",
+    "OpaPath_TextBox": ".",
+    "LogIn_CheckBox": true,
+    "DisconnectOnExit`_CheckBox": false
+  },
+  "products": [
+    {
+      "id": "Aad",
+      "name": "Microsoft Entra ID",
+      "supportsExclusions": true,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "SecuritySuite",
+      "name": "SecuritySuite",
+      "supportsExclusions": true,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "Exo",
+      "name": "Exchange Online",
+      "supportsExclusions": true,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "PowerBI",
+      "name": "Power BI",
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "PowerPlatform",
+      "name": "Power Platform",
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "Sharepoint",
+      "name": "SharePoint & OneDrive",
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
+    },
+    {
+      "id": "Teams",
+      "name": "Microsoft Teams",
+      "supportsExclusions": false,
+      "showInApp": true,
+      "showInViewer": true
+    }
+  ],
+  "M365Environment": [
+    {
+      "id": "commercial",
+      "name": "commercial"
+    },
+    {
+      "id": "gcc",
+      "name": "gcc"
+    },
+    {
+      "id": "gcchigh",
+      "name": "gcchigh"
+    },
+    {
+      "id": "dod",
+      "name": "dod"
+    }
+  ],
+  "requiredFields": {
+    "Organization": {
+      "fieldName": "Organization_TextBox",
+      "validationPatternName": "tenantDomain",
+      "toggleTrigger": "OnClick"
+    },
+    "OrgName": {
+      "fieldName": "OrgName_TextBox",
+      "validationPatternName": "orgName",
+      "toggleTrigger": "OnClick"
+    },
+    "AppId": {
+      "fieldName": "AppId_TextBox",
+      "validationPatternName": "guid",
+      "toggleTrigger": "ApplicationSection_Toggle"
+    },
+    "CertificateThumbprint": {
+      "fieldName": "CertificateThumbprint_TextBox",
+      "validationPatternName": "thumbprint",
+      "toggleTrigger": "ApplicationSection_Toggle"
+    },
+    "OPAPath": {
+      "fieldName": "OPAPath_TextBox",
+      "validationPatternName": "opaPath",
+      "toggleTrigger": "OpaSection_Toggle"
+    }
+  },
+  "settingsControl": {
+    "MainTab": {
+      "dataControlOutput": "GeneralSettingsData",
+      "validationKeys": [
+        "Organization",
+        "OrgName",
+        "OrgUnitName",
+        "Description",
+        "ProductNames",
+        "M365Environment"
+      ]
+    },
+    "AdvancedTab": {
+      "dataControlOutput": "AdvancedSettingsData",
+      "validationKeys": [
+        "AppId",
+        "CertificateThumbprint",
+        "OutPath",
+        "OutFolderName",
+        "OutProviderFileName",
+        "OutRegoFileName",
+        "OutReportName",
+        "OutJsonFileName",
+        "OutCsvFileName",
+        "OutActionPlanFileName",
+        "OPAPath",
+        "LogIn",
+        "DisconnectOnExit"
+      ],
+      "sectionControl": {
+        "ApplicationSection_Toggle": {
+          "fields": [
+            "AppId_TextBox",
+            "CertificateThumbprint_TextBox"
+          ]
+        },
+        "OutputSection_Toggle": {
+          "fields": [
+            "OutPath_TextBox",
+            "OutFolderName_TextBox",
+            "OutProviderFileName_TextBox",
+            "OutRegoFileName_TextBox",
+            "OutReportName_TextBox",
+            "OutJsonFileName_TextBox",
+            "OutCsvFileName_TextBox",
+            "OutActionPlanFileName_TextBox"
+          ]
+        },
+        "OpaSection_Toggle": {
+          "fields": [
+            "OpaPath_TextBox"
+          ]
+        },
+        "GeneralSection_Toggle": {
+          "fields": [
+            "LogIn_CheckBox",
+            "DisconnectOnExit_CheckBox"
+          ]
+        }
+      }
+    },
+    "GlobalTab": {
+      "dataControlOutput": "GlobalSettingsData",
+      "validationKeys": [
+        "PreferredDnsResolvers",
+        "SkipDoH"
+      ],
+      "sectionControl": {
+        "GlobalSettingsContainer": {
+          "fields": [
+            "PreferredDnsResolvers",
+            "SkipDoH"
+          ]
+        }
+      }
+    }
+  },
+  "baselineControls": [
+    {
+      "yamlValue": "[ProductName][PolicyId]",
+      "controlType": "Exclusions",
+      "dataControlOutput": "ExclusionData",
+      "fieldControlName": "exclusionField",
+      "defaultFields": "None",
+      "cardName": "Exclusion",
+      "showFieldType": true,
+      "showDescription": false,
+      "supportsAllProducts": false
+    },
+    {
+      "yamlValue": "AnnotatePolicy",
+      "controlType": "Annotations",
+      "dataControlOutput": "AnnotationData",
+      "fieldControlName": "annotationField",
+      "defaultFields": "Annotations",
+      "cardName": "Annotate",
+      "showFieldType": false,
+      "showDescription": true,
+      "supportsAllProducts": true
+    },
+    {
+      "yamlValue": "OmitPolicy",
+      "controlType": "Omissions",
+      "dataControlOutput": "OmissionData",
+      "fieldControlName": "omissionField",
+      "defaultFields": "Omissions",
+      "cardName": "Omit",
+      "showFieldType": false,
+      "showDescription": true,
+      "supportsAllProducts": true
+    }
+  ],
+  "ScubaRunConfig": {
+    "powershell": {
+      "version": "5.1",
+      "modules": [
+        "ScubaGear"
+      ],
+      "preCommands": [
+        "Import-Module ScubaGear -Force -Verbose",
+        "$Scope = If(([System.Security.Principal.WindowsIdentity]::GetCurrent()).groups -match \"S-1-5-32-544\"){\"AllUsers\"}Else{\"CurrentUser\"}",
+        "Write-Output \"Running with scope: $Scope\""
+      ],
+      "cmdlets": "Invoke-Scuba",
+      "postCommands": [
+        "Write-Output 'ScubaGear execution completed'",
+        "Get-ChildItem \"$env:temp\\ScubaConfigRun\" | Remove-Item -Force -ErrorAction SilentlyContinue -Verbose"
+      ],
+      "parameters": {
+        "SilenceBODWarnings": {
+          "type": "boolean",
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "DarkMode": {
+          "type": "boolean",
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "Quiet": {
+          "type": "boolean",
+          "defaultValue": false,
+          "hidden": false,
+          "readOnly": false
+        },
+        "NumberOfUUIDCharactersToTruncate": {
+          "type": "dropdown",
+          "items": [
+            0,
+            13,
+            18,
+            36
+          ],
+          "defaultValue": 18,
+          "hidden": false,
+          "readOnly": false
+        }
+      }
+    }
+  },
+  "Reports": {
+    "ShowProductSummaryReports": true,
+    "summaryColumns": [
+      "Manual",
+      "Failures",
+      "Warnings",
+      "Errors",
+      "Passes",
+      "Omits",
+      "IncorrectResults"
+    ],
+    "ProductColumns": [
+      "GroupReferenceURL",
+      "Control ID",
+      "Requirement",
+      "Result",
+      "Criticality",
+      "Details",
+      "OmittedEvaluationResult",
+      "IncorrectResult"
+    ]
+  },
+  "inputTypes": {
+    "CapExclusions": {
+      "name": "Conditional Access Policy Excluded Groups, Users, Applications, and Guest User Types",
+      "value": "CapExclusions",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Group Object Id's",
+          "value": "Groups",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "User Object Id's",
+          "value": "Users",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Cloud Applications",
+          "value": "Applications",
+          "valueType": "guidOrName",
+          "required": false
+        },
+        {
+          "type": "multiselect",
+          "name": "Guest User Types",
+          "value": "GuestUserTypes",
+          "valueType": "guestTypes",
+          "required": false
+        }
+      ]
+    },
+    "CapExclusionsWithoutApps": {
+      "name": "Conditional Access Policy Excluded Groups, Users, and Guest User Types Without Applications",
+      "value": "CapExclusions",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Group Object Id's",
+          "value": "Groups",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "User Object Id's",
+          "value": "Users",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "multiselect",
+          "name": "Guest User Types",
+          "value": "GuestUserTypes",
+          "valueType": "guestTypes",
+          "required": false
+        }
+      ]
+    },
+    "RoleExclusions": {
+      "name": "Privilege Identity Management Excluded Roles",
+      "value": "RoleExclusions",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Group Object Id's",
+          "value": "Groups",
+          "valueType": "guid",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "User Object Id's",
+          "value": "Users",
+          "valueType": "guid",
+          "required": false
+        }
+      ]
+    },
+    "SensitiveAccounts": {
+      "name": "Sensitive Accounts",
+      "value": "SensitiveAccounts",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Included User",
+          "value": "IncludedUsers",
+          "valueType": "email",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Included Groups Names",
+          "value": "IncludedGroups",
+          "valueType": "string",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Included Domain Names",
+          "value": "IncludedDomains",
+          "valueType": "domain",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Excluded User",
+          "value": "ExcludedUsers",
+          "valueType": "email",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Excluded Groups Names",
+          "value": "ExcludedGroups",
+          "valueType": "string",
+          "required": false
+        },
+        {
+          "type": "array",
+          "name": "Excluded Domains Names",
+          "value": "ExcludedDomains",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "SensitiveUsers": {
+      "name": "Defender's Sensitive Users",
+      "value": "",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Sensitive Users",
+          "value": "SensitiveUsers",
+          "valueType": "semicolonList",
+          "required": false
+        }
+      ]
+    },
+    "PartnerDomains": {
+      "name": "Partner Domains",
+      "value": "",
+      "fields": [
+        {
+          "type": "array",
+          "name": "PartnerDomains",
+          "value": "PartnerDomains",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "AllowedForwardingDomains": {
+      "name": "Allowed Forwarding Domains",
+      "value": "",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Enter domains allowed for forwarding",
+          "value": "AllowedForwardingDomains",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "AgencyDomains": {
+      "name": "Agency Domains",
+      "value": "",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Agency Domains",
+          "value": "AgencyDomains",
+          "valueType": "domain",
+          "required": false
+        }
+      ]
+    },
+    "PreferredDnsResolvers": {
+      "name": "Preferred DNS Resolver IP Addresses",
+      "value": "",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Enter preferred DNS resolver IP addresses:",
+          "value": "PreferredDnsResolvers",
+          "valueType": "ipAddress",
+          "required": false
+        }
+      ]
+    },
+    "skipDoH": {
+      "name": "Skip DNS over HTTPS",
+      "value": "",
+      "fields": [
+        {
+          "type": "boolean",
+          "name": "Check to skip DNS over HTTPS:",
+          "value": "SkipDoH",
+          "valueType": "boolean",
+          "required": false
+        }
+      ]
+    },
+    "Annotations": {
+      "name": "Annotation",
+      "value": "AnnotatePolicy",
+      "fields": [
+        {
+          "type": "boolean",
+          "name": "Incorrect Result (aka False Positive)",
+          "value": "IncorrectResult",
+          "valueType": "boolean",
+          "required": false
+        },
+        {
+          "type": "longstring",
+          "name": "Comment",
+          "value": "Comment",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "type": "dateString",
+          "name": "Remediation Date",
+          "value": "RemediationDate",
+          "valueType": "yearmonthday",
+          "dateDayMin": 0,
+          "dateDayMax": 1825,
+          "required": false
+        }
+      ]
+    },
+    "Omissions": {
+      "name": "Omissions",
+      "Value": "OmitPolicy",
+      "fields": [
+        {
+          "type": "longstring",
+          "name": "Rationale",
+          "value": "Rationale",
+          "valueType": "string",
+          "required": true
+        },
+        {
+          "type": "dateString",
+          "name": "Expiration Date",
+          "value": "Expiration",
+          "valueType": "yearmonthday",
+          "dateDayMin": 0,
+          "dateDayMax": 1825,
+          "required": false
+        }
+      ]
+    }
+  },
+  "valueValidations": {
+    "email": {
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "sample": "user@example.com",
+      "format": "user@example.com",
+      "invalidScriptMessage": "Email domain must be accessible and not temporary.",
+      "invalidScriptChecks": [
+        "$value -notmatch 'tempmail|disposable'"
+      ],
+      "sensitive": true
+    },
+    "domain": {
+      "pattern": "^(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\\.[A-Za-z0-9-]{1,63})+$",
+      "sample": "example.com",
+      "format": "user@example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "ipAddress": {
+      "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+      "sample": "192.168.1.1",
+      "format": "x.x.x.x",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "guid": {
+      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
+      "sample": "123e4567-e89b-12d3-a456-426614174000",
+      "format": "123e4567-e89b-12d3-a456-426614174000",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "guidOrName": {
+      "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$|^[a-zA-Z0-9]+$",
+      "sample": "123e4567-e89b-12d3-a456-426614174000 or Office365",
+      "format": "123e4567-e89b-12d3-a456-426614174000 or Office365",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "guestTypes": {
+      "itemType": "string",
+      "format": "multiselect",
+      "allowedValues": {
+        "b2bCollaborationGuest": "B2B collaboration guest users",
+        "b2bCollaborationMember": "B2B collaboration member users",
+        "b2bDirectConnectUser": "B2B direct connect users",
+        "internalGuest": "Local guest users",
+        "serviceProvider": "Service provider users",
+        "otherExternalUser": "Other external users"
+      },
+      "sensitive": false
+    },
+    "yearmonthday": {
+      "pattern": "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+      "sample": "2023-03-15",
+      "format": "yyyy-MM-dd",
+      "invalidScriptMessage": "Date must be between today and five years from now.",
+      "invalidScriptChecks": [
+        "[DateTime]::Parse($value) -gt (Get-Date).AddDays(-1)",
+        "[DateTime]::Parse($value) -lt (Get-Date).AddYears(5)"
+      ],
+      "sensitive": false
+    },
+    "semicolonList": {
+      "pattern": "^[^;@]+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "sample": "John Doe;jdoe@example.com",
+      "format": "John Doe;jdoe@example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": true
+    },
+    "thumbprint": {
+      "pattern": "^[A-Fa-f0-9]{40}$",
+      "sample": "1234567890abcdef1234567890abcdef12345678",
+      "format": "1234567890abcdef1234567890abcdef12345678",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "tenantDomain": {
+      "pattern": "^(?=.{1,253}$)([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$",
+      "sample": "example.onmicrosoft.com",
+      "format": "example.com",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "orgName": {
+      "pattern": "^[a-zA-Z0-9 .-]+$",
+      "sample": "Department of Example",
+      "format": "example",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    },
+    "orgUnitName": {
+      "pattern": "^[a-zA-Z0-9 .-]+$",
+      "sample": "Division of Example",
+      "format": "example",
+      "invalidScriptMessage": "",
+      "invalidScriptChecks": [],
+      "sensitive": false
+    }
+  },
+  "policyViewerSettings": {
+    "windowHeader": {},
+    "defaultContentHeaders": {},
+    "mainMarkdownMappings": {
+      "rationale": {
+        "jsonProperty": [
+          "introduction"
+        ]
+      },
+      "implementation": {
+        "jsonProperty": [
+          "keyTerminology"
+        ]
+      },
+      "licenseRequirements": {
+        "jsonProperty": [
+          "licenseCompliance"
+        ]
+      },
+      "resources": {
+        "jsonProperty": [
+          "assumptions"
+        ]
+      }
+    },
+    "policyMarkdownMappings": {
+      "section": {
+        "containerIndex": 0,
+        "jsonProperty": [
+          "sectionDescription"
+        ],
+        "headerBackground": "#E8E8E8",
+        "borderColor": "#C0C0C0",
+        "contentBackground": "#E8E8E8",
+        "isExpanded": false
+      },
+      "rationale": {
+        "containerIndex": 2,
+        "jsonProperty": [
+          "rationale"
+        ],
+        "headerBackground": "#F8F9FA",
+        "borderColor": "#E5E7EB",
+        "contentBackground": "#F8F9FA",
+        "isExpanded": true
+      },
+      "mitreMapping": {
+        "containerIndex": 3,
+        "jsonProperty": [
+          "mitreMapping"
+        ],
+        "headerBackground": "#FEE2E2",
+        "borderColor": "#EF4444",
+        "contentBackground": "#FEF2F2",
+        "isExpanded": false
+      },
+      "implementation": {
+        "containerIndex": 5,
+        "jsonProperty": [
+          "implementation"
+        ],
+        "headerBackground": "#F8F9FA",
+        "borderColor": "#E5E7EB",
+        "contentBackground": "#F8F9FA",
+        "isExpanded": true
+      },
+      "licenseRequirements": {
+        "containerIndex": 6,
+        "jsonProperty": [
+          "licenseRequirements"
+        ],
+        "headerBackground": "#FEF3C7",
+        "borderColor": "#F59E0B",
+        "contentBackground": "#FEF3C7",
+        "isExpanded": false
+      },
+      "resources": {
+        "containerIndex": 4,
+        "jsonProperty": [
+          "resources"
+        ],
+        "headerBackground": "#DBEAFE",
+        "borderColor": "#3B82F6",
+        "contentBackground": "#EFF6FF",
+        "isExpanded": false
+      }
+    }
+  },
+  "graphQueries": {
+    "Users": {
+      "endpoint": "/v1.0/users",
+      "directoryObjectType": "user",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "userPrincipalName"
+        },
+        {
+          "value": "mail"
+        },
+        {
+          "value": "id"
+        },
+        {
+          "value": "accountEnabled"
+        },
+        {
+          "value": "userType"
+        }
+      ],
+      "outProperty": "id",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "Groups": {
+      "endpoint": "/v1.0/groups",
+      "directoryObjectType": "group",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "description"
+        },
+        {
+          "value": "id"
+        },
+        {
+          "value": "groupTypes"
+        },
+        {
+          "value": "mailEnabled"
+        },
+        {
+          "value": "securityEnabled"
+        }
+      ],
+      "outProperty": "id",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "IncludedUsers": {
+      "endpoint": "/v1.0/users",
+      "directoryObjectType": "user",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "userPrincipalName"
+        },
+        {
+          "value": "mail"
+        },
+        {
+          "value": "id"
+        },
+        {
+          "value": "accountEnabled"
+        },
+        {
+          "value": "userType"
+        }
+      ],
+      "outProperty": "userPrincipalName",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "IncludedGroups": {
+      "endpoint": "/v1.0/groups",
+      "directoryObjectType": "group",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "description"
+        },
+        {
+          "value": "id"
+        },
+        {
+          "value": "groupTypes"
+        },
+        {
+          "value": "mailEnabled"
+        },
+        {
+          "value": "securityEnabled"
+        }
+      ],
+      "outProperty": "displayName",
+      "tipProperty": "description",
+      "allowMultipleSelection": true
+    },
+    "ExcludedUsers": {
+      "endpoint": "/v1.0/users",
+      "directoryObjectType": "user",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,userPrincipalName,mail,accountEnabled,userType"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "userPrincipalName"
+        },
+        {
+          "value": "mail"
+        },
+        {
+          "value": "id"
+        },
+        {
+          "value": "accountEnabled"
+        },
+        {
+          "value": "userType"
+        }
+      ],
+      "outProperty": "userPrincipalName",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": true
+    },
+    "ExcludedGroups": {
+      "endpoint": "/v1.0/groups",
+      "directoryObjectType": "group",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,displayName,description,groupTypes,securityEnabled,mailEnabled"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "description"
+        },
+        {
+          "value": "id"
+        },
+        {
+          "value": "groupTypes"
+        },
+        {
+          "value": "mailEnabled"
+        },
+        {
+          "value": "securityEnabled"
+        }
+      ],
+      "outProperty": "displayName",
+      "tipProperty": "description",
+      "allowMultipleSelection": true
+    },
+    "AppId_TextBox": {
+      "endpoint": "/v1.0/applications",
+      "directoryObjectType": "application",
+      "queryfilterProperty": "displayName",
+      "queryParameters": {
+        "$select": "id,appId,displayName"
+      },
+      "searchProperty": "displayName",
+      "displayColumnOrder": [
+        {
+          "value": "displayName"
+        },
+        {
+          "value": "appId"
+        },
+        {
+          "value": "id"
+        }
+      ],
+      "outProperty": "appId",
+      "tipProperty": "displayName",
+      "allowMultipleSelection": false
+    }
+  }
+}

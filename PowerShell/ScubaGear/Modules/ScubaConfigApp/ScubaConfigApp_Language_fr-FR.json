@@ -1,0 +1,343 @@
+{
+  "Language": "fr-FR",
+  "localeContext": {
+    "Title_TextBlock": "Éditeur de configuration SCuBAGear",
+    "SubTitle_TextBlock": "Créez un fichier de configuration pour les exclusions, annotations et omissions des contrôles de référence SCuBAGear",
+    "M365Environment_TextBlock": "Sélectionnez votre environnement M365",
+    "Products_TextBlock": "Sélectionnez au moins un produit :",
+    "ExclusionsProducts_TextBlock": "Produits prenant en charge les exclusions :",
+    "ExclusionsInfo_TextBlock": "Les exclusions sont prises en charge pour les produits suivants : {0}",
+    "Organization_Required_TextBlock": "Obligatoire. Doit être au format : nom.onmicrosoft.com ou nom.onmicrosoft.us",
+    "OrgName_Required_TextBlock": "Cette option est requise pour les soumissions BOD.",
+    "ExclusionsTabInfo_TextBlock": "Configurez des exclusions pour des stratégies spécifiques. Les exclusions vous permettent de personnaliser le comportement des stratégies en excluant certains utilisateurs, groupes, domaines ou autres entités de l'évaluation des stratégies. Les produits doivent être sélectionnés dans l'onglet principal avant de configurer les exclusions.",
+    "AnnotationsTabInfo_TextBlock": "Ajoutez des commentaires et des annotations aux stratégies à des fins de documentation et de suivi. Les produits doivent être sélectionnés dans l'onglet principal avant de configurer les annotations.",
+    "OmissionsTabInfo_TextBlock": "Sélectionnez des stratégies à omettre de l'évaluation et fournissez une justification. Les produits doivent être sélectionnés dans l'onglet principal avant de configurer les omissions.",
+    "PreviewTabInfo_TextBlock": "Prévisualisez votre configuration avant de l'enregistrer. Assurez-vous que toutes les exclusions et omissions sont correctement définies.",
+    "ScubaRunDescription_TextBlock": "Exécutez l'évaluation ScubaGear avec la configuration actuelle. Assurez-vous d'avoir créé une configuration YAML valide avant l'exécution."
+  },
+  "localePlaceholder": {
+    "Organization_TextBox": "Entrez le nom du locataire (ex. : exemple.onmicrosoft.com)",
+    "OrgName_TextBox": "Entrez le nom de l'organisation",
+    "OrgUnitName_TextBox": "Entrez le nom de l'unité organisationnelle",
+    "Description_TextBox": "Entrez une description pour cette configuration (facultatif)",
+    "AppId_TextBox": "Entrez l'ID d'application (format GUID)",
+    "CertificateThumbprint_TextBox": "Entrez l'empreinte du certificat (40 caractères hexadécimaux)",
+    "SearchPlaceholder_TextBox": "Rechercher des stratégies par nom ou ID...",
+    "ClearSearch_Button": "Effacer la recherche",
+    "AllCriticality_ComboBox": "Toutes les criticités",
+    "CriticalityFilter_ComboBox": "{0} uniquement",
+    "ResultCount_TextBlock": "{0} stratégies"
+  },
+  "localeTitles": {
+    "DuplicateEntry": "Entrée en double",
+    "Success": "Succès",
+    "ValidationError": "Erreur de validation",
+    "ConfirmRemove": "Confirmer la suppression",
+    "Error": "Erreur",
+    "Information": "Information",
+    "Warning": "Avertissement",
+    "Confirmation": "Confirmation",
+    "RequiredFieldsMissing": "Champs obligatoires manquants",
+    "GraphError": "Erreur Graph",
+    "ExportDebugLog": "Exporter le journal de débogage",
+    "ExportSanitizedDebugLog": "Exporter le journal de débogage nettoyé",
+    "ExportSuccessful": "Exportation réussie",
+    "ExportError": "Erreur d'exportation",
+    "SessionRestored": "Session restaurée",
+    "ConfigurationViewer": "Visionneuse de configuration",
+    "ReportNotFound": "Rapport introuvable",
+    "ConfigurationViewerError": "Erreur de la visionneuse de configuration",
+    "ConnectionError": "Erreur de connexion",
+    "NoSelection": "Aucune sélection",
+    "DebugWindowError": "Erreur de fenêtre de débogage",
+    "NewSession": "Nouvelle session",
+    "ImportComplete": "Importation terminée",
+    "ImportError": "Erreur d'importation",
+    "ValidationErrors": "Erreurs de validation",
+    "CopyComplete": "Copie terminée",
+    "NothingToCopy": "Rien à copier",
+    "CopyError": "Erreur de copie",
+    "NothingToDownload": "Rien à télécharger",
+    "SaveComplete": "Enregistrement terminé",
+    "SaveError": "Erreur d'enregistrement",
+    "CertificateStoreError": "Erreur du magasin de certificats",
+    "NoCertificates": "Aucun certificat",
+    "RestoreError": "Erreur de restauration",
+    "ConfirmClose": "Confirmer la fermeture"
+  },
+  "localeInfoMessages": {
+    "NoPoliciesAvailable": "Aucune stratégie disponible pour ce produit.",
+    "PolicySaving": "Enregistrement de {0} pour la stratégie : {1}",
+    "CollectedArrayField": "Champ tableau collecté [{0}][{1}] : {2}",
+    "CollectedBooleanField": "Champ booléen collecté [{0}][{1}] : {2}",
+    "CollectedStringField": "Champ chaîne collecté [{0}][{1}] : {2}",
+    "MergedCardField": "{0} fusionné pour [{1}][{2}][{3}] : {4}",
+    "SelectedCertificateThumbprint": "Empreinte de certificat sélectionnée : {0}",
+    "FilterApplied": "Filtre appliqué : {0} stratégies visibles",
+    "SearchCleared": "Critères de recherche effacés",
+    "ScubaRunReady": "Prêt à exécuter ScubaGear {0}",
+    "PowerShellVersionRequired": "PowerShell {0} requis"
+  },
+  "localeErrorMessages": {
+    "CertificateNotFound": "Aucun certificat approprié trouvé dans le magasin de certificats personnel de l'utilisateur actuel.",
+    "WindowError": "Erreur lors du chargement de l'écran",
+    "OrganizationValidation": "Le nom de l'organisation est requis et doit être au format : exemple.onmicrosoft.com ou exemple.onmicrosoft.us",
+    "OrgNameValidation": "Le nom de l'organisation est requis. Veuillez fournir un nom d'organisation valide.",
+    "AppIdValidation": "L'ID d'application doit être au format GUID (ex. : 12345678-1234-1234-1234-123456789abc)",
+    "CertificateValidation": "L'empreinte du certificat doit contenir 40 caractères hexadécimaux",
+    "CertificateStoreAccessError": "Erreur lors de l'accès au magasin de certificats : {0}",
+    "OpaPathValidation": "Exécutable OPA introuvable. Assurez-vous que 'opa_windows_amd64.exe' ou 'opa.exe' est présent dans le chemin spécifié : {0}",
+    "OpaFileNotExist": "Le chemin OPA n'existe pas : {0}",
+    "PreviewValidation": "Veuillez vérifier tous les champs pour les erreurs avant de continuer.",
+    "CopyError": "Aucun contenu YAML à copier. Veuillez d'abord générer la configuration.",
+    "DownloadNullError": "Aucun contenu YAML à télécharger. Veuillez d'abord générer la configuration.",
+    "NewFieldCardWarning": "Avertissement : champ '{0}' introuvable dans les données {1} pour {2}",
+    "InvalidEmailFormat": "Format d'e-mail invalide. Veuillez utiliser le format : utilisateur@domaine.com",
+    "InvalidGuidFormat": "Format GUID invalide. Veuillez utiliser le format : 12345678-1234-1234-1234-123456789abc",
+    "InvalidDomainFormat": "Format de domaine invalide. Veuillez utiliser le format : exemple.com",
+    "InvalidIpAddressFormat": "Format d'adresse IP invalide. Veuillez utiliser le format : 192.168.1.1",
+    "FieldSelectionError": "Erreur lors de la sélection de {0} : {1}",
+    "RequiredFieldValidation": "Le champ obligatoire '{0}' ne peut pas être vide",
+    "RequiredFieldsValidation": "Les champs obligatoires suivants ne peuvent pas être vides : {0}",
+    "SkippingNullCard": "Carte nulle ignorée pour la stratégie : {0}",
+    "RemoveEventHandlerError": "Erreur lors de la suppression du gestionnaire d'événements pour : {0}",
+    "CertificateSelectionError": "Erreur lors de la sélection du certificat : {0}",
+    "ProductSelection": "Au moins {0} produit(s) doit/doivent être sélectionné(s) pour que la configuration soit valide.",
+    "ScubRunIncomplete": "Configuration incomplète - vérifier l'onglet principal",
+    "ScubRunConfigFailed": "Échec de la génération de la configuration temporaire",
+    "ScubRunInteractiveNotAllowed": "ScubaGear ne peut pas être exécuté de manière interactive. Activez les paramètres de l'application dans l'onglet 'Avancé' et fournissez un ID d'application et une empreinte de certificat.",
+    "GraphConnectionError": "Microsoft Graph n'est pas connecté. Veuillez vérifier votre connexion et réessayer.",
+    "PleaseSelectItem": "Veuillez sélectionner un élément.",
+    "ConfigurationFileNotFound": "Fichier de configuration introuvable : {0}",
+    "ConfigurationViewerError": "Erreur lors de l'ouverture de la visionneuse de configuration : {0}",
+    "ConfigurationFileNotFoundInResults": "Fichier de configuration introuvable dans le dossier de résultats : {0}",
+    "NoConfigurationFileAvailable": "Aucun fichier de configuration disponible. Exécutez d'abord ScubaGear pour générer un fichier de configuration.",
+    "HtmlReportNotFound": "Rapport HTML introuvable dans le dossier.",
+    "FailedToOpenDebugWindow": "Erreur lors de l'ouverture de la fenêtre de débogage : {0}",
+    "ConfigurationCopiedToClipboard": "Configuration copiée dans le presse-papiers",
+    "FailedToCopyToClipboard": "Erreur lors de la copie dans le presse-papiers : {0}",
+    "ImportConfigFileError": "Erreur lors de l'importation du fichier de configuration : {0}",
+    "ImportConfigError": "Erreur lors de l'importation de la configuration : {0}",
+    "RestoreSessionError": "Une erreur s'est produite lors de la restauration de la session : {0}",
+    "ValidationErrorsPrefix": "Les erreurs de validation suivantes se sont produites : {0}"
+  },
+  "localePopupMessages": {
+    "NewSessionConfirmation": "Êtes-vous sûr de vouloir réinitialiser la session ? Toutes les sélections et configurations actuelles seront effacées.",
+    "ImportSuccess": "Configuration importée avec succès.",
+    "CopySuccess": "Configuration YAML copiée avec succès dans le presse-papiers.",
+    "AnnotationSavedSuccess": "Annotation pour [{0}] enregistrée avec succès.",
+    "AnnotationRemoveSuccess": "Annotation pour [{0}] supprimée avec succès.",
+    "AnnotationRemoveConfirmation": "Voulez-vous vraiment supprimer l'annotation pour [{0}] ?",
+    "DuplicateEntry": "La valeur est déjà présente dans la liste.",
+    "FieldSelectionError": "Erreur lors de la sélection de {0} : {1}",
+    "CardSavedSuccess": "[{0}] {1} enregistré avec succès pour : {2}",
+    "NoEntriesFound": "Aucune entrée {0} saisie. Veuillez renseigner au moins un champ dans les champs {0} disponibles.",
+    "RemoveCardPolicyConfirmation": "Voulez-vous vraiment supprimer tous les {0} pour [{1}] ?",
+    "RemoveCardEntrySuccess": "[{0}] {1} supprimé avec succès.",
+    "YamlClipboardComplete": "Aperçu YAML copié avec succès dans le presse-papiers.",
+    "YamlClipboardNoPreview": "Aucun aperçu YAML à copier.",
+    "YamlClipboardError": "Erreur lors de la copie de l'aperçu YAML dans le presse-papiers : {0}",
+    "YamlSaveSuccess": "Configuration enregistrée avec succès sous : {0}",
+    "YamlSaveError": "Erreur lors de l'enregistrement de la configuration au format YAML : {0}",
+    "DebugLogsCopied": "Journaux de débogage copiés avec succès dans le presse-papiers.",
+    "DebugLogsNoEntries": "Aucun journal de débogage à copier.",
+    "DebugLogsError": "Erreur lors de la copie des journaux de débogage dans le presse-papiers : {0}",
+    "ProductSelectionError": "Au moins {0} produit(s) doit/doivent être sélectionné(s) pour que la configuration soit valide.",
+    "NoUsersSelected": "Veuillez sélectionner au moins un utilisateur.",
+    "AtLeastOneSelectionRequired": "Veuillez effectuer au moins une sélection.",
+    "InvalidPolicyId": "Format d'ID de stratégie invalide.",
+    "ConfirmRemovalOfCard": "Voulez-vous vraiment supprimer cet élément ?",
+    "ValidationErrors": "Veuillez corriger les erreurs de validation avant de continuer.",
+    "GraphError": "Erreur lors de la récupération des données depuis Graph : {0}",
+    "CloseConfirmation": "Êtes-vous sûr de vouloir fermer l'éditeur de configuration SCuBAGear ?\n\nToutes les informations saisies seront perdues.\n\nPour sauvegarder vos données, cliquez sur 'Aperçu et générer' puis sur 'Télécharger YAML'.",
+    "GraphNotConnected": "Microsoft Graph n'est pas connecté.`n`nPour connecter Graph, redémarrez l'application avec le paramètre -Online ou utilisez Connect-MgGraph manuellement."
+  },
+  "localeStatusMessages": {
+    "GraphConnected": "Graph connecté",
+    "GraphDisconnected": "Graph déconnecté",
+    "DebugLogExported": "Journal de débogage exporté vers : {0}",
+    "SanitizedLogExported": "Journal de débogage nettoyé exporté vers {0}, fichier de correspondance : {1}",
+    "DebugLogExportedNoSensitiveData": "Journal de débogage exporté (aucune donnée sensible) : {0}",
+    "ExportFailed": "Échec de l'exportation : {0}",
+    "SessionRestored": "Session restaurée avec succès depuis : {0}",
+    "SessionRestoreCompleted": "Restauration de la session terminée.",
+    "NoSearchText": "Aucun texte à rechercher",
+    "RestoreFrom": "Restauration depuis : {0}",
+    "ChangelogSource": "Source : {0}"
+  },
+  "localeYamlComments": {
+    "ConfigurationFile": "# Fichier de configuration ScubaGear",
+    "GeneratedOn": "# Généré le : {0}",
+    "OrganizationConfiguration": "# Configuration de l'organisation",
+    "ConfigurationDetails": "# Détails de configuration",
+    "AdvancedSettings": "# Paramètres avancés",
+    "GlobalSettings": "# Paramètres globaux",
+    "BaselineControl": "#  Contrôle de référence : {0}"
+  },
+  "localeProgressMessages": {
+    "SanitizedDebugLogExportSuccess": "Journal de débogage nettoyé exporté avec succès !\n\nFichier journal : {0}\nFichier de correspondance : {1}\n\nLe fichier de correspondance contient la corrélation entre les valeurs originales et nettoyées pour le débogage.",
+    "DebugLogExportSuccess": "Journal de débogage exporté avec succès vers :\n{0}",
+    "DebugLogExportNoSensitiveData": "Journal de débogage exporté avec succès vers :\n{0}\n\nAucune donnée sensible trouvée à nettoyer.",
+    "DebugLogExportError": "Erreur lors de l'exportation du journal de débogage : {0}",
+    "SessionRestoreSuccess": "Session précédente restaurée avec succès ! {0} stratégies et {1} configurations de paramètres restaurées.",
+    "SessionRestoreFinalize": "Finalisation de la restauration...",
+    "SessionRestoreStatus": "Session restaurée avec succès"
+  },
+  "localeHelpTips": {
+    "Organization_HelpLabel": {
+      "Title": "Domaine de l'organisation",
+      "Content": "Entrez le domaine de votre organisation (ex. : exemple.onmicrosoft.com). Celui-ci est utilisé pour se connecter à votre locataire Microsoft 365.",
+      "AdditionalSections": {
+        "Example": "exemple.onmicrosoft.com",
+        "Required": "Oui, ce champ est obligatoire",
+        "Note": "Doit être un domaine de locataire Microsoft 365 valide"
+      },
+      "Placement": "Right"
+    },
+    "OrgName_HelpLabel": {
+      "Title": "Nom de l'organisation",
+      "Content": "Entrez le nom de votre organisation. Celui-ci est utilisé à des fins de documentation.",
+      "AdditionalSections": {
+        "Example": "Exemple SARL",
+        "Required": "Cette option est requise pour les soumissions de conformité SCuBA et BOD",
+        "Note": "Celui-ci sera inclus dans le fichier de configuration"
+      },
+      "Placement": "Right"
+    },
+    "OrgUnitName_HelpLabel": {
+      "Title": "Nom de l'unité organisationnelle",
+      "Content": "Entrez le nom de la sous-unité de votre organisation. Celui-ci est utilisé à des fins de documentation.",
+      "AdditionalSections": {
+        "Example": "Département informatique",
+        "Required": "Cette option n'est pas requise pour les soumissions de conformité SCuBA et BOD",
+        "Note": "Celui-ci sera inclus dans le fichier de configuration"
+      },
+      "Placement": "Right"
+    },
+    "ProductNames_HelpLabel": {
+      "Title": "Noms des produits",
+      "Content": "Sélectionnez les produits à inclure dans la configuration.",
+      "AdditionalSections": {
+        "Required": "Au moins un produit doit être sélectionné.",
+        "Note": "Ceux-ci seront inclus dans le fichier de configuration"
+      },
+      "Placement": "Right"
+    }
+  },
+  "localizedControl": {
+    "products": {
+      "Aad": { "displayName": "Microsoft Entra ID (aad)" },
+      "SecuritySuite": { "displayName": "Suite de sécurité (defender)" },
+      "Exo": { "displayName": "Exchange Online (exo)" },
+      "PowerBI": { "displayName": "Power BI (powerbi)" },
+      "PowerPlatform": { "displayName": "Power Platform (powerplatform)" },
+      "Sharepoint": { "displayName": "SharePoint et OneDrive (sharepoint)" },
+      "Teams": { "displayName": "Microsoft Teams (teams)" }
+    },
+    "M365Environment": {
+      "commercial": {
+        "displayName": "Commercial",
+        "rationale": "Environnement de production pour les locataires publics."
+      },
+      "gcc": {
+        "displayName": "Government Community Cloud",
+        "rationale": "Environnement de production pour les locataires gouvernementaux."
+      },
+      "gcchigh": {
+        "displayName": "Government Community Cloud High",
+        "rationale": "Environnement de production pour les locataires GCC High."
+      },
+      "dod": {
+        "displayName": "Département de la Défense",
+        "rationale": "Environnement de production pour les locataires du Département de la Défense."
+      }
+    },
+    "settingsControl": {
+      "MainTab": { "name": "Principal" },
+      "AdvancedTab": {
+        "name": "Avancé",
+        "sectionControl": {
+          "ApplicationSection_Toggle": { "sectionName": "Authentification de l'application" },
+          "OutputSection_Toggle": { "sectionName": "Configuration de la sortie" },
+          "OpaSection_Toggle": { "sectionName": "Configuration OPA" },
+          "GeneralSection_Toggle": { "sectionName": "Paramètres généraux" }
+        }
+      },
+      "GlobalTab": {
+        "name": "Paramètres globaux",
+        "description": "Configurez les paramètres globaux qui s'appliquent à toutes les stratégies et configurations.",
+        "sectionControl": {
+          "GlobalSettingsContainer": { "sectionName": "Paramètres globaux" }
+        }
+      }
+    },
+    "baselineControls": {
+      "Exclusions": {
+        "tabName": "Exclusions",
+        "filterAllLabel": "Toutes les stratégies d'exclusion",
+        "filterConfiguredLabel": "Exclusions configurées",
+        "filterNotConfiguredLabel": "Exclusions non configurées"
+      },
+      "Annotations": {
+        "tabName": "Annoter les stratégies",
+        "filterAllLabel": "Toutes les stratégies d'annotation",
+        "filterConfiguredLabel": "Stratégies annotées",
+        "filterNotConfiguredLabel": "Stratégies non annotées"
+      },
+      "Omissions": {
+        "tabName": "Omettre les stratégies",
+        "filterAllLabel": "Toutes les stratégies d'omission",
+        "filterConfiguredLabel": "Stratégies omises",
+        "filterNotConfiguredLabel": "Stratégies non omises"
+      }
+    },
+    "ScubaRunConfig": {
+      "sectionName": "Exécuter la configuration ScubaGear",
+      "description": "Cette section permet d'exécuter ScubaGear avec la configuration actuelle.",
+      "parameters": {
+        "SilenceBODWarnings": {
+          "name": "Masquer les avertissements BOD",
+          "description": "Masquer les avertissements BOD."
+        },
+        "DarkMode": {
+          "name": "Mode sombre",
+          "description": "Afficher le rapport ScubaGear en mode sombre."
+        },
+        "Quiet": {
+          "name": "Mode silencieux",
+          "description": "Exécuter ScubaGear en mode silencieux et masquer la sortie du rapport."
+        },
+        "NumberOfUUIDCharactersToTruncate": {
+          "name": "Nombre de caractères UUID à tronquer",
+          "description": "Indiquez le nombre de caractères à tronquer dans l'UUID."
+        }
+      }
+    },
+    "Reports": { "tabName": "Résumé du rapport" }
+  },
+  "policyMigration": {
+    "localeReportWindow": {
+      "title": "Migration de stratégies héritées appliquée",
+      "intro": "Ce fichier de configuration contenait {0} paramètre(s) de stratégie hérité(s).",
+      "outro": "Veuillez vérifier les paramètres mis à jour avant de sauvegarder.",
+      "sections": {
+        "migrated": {
+          "prefix": "MIGRÉ",
+          "heading": "MIGRÉ AUTOMATIQUEMENT ({0}) :"
+        },
+        "decoupled": {
+          "prefix": "DÉCOUPLÉ",
+          "heading": "RÉVISION REQUISE - STRATÉGIE DIVISÉE ({0}) :",
+          "body": "Ces stratégies ont été divisées en plusieurs nouvelles stratégies. Les paramètres n'ont été appliqués qu'à la première cible listée.\nVeuillez configurer manuellement les nouvelles stratégies restantes dans l'application."
+        },
+        "dropped": {
+          "prefix": "SUPPRIMÉ",
+          "heading": "SUPPRIMÉ - SANS REMPLACEMENT ({0}) :"
+        },
+        "skipped": {
+          "prefix": "IGNORÉ"
+        }
+      }
+    }
+  }
+}
