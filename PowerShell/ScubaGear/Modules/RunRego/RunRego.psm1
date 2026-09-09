@@ -42,6 +42,8 @@ function Invoke-Rego {
     if (-not (Test-Path -LiteralPath $Cmd)) {
         throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and which directory it should be placed."
     }
+    # Must be absolute because OPA is launched with a working directory other than the caller's.
+    $Cmd = (Resolve-Path -LiteralPath $Cmd -ErrorAction Stop).Path
 
     # Load Utils
     if (-not (Test-Path -LiteralPath $RegoFile -PathType Leaf)) {
@@ -61,18 +63,26 @@ function Invoke-Rego {
     if (-not (Test-Path -LiteralPath $ScubaUtils -PathType Container)) {
         throw "Rego Utils directory not found at: $ScubaUtils"
     }
-    $ResolvedScubaUtils = (Resolve-Path -LiteralPath $ScubaUtils -ErrorAction Stop).Path
 
-    $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $ResolvedInputFile, "-d", $ResolvedRegoFile, "-d", $ResolvedScubaUtils, "-f", "values")
+    # OPA's -d flag treats everything before a colon as a data prefix, so an absolute Windows path such as
+    # "C:\...\AADConfig.rego" is parsed as prefix "C" plus "\...\AADConfig.rego" and then resolved against the
+    # drive of OPA's working directory. Run OPA from the Rego folder and pass -d values as bare relative names
+    # so the module still loads when the working directory is on a different drive than ScubaGear.
+    $RegoWorkingDirectory = (Resolve-Path -LiteralPath $RegoFileObject.DirectoryName -ErrorAction Stop).Path
+    $RegoFileArg = $RegoFileObject.Name
+    $ScubaUtilsArg = "Utils"
+
+    $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $ResolvedInputFile, "-d", $RegoFileArg, "-d", $ScubaUtilsArg, "-f", "values")
 
     Write-Debug "OPA Command: $Cmd"
     Write-Debug "OPA Arguments: $($CmdArgs -join ' ')"
+    Write-Debug "OPA WorkingDirectory: $RegoWorkingDirectory"
     Write-Debug "InputFile: $ResolvedInputFile"
     Write-Debug "RegoFile: $ResolvedRegoFile"
-    Write-Debug "ScubaUtils: $ResolvedScubaUtils"
+    Write-Debug "ScubaUtils: $ScubaUtils"
     Write-Debug "PackageName: $PackageName"
 
-    $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
+    $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -WorkingDirectory $RegoWorkingDirectory -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
     $RegoOutput
 }
 
@@ -81,6 +91,7 @@ function Invoke-ExternalCmd{
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
         [string]$LiteralPath,
+        [string]$WorkingDirectory,
         [Parameter(ValueFromRemainingArguments=$true)]
         $PassThruArgs
     )
@@ -91,6 +102,10 @@ function Invoke-ExternalCmd{
     $ProcessStartInfo.RedirectStandardOutput = $true
     $ProcessStartInfo.RedirectStandardError = $true
     $ProcessStartInfo.CreateNoWindow = $true
+    # Without this the child inherits the host process' current directory, which PowerShell's Set-Location does not update.
+    if (-not [string]::IsNullOrWhiteSpace($WorkingDirectory)) {
+        $ProcessStartInfo.WorkingDirectory = $WorkingDirectory
+    }
 
     $EscapedArgs = foreach ($Arg in $PassThruArgs) {
         $ArgText = [string]$Arg
