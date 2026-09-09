@@ -721,7 +721,7 @@ function Invoke-SCuBA {
                 }
             }
             else {
-                Invoke-ReportCreation -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet
+                Invoke-ReportCreation -ScubaConfig Can  yi -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -DarkMode:$DarkMode -Quiet:$Quiet
             }
 
             $FullNameParams = @{
@@ -1158,6 +1158,14 @@ function Invoke-RunRego {
             }
             $FileName = Join-Path -Path $OutFolderPath "$($ScubaConfig.OutRegoFileName).json" -ErrorAction 'Stop'
             $TestResultsJson | Set-Content -LiteralPath $FileName -Encoding (Get-FileEncoding) -ErrorAction 'Stop'
+
+            # Continuing here would produce a report with no results at all, which reads as a clean run.
+            if ($ProdRegoFailed.Count -eq $ScubaConfig.ProductNames.Count) {
+                $AllFailedMessage = "Every product's Rego evaluation failed, so no results were produced. "
+                $AllFailedMessage += "Review the warnings above for the OPA error and see $FileName. "
+                $AllFailedMessage += "Do not copy a Rego output file from another run to work around this; the report would describe the wrong tenant."
+                throw $AllFailedMessage
+            }
 
             $ProdRegoFailed
         }
