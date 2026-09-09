@@ -1254,7 +1254,7 @@ Function Show-ScubaBaselinePolicyHelper {
                     try {
                         while ($syncHash.NavigationQueue.Count -gt 0) {
                             $targetPolicyId = $syncHash.NavigationQueue.Dequeue()
-                            Write-Host "Processing navigation request to policy: $targetPolicyId"
+                            Write-Verbose "Processing navigation request to policy: $targetPolicyId"
 
                             # Find and navigate to the policy
                             $foundPolicy = $null
@@ -1285,7 +1285,7 @@ Function Show-ScubaBaselinePolicyHelper {
                                     if ($policyItem) {
                                         $policySelector.SelectedItem = $policyItem
                                         $policySelector.ScrollIntoView($policyItem)
-                                        Write-Host "Navigated to policy: $targetPolicyId"
+                                        Write-Verbose "Navigated to policy: $targetPolicyId"
                                     }
                                 }
                             } else {
@@ -1302,7 +1302,7 @@ Function Show-ScubaBaselinePolicyHelper {
                 if (-not [string]::IsNullOrWhiteSpace($NavigateToPolicyId)) {
                     $window.Add_Loaded({
                         try {
-                            Write-Host "Searching for policy: $NavigateToPolicyId"
+                            Write-Verbose "Searching for policy: $NavigateToPolicyId"
 
                             # Find the policy in the data and expand its product
                             $foundPolicy = $null
@@ -1321,7 +1321,7 @@ Function Show-ScubaBaselinePolicyHelper {
                             }
 
                             if ($foundPolicy) {
-                                Write-Host "Found policy in product: $foundProductKey"
+                                Write-Verbose "Found policy in product: $foundProductKey"
 
                                 # Find and expand the product header
                                 $productItem = $navigationItems | Where-Object { $_.Type -eq "ProductHeader" -and $_.ProductKey -eq $foundProductKey }
@@ -1340,7 +1340,7 @@ Function Show-ScubaBaselinePolicyHelper {
                                         $policySelector.SelectedItem = $policyItem
                                         $policySelector.ScrollIntoView($policyItem)
 
-                                        Write-Host "Navigated to policy: $NavigateToPolicyId"
+                                        Write-Verbose "Navigated to policy: $NavigateToPolicyId"
                                     } else {
                                         Write-Warning "Policy item not found in display: $NavigateToPolicyId"
                                     }

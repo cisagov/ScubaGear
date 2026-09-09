@@ -34,11 +34,13 @@ function Test-ScAPolicyRequirement {
     # Navigate to the target property.
     $currentValue = $Policy
     $currentPath = ""
+    # Traverse the policy object according to the actual path to reach the target property.
     foreach ($part in $actualPath) {
         $currentPath = if ($currentPath) { "$currentPath.$part" } else { $part }
         if ($null -eq $currentValue) {
             return @{ Meets = $false; Issues = @("ERROR: Property path is null at: $currentPath") }
         }
+        # If the current value is null, we cannot proceed further down the path.
         if ($currentValue.PSObject.Properties.Name -contains $part) {
             $currentValue = $currentValue.$part
         } else {
@@ -46,8 +48,12 @@ function Test-ScAPolicyRequirement {
         }
     }
 
+    # At this point, $currentValue holds the value of the target property specified by the schema path.
     $meets = $true
 
+    # Compare the current value against the expected value to determine if the requirement is met.
+    # If the expected value is an array, check that all expected items are present in the current value.
+    # If the expected value is a hashtable or PSCustomObject, recursively check each property.
     if ($ExpectedValue -is [array]) {
         if ($null -eq $currentValue) {
             return @{ Meets = $false; Issues = @("ERROR: $FriendlyName is null (expected: $($ExpectedValue -join ', '))") }
@@ -71,6 +77,7 @@ function Test-ScAPolicyRequirement {
         $anyOfProp  = $reqProps | Where-Object { $_.Name -eq 'anyOf' } | Select-Object -First 1
         $otherProps = $reqProps | Where-Object { $_.Name -ne 'anyOf' }
 
+        # First, handle all properties that are not part of the 'anyOf' alternatives.
         foreach ($prop in $otherProps) {
             $nestedResult = Test-ScAPolicyRequirement -Policy $Policy -SchemaPath "$SchemaPath.$($prop.Name)" -ExpectedValue $prop.Value -FriendlyName "$FriendlyName > $($prop.Name)"
             if (-not $nestedResult.Meets) {
@@ -79,6 +86,7 @@ function Test-ScAPolicyRequirement {
             }
         }
 
+        # Next, handle the 'anyOf' alternatives, if present.
         if ($anyOfProp) {
             $alternatives = @($anyOfProp.Value)
             $anyMatched = $false
@@ -86,6 +94,7 @@ function Test-ScAPolicyRequirement {
                 $altResult = Test-ScAPolicyRequirement -Policy $Policy -SchemaPath $SchemaPath -ExpectedValue $alt -FriendlyName $FriendlyName
                 if ($altResult.Meets) { $anyMatched = $true; break }
             }
+            # If none of the 'anyOf' alternatives matched, record an error.
             if (-not $anyMatched) {
                 $optionNames = @($alternatives | ForEach-Object {
                     (@($_.PSObject.Properties.Name | ForEach-Object { Get-ScAFriendlyName -Path "$SchemaPath.$_" }) -join ' + ')
@@ -102,6 +111,7 @@ function Test-ScAPolicyRequirement {
         }
     }
 
+    # Return the result indicating whether the policy meets the requirement and any issues found.
     return @{ Meets = $meets; Issues = $issues }
 }
 
@@ -116,8 +126,10 @@ function Test-ScAPolicyRelevance {
     #>
     param($Policy, $Requirements, $Rules)
 
+    # If there are no relevance rules defined, the policy is considered relevant by default.
     if (-not $Rules -or -not $Rules.relevanceSignals -or -not $Rules.relevanceSignals.rules) { return $true }
 
+    # Iterate over each relevance signal rule to determine if the policy is relevant.
     foreach ($sig in @($Rules.relevanceSignals.rules)) {
         switch ([string]$sig.kind) {
             'arrayMatch' {
@@ -125,6 +137,7 @@ function Test-ScAPolicyRelevance {
                 if ($null -eq $reqVal) { continue }   # requirement doesn't use this signal
                 $reqArr = @($reqVal)
                 $polArr = @(Get-ScAValueAtPath -Object $Policy -Path $sig.policyPath)
+                # Determine if the policy array satisfies the requirement array based on the match type ('all' or 'any').
                 if ([string]$sig.match -eq 'all') {
                     if (@($reqArr).Count -gt 0) {
                         $all = $true
@@ -138,6 +151,7 @@ function Test-ScAPolicyRelevance {
             'grantControls' {
                 $gc = Get-ScAValueAtPath -Object $Requirements -Path $sig.conditionPath
                 if (-not $gc) { continue }
+                # Determine which sub-signals of the grant control are present and should be used for relevance checking.
                 $names = @($gc.PSObject.Properties.Name)
                 $use = (($names -contains 'anyOf') -and $sig.useWhenAnyOf) -or
                        (($names -contains 'authenticationStrength') -and $sig.useWhenAuthenticationStrength) -or
@@ -160,9 +174,11 @@ function Test-ScAPolicyInScope {
 
     if (-not $Rules -or -not $Rules.scopeGates -or -not $Rules.scopeGates.rules) { return $true }
 
+    # Iterate over each scope gate rule to determine if the policy is in scope.
     foreach ($gate in @($Rules.scopeGates.rules)) {
         $reqVal = Get-ScAValueAtPath -Object $Requirements -Path $gate.conditionPath
         if ($null -eq $reqVal) { continue }
+        # Skip this gate if the required value is not present in the requirements.
         if (@($reqVal) -contains $gate.requiredValue) {
             $polVal = @(Get-ScAValueAtPath -Object $Policy -Path $gate.policyPath)
             if ($polVal -notcontains $gate.requiredValue) { return $false }
@@ -180,17 +196,22 @@ function Test-ScAGrantControlRelevance {
     "about" this control - not whether it fully complies.
     #>
     param($Policy, $GrantReq)
+    
+    # Determine if the policy is relevant to the specified grant control requirement.
     if (-not $GrantReq) { return $false }
+    # Check if the grant control requirement has any alternative conditions (anyOf).
     if ($GrantReq.PSObject.Properties.Name -contains 'anyOf') {
         foreach ($alt in @($GrantReq.anyOf)) {
             if (Test-ScAGrantControlRelevance -Policy $Policy -GrantReq $alt) { return $true }
         }
         return $false
     }
+    # Check if the grant control requirement specifies an authentication strength.
     if ($GrantReq.PSObject.Properties.Name -contains 'authenticationStrength') {
         $reqId = $GrantReq.authenticationStrength.id
         if ($reqId -and $Policy.GrantControls.AuthenticationStrength.Id -eq $reqId) { return $true }
     }
+    # Check if the grant control requirement specifies built-in controls.
     if ($GrantReq.PSObject.Properties.Name -contains 'builtInControls') {
         $reqControls = @($GrantReq.builtInControls)
         $polControls = @($Policy.GrantControls.BuiltInControls)
@@ -234,26 +255,30 @@ function Get-ScAPolicyAnalysis {
     Write-Verbose "Get-ScAPolicyAnalysis: analyzing Conditional Access policies for control '$ControlId'."
 
     $allPoliciesData = @()
-
+    # Initialize the collection of all analyzed policy data.
     if (-not ($Results.Raw.PSObject.Properties.Name -contains 'conditional_access_policies')) {
         return @{ AllPolicies = @(); TotalPoliciesFound = 0 }
     }
+    # Ensure that the results contain Conditional Access policies and that the validation schema is for Conditional Access policies.
     if (-not ($ValidationSchema -and $ValidationSchema.validationLogic.type -eq 'conditionalAccessPolicy')) {
         return @{ AllPolicies = @(); TotalPoliciesFound = 0 }
     }
 
+    # Extract the relevant rules, policies, requirements, and exclusion field from the input data.
     $rules          = $syncHash.ScACaRules
     $caPolicies     = $Results.Raw.conditional_access_policies
     $requirements   = $ValidationSchema.validationLogic.requirements
     $exclusionField = if ($ValidationSchema.exclusionField) { [string]$ValidationSchema.exclusionField } else { 'none' }
 
+    # Determine the property names for policy state and enabled value, with defaults if not specified in the rules.
     $stateProp  = if ($rules -and $rules.policyStateProperty) { [string]$rules.policyStateProperty } else { 'state' }
     $enabledVal = if ($rules -and $rules.enabledStateValue)   { [string]$rules.enabledStateValue }   else { 'enabled' }
     $matchingPolicies = @($caPolicies | Where-Object { (Get-ScAValueAtPath -Object $_ -Path $stateProp) -eq $enabledVal })
 
+    # Filter the policies to only include those that are currently enabled according to the determined state property and enabled value.
     foreach ($policy in $matchingPolicies) {
         $settingIssues   = @()   # requirement failures + disallowed exclusions (need a tenant change)
-        $exclusionIssues = @()   # config-waivable exclusions (add to config to pass)
+        $exclusionIssues = @()   # config exclusions (add to config to pass)
         $detected        = @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
         $excludedCount   = 0
 
@@ -306,6 +331,7 @@ function Get-ScAPolicyAnalysis {
             }
         }
 
+        # Combine setting issues and exclusion issues into a single collection of policy issues.
         $policyIssues  = @($settingIssues) + @($exclusionIssues)
         $meetsCriteria = (@($policyIssues).Count -eq 0)
 
@@ -314,6 +340,7 @@ function Get-ScAPolicyAnalysis {
         $hasRelevantConfig = Test-ScAPolicyRelevance -Policy $policy -Requirements $requirements -Rules $rules
         $inScope           = Test-ScAPolicyInScope   -Policy $policy -Requirements $requirements -Rules $rules
 
+        # Only include policies that are relevant to this control and within the required scope.
         if ($hasRelevantConfig -and $inScope) {
             $allPoliciesData += @{
                 DisplayName   = $policy.DisplayName
@@ -334,6 +361,7 @@ function Get-ScAPolicyAnalysis {
         }
     }
 
+    # Return the collected policy data along with the total count of policies found.
     return @{ AllPolicies = $allPoliciesData; TotalPoliciesFound = @($allPoliciesData).Count }
 }
 

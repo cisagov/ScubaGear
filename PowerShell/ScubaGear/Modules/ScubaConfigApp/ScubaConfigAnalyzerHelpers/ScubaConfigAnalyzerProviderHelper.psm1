@@ -140,28 +140,42 @@ function Get-ScAConfiguredExclusionValues {
         [Parameter(Mandatory)][string]$ExclusionField
     )
 
+    # Initialize the output hashtable for configured exclusion values.
+    # This function navigates the nested structure of the imported ScubaResults to extract
+    # the values already configured for a specific exclusion field within a control.
     $out = [ordered]@{}
+    # Return an empty ordered hashtable if any of the required nested structures are missing.
     if (-not $Raw -or -not ($Raw.PSObject.Properties.Name -contains 'scuba_config')) { return $out }
     $cfg = $Raw.scuba_config
+    # Return an empty ordered hashtable if the product configuration key is missing.
     if (-not $cfg -or -not ($cfg.PSObject.Properties.Name -contains $ProductConfigKey)) { return $out }
     $prod = $cfg.$ProductConfigKey
+    # Return an empty ordered hashtable if the control ID is missing.
     if (-not $prod -or -not ($prod.PSObject.Properties.Name -contains $ControlId)) { return $out }
     $ctl = $prod.$ControlId
+    # Return an empty ordered hashtable if the exclusion field is missing.
     if (-not $ctl -or -not ($ctl.PSObject.Properties.Name -contains $ExclusionField)) { return $out }
     $val = $ctl.$ExclusionField
 
+    # Determine the shape of the exclusion field (list or principal) based on the schema definitions.
     $schema = if ($syncHash.ScAExclusionDefinitions.ContainsKey($ExclusionField)) { $syncHash.ScAExclusionDefinitions[$ExclusionField] } else { $null }
     $shape  = if ($schema -and $schema.valueShape) { [string]$schema.valueShape } else { 'list' }
 
+    # Extract the configured exclusion values based on the determined shape.
+    # For list-shaped fields, the values are stored directly in an array.
     if ($shape -eq 'list') {
         $list = @($val | Where-Object { $_ })
+        # Only add the list to the output if it contains one or more values.
         if (@($list).Count -gt 0) { $out[$ExclusionField] = $list }
     } else {
+        # For principal-shaped fields, the values are stored as named lists within an object.
         foreach ($p in @($val.PSObject.Properties)) {
             $items = @($p.Value | Where-Object { $_ })
             if (@($items).Count -gt 0) { $out[$p.Name] = @($items) }
         }
     }
+
+    # Return the configured exclusion values for the specified field.
     return $out
 }
 
