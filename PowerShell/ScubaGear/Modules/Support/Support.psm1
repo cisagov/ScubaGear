@@ -1475,7 +1475,9 @@ function New-SCuBAConfig {
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigLocation
-    The folder path where the generated SampleConfig.yaml will be created. Defaults to the current directory.
+    The folder path where the generated SampleConfig.yaml will be created. The folder is created if it
+    does not already exist. Defaults to the user's Desktop, falling back to the home directory on
+    platforms where no Desktop path is available (e.g., headless Linux).
     .Parameter OmitPolicy
     A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.AAD.1.1v1.
     Note that the rationales will need to be manually added to the resulting config file.
@@ -1497,7 +1499,7 @@ function New-SCuBAConfig {
     records. Each value must be a valid IPv4 address.
     .EXAMPLE
     New-SCuBAConfig
-    Generates SampleConfig.yaml in the current directory using the default product set
+    Generates SampleConfig.yaml on the user's Desktop using the default product set
     (aad, exo, sharepoint, teams).
     .EXAMPLE
     New-SCuBAConfig -ProductNames aad, exo, teams
@@ -1507,7 +1509,7 @@ function New-SCuBAConfig {
     Generates a config that includes every supported product baseline.
     .EXAMPLE
     New-SCuBAConfig -ConfigLocation 'C:\ScubaGear\Configs'
-    Saves the generated SampleConfig.yaml to the specified folder instead of the current directory.
+    Saves the generated SampleConfig.yaml to the specified folder instead of the default Desktop location.
     .EXAMPLE
     New-SCuBAConfig -Organization contoso.onmicrosoft.com -AppID '00000000-0000-0000-0000-000000000000' -CertificateThumbprint 'A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0'
     Pre-populates the config with service principal (non-interactive) authentication values.
@@ -1645,7 +1647,7 @@ function New-SCuBAConfig {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $ConfigLocation = "./",
+        $ConfigLocation = [Environment]::GetFolderPath('Desktop'),
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
@@ -1946,7 +1948,18 @@ function New-SCuBAConfig {
         Write-Warning $Warning
     }
 
-    ConvertTo-Yaml $Config | Set-Content "$($ConfigLocation)/SampleConfig.yaml"
+    # Some platforms (e.g., headless Linux) return an empty Desktop path; fall back to the home directory.
+    if ([string]::IsNullOrWhiteSpace($ConfigLocation)) {
+        $ConfigLocation = $HOME
+    }
+
+    if (-not (Test-Path -LiteralPath $ConfigLocation)) {
+        [System.IO.Directory]::CreateDirectory($ConfigLocation) | Out-Null
+    }
+
+    $ConfigOutputPath = Join-Path -Path $ConfigLocation -ChildPath "SampleConfig.yaml"
+    ConvertTo-Yaml $Config | Set-Content -LiteralPath $ConfigOutputPath
+    Write-Information -MessageData "Configuration file created at: $ConfigOutputPath" -InformationAction Continue
 }
 
 function Test-ScubaGearVersion {
