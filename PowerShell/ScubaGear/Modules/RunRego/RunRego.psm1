@@ -48,9 +48,11 @@ function Invoke-Rego {
         throw "Rego file not found at: $RegoFile"
     }
 
-    # LiteralPath so input/output paths containing wildcard characters (e.g. []) resolve correctly.
-    $ResolvedInputFile = (Resolve-Path -LiteralPath $InputFile -ErrorAction Stop).Path
-    $ResolvedRegoFile = (Resolve-Path -LiteralPath $RegoFile -ErrorAction Stop).Path
+    # OPA is a native process: resolve relative paths and PSDrives to filesystem paths.
+    # LiteralPath also preserves wildcard characters (e.g. []) in folder names.
+    $Cmd = (Resolve-Path -LiteralPath $Cmd -ErrorAction Stop).ProviderPath
+    $ResolvedInputFile = (Resolve-Path -LiteralPath $InputFile -ErrorAction Stop).ProviderPath
+    $ResolvedRegoFile = (Resolve-Path -LiteralPath $RegoFile -ErrorAction Stop).ProviderPath
 
     $RegoFileObject = Get-Item -LiteralPath $ResolvedRegoFile -ErrorAction Stop
     if ($null -eq $RegoFileObject) {
@@ -61,7 +63,7 @@ function Invoke-Rego {
     if (-not (Test-Path -LiteralPath $ScubaUtils -PathType Container)) {
         throw "Rego Utils directory not found at: $ScubaUtils"
     }
-    $ResolvedScubaUtils = (Resolve-Path -LiteralPath $ScubaUtils -ErrorAction Stop).Path
+    $ResolvedScubaUtils = (Resolve-Path -LiteralPath $ScubaUtils -ErrorAction Stop).ProviderPath
 
     $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $ResolvedInputFile, "-d", $ResolvedRegoFile, "-d", $ResolvedScubaUtils, "-f", "values")
 
