@@ -10,10 +10,6 @@ InModuleScope Connection {
             Mock -ModuleName Connection Disconnect-MgGraph {}
             # EXO now uses REST API - no ExchangeOnline module disconnect needed
             # SharePoint uses REST API - no SPO module disconnect needed
-            function Remove-PowerAppsAccount {throw 'this will be mocked'}
-            Mock  -ModuleName Connection Remove-PowerAppsAccount {}
-            function Disconnect-MicrosoftTeams {throw 'this will be mocked'}
-            Mock  -ModuleName Connection Disconnect-MicrosoftTeams {}
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {

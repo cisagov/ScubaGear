@@ -1,4 +1,5 @@
 Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
+Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Trace-ScubaFunction
 
 function Export-AADProvider {
     <#

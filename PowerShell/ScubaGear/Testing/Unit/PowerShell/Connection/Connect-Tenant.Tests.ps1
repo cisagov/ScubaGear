@@ -13,19 +13,21 @@ InModuleScope Connection {
             function Connect-GraphHelper {throw 'this will be mocked'}
             Mock Connect-GraphHelper -MockWith {}
             # SharePoint now uses REST API - no PnP/SPO connection needed
-            function Connect-MicrosoftTeams{throw 'this will be mocked'}
-            Mock Connect-MicrosoftTeams -MockWith {}
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
             Mock Get-ExchangeOnlineApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
             function Get-ExchangeOnlineScope {throw 'this will be mocked'}
-            Mock Get-ExchangeOnlineScope -MockWith { return "https://outlook.office365.com/.default" }
+            Mock Get-ExchangeOnlineScope -MockWith { return "https://mock.outlook.office365.com/.default" }
+            function Get-ComplianceApiEndpoint {throw 'this will be mocked'}
+            Mock Get-ComplianceApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
+            function Get-ComplianceScope {throw 'this will be mocked'}
+            Mock Get-ComplianceScope -MockWith { return "https://mock.outlook.office365.com/.default" }
             function Invoke-GraphDirectly {throw 'this will be mocked'}
             Mock Invoke-GraphDirectly -MockWith {
                 return [pscustomobject]@{
                     Value = [pscustomobject]@{
                         DisplayName     = "DisplayName";
-                        Name            = "DomainName";
-                        Id              = "TenantId";
+                        Name            = "contoso.onmicrosoft.com";
+                        Id              = "305102d0-7ccc-4007-83bb-ac1f44f8d620";
                         VerifiedDomains = @(
                             @{ isInitial = $false; Name = "example.onmicrosoft.com" },
                             @{ isInitial = $true; Name = "contoso.onmicrosoft.com" }
@@ -37,20 +39,26 @@ InModuleScope Connection {
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
             }
+            function Get-MgContext {throw 'this will be mocked'}
+            Mock Get-MgContext -MockWith { return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" } }
+            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
+            Mock Get-M365EnvironmentByDomain -MockWith {
+                return (Get-Random -InputObject @('commercial', 'gcc', 'gcchigh', 'dod'))
+            }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
             @{ProductNames = "securitysuite"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
             @{ProductNames = "exo"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 1}
-            @{ProductNames = "powerplatform"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
-            @{ProductNames = "sharepoint"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}  # SharePoint uses REST API, only needs Graph for tenant info
-            @{ProductNames = "teams"; Services = @('Connect-MicrosoftTeams'); EXOHelperCalls = 0}
+            @{ProductNames = "powerplatform"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
+            @{ProductNames = "sharepoint"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
+            @{ProductNames = "teams"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
+            @{ProductNames = "powerbi"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
             @{
-                ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams"
+                ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
                 Services = @(
                     'Connect-GraphHelper',
-                    'Get-MsalAccessToken',
-                    'Connect-MicrosoftTeams'
+                    'Get-MsalAccessToken'
                 )
             }
 
@@ -80,5 +88,6 @@ InModuleScope Connection {
 }
 AfterAll {
     Remove-Module Connection -ErrorAction SilentlyContinue
-    Remove-Module ConnectHelper -ErrorAction SilentlyContinue
+    Remove-Module ConnectHelpers -ErrorAction SilentlyContinue
+    Remove-Module PermissionsHelper -ErrorAction SilentlyContinue
 }
