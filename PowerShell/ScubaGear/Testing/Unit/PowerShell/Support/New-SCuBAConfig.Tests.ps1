@@ -66,6 +66,18 @@ InModuleScope Support {
         }
 
         Context "When policy IDs are provided in the OmitPolicy parameter" {
+            It 'Allows policies without exclusions when all products are selected' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $OmitArgs = $CMDArgs.Clone()
+                $OmitArgs['ProductNames'] = @('*')
+                $OmitArgs['OmitPolicy'] = @('MS.TEAMS.1.1v1')
+                New-SCuBAConfig @OmitArgs
+
+                $Script:CapturedConfig['OmitPolicy'].Contains('MS.TEAMS.1.1v1') | Should -BeTrue
+            }
+
             It 'It reminds users to manually add the rationales' {
                 # Should warn once to for the reminder to manually add the rationales
                 $OmitArgs = $CMDArgs.Clone()
@@ -120,6 +132,18 @@ InModuleScope Support {
         }
 
         Context "When policy IDs are provided in the AnnotatePolicy parameter" {
+            It 'Allows policies without exclusions when all products are selected' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $AnnotateArgs = $CMDArgs.Clone()
+                $AnnotateArgs['ProductNames'] = @('*')
+                $AnnotateArgs['AnnotatePolicy'] = @('MS.TEAMS.1.1v1')
+                New-SCuBAConfig @AnnotateArgs
+
+                $Script:CapturedConfig['AnnotatePolicy'].Contains('MS.TEAMS.1.1v1') | Should -BeTrue
+            }
+
             It 'Adds an AnnotatePolicy section with the expected fields' {
                 $Script:CapturedConfig = $null
                 Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }

@@ -1696,6 +1696,7 @@ function New-SCuBAConfig {
                 # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
                 if ($PolicyId -like 'MS.DEFENDER.*') { continue }
                 if ($PolicyId -like "$WordToComplete*") {
+                    # Return a completion result for the current policy ID.
                     [System.Management.Automation.CompletionResult]::new($PolicyId, $PolicyId, 'ParameterValue', $PolicyId)
                 }
             }
@@ -1722,6 +1723,7 @@ function New-SCuBAConfig {
                 if ($Product -eq 'defender') { continue }
                 foreach ($Policy in $Baselines.$Product) {
                     if ($Policy.id -like "$WordToComplete*") {
+                        # Return a completion result for the current policy ID.
                         [System.Management.Automation.CompletionResult]::new($Policy.id, $Policy.id, 'ParameterValue', $Policy.id)
                     }
                 }
@@ -1770,11 +1772,14 @@ function New-SCuBAConfig {
         if ($Node.PSObject.Properties.Name -contains '$ref') {
             $Node = Resolve-SchemaReference -Reference $Node.'$ref' -Schema $Schema
         }
+        # If the node contains a "$ref", resolve it to the actual schema node before continuing.
         switch ($Node.type) {
             'object' {
+                # Create an ordered dictionary to hold the template for this object node.
                 $Template = [ordered]@{}
                 foreach ($PropertyName in $Node.properties.PSObject.Properties.Name) {
                     if ($PropertyName -eq '_comment') { continue }
+                    # Recursively build the template for this property based on its schema node.
                     $Template[$PropertyName] = New-SchemaTemplate -Node $Node.properties.$PropertyName -Schema $Schema
                 }
                 return $Template
@@ -1786,30 +1791,40 @@ function New-SCuBAConfig {
         }
     }
 
-    # Discover schema-defined product namespaces before validating policy parameters so that the
-    # ProductNames wildcard can be expanded for all subsequent product membership checks.
+    # Discover schema-defined product namespaces for exclusion generation.
     $Schema = $null
     $NamespaceExclusionFields = @{}
     $ShortNameToNamespace = @{}
-    $SelectedProducts = $ProductNames
+    # Determine which products are selected based on the input $ProductNames parameter.
+    $SelectedProducts = if ($ProductNames -contains '*') {
+        @([ScubaConfig]::ScubaDefault('AllProductNames'))
+    }
+    else {
+        # Use the provided list of product names as-is.
+        $ProductNames
+    }
+
+    # Load the schema from the specified path if it exists.
     if (Test-Path -Path $SchemaPath) {
         $Schema = Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json
+        # Iterate through the top-level properties of the schema to build the namespace exclusion fields and short name mappings.
         foreach ($PropertyName in $Schema.properties.PSObject.Properties.Name) {
             $PropertyNode = $Schema.properties.$PropertyName
             if (-not $PropertyNode.patternProperties) { continue }
+            # Iterate through the pattern properties of the current top-level property node.
             foreach ($Pattern in $PropertyNode.patternProperties.PSObject.Properties.Name) {
                 $PatternNode = $PropertyNode.patternProperties.$Pattern
                 if (-not $PatternNode.properties) { continue }
+                # Add the properties of the current pattern node to the namespace exclusion fields.
                 $NamespaceExclusionFields[$PropertyName] = $PatternNode.properties
                 if ($Pattern -match 'MS\\\.([A-Za-z]+)\\\.') {
                     $ShortNameToNamespace[$Matches[1].ToLower()] = $PropertyName
                 }
             }
         }
-
-        $SelectedProducts = if ($ProductNames -contains '*') { $ShortNameToNamespace.Keys } else { $ProductNames }
     }
 
+    # Define the namespace for omitted policies.
     $OmissionNamespace = "OmitPolicy"
 
     # List to track which policies the user specified in $OmitPolicy are properly formatted
@@ -1838,6 +1853,7 @@ function New-SCuBAConfig {
         }
         # Ensure the policy ID is properly capitalized (i.e., all caps except for the "v1" portion)
         $PolicyCapitalized = $Policy.Substring(0, $Policy.Length-2).ToUpper() + $Policy.SubString($Policy.Length-2)
+        # Add the validated and capitalized policy to the list of omitted policies.
         $OmitPolicyValidated += $PolicyCapitalized
         $OmitEntries[$PolicyCapitalized] = @{
             "Rationale" = "";
@@ -1845,10 +1861,12 @@ function New-SCuBAConfig {
         }
     }
 
+    # If there are any omitted policies, add them to the configuration under the appropriate namespace.
     if ($OmitEntries.Count -gt 0) {
         $config[$OmissionNamespace] = $OmitEntries
     }
 
+    # If there are any omitted policies, provide a warning to the user.
     if ($OmitPolicy.Count -gt 0) {
         $Warning = "The following policies have been configured for omission: $($OmitPolicyValidated -Join ', '). "
         $Warning += "Note that as the New-SCuBAConfig function does not support providing the rationale for omission via "
@@ -1856,6 +1874,7 @@ function New-SCuBAConfig {
         Write-Warning $Warning
     }
 
+    # Define the namespace for annotated policies.
     $AnnotationNamespace = "AnnotatePolicy"
 
     # List to track which policies the user specified in $AnnotatePolicy are properly formatted
@@ -1864,7 +1883,9 @@ function New-SCuBAConfig {
     # Build the annotated policies template; only add the section if at least one policy was provided.
     $AnnotateEntries = [ordered]@{}
 
+    # Iterate through each policy specified in the AnnotatePolicy parameter.
     foreach ($Policy in $AnnotatePolicy) {
+        # Validate the format of the policy ID before proceeding.
         if (-not ($Policy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$")) {
             $Warning = "The policy, $Policy, in the AnnotatePolicy parameter, is not a valid "
             $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
@@ -1872,7 +1893,9 @@ function New-SCuBAConfig {
             Write-Warning $Warning
             Continue
         }
+        # Extract the product component from the policy ID and ensure it is among the selected products.
         $Product = ($Policy -Split "\.")[1]
+        # Convert the product component to lowercase for comparison with the selected products list.
         if (-not ($SelectedProducts -Contains $Product)) {
             $Warning = "The policy, $Policy, in the AnnotatePolicy parameter, is not encompassed by "
             $Warning += "the products specified in the ProductName parameter. Skipping."
@@ -1881,6 +1904,7 @@ function New-SCuBAConfig {
         }
         # Ensure the policy ID is properly capitalized (i.e., all caps except for the "v1" portion)
         $PolicyCapitalized = $Policy.Substring(0, $Policy.Length-2).ToUpper() + $Policy.SubString($Policy.Length-2)
+        # Add the validated and capitalized policy to the list of annotated entries.
         $AnnotatePolicyValidated += $PolicyCapitalized
         $AnnotateEntries[$PolicyCapitalized] = [ordered]@{
             "Comment" = "";
@@ -1889,9 +1913,9 @@ function New-SCuBAConfig {
         }
     }
 
+    # If there are any annotated entries, add them to the configuration under the appropriate namespace and provide a warning to the user.
     if ($AnnotateEntries.Count -gt 0) {
         $config[$AnnotationNamespace] = $AnnotateEntries
-
         $Warning = "The following policies have been configured for annotation: $($AnnotatePolicyValidated -Join ', '). "
         $Warning += "Note that as the New-SCuBAConfig function does not support providing the comment via the "
         $Warning += "commandline, you will need to open the resulting config file and manually enter the comments."
@@ -1905,27 +1929,37 @@ function New-SCuBAConfig {
         # ExclusionPolicy IDs are requested, only those are generated.
         $MatchedExclusions = @()
         $PolicyExclusionMappings = $Schema.schemaMetadata.policyExclusionMappings
+        # Iterate through each policy ID in the policy exclusion mappings to build the exclusion sections.
         foreach ($PolicyId in $PolicyExclusionMappings.PSObject.Properties.Name) {
             if ($PolicyId -eq '_comment') { continue }
+            # Skip any policies that are not part of the requested exclusion policies, if any are specified.
             if ($ExclusionPolicy.Count -gt 0 -and ($ExclusionPolicy -notcontains $PolicyId)) { continue }
 
+            # Extract the product short name from the policy ID and ensure it is among the selected products.
             $ProductShortName = ($PolicyId -split '\.')[1].ToLower()
             if ($SelectedProducts -notcontains $ProductShortName) { continue }
 
+            # Determine the namespace for the product and skip if it is not found.
             $Namespace = $ShortNameToNamespace[$ProductShortName]
             if (-not $Namespace) { continue }
 
+            # Initialize the policy template for the current policy ID.
             $PolicyTemplate = [ordered]@{}
             foreach ($ExclusionType in $PolicyExclusionMappings.$PolicyId) {
+                # Retrieve the field node for the current exclusion type within the product's namespace.
                 $FieldNode = $NamespaceExclusionFields[$Namespace].$ExclusionType
                 if ($null -eq $FieldNode) { continue }
+                # Generate the schema template for the current exclusion type within the policy.
                 $PolicyTemplate[$ExclusionType] = New-SchemaTemplate -Node $FieldNode -Schema $Schema
             }
 
+            # If the policy template contains any exclusion types, add it to the configuration under the appropriate namespace.
             if ($PolicyTemplate.Count -gt 0) {
+                # Ensure the configuration has an entry for the current namespace.
                 if (-not $config.Contains($Namespace)) {
                     $config[$Namespace] = [ordered]@{}
                 }
+                # Add the policy template to the configuration under the appropriate namespace.
                 $config[$Namespace][$PolicyId] = $PolicyTemplate
                 $MatchedExclusions += $PolicyId
             }
@@ -1933,6 +1967,7 @@ function New-SCuBAConfig {
 
         # Warn about any requested ExclusionPolicy entries that were not generated.
         if ($ExclusionPolicy.Count -gt 0) {
+            # Identify any exclusion policies that were requested but not matched in the generated configuration.
             $UnmatchedExclusions = $ExclusionPolicy | Where-Object { $MatchedExclusions -notcontains $_ }
             if ($UnmatchedExclusions) {
                 $Warning = "The following ExclusionPolicy entries were not added because they do not "
@@ -1953,10 +1988,12 @@ function New-SCuBAConfig {
         $ConfigLocation = $HOME
     }
 
+    # Determine the output path for the generated configuration file.
     if (-not (Test-Path -LiteralPath $ConfigLocation)) {
         [System.IO.Directory]::CreateDirectory($ConfigLocation) | Out-Null
     }
 
+    # Ensure the configuration directory exists before attempting to write the output file.
     $ConfigOutputPath = Join-Path -Path $ConfigLocation -ChildPath "SampleConfig.yaml"
     ConvertTo-Yaml $Config | Set-Content -LiteralPath $ConfigOutputPath
     Write-Information -MessageData "Configuration file created at: $ConfigOutputPath" -InformationAction Continue
