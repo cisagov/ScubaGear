@@ -235,6 +235,12 @@ Aad:
         - "12345678-1234-1234-1234-123456789012"  # Emergency access account
       Groups:
         - "22222222-2222-2222-2222-222222222222"  # Service account group
+  MS.AAD.7.5v1:
+    RoleExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account
+      Groups:
+        - "22222222-2222-2222-2222-222222222222"  # Service account group
 ```
 
 #### Conditional Access Policy Exclusions
@@ -286,6 +292,7 @@ In addition to defining exclusions for conditional access policies, the configur
 RoleExclusions are supported for the following policies:
 
 - MS.AAD.7.4v1
+- MS.AAD.7.5v1
 
 ### Security Suite Configuration
 

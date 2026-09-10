@@ -1314,12 +1314,29 @@ tests contains {
 # MS.AAD.7.5v1
 #--
 
-# Get all privileged roles that do not have a start date
+# Return true when a privileged role has at least one assignment outside PIM
+# that is not explicitly excluded by user or group object ID.
+RoleAssignedOutsidePim(PrivilegedRole, PolicyID) if {
+    OutsidePimPrincipals := {x.PrincipalId |
+        some x in PrivilegedRole.Assignments
+        is_null(x.StartDateTime)
+    }
+    AllowedPrivilegedRoleUsers := {y |
+        some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Users
+        y != null
+    }
+    AllowedPrivilegedRoleGroups := {y |
+        some y in input.scuba_config.Aad[PolicyID].RoleExclusions.Groups
+        y != null
+    }
+
+    Count(OutsidePimPrincipals - (AllowedPrivilegedRoleUsers | AllowedPrivilegedRoleGroups)) > 0
+}
+
+# Get all privileged roles that have a non-excluded assignment outside PIM.
 RolesAssignedOutsidePim contains Role.DisplayName if {
     some Role in input.privileged_roles
-    NoStartAssignments := {is_null(X.StartDateTime) | some X in Role.Assignments}
-
-    Count(FilterArray(NoStartAssignments, true)) > 0
+    RoleAssignedOutsidePim(Role, "MS.AAD.7.5v1")
 }
 
 # If you have the correct license & no roles without start date, pass

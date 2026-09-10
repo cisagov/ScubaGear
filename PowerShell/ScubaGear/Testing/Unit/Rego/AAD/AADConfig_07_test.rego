@@ -452,6 +452,49 @@ test_Assignments_Incorrect if {
     ReportDetailString := "1 role(s) assigned to users outside of PIM:<br/>Global Administrator"
     TestResult("MS.AAD.7.5v1", Output, ReportDetailString, false) == true
 }
+
+
+test_Assignments_UserExclusion_Correct if {
+    Roles := json.patch(PrivilegedRoles,
+                [{"op": "add", "path": "0/Assignments/0/StartDateTime", "value": null},
+                {"op": "remove", "path": "1"}])
+
+    Output := aad.tests with input.privileged_roles as Roles
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.7.5v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.7.5v1"].RoleExclusions.Users as ["ae71e61c-f465-4db6-8d26-5f3e52bdd800"]
+
+    ReportDetailString := "0 role(s) assigned to users outside of PIM"
+    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, true) == true
+}
+
+test_Assignments_GroupExclusion_Correct if {
+    Roles := json.patch(PrivilegedRoles,
+                [{"op": "add", "path": "0/Assignments/0/StartDateTime", "value": null},
+                {"op": "remove", "path": "1"}])
+
+    Output := aad.tests with input.privileged_roles as Roles
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.7.5v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.7.5v1"].RoleExclusions.Groups as ["ae71e61c-f465-4db6-8d26-5f3e52bdd800"]
+
+    ReportDetailString := "0 role(s) assigned to users outside of PIM"
+    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, true) == true
+}
+
+test_Assignments_UnrelatedExclusion_Incorrect if {
+    Roles := json.patch(PrivilegedRoles,
+                [{"op": "add", "path": "0/Assignments/0/StartDateTime", "value": null},
+                {"op": "remove", "path": "1"}])
+
+    Output := aad.tests with input.privileged_roles as Roles
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.7.5v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.7.5v1"].RoleExclusions.Users as ["7b36d094-0211-400b-aabd-3793e9a30fc6"]
+
+    ReportDetailString := "1 role(s) assigned to users outside of PIM:<br/>Global Administrator"
+    TestResult("MS.AAD.7.5v1", Output, ReportDetailString, false) == true
+}
 #--
 
 #

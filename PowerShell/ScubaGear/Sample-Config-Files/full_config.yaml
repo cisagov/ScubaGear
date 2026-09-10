@@ -138,6 +138,9 @@ Aad:
       Groups:
         - 4a471183-d934-4fb4-b1b3-d9525e0e1b45 # Example Group 2
 
+  # Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.
+  MS.AAD.7.5v1: *CommonRoleExclusions
+
 # ========================
 # EXCLUSIONS : EXO SAMPLE
 # ========================

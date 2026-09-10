@@ -40,6 +40,7 @@
       "MS.AAD.3.8v1": ["CapExclusions"],
       "MS.AAD.3.9v1": ["CapExclusions"],
       "MS.AAD.7.4v1": ["RoleExclusions"],
+      "MS.AAD.7.5v1": ["RoleExclusions"],
       "MS.SECURITYSUITE.2.1v1": ["SensitiveUsers"],
       "MS.SECURITYSUITE.2.3v1": ["PartnerDomains"],
       "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
