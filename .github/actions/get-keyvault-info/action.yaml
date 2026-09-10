@@ -1,0 +1,30 @@
+name: Get Key Vault Info
+description: Parse Key Vault configuration JSON to extract the vault URL and certificate name
+inputs:
+  key-vault-info:
+    required: true
+    description: "Key Vault configuration JSON (from SCUBA_KEY_VAULT_PROD secret)"
+  checkout-path:
+    required: false
+    default: "."
+    description: "Path where the repo was checked out (matches 'path' in actions/checkout)"
+outputs:
+  key-vault-url:
+    description: "Azure Key Vault URL"
+    value: ${{ steps.parse.outputs.key-vault-url }}
+  certificate-name:
+    description: "Certificate name for code signing"
+    value: ${{ steps.parse.outputs.certificate-name }}
+runs:
+  using: "composite"
+  steps:
+    - id: parse
+      run: |
+        . $env:CHECKOUT_PATH/utils/workflow/Get-KeyVaultSecret.ps1
+        $Info = Get-KeyVaultInfo -KeyVaultInfo $env:KEY_VAULT_INFO
+        echo "key-vault-url=$($Info.KeyVaultUrl)" >> $env:GITHUB_OUTPUT
+        echo "certificate-name=$($Info.KeyVaultCertificateName)" >> $env:GITHUB_OUTPUT
+      env:
+        KEY_VAULT_INFO: ${{ inputs.key-vault-info }}
+        CHECKOUT_PATH: ${{ inputs.checkout-path }}
+      shell: pwsh
