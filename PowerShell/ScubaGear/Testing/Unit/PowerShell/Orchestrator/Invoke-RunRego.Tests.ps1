@@ -31,6 +31,22 @@ InModuleScope Orchestrator {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $OutFolderPath = "./"
             }
+            It 'Reports progress for <Label>' -ForEach @(
+                @{ Label = 'a scalar product'; Products = 'aad'; Total = 1 }
+                @{ Label = 'a scalar security suite'; Products = 'securitysuite'; Total = 1 }
+                @{ Label = 'a single-element array'; Products = @('aad'); Total = 1 }
+                @{ Label = 'multiple products'; Products = @('aad', 'exo'); Total = 2 }
+            ) {
+                $ScubaConfig.ProductNames = $Products
+                Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath
+                Should -Invoke Write-Progress -Exactly -Times $Total
+                for ($Index = 1; $Index -le $Total; $Index++) {
+                    Should -Invoke Write-Progress -Exactly -Times 1 -ParameterFilter {
+                        $Status -like "*$Index of $Total *" -and
+                        $PercentComplete -eq ($Index * 100 / $Total)
+                    }
+                }
+            }
             It 'With -ProductNames "aad", should not throw' {
                 $ScubaConfig.ProductNames = @("aad")
                 { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw

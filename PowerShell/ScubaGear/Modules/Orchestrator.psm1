@@ -1075,7 +1075,7 @@ function Invoke-RunRego {
             $ProdRegoFailed = @()
             $TestResults = @()
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             foreach ($Product in $ScubaConfig.ProductNames) {
                 $BaselineName = $ArgToProd[$Product]
                 $N += 1
@@ -2058,7 +2058,7 @@ function Invoke-ReportCreation {
     process {
         try {
             $N = 0
-            $Len = $ScubaConfig.ProductNames.Length
+            $Len = @($ScubaConfig.ProductNames).Count
             $Fragment = @()
             $IndividualReportPath = Join-Path -Path $OutFolderPath -ChildPath $IndividualReportFolderName
             # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
