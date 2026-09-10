@@ -274,7 +274,7 @@ jobs:
           Alias: Shr_Tenant1_PNP
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        uses: dawidd6/action-send-mail@v18
+        uses: dawidd6/action-send-mail@v19
         with:
           server_address: smtp.gmail.com
           server_port: 465
