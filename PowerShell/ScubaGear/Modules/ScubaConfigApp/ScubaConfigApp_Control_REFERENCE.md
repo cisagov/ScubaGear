@@ -32,8 +32,8 @@ These boolean fields toggle top-level app capabilities at startup.
 | `EnableScubaRun` | bool | Shows the ScubaRun tab and execution controls |
 | `AllowScubaRunInteractive` | bool | Allows ScubaGear to run in interactive (non-app-auth) mode |
 | `EnableResultReader` | bool | Shows the results reader tab for reviewing past ScubaGear output |
-| `PullOnlineBaselines` | bool | When `true`, baselines are loaded from `OnlineBaselineSchemaURL` instead of the local schema file. When `false` (default), baselines are loaded from the local `schemas\ScubaBaselines.json`. It is one or the other — not both. The `-Online` parameter is independent and controls only Microsoft Graph tenant connectivity, not baseline loading. |
-| `EnablePolicyViewer` | bool | Enables the baseline policy viewer panel |
+| `PullOnlineBaselines` | bool | When `true`, baselines are loaded from `OnlineBaselineSchemaURL` instead of the local schema file. When `false` (default), baselines are loaded from the local `schemas\ScubaBaselines.json`. It is one or the other — not both. The `-Online` parameter is independent and controls only Microsoft Graph tenant connectivity, not baseline loading. Both ScubaConfigApp **and** the Baseline Policy Viewer read this key from this file, so one toggle drives both. (The Config Analyzer has its own independent `PullOnlineBaselines` in `ScubaConfigAnalyzer_Control_*.json`.) |
+| `EnablePolicyViewer` | bool | When `true` (default), the per-policy **View Baseline Policies** button is shown on each Exclusion/Annotation/Omission card (opens the Baseline Policy Viewer at that control). When `false`, that button is hidden. |
 
 ---
 
@@ -337,8 +337,9 @@ restored session value.
 
 ## products
 
-The list of M365 products available for selection. Drives the product checkboxes on the Main tab,
-the exclusions tab visibility, and the policy viewer product filter.
+The list of M365 products available for selection. Drives the product checkboxes on the Main tab
+and the exclusions tab visibility. (Baseline Policy Viewer product filtering now lives in
+`ScubaBaselineViewer_Control_*.json` — see `ScubaBaselineViewer_Control_REFERENCE.md`.)
 
 ```json
 {
@@ -346,8 +347,7 @@ the exclusions tab visibility, and the policy viewer product filter.
   "name": "Microsoft Entra ID",
   "displayName": "Microsoft Entra ID (aad)",
   "supportsExclusions": true,
-  "showInApp": true,
-  "showInViewer": true
+  "showInApp": true
 }
 ```
 
@@ -358,7 +358,10 @@ the exclusions tab visibility, and the policy viewer product filter.
 | `displayName` | Longer label shown in dropdowns and section headers. |
 | `supportsExclusions` | When true, the Exclusions tab shows this product and accepts exclusion entries for it. |
 | `showInApp` | When false, the product is hidden from all app controls. Used to soft-disable a product without removing its config. |
-| `showInViewer` | When false, the product is excluded from the policy viewer. |
+
+> Note: the former `showInViewer` field and the `policyViewerSettings` block were moved out of this
+> file when the Baseline Policy Viewer became app-independent. They now live in
+> `ScubaBaselineViewer_Control_*.json`.
 
 The `id` values are also used at runtime to derive the policy migration product code map
 (`$product.id.ToUpper()` maps to `$product.id`), so adding a product here automatically
