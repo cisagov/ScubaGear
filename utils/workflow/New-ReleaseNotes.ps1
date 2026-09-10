@@ -627,15 +627,16 @@ function Get-MergedPullRequestsForCompare {
         -RefName $RefName
     $BaseHead = "$PreviousTag...$HeadRef"
 
-    $Comparison = Invoke-GitHubApi -Path "repos/$Owner/$Repository/compare/$BaseHead"
-    $CommitCount = 0
-    if ($Comparison.commits) {
-        $CommitCount = @($Comparison.commits).Count
-    }
-    Write-Warning "Comparing $BaseHead : $CommitCount commits (status: $($Comparison.status))."
+    $ComparisonPages = @(Invoke-GitHubApi `
+        -Path "repos/$Owner/$Repository/compare/$BaseHead" `
+        -Query @{ per_page = '100' } `
+        -Paginate)
+    $Commits = @($ComparisonPages | ForEach-Object { $_.commits })
+    $CommitCount = $Commits.Count
+    Write-Warning "Comparing $BaseHead : $CommitCount commits (status: $($ComparisonPages[0].status))."
 
     $PullRequestsByNumber = @{}
-    foreach ($Commit in @($Comparison.commits)) {
+    foreach ($Commit in $Commits) {
         $Pulls = Invoke-GitHubApi -Path "repos/$Owner/$Repository/commits/$($Commit.sha)/pulls"
         foreach ($PullRequest in @($Pulls)) {
             if ($PullRequest.merged_at) {
