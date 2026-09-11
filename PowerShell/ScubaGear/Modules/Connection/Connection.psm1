@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Connect-Tenant {
     <#
    .Description
@@ -13,7 +15,6 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -21,7 +22,6 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
    [string]
    $M365Environment,
 
@@ -519,20 +519,12 @@ function Disconnect-SCuBATenant {
        Forces disconnect of all active authentication sessions associated with an M365 tenant.
        Call this when you want to switch ScubaGear to audit a different tenant.
    .EXAMPLE
-   Disconnect-SCuBATenant
+    Disconnect-SCuBATenant
    .Functionality
-   Public
-   #>
+    Public
+    #>
     [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $false)]
-        [string[]]
-        $ProductNames
-    )
-
-    if ($PSBoundParameters.ContainsKey('ProductNames')) {
-        Write-Warning "-ProductNames is deprecated and ignored; Disconnect-SCuBATenant now always disconnects the full tenant session."
-    }
+    param()
 
     try {
         Write-Information "Disconnecting from tenant..." -InformationAction Continue
