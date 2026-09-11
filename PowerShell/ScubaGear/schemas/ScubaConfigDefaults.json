@@ -7,6 +7,8 @@
   },
   "defaults": {
     "OPAPath": "~/.scubagear/Tools",
+    "ScubaGitHubUrl": "https://github.com/cisagov/ScubaGear",
+    "IndividualReportFolderName": "IndividualReports",
     "OPAExecutable": {
       "Windows": "opa_windows_amd64.exe",
       "MacOS": "opa_darwin_amd64",
@@ -26,7 +28,7 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-    "OPAVersion": "1.19.1",
+    "OPAVersion": "1.19.0",
     "PreferredDnsResolvers": [],
     "SkipDoH": false
   },
