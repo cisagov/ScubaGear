@@ -416,6 +416,21 @@ function Connect-Tenant {
                    }
                }
                "teams" {
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                           'ErrorAction' = 'Stop';
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       elseif ($UseSystemBrowserAuthentication) {
+                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
+                       }
+                       Connect-GraphHelper @LimitedGraphParams
+                       $AADAuthRequired = $false
+                   }
+
                     # Get access tokens for Teams Admin API and Teams Unified settings API
                     # The Teams Unified settings API is used for some operations that are not available in the standard Teams Admin API
                     $TeamsScope = Get-TeamsScope -M365Environment $M365Environment
