@@ -172,6 +172,11 @@ At line:1 char:1
 
 # 2. Dependency Updating
 ## Removing Old Dependencies
+
+For permanent removal of ScubaGear, OPA, or dependencies left by older releases,
+see the [uninstall guide](uninstall.md). The options below maintain an existing
+ScubaGear installation.
+
 Removing old modules and ensuring different versions don't exist minimizes potential errors.
 
 > [!NOTE]
@@ -179,7 +184,7 @@ Removing old modules and ensuring different versions don't exist minimizes poten
 
 ## Option A: Reset All Dependencies
 
-**What it does:** Removes and reinstalls all ScubaGear dependencies for a clean baseline.
+**What it does:** Checks current dependency requirements, installs missing modules and OPA, updates versions when needed, and cleans up duplicate module versions.
 
 **Use this when:**
 - You have dependency conflicts
@@ -187,13 +192,13 @@ Removing old modules and ensuring different versions don't exist minimizes poten
 - You're troubleshooting ScubaGear issues
 
 > [!IMPORTANT]
-> This removes ALL existing dependency modules and reinstalls them. If other applications depend on specific module versions, use Option B instead to avoid breaking them.
+> This can remove dependency versions used by other applications. Review the proposed changes and confirmation prompts. If other applications require those versions, use Option B instead.
 
 > [!NOTE]
 > You'll be prompted before any modules are removed.
 
 1. Open PowerShell.
-2. Run the following command to remove all ScubaGear dependencies and reinstall.
+2. Run the following command to check and repair ScubaGear dependencies.
 ```powershell
    PS C:\Users\ScubaGear> Reset-ScubaGearDependencies
 ```
