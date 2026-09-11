@@ -6,15 +6,15 @@ BeforeDiscovery {
 InModuleScope Connection {
     Describe -Tag 'Connection' -Name 'Disconnect-SCuBATenant' {
         BeforeAll {
-            function Disconnect-MgGraph {throw 'this will be mocked'}
-            Mock -ModuleName Connection Disconnect-MgGraph {}
+            function Disconnect-ScubaGraph {throw 'this will be mocked'}
+            Mock -ModuleName Connection Disconnect-ScubaGraph {}
             # EXO now uses REST API - no ExchangeOnline module disconnect needed
             # SharePoint uses REST API - no SPO module disconnect needed
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {
             Disconnect-SCuBATenant -ProductNames 'aad'
-            Should -Invoke -ModuleName Connection -CommandName Disconnect-MgGraph -Times 1 -Exactly
+            Should -Invoke -ModuleName Connection -CommandName Disconnect-ScubaGraph -Times 1 -Exactly
         }
         It 'Disconnects from Exchange Online' {
             # EXO uses REST API with on-demand token - no persistent connection to disconnect

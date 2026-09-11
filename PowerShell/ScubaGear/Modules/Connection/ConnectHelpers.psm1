@@ -1,4 +1,11 @@
-﻿function Connect-GraphHelper {
+﻿# Session state stored globally so all module import paths share the same instance
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+if (-not $Global:ScubaGearState) {
+    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false }
+}
+
+function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
@@ -18,53 +25,230 @@
         $Scopes = $null,
 
         [Parameter(Mandatory = $false)]
+        [switch]
+        $UseSystemBrowserAuthentication,
+
+        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [hashtable]
         $ServicePrincipalParams
     )
-    $GraphParams = @{
-        'ErrorAction' = 'Stop';
-    }
-
     if ($ServicePrincipalParams.CertThumbprintParams) {
-        $GraphParams += @{
-            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint;
-            ClientID              = $ServicePrincipalParams.CertThumbprintParams.AppID;
-            TenantId              = $ServicePrincipalParams.CertThumbprintParams.Organization; # Organization also works here
+        $TokenParameters = @{
+            CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint
+            AppID = $ServicePrincipalParams.CertThumbprintParams.AppID
+            Tenant = $ServicePrincipalParams.CertThumbprintParams.Organization
+            Scope = switch ($M365Environment) {
+                { $_ -in @('commercial', 'gcc') } { 'https://graph.microsoft.com/.default' }
+                default { 'https://graph.microsoft.us/.default' }
+            }
         }
     }
     else {
-        $GraphParams += @{Scopes = $Scopes; }
-    }
-    switch ($M365Environment) {
-        "gcchigh" {
-            $GraphParams += @{'Environment' = "USGov"; }
+        $TokenParameters = @{
+            Scope = if ($Scopes) { $Scopes } else { @('Organization.Read.All') }
+            ClientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
+            Tenant = 'organizations'
         }
-        "dod" {
-            $GraphParams += @{'Environment' = "USGovDoD"; }
+        if ($UseSystemBrowserAuthentication) {
+            $TokenParameters.DisableBroker = $true
         }
     }
 
-    ################### If we receive a very specific error from Connect-MgGraph, we will retry with the GCC High environment.
-    try {
-        $null = Connect-MgGraph @GraphParams
+    $TokenParameters.M365Environment = $M365Environment
+    $Global:ScubaGearState.Session = @{
+        M365Environment = $M365Environment
+        GraphEndpoint = switch ($M365Environment) {
+            'gcchigh' { 'https://graph.microsoft.us' }
+            'dod' { 'https://dod-graph.microsoft.us' }
+            default { 'https://graph.microsoft.com' }
+        }
+        TokenParameters = $TokenParameters
     }
-    catch {
-        $ErrorText = $_.Exception.Message
+    $null = Get-MsalAccessToken @TokenParameters
+}
 
-        $IsWrongCloudError =
-            $ErrorText -match "AADSTS900384" -and
-            $ErrorText -match "determine the corresponding service endpoint"
+function Get-ScubaGraphContext {
+    <#
+    .SYNOPSIS
+        Returns the active Graph session environment and endpoint.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param()
 
-        if (-not $IsWrongCloudError) {
+    if ($Global:ScubaGearState.Session) {
+        [pscustomobject]@{
+            Environment = $Global:ScubaGearState.Session.M365Environment
+            GraphEndpoint = $Global:ScubaGearState.Session.GraphEndpoint
+        }
+    }
+}
+
+function Disconnect-ScubaGraph {
+    <#
+    .SYNOPSIS
+        Clears the Graph session and MSAL token cache.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param()
+
+    $Global:ScubaGearState.Session = $null
+    $Global:ScubaGearState.MsalAppCache = @{}
+}
+
+function Invoke-ScubaGraphRequest {
+    <#
+    .SYNOPSIS
+        Sends an authenticated REST request to the Microsoft Graph API.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'OutputType', Justification = 'Retained for Invoke-MgGraphRequest call-site compatibility; Invoke-RestMethod already returns PSObject output.')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Uri,
+
+        [ValidateSet('GET', 'POST', 'PATCH', 'PUT', 'DELETE')]
+        [string]$Method = 'GET',
+
+        [object]$Body,
+
+        [hashtable]$Headers,
+
+        [string]$ContentType = 'application/json',
+
+        [string]$OutputType,
+
+        [ValidateRange(0, 10)]
+        [int]$MaxRetries = 3
+    )
+
+    if (-not $Global:ScubaGearState.Session) {
+        throw 'Microsoft Graph is not connected. Call Connect-GraphHelper first.'
+    }
+
+    $RequestUri = if ([uri]::IsWellFormedUriString($Uri, [UriKind]::Absolute)) {
+        $Uri
+    }
+    else {
+        "$($Global:ScubaGearState.Session.GraphEndpoint)/$($Uri.TrimStart('/'))"
+    }
+
+    $Attempt = 0
+    $RefreshedToken = $false
+    while ($Attempt -le $MaxRetries) {
+        $Attempt++
+        $TokenParameters = $Global:ScubaGearState.Session.TokenParameters
+        $AccessToken = Get-MsalAccessToken @TokenParameters
+        $RequestHeaders = @{
+            Authorization = "Bearer $AccessToken"
+        }
+        if ($Headers) {
+            foreach ($Header in $Headers.GetEnumerator()) {
+                $RequestHeaders[$Header.Key] = $Header.Value
+            }
+        }
+        $RequestParameters = @{
+            Uri = $RequestUri
+            Method = $Method
+            Headers = $RequestHeaders
+            ErrorAction = 'Stop'
+        }
+        if ($null -ne $Body) {
+            $RequestParameters.ContentType = $ContentType
+            $RequestParameters.Body = if ($Body -is [string]) { $Body } else { $Body | ConvertTo-Json -Depth 20 }
+        }
+
+        try {
+            $Response = Invoke-RestMethod @RequestParameters
+            if ($Method -eq 'GET' -and $Response.PSObject.Properties.Name -contains 'value') {
+                $Items = [System.Collections.Generic.List[object]]::new()
+                foreach ($Item in @($Response.value)) {
+                    $Items.Add($Item)
+                }
+                $NextLink = $Response.'@odata.nextLink'
+                while ($NextLink) {
+                    $PageParameters = @{
+                        Uri = $NextLink
+                        Method = 'GET'
+                        Headers = $RequestHeaders
+                        ErrorAction = 'Stop'
+                    }
+                    $Page = Invoke-RestMethod @PageParameters
+                    foreach ($Item in @($Page.value)) {
+                        $Items.Add($Item)
+                    }
+                    $NextLink = $Page.'@odata.nextLink'
+                }
+                $Response.value = $Items.ToArray()
+            }
+            return $Response
+        }
+        catch {
+            $StatusCode = $null
+            if ($_.Exception.Response) {
+                $StatusCode = [int]$_.Exception.Response.StatusCode
+            }
+            if ($StatusCode -eq 401 -and -not $RefreshedToken) {
+                $RefreshedToken = $true
+                $Global:ScubaGearState.MsalAppCache = @{}
+                continue
+            }
+            if ($StatusCode -eq 429 -and $Attempt -le $MaxRetries) {
+                $RetryAfter = 1
+                $RetryAfterHeader = $_.Exception.Response.Headers['Retry-After']
+                if ($RetryAfterHeader -as [int]) {
+                    $RetryAfter = [int]$RetryAfterHeader
+                }
+                Start-Sleep -Seconds $RetryAfter
+                continue
+            }
+            $IsTransientFailure = $null -eq $StatusCode -or $StatusCode -in @(408, 500, 502, 503, 504)
+            if ($IsTransientFailure -and $Attempt -le $MaxRetries) {
+                Start-Sleep -Seconds ([Math]::Min([Math]::Pow(2, $Attempt - 1), 4))
+                continue
+            }
             throw
         }
-
-        Write-Information "Detected a login to a tenant that is not Commercial or GCC. Retrying with GCC High environment login page..." -InformationAction Continue
-        $GraphParams += @{'Environment' = "USGov"; }
-        $null = Connect-MgGraph @GraphParams
     }
-    ###################
+}
+
+function Get-TeamsAccessTokens {
+    <#
+    .SYNOPSIS
+        Acquires the delegated Graph and Teams resource tokens required by Connect-MicrosoftTeams.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$DisableBroker
+    )
+
+    $TeamsClientId = "12128f48-ec9e-42f0-b203-ea49fb6af367"
+    $GraphScope = switch ($M365Environment) {
+        { $_ -in @("commercial", "gcc") } { "https://graph.microsoft.com/.default" }
+        { $_ -in @("gcchigh", "dod") } { "https://graph.microsoft.us/.default" }
+    }
+    $CommonParameters = @{
+        ClientId = $TeamsClientId
+        Tenant = "organizations"
+        M365Environment = $M365Environment
+        DisableBroker = $DisableBroker
+    }
+
+    Get-MsalAccessToken -Scope $GraphScope @CommonParameters
+    Get-MsalAccessToken -Scope "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default" @CommonParameters
 }
 
 function Initialize-Msal {
@@ -77,83 +261,105 @@ function Initialize-Msal {
     [CmdletBinding()]
     param()
 
-    # ------------------------------------------------------------------
-    # 1. See if the MSAL types are already resolvable
-    # ------------------------------------------------------------------
-    try {
-        # If the MSAL types are already loaded, this will succeed and we can skip the rest of this function.
-        $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
-        return
-    }
-    catch {
-        Write-Information "MSAL types not yet resolvable so ScubaGear is loading them..." -InformationAction Continue
+    $ModuleRoot = Resolve-Path (Join-Path $PSScriptRoot '../..')
+    $LockPath = Join-Path $ModuleRoot 'dependencies/msal-lock.json'
+    $LibPath = Join-Path $ModuleRoot 'lib/net462'
+
+    if (-not (Test-Path -Path $LockPath -PathType Leaf)) {
+        throw "MSAL dependency lock was not found: $LockPath"
     }
 
-    # ------------------------------------------------------------------
-    # 2. Load the MSAL types so that they are resolvable
-    # ------------------------------------------------------------------
+    $Lock = Get-Content -Path $LockPath -Raw | ConvertFrom-Json
+    $ExpectedAssemblyVersion = [version]"$($Lock.msalVersion).0"
+    $LoadedMsal = [AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
+        $_.GetName().Name -eq 'Microsoft.Identity.Client'
+    } | Select-Object -First 1
+    if ($LoadedMsal -and $LoadedMsal.GetName().Version -ne $ExpectedAssemblyVersion) {
+        throw "Microsoft.Identity.Client $($LoadedMsal.GetName().Version) is already loaded; ScubaGear requires $ExpectedAssemblyVersion. Start a new PowerShell session."
+    }
 
-    # We have a different solution for PowerShell 5.1 vs PowerShell 7 because the same solution didn't work for both based on testing.
-    $RuntimeVersion = if ($PSVersionTable.PSEdition -eq 'Core') { 'Core' } else { 'Desktop' }
-
-    # PowerShell 5.1 solution
-    if ($RuntimeVersion -eq 'Desktop') {
-        # Call Connect-MgGraph with a bogus thumbprint purely to force MSAL to load.
-        # We expect this to fail we just want the side effect of loading Microsoft.Identity.Client.dll.
-        try {
-            Connect-MgGraph `
-                -CertificateThumbprint '2A0268B04B9F22EFA77A0EFF01930ADE279AC072' `
-                -ClientId 'ad1cb53b92084abeb99c3acf35c91c2a' `
-                -TenantId 'bogus.onmicrosoft.com' `
-                -ErrorAction Stop
-        }
-        catch {
-            if ($_.Exception.Message -like '*was not found in certificate store*') {
-                # Do nothing - this is the expected error, and it means MSAL was loaded successfully.
+    if (-not $Global:ScubaGearState.MsalValidated) {
+        foreach ($Record in $Lock.files) {
+            $FilePath = Join-Path $ModuleRoot $Record.path
+            if (-not (Test-Path -Path $FilePath -PathType Leaf)) {
+                throw "Bundled MSAL dependency is missing: $($Record.path)"
             }
-            # Some unrelated error occurred so we can't be sure MSAL was loaded. Rethrow the error so the user can see it.
-            else {
-                throw
+            $ActualHash = (Get-FileHash -Path $FilePath -Algorithm SHA256).Hash
+            if ($ActualHash -ne $Record.sha256) {
+                throw "Bundled MSAL dependency failed SHA-256 validation: $($Record.path)"
+            }
+            $Signature = Get-AuthenticodeSignature -FilePath $FilePath
+            if ($Signature.Status -ne 'Valid' -or
+                -not $Signature.SignerCertificate -or
+                $Signature.SignerCertificate.Subject -notmatch '(^|,\s*)O=Microsoft Corporation(,|$)') {
+                throw "Bundled MSAL dependency failed Authenticode validation: $($Record.path)"
             }
         }
+        $Global:ScubaGearState.MsalValidated = $true
     }
-    # PowerShell 7 solution
-    else {
-        # If Graph auth module is not already loaded, load it so we can find the MSAL assembly.
-        $GraphModule = Get-Module Microsoft.Graph.Authentication
-        if (-not $GraphModule) {
-            Import-Module Microsoft.Graph.Authentication
-            $GraphModule = Get-Module Microsoft.Graph.Authentication
+
+    $Architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
+        'ARM64' { 'win-arm64' }
+        'x86' { 'win-x86' }
+        default { 'win-x64' }
+    }
+    $NativePath = Join-Path $ModuleRoot "runtimes/$Architecture/native"
+    if (($env:PATH -split ';') -notcontains $NativePath) {
+        $env:PATH = "$NativePath;$env:PATH"
+    }
+
+    $LoadOrder = @(
+        'System.Runtime.CompilerServices.Unsafe.dll',
+        'System.Diagnostics.DiagnosticSource.dll',
+        'Microsoft.IdentityModel.Abstractions.dll',
+        'Microsoft.Identity.Client.dll',
+        'Microsoft.Identity.Client.NativeInterop.dll',
+        'Microsoft.Identity.Client.Broker.dll'
+    )
+    foreach ($AssemblyFile in $LoadOrder) {
+        $AssemblyName = [System.IO.Path]::GetFileNameWithoutExtension($AssemblyFile)
+        $IsLoaded = [AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
+            $_.GetName().Name -eq $AssemblyName
         }
-
-        $ModulePath = $GraphModule.Path | Split-Path
-        # $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
-        $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue |
-                Where-Object { $_.Directory.Name -eq $RuntimeVersion } |
-                Select-Object -First 1
-
-        if (-not $MsalDll) {
-            throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+        if (-not $IsLoaded) {
+            [void][Reflection.Assembly]::LoadFrom((Join-Path $LibPath $AssemblyFile))
         }
+    }
+}
 
-        Write-Information "Loading MSAL from path: $($MsalDll.FullName)" -InformationAction Continue
-        Add-Type -Path $MsalDll.FullName
+function Get-ScubaParentWindowHandle {
+    [CmdletBinding()]
+    param()
+
+    $Handle = [System.Diagnostics.Process]::GetCurrentProcess().MainWindowHandle
+    if ($Handle -ne [IntPtr]::Zero) {
+        return $Handle
     }
 
-    # ------------------------------------------------------------------
-    # 3. Verify the type is now loaded and resolvable
-    # ------------------------------------------------------------------
+    if (-not $Script:ScubaWindowNativeMethods) {
+        $NativeMethods = @'
+[System.Runtime.InteropServices.DllImport("kernel32.dll")]
+public static extern System.IntPtr GetConsoleWindow();
 
-    try {
-        $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
-        # It is resolvable so we succeeded.
-        Write-Information "Successfully loaded MSAL types." -InformationAction Continue
-        return
+[System.Runtime.InteropServices.DllImport("user32.dll")]
+public static extern System.IntPtr GetForegroundWindow();
+'@
+        $Script:ScubaWindowNativeMethods = Add-Type `
+            -MemberDefinition $NativeMethods `
+            -Name 'WindowNativeMethods' `
+            -Namespace 'ScubaGear' `
+            -PassThru
     }
-    catch {
-        Write-Warning "MSAL still not resolvable after going through loader code!"
-        throw
+
+    $Handle = $Script:ScubaWindowNativeMethods::GetConsoleWindow()
+    if ($Handle -eq [IntPtr]::Zero) {
+        $Handle = $Script:ScubaWindowNativeMethods::GetForegroundWindow()
     }
+    if ($Handle -eq [IntPtr]::Zero) {
+        throw 'Unable to resolve a parent window handle required by WAM.'
+    }
+
+    $Handle
 }
 
 function Get-MsalAccessToken {
@@ -168,7 +374,7 @@ function Get-MsalAccessToken {
     [CmdletBinding(DefaultParameterSetName = 'Interactive')]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$Scope,
+        [string[]]$Scope,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal')]
         [string]$CertificateThumbprint,
@@ -184,7 +390,10 @@ function Get-MsalAccessToken {
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
-        [string]$M365Environment
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Interactive')]
+        [switch]$DisableBroker
     )
 
     Initialize-Msal
@@ -207,8 +416,8 @@ function Get-MsalAccessToken {
     # Cache MSAL app instances by key so token cache persists across calls.
     # This enables AcquireTokenSilent to succeed for subsequent scope requests
     # after the first interactive sign-in, reducing browser popups to one.
-    if (-not $Script:MsalAppCache) {
-        $Script:MsalAppCache = @{}
+    if (-not $Global:ScubaGearState.MsalAppCache) {
+        $Global:ScubaGearState.MsalAppCache = @{}
     }
 
     $MaxAttempts = 3
@@ -218,25 +427,37 @@ function Get-MsalAccessToken {
         try {
             if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
                 $CacheKey = "SP:$AppID|$Authority"
-                if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
-                    $Script:MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
+                if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
                         WithCertificate($Certificate).
                         WithAuthority($Authority).
                         Build()
                 }
-                $MsalApp = $Script:MsalAppCache[$CacheKey]
+                $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
                 $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
             }
             else {
-                $RedirectUri = "http://localhost"
-                $CacheKey = "PUB:$ClientId|$Authority"
-                if (-not $Script:MsalAppCache.ContainsKey($CacheKey)) {
-                    $Script:MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-                        WithAuthority($Authority).
-                        WithRedirectUri($RedirectUri).
-                        Build()
+                $CacheKey = "PUB:$ClientId|$Authority|Broker:$(-not $DisableBroker)"
+                if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
+                    $Builder = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                        WithAuthority($Authority)
+                    if ($DisableBroker) {
+                        # MSAL convention: loopback redirect for public client system-browser flow
+                        $Builder = $Builder.WithRedirectUri('http://localhost')
+                    }
+                    else {
+                        $Builder = $Builder.WithDefaultRedirectUri()
+                        $Builder = $Builder.WithParentActivityOrWindow([Func[IntPtr]] {
+                            Get-ScubaParentWindowHandle
+                        })
+                        $BrokerOptions = [Microsoft.Identity.Client.BrokerOptions]::new(
+                            [Microsoft.Identity.Client.BrokerOptions+OperatingSystems]::Windows
+                        )
+                        $Builder = [Microsoft.Identity.Client.Broker.BrokerExtension]::WithBroker($Builder, $BrokerOptions)
+                    }
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = $Builder.Build()
                 }
-                $MsalApp = $Script:MsalAppCache[$CacheKey]
+                $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
 
                 # Try silent acquisition first using cached accounts
                 $TokenResult = $null
@@ -246,6 +467,12 @@ function Get-MsalAccessToken {
                         $TokenResult = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $Accounts[0]).
                             ExecuteAsync().GetAwaiter().GetResult()
                     }
+                    elseif (-not $DisableBroker) {
+                        $TokenResult = $MsalApp.AcquireTokenSilent(
+                            [string[]]@($Scope),
+                            [Microsoft.Identity.Client.PublicClientApplication]::OperatingSystemAccount
+                        ).ExecuteAsync().GetAwaiter().GetResult()
+                    }
                 }
                 catch {
                     # Silent failed (no cached token for this scope) — fall through to interactive
@@ -253,10 +480,11 @@ function Get-MsalAccessToken {
                 }
 
                 if (-not $TokenResult) {
-                    $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
-                        WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                        WithUseEmbeddedWebView($true).
-                        ExecuteAsync().GetAwaiter().GetResult()
+                    $InteractiveRequest = $MsalApp.AcquireTokenInteractive([string[]]@($Scope))
+                    if ($DisableBroker) {
+                        $InteractiveRequest = $InteractiveRequest.WithUseEmbeddedWebView($false)
+                    }
+                    $TokenResult = $InteractiveRequest.ExecuteAsync().GetAwaiter().GetResult()
                 }
             }
 
@@ -276,6 +504,10 @@ function Get-MsalAccessToken {
 
 Export-ModuleMember -Function @(
     'Connect-GraphHelper',
+    'Disconnect-ScubaGraph',
+    'Get-ScubaGraphContext',
+    'Get-TeamsAccessTokens',
     'Initialize-Msal',
-    'Get-MsalAccessToken'
+    'Get-MsalAccessToken',
+    'Invoke-ScubaGraphRequest'
 )

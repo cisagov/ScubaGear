@@ -111,6 +111,55 @@ InModuleScope Utility {
             $expectedValue | Should -Be $apiHeaderValue
         }
     }
+
+    Describe -Tag 'Utility' -Name "ConvertFrom-GraphHashtable" {
+        It "normalizes Invoke-RestMethod objects to the Graph SDK property shape" {
+            $Response = [pscustomobject]@{
+                value = @(
+                    [pscustomobject]@{
+                        servicePlanName = 'AAD_PREMIUM_P2'
+                        servicePlans = @(
+                            [pscustomobject]@{ provisioningStatus = 'Success' }
+                        )
+                        defaultUserRolePermissions = [pscustomobject]@{
+                            allowedToCreateApps = $true
+                        }
+                    }
+                )
+            }
+
+            $Json = ConvertFrom-GraphHashtable -GraphData $Response | ConvertTo-Json -Depth 5
+
+            $Json.Contains('"Value"') | Should -BeTrue
+            $Json.Contains('"ServicePlanName"') | Should -BeTrue
+            $Json.Contains('"ProvisioningStatus"') | Should -BeTrue
+            $Json.Contains('"DefaultUserRolePermissions"') | Should -BeTrue
+            $Json.Contains('"AllowedToCreateApps"') | Should -BeTrue
+            $Json.Contains('"servicePlanName"') | Should -BeFalse
+        }
+
+        It "preserves wrapped primitive responses" {
+            $Response = [pscustomobject]42
+
+            $Result = ConvertFrom-GraphHashtable -GraphData $Response
+
+            $Result | Should -Be 42
+            $Result.GetType() | Should -Be ([int])
+        }
+
+        It "preserves null properties and array elements" {
+            $Response = [pscustomobject]@{
+                nullableProperty = $null
+                items = @($null, [pscustomobject]@{ id = '1' })
+            }
+
+            $Result = ConvertFrom-GraphHashtable -GraphData $Response
+
+            $Result.NullableProperty | Should -BeNullOrEmpty
+            $Result.Items[0] | Should -BeNullOrEmpty
+            $Result.Items[1].Id | Should -Be '1'
+        }
+    }
 }
 
 AfterAll {

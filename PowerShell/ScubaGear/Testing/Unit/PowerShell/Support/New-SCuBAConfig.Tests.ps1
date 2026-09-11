@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Support')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Support') -Force
 
 InModuleScope Support {
     Describe -Tag Support -Name 'New-SCuBAConfig' {
@@ -30,6 +30,7 @@ InModuleScope Support {
                 OPAPath = ".";
                 LogIn = $true;
                 DisconnectOnExit = $false;
+                UseSystemBrowserAuthentication = $true;
                 OutPath = '.';
                 AppID = '0';
                 CertificateThumbprint = '0';

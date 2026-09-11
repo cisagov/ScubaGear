@@ -129,6 +129,12 @@
       "caseSensitive": false
     },
 
+    "UseSystemBrowserAuthentication": {
+      "_comment": "Whether delegated Graph and Teams authentication should use the system browser instead of WAM",
+      "type": "boolean",
+      "caseSensitive": false
+    },
+
     "Organization": {
       "_comment": "Tenant domain name (FQDN) for service principal authentication",
       "$ref": "#/definitions/patterns/orgDomain",

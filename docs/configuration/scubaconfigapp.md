@@ -330,7 +330,7 @@ Instead, it is recommended to:
   $SCuBAUI.error
   ```
 
-- **Graph connectivity fails**: Verify the `Microsoft.Graph.Authentication` module is installed and your authentication credentials have Graph permissions. You must have the following Graph permissions:
+- **Graph connectivity fails**: Verify that the bundled MSAL files pass the integrity check and your authentication credentials have Graph permissions. You must have the following Graph permissions:
 
   ```
   User.Read.All

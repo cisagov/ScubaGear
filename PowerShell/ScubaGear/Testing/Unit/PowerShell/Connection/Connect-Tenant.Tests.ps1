@@ -10,7 +10,11 @@ InModuleScope Connection {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            function Connect-GraphHelper {throw 'this will be mocked'}
+            function Connect-GraphHelper {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($UseSystemBrowserAuthentication, $ServicePrincipalParams, $M365Environment, $Scopes)
+                throw 'this will be mocked'
+            }
             Mock Connect-GraphHelper -MockWith {}
             # SharePoint now uses REST API - no PnP/SPO connection needed
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
@@ -35,15 +39,13 @@ InModuleScope Connection {
                     }
                 }
             }
-            function Get-MsalAccessToken {throw 'this will be mocked'}
+            function Get-MsalAccessToken {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($Scope, $ClientId, $Tenant, $M365Environment, $DisableBroker, $CertificateThumbprint, $AppID)
+                throw 'this will be mocked'
+            }
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
-            }
-            function Get-MgContext {throw 'this will be mocked'}
-            Mock Get-MgContext -MockWith { return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" } }
-            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
-            Mock Get-M365EnvironmentByDomain -MockWith {
-                return (Get-Random -InputObject @('commercial', 'gcc', 'gcchigh', 'dod'))
             }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
@@ -83,6 +85,50 @@ InModuleScope Connection {
                 }
             }
 
+        }
+        Context 'System browser authentication' {
+            It 'disables broker for Exchange and Compliance token acquisition' {
+                Connect-Tenant -ProductNames 'exo' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Get-MsalAccessToken -Times 2 -ParameterFilter {
+                    $ClientId -eq 'fb78d390-0c51-40cd-8e17-fdbfab77341b' -and $DisableBroker
+                }
+            }
+
+            It 'disables broker for Power Platform token acquisition' {
+                Connect-Tenant -ProductNames 'powerplatform' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
+                    $ClientId -eq '1950a258-227b-4e31-a9cf-717495945fc2' -and $DisableBroker
+                }
+            }
+
+            It 'disables broker for SharePoint token acquisition' {
+                Connect-Tenant -ProductNames 'sharepoint' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
+                    $ClientId -eq '9bc3ab49-b65d-410a-85ad-de819febfddc' -and $DisableBroker
+                }
+            }
+
+            It 'uses system-browser Graph authentication for aad' {
+                Connect-Tenant -ProductNames 'aad', 'teams' -M365Environment $Endpoint -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Connect-GraphHelper -Times 1 -ParameterFilter {
+                    $UseSystemBrowserAuthentication -and -not $ServicePrincipalParams
+                }
+            }
+
+            It 'does not pass delegated controls to service principal connections' {
+                $ServicePrincipalParams = @{
+                    CertThumbprintParams = @{
+                        AppID = 'a'
+                        CertificateThumbprint = 'b'
+                        Organization = 'c'
+                    }
+                }
+                Connect-Tenant -ProductNames 'aad', 'teams' -M365Environment $Endpoint `
+                    -ServicePrincipalParams $ServicePrincipalParams -UseSystemBrowserAuthentication
+                Should -Invoke -CommandName Connect-GraphHelper -Times 0 -ParameterFilter {
+                    $UseSystemBrowserAuthentication
+                }
+            }
         }
     }
 }

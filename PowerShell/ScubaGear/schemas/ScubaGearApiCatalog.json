@@ -1792,9 +1792,7 @@
         "apiHeader": [
             { }
         ],
-        "poshModule": [
-            "Microsoft.Graph.Authentication"
-        ],
+        "poshModule": [],
         "leastPermissions": [
             "User.Read"
         ],
@@ -1811,9 +1809,9 @@
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
+            "https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam"
         ],
-        "notes": "",
+        "notes": "ScubaGear connects through its bundled MSAL and Graph REST transport.",
         "oauthScope": ""
     },
 
@@ -1824,9 +1822,7 @@
         "apiHeader": [
             { }
         ],
-        "poshModule": [
-            "Microsoft.Graph.Authentication"
-        ],
+        "poshModule": [],
         "leastPermissions": [
             "User.Read"
         ],
@@ -1842,9 +1838,9 @@
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
+            "https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam"
         ],
-        "notes": "",
+        "notes": "ScubaGear connects through its bundled MSAL and Graph REST transport.",
         "oauthScope": ""
     },
 
@@ -1855,9 +1851,7 @@
         "apiHeader": [
             { }
         ],
-        "poshModule": [
-            "Microsoft.Graph.Authentication"
-        ],
+        "poshModule": [],
         "leastPermissions": [
             "User.Read"
         ],
@@ -1873,9 +1867,9 @@
         ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
+            "https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam"
         ],
-        "notes": "",
+        "notes": "ScubaGear connects through its bundled MSAL and Graph REST transport.",
         "oauthScope": ""
     },
 

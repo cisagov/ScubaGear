@@ -10,8 +10,13 @@ InModuleScope Orchestrator {
                     ProductNames    = @('aad')  # default, overridden in tests
                     LogIn           = $true
                     M365Environment = 'commercial'
+                    UseSystemBrowserAuthentication = $true
                 }
-                function Connect-Tenant { throw 'this will be mocked' }
+                function Connect-Tenant {
+                    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                    param($ProductNames, $M365Environment, $UseSystemBrowserAuthentication, $ServicePrincipalParams)
+                    throw 'this will be mocked'
+                }
                 Mock -ModuleName Orchestrator Connect-Tenant { @() }
                 function Get-ServicePrincipalParams { throw 'this will be mocked' }
                 Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @() }
@@ -19,7 +24,17 @@ InModuleScope Orchestrator {
 
             It 'connects to aad (single product)' {
                 $FailedAuthList = Invoke-Connection -ScubaConfig $ScubaConfig
-                Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly
+                Should -Invoke -CommandName Connect-Tenant -Times 1 -Exactly -ParameterFilter {
+                    $UseSystemBrowserAuthentication
+                }
+                $FailedAuthList | Should -BeNullOrEmpty
+            }
+            It 'does not pass system browser authentication when disabled' {
+                $ScubaConfig.UseSystemBrowserAuthentication = $false
+                $FailedAuthList = Invoke-Connection -ScubaConfig $ScubaConfig
+                Should -Invoke -CommandName Connect-Tenant -Times 0 -Exactly -ParameterFilter {
+                    $UseSystemBrowserAuthentication
+                }
                 $FailedAuthList | Should -BeNullOrEmpty
             }
             It 'connects to security suite' {
