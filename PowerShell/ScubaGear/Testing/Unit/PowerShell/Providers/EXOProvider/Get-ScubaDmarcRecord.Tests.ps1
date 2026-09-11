@@ -62,35 +62,229 @@ InModuleScope 'ExportEXOProvider' {
         }
 
         Context "When the DMARC record is unavailable at the full domain" {
-            BeforeAll {
+            BeforeEach {
+                $script:DmarcQueries = @()
+                $script:DmarcAnswerName = "_dmarc.example.com"
                 Mock -CommandName Invoke-RobustDnsTxt {
-                    Mock -CommandName Invoke-RobustDnsTxt {
-                        if ($Qname -eq "_dmarc.example.com") {
-                            @{
-                                "Answers" = @("v=DMARC1...");
-                                "Errors" = @();
-                                "NXDomain" = $false;
-                                "LogEntries" = @("some text")
-                            }
+                    $script:DmarcQueries += $Qname
+                    if ($Qname -eq $script:DmarcAnswerName) {
+                        @{
+                            "Answers" = @("v=DMARC1...");
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("some text")
                         }
-                        else {
-                            @{
-                                "Answers" = @();
-                                "Errors" = @();
-                                "NXDomain" = $false;
-                                "LogEntries" = @("Query returned NXDomain")
-                            }
+                    }
+                    else {
+                        @{
+                            "Answers" = @();
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("Query returned NXDomain")
                         }
                     }
                 }
             }
             It "Checks at the organization level" {
-                # There are two locations where DMARC records can be found. If it's not available at the
-                # full domain level, GetScubaDmarcRecord should try again at the organization domain level
+                # If no policy is available at the author domain, use the RFC 9989
+                # DNS Tree Walk to find the applicable policy.
                 $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
                     -PreferredDnsResolvers @() -SkipDoH $false
-                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 2
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 4
                 $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+
+            It "Checks the correct policy domain for a multi-label public suffix" {
+                $script:DmarcAnswerName = "_dmarc.example.fed.us"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "subdomain.example.fed.us"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+                $Response.rdata -Contains "v=DMARC1..." | Should -Be $true
+                $script:DmarcQueries | Should -Contain "_dmarc.example.fed.us"
+            }
+
+            It "Limits RFC 9989 tree-walk lookups to eight total DNS queries" {
+                $script:DmarcAnswerName = "_dmarc.not-a-query.example"
+                $Response = Get-ScubaDmarcRecord -Domains @(
+                    @{"DomainName" = "a.b.c.d.e.f.g.h.i.j.mail.example.com"}
+                ) -PreferredDnsResolvers @() -SkipDoH $false
+
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 8
+                $Response.rdata.Length | Should -Be 0
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.c.d.e.f.g.h.i.j.mail.example.com",
+                    "_dmarc.g.h.i.j.mail.example.com",
+                    "_dmarc.h.i.j.mail.example.com",
+                    "_dmarc.i.j.mail.example.com",
+                    "_dmarc.j.mail.example.com",
+                    "_dmarc.mail.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+        }
+
+        Context "When the tree walk encounters ambiguous or boundary-marking records" {
+            BeforeEach {
+                $script:DmarcQueries = @()
+                $script:DmarcAnswersByName = @{}
+                Mock -CommandName Invoke-RobustDnsTxt {
+                    $script:DmarcQueries += $Qname
+                    if ($script:DmarcAnswersByName.ContainsKey($Qname)) {
+                        @{
+                            "Answers" = @($script:DmarcAnswersByName[$Qname]);
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("some text")
+                        }
+                    }
+                    else {
+                        @{
+                            "Answers" = @();
+                            "Errors" = @();
+                            "NXDomain" = $false;
+                            "LogEntries" = @("Query returned NXDomain")
+                        }
+                    }
+                }
+            }
+
+            It "Stops the walk early when a valid record carries psd=y" {
+                # RFC 9989 step 6: a psd tag marks the walk boundary explicitly.
+                $script:DmarcAnswersByName["_dmarc.b.example.com"] = "v=DMARC1; p=none; psd=y;"
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=none; psd=y;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com"
+                )
+            }
+
+            It "Prefers the Organizational Domain record over its PSD record" {
+                $script:DmarcAnswersByName["_dmarc.cisa.gov"] = "v=DMARC1; p=reject;"
+                $script:DmarcAnswersByName["_dmarc.gov"] = "v=DMARC1; p=reject; psd=y;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "example.cisa.gov"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.example.cisa.gov",
+                    "_dmarc.cisa.gov",
+                    "_dmarc.gov"
+                )
+            }
+
+            It "Uses the PSD record when the Organizational Domain has no record" {
+                $script:DmarcAnswersByName["_dmarc.b.c.gov"] = "v=DMARC1; p=none;"
+                $script:DmarcAnswersByName["_dmarc.gov"] = "v=DMARC1; p=reject; psd=y;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.c.gov"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject; psd=y;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.c.gov",
+                    "_dmarc.b.c.gov",
+                    "_dmarc.c.gov",
+                    "_dmarc.gov"
+                )
+            }
+
+            It "Stops the walk early when a valid record carries psd=n" {
+                $script:DmarcAnswersByName["_dmarc.b.example.com"] = "v=DMARC1; p=none; psd=n;"
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=none; psd=n;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com"
+                )
+            }
+
+            It "Discards a non-DMARC answer during the tree walk and keeps walking" {
+                # A TXT record at "_dmarc.<name>" that isn't itself a DMARC record
+                # (missing the v=DMARC1 tag) must not be treated as this target's
+                # policy - the walk should continue past it.
+                $script:DmarcAnswersByName["_dmarc.b.example.com"] = "some unrelated TXT record"
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+
+            It "Treats multiple valid DMARC records at one target as unusable and keeps walking" {
+                # RFC 7489 6.6.3: more than one DMARC TXT record at a name is a
+                # discovery failure at that name, not a usable policy.
+                $script:DmarcAnswersByName["_dmarc.b.example.com"] = @("v=DMARC1; p=none;", "v=DMARC1; p=quarantine;")
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+
+            It "Discards a non-DMARC answer at the author domain and starts the tree walk" {
+                $script:DmarcAnswersByName["_dmarc.a.b.example.com"] = "some unrelated TXT record"
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
+            }
+
+            It "Discards multiple DMARC records at the author domain and starts the tree walk" {
+                $script:DmarcAnswersByName["_dmarc.a.b.example.com"] = @(
+                    "v=DMARC1; p=none;",
+                    "v=DMARC1; p=quarantine;"
+                )
+                $script:DmarcAnswersByName["_dmarc.example.com"] = "v=DMARC1; p=reject;"
+
+                $Response = Get-ScubaDmarcRecord -Domains @(@{"DomainName" = "a.b.example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+
+                $Response.rdata | Should -Be @("v=DMARC1; p=reject;")
+                $script:DmarcQueries | Should -Be @(
+                    "_dmarc.a.b.example.com",
+                    "_dmarc.b.example.com",
+                    "_dmarc.example.com",
+                    "_dmarc.com"
+                )
             }
         }
     }
