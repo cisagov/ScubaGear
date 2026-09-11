@@ -10,7 +10,7 @@
 3. Unzip the file to create a folder with the ScubaGear code 
 	```powershell
 	cd c:\folder_containing_code
-	import-module .\powershell\scubagear
+	Import-Module .\PowerShell\ScubaGear
 	```
 	If you see any execution warning when trying to import the module or run cmdlets type 
 	```powershell
