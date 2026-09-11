@@ -682,6 +682,55 @@ function Invoke-GraphBatchRequest {
     return $allResults
 }
 
+function Get-RetryAfterSeconds {
+    <#
+    .SYNOPSIS
+        Extracts the Retry-After delay (in seconds) from an HTTP response object, if present.
+    .DESCRIPTION
+        Handles both the PS 5.1 HttpWebResponse header shape (string-indexable WebHeaderCollection)
+        and the PS 7+ HttpResponseMessage shape (strongly-typed RetryConditionHeaderValue).
+    .PARAMETER HttpResponseObject
+        The response object to inspect (an exception's .Response property).
+    .PARAMETER DefaultSeconds
+        The value to return if no Retry-After header is present or it cannot be parsed.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        $HttpResponseObject,
+
+        [Parameter(Mandatory = $true)]
+        [int]$DefaultSeconds
+    )
+
+    if ($null -eq $HttpResponseObject) {
+        return $DefaultSeconds
+    }
+
+    try {
+        if ($HttpResponseObject.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
+            $RetryAfterHeader = $HttpResponseObject.Headers.RetryAfter
+            # PowerShell auto-unwraps Nullable<TimeSpan>, so .Delta is already a [TimeSpan] (not Nullable<TimeSpan>).
+            if ($RetryAfterHeader -and $RetryAfterHeader.Delta) {
+                return [int]$RetryAfterHeader.Delta.TotalSeconds
+            }
+        }
+        else {
+            $RetryAfterValue = $HttpResponseObject.Headers['Retry-After']
+            if ($RetryAfterValue -and [int]::TryParse($RetryAfterValue, [ref]$null)) {
+                return [int]$RetryAfterValue
+            }
+        }
+    }
+    catch {
+        Write-Verbose "Could not parse Retry-After header: $($_.Exception.Message)"
+    }
+
+    return $DefaultSeconds
+}
+
 function Invoke-ScubaRestMethod {
     <#
     .SYNOPSIS
@@ -712,6 +761,19 @@ function Invoke-ScubaRestMethod {
     .PARAMETER Accept
         The Accept header value (optional). If not specified, not included in headers.
 
+    .PARAMETER AdditionalHeaders
+        Extra request headers to send beyond Authorization/Content-Type/Accept (optional).
+
+    .PARAMETER TimeoutSec
+        Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
+
+    .PARAMETER MaxRetries
+        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries).
+
+    .PARAMETER RetryDelaySeconds
+        Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
+        header, and doubled after each successive 500/503 retry (default: 5).
+
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
             -AccessToken $Token -Endpoint "/providers/PowerPlatform.Governance/v1/tenants/settings"
@@ -730,6 +792,11 @@ function Invoke-ScubaRestMethod {
             -Method "POST" -Body '{"walkMeOptOut": true}'
         Makes a POST request to the Power Platform API with a JSON body.
 
+    .EXAMPLE
+        Invoke-ScubaRestMethod -BaseUrl $ApiEndpoint -AccessToken $Token -Endpoint "" `
+            -Method "POST" -Body $Body -MaxRetries 3 -RetryDelaySeconds 5
+        Makes a POST request with up to 3 retries on throttling/transient server errors.
+
     .FUNCTIONALITY
         Internal
     #>
@@ -742,6 +809,7 @@ function Invoke-ScubaRestMethod {
         [string]$AccessToken,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]$Endpoint,
 
         [Parameter(Mandatory = $false)]
@@ -754,7 +822,19 @@ function Invoke-ScubaRestMethod {
         [string]$ContentType = "application/json",
 
         [Parameter(Mandatory = $false)]
-        [string]$Accept = $null
+        [string]$Accept = $null,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]$AdditionalHeaders = $null,
+
+        [Parameter(Mandatory = $false)]
+        [int]$TimeoutSec = 0,
+
+        [Parameter(Mandatory = $false)]
+        [int]$MaxRetries = 0,
+
+        [Parameter(Mandatory = $false)]
+        [int]$RetryDelaySeconds = 5
     )
 
     $Uri = "$BaseUrl$Endpoint"
@@ -765,6 +845,12 @@ function Invoke-ScubaRestMethod {
 
     if ($Accept) {
         $Headers["Accept"] = $Accept
+    }
+
+    if ($AdditionalHeaders) {
+        foreach ($HeaderName in $AdditionalHeaders.Keys) {
+            $Headers[$HeaderName] = $AdditionalHeaders[$HeaderName]
+        }
     }
 
     $Params = @{
@@ -778,77 +864,97 @@ function Invoke-ScubaRestMethod {
         $Params.Body = $Body
     }
 
-    try {
-        $Response = Invoke-RestMethod @Params
+    if ($TimeoutSec -gt 0) {
+        $Params.TimeoutSec = $TimeoutSec
     }
-    # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
-    catch {
-        $ErrorRecord = $_
-        $WebResponse = $ErrorRecord.Exception.Response
 
-        $ErrorBuffer = [System.Text.StringBuilder]::new()
-        [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
-        [void]$ErrorBuffer.AppendLine("Message       : $($ErrorRecord.Exception.Message)")
+    for ($Attempt = 1; $Attempt -le ($MaxRetries + 1); $Attempt++) {
+        try {
+            return Invoke-RestMethod @Params
+        }
+        # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
+        catch {
+            $ErrorRecord = $_
+            $WebResponse = $ErrorRecord.Exception.Response
+            $StatusCode = if ($WebResponse) { [int]$WebResponse.StatusCode } else { 0 }
+            $IsLastAttempt = $Attempt -gt $MaxRetries
 
-        if ($null -eq $WebResponse) {
-            [void]$ErrorBuffer.AppendLine("No HTTP response object was returned.")
+            if (-not $IsLastAttempt -and $StatusCode -eq 429) {
+                $RetryAfter = Get-RetryAfterSeconds -HttpResponseObject $WebResponse -DefaultSeconds $RetryDelaySeconds
+                Write-Warning "Request to '$Uri' throttled (HTTP 429). Retrying in ${RetryAfter}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $RetryAfter
+                continue
+            }
+
+            if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
+                Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${RetryDelaySeconds}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $RetryDelaySeconds
+                $RetryDelaySeconds *= 2
+                continue
+            }
+
+            $ErrorBuffer = [System.Text.StringBuilder]::new()
+            [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
+            [void]$ErrorBuffer.AppendLine("Message       : $($ErrorRecord.Exception.Message)")
+
+            if ($null -eq $WebResponse) {
+                [void]$ErrorBuffer.AppendLine("No HTTP response object was returned.")
+                Write-Information $ErrorBuffer.ToString() -InformationAction Continue
+                throw
+            }
+
+            # PS 5.1 throws WebException -> HttpWebResponse. PS 7+ throws HttpResponseException -> HttpResponseMessage.
+            # Compare the type name as a string rather than "-is [System.Net.Http.HttpResponseMessage]" because that
+            # assembly isn't loaded by default on PS 5.1 Desktop, and the type-literal itself fails to resolve there.
+            if ($WebResponse.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
+                [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
+                [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.ReasonPhrase)")
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
+                foreach ($Header in $WebResponse.Headers) {
+                    [void]$ErrorBuffer.AppendLine("$($Header.Key): $($Header.Value -join ', ')")
+                }
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
+                # On PS 7+, Invoke-RestMethod already reads and disposes the response content internally,
+                # so re-reading $WebResponse.Content throws "Cannot access a disposed object." The body text
+                # (when PowerShell can parse it) is instead surfaced via ErrorRecord.ErrorDetails.Message.
+                $ResponseBody = $ErrorRecord.ErrorDetails.Message
+                [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
+            }
+            else {
+                [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
+                [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.StatusDescription)")
+                [void]$ErrorBuffer.AppendLine("Content Type  : $($WebResponse.ContentType)")
+                [void]$ErrorBuffer.AppendLine("Content Length: $($WebResponse.ContentLength)")
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
+                foreach ($HeaderName in $WebResponse.Headers.AllKeys) {
+                    [void]$ErrorBuffer.AppendLine("${HeaderName}: $($WebResponse.Headers[$HeaderName])")
+                }
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
+                $ResponseStream = $WebResponse.GetResponseStream()
+                if ($null -eq $ResponseStream) {
+                    [void]$ErrorBuffer.AppendLine("No response stream in Error.Exception.Response object.")
+                }
+                else {
+                    $Reader = New-Object System.IO.StreamReader($ResponseStream)
+                    try {
+                        $ResponseBody = $Reader.ReadToEnd()
+                    }
+                    finally {
+                        $Reader.Dispose()
+                        $ResponseStream.Dispose()
+                    }
+                    [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
+                }
+            }
+
             Write-Information $ErrorBuffer.ToString() -InformationAction Continue
             throw
         }
-
-        # PS 5.1 throws WebException -> HttpWebResponse. PS 7+ throws HttpResponseException -> HttpResponseMessage.
-        # Compare the type name as a string rather than "-is [System.Net.Http.HttpResponseMessage]" because that
-        # assembly isn't loaded by default on PS 5.1 Desktop, and the type-literal itself fails to resolve there.
-        if ($WebResponse.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
-            [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
-            [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.ReasonPhrase)")
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
-            foreach ($Header in $WebResponse.Headers) {
-                [void]$ErrorBuffer.AppendLine("$($Header.Key): $($Header.Value -join ', ')")
-            }
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
-            # On PS 7+, Invoke-RestMethod already reads and disposes the response content internally,
-            # so re-reading $WebResponse.Content throws "Cannot access a disposed object." The body text
-            # (when PowerShell can parse it) is instead surfaced via ErrorRecord.ErrorDetails.Message.
-            $ResponseBody = $ErrorRecord.ErrorDetails.Message
-            [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
-        }
-        else {
-            [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
-            [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.StatusDescription)")
-            [void]$ErrorBuffer.AppendLine("Content Type  : $($WebResponse.ContentType)")
-            [void]$ErrorBuffer.AppendLine("Content Length: $($WebResponse.ContentLength)")
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
-            foreach ($HeaderName in $WebResponse.Headers.AllKeys) {
-                [void]$ErrorBuffer.AppendLine("${HeaderName}: $($WebResponse.Headers[$HeaderName])")
-            }
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
-            $ResponseStream = $WebResponse.GetResponseStream()
-            if ($null -eq $ResponseStream) {
-                [void]$ErrorBuffer.AppendLine("No response stream in Error.Exception.Response object.")
-            }
-            else {
-                $Reader = New-Object System.IO.StreamReader($ResponseStream)
-                try {
-                    $ResponseBody = $Reader.ReadToEnd()
-                }
-                finally {
-                    $Reader.Dispose()
-                    $ResponseStream.Dispose()
-                }
-                [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
-            }
-        }
-
-        Write-Information $ErrorBuffer.ToString() -InformationAction Continue
-        throw
     }
-
-    return $Response
 }
 
 Export-ModuleMember -Function @(
