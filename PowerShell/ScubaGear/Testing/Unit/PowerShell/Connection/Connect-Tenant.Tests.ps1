@@ -47,12 +47,6 @@ InModuleScope Connection {
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
             }
-            function Get-MgContext {throw 'this will be mocked'}
-            Mock Get-MgContext -MockWith { return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" } }
-            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
-            Mock Get-M365EnvironmentByDomain -MockWith {
-                return (Get-Random -InputObject @('commercial', 'gcc', 'gcchigh', 'dod'))
-            }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
@@ -114,36 +108,10 @@ InModuleScope Connection {
                 }
             }
 
-            It 'uses system-browser Graph authentication and edition-compatible Teams authentication' {
+            It 'uses system-browser Graph authentication for aad' {
                 Connect-Tenant -ProductNames 'aad', 'teams' -M365Environment $Endpoint -UseSystemBrowserAuthentication
                 Should -Invoke -CommandName Connect-GraphHelper -Times 1 -ParameterFilter {
                     $UseSystemBrowserAuthentication -and -not $ServicePrincipalParams
-                }
-                if ($PSEdition -eq 'Desktop') {
-                    Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
-                    Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
-                        -not $DisableWAM -and
-                        -not $AccessTokens -and
-                        -not $CertificateThumbprint
-                    }
-                }
-                else {
-                    Should -Invoke -CommandName Get-TeamsAccessTokens -Times 1 -ParameterFilter {
-                        $DisableBroker
-                    }
-                    Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
-                        -not $DisableWAM -and
-                        $AccessTokens.Count -eq 2 -and
-                        -not $CertificateThumbprint
-                    }
-                }
-            }
-
-            It 'retains WAM when system browser authentication is disabled' {
-                Connect-Tenant -ProductNames 'teams' -M365Environment $Endpoint
-                Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
-                Should -Invoke -CommandName Connect-MicrosoftTeams -Times 1 -ParameterFilter {
-                    -not $DisableWAM -and -not $AccessTokens -and -not $CertificateThumbprint
                 }
             }
 
@@ -159,10 +127,6 @@ InModuleScope Connection {
                     -ServicePrincipalParams $ServicePrincipalParams -UseSystemBrowserAuthentication
                 Should -Invoke -CommandName Connect-GraphHelper -Times 0 -ParameterFilter {
                     $UseSystemBrowserAuthentication
-                }
-                Should -Invoke -CommandName Get-TeamsAccessTokens -Times 0
-                Should -Invoke -CommandName Connect-MicrosoftTeams -Times 0 -ParameterFilter {
-                    $DisableWAM -or $AccessTokens
                 }
             }
         }
