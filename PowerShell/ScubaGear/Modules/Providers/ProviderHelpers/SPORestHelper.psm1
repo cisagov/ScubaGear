@@ -1,4 +1,5 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearRestEndpoint
 
 function Get-SPOTenantRest {
     <#
@@ -23,7 +24,7 @@ function Get-SPOTenantRest {
     )
 
     # SharePoint CSOM-style REST endpoint for tenant properties
-    $Endpoint = "/_api/SPO.Tenant"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-SPOTenantRest'
 
     # accept header https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/complete-basic-operations-using-sharepoint-rest-endpoints#properties-used-in-rest-requests
     $SPOContentType = "application/json;odata=verbose"
