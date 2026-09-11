@@ -215,7 +215,7 @@ The integrated ScubaGear execution feature allows you to run assessments directl
 
 ### Requirements for Execution
 
-- _Initialize-Scuba_ has been ran to ensure all modules and dependencies are installed
+- _Install-ScubaDependencies_ has been ran to ensure all modules and dependencies are installed
 - Valid configuration with at least one product selected
 - Appropriate Microsoft Graph permissions for your account
 - Network connectivity to Microsoft 365 services

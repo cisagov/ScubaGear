@@ -26,4 +26,4 @@ After deleting the `.graph` folder in your home directory, re-run ScubaGear, and
 
 ## Could not load file or assembly 'Microsoft.Graph.Authentication'
 
-This error can be seen when running ScubaGear. It indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by ScubaGear. Follow the instructions on the [dependencies page](../prerequisites/dependencies.md) and execute the `Initialize-SCuBA` cmdlet, which will ensure that the module versions get synchronized with dependencies. Then run the tool again.
+This error can be seen when running ScubaGear. It indicates that the authentication module is at a version level that conflicts with the MS Graph modules used by ScubaGear. Follow the instructions on the [dependencies page](../prerequisites/dependencies.md) and execute the `Install-ScubaDependencies` cmdlet, which will ensure that the module versions get synchronized with dependencies. Then run the tool again.

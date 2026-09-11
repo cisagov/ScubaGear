@@ -1,52 +1,21 @@
 using module 'ScubaConfig\ScubaConfig.psm1'
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility/ScubaLogging.psm1")
 
-function ConvertTo-ScubaProductNames {
-    <#
-    .SYNOPSIS
-    Normalizes a list of ScubaGear product names.
-    .DESCRIPTION
-    Centralizes ScubaGear product-name normalization so the value is handled identically
-    regardless of whether it originates from the -ProductNames parameter or an imported
-    configuration file. It:
-      1. Expands the '*' wildcard to the full list of supported products.
-      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
-         (adding 'securitysuite' only if not already present).
-      3. Returns a sorted, de-duplicated array.
-    .PARAMETER ProductNames
-    The array of product names to normalize.
-    #>
-    [CmdletBinding()]
-    [OutputType([string[]])]
-    param(
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [AllowEmptyCollection()]
-        [string[]]
-        $ProductNames
-    )
+# Core helper modules (ScubaConfig is loaded above via 'using module')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility\ScubaLogging.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Utility")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Connection")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "RunRego")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "CreateReport")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Support")
 
-    if ($null -eq $ProductNames) {
-        return @()
-    }
-
-    # Expand the wildcard to all supported products
-    if ($ProductNames -contains '*') {
-        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
-        Write-Debug "Setting ProductNames to all products because of wildcard"
-    }
-
-    # 'defender' is a deprecated alias for 'securitysuite'
-    if ($ProductNames -contains 'defender') {
-        if (-not ($ProductNames -contains 'securitysuite')) {
-            $ProductNames = @($ProductNames) + "securitysuite"
-        }
-        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
-        Write-Debug "Substituting defender with securitysuite in ProductNames"
-    }
-
-    return @($ProductNames | Sort-Object -Unique)
-}
+# Providers
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportAADProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportEXOProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerBIProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerPlatformProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSecuritySuiteProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSharePointProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportTeamsProvider.psm1")
 
 function Invoke-SCuBA {
     <#
@@ -397,9 +366,6 @@ function Invoke-SCuBA {
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
         }
 
-        Remove-Resources # Unload helper modules if they are still in the PowerShell session
-        Import-Resources # Imports Providers, RunRego, etc.
-
         # Loads and executes parameters from a Configuration file
         if ($PSCmdlet.ParameterSetName -eq 'Configuration'){
             [ScubaConfig]::ResetInstance()
@@ -575,15 +541,17 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $false
         }
 
+        # If user supplied the $M365Environment parameter, let them know that it is no longer necessary
+        if ($PSBoundParameters.ContainsKey('M365Environment')) {
+            Write-Information "`nStarting in ScubaGear v2.0.0 the -M365Environment parameter is no longer necessary.`n" -InformationAction Continue
+        }
+
         # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
         # This overrides any user provided command line value for M365Environment and the default value of "commercial"
         if ($ScubaConfig.CertificateThumbprint -or $ScubaConfig.AppID) {
             # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
             $null = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
             $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
-        }
-        else {
-            Write-Information "`nIf you are running v2.0.0 with interactive login against a non-commercial tenant such as gcc or gcchigh, include the -M365Environment parameter. In a future release ScubaGear will auto-detect the M365 environment and this won't be necessary.`n" -InformationAction Continue
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
@@ -594,6 +562,11 @@ function Invoke-SCuBA {
         }
 
         $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig
+        # If Connect-Tenant automatically detected the M365Environment during interactive auth, change the ScubaConfig value to the detected value.
+        if ($ConnectionResult.DetectedM365Environment) {
+            $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
+        }
+
         $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
         if ($ProdAuthFailed.Count -gt 0) {
             Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
@@ -634,7 +607,7 @@ function Invoke-SCuBA {
             M365Environment = $ScubaConfig.M365Environment
         }
 
-        $TenantDetails = Get-TenantDetail -ProductNames $ScubaConfig.ProductNames -M365Environment $ScubaConfig.M365Environment -ConnectionResult $ConnectionResult
+        $TenantDetails = Get-TenantDetail -M365Environment $ScubaConfig.M365Environment
         Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
 
         # Generate a GUID to uniquely identify the output JSON
@@ -754,6 +727,15 @@ function Invoke-SCuBA {
                 'OutActionPlanFileName' = $ScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
+
+            # Craft the csv version of risky applications/service principals for remediation
+            $RiskyAppsCsvParams = @{
+                'ProductNames'         = $ScubaConfig.ProductNames;
+                'OutFolderPath'        = $OutFolderPath;
+                'FullScubaResultsName' = $FullScubaResultsName;
+                'OutProviderFileName'  = $ScubaConfig.OutProviderFileName;
+            }
+            ConvertTo-RiskyAppsCsv @RiskyAppsCsvParams
         }
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
@@ -952,12 +934,17 @@ function Invoke-ProviderList {
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
                         "teams" {
+                            $TeamsProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                                'AccessToken' = $ConnectionResult.TeamsAccessToken
+                                'BaseUrl' = $ConnectionResult.TeamsBaseUrl
+                                'UnifiedAccessToken' = $ConnectionResult.TeamsUnifiedAccessToken
+                                'UnifiedBaseUrl' = $ConnectionResult.TeamsUnifiedBaseUrl
+                            }
                             if ($ServicePrincipalAuth) {
-                                $RetVal = Export-TeamsProvider -CertificateBasedAuth | Select-Object -Last 1
+                                $TeamsProviderParams['CertificateBasedAuth'] = $true
                             }
-                            else {
-                                $RetVal = Export-TeamsProvider | Select-Object -Last 1
-                            }
+                            $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"
@@ -1398,6 +1385,445 @@ function ConvertTo-ResultsCsv {
     }
 }
 
+function ConvertFrom-RiskyAppsCsvDate {
+    <#
+    .Description
+    Parses Graph/.NET JSON date strings used on credential objects into DateTime values.
+    .Functionality
+    Internal
+    #>
+    param(
+        [string]
+        $DateString
+    )
+
+    if ([string]::IsNullOrEmpty($DateString)) {
+        return $null
+    }
+
+    # Dates are returned from Graph as .NET JSON dates: /Date(1675800895000)/
+    if ($DateString -match '\\?/Date\((\d+)\)\\?/') {
+        $EpochMs = $Matches[1]
+        return [System.DateTimeOffset]::FromUnixTimeMilliseconds($EpochMs).UtcDateTime
+    }
+
+    try {
+        return [Datetime]::Parse($DateString)
+    }
+    catch {
+        return $null
+    }
+}
+
+function Get-RiskyAppsCredentialCounts {
+    <#
+    .Description
+    Counts active and expired credentials and how many active credentials exceed a lifetime threshold.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $false)]
+        [object[]]
+        $AccessKeys,
+
+        [Parameter(Mandatory = $true)]
+        [int]
+        $LifetimeThresholdDays
+    )
+
+    $ActiveCount = 0
+    $ExpiredCount = 0
+    $ActiveExceedingLifetimeCount = 0
+    $Now = Get-Date
+
+    if ($null -eq $AccessKeys) {
+        return [PSCustomObject]@{
+            ActiveCount = $ActiveCount
+            ExpiredCount = $ExpiredCount
+            ActiveExceedingLifetimeCount = $ActiveExceedingLifetimeCount
+        }
+    }
+
+    foreach ($AccessKey in @($AccessKeys)) {
+        if ($null -eq $AccessKey) {
+            continue
+        }
+
+        $End = $null
+        if ($null -ne $AccessKey.EndDateTime) {
+            if ($AccessKey.EndDateTime -is [datetime]) {
+                $End = $AccessKey.EndDateTime
+            }
+            else {
+                $End = ConvertFrom-RiskyAppsCsvDate -DateString "$($AccessKey.EndDateTime)"
+            }
+        }
+
+        $IsExpired = ($null -ne $End -and $End -lt $Now)
+        if ($IsExpired) {
+            $ExpiredCount++
+            continue
+        }
+
+        $ActiveCount++
+
+        $Start = $null
+        if ($null -ne $AccessKey.StartDateTime) {
+            if ($AccessKey.StartDateTime -is [datetime]) {
+                $Start = $AccessKey.StartDateTime
+            }
+            else {
+                $Start = ConvertFrom-RiskyAppsCsvDate -DateString "$($AccessKey.StartDateTime)"
+            }
+        }
+
+        if ($null -ne $Start -and $null -ne $End) {
+            $DurationDays = (New-TimeSpan -Start $Start -End $End).Days
+            if ($DurationDays -gt $LifetimeThresholdDays) {
+                $ActiveExceedingLifetimeCount++
+            }
+        }
+    }
+
+    return [PSCustomObject]@{
+        ActiveCount = $ActiveCount
+        ExpiredCount = $ExpiredCount
+        ActiveExceedingLifetimeCount = $ActiveExceedingLifetimeCount
+    }
+}
+
+function Get-RiskyAppsRiskLevel {
+    <#
+    .Description
+    Resolves the highest permission risk level for a risky application or service principal.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Object
+    )
+
+    if ($null -ne $Object.ScoreBreakdown -and
+        -not [string]::IsNullOrEmpty("$($Object.ScoreBreakdown.HighestRiskLevel)")) {
+        return "$($Object.ScoreBreakdown.HighestRiskLevel)"
+    }
+
+    $RiskLevelPriority = @{ Critical = 4; High = 3; Medium = 2; Low = 1 }
+    $HighestRiskLevel = "None"
+    $HighestPriority = 0
+
+    foreach ($Permission in @($Object.Permissions)) {
+        if ($null -eq $Permission -or $Permission.IsRisky -ne $true) {
+            continue
+        }
+
+        $Priority = $RiskLevelPriority[$Permission.RiskLevel]
+        if ($null -ne $Priority -and $Priority -gt $HighestPriority) {
+            $HighestPriority = $Priority
+            $HighestRiskLevel = $Permission.RiskLevel
+        }
+    }
+
+    return $HighestRiskLevel
+}
+
+function Get-RiskyAppsPermissionList {
+    <#
+    .Description
+    Formats an application's risky permissions as a semicolon-separated list ordered
+    from highest risk level to lowest so remediating admins know which grants to review.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Object
+    )
+
+    $RiskLevelPriority = @{ Critical = 4; High = 3; Medium = 2; Low = 1 }
+    $RiskyPermissions = @($Object.Permissions) | Where-Object {
+        $null -ne $_ -and $_.IsRisky -eq $true
+    }
+
+    if (@($RiskyPermissions).Count -eq 0) {
+        return ""
+    }
+
+    $SortedPermissions = @(
+        $RiskyPermissions | Sort-Object -Property @{
+            Expression = {
+                $Priority = $RiskLevelPriority[$_.RiskLevel]
+                if ($null -eq $Priority) { 0 } else { $Priority }
+            }
+            Descending = $true
+        }, @{
+            Expression = {
+                if (-not [string]::IsNullOrEmpty("$($_.RoleDisplayName)")) {
+                    "$($_.RoleDisplayName)"
+                }
+                elseif (-not [string]::IsNullOrEmpty("$($_.RoleId)")) {
+                    "$($_.RoleId)"
+                }
+                else {
+                    ""
+                }
+            }
+            Descending = $false
+        }
+    )
+
+    $FormattedPermissions = foreach ($Permission in $SortedPermissions) {
+        $PermissionName = "$($Permission.RoleDisplayName)"
+        if ([string]::IsNullOrEmpty($PermissionName)) {
+            $PermissionName = "$($Permission.RoleId)"
+        }
+        if ([string]::IsNullOrEmpty($PermissionName)) {
+            $PermissionName = "Unknown"
+        }
+
+        $Details = @()
+        if (-not [string]::IsNullOrEmpty("$($Permission.RiskLevel)")) {
+            $Details += "$($Permission.RiskLevel)"
+        }
+        if (-not [string]::IsNullOrEmpty("$($Permission.RoleType)")) {
+            $Details += "$($Permission.RoleType)"
+        }
+
+        if ($Details.Count -gt 0) {
+            "$PermissionName ($($Details -join ', '))"
+        }
+        else {
+            $PermissionName
+        }
+    }
+
+    return ($FormattedPermissions -join "; ")
+}
+
+function ConvertFrom-CsvValue {
+    <#
+    .Description
+    Prefixes a single quote to values that spreadsheet applications would otherwise
+    evaluate as a formula. Tenant-controlled text such as an application display name
+    can begin with =, +, -, or @, which Excel executes on open even when the field is
+    CSV-quoted.
+    .Functionality
+    Internal
+    #>
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]
+        $Value
+    )
+
+    if ([string]::IsNullOrEmpty($Value)) {
+        return $Value
+    }
+
+    if ($Value -match '^[=+\-@\t\r]') {
+        return "'$Value"
+    }
+
+    return $Value
+}
+
+function ConvertTo-RiskyAppsCsv {
+    <#
+    .Description
+    Creates a CSV in the ScubaGear output directory to assist remediation of risky
+    applications and third-party service principals. Rows are ordered by severity score
+    (highest first). Each row includes the app's risky permissions ordered from
+    highest risk level to lowest.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [string[]]
+        $ProductNames,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutFolderPath,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $FullScubaResultsName,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutProviderFileName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutRiskyAppsFileName = "RiskyApps"
+    )
+    process {
+        # Risky application data is only produced by the AAD provider
+        if ($ProductNames -notcontains "aad" -and $ProductNames -notcontains "*") {
+            return
+        }
+
+        try {
+            $RiskyApplications = @()
+            $RiskyThirdPartyServicePrincipals = @()
+            $ProviderData = $null
+
+            $ScubaResultsPath = Join-Path $OutFolderPath -ChildPath $FullScubaResultsName
+            if (Test-Path -LiteralPath $ScubaResultsPath -PathType Leaf) {
+                $ScubaResults = Get-Content -Encoding UTF8 -LiteralPath $ScubaResultsPath | ConvertFrom-Json
+                if ($null -ne $ScubaResults.Raw) {
+                    $ProviderData = $ScubaResults.Raw
+                }
+            }
+
+            if ($null -eq $ProviderData) {
+                $ProviderSettingsPath = Join-Path $OutFolderPath -ChildPath "$OutProviderFileName.json"
+                if (Test-Path -LiteralPath $ProviderSettingsPath -PathType Leaf) {
+                    $ProviderData = Get-Content -Encoding UTF8 -LiteralPath $ProviderSettingsPath | ConvertFrom-Json
+                }
+            }
+
+            if ($null -ne $ProviderData) {
+                if ($null -ne $ProviderData.risky_applications) {
+                    $RiskyApplications = @($ProviderData.risky_applications | Where-Object { $null -ne $_ })
+                }
+                if ($null -ne $ProviderData.risky_third_party_service_principals) {
+                    $RiskyThirdPartyServicePrincipals = @(
+                        $ProviderData.risky_third_party_service_principals | Where-Object { $null -ne $_ }
+                    )
+                }
+            }
+
+            $RiskyAppsCsv = @()
+
+            foreach ($App in $RiskyApplications) {
+                $PasswordCounts = Get-RiskyAppsCredentialCounts `
+                    -AccessKeys $App.PasswordCredentials `
+                    -LifetimeThresholdDays 180
+                $KeyCounts = Get-RiskyAppsCredentialCounts `
+                    -AccessKeys $App.KeyCredentials `
+                    -LifetimeThresholdDays 365
+
+                $PrivilegedRoles = @()
+                if ($null -ne $App.PrivilegedRoles) {
+                    $PrivilegedRoles = @($App.PrivilegedRoles | Where-Object { -not [string]::IsNullOrEmpty("$_") })
+                }
+
+                $RiskyAppsCsv += [PSCustomObject]@{
+                    "Display Name" = ConvertFrom-CsvValue -Value $App.DisplayName
+                    "Severity Score" = $(if ($null -ne $App.SeverityScore) { $App.SeverityScore } else { 0 })
+                    "Risk Level" = Get-RiskyAppsRiskLevel -Object $App
+                    "Risky Permissions" = Get-RiskyAppsPermissionList -Object $App
+                    "Multi-Tenant" = [bool]$App.IsMultiTenantEnabled
+                    "Third-Party Service Principal" = $false
+                    "Assigned Privileged Roles" = ($PrivilegedRoles -join "; ")
+                    "Active Password Credentials" = $PasswordCounts.ActiveCount
+                    "Expired Password Credentials" = $PasswordCounts.ExpiredCount
+                    "Active Password Credentials Exceeding 180 Days" = $PasswordCounts.ActiveExceedingLifetimeCount
+                    "Active Key Credentials" = $KeyCounts.ActiveCount
+                    "Expired Key Credentials" = $KeyCounts.ExpiredCount
+                    "Active Key Credentials Exceeding 365 Days" = $KeyCounts.ActiveExceedingLifetimeCount
+                }
+            }
+
+            foreach ($ServicePrincipal in $RiskyThirdPartyServicePrincipals) {
+                $PasswordCounts = Get-RiskyAppsCredentialCounts `
+                    -AccessKeys $ServicePrincipal.PasswordCredentials `
+                    -LifetimeThresholdDays 180
+                $KeyCounts = Get-RiskyAppsCredentialCounts `
+                    -AccessKeys $ServicePrincipal.KeyCredentials `
+                    -LifetimeThresholdDays 365
+
+                $IsMultiTenant = $false
+                if ($null -ne $ServicePrincipal.IsMultiTenantEnabled) {
+                    $IsMultiTenant = [bool]$ServicePrincipal.IsMultiTenantEnabled
+                }
+                elseif ($ServicePrincipal.SignInAudience -eq "AzureADMultipleOrgs") {
+                    $IsMultiTenant = $true
+                }
+
+                $PrivilegedRoles = @()
+                if ($null -ne $ServicePrincipal.PrivilegedRoles) {
+                    $PrivilegedRoles = @(
+                        $ServicePrincipal.PrivilegedRoles | Where-Object { -not [string]::IsNullOrEmpty("$_") }
+                    )
+                }
+
+                $RiskyAppsCsv += [PSCustomObject]@{
+                    "Display Name" = ConvertFrom-CsvValue -Value $ServicePrincipal.DisplayName
+                    "Severity Score" = $(
+                        if ($null -ne $ServicePrincipal.SeverityScore) { $ServicePrincipal.SeverityScore } else { 0 }
+                    )
+                    "Risk Level" = Get-RiskyAppsRiskLevel -Object $ServicePrincipal
+                    "Risky Permissions" = Get-RiskyAppsPermissionList -Object $ServicePrincipal
+                    "Multi-Tenant" = $IsMultiTenant
+                    "Third-Party Service Principal" = $true
+                    "Assigned Privileged Roles" = ($PrivilegedRoles -join "; ")
+                    "Active Password Credentials" = $PasswordCounts.ActiveCount
+                    "Expired Password Credentials" = $PasswordCounts.ExpiredCount
+                    "Active Password Credentials Exceeding 180 Days" = $PasswordCounts.ActiveExceedingLifetimeCount
+                    "Active Key Credentials" = $KeyCounts.ActiveCount
+                    "Expired Key Credentials" = $KeyCounts.ExpiredCount
+                    "Active Key Credentials Exceeding 365 Days" = $KeyCounts.ActiveExceedingLifetimeCount
+                }
+            }
+
+            if ($RiskyAppsCsv.Count -gt 0) {
+                $RiskyAppsCsv = @(
+                    $RiskyAppsCsv | Sort-Object -Property @{ Expression = { $_."Severity Score" }; Descending = $true },
+                        @{ Expression = { $_."Display Name" }; Descending = $false }
+                )
+            }
+
+            $RiskyAppsCsvPath = Join-Path -Path $OutFolderPath "$OutRiskyAppsFileName.csv"
+            $Encoding = Get-FileEncoding
+            if ($RiskyAppsCsv.Count -eq 0) {
+                $Headers = @(
+                    "Display Name",
+                    "Severity Score",
+                    "Risk Level",
+                    "Risky Permissions",
+                    "Multi-Tenant",
+                    "Third-Party Service Principal",
+                    "Assigned Privileged Roles",
+                    "Active Password Credentials",
+                    "Expired Password Credentials",
+                    "Active Password Credentials Exceeding 180 Days",
+                    "Active Key Credentials",
+                    "Expired Key Credentials",
+                    "Active Key Credentials Exceeding 365 Days"
+                )
+                $HeaderLine = ($Headers | ForEach-Object { "`"$_`"" }) -join ","
+                $HeaderLine | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
+            }
+            else {
+                $RiskyAppsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
+            }
+        }
+        catch {
+            Write-ScubaLog -Message "Error creating risky applications CSV output file" -Level "Warning" -Source "CreateRiskyAppsCsv" -Data @{
+                Error = $_.Exception.Message
+                StackTrace = $_.ScriptStackTrace
+            }
+            Write-Warning "Error creating risky applications CSV output file: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+        }
+    }
+}
+
 function Merge-JsonOutput {
     <#
     .Description
@@ -1800,57 +2226,6 @@ function Invoke-ReportCreation {
     }
 }
 
-function Get-EXOTenantDetailFromConnection {
-    <#
-    .Description
-    Gets tenant details through EXO Admin API using existing Defender/EXO connection context.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [hashtable]
-        $ConnectionResult
-    )
-
-    $EXORestHelperPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers/ProviderHelpers/EXORestHelper.psm1"
-    Import-Module -Name $EXORestHelperPath -Function Invoke-EXORestMethod -ErrorAction Stop
-
-    if ([string]::IsNullOrWhiteSpace($ConnectionResult.EXOAccessToken) -or [string]::IsNullOrWhiteSpace($ConnectionResult.EXOApiEndpoint)) {
-        throw "Missing EXO token or endpoint in ConnectionResult."
-    }
-
-    $OrgConfigResponse = Invoke-EXORestMethod `
-        -CmdletName "Get-OrganizationConfig" `
-        -ApiEndpoint $ConnectionResult.EXOApiEndpoint `
-        -AccessToken $ConnectionResult.EXOAccessToken
-
-    $OrgConfig = if ($OrgConfigResponse -is [System.Array]) { $OrgConfigResponse | Select-Object -First 1 } else { $OrgConfigResponse }
-    if (-not $OrgConfig) {
-        throw "Get-OrganizationConfig returned no data."
-    }
-
-    $TenantId = "Error retrieving Tenant ID"
-    $TenantIdMatch = [regex]::Match($ConnectionResult.EXOApiEndpoint, '/adminapi/(?:beta|v1\.0)/([^/]+)/InvokeCommand')
-    if ($TenantIdMatch.Success) {
-        $TenantId = $TenantIdMatch.Groups[1].Value
-    }
-
-    $DomainName = if ($OrgConfig.Name) { [string]$OrgConfig.Name } else { "Error retrieving Domain name" }
-    $DisplayName = if ($OrgConfig.DisplayName) { [string]$OrgConfig.DisplayName } else { $DomainName }
-
-    $TenantInfo = @{
-        "DisplayName" = $DisplayName;
-        "DomainName" = $DomainName;
-        "TenantId" = $TenantId;
-        "EXOAdditionalData" = "Retrieved via EXO REST Admin API";
-    }
-
-    ConvertTo-Json @($TenantInfo) -Depth 4
-}
-
 function Get-TenantDetail {
     <#
     .Description
@@ -1861,60 +2236,14 @@ function Get-TenantDetail {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
-        [ValidateNotNullOrEmpty()]
-        [string[]]
-        $ProductNames,
-
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [hashtable]
-        $ConnectionResult
+        $M365Environment
     )
 
-    # organized by best tenant details information
-    if ($ProductNames.Contains("aad")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("sharepoint")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerbi")) {
-        Get-AADTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("teams")) {
-        Get-TeamsTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("powerplatform")) {
-        Get-PowerPlatformTenantDetail -M365Environment $M365Environment
-    }
-    elseif ($ProductNames.Contains("exo")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    elseif ($ProductNames.Contains("securitysuite")) {
-        Get-EXOTenantDetail -M365Environment $M365Environment `
-            -AccessToken $ConnectionResult.EXOAccessToken `
-            -ApiEndpoint $ConnectionResult.EXOApiEndpoint
-    }
-    else {
-        $TenantInfo = @{
-            "DisplayName" = "Orchestrator Error retrieving Display name";
-            "DomainName" = "Orchestrator Error retrieving Domain name";
-            "TenantId" = "Orchestrator Error retrieving Tenant ID";
-            "AdditionalData" = "Orchestrator Error retrieving additional data";
-        }
-        $TenantInfo = $TenantInfo | ConvertTo-Json -Depth 3
-        $TenantInfo
-    }
+    Get-AADTenantDetail -M365Environment $M365Environment
 }
 
 function Invoke-Connection {
@@ -1999,77 +2328,6 @@ function Compare-ProductList {
     else {
         $Difference
     }
-}
-
-function Import-Resources {
-    <#
-    .Description
-    This function imports all of the various helper Provider,
-    Rego, and Reporter modules to the runtime
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param()
-    try {
-        $ProvidersPath = Join-Path -Path $PSScriptRoot `
-        -ChildPath "Providers" `
-        -Resolve `
-        -ErrorAction 'Stop'
-        $ProviderResources = Get-ChildItem $ProvidersPath -Recurse | Where-Object { $_.Name -like 'Export*.psm1' }
-        if (!$ProviderResources)
-        {
-            throw "Provider files were not found, aborting this run"
-        }
-
-        foreach ($Provider in $ProviderResources.Name) {
-            $ProvidersPath = Join-Path -Path $PSScriptRoot -ChildPath "Providers" -ErrorAction 'Stop'
-            $ModulePath = Join-Path -Path $ProvidersPath -ChildPath $Provider -ErrorAction 'Stop'
-            Import-Module $ModulePath
-        }
-
-        @('Connection', 'RunRego', 'CreateReport', 'ScubaConfig', 'Support', 'Utility') | ForEach-Object {
-            $ModulePath = Join-Path -Path $PSScriptRoot -ChildPath $_ -ErrorAction 'Stop'
-            Write-Debug "Importing $_ module $ModulePath"
-            Import-Module -Name $ModulePath
-        }
-
-        # Import ScubaLogging explicitly (not part of Utility folder import)
-        $ScubaLoggingPath = Join-Path -Path $PSScriptRoot -ChildPath 'Utility\ScubaLogging.psm1' -ErrorAction 'Stop'
-        Import-Module -Name $ScubaLoggingPath -Force
-    }
-    catch {
-        Write-ScubaLog -Message "Fatal error importing PowerShell modules" -Level "Error" -Source "ImportResources" -Data @{
-            Error = $_.Exception.Message
-            StackTrace = $_.ScriptStackTrace
-        }
-        $ImportResourcesErrorMessage = "Fatal Error involving importing PowerShell modules. `
-            Ending ScubaGear execution. Error: $($_.Exception.Message) `
-            `n$($_.ScriptStackTrace)"
-            throw $ImportResourcesErrorMessage
-    }
-}
-
-function Remove-Resources {
-    <#
-    .Description
-    This function cleans up all of the various imported modules
-    Mostly meant for dev work
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    $Providers = @("ExportPowerPlatform", "ExportEXOProvider", "ExportAADProvider",
-    "ExportSecuritySuiteProvider", "ExportTeamsProvider", "ExportSharePointProvider", "ExportPowerBIProvider")
-    foreach ($Provider in $Providers) {
-        Remove-Module $Provider -ErrorAction "SilentlyContinue"
-    }
-
-    Remove-Module "ScubaConfig" -ErrorAction "SilentlyContinue"
-    Remove-Module "RunRego" -ErrorAction "SilentlyContinue"
-    Remove-Module "CreateReport" -ErrorAction "SilentlyContinue"
-    Remove-Module "Connection" -ErrorAction "SilentlyContinue"
-    Remove-Module "ScubaLogging" -ErrorAction "SilentlyContinue"
 }
 
 function Invoke-SCuBACached {
@@ -2351,9 +2609,6 @@ function Invoke-SCuBACached {
             $OutFolderPath = $OutPath
             $ProductNames = $ProductNames | Sort-Object -Unique
 
-            Remove-Resources
-            Import-Resources # Imports Providers, RunRego, etc.
-
             # Initialize logging for troubleshooting - debug logs are ALWAYS created
             # Logs are placed in a DebugLogs subfolder within the output folder
             # Transcript logging is optional and enabled only when -Transcript is specified
@@ -2507,7 +2762,7 @@ function Invoke-SCuBACached {
                 }
 
                 Write-ScubaLog -Message "Retrieving tenant details" -Level "Info" -Source "ScubaCached"
-                $TenantDetails = Get-TenantDetail -ProductNames $ProductNames -M365Environment $TempScubaConfig.M365Environment -ConnectionResult $ConnectionResult
+                $TenantDetails = Get-TenantDetail -M365Environment $TempScubaConfig.M365Environment
 
                 # A new GUID needs to be generated if the provider is run
                 $Guid = New-Guid -ErrorAction 'Stop'
@@ -2633,6 +2888,15 @@ function Invoke-SCuBACached {
                 'OutActionPlanFileName' = $TempScubaConfig.OutActionPlanFileName;
             }
             ConvertTo-ResultsCsv @CsvParams
+
+            # Craft the csv version of risky applications/service principals for remediation
+            $RiskyAppsCsvParams = @{
+                'ProductNames'         = $TempScubaConfig.ProductNames;
+                'OutFolderPath'        = $OutFolderPath;
+                'FullScubaResultsName' = $FullScubaResultsName;
+                'OutProviderFileName'  = $TempScubaConfig.OutProviderFileName;
+            }
+            ConvertTo-RiskyAppsCsv @RiskyAppsCsvParams
         }
         finally {
             # Clean up debug logging module
@@ -2830,6 +3094,53 @@ After correcting the JSON file, rerun ScubaGear but use Invoke-ScubaCached since
 "@
         }
     }
+}
+
+function ConvertTo-ScubaProductNames {
+    <#
+    .SYNOPSIS
+    Normalizes a list of ScubaGear product names.
+    .DESCRIPTION
+    Centralizes ScubaGear product-name normalization so the value is handled identically
+    regardless of whether it originates from the -ProductNames parameter or an imported
+    configuration file. It:
+      1. Expands the '*' wildcard to the full list of supported products.
+      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
+         (adding 'securitysuite' only if not already present).
+      3. Returns a sorted, de-duplicated array.
+    .PARAMETER ProductNames
+    The array of product names to normalize.
+    #>
+    [CmdletBinding()]
+    [OutputType([string[]])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [string[]]
+        $ProductNames
+    )
+
+    if ($null -eq $ProductNames) {
+        return @()
+    }
+
+    # Expand the wildcard to all supported products
+    if ($ProductNames -contains '*') {
+        $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+        Write-Debug "Setting ProductNames to all products because of wildcard"
+    }
+
+    # 'defender' is a deprecated alias for 'securitysuite'
+    if ($ProductNames -contains 'defender') {
+        if (-not ($ProductNames -contains 'securitysuite')) {
+            $ProductNames = @($ProductNames) + "securitysuite"
+        }
+        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
+        Write-Debug "Substituting defender with securitysuite in ProductNames"
+    }
+
+    return @($ProductNames | Sort-Object -Unique)
 }
 
 Export-ModuleMember -Function @(

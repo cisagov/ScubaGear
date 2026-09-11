@@ -4,8 +4,6 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-SCuBACached' {
         BeforeAll {
-            Mock -ModuleName Orchestrator Remove-Resources {}
-            Mock -ModuleName Orchestrator Import-Resources {}
             function Invoke-Connection {}
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
             function Get-TenantDetail {}
@@ -22,6 +20,8 @@ InModuleScope Orchestrator {
             Mock -ModuleName Orchestrator Disconnect-SCuBATenant
             function ConvertTo-ResultsCsv {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator ConvertTo-ResultsCsv {}
+            function ConvertTo-RiskyAppsCsv {throw 'this will be mocked'}
+            Mock -ModuleName Orchestrator ConvertTo-RiskyAppsCsv {}
             function Set-Utf8NoBom {}
             Mock -ModuleName Orchestrator Set-Utf8NoBom
 
