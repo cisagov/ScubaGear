@@ -132,7 +132,9 @@ function Get-ScubaRequiredModuleList {
         }
     }
 
-    return @($requiredModules)
+    # The unary comma prevents PowerShell from unwrapping a single-element array back to a
+    # scalar when it is enumerated onto the pipeline as the function's return value.
+    return ,@($requiredModules)
 }
 
 function New-ScubaDependencyStatus {
@@ -692,7 +694,9 @@ function Get-ScubaGearDependencyStatus {
         }
     }
 
-    return $statuses
+    # The unary comma prevents PowerShell from unwrapping a single-element array back to a
+    # scalar when it is enumerated onto the pipeline as the function's return value.
+    return ,$statuses
 }
 
 function Install-ScubaModule {
