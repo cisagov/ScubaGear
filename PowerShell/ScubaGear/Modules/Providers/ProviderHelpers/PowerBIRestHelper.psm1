@@ -1,3 +1,6 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearRestEndpoint
+
 function Get-PowerBIBaseUrl {
     <#
     .SYNOPSIS
@@ -41,7 +44,36 @@ function Get-PowerBIScope {
     }
 }
 
+function Get-PowerBITenantSettingsRest {
+    <#
+    .SYNOPSIS
+        Gets Power BI tenant settings via the Power BI Admin REST API.
+    .DESCRIPTION
+        Replaces the Power BI Admin API's tenant settings call previously made inline in
+        Export-PowerBIProvider with a dedicated wrapper, matching the pattern used by the
+        other Rest helpers (Get-SPOTenantRest, Get-PowerPlatform*Rest, Get-Teams*Rest).
+    .PARAMETER BaseUrl
+        The Power BI Admin API base URL.
+    .PARAMETER AccessToken
+        The OAuth2 access token.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$BaseUrl,
+
+        [Parameter(Mandatory = $true)]
+        [string]$AccessToken
+    )
+
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerBITenantSettingsRest'
+    Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+}
+
 Export-ModuleMember -Function @(
     'Get-PowerBIBaseUrl',
-    'Get-PowerBIScope'
+    'Get-PowerBIScope',
+    'Get-PowerBITenantSettingsRest'
 )
