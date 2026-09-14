@@ -31,13 +31,7 @@ function Connect-Tenant {
    [Parameter(Mandatory = $false)]
    [AllowNull()]
    [hashtable]
-    $ServicePrincipalParams,
-
-    [Parameter(ParameterSetName = 'Auto')]
-    [Parameter(ParameterSetName = 'Manual')]
-    [Parameter(Mandatory = $false)]
-    [switch]
-    $UseSystemBrowserAuthentication
+    $ServicePrincipalParams
    )
    Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
@@ -108,9 +102,6 @@ function Connect-Tenant {
                    if($ServicePrincipalParams) {
                     $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                    }
-                   elseif ($UseSystemBrowserAuthentication) {
-                       $GraphParams += @{UseSystemBrowserAuthentication = $true}
-                   }
                    Connect-GraphHelper @GraphParams
                    $AADAuthRequired = $false
                }
@@ -123,9 +114,6 @@ function Connect-Tenant {
                            }
                            if ($ServicePrincipalParams) {
                                $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                           }
-                           elseif ($UseSystemBrowserAuthentication) {
-                               $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                            }
                            Connect-GraphHelper @LimitedGraphParams
                            $AADAuthRequired = $false
@@ -157,7 +145,6 @@ function Connect-Tenant {
                                ClientId = $EXOClientId
                                Tenant = $TenantName
                                M365Environment = $M365Environment
-                               DisableBroker = $UseSystemBrowserAuthentication
                            }
                            $TokenData.EXOAccessToken = Get-MsalAccessToken @EXOAuthParams
                        }
@@ -190,7 +177,6 @@ function Connect-Tenant {
                                    ClientId = $EXOClientId
                                    Tenant = $TenantName
                                    M365Environment = $M365Environment
-                                   DisableBroker = $UseSystemBrowserAuthentication
                                }
                                $TokenData.ComplianceAccessToken = Get-MsalAccessToken @ComplianceAuthParams
                            }
@@ -216,9 +202,6 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                       }
-                       elseif ($UseSystemBrowserAuthentication) {
-                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
@@ -252,7 +235,6 @@ function Connect-Tenant {
                            ClientId = $PPClientId
                            Tenant = $TenantName
                            M365Environment = $M365Environment
-                           DisableBroker = $UseSystemBrowserAuthentication
                        }
                        $TokenData.PPAccessToken = Get-MsalAccessToken @PPAuthParams
                    }
@@ -266,9 +248,6 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
-                       }
-                       elseif ($UseSystemBrowserAuthentication) {
-                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
@@ -302,9 +281,6 @@ function Connect-Tenant {
                                Tenant = $TenantName
                                M365Environment = $M365Environment
                            }
-                           if ($UseSystemBrowserAuthentication) {
-                               $SPOAuthParams.DisableBroker = $true
-                           }
                            $TokenData.SPOAccessToken = Get-MsalAccessToken @SPOAuthParams
                        }
                        Write-Verbose "SharePoint token acquired successfully"
@@ -320,9 +296,6 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                       }
-                       elseif ($UseSystemBrowserAuthentication) {
-                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false
@@ -407,7 +380,6 @@ function Connect-Tenant {
                                    ClientId = $PBIClientId
                                    Tenant = $TenantName
                                    M365Environment = $M365Environment
-                                   DisableBroker = $UseSystemBrowserAuthentication
                                }
                                $TokenData.PBIAccessToken = Get-MsalAccessToken @PBIAuthParams
                            }
@@ -423,9 +395,6 @@ function Connect-Tenant {
                        }
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
-                       }
-                       elseif ($UseSystemBrowserAuthentication) {
-                           $LimitedGraphParams += @{UseSystemBrowserAuthentication = $true}
                        }
                        Connect-GraphHelper @LimitedGraphParams
                        $AADAuthRequired = $false

@@ -174,7 +174,7 @@ Function Start-SCuBAConfigApp {
         try {
             Write-Output ""
             Write-Output "Connecting to Microsoft Graph..."
-            Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphParameters.Scopes -UseSystemBrowserAuthentication
+            Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphParameters.Scopes
 
             #ensure user is authenticated
             Invoke-ScubaGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null

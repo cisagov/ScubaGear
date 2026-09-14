@@ -30,7 +30,6 @@ InModuleScope Support {
                 OPAPath = ".";
                 LogIn = $true;
                 DisconnectOnExit = $false;
-                UseSystemBrowserAuthentication = $true;
                 OutPath = '.';
                 AppID = '0';
                 CertificateThumbprint = '0';

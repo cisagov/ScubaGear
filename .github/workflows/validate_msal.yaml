@@ -5,7 +5,6 @@ on:
     paths:
       - 'PowerShell/ScubaGear/dependencies/**'
       - 'PowerShell/ScubaGear/lib/**'
-      - 'PowerShell/ScubaGear/runtimes/**'
       - 'PowerShell/ScubaGear/Modules/Connection/**'
       - 'utils/workflow/Update-Msal.ps1'
       - 'utils/workflow/Test-MsalTeamsCompatibility.ps1'

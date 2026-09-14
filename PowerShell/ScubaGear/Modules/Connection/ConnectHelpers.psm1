@@ -25,10 +25,6 @@ function Connect-GraphHelper {
         $Scopes = $null,
 
         [Parameter(Mandatory = $false)]
-        [switch]
-        $UseSystemBrowserAuthentication,
-
-        [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [hashtable]
         $ServicePrincipalParams
@@ -49,9 +45,6 @@ function Connect-GraphHelper {
             Scope = if ($Scopes) { $Scopes } else { @('Organization.Read.All') }
             ClientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
             Tenant = 'organizations'
-        }
-        if ($UseSystemBrowserAuthentication) {
-            $TokenParameters.DisableBroker = $true
         }
     }
 
@@ -218,39 +211,6 @@ function Invoke-ScubaGraphRequest {
     }
 }
 
-function Get-TeamsAccessTokens {
-    <#
-    .SYNOPSIS
-        Acquires the delegated Graph and Teams resource tokens required by Connect-MicrosoftTeams.
-    .FUNCTIONALITY
-        Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
-        [string]$M365Environment,
-
-        [Parameter(Mandatory = $false)]
-        [switch]$DisableBroker
-    )
-
-    $TeamsClientId = "12128f48-ec9e-42f0-b203-ea49fb6af367"
-    $GraphScope = switch ($M365Environment) {
-        { $_ -in @("commercial", "gcc") } { "https://graph.microsoft.com/.default" }
-        { $_ -in @("gcchigh", "dod") } { "https://graph.microsoft.us/.default" }
-    }
-    $CommonParameters = @{
-        ClientId = $TeamsClientId
-        Tenant = "organizations"
-        M365Environment = $M365Environment
-        DisableBroker = $DisableBroker
-    }
-
-    Get-MsalAccessToken -Scope $GraphScope @CommonParameters
-    Get-MsalAccessToken -Scope "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default" @CommonParameters
-}
-
 function Initialize-Msal {
     <#
     .SYNOPSIS
@@ -298,23 +258,11 @@ function Initialize-Msal {
         $Global:ScubaGearState.MsalValidated = $true
     }
 
-    $Architecture = switch ($env:PROCESSOR_ARCHITECTURE) {
-        'ARM64' { 'win-arm64' }
-        'x86' { 'win-x86' }
-        default { 'win-x64' }
-    }
-    $NativePath = Join-Path $ModuleRoot "runtimes/$Architecture/native"
-    if (($env:PATH -split ';') -notcontains $NativePath) {
-        $env:PATH = "$NativePath;$env:PATH"
-    }
-
     $LoadOrder = @(
         'System.Runtime.CompilerServices.Unsafe.dll',
         'System.Diagnostics.DiagnosticSource.dll',
         'Microsoft.IdentityModel.Abstractions.dll',
-        'Microsoft.Identity.Client.dll',
-        'Microsoft.Identity.Client.NativeInterop.dll',
-        'Microsoft.Identity.Client.Broker.dll'
+        'Microsoft.Identity.Client.dll'
     )
     foreach ($AssemblyFile in $LoadOrder) {
         $AssemblyName = [System.IO.Path]::GetFileNameWithoutExtension($AssemblyFile)
@@ -325,41 +273,6 @@ function Initialize-Msal {
             [void][Reflection.Assembly]::LoadFrom((Join-Path $LibPath $AssemblyFile))
         }
     }
-}
-
-function Get-ScubaParentWindowHandle {
-    [CmdletBinding()]
-    param()
-
-    $Handle = [System.Diagnostics.Process]::GetCurrentProcess().MainWindowHandle
-    if ($Handle -ne [IntPtr]::Zero) {
-        return $Handle
-    }
-
-    if (-not $Script:ScubaWindowNativeMethods) {
-        $NativeMethods = @'
-[System.Runtime.InteropServices.DllImport("kernel32.dll")]
-public static extern System.IntPtr GetConsoleWindow();
-
-[System.Runtime.InteropServices.DllImport("user32.dll")]
-public static extern System.IntPtr GetForegroundWindow();
-'@
-        $Script:ScubaWindowNativeMethods = Add-Type `
-            -MemberDefinition $NativeMethods `
-            -Name 'WindowNativeMethods' `
-            -Namespace 'ScubaGear' `
-            -PassThru
-    }
-
-    $Handle = $Script:ScubaWindowNativeMethods::GetConsoleWindow()
-    if ($Handle -eq [IntPtr]::Zero) {
-        $Handle = $Script:ScubaWindowNativeMethods::GetForegroundWindow()
-    }
-    if ($Handle -eq [IntPtr]::Zero) {
-        throw 'Unable to resolve a parent window handle required by WAM.'
-    }
-
-    $Handle
 }
 
 function Get-MsalAccessToken {
@@ -390,10 +303,7 @@ function Get-MsalAccessToken {
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
-        [string]$M365Environment,
-
-        [Parameter(Mandatory = $false, ParameterSetName = 'Interactive')]
-        [switch]$DisableBroker
+        [string]$M365Environment
     )
 
     Initialize-Msal
@@ -437,25 +347,13 @@ function Get-MsalAccessToken {
                 $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
             }
             else {
-                $CacheKey = "PUB:$ClientId|$Authority|Broker:$(-not $DisableBroker)"
+                $CacheKey = "PUB:$ClientId|$Authority"
                 if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
-                    $Builder = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-                        WithAuthority($Authority)
-                    if ($DisableBroker) {
-                        # MSAL convention: loopback redirect for public client system-browser flow
-                        $Builder = $Builder.WithRedirectUri('http://localhost')
-                    }
-                    else {
-                        $Builder = $Builder.WithDefaultRedirectUri()
-                        $Builder = $Builder.WithParentActivityOrWindow([Func[IntPtr]] {
-                            Get-ScubaParentWindowHandle
-                        })
-                        $BrokerOptions = [Microsoft.Identity.Client.BrokerOptions]::new(
-                            [Microsoft.Identity.Client.BrokerOptions+OperatingSystems]::Windows
-                        )
-                        $Builder = [Microsoft.Identity.Client.Broker.BrokerExtension]::WithBroker($Builder, $BrokerOptions)
-                    }
-                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = $Builder.Build()
+                    # Loopback redirect + system browser (no WAM broker)
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                        WithAuthority($Authority).
+                        WithRedirectUri('http://localhost').
+                        Build()
                 }
                 $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
 
@@ -467,12 +365,6 @@ function Get-MsalAccessToken {
                         $TokenResult = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $Accounts[0]).
                             ExecuteAsync().GetAwaiter().GetResult()
                     }
-                    elseif (-not $DisableBroker) {
-                        $TokenResult = $MsalApp.AcquireTokenSilent(
-                            [string[]]@($Scope),
-                            [Microsoft.Identity.Client.PublicClientApplication]::OperatingSystemAccount
-                        ).ExecuteAsync().GetAwaiter().GetResult()
-                    }
                 }
                 catch {
                     # Silent failed (no cached token for this scope) — fall through to interactive
@@ -480,11 +372,9 @@ function Get-MsalAccessToken {
                 }
 
                 if (-not $TokenResult) {
-                    $InteractiveRequest = $MsalApp.AcquireTokenInteractive([string[]]@($Scope))
-                    if ($DisableBroker) {
-                        $InteractiveRequest = $InteractiveRequest.WithUseEmbeddedWebView($false)
-                    }
-                    $TokenResult = $InteractiveRequest.ExecuteAsync().GetAwaiter().GetResult()
+                    $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
+                        WithUseEmbeddedWebView($false).
+                        ExecuteAsync().GetAwaiter().GetResult()
                 }
             }
 
@@ -506,7 +396,6 @@ Export-ModuleMember -Function @(
     'Connect-GraphHelper',
     'Disconnect-ScubaGraph',
     'Get-ScubaGraphContext',
-    'Get-TeamsAccessTokens',
     'Initialize-Msal',
     'Get-MsalAccessToken',
     'Invoke-ScubaGraphRequest'

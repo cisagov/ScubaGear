@@ -4,8 +4,7 @@ BeforeAll {
     function New-TestMsalPackagesConfig {
         param(
             [string]$Root,
-            [string]$MsalVersion = '4.82.0',
-            [string]$BrokerVersion = '4.82.0'
+            [string]$MsalVersion = '4.82.0'
         )
 
         $dependencyPath = Join-Path $Root 'PowerShell/ScubaGear/dependencies'
@@ -14,7 +13,6 @@ BeforeAll {
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
   <package id="Microsoft.Identity.Client" version="$MsalVersion" targetFramework="net462" />
-  <package id="Microsoft.Identity.Client.Broker" version="$BrokerVersion" targetFramework="net462" />
 </packages>
 "@ | Set-Content -Path (Join-Path $dependencyPath 'packages.config')
     }
@@ -43,21 +41,12 @@ Describe 'MSAL dependency updates' {
         Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig | Should -Be '4.82.0'
     }
 
-    It 'rejects MSAL and Broker version skew' {
-        New-TestMsalPackagesConfig -Root $TestDrive -BrokerVersion '4.81.0'
-        $paths = Get-MsalDependencyPaths -RepoRoot $TestDrive
-        { Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig } | Should -Throw
-    }
-
-    It 'returns only stable versions shared by both packages' {
+    It 'returns only stable versions' {
         Mock Invoke-RestMethod {
-            if ($Uri -match 'broker') {
-                return @{ versions = @('4.82.0', '4.83.0-beta', '4.84.0') }
-            }
-            return @{ versions = @('4.81.0', '4.82.0', '4.84.0', '4.85.0') }
+            return @{ versions = @('4.81.0', '4.82.0', '4.83.0-beta', '4.84.0') }
         }
 
-        @(Get-AvailableMsalVersions) | Should -Be @('4.82.0', '4.84.0')
+        @(Get-AvailableMsalVersions) | Should -Be @('4.81.0', '4.82.0', '4.84.0')
     }
 
     It 'reports an available shared update without applying it' {

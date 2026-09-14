@@ -10,7 +10,7 @@ InModuleScope ConnectHelpers {
         BeforeAll {
             function Get-MsalAccessToken {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
-                param($Scope, $ClientId, $Tenant, $M365Environment, $DisableBroker, $CertificateThumbprint, $AppID)
+                param($Scope, $ClientId, $Tenant, $M365Environment, $CertificateThumbprint, $AppID)
                 throw 'this will be mocked'
             }
             Mock -ModuleName ConnectHelpers Get-MsalAccessToken {'plain-text-token'}
@@ -22,35 +22,25 @@ InModuleScope ConnectHelpers {
             It 'Invokes for commercial environment' {
                 Connect-GraphHelper -M365Environment 'commercial'
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                    $M365Environment -eq 'commercial' -and -not $DisableBroker
+                    $M365Environment -eq 'commercial'
                 }
             }
             It 'Invokes for gcc environment' {
                 Connect-GraphHelper -M365Environment 'gcc'
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                    $M365Environment -eq 'gcc' -and -not $DisableBroker
+                    $M365Environment -eq 'gcc'
                 }
             }
             It 'Invokes for gcchigh environment' {
                 Connect-GraphHelper -M365Environment 'gcchigh'
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                    $M365Environment -eq 'gcchigh' -and -not $DisableBroker
+                    $M365Environment -eq 'gcchigh'
                 }
             }
             It 'Invokes for dod environment' {
                 Connect-GraphHelper -M365Environment 'dod'
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                    $M365Environment -eq 'dod' -and -not $DisableBroker
-                }
-            }
-            It 'Uses system-browser authentication when requested' {
-                Connect-GraphHelper -M365Environment 'gcc' -Scopes 'Organization.Read.All' -UseSystemBrowserAuthentication
-                Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                    $ClientId -eq '14d82eec-204b-4c2f-b7e8-296a70dab67e' -and
-                    $Tenant -eq 'organizations' -and
-                    $M365Environment -eq 'gcc' -and
-                    $Scope -contains 'Organization.Read.All' -and
-                    $DisableBroker
+                    $M365Environment -eq 'dod'
                 }
             }
         }
@@ -63,48 +53,13 @@ InModuleScope ConnectHelpers {
                         Organization = 'My Organization';
                     }
                 }
-                Connect-GraphHelper -M365Environment 'commercial' -ServicePrincipalParams $sp -UseSystemBrowserAuthentication
+                Connect-GraphHelper -M365Environment 'commercial' -ServicePrincipalParams $sp
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
                     $CertificateThumbprint -eq 'A thumbprint' -and
                     $AppID -eq 'My Id' -and
                     $Tenant -eq 'My Organization' -and
                     $M365Environment -eq 'commercial'
                 }
-            }
-        }
-    }
-
-    Describe -Tag 'Connection' -Name 'Get-TeamsAccessTokens' {
-        BeforeAll {
-            Mock -ModuleName ConnectHelpers Get-MsalAccessToken {
-                if ($Scope -like '*graph*') { return 'graph-token' }
-                return 'teams-token'
-            }
-        }
-
-        It 'returns Graph then Teams tokens for <M365Environment>' -ForEach @(
-            @{M365Environment = 'commercial'; GraphScope = 'https://graph.microsoft.com/.default'}
-            @{M365Environment = 'gcc'; GraphScope = 'https://graph.microsoft.com/.default'}
-            @{M365Environment = 'gcchigh'; GraphScope = 'https://graph.microsoft.us/.default'}
-            @{M365Environment = 'dod'; GraphScope = 'https://graph.microsoft.us/.default'}
-        ) {
-            $Tokens = @(Get-TeamsAccessTokens -M365Environment $M365Environment)
-            $Tokens | Should -Be @('graph-token', 'teams-token')
-            Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                $Scope -eq $GraphScope -and
-                $ClientId -eq '12128f48-ec9e-42f0-b203-ea49fb6af367' -and
-                $Tenant -eq 'organizations' -and
-                $M365Environment -eq $M365Environment
-            }
-            Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -ParameterFilter {
-                $Scope -eq '48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default'
-            }
-        }
-
-        It 'disables broker for both system-browser Teams tokens' {
-            Get-TeamsAccessTokens -M365Environment 'gcc' -DisableBroker
-            Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 2 -ParameterFilter {
-                $DisableBroker
             }
         }
     }

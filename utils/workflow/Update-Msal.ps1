@@ -1,8 +1,7 @@
 #Requires -Version 5.1
 
 $script:MsalPackageIds = @(
-    'Microsoft.Identity.Client',
-    'Microsoft.Identity.Client.Broker'
+    'Microsoft.Identity.Client'
 )
 
 function Get-MsalDependencyPaths {
@@ -19,7 +18,6 @@ function Get-MsalDependencyPaths {
         PackagesConfig = Join-Path $moduleRoot 'dependencies/packages.config'
         LockFile = Join-Path $moduleRoot 'dependencies/msal-lock.json'
         LibRoot = Join-Path $moduleRoot 'lib/net462'
-        RuntimeRoot = Join-Path $moduleRoot 'runtimes'
     }
 }
 
@@ -37,7 +35,7 @@ function Get-CurrentMsalVersion {
         Select-Object -Unique)
 
     if ($versions.Count -ne 1) {
-        throw 'Microsoft.Identity.Client and Microsoft.Identity.Client.Broker must use the same version.'
+        throw 'Microsoft.Identity.Client version could not be determined from packages.config.'
     }
 
     $versions[0]
@@ -47,14 +45,10 @@ function Get-AvailableMsalVersions {
     [CmdletBinding()]
     param()
 
-    $versionSets = foreach ($packageId in $script:MsalPackageIds) {
-        $uri = "https://api.nuget.org/v3-flatcontainer/$($packageId.ToLowerInvariant())/index.json"
-        $response = Invoke-RestMethod -Method Get -Uri $uri -ErrorAction Stop
-        ,@($response.versions | Where-Object { $_ -match '^\d+\.\d+\.\d+$' })
-    }
-
-    $sharedVersions = @($versionSets[0] | Where-Object { $_ -in $versionSets[1] })
-    $sharedVersions | Sort-Object { [version]$_ }
+    $uri = "https://api.nuget.org/v3-flatcontainer/microsoft.identity.client/index.json"
+    $response = Invoke-RestMethod -Method Get -Uri $uri -ErrorAction Stop
+    $stableVersions = @($response.versions | Where-Object { $_ -match '^\d+\.\d+\.\d+$' })
+    $stableVersions | Sort-Object { [version]$_ }
 }
 
 function Confirm-MsalUpdateRequirements {
@@ -130,7 +124,7 @@ function Update-MsalDependencyVersion {
 
     try {
         New-Item -Path $resolveRoot -ItemType Directory -Force | Out-Null
-        & $NuGetPath install Microsoft.Identity.Client.Broker -Version $Version `
+        & $NuGetPath install Microsoft.Identity.Client -Version $Version `
             -OutputDirectory $resolveRoot -NonInteractive -DirectDownload
         if ($LASTEXITCODE -ne 0) {
             throw "NuGet dependency resolution failed with exit code $LASTEXITCODE."
@@ -146,9 +140,8 @@ function Update-MsalDependencyVersion {
         $resolvedPackages = @($resolvedPackages |
             Where-Object { $_.Id -and $_.Version } |
             Sort-Object Id -Unique)
-        if (($resolvedPackages | Where-Object Id -eq 'Microsoft.Identity.Client').Version -ne $Version -or
-            ($resolvedPackages | Where-Object Id -eq 'Microsoft.Identity.Client.Broker').Version -ne $Version) {
-            throw 'NuGet did not resolve aligned Microsoft.Identity.Client and Broker versions.'
+        if (($resolvedPackages | Where-Object Id -eq 'Microsoft.Identity.Client').Version -ne $Version) {
+            throw 'NuGet did not resolve the requested Microsoft.Identity.Client version.'
         }
 
         $document = New-Object System.Xml.XmlDocument
@@ -237,21 +230,14 @@ function Restore-MsalDependencies {
         }
         $managedFiles = @(
             @{ PackageId = 'Microsoft.Identity.Client'; Source = 'lib/net462/Microsoft.Identity.Client.dll' },
-            @{ PackageId = 'Microsoft.Identity.Client.Broker'; Source = 'lib/net462/Microsoft.Identity.Client.Broker.dll' },
-            @{ PackageId = 'Microsoft.Identity.Client.NativeInterop'; Source = 'lib/net461/Microsoft.Identity.Client.NativeInterop.dll' },
             @{ PackageId = 'Microsoft.IdentityModel.Abstractions'; Source = 'lib/net462/Microsoft.IdentityModel.Abstractions.dll' },
             @{ PackageId = 'System.Diagnostics.DiagnosticSource'; Source = 'lib/net461/System.Diagnostics.DiagnosticSource.dll' },
             @{ PackageId = 'System.Runtime.CompilerServices.Unsafe'; Source = 'lib/net461/System.Runtime.CompilerServices.Unsafe.dll' },
             @{ PackageId = 'System.ValueTuple'; Source = 'lib/net47/System.ValueTuple.dll' }
         )
-        $nativeFiles = @(
-            @{ PackageId = 'Microsoft.Identity.Client.NativeInterop'; Source = 'runtimes/win-x64/native/msalruntime.dll'; Destination = 'win-x64/native/msalruntime.dll' },
-            @{ PackageId = 'Microsoft.Identity.Client.NativeInterop'; Source = 'runtimes/win-x86/native/msalruntime_x86.dll'; Destination = 'win-x86/native/msalruntime_x86.dll' },
-            @{ PackageId = 'Microsoft.Identity.Client.NativeInterop'; Source = 'runtimes/win-arm64/native/msalruntime_arm64.dll'; Destination = 'win-arm64/native/msalruntime_arm64.dll' }
-        )
 
         if ($PSCmdlet.ShouldProcess($paths.ModuleRoot, 'Replace bundled MSAL dependency files')) {
-            Remove-Item -Path $paths.LibRoot, $paths.RuntimeRoot -Recurse -Force -ErrorAction SilentlyContinue
+            Remove-Item -Path $paths.LibRoot -Recurse -Force -ErrorAction SilentlyContinue
             New-Item -Path $paths.LibRoot -ItemType Directory -Force | Out-Null
 
             foreach ($entry in $managedFiles) {
@@ -261,16 +247,10 @@ function Restore-MsalDependencies {
                 }
                 Copy-Item -Path $source -Destination $paths.LibRoot -Force
             }
-            foreach ($entry in $nativeFiles) {
-                $source = Join-Path (Join-Path $restoreRoot $packageDirectories[$entry.PackageId]) $entry.Source
-                $destination = Join-Path $paths.RuntimeRoot $entry.Destination
-                New-Item -Path (Split-Path $destination) -ItemType Directory -Force | Out-Null
-                Copy-Item -Path $source -Destination $destination -Force
-            }
         }
 
         $binaryFiles = @(
-            Get-ChildItem -Path $paths.LibRoot, $paths.RuntimeRoot -Recurse -File |
+            Get-ChildItem -Path $paths.LibRoot -Recurse -File |
                 Where-Object { $_.Extension -in '.dll', '.exe' }
         )
         $fileRecords = foreach ($file in $binaryFiles) {
@@ -326,7 +306,7 @@ function Test-MsalDependencyIntegrity {
     $lock = Get-Content -Path $paths.LockFile -Raw | ConvertFrom-Json
     $expectedPaths = @($lock.files.path | Sort-Object)
     $actualFiles = @(
-        Get-ChildItem -Path $paths.LibRoot, $paths.RuntimeRoot -Recurse -File -ErrorAction Stop |
+        Get-ChildItem -Path $paths.LibRoot -Recurse -File -ErrorAction Stop |
             Where-Object { $_.Extension -in '.dll', '.exe' }
     )
     $actualPaths = @($actualFiles | ForEach-Object {
@@ -347,11 +327,11 @@ function Test-MsalDependencyIntegrity {
     }
 
     $msalVersions = @($lock.files |
-        Where-Object { $_.path -match 'Microsoft\.Identity\.Client(\.Broker)?\.dll$' } |
+        Where-Object { $_.path -match 'Microsoft\.Identity\.Client\.dll$' } |
         ForEach-Object { $_.assemblyVersion } |
         Select-Object -Unique)
     if ($msalVersions.Count -ne 1 -or $msalVersions[0] -ne "$($lock.msalVersion).0") {
-        throw 'MSAL and Broker assembly versions are not aligned with the package lock.'
+        throw 'MSAL assembly version is not aligned with the package lock.'
     }
 
     [pscustomobject]@{

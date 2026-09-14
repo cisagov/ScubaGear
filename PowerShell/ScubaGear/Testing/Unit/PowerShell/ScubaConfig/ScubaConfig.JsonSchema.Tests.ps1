@@ -45,7 +45,7 @@ Describe "ScubaConfig JSON Schema Validation Tests" {
         }
 
         It "Should have boolean properties correctly defined" {
-            $BooleanProperties = @("LogIn", "DisconnectOnExit", "UseSystemBrowserAuthentication", "SkipDoH")
+            $BooleanProperties = @("LogIn", "DisconnectOnExit", "SkipDoH")
 
             foreach ($prop in $BooleanProperties) {
                 $script:SchemaContent.properties.$prop | Should -Not -BeNullOrEmpty
