@@ -335,7 +335,7 @@ function Connect-Tenant {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                           $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           $UserLicenseResponse = Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET -ErrorAction Stop
                            $UserPlans = $UserLicenseResponse.value |
                                Where-Object { $null -ne $_.servicePlans } |
                                ForEach-Object { $_.servicePlans } |

@@ -175,24 +175,80 @@ function Invoke-GraphDirectly {
 
     This example invokes the Microsoft Graph API to create a new service principal with the specified body, using the commercial environment.
 
+    .Parameter Uri
+    An explicit Graph API URI (relative, e.g. "/v1.0/me/licenseDetails") to call when the target has
+    no registered cmdlet mapping. When supplied, the request is sent as-is without endpoint resolution,
+    response key normalization, or automatic pagination, so callers receive the raw Graph response.
+
+    .Parameter Method
+    The HTTP method to use with -Uri (default: GET). Ignored in cmdlet mode, where the method is
+    derived from the cmdlet verb.
+
+    .Parameter Headers
+    Additional request headers to send with -Uri (e.g. @{ ConsistencyLevel = 'eventual' }).
+
+    .Parameter OutputType
+    The Invoke-MgGraphRequest -OutputType to use with -Uri (e.g. "PSObject").
+
+    .Example
+    Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET
+
+    This example calls an arbitrary Graph endpoint that has no registered cmdlet mapping.
+
     #>
-    [cmdletbinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Commandlet')]
     param (
+        [Parameter(ParameterSetName = 'Commandlet')]
         [ValidateNotNullOrEmpty()]
         [string]
         $commandlet,
 
+        [Parameter(ParameterSetName = 'Commandlet')]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
+        [Parameter(ParameterSetName = 'Commandlet')]
         [System.Collections.Hashtable]
         $queryParams,
 
+        [Parameter(ParameterSetName = 'Commandlet')]
         [string]$ID,
 
-        [object]$Body
+        [object]$Body,
+
+        [Parameter(ParameterSetName = 'Uri', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Uri,
+
+        [Parameter(ParameterSetName = 'Uri')]
+        [string]$Method = 'GET',
+
+        [Parameter(ParameterSetName = 'Uri')]
+        [System.Collections.Hashtable]$Headers,
+
+        [Parameter(ParameterSetName = 'Uri')]
+        [string]$OutputType
     )
+
+    # Uri mode: call an arbitrary Graph endpoint directly for targets with no registered cmdlet
+    # mapping. The raw response is returned without key normalization or pagination so the caller
+    # gets exactly what the Graph API sent, matching a direct Invoke-MgGraphRequest call.
+    if ($PSCmdlet.ParameterSetName -eq 'Uri') {
+        Write-Debug "Graph Api direct (explicit Uri): $Uri"
+        $graphParams = @{
+            Uri    = $Uri
+            Method = $Method
+        }
+        if ($Headers) { $graphParams['Headers'] = $Headers }
+        if ($OutputType) { $graphParams['OutputType'] = $OutputType }
+        if ($null -ne $Body) {
+            # Accept either a pre-serialized JSON string or an object to serialize.
+            $graphParams['Body'] = if ($Body -is [string]) { $Body } else { $Body | ConvertTo-Json -Depth 10 }
+            $graphParams['ContentType'] = 'application/json'
+        }
+        return Invoke-MgGraphRequest @graphParams
+    }
 
     Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
 
@@ -221,9 +277,10 @@ function Invoke-GraphDirectly {
         foreach ($item in $queryParams.GetEnumerator()) {
             $q.Add($item.Key, $item.Value)
         }
-        $uri = [System.UriBuilder]::new("", "", 443, $endpoint)
-        $uri.Query = $q.ToString()
-        $APIFilter = $uri.Query
+        # Named $uriBuilder (not $uri) to avoid colliding with the [string]$Uri parameter (variables are case-insensitive).
+        $uriBuilder = [System.UriBuilder]::new("", "", 443, $endpoint)
+        $uriBuilder.Query = $q.ToString()
+        $APIFilter = $uriBuilder.Query
         $endpoint = $endpoint + $APIFilter
     }
     Write-Debug "Graph Api direct: $endpoint"
@@ -241,11 +298,12 @@ function Invoke-GraphDirectly {
 
     # If the API header is stored in the PermissionsHelper module for the commandlet, we add it to the request
     if ($null -ne $apiHeader.PSObject.Properties.Name) {
-        $headers = @{}
+        # Named $apiHeaders (not $headers) to avoid colliding with the [hashtable]$Headers parameter (variables are case-insensitive).
+        $apiHeaders = @{}
         foreach ($property in $apiHeader.PSObject.Properties) {
-            $headers[$property.Name] = $property.Value
+            $apiHeaders[$property.Name] = $property.Value
         }
-        $graphParams['Headers'] = $headers
+        $graphParams['Headers'] = $apiHeaders
     }
 
     # Add body if provided
@@ -428,6 +486,21 @@ function Invoke-GraphBatchRequest {
         Lower values reduce burst pressure on rate-limited endpoints (e.g. the PIM policy store
         when using $filter) at the cost of more HTTP round-trips.
 
+    .PARAMETER RetriableStatusCodes
+        Sub-response (and batch-envelope) HTTP status codes eligible for retry. Default is @(429),
+        which preserves the throttle-only behavior. Pass e.g. @(429, 500, 502, 503, 504) to also
+        retry transient server errors.
+
+    .PARAMETER UseExponentialBackoffFallback
+        When set, retriable responses that lack a parseable Retry-After header (common for 5xx) are
+        retried using exponential backoff (FallbackBaseDelaySeconds * 2^attempt, capped at 300s)
+        instead of being surfaced to the caller. Default is off, preserving the "honor Retry-After
+        or surface" behavior described in .NOTES.
+
+    .PARAMETER FallbackBaseDelaySeconds
+        Base delay in seconds for the exponential backoff fallback (default: 1). Only used when
+        -UseExponentialBackoffFallback is set and no Retry-After header is present.
+
     .EXAMPLE
         $requests = @(
             @{ id = "1"; method = "GET"; url = "/servicePrincipals/12345" }
@@ -521,7 +594,17 @@ function Invoke-GraphBatchRequest {
 
         [Parameter(Mandatory = $false)]
         [ValidateRange(1, 20)]
-        [int]$BatchSize = 20
+        [int]$BatchSize = 20,
+
+        [Parameter(Mandatory = $false)]
+        [int[]]$RetriableStatusCodes = @(429),
+
+        [Parameter(Mandatory = $false)]
+        [switch]$UseExponentialBackoffFallback,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(1, 60)]
+        [int]$FallbackBaseDelaySeconds = 1
     )
 
     # If InputObject parameter set is used, build $Requests from the collection + scriptblocks
@@ -575,33 +658,41 @@ function Invoke-GraphBatchRequest {
                 $response   = $_.Exception.Response
                 if ($response) {
                     $statusCode = [int]$response.StatusCode
-                    # Only retry HTTP 429 responses when Graph provides a parseable Retry-After delay.
-                    if ($statusCode -eq 429 -and $attempt -lt $MaxRetries -and $response.Headers) {
+                    # Retry retriable responses when Graph provides a parseable Retry-After delay.
+                    if (($RetriableStatusCodes -contains $statusCode) -and $attempt -lt $MaxRetries -and $response.Headers) {
                         $headerValue = $response.Headers['Retry-After']
                         if ($headerValue) {
                             [void][int]::TryParse([string]$headerValue, [ref]$retryAfter)
                         }
                     }
                 }
-                if ($statusCode -eq 429 -and $attempt -lt $MaxRetries -and $retryAfter -gt 0) {
-                    # First retry waits exactly the Retry-After value the server told us to wait.
-                    # Later retries double that wait time, but never sleep more than 300 seconds.
-                    # See .NOTES for why we double instead of using Retry-After every time.
-                    $waitSeconds = [int]([Math]::Min([double]$retryAfter * [Math]::Pow(2, $attempt), 300))
+                $canRetryEnvelope = ($null -ne $statusCode) -and ($RetriableStatusCodes -contains $statusCode) -and ($attempt -lt $MaxRetries)
+                if ($canRetryEnvelope -and ($retryAfter -gt 0 -or $UseExponentialBackoffFallback)) {
+                    if ($retryAfter -gt 0) {
+                        # First retry waits exactly the Retry-After value the server told us to wait.
+                        # Later retries double that wait time, but never sleep more than 300 seconds.
+                        # See .NOTES for why we double instead of using Retry-After every time.
+                        $waitSeconds = [int]([Math]::Min([double]$retryAfter * [Math]::Pow(2, $attempt), 300))
+                    }
+                    else {
+                        # No Retry-After (common for 5xx). Fall back to exponential backoff when the
+                        # caller opted in via -UseExponentialBackoffFallback.
+                        $waitSeconds = [int]([Math]::Min([double]$FallbackBaseDelaySeconds * [Math]::Pow(2, $attempt), 300))
+                    }
                     # We got throttled, so cut the batch size in half and trim the request list
                     # down to the new size before we retry. The requests we trimmed off don't get
                     # lost: this batch only advances by the number of requests we keep, so the next
                     # pass will pick up the trimmed requests in a new (smaller) batch.
                     if ($currentBatchSize -gt 1) {
                         $currentBatchSize = [Math]::Max(1, [int][Math]::Floor($currentBatchSize / 2))
-                        Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP 429." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP $statusCode." -Level Info -Source "Invoke-GraphBatchRequest"
                         $pendingRequests = @($pendingRequests | Select-Object -First $currentBatchSize)
                         $requestCountForThisBatch = $pendingRequests.Count
                     }
                     if ($attempt -eq 0) {
-                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request failed (HTTP $statusCode). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
                     } else {
-                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request failed (HTTP $statusCode). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
                     }
                     Start-Sleep -Seconds $waitSeconds
                     $attempt++
@@ -620,7 +711,7 @@ function Invoke-GraphBatchRequest {
             # (https://learn.microsoft.com/en-us/graph/json-batching).
             $throttled = @()
             foreach ($response in $batchResponse.responses) {
-                if ($response.status -eq 429 -and $attempt -lt $MaxRetries) {
+                if (($RetriableStatusCodes -contains [int]$response.status) -and $attempt -lt $MaxRetries) {
                     $throttled += $response
                 }
                 else {
@@ -643,30 +734,37 @@ function Invoke-GraphBatchRequest {
                 }
             }
 
-            if (-not $hasRetryAfter) {
+            if (-not $hasRetryAfter -and -not $UseExponentialBackoffFallback) {
                 # No parseable Retry-After on any throttled sub-response. Identity-and-access
                 # endpoints always return Retry-After per
                 # https://learn.microsoft.com/en-us/graph/throttling-limits, so if it is missing
-                # the wait time is unknown. Surface the 429s to the caller instead of guessing.
+                # the wait time is unknown. Surface the responses to the caller instead of guessing,
+                # unless the caller opted in to exponential backoff via -UseExponentialBackoffFallback.
                 foreach ($r in $throttled) { $allResults[$r.id] = $r }
                 break
             }
 
             # First retry honors Retry-After verbatim; subsequent retries double the wait,
-            # capped at 300 seconds per sleep. See .NOTES for rationale.
-            $waitSeconds = [int][Math]::Min($longestRetryAfterSeconds * [Math]::Pow(2, $attempt), 300)
+            # capped at 300 seconds per sleep. See .NOTES for rationale. When no Retry-After was
+            # provided (e.g. transient 5xx) and the caller opted in, fall back to exponential backoff.
+            if ($hasRetryAfter) {
+                $waitSeconds = [int][Math]::Min($longestRetryAfterSeconds * [Math]::Pow(2, $attempt), 300)
+            }
+            else {
+                $waitSeconds = [int][Math]::Min([double]$FallbackBaseDelaySeconds * [Math]::Pow(2, $attempt), 300)
+            }
 
             if ($attempt -eq 0) {
-                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) failed with a retriable status. Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
             } else {
-                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) failed with a retriable status. Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
             }
             # Cut the batch size in half so later batches in this call are smaller.
             # We don't trim $pendingRequests here because it already only holds the throttled
             # requests, which is no more than the original batch size, so it still fits in one send.
             if ($currentBatchSize -gt 1) {
                 $currentBatchSize = [Math]::Max(1, [int][Math]::Floor($currentBatchSize / 2))
-                Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP 429." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after a retriable failure." -Level Info -Source "Invoke-GraphBatchRequest"
             }
             Start-Sleep -Seconds $waitSeconds
 
