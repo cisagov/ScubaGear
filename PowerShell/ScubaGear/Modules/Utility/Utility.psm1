@@ -731,6 +731,59 @@ function Get-RetryAfterSeconds {
     return $DefaultSeconds
 }
 
+function Test-ScubaTransientConnectionError {
+    <#
+    .SYNOPSIS
+        Determines whether a REST call failure with no HTTP response object represents a
+        transient connection-level issue (timeout, DNS blip, connection reset) worth retrying.
+
+    .DESCRIPTION
+        PS 5.1 throws System.Net.WebException with a .Status enum that reliably identifies
+        timeouts/connection failures. PS 7+ throws a mix of types (HttpRequestException,
+        TaskCanceledException, IOException, SocketException) with no single reliable status
+        enum, so those are matched by exception type name, falling back to a message-text
+        match for anything else that looks like a timeout/connection failure.
+
+    .PARAMETER ErrorRecord
+        The error record whose exception should be inspected.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        $ErrorRecord
+    )
+
+    $Exception = $ErrorRecord.Exception
+
+    if ($Exception -is [System.Net.WebException]) {
+        $TransientStatuses = @(
+            [System.Net.WebExceptionStatus]::Timeout,
+            [System.Net.WebExceptionStatus]::ConnectFailure,
+            [System.Net.WebExceptionStatus]::ConnectionClosed,
+            [System.Net.WebExceptionStatus]::KeepAliveFailure,
+            [System.Net.WebExceptionStatus]::NameResolutionFailure,
+            [System.Net.WebExceptionStatus]::ReceiveFailure,
+            [System.Net.WebExceptionStatus]::SendFailure
+        )
+        return $Exception.Status -in $TransientStatuses
+    }
+
+    $TypeName = $Exception.GetType().FullName
+    if ($TypeName -in @(
+            'System.Threading.Tasks.TaskCanceledException',
+            'System.Net.Http.HttpRequestException',
+            'System.IO.IOException',
+            'System.Net.Sockets.SocketException'
+        )) {
+        return $true
+    }
+
+    return $Exception.Message -match 'timed out|timeout|connection.*(closed|reset|refused)|name.*resolution'
+}
+
 function Invoke-ScubaRestMethod {
     <#
     .SYNOPSIS
@@ -888,6 +941,13 @@ function Invoke-ScubaRestMethod {
 
             if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
                 Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${RetryDelaySeconds}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $RetryDelaySeconds
+                $RetryDelaySeconds *= 2
+                continue
+            }
+
+            if (-not $IsLastAttempt -and $null -eq $WebResponse -and (Test-ScubaTransientConnectionError -ErrorRecord $ErrorRecord)) {
+                Write-Warning "Request to '$Uri' failed with a transient connection error ($($ErrorRecord.Exception.GetType().Name): $($ErrorRecord.Exception.Message)). Retrying in ${RetryDelaySeconds}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $RetryDelaySeconds
                 $RetryDelaySeconds *= 2
                 continue
