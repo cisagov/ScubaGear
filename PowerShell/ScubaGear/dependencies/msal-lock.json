@@ -1,6 +1,5 @@
 ﻿{
     "msalVersion":  "4.82.0",
-    "teamsCompatibilityVersion":  "7.9.0",
     "packages":  [
                      {
                          "file":  "Microsoft.Identity.Client.4.82.0.nupkg",

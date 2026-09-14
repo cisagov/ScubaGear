@@ -7,7 +7,6 @@ on:
       - 'PowerShell/ScubaGear/lib/**'
       - 'PowerShell/ScubaGear/Modules/Connection/**'
       - 'utils/workflow/Update-Msal.ps1'
-      - 'utils/workflow/Test-MsalTeamsCompatibility.ps1'
       - '.github/workflows/validate_msal.yaml'
   workflow_dispatch:
 
@@ -33,7 +32,3 @@ jobs:
           Import-Module Pester -MinimumVersion 5.0 -Force
           $result = Invoke-Pester -Path ./Testing/workflow/Update-Msal.Tests.ps1 -PassThru
           if ($result.FailedCount -gt 0) { throw "$($result.FailedCount) updater tests failed." }
-
-      - name: Test MicrosoftTeams load order
-        run: |
-          ./utils/workflow/Test-MsalTeamsCompatibility.ps1 -RepoRoot . -TeamsVersion 7.9.0

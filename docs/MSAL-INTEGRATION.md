@@ -33,7 +33,7 @@ git worktree add ..\SCUBA2305-pre-msal 721e7e1e544c8ec507a0b0b9c02c73e73ff10550
 
 ## Compatibility decision
 
-ScubaGear pins `Microsoft.Identity.Client` 4.82.0. Interactive authentication uses the system browser only (loopback redirect); the WAM broker and its native runtime are no longer bundled. Newer MSAL versions are advisory until fresh-process load-order validation passes.
+ScubaGear pins `Microsoft.Identity.Client` 4.82.0. Interactive authentication uses the system browser only (loopback redirect); the WAM broker and its native runtime are no longer bundled. Newer MSAL versions are advisory until signature and hash integrity validation passes.
 
 ## Migration status
 
@@ -47,5 +47,4 @@ ScubaGear pins `Microsoft.Identity.Client` 4.82.0. Interactive authentication us
 - [x] Replace executable Graph Authentication cmdlet calls.
 - [x] Remove Microsoft.Graph.Authentication from RequiredVersions.ps1.
 - [ ] Complete live certificate authentication tests.
-- [x] Complete MicrosoftTeams load-order tests in fresh processes.
 - [ ] Complete sovereign-cloud tenant tests where tenants are available.

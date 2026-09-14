@@ -279,7 +279,6 @@ function Restore-MsalDependencies {
         }
         $lock = [ordered]@{
             msalVersion = Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig
-            teamsCompatibilityVersion = '7.9.0'
             packages = @($packageRecords)
             files = @($fileRecords | Sort-Object path)
         }
