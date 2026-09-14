@@ -111,6 +111,24 @@ InModuleScope Utility {
             $expectedValue | Should -Be $apiHeaderValue
         }
     }
+
+    Describe -Tag 'Utility' -Name "Invoke-GraphDirectly queryParams path (regression)" {
+        BeforeAll {
+            # Stub so Mock can intercept even when the Graph SDK isn't loaded in the test session.
+            function Invoke-MgGraphRequest { param($Uri, $Method, $Headers, $Body, $ContentType, $OutputType) }
+            Mock Invoke-MgGraphRequest -MockWith { @{ value = @() } }
+        }
+
+        # Guards against the $Uri parameter colliding (case-insensitively) with the internal
+        # $uriBuilder used when building the query string. The prior collision coerced the
+        # UriBuilder to a string and threw "The property 'Query' cannot be found on this object".
+        It "does not throw and appends the query string when -queryParams is supplied" {
+            { Invoke-GraphDirectly -commandlet "Get-MgBetaApplication" -M365Environment "commercial" -queryParams @{ '$top' = '5' } } | Should -Not -Throw
+            Should -Invoke Invoke-MgGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Uri -match 'applications' -and $Uri -match '(\$|%24)top=5'
+            }
+        }
+    }
 }
 
 AfterAll {
