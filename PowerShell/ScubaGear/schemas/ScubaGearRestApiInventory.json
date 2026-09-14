@@ -34,7 +34,7 @@
             "Get-PowerPlatformEnvironmentsRest", "Get-PowerPlatformDlpPoliciesRest", "Get-PowerPlatformTenantIsolationRest",
             "Get-TeamsMeetingPolicyRest", "Get-TeamsTenantFederationConfigurationRest", "Get-TeamsClientConfigurationRest",
             "Get-TeamsAppPermissionPolicyRest", "Get-TeamsMeetingBroadcastPolicyRest", "Get-TeamsM365UnifiedTenantSettingsRest",
-            "Export-PowerBIProvider"
+            "Get-PowerBITenantSettingsRest"
         ],
         "scubaGearProducts": ["exo", "securitysuite", "sharepoint", "powerplatform", "teams", "powerbi"],
         "unitTests": "Testing/Unit/PowerShell/Utility/Invoke-ScubaRestMethod.Tests.ps1",
@@ -354,18 +354,18 @@
         "notes": "Not called for gcchigh/dod or certificate-based (app-only) auth - Export-TeamsProvider substitutes legacy policy data in those cases instead."
     },
     {
-        "functionName": "Export-PowerBIProvider",
-        "filePath": "Modules/Providers/ExportPowerBIProvider.psm1",
-        "category": "Provider REST helper (inline, no dedicated wrapper function)",
-        "description": "Gets Power BI tenant settings directly inline in the provider function, rather than via a PowerBIRestHelper.psm1 wrapper (PowerBIRestHelper.psm1 only contains Get-PowerBIBaseUrl/Get-PowerBIScope, no REST-calling function).",
+        "functionName": "Get-PowerBITenantSettingsRest",
+        "filePath": "Modules/Providers/ProviderHelpers/PowerBIRestHelper.psm1",
+        "category": "Provider REST helper",
+        "description": "Gets Power BI tenant settings via the Power BI Admin REST API, replacing the inline Invoke-ScubaRestMethod call previously made directly in Export-PowerBIProvider.",
         "httpMethods": ["GET"],
         "baseUrlSource": "Get-ScubaGearPermissions -Product powerbi -OutAs endpoint (via Get-PowerBIBaseUrl)",
         "endpointPath": "/v1/admin/tenantsettings",
         "authTokenSource": "Caller-supplied -AccessToken",
-        "calledBy": ["Orchestrator (powerbi product)"],
+        "calledBy": ["Export-PowerBIProvider"],
         "scubaGearProducts": ["powerbi"],
         "unitTests": "Testing/Unit/PowerShell/Providers/PowerBIProvider/Export-PowerBIProvider.Tests.ps1",
-        "notes": "Migrated from a raw Invoke-RestMethod call (with hand-built headers) onto Invoke-ScubaRestMethod during the centralize-invoke-scubarestmethod-retry branch; previously had no retry support or shared error diagnostics, and had zero unit test coverage."
+        "notes": "Given a dedicated wrapper function (matching Get-SPOTenantRest/Get-PowerPlatform*Rest/Get-Teams*Rest) so CommandTracker tracks a meaningful, product-specific command name instead of the generic Invoke-ScubaRestMethod primitive name. Previously calling Invoke-ScubaRestMethod directly caused the Rego dependency-check 'Commandlet' metadata to reference the primitive itself, which broke when it didn't match the tracked command name."
     },
     {
         "functionName": "Select-DohServer / Invoke-DoH",

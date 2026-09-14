@@ -18,11 +18,9 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 [System.Object[]] TryCommand([string]$Command, [hashtable]$CommandArgs) {
                     try {
                         switch ($Command) {
-                            "Invoke-ScubaRestMethod" {
+                            "Get-PowerBITenantSettingsRest" {
                                 $CommandArgs.BaseUrl | Should -Be 'https://api.powerbi.com'
                                 $CommandArgs.AccessToken | Should -Be 'mock-access-token'
-                                $CommandArgs.Endpoint | Should -Be '/v1/admin/tenantsettings'
-                                $CommandArgs.Method | Should -Be 'GET'
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{
                                     tenantSettings = @(
@@ -85,7 +83,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
             }
         }
 
-        It "When LicenseFound is true, calls Invoke-ScubaRestMethod with the tenant settings endpoint and returns valid JSON" {
+        It "When LicenseFound is true, calls Get-PowerBITenantSettingsRest with the tenant settings endpoint and returns valid JSON" {
             $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-access-token' -BaseUrl 'https://api.powerbi.com'
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true
@@ -93,7 +91,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
             $Json | Should -Match 'ExampleSetting'
         }
 
-        It "When LicenseFound is false, does not call Invoke-ScubaRestMethod and returns empty tenant settings" {
+        It "When LicenseFound is false, does not call Get-PowerBITenantSettingsRest and returns empty tenant settings" {
             $Json = Export-PowerBIProvider -LicenseFound $false
             $ValidJson = Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1
             $ValidJson | Should -Be $true

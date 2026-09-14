@@ -1,5 +1,4 @@
 Import-Module -Name $PSScriptRoot/ProviderHelpers/PowerBIRestHelper.psm1 -Force
-Import-Module -Name $PSScriptRoot/../Permissions/PermissionsHelper.psm1 -Function Get-ScubaGearRestEndpoint
 
 function Export-PowerBIProvider {
     <#
@@ -35,11 +34,9 @@ function Export-PowerBIProvider {
             throw "AccessToken and BaseUrl must be provided when LicenseFound is true."
         }
 
-        $AdminSettings = $Tracker.TryCommand("Invoke-ScubaRestMethod", @{
+        $AdminSettings = $Tracker.TryCommand("Get-PowerBITenantSettingsRest", @{
             "BaseUrl" = $BaseUrl
             "AccessToken" = $AccessToken
-            "Endpoint" = (Get-ScubaGearRestEndpoint -FunctionName 'Export-PowerBIProvider')
-            "Method" = "GET"
         })
 
         if ($AdminSettings.Count -gt 0) {
@@ -48,7 +45,7 @@ function Export-PowerBIProvider {
         }
     }
     else {
-        $Tracker.AddSuccessfulCommand("Invoke-ScubaRestMethod")
+        $Tracker.AddSuccessfulCommand("Get-PowerBITenantSettingsRest")
     }
 
     $LicenseFoundJson = ConvertTo-Json $LicenseFound
