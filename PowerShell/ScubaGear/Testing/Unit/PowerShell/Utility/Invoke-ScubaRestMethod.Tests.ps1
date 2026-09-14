@@ -91,6 +91,57 @@ InModuleScope Utility {
             }
         }
 
+        Context 'Transient connection error retry behavior' {
+            BeforeAll {
+                Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
+            }
+
+            It 'Retries on a connection timeout (WebException) and succeeds once the connection recovers' {
+                $script:CallCount = 0
+                Mock -ModuleName Utility Invoke-RestMethod {
+                    $script:CallCount++
+                    if ($script:CallCount -eq 1) {
+                        throw (New-Object System.Net.WebException('The operation has timed out', [System.Net.WebExceptionStatus]::Timeout))
+                    }
+                    return [pscustomobject]@{ result = 'ok' }
+                }
+                $Result = Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                    -MaxRetries 2 -RetryDelaySeconds 0 -WarningAction SilentlyContinue
+                $Result.result | Should -Be 'ok'
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
+            }
+
+            It 'Exhausts retries on a persistent connection timeout and throws the original exception' {
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-Object System.Net.WebException('The operation has timed out', [System.Net.WebExceptionStatus]::Timeout)) }
+                Mock -ModuleName Utility Start-Sleep { }
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                        -MaxRetries 2 -RetryDelaySeconds 1 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw '*timed out*'
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 3 -Exactly
+            }
+
+            It 'Does not retry on a non-transient WebException status with no response object' {
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-Object System.Net.WebException('Trust failure', [System.Net.WebExceptionStatus]::TrustFailure)) }
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                        -MaxRetries 3 -InformationAction SilentlyContinue } | Should -Throw
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 1 -Exactly
+            }
+
+            It 'Retries on a PS7-style HttpRequestException with no response object' {
+                $script:CallCount2 = 0
+                Mock -ModuleName Utility Invoke-RestMethod {
+                    $script:CallCount2++
+                    if ($script:CallCount2 -eq 1) {
+                        throw (New-Object System.Net.Http.HttpRequestException('Connection reset by peer'))
+                    }
+                    return [pscustomobject]@{ result = 'ok' }
+                }
+                $Result = Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                    -MaxRetries 2 -RetryDelaySeconds 0 -WarningAction SilentlyContinue
+                $Result.result | Should -Be 'ok'
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
+            }
+        }
+
         Context 'Non-retryable errors' {
             It 'Does not retry on 404 and throws immediately' {
                 Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 404) }
