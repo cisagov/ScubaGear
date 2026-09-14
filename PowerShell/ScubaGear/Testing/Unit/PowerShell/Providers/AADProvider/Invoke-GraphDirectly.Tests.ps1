@@ -115,7 +115,12 @@ InModuleScope Utility {
     Describe -Tag 'Utility' -Name "Invoke-GraphDirectly queryParams path (regression)" {
         BeforeAll {
             # Stub so Mock can intercept even when the Graph SDK isn't loaded in the test session.
-            function Invoke-MgGraphRequest { param($Uri, $Method, $Headers, $Body, $ContentType, $OutputType) }
+            # The parameters mirror the real cmdlet so Pester can bind ParameterFilter arguments;
+            # the $null assignment marks them as used for PSScriptAnalyzer (PSReviewUnusedParameter).
+            function Invoke-MgGraphRequest {
+                param($Uri, $Method, $Headers, $Body, $ContentType, $OutputType)
+                $null = $Uri, $Method, $Headers, $Body, $ContentType, $OutputType
+            }
             Mock Invoke-MgGraphRequest -MockWith { @{ value = @() } }
         }
 
