@@ -381,6 +381,39 @@ function Install-ScubaMsalDependency {
     return $LibraryPath
 }
 
+function Remove-ScubaMsalStaleVersion {
+    <#
+    .SYNOPSIS
+        Removes cached MSAL version folders under ~/.scubagear/MSAL other than the pinned version.
+        No-op when the $env:ScubaGearMsalPath override is in use.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$KeepVersion
+    )
+
+    if ($env:ScubaGearMsalPath) {
+        return
+    }
+
+    $HomeDirectory = if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
+    $MsalRoot = Join-Path -Path $HomeDirectory -ChildPath '.scubagear/MSAL'
+    if (-not (Test-Path -Path $MsalRoot -PathType Container)) {
+        return
+    }
+
+    Get-ChildItem -Path $MsalRoot -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -ne $KeepVersion } |
+        ForEach-Object {
+            if ($PSCmdlet.ShouldProcess($_.FullName, 'Remove stale MSAL version')) {
+                Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+}
+
 function Initialize-Msal {
     <#
     .SYNOPSIS
@@ -394,6 +427,7 @@ function Initialize-Msal {
         [string]$LibraryPath
     )
 
+    $ExplicitLibraryPath = $PSBoundParameters.ContainsKey('LibraryPath')
     $Manifest = Get-ScubaMsalManifest
     $ExpectedAssemblyVersion = [version]"$($Manifest.Version).0"
     $LoadedMsal = [AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
@@ -420,6 +454,11 @@ function Initialize-Msal {
         $null = Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest -ThrowOnFail
         $Global:ScubaGearState.MsalValidated = $true
         $Global:ScubaGearState.MsalLibraryPath = $LibraryPath
+
+        # Prune superseded cache versions once the pinned version is confirmed usable.
+        if (-not $ExplicitLibraryPath -and -not $env:ScubaGearMsalPath) {
+            Remove-ScubaMsalStaleVersion -KeepVersion $Manifest.Version
+        }
     }
 
     foreach ($AssemblyFile in $Manifest.LoadOrder) {
@@ -560,5 +599,6 @@ Export-ModuleMember -Function @(
     'Get-ScubaMsalManifest',
     'Get-ScubaMsalLibraryPath',
     'Test-ScubaMsalLibrary',
-    'Install-ScubaMsalDependency'
+    'Install-ScubaMsalDependency',
+    'Remove-ScubaMsalStaleVersion'
 )
