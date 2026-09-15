@@ -152,13 +152,31 @@ function Get-MsalPackagePayload {
     }
 
     $idLower = $Package.Id.ToLowerInvariant()
-    $uri = "https://api.nuget.org/v3-flatcontainer/$idLower/$($Package.Version)/$idLower.$($Package.Version).nupkg"
+    $endpoints = @(
+        "https://api.nuget.org/v3-flatcontainer/$idLower/$($Package.Version)/$idLower.$($Package.Version).nupkg"
+        "https://www.nuget.org/api/v2/package/$($Package.Id)/$($Package.Version)"
+        "https://globalcdn.nuget.org/packages/$idLower.$($Package.Version).nupkg"
+    )
     $nupkgPath = Join-Path $WorkRoot "$($Package.Id).$($Package.Version).nupkg"
 
     $previousProgress = $ProgressPreference
     $ProgressPreference = 'SilentlyContinue'
     try {
-        Invoke-WebRequest -Uri $uri -OutFile $nupkgPath -UseBasicParsing -ErrorAction Stop
+        $failures = @()
+        $downloaded = $false
+        foreach ($uri in $endpoints) {
+            try {
+                Invoke-WebRequest -Uri $uri -OutFile $nupkgPath -UseBasicParsing -ErrorAction Stop
+                $downloaded = $true
+                break
+            }
+            catch {
+                $failures += "$uri -> $($_.Exception.Message)"
+            }
+        }
+        if (-not $downloaded) {
+            throw "Unable to download $($Package.Id) $($Package.Version) from any NuGet endpoint:`n$($failures -join "`n")"
+        }
     }
     finally {
         $ProgressPreference = $previousProgress

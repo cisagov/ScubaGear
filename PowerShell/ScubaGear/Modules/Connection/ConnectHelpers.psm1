@@ -299,6 +299,61 @@ function Test-ScubaMsalLibrary {
     return $true
 }
 
+function Save-ScubaNuGetPackage {
+    <#
+    .SYNOPSIS
+        Downloads a NuGet package (.nupkg) to a file, trying multiple NuGet endpoints so a network
+        that blocks one host can still reach the authoritative signed package. All endpoints serve
+        identical bytes, so the caller's SHA-256 check is unaffected by which one responds.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Id,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Version,
+
+        [Parameter(Mandatory = $true)]
+        [string]$OutFile
+    )
+
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    }
+    catch {
+        Write-Verbose "Unable to adjust TLS protocol: $($_.Exception.Message)"
+    }
+
+    $IdLower = $Id.ToLowerInvariant()
+    $Endpoints = @(
+        "https://api.nuget.org/v3-flatcontainer/$IdLower/$Version/$IdLower.$Version.nupkg"
+        "https://www.nuget.org/api/v2/package/$Id/$Version"
+        "https://globalcdn.nuget.org/packages/$IdLower.$Version.nupkg"
+    )
+
+    $PreviousProgress = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
+    try {
+        $Failures = @()
+        foreach ($Uri in $Endpoints) {
+            try {
+                Invoke-WebRequest -Uri $Uri -OutFile $OutFile -UseBasicParsing -ErrorAction Stop
+                return
+            }
+            catch {
+                $Failures += "$Uri -> $($_.Exception.Message)"
+            }
+        }
+        throw "Unable to download $Id $Version from any NuGet endpoint:`n$($Failures -join "`n")"
+    }
+    finally {
+        $ProgressPreference = $PreviousProgress
+    }
+}
+
 function Install-ScubaMsalDependency {
     <#
     .SYNOPSIS
@@ -341,18 +396,8 @@ function Install-ScubaMsalDependency {
     New-Item -ItemType Directory -Path $TempRoot -Force | Out-Null
     try {
         foreach ($Package in $Manifest.Packages) {
-            $IdLower = $Package.Id.ToLowerInvariant()
-            $Uri = "https://api.nuget.org/v3-flatcontainer/$IdLower/$($Package.Version)/$IdLower.$($Package.Version).nupkg"
             $NupkgPath = Join-Path $TempRoot "$($Package.Id).$($Package.Version).nupkg"
-
-            $PreviousProgress = $ProgressPreference
-            $ProgressPreference = 'SilentlyContinue'
-            try {
-                Invoke-WebRequest -Uri $Uri -OutFile $NupkgPath -UseBasicParsing -ErrorAction Stop
-            }
-            finally {
-                $ProgressPreference = $PreviousProgress
-            }
+            Save-ScubaNuGetPackage -Id $Package.Id -Version $Package.Version -OutFile $NupkgPath
 
             $NupkgHash = (Get-FileHash -Path $NupkgPath -Algorithm SHA256).Hash
             if ($NupkgHash -ne $Package.Sha256) {
