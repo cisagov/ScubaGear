@@ -33,7 +33,7 @@ git worktree add ..\SCUBA2305-pre-msal 721e7e1e544c8ec507a0b0b9c02c73e73ff10550
 
 ## Compatibility decision
 
-ScubaGear pins `Microsoft.Identity.Client` 4.89.0. The signed assemblies are not bundled in the repo; they are downloaded from NuGet on first use and cached under `~/.scubagear/MSAL/<version>/net462`, mirroring how the OPA executable is handled. Interactive authentication uses the system browser only (loopback redirect); the WAM broker and its native runtime are not used. Newer MSAL versions are advisory until signature and hash integrity validation passes.
+ScubaGear pins `Microsoft.Identity.Client` 4.82.0. The signed assemblies are not bundled in the repo; they are downloaded from NuGet on first use and cached under `~/.scubagear/MSAL/<version>/net462`, mirroring how the OPA executable is handled. Interactive authentication uses the system browser only (loopback redirect); the WAM broker and its native runtime are not used. Newer MSAL versions are advisory until signature and hash integrity validation passes.
 
 ## Migration status
 
