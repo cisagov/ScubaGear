@@ -25,6 +25,8 @@ InModuleScope Support {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'CMDArgs')]
             $CMDArgs = @{
                 Description = "YAML configuration file with default description";
+                OrgName = "Test Organization";
+                OrgUnitName = "Test Unit";
                 ProductNames = @("aad", "securitysuite", "exo", "sharepoint", "teams");
                 M365Environment = "commercial";
                 OPAPath = ".";
@@ -38,6 +40,10 @@ InModuleScope Support {
                 OutProviderFileName = "ProviderSettingsExport";
                 OutRegoFileName = "RegoOutput";
                 OutReportName = "BaselineReports";
+                OutJsonFileName = "ScubaResults";
+                OutCsvFileName = "ScubaResults";
+                OutActionPlanFileName = "ActionPlan";
+                NumberOfUUIDCharactersToTruncate = 18;
                 ConfigLocation = $TestPath;
             }
         }
@@ -49,6 +55,20 @@ InModuleScope Support {
         }
 
         Context "When generating the product exclusion sections" {
+            It 'Includes the complete set of general configuration options' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                New-SCuBAConfig @CMDArgs
+
+                $Script:CapturedConfig['OrgName'] | Should -Be 'Test Organization'
+                $Script:CapturedConfig['OrgUnitName'] | Should -Be 'Test Unit'
+                $Script:CapturedConfig['OutJsonFileName'] | Should -Be 'ScubaResults'
+                $Script:CapturedConfig['OutCsvFileName'] | Should -Be 'ScubaResults'
+                $Script:CapturedConfig['OutActionPlanFileName'] | Should -Be 'ActionPlan'
+                $Script:CapturedConfig['NumberOfUUIDCharactersToTruncate'] | Should -Be 18
+            }
+
             It 'Builds the exclusion templates from the ScubaGear configuration schema' {
                 # Capture the config object handed to ConvertTo-Yaml so we can inspect the generated
                 # structure. The exclusion sections are derived from Modules/ScubaConfig/ScubaConfigSchema.json.

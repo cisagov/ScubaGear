@@ -1423,6 +1423,10 @@ function New-SCuBAConfig {
     - SharePoint Online: sharepoint
     - MS Teams: teams.
     Use '*' to run all baselines.
+    .Parameter OrgName
+    The organization display name to include in the generated configuration.
+    .Parameter OrgUnitName
+    The organizational unit or department name to include in the generated configuration.
     .Parameter M365Environment
     This parameter is used to authenticate to the different commercial/government environments.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
@@ -1472,6 +1476,14 @@ function New-SCuBAConfig {
     .Parameter OutReportName
     The name of the main html file page created in the folder created in OutPath.
     Defaults to "BaselineReports".
+    .Parameter OutJsonFileName
+    The consolidated JSON results filename without the extension. Defaults to "ScubaResults".
+    .Parameter OutCsvFileName
+    The CSV results filename without the extension. Defaults to "ScubaResults".
+    .Parameter OutActionPlanFileName
+    The action plan filename without the extension. Defaults to "ActionPlan".
+    .Parameter NumberOfUUIDCharactersToTruncate
+    The number of UUID characters to truncate in generated output filenames. Valid values are 0, 13, 18, or 36.
     .Parameter DisconnectOnExit
     Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
     .Parameter ConfigLocation
@@ -1539,6 +1551,16 @@ function New-SCuBAConfig {
         [ValidateNotNullOrEmpty()]
         [string]
         $Description = "YAML configuration file with default description", #(Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OrgName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OrgUnitName,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
@@ -1647,6 +1669,26 @@ function New-SCuBAConfig {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
+        $OutJsonFileName = [ScubaConfig]::ScubaDefault('DefaultOutJsonFileName'),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutCsvFileName = [ScubaConfig]::ScubaDefault('DefaultOutCsvFileName'),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $OutActionPlanFileName = [ScubaConfig]::ScubaDefault('DefaultOutActionPlanFileName'),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet(0, 13, 18, 36)]
+        [int]
+        $NumberOfUUIDCharactersToTruncate = [ScubaConfig]::ScubaDefault('DefaultNumberOfUUIDCharactersToTruncate'),
+
+        [Parameter(Mandatory = $false)]
+        [ValidateNotNullOrEmpty()]
+        [string]
         $ConfigLocation = [Environment]::GetFolderPath('Desktop'),
 
         [Parameter(Mandatory = $false)]
@@ -1740,9 +1782,11 @@ function New-SCuBAConfig {
 
     # Populate the general settings section from the bound/default parameter values.
     ($MyInvocation.MyCommand.Parameters).Keys | ForEach-Object {
+        # Skip any parameters that are listed as non-config parameters.
         if ($NonConfigParameters -contains $_) {
             return
         }
+        # Skip parameters that are not part of the ScubaGear configuration.
         $Val = (Get-Variable -Name $_ -EA SilentlyContinue).Value
         if ($Val.length -gt 0) {
             $Config.add($_, $Val)
