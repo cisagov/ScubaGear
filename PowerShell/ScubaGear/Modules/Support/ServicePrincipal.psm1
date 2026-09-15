@@ -1571,8 +1571,7 @@ function Set-ScubaGearAppPermission {
 
                         foreach ($grant in $CurrentDelegatedGrants) {
                             try {
-                                $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgOauth2PermissionGrant -Environment $M365Environment -outAs api -id $grant.Id)
-                                Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                                Invoke-GraphDirectly -Commandlet Remove-MgOauth2PermissionGrant -M365Environment $M365Environment -id $grant.Id
                                 Write-Verbose "Removed OAuth2 grant: $($grant.Id) with scopes: $($grant.Scope)"
                             } catch {
                                 Write-Warning "Failed to remove OAuth2 grant $($grant.Id): $($_.Exception.Message)"
@@ -1640,7 +1639,7 @@ function Set-ScubaGearAppPermission {
                     if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
                         foreach ($extraPerm in $ExtraPermissionsDetails) {
                             $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -outAs api -id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
-                            Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                            Invoke-GraphDirectly -Uri $deleteUri -Method DELETE
                             Write-Output "Removed consented extra permission: $($extraPerm.PermissionName)"
                         }
                     }

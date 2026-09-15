@@ -544,4 +544,65 @@ Function Get-ServicePrincipalPermissions {
     return $deduplicatedPermissions | Select-Object -Property LeastPermissions, ResourceAPIAppID, scubaGearProduct -Unique
 }
 
-Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions
+function Get-ScubaGearRestEndpoint {
+    <#
+    .SYNOPSIS
+        Looks up the REST endpoint path for a ScubaGear provider REST helper function
+        from the ScubaGearRestApiInventory.json catalog.
+
+    .DESCRIPTION
+        Centralizes the REST endpoint paths used by the non-Graph provider REST helpers
+        (EXO/SecuritySuite excluded - their endpoint is resolved dynamically per-tenant,
+        not a fixed catalog path) so each path is defined in exactly one place, the same
+        way ScubaGearApiCatalog.json centralizes Graph resource paths for Invoke-GraphDirectly.
+
+    .PARAMETER FunctionName
+        The REST helper function name, matching the catalog's functionName field
+        (e.g. "Get-SPOTenantRest").
+
+    .PARAMETER PathParameters
+        Optional hashtable of {placeholder} substitutions in the endpoint path,
+        e.g. @{ TenantId = $TenantId }.
+
+    .EXAMPLE
+        Get-ScubaGearRestEndpoint -FunctionName 'Get-SPOTenantRest'
+
+    .EXAMPLE
+        Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformTenantIsolationRest' -PathParameters @{ TenantId = $TenantId }
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FunctionName,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]$PathParameters
+    )
+
+    [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+    $CatalogPath = "$ResourceRoot\..\..\schemas\ScubaGearRestApiInventory.json"
+    $Catalog = Get-Content -Path $CatalogPath -Raw | ConvertFrom-Json
+
+    $Entry = $Catalog | Where-Object { $_.functionName -eq $FunctionName }
+    if (-not $Entry) {
+        throw "No REST API inventory entry found for function '$FunctionName' in $CatalogPath"
+    }
+
+    $EndpointPath = $Entry.endpointPath
+    if ([string]::IsNullOrWhiteSpace($EndpointPath)) {
+        throw "Function '$FunctionName' has no fixed endpointPath in the REST API inventory."
+    }
+
+    if ($PathParameters) {
+        foreach ($Key in $PathParameters.Keys) {
+            $EndpointPath = $EndpointPath -replace "\{$Key\}", $PathParameters[$Key]
+        }
+    }
+
+    return $EndpointPath
+}
+
+Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions, Get-ScubaGearRestEndpoint
