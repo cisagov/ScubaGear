@@ -132,7 +132,9 @@ function Get-ScubaRequiredModuleList {
         }
     }
 
-    return @($requiredModules)
+    # The unary comma prevents PowerShell from unwrapping a single-element array back to a
+    # scalar when it is enumerated onto the pipeline as the function's return value.
+    return ,@($requiredModules)
 }
 
 function New-ScubaDependencyStatus {
@@ -450,6 +452,101 @@ function Get-ScubaOpaDependencyStatus {
     return $status
 }
 
+function Install-MsalForScuBA {
+    <#
+    .SYNOPSIS
+        Downloads and verifies the pinned MSAL assemblies used by ScubaGear.
+    .DESCRIPTION
+        Fetches the signed Microsoft.Identity.Client dependency closure pinned in
+        RequiredVersions.ps1 from NuGet and caches it under ~/.scubagear/MSAL/<version>/net462
+        (or the path in $env:ScubaGearMsalPath). Each assembly is validated by SHA-256 and
+        Authenticode signer. This mirrors Install-OPAforSCuBA for the OPA executable.
+    .PARAMETER LibraryPath
+        Optional override for the cache folder. Defaults to the ScubaGear MSAL cache.
+    .PARAMETER Force
+        Re-download even if a valid cached copy already exists.
+    .EXAMPLE
+        Install-MsalForScuBA
+    .FUNCTIONALITY
+        Public
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$LibraryPath,
+        [Parameter(Mandatory = $false)]
+        [switch]$Force
+    )
+
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Install-ScubaMsalDependency -Force
+    $InstallParams = @{}
+    if ($LibraryPath) { $InstallParams.LibraryPath = $LibraryPath }
+    if ($Force) { $InstallParams.Force = $true }
+    $ResolvedPath = Install-ScubaMsalDependency @InstallParams
+    Write-Information -MessageData "MSAL dependencies ready at ${ResolvedPath}" -InformationAction Continue
+}
+
+function Get-ScubaMsalDependencyStatus {
+    <#
+    .SYNOPSIS
+        Returns the dependency status of the cached MSAL assemblies.
+    .DESCRIPTION
+        Mirrors Get-ScubaOpaDependencyStatus: checks whether the pinned MSAL assemblies exist in
+        the ScubaGear cache and validates them against the manifest in RequiredVersions.ps1.
+    .OUTPUTS
+        PSCustomObject
+    .NOTES
+        Internal helper used by Get-ScubaGearDependencyStatus.
+    #>
+    [CmdletBinding()]
+    param()
+
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Get-ScubaMsalManifest, Get-ScubaMsalLibraryPath, Test-ScubaMsalLibrary -Force
+
+    $Manifest    = Get-ScubaMsalManifest
+    $LibraryPath = Get-ScubaMsalLibraryPath -Version $Manifest.Version
+
+    $status = New-ScubaDependencyStatus -ModuleName 'MSAL' `
+        -MinimumVersion $Manifest.Version `
+        -MaximumVersion $Manifest.Version `
+        -AdditionalProperties ([ordered]@{
+            InstallPath = $LibraryPath
+            FileCount   = $Manifest.Files.Count
+        })
+
+    $AnyMissing = $false
+    foreach ($File in $Manifest.Files) {
+        if (-not (Test-Path -Path (Join-Path $LibraryPath $File.File) -PathType Leaf)) {
+            $AnyMissing = $true
+            break
+        }
+    }
+
+    if ($AnyMissing) {
+        # Nothing (or only some) cached yet - report as needing install.
+        return $status
+    }
+
+    if (Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest) {
+        $status.Installed            = $true
+        $status.VersionCount         = 1
+        $status.InstalledVersions    = @($Manifest.Version)
+        $status.VersionsInRange      = @($Manifest.Version)
+        $status.HighestVersion       = $Manifest.Version
+        $status.BestVersionToKeep    = $Manifest.Version
+        $status.HighestVersionStatus = 'OK'
+        $status.Action               = 'None'
+    }
+    else {
+        # Present but failing hash/signature validation.
+        $status.Installed            = $true
+        $status.HighestVersionStatus = 'MISMATCH'
+        $status.Action               = 'Update'
+    }
+
+    return $status
+}
+
 function Get-ScubaGearModuleStatus {
     <#
     .SYNOPSIS
@@ -692,7 +789,9 @@ function Get-ScubaGearDependencyStatus {
         }
     }
 
-    return $statuses
+    # The unary comma prevents PowerShell from unwrapping a single-element array back to a
+    # scalar when it is enumerated onto the pipeline as the function's return value.
+    return ,$statuses
 }
 
 function Install-ScubaModule {
@@ -834,6 +933,8 @@ function Install-ScubaDependencies {
         Do not automatically trust the PSGallery repository for module installation.
     .PARAMETER $NoOPA
         Do not download OPA
+    .PARAMETER $NoMSAL
+        Do not download the MSAL assemblies
     .PARAMETER $ExpectedVersion
         The version of OPA Rego to be downloaded, must be in "x.x.x" format.
     .PARAMETER $OperatingSystem
@@ -868,6 +969,9 @@ function Install-ScubaDependencies {
         [Parameter(Mandatory = $false)]
         [switch]
         $NoOPA,
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $NoMSAL,
         [Parameter(Mandatory = $false)]
         [Alias('version')]
         [string]
@@ -1022,6 +1126,18 @@ function Install-ScubaDependencies {
     else {
         try {
             Install-OPAforSCuBA -OPAExe $OPAExe -ExpectedVersion $ExpectedVersion -OperatingSystem $OperatingSystem -ScubaParentDirectory $ScubaParentDirectory
+        }
+        catch {
+            $Error[0] | Format-List -Property * -Force | Out-Host
+        }
+    }
+
+    if ($NoMSAL -eq $true) {
+        Write-Information -MessageData "Skipping Download for MSAL.`n"
+    }
+    else {
+        try {
+            Install-MsalForScuBA
         }
         catch {
             $Error[0] | Format-List -Property * -Force | Out-Host
@@ -2443,6 +2559,17 @@ function Reset-ScubaGearDependencies {
             $result.OpaUpToDate = $opaInfo
         }
 
+        # Analyze MSAL assemblies (downloaded into ~/.scubagear/MSAL like OPA).
+        try {
+            $msalStatus = Get-ScubaMsalDependencyStatus
+            if ($msalStatus.Action -ne 'None') {
+                $result.Warnings += "MSAL $($msalStatus.MinimumVersion) is $($msalStatus.HighestVersionStatus) at $($msalStatus.InstallPath). Run 'Install-MsalForScuBA' (or 'Install-ScubaDependencies')."
+            }
+        }
+        catch {
+            $result.Warnings += "Could not determine MSAL dependency status: $($_.Exception.Message)"
+        }
+
         # Calculate totals
         $opaActionNeeded  = ($null -ne $result.OpaToInstall) -or ($null -ne $result.OpaToUpdate)
         $result.ActionsNeeded = $result.ModulesToInstall.Count + $result.ModulesToReinstall.Count + $result.ModulesToUpdate.Count + $result.ModulesToCleanup.Count + [int]$opaActionNeeded
@@ -2875,6 +3002,7 @@ Export-ModuleMember -Function @(
     'Copy-SCuBABaselineDocument',
     'Get-ExeHash',
     'Install-OPAforSCuBA',
+    'Install-MsalForScuBA',
     'Install-ScubaDependencies',
     'Get-ScubaRequiredModuleList',
     'Get-ScubaGearDependencyStatus',
