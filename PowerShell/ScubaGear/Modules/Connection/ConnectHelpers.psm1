@@ -2,7 +2,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
 if (-not $Global:ScubaGearState) {
-    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null }
+    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; MsalResolverRegistered = $false }
 }
 
 function Connect-GraphHelper {
@@ -506,8 +506,44 @@ function Initialize-Msal {
         }
     }
 
+    # A compiled AssemblyResolve handler provides runtime binding redirects (MSAL 4.89 requests
+    # e.g. System.Memory 4.0.1.1 but the package ships 4.0.1.2). It is compiled rather than a
+    # PowerShell scriptblock so executing it cannot itself trigger assembly loads and recurse.
+    # Scoped to the known MSAL closure so it never affects unrelated resolution.
+    if (-not ('ScubaGear.MsalAssemblyResolver' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+namespace ScubaGear {
+    public static class MsalAssemblyResolver {
+        private static HashSet<string> _known;
+        private static bool _registered;
+        public static void Register(string[] names) {
+            _known = new HashSet<string>(names, StringComparer.OrdinalIgnoreCase);
+            if (_registered) { return; }
+            _registered = true;
+            AppDomain.CurrentDomain.AssemblyResolve += delegate(object sender, ResolveEventArgs e) {
+                string simple = new AssemblyName(e.Name).Name;
+                if (_known == null || !_known.Contains(simple)) { return null; }
+                foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies()) {
+                    if (a.GetName().Name == simple) { return a; }
+                }
+                return null;
+            };
+        }
+    }
+}
+'@
+    }
+    [ScubaGear.MsalAssemblyResolver]::Register([string[]]($Manifest.Files | ForEach-Object { [System.IO.Path]::GetFileNameWithoutExtension($_.File) }))
+
+    # PowerShell 7 (.NET) already ships the System.*/Bcl closure; loading the net462 copies
+    # collides with the runtime, so only load the MSAL assemblies there.
+    $LoadMsalOnly = $PSVersionTable.PSEdition -eq 'Core'
     foreach ($AssemblyFile in $Manifest.LoadOrder) {
         $AssemblyName = [System.IO.Path]::GetFileNameWithoutExtension($AssemblyFile)
+        if ($LoadMsalOnly -and $AssemblyName -notlike 'Microsoft.Identity*') { continue }
         $IsLoaded = [AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
             $_.GetName().Name -eq $AssemblyName
         }
