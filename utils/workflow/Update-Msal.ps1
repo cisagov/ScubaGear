@@ -1,10 +1,10 @@
 #Requires -Version 5.1
 
-$script:MsalPackageIds = @(
-    'Microsoft.Identity.Client'
-)
+# Tooling used by CI to validate and bump the pinned MSAL dependency closure that ScubaGear
+# downloads at runtime. The pin lives in PowerShell/ScubaGear/RequiredVersions.ps1 ($MsalDependency);
+# the assemblies are no longer bundled in the repo.
 
-function Get-MsalDependencyPaths {
+function Get-MsalManifestPath {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -12,33 +12,37 @@ function Get-MsalDependencyPaths {
     )
 
     $resolvedRepoRoot = (Resolve-Path -Path $RepoRoot -ErrorAction Stop).Path
-    $moduleRoot = Join-Path $resolvedRepoRoot 'PowerShell/ScubaGear'
-    @{
-        ModuleRoot = $moduleRoot
-        PackagesConfig = Join-Path $moduleRoot 'dependencies/packages.config'
-        LockFile = Join-Path $moduleRoot 'dependencies/msal-lock.json'
-        LibRoot = Join-Path $moduleRoot 'lib/net462'
+    Join-Path $resolvedRepoRoot 'PowerShell/ScubaGear/RequiredVersions.ps1'
+}
+
+function Get-MsalManifest {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepoRoot
+    )
+
+    $ManifestPath = Get-MsalManifestPath -RepoRoot $RepoRoot
+    if (-not (Test-Path -Path $ManifestPath -PathType Leaf)) {
+        throw "RequiredVersions.ps1 was not found: $ManifestPath"
     }
+
+    $MsalDependency = $null
+    . $ManifestPath
+    if (-not $MsalDependency) {
+        throw 'The MSAL dependency manifest ($MsalDependency) is not defined in RequiredVersions.ps1.'
+    }
+    $MsalDependency
 }
 
 function Get-CurrentMsalVersion {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$PackagesConfig
+        [string]$RepoRoot
     )
 
-    [xml]$config = Get-Content -Path $PackagesConfig -Raw
-    $versions = @($config.packages.package |
-        Where-Object { $_.id -in $script:MsalPackageIds } |
-        ForEach-Object { $_.version } |
-        Select-Object -Unique)
-
-    if ($versions.Count -ne 1) {
-        throw 'Microsoft.Identity.Client version could not be determined from packages.config.'
-    }
-
-    $versions[0]
+    (Get-MsalManifest -RepoRoot $RepoRoot).Version
 }
 
 function Get-AvailableMsalVersions {
@@ -58,8 +62,7 @@ function Confirm-MsalUpdateRequirements {
         [string]$RepoRoot
     )
 
-    $paths = Get-MsalDependencyPaths -RepoRoot $RepoRoot
-    $currentVersion = Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig
+    $currentVersion = Get-CurrentMsalVersion -RepoRoot $RepoRoot
 
     try {
         $availableVersions = @(Get-AvailableMsalVersions)
@@ -80,7 +83,7 @@ function Confirm-MsalUpdateRequirements {
             CurrentVersion = $currentVersion
             LatestVersion = $null
             UpdateRequired = $false
-            Summary = 'No stable version is available for both MSAL packages.'
+            Summary = 'No stable Microsoft.Identity.Client version is available.'
         }
     }
 
@@ -100,8 +103,201 @@ function Confirm-MsalUpdateRequirements {
     }
 }
 
-function Update-MsalDependencyVersion {
+function Assert-MsalAuthenticodeSignature {
     [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FilePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$SignerOrganization
+    )
+
+    $signature = Get-AuthenticodeSignature -FilePath $FilePath
+    if ($signature.Status -ne 'Valid') {
+        throw "Invalid Authenticode signature for ${FilePath}: $($signature.Status)"
+    }
+    if (-not $signature.SignerCertificate -or $signature.SignerCertificate.Subject -notmatch [regex]::Escape($SignerOrganization)) {
+        throw "Unexpected Authenticode signer for ${FilePath}."
+    }
+
+    $signature
+}
+
+function Get-MsalPackagePayload {
+    <#
+        Downloads a pinned package directly from the NuGet flat container, verifies its SHA-256,
+        and extracts the manifest-declared assembly to a destination file. No nuget.exe required.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Package,
+
+        [Parameter(Mandatory = $true)]
+        [string]$WorkRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$DestinationDirectory
+    )
+
+    if (-not ('System.IO.Compression.ZipFile' -as [type])) {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+    }
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    }
+    catch {
+        Write-Verbose "Unable to adjust TLS protocol: $($_.Exception.Message)"
+    }
+
+    $idLower = $Package.Id.ToLowerInvariant()
+    $uri = "https://api.nuget.org/v3-flatcontainer/$idLower/$($Package.Version)/$idLower.$($Package.Version).nupkg"
+    $nupkgPath = Join-Path $WorkRoot "$($Package.Id).$($Package.Version).nupkg"
+
+    $previousProgress = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
+    try {
+        Invoke-WebRequest -Uri $uri -OutFile $nupkgPath -UseBasicParsing -ErrorAction Stop
+    }
+    finally {
+        $ProgressPreference = $previousProgress
+    }
+
+    $nupkgHash = (Get-FileHash -Path $nupkgPath -Algorithm SHA256).Hash
+    if ($nupkgHash -ne $Package.Sha256) {
+        throw "MSAL package failed SHA-256 validation: $($Package.Id) $($Package.Version)"
+    }
+
+    $destination = Join-Path $DestinationDirectory $Package.TargetDll
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($nupkgPath)
+    try {
+        $entry = $archive.Entries | Where-Object { $_.FullName -eq $Package.LibPath } | Select-Object -First 1
+        if (-not $entry) {
+            throw "Assembly '$($Package.LibPath)' was not found in package $($Package.Id) $($Package.Version)."
+        }
+        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $destination, $true)
+    }
+    finally {
+        $archive.Dispose()
+    }
+
+    [pscustomobject]@{
+        NupkgPath = $nupkgPath
+        NupkgSha256 = $nupkgHash
+        AssemblyPath = $destination
+    }
+}
+
+function Test-MsalDependencyIntegrity {
+    <#
+        Validates that the pinned manifest is internally consistent and reproducible: every pinned
+        package downloads with the expected SHA-256, extracts to the expected assembly, and that
+        assembly matches the expected SHA-256, managed version, and Microsoft Authenticode signer.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RepoRoot
+    )
+
+    $manifest = Get-MsalManifest -RepoRoot $RepoRoot
+    $signerOrg = $manifest.SignerOrganization
+
+    $filesByName = @{}
+    foreach ($file in $manifest.Files) {
+        $filesByName[$file.File] = $file
+    }
+
+    $workRoot = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-verify-$([guid]::NewGuid().ToString('N'))"
+    $extractRoot = Join-Path $workRoot 'lib'
+    New-Item -Path $extractRoot -ItemType Directory -Force | Out-Null
+    try {
+        foreach ($package in $manifest.Packages) {
+            $payload = Get-MsalPackagePayload -Package $package -WorkRoot $workRoot -DestinationDirectory $extractRoot
+
+            $expected = $filesByName[$package.TargetDll]
+            if (-not $expected) {
+                throw "Manifest is missing a Files entry for $($package.TargetDll)."
+            }
+
+            $actualHash = (Get-FileHash -Path $payload.AssemblyPath -Algorithm SHA256).Hash
+            if ($actualHash -ne $expected.Sha256) {
+                throw "SHA-256 mismatch for $($package.TargetDll)."
+            }
+
+            $actualVersion = [Reflection.AssemblyName]::GetAssemblyName($payload.AssemblyPath).Version.ToString()
+            if ($actualVersion -ne $expected.AssemblyVersion) {
+                throw "Assembly version mismatch for $($package.TargetDll): expected $($expected.AssemblyVersion), found $actualVersion."
+            }
+
+            $null = Assert-MsalAuthenticodeSignature -FilePath $payload.AssemblyPath -SignerOrganization $signerOrg
+        }
+
+        $manifestMsal = @($manifest.Files | Where-Object { $_.File -eq 'Microsoft.Identity.Client.dll' } | ForEach-Object { $_.AssemblyVersion })
+        if ($manifestMsal.Count -ne 1 -or $manifestMsal[0] -ne "$($manifest.Version).0") {
+            throw 'MSAL assembly version is not aligned with the manifest version.'
+        }
+    }
+    finally {
+        Remove-Item -Path $workRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    [pscustomobject]@{
+        State = 'Valid'
+        MsalVersion = $manifest.Version
+        FileCount = $manifest.Files.Count
+    }
+}
+
+function Format-MsalManifestBlock {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Version,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IEnumerable]$Packages,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IEnumerable]$Files
+    )
+
+    $sb = [System.Text.StringBuilder]::new()
+    [void]$sb.AppendLine('# Pinned MSAL (Microsoft.Identity.Client) dependency closure. These signed assemblies are not')
+    [void]$sb.AppendLine('# bundled in the repo; they are downloaded on demand from NuGet into')
+    [void]$sb.AppendLine('# ~/.scubagear/MSAL/<Version>/net462 and verified against the hashes and signer below.')
+    [void]$sb.AppendLine('# The Update-Msal workflow rewrites this block when a new version is approved.')
+    [void]$sb.AppendLine("[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MsalDependency')]")
+    [void]$sb.AppendLine('$MsalDependency = @{')
+    [void]$sb.AppendLine("    Version = '$Version'")
+    [void]$sb.AppendLine("    SignerOrganization = 'O=Microsoft Corporation'")
+    [void]$sb.AppendLine('    Packages = @(')
+    foreach ($p in $Packages) {
+        [void]$sb.AppendLine("        @{ Id = '$($p.Id)'; Version = '$($p.Version)'; Sha256 = '$($p.Sha256)'; LibPath = '$($p.LibPath)'; TargetDll = '$($p.TargetDll)' }")
+    }
+    [void]$sb.AppendLine('    )')
+    [void]$sb.AppendLine('    Files = @(')
+    foreach ($f in $Files) {
+        [void]$sb.AppendLine("        @{ File = '$($f.File)'; Sha256 = '$($f.Sha256)'; AssemblyVersion = '$($f.AssemblyVersion)' }")
+    }
+    [void]$sb.AppendLine('    )')
+    [void]$sb.AppendLine('    LoadOrder = @(')
+    [void]$sb.AppendLine("        'System.Runtime.CompilerServices.Unsafe.dll'")
+    [void]$sb.AppendLine("        'System.Diagnostics.DiagnosticSource.dll'")
+    [void]$sb.AppendLine("        'Microsoft.IdentityModel.Abstractions.dll'")
+    [void]$sb.AppendLine("        'Microsoft.Identity.Client.dll'")
+    [void]$sb.AppendLine('    )')
+    [void]$sb.AppendLine('}')
+    $sb.ToString()
+}
+
+function Update-MsalDependencyVersion {
+    <#
+        Resolves the dependency closure for a new MSAL version with nuget.exe, computes the hashes
+        and assembly versions, and rewrites the $MsalDependency block in RequiredVersions.ps1.
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory = $true)]
         [string]$RepoRoot,
@@ -115,227 +311,97 @@ function Update-MsalDependencyVersion {
 
     $availableVersions = @(Get-AvailableMsalVersions)
     if ($Version -notin $availableVersions) {
-        throw "MSAL $Version is not a stable version shared by both required packages."
+        throw "MSAL $Version is not a stable published version."
     }
 
-    $paths = Get-MsalDependencyPaths -RepoRoot $RepoRoot
-    $originalConfig = Get-Content -Path $paths.PackagesConfig -Raw
-    $resolveRoot = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-update-$([guid]::NewGuid().ToString('N'))"
+    # Same net-target preference the previous bundling logic used.
+    $libPreference = @{
+        'Microsoft.Identity.Client'              = @('lib/net462')
+        'Microsoft.IdentityModel.Abstractions'   = @('lib/net462', 'lib/netstandard2.0')
+        'System.Diagnostics.DiagnosticSource'    = @('lib/net461', 'lib/netstandard2.0')
+        'System.Runtime.CompilerServices.Unsafe' = @('lib/net461', 'lib/netstandard2.0')
+        'System.ValueTuple'                      = @('lib/net47', 'lib/netstandard2.0')
+    }
 
+    $resolveRoot = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-resolve-$([guid]::NewGuid().ToString('N'))"
+    New-Item -Path $resolveRoot -ItemType Directory -Force | Out-Null
     try {
-        New-Item -Path $resolveRoot -ItemType Directory -Force | Out-Null
-        & $NuGetPath install Microsoft.Identity.Client -Version $Version `
-            -OutputDirectory $resolveRoot -NonInteractive -DirectDownload
+        & $NuGetPath install Microsoft.Identity.Client -Version $Version -OutputDirectory $resolveRoot -NonInteractive -DirectDownload
         if ($LASTEXITCODE -ne 0) {
             throw "NuGet dependency resolution failed with exit code $LASTEXITCODE."
         }
 
-        $resolvedPackages = foreach ($nuspec in Get-ChildItem -Path $resolveRoot -Recurse -Filter '*.nuspec' -File) {
+        $packages = @()
+        $files = @()
+        foreach ($nuspec in Get-ChildItem -Path $resolveRoot -Recurse -Filter '*.nuspec' -File) {
             [xml]$metadata = Get-Content -Path $nuspec.FullName -Raw
-            [pscustomobject]@{
-                Id = [string]$metadata.package.metadata.id
-                Version = [string]$metadata.package.metadata.version
+            $id = [string]$metadata.package.metadata.id
+            $ver = [string]$metadata.package.metadata.version
+            if (-not $libPreference.ContainsKey($id)) {
+                continue
+            }
+
+            $packageDir = $nuspec.Directory.FullName
+            $libPath = $null
+            $assemblyPath = $null
+            foreach ($candidate in $libPreference[$id]) {
+                $candidatePath = Join-Path $packageDir "$candidate/$id.dll"
+                if (Test-Path -Path $candidatePath -PathType Leaf) {
+                    $libPath = "$candidate/$id.dll"
+                    $assemblyPath = $candidatePath
+                    break
+                }
+            }
+            if (-not $assemblyPath) {
+                throw "Could not locate a compatible assembly for $id $ver."
+            }
+
+            $nupkgPath = Join-Path $packageDir "$id.$ver.nupkg"
+            if (-not (Test-Path -Path $nupkgPath -PathType Leaf)) {
+                throw "Downloaded package archive was not found for $id $ver."
+            }
+
+            & $NuGetPath verify -Signatures $nupkgPath
+            if ($LASTEXITCODE -ne 0) {
+                throw "NuGet signature verification failed for $id $ver."
+            }
+            $null = Assert-MsalAuthenticodeSignature -FilePath $assemblyPath -SignerOrganization 'O=Microsoft Corporation'
+
+            $packages += [ordered]@{
+                Id = $id
+                Version = $ver
+                Sha256 = (Get-FileHash -Path $nupkgPath -Algorithm SHA256).Hash
+                LibPath = $libPath
+                TargetDll = "$id.dll"
+            }
+            $files += [ordered]@{
+                File = "$id.dll"
+                Sha256 = (Get-FileHash -Path $assemblyPath -Algorithm SHA256).Hash
+                AssemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($assemblyPath).Version.ToString()
             }
         }
-        $resolvedPackages = @($resolvedPackages |
-            Where-Object { $_.Id -and $_.Version } |
-            Sort-Object Id -Unique)
-        if (($resolvedPackages | Where-Object Id -eq 'Microsoft.Identity.Client').Version -ne $Version) {
+
+        if (-not ($packages | Where-Object { $_.Id -eq 'Microsoft.Identity.Client' -and $_.Version -eq $Version })) {
             throw 'NuGet did not resolve the requested Microsoft.Identity.Client version.'
         }
 
-        $document = New-Object System.Xml.XmlDocument
-        $declaration = $document.CreateXmlDeclaration('1.0', 'utf-8', $null)
-        [void]$document.AppendChild($declaration)
-        $packagesElement = $document.CreateElement('packages')
-        [void]$document.AppendChild($packagesElement)
-        foreach ($package in $resolvedPackages) {
-            $packageElement = $document.CreateElement('package')
-            $packageElement.SetAttribute('id', $package.Id)
-            $packageElement.SetAttribute('version', $package.Version)
-            $packageElement.SetAttribute('targetFramework', 'net462')
-            [void]$packagesElement.AppendChild($packageElement)
-        }
-        $settings = New-Object System.Xml.XmlWriterSettings
-        $settings.Indent = $true
-        $settings.Encoding = New-Object System.Text.UTF8Encoding($false)
-        $writer = [System.Xml.XmlWriter]::Create($paths.PackagesConfig, $settings)
-        try {
-            $document.Save($writer)
-        }
-        finally {
-            $writer.Dispose()
+        $manifestText = Format-MsalManifestBlock -Version $Version -Packages $packages -Files $files
+        $manifestPath = Get-MsalManifestPath -RepoRoot $RepoRoot
+        if ($PSCmdlet.ShouldProcess($manifestPath, 'Rewrite $MsalDependency manifest')) {
+            $content = Get-Content -Path $manifestPath -Raw
+            $pattern = '(?ms)^# Pinned MSAL .*?\r?\n\$MsalDependency = @\{.*?\r?\n\}\r?\n?'
+            if ($content -notmatch $pattern) {
+                throw 'Could not locate the $MsalDependency block in RequiredVersions.ps1.'
+            }
+            # Escape $ so the replacement text is treated literally by [regex]::Replace.
+            $replacement = $manifestText -replace '\$', '$$$$'
+            $updated = [regex]::Replace($content, $pattern, $replacement)
+            Set-Content -Path $manifestPath -Value $updated -Encoding UTF8 -NoNewline
         }
 
-        Restore-MsalDependencies -RepoRoot $RepoRoot -NuGetPath $NuGetPath
-    }
-    catch {
-        [System.IO.File]::WriteAllText($paths.PackagesConfig, $originalConfig, (New-Object System.Text.UTF8Encoding($false)))
-        throw
+        Test-MsalDependencyIntegrity -RepoRoot $RepoRoot
     }
     finally {
         Remove-Item -Path $resolveRoot -Recurse -Force -ErrorAction SilentlyContinue
-    }
-}
-
-function Assert-MsalAuthenticodeSignature {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [System.IO.FileInfo]$File
-    )
-
-    $signature = Get-AuthenticodeSignature -FilePath $File.FullName
-    if ($signature.Status -ne 'Valid') {
-        throw "Invalid Authenticode signature for $($File.FullName): $($signature.Status)"
-    }
-    if (-not $signature.SignerCertificate -or $signature.SignerCertificate.Subject -notmatch '(^|,\s*)O=Microsoft Corporation(,|$)') {
-        throw "Unexpected Authenticode signer for $($File.FullName)."
-    }
-
-    $signature
-}
-
-function Restore-MsalDependencies {
-    [CmdletBinding(SupportsShouldProcess)]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$RepoRoot,
-
-        [string]$NuGetPath = 'nuget.exe'
-    )
-
-    $paths = Get-MsalDependencyPaths -RepoRoot $RepoRoot
-    $restoreRoot = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-$([guid]::NewGuid().ToString('N'))"
-
-    try {
-        New-Item -Path $restoreRoot -ItemType Directory -Force | Out-Null
-        & $NuGetPath restore $paths.PackagesConfig -PackagesDirectory $restoreRoot -NonInteractive -DirectDownload
-        if ($LASTEXITCODE -ne 0) {
-            throw "NuGet restore failed with exit code $LASTEXITCODE."
-        }
-
-        $packages = @(Get-ChildItem -Path $restoreRoot -Recurse -Filter '*.nupkg' -File)
-        foreach ($package in $packages) {
-            & $NuGetPath verify -Signatures $package.FullName
-            if ($LASTEXITCODE -ne 0) {
-                throw "NuGet package signature verification failed for $($package.Name) with exit code $LASTEXITCODE."
-            }
-        }
-
-        [xml]$packageConfig = Get-Content -Path $paths.PackagesConfig -Raw
-        $packageDirectories = @{}
-        foreach ($packageEntry in $packageConfig.packages.package) {
-            $packageDirectories[$packageEntry.id] = "$($packageEntry.id).$($packageEntry.version)"
-        }
-        $managedFiles = @(
-            @{ PackageId = 'Microsoft.Identity.Client'; Source = 'lib/net462/Microsoft.Identity.Client.dll' },
-            @{ PackageId = 'Microsoft.IdentityModel.Abstractions'; Source = 'lib/net462/Microsoft.IdentityModel.Abstractions.dll' },
-            @{ PackageId = 'System.Diagnostics.DiagnosticSource'; Source = 'lib/net461/System.Diagnostics.DiagnosticSource.dll' },
-            @{ PackageId = 'System.Runtime.CompilerServices.Unsafe'; Source = 'lib/net461/System.Runtime.CompilerServices.Unsafe.dll' },
-            @{ PackageId = 'System.ValueTuple'; Source = 'lib/net47/System.ValueTuple.dll' }
-        )
-
-        if ($PSCmdlet.ShouldProcess($paths.ModuleRoot, 'Replace bundled MSAL dependency files')) {
-            Remove-Item -Path $paths.LibRoot -Recurse -Force -ErrorAction SilentlyContinue
-            New-Item -Path $paths.LibRoot -ItemType Directory -Force | Out-Null
-
-            foreach ($entry in $managedFiles) {
-                $source = Join-Path (Join-Path $restoreRoot $packageDirectories[$entry.PackageId]) $entry.Source
-                if (-not (Test-Path -Path $source -PathType Leaf)) {
-                    throw "Expected restored dependency was not found: $source"
-                }
-                Copy-Item -Path $source -Destination $paths.LibRoot -Force
-            }
-        }
-
-        $binaryFiles = @(
-            Get-ChildItem -Path $paths.LibRoot -Recurse -File |
-                Where-Object { $_.Extension -in '.dll', '.exe' }
-        )
-        $fileRecords = foreach ($file in $binaryFiles) {
-            $signature = Assert-MsalAuthenticodeSignature -File $file
-            $assemblyVersion = $null
-            try {
-                $assemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($file.FullName).Version.ToString()
-            }
-            catch {
-                # Native binaries do not have a managed assembly identity.
-                $null = $_
-            }
-            [ordered]@{
-                path = $file.FullName.Substring($paths.ModuleRoot.Length + 1).Replace('\', '/')
-                sha256 = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash
-                assemblyVersion = $assemblyVersion
-                signerSubject = $signature.SignerCertificate.Subject
-            }
-        }
-
-        $packageRecords = foreach ($package in $packages | Sort-Object Name) {
-            [ordered]@{
-                file = $package.Name
-                sha256 = (Get-FileHash -Path $package.FullName -Algorithm SHA256).Hash
-            }
-        }
-        $lock = [ordered]@{
-            msalVersion = Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig
-            packages = @($packageRecords)
-            files = @($fileRecords | Sort-Object path)
-        }
-        $lock | ConvertTo-Json -Depth 6 | Set-Content -Path $paths.LockFile -Encoding UTF8
-        $lock
-    }
-    finally {
-        Remove-Item -Path $restoreRoot -Recurse -Force -ErrorAction SilentlyContinue
-    }
-}
-
-function Test-MsalDependencyIntegrity {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$RepoRoot
-    )
-
-    $paths = Get-MsalDependencyPaths -RepoRoot $RepoRoot
-    if (-not (Test-Path -Path $paths.LockFile -PathType Leaf)) {
-        throw "MSAL lock file was not found: $($paths.LockFile)"
-    }
-
-    $lock = Get-Content -Path $paths.LockFile -Raw | ConvertFrom-Json
-    $expectedPaths = @($lock.files.path | Sort-Object)
-    $actualFiles = @(
-        Get-ChildItem -Path $paths.LibRoot -Recurse -File -ErrorAction Stop |
-            Where-Object { $_.Extension -in '.dll', '.exe' }
-    )
-    $actualPaths = @($actualFiles | ForEach-Object {
-        $_.FullName.Substring($paths.ModuleRoot.Length + 1).Replace('\', '/')
-    } | Sort-Object)
-
-    if (Compare-Object -ReferenceObject $expectedPaths -DifferenceObject $actualPaths) {
-        throw 'The bundled MSAL file set does not match msal-lock.json.'
-    }
-
-    foreach ($record in $lock.files) {
-        $file = Get-Item -Path (Join-Path $paths.ModuleRoot $record.path)
-        $actualHash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash
-        if ($actualHash -ne $record.sha256) {
-            throw "SHA-256 mismatch for $($record.path)."
-        }
-        $null = Assert-MsalAuthenticodeSignature -File $file
-    }
-
-    $msalVersions = @($lock.files |
-        Where-Object { $_.path -match 'Microsoft\.Identity\.Client\.dll$' } |
-        ForEach-Object { $_.assemblyVersion } |
-        Select-Object -Unique)
-    if ($msalVersions.Count -ne 1 -or $msalVersions[0] -ne "$($lock.msalVersion).0") {
-        throw 'MSAL assembly version is not aligned with the package lock.'
-    }
-
-    [pscustomobject]@{
-        State = 'Valid'
-        MsalVersion = $lock.msalVersion
-        FileCount = $lock.files.Count
     }
 }

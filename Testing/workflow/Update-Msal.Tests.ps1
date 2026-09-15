@@ -1,44 +1,62 @@
 BeforeAll {
     . (Join-Path $PSScriptRoot '../../utils/workflow/Update-Msal.ps1')
 
-    function New-TestMsalPackagesConfig {
+    function New-TestRequiredVersions {
         param(
             [string]$Root,
             [string]$MsalVersion = '4.82.0'
         )
 
-        $dependencyPath = Join-Path $Root 'PowerShell/ScubaGear/dependencies'
-        New-Item -Path $dependencyPath -ItemType Directory -Force | Out-Null
+        $moduleRoot = Join-Path $Root 'PowerShell/ScubaGear'
+        New-Item -Path $moduleRoot -ItemType Directory -Force | Out-Null
         @"
-<?xml version="1.0" encoding="utf-8"?>
-<packages>
-  <package id="Microsoft.Identity.Client" version="$MsalVersion" targetFramework="net462" />
-</packages>
-"@ | Set-Content -Path (Join-Path $dependencyPath 'packages.config')
+`$ModuleList = @()
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MsalDependency')]
+`$MsalDependency = @{
+    Version = '$MsalVersion'
+    SignerOrganization = 'O=Microsoft Corporation'
+    Packages = @(
+        @{ Id = 'Microsoft.Identity.Client'; Version = '$MsalVersion'; Sha256 = 'AAAA'; LibPath = 'lib/net462/Microsoft.Identity.Client.dll'; TargetDll = 'Microsoft.Identity.Client.dll' }
+    )
+    Files = @(
+        @{ File = 'Microsoft.Identity.Client.dll'; Sha256 = 'BBBB'; AssemblyVersion = '$MsalVersion.0' }
+    )
+    LoadOrder = @(
+        'Microsoft.Identity.Client.dll'
+    )
+}
+"@ | Set-Content -Path (Join-Path $moduleRoot 'RequiredVersions.ps1')
     }
 }
 
 Describe 'MSAL dependency updates' {
     BeforeEach {
-        New-TestMsalPackagesConfig -Root $TestDrive
+        New-TestRequiredVersions -Root $TestDrive
     }
 
     It 'normalizes relative repository paths' {
         Push-Location $TestDrive
         try {
-            $paths = Get-MsalDependencyPaths -RepoRoot '.'
+            $manifestPath = Get-MsalManifestPath -RepoRoot '.'
 
-            [IO.Path]::IsPathRooted($paths.ModuleRoot) | Should -BeTrue
-            $paths.ModuleRoot | Should -Be (Join-Path $TestDrive 'PowerShell/ScubaGear')
+            [IO.Path]::IsPathRooted($manifestPath) | Should -BeTrue
+            $manifestPath | Should -Be (Join-Path $TestDrive 'PowerShell/ScubaGear/RequiredVersions.ps1')
         }
         finally {
             Pop-Location
         }
     }
 
-    It 'returns the aligned current package version' {
-        $paths = Get-MsalDependencyPaths -RepoRoot $TestDrive
-        Get-CurrentMsalVersion -PackagesConfig $paths.PackagesConfig | Should -Be '4.82.0'
+    It 'reads the pinned manifest from RequiredVersions.ps1' {
+        $manifest = Get-MsalManifest -RepoRoot $TestDrive
+
+        $manifest.Version | Should -Be '4.82.0'
+        $manifest.Files.Count | Should -Be 1
+    }
+
+    It 'returns the pinned current version' {
+        Get-CurrentMsalVersion -RepoRoot $TestDrive | Should -Be '4.82.0'
     }
 
     It 'returns only stable versions' {
@@ -49,7 +67,7 @@ Describe 'MSAL dependency updates' {
         @(Get-AvailableMsalVersions) | Should -Be @('4.81.0', '4.82.0', '4.84.0')
     }
 
-    It 'reports an available shared update without applying it' {
+    It 'reports an available update without applying it' {
         Mock Get-AvailableMsalVersions { @('4.82.0', '4.87.0') }
 
         $result = Confirm-MsalUpdateRequirements -RepoRoot $TestDrive
@@ -68,5 +86,20 @@ Describe 'MSAL dependency updates' {
         $result.State | Should -Be 'QueryFailed'
         $result.UpdateRequired | Should -BeFalse
         $result.Summary | Should -Match 'NuGet unavailable'
+    }
+
+    It 'round-trips the manifest block through the formatter and regex replacement' {
+        $manifest = Get-MsalManifest -RepoRoot $TestDrive
+        $block = Format-MsalManifestBlock -Version $manifest.Version -Packages $manifest.Packages -Files $manifest.Files
+        $block | Should -Match "Version = '4.82.0'"
+
+        # The formatter output must parse back to an equivalent manifest.
+        $tmp = Join-Path $TestDrive 'roundtrip.ps1'
+        Set-Content -Path $tmp -Value $block -Encoding UTF8
+
+        $MsalDependency = $null
+        . $tmp
+        $MsalDependency.Version | Should -Be '4.82.0'
+        $MsalDependency.Files.Count | Should -Be 1
     }
 }

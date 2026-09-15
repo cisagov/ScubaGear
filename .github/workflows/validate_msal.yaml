@@ -1,10 +1,9 @@
-name: Validate bundled MSAL dependencies
+name: Validate pinned MSAL dependencies
 
 on:
   pull_request:
     paths:
-      - 'PowerShell/ScubaGear/dependencies/**'
-      - 'PowerShell/ScubaGear/lib/**'
+      - 'PowerShell/ScubaGear/RequiredVersions.ps1'
       - 'PowerShell/ScubaGear/Modules/Connection/**'
       - 'utils/workflow/Update-Msal.ps1'
       - '.github/workflows/validate_msal.yaml'

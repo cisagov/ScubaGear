@@ -2,7 +2,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
 if (-not $Global:ScubaGearState) {
-    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false }
+    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null }
 }
 
 function Connect-GraphHelper {
@@ -211,10 +211,10 @@ function Invoke-ScubaGraphRequest {
     }
 }
 
-function Initialize-Msal {
+function Get-ScubaMsalManifest {
     <#
     .SYNOPSIS
-        Ensures the MSAL assembly is loaded and types are resolvable.
+        Returns the pinned MSAL dependency manifest declared in RequiredVersions.ps1.
     .FUNCTIONALITY
         Internal
     #>
@@ -222,15 +222,180 @@ function Initialize-Msal {
     param()
 
     $ModuleRoot = Resolve-Path (Join-Path $PSScriptRoot '../..')
-    $LockPath = Join-Path $ModuleRoot 'dependencies/msal-lock.json'
-    $LibPath = Join-Path $ModuleRoot 'lib/net462'
-
-    if (-not (Test-Path -Path $LockPath -PathType Leaf)) {
-        throw "MSAL dependency lock was not found: $LockPath"
+    $RequiredVersionsPath = Join-Path $ModuleRoot 'RequiredVersions.ps1'
+    if (-not (Test-Path -Path $RequiredVersionsPath -PathType Leaf)) {
+        throw "RequiredVersions.ps1 was not found: $RequiredVersionsPath"
     }
 
-    $Lock = Get-Content -Path $LockPath -Raw | ConvertFrom-Json
-    $ExpectedAssemblyVersion = [version]"$($Lock.msalVersion).0"
+    # Dot-source in a child scope so only the manifest variable leaks back.
+    $MsalDependency = $null
+    . $RequiredVersionsPath
+    if (-not $MsalDependency) {
+        throw 'The MSAL dependency manifest ($MsalDependency) is not defined in RequiredVersions.ps1.'
+    }
+    return $MsalDependency
+}
+
+function Get-ScubaMsalLibraryPath {
+    <#
+    .SYNOPSIS
+        Resolves the cache folder that holds the MSAL assemblies for a given version.
+        Honors the $env:ScubaGearMsalPath override so air-gapped hosts can pre-stage the files.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Version
+    )
+
+    if ($env:ScubaGearMsalPath) {
+        return $env:ScubaGearMsalPath
+    }
+
+    $HomeDirectory = if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }
+    Join-Path -Path $HomeDirectory -ChildPath ".scubagear/MSAL/$Version/net462"
+}
+
+function Test-ScubaMsalLibrary {
+    <#
+    .SYNOPSIS
+        Verifies every MSAL assembly in the cache matches the manifest hash, signer, and version.
+        Returns $true/$false, or throws when -ThrowOnFail is set.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$LibraryPath,
+
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Manifest,
+
+        [switch]$ThrowOnFail
+    )
+
+    foreach ($Record in $Manifest.Files) {
+        $FilePath = Join-Path $LibraryPath $Record.File
+        if (-not (Test-Path -Path $FilePath -PathType Leaf)) {
+            if ($ThrowOnFail) { throw "MSAL dependency is missing from the cache: $($Record.File)" }
+            return $false
+        }
+        $ActualHash = (Get-FileHash -Path $FilePath -Algorithm SHA256).Hash
+        if ($ActualHash -ne $Record.Sha256) {
+            if ($ThrowOnFail) { throw "MSAL dependency failed SHA-256 validation: $($Record.File)" }
+            return $false
+        }
+        $Signature = Get-AuthenticodeSignature -FilePath $FilePath
+        if ($Signature.Status -ne 'Valid' -or
+            -not $Signature.SignerCertificate -or
+            $Signature.SignerCertificate.Subject -notmatch [regex]::Escape($Manifest.SignerOrganization)) {
+            if ($ThrowOnFail) { throw "MSAL dependency failed Authenticode validation: $($Record.File)" }
+            return $false
+        }
+    }
+    return $true
+}
+
+function Install-ScubaMsalDependency {
+    <#
+    .SYNOPSIS
+        Downloads the pinned MSAL assemblies from NuGet into the ScubaGear cache and verifies them.
+        Each package is fetched directly (flat-container .nupkg), hash-checked, and the target
+        assembly is extracted into the net462 cache folder. No nuget.exe dependency.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$LibraryPath,
+
+        [switch]$Force
+    )
+
+    $Manifest = Get-ScubaMsalManifest
+    if (-not $LibraryPath) {
+        $LibraryPath = Get-ScubaMsalLibraryPath -Version $Manifest.Version
+    }
+
+    if (-not $Force -and (Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest)) {
+        return $LibraryPath
+    }
+
+    if (-not ('System.IO.Compression.ZipFile' -as [type])) {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+    }
+
+    # PowerShell 5.1 defaults to SSL3/TLS1.0; NuGet requires TLS 1.2+.
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    }
+    catch {
+        Write-Verbose "Unable to adjust TLS protocol: $($_.Exception.Message)"
+    }
+
+    New-Item -ItemType Directory -Path $LibraryPath -Force | Out-Null
+    $TempRoot = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-$([guid]::NewGuid().ToString('N'))"
+    New-Item -ItemType Directory -Path $TempRoot -Force | Out-Null
+    try {
+        foreach ($Package in $Manifest.Packages) {
+            $IdLower = $Package.Id.ToLowerInvariant()
+            $Uri = "https://api.nuget.org/v3-flatcontainer/$IdLower/$($Package.Version)/$IdLower.$($Package.Version).nupkg"
+            $NupkgPath = Join-Path $TempRoot "$($Package.Id).$($Package.Version).nupkg"
+
+            $PreviousProgress = $ProgressPreference
+            $ProgressPreference = 'SilentlyContinue'
+            try {
+                Invoke-WebRequest -Uri $Uri -OutFile $NupkgPath -UseBasicParsing -ErrorAction Stop
+            }
+            finally {
+                $ProgressPreference = $PreviousProgress
+            }
+
+            $NupkgHash = (Get-FileHash -Path $NupkgPath -Algorithm SHA256).Hash
+            if ($NupkgHash -ne $Package.Sha256) {
+                throw "MSAL package failed SHA-256 validation: $($Package.Id) $($Package.Version)"
+            }
+
+            $Archive = [System.IO.Compression.ZipFile]::OpenRead($NupkgPath)
+            try {
+                $Entry = $Archive.Entries | Where-Object { $_.FullName -eq $Package.LibPath } | Select-Object -First 1
+                if (-not $Entry) {
+                    throw "Assembly '$($Package.LibPath)' was not found in package $($Package.Id) $($Package.Version)."
+                }
+                $Destination = Join-Path $LibraryPath $Package.TargetDll
+                [System.IO.Compression.ZipFileExtensions]::ExtractToFile($Entry, $Destination, $true)
+            }
+            finally {
+                $Archive.Dispose()
+            }
+        }
+    }
+    finally {
+        Remove-Item -Path $TempRoot -Recurse -Force -ErrorAction SilentlyContinue
+    }
+
+    $null = Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest -ThrowOnFail
+    return $LibraryPath
+}
+
+function Initialize-Msal {
+    <#
+    .SYNOPSIS
+        Ensures the pinned MSAL assemblies are present in the ScubaGear cache and loaded.
+        Downloads and verifies them on first use, then loads them dependency-first.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$LibraryPath
+    )
+
+    $Manifest = Get-ScubaMsalManifest
+    $ExpectedAssemblyVersion = [version]"$($Manifest.Version).0"
     $LoadedMsal = [AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
         $_.GetName().Name -eq 'Microsoft.Identity.Client'
     } | Select-Object -First 1
@@ -238,39 +403,32 @@ function Initialize-Msal {
         throw "Microsoft.Identity.Client $($LoadedMsal.GetName().Version) is already loaded; ScubaGear requires $ExpectedAssemblyVersion. Start a new PowerShell session."
     }
 
-    if (-not $Global:ScubaGearState.MsalValidated) {
-        foreach ($Record in $Lock.files) {
-            $FilePath = Join-Path $ModuleRoot $Record.path
-            if (-not (Test-Path -Path $FilePath -PathType Leaf)) {
-                throw "Bundled MSAL dependency is missing: $($Record.path)"
-            }
-            $ActualHash = (Get-FileHash -Path $FilePath -Algorithm SHA256).Hash
-            if ($ActualHash -ne $Record.sha256) {
-                throw "Bundled MSAL dependency failed SHA-256 validation: $($Record.path)"
-            }
-            $Signature = Get-AuthenticodeSignature -FilePath $FilePath
-            if ($Signature.Status -ne 'Valid' -or
-                -not $Signature.SignerCertificate -or
-                $Signature.SignerCertificate.Subject -notmatch '(^|,\s*)O=Microsoft Corporation(,|$)') {
-                throw "Bundled MSAL dependency failed Authenticode validation: $($Record.path)"
-            }
+    if (-not $LibraryPath) {
+        $LibraryPath = if ($Global:ScubaGearState.MsalLibraryPath) {
+            $Global:ScubaGearState.MsalLibraryPath
         }
-        $Global:ScubaGearState.MsalValidated = $true
+        else {
+            Get-ScubaMsalLibraryPath -Version $Manifest.Version
+        }
     }
 
-    $LoadOrder = @(
-        'System.Runtime.CompilerServices.Unsafe.dll',
-        'System.Diagnostics.DiagnosticSource.dll',
-        'Microsoft.IdentityModel.Abstractions.dll',
-        'Microsoft.Identity.Client.dll'
-    )
-    foreach ($AssemblyFile in $LoadOrder) {
+    if (-not $Global:ScubaGearState.MsalValidated) {
+        if (-not (Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest)) {
+            Write-Information "MSAL dependencies not found or invalid; downloading to $LibraryPath ..." -InformationAction Continue
+            $LibraryPath = Install-ScubaMsalDependency -LibraryPath $LibraryPath
+        }
+        $null = Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest -ThrowOnFail
+        $Global:ScubaGearState.MsalValidated = $true
+        $Global:ScubaGearState.MsalLibraryPath = $LibraryPath
+    }
+
+    foreach ($AssemblyFile in $Manifest.LoadOrder) {
         $AssemblyName = [System.IO.Path]::GetFileNameWithoutExtension($AssemblyFile)
         $IsLoaded = [AppDomain]::CurrentDomain.GetAssemblies() | Where-Object {
             $_.GetName().Name -eq $AssemblyName
         }
         if (-not $IsLoaded) {
-            [void][Reflection.Assembly]::LoadFrom((Join-Path $LibPath $AssemblyFile))
+            [void][Reflection.Assembly]::LoadFrom((Join-Path $LibraryPath $AssemblyFile))
         }
     }
 }
@@ -398,5 +556,9 @@ Export-ModuleMember -Function @(
     'Get-ScubaGraphContext',
     'Initialize-Msal',
     'Get-MsalAccessToken',
-    'Invoke-ScubaGraphRequest'
+    'Invoke-ScubaGraphRequest',
+    'Get-ScubaMsalManifest',
+    'Get-ScubaMsalLibraryPath',
+    'Test-ScubaMsalLibrary',
+    'Install-ScubaMsalDependency'
 )

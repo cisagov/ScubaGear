@@ -1,4 +1,4 @@
-name: Check bundled MSAL dependencies
+name: Check pinned MSAL dependencies
 
 on:
   schedule:
@@ -64,16 +64,16 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git switch -c $branch
-          git add --all --force PowerShell/ScubaGear/dependencies PowerShell/ScubaGear/lib
-          git commit -m "Update bundled MSAL dependencies to $env:LATEST_VERSION"
+          git add --force PowerShell/ScubaGear/RequiredVersions.ps1
+          git commit -m "Update pinned MSAL dependencies to $env:LATEST_VERSION"
           git push origin $branch
 
           $body = @"
-          Updates the signed, bundled MSAL dependency set from $env:CURRENT_VERSION to $env:LATEST_VERSION.
+          Updates the pinned, signed MSAL dependency set from $env:CURRENT_VERSION to $env:LATEST_VERSION.
 
           - NuGet repository signatures verified
           - Authenticode publishers verified
-          - SHA-256 lock manifest regenerated
+          - SHA-256 manifest regenerated in RequiredVersions.ps1
           - Integrity tests passed
 
           This update must not be merged until delegated system-browser and certificate authentication smoke tests pass.
@@ -82,7 +82,7 @@ jobs:
             'pr', 'create',
             '--base', '${{ github.event.repository.default_branch }}',
             '--head', $branch,
-            '--title', "Update bundled MSAL dependencies to $env:LATEST_VERSION",
+            '--title', "Update pinned MSAL dependencies to $env:LATEST_VERSION",
             '--body', $body
           )
           gh @arguments

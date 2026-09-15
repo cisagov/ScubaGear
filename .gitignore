@@ -6,7 +6,6 @@
 
 # msc
 *.xml
-!PowerShell/ScubaGear/dependencies/packages.config
 *.cer
 *.exe
 *.cat
