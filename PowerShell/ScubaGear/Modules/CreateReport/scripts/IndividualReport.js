@@ -10,20 +10,24 @@ window.addEventListener('DOMContentLoaded', () => {
     const securitySuitePartnerDomains = getJsonData('securitysuite-partner-domains-json');
     const securitySuiteAntiPhishPolicies = getJsonData('securitysuite-anti-phish-policies-json');
     const securitySuiteAntiPhishRules = getJsonData('securitysuite-anti-phish-rules-json');
+    const securitySuiteAntiSpamPolicies = getJsonData('securitysuite-anti-spam-policies-json');
+    const securitySuiteAntiSpamRules = getJsonData('securitysuite-anti-spam-rules-json');
     const securitySuiteProtectionPolicyRules = getJsonData('securitysuite-protection-policy-rules-json');
     const securitySuiteAcceptedDomains = getJsonData('securitysuite-accepted-domains-json');
 
     buildExpandableTable(caps, "caps");
     buildExpandableTable(riskyApps, "riskyApps", severityScoreWeights);
     buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs", severityScoreWeights);
-    buildSecuritySuiteConfigTables(
-        securitySuiteSensitiveUsers,
-        securitySuitePartnerDomains,
-        securitySuiteAntiPhishPolicies,
-        securitySuiteAntiPhishRules,
-        securitySuiteProtectionPolicyRules,
-        securitySuiteAcceptedDomains
-    );
+    buildSecuritySuiteConfigTables({
+        sensitiveUsers: securitySuiteSensitiveUsers,
+        partnerDomains: securitySuitePartnerDomains,
+        antiPhishPolicies: securitySuiteAntiPhishPolicies,
+        antiPhishRules: securitySuiteAntiPhishRules,
+        antiSpamPolicies: securitySuiteAntiSpamPolicies,
+        antiSpamRules: securitySuiteAntiSpamRules,
+        protectionPolicyRules: securitySuiteProtectionPolicyRules,
+        acceptedDomains: securitySuiteAcceptedDomains
+    });
 
     colorRows();
     applyScopeAttributes();
