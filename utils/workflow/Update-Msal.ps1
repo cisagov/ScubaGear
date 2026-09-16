@@ -292,17 +292,24 @@ function Format-MsalManifestBlock {
     [void]$sb.AppendLine("[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'MsalDependency')]")
     [void]$sb.AppendLine('$MsalDependency = @{')
     [void]$sb.AppendLine("    Version = '$Version'")
+    [void]$sb.AppendLine('    # Subject substring every bundled assembly''s Authenticode signer must contain.')
     [void]$sb.AppendLine("    SignerOrganization = 'O=Microsoft Corporation'")
+    [void]$sb.AppendLine('    # Full net462 dependency closure. LibPath is the entry inside the .nupkg; TargetDll is the')
+    [void]$sb.AppendLine('    # file name written to the cache; Purpose documents why each assembly is present. Everything')
+    [void]$sb.AppendLine('    # after Microsoft.IdentityModel.Abstractions is pulled in transitively (mostly by System.Text.Json).')
     [void]$sb.AppendLine('    Packages = @(')
     foreach ($p in $Packages) {
-        [void]$sb.AppendLine("        @{ Id = '$($p.Id)'; Version = '$($p.Version)'; Sha256 = '$($p.Sha256)'; LibPath = '$($p.LibPath)'; TargetDll = '$($p.TargetDll)' }")
+        $purpose = Get-MsalPackagePurpose -Id $p.Id
+        [void]$sb.AppendLine("        @{ Id = '$($p.Id)'; Version = '$($p.Version)'; Sha256 = '$($p.Sha256)'; LibPath = '$($p.LibPath)'; TargetDll = '$($p.TargetDll)'; Purpose = '$purpose' }")
     }
     [void]$sb.AppendLine('    )')
+    [void]$sb.AppendLine('    # Expected identity of each extracted assembly (SHA-256 + managed assembly version).')
     [void]$sb.AppendLine('    Files = @(')
     foreach ($f in $Files) {
         [void]$sb.AppendLine("        @{ File = '$($f.File)'; Sha256 = '$($f.Sha256)'; AssemblyVersion = '$($f.AssemblyVersion)' }")
     }
     [void]$sb.AppendLine('    )')
+    [void]$sb.AppendLine('    # Assemblies must be loaded dependency-first (Windows PowerShell only; PowerShell 7 provides System.*).')
     [void]$sb.AppendLine('    LoadOrder = @(')
     foreach ($entry in $LoadOrder) {
         [void]$sb.AppendLine("        '$entry'")
@@ -310,6 +317,29 @@ function Format-MsalManifestBlock {
     [void]$sb.AppendLine('    )')
     [void]$sb.AppendLine('}')
     $sb.ToString()
+}
+
+function Get-MsalPackagePurpose {
+    # Human-readable reason each package is part of the MSAL closure, emitted into the manifest so
+    # the "why" survives automated bumps. New transitive packages fall back to a generic note
+    # until curated here.
+    param([Parameter(Mandatory = $true)][string]$Id)
+    $purposes = @{
+        'Microsoft.Identity.Client'              = 'MSAL: acquires OAuth tokens for Microsoft Graph and M365 admin APIs'
+        'Microsoft.IdentityModel.Abstractions'   = 'Logging/telemetry abstraction (direct MSAL dependency)'
+        'System.Diagnostics.DiagnosticSource'    = 'MSAL diagnostics/telemetry'
+        'System.Runtime.CompilerServices.Unsafe' = '.NET Framework low-level memory shim required by System.Text.Json'
+        'System.ValueTuple'                      = '.NET Framework tuple support shim'
+        'System.Text.Json'                       = 'JSON (de)serialization of token responses on .NET Framework'
+        'System.Text.Encodings.Web'              = 'Safe text encoding used by System.Text.Json'
+        'System.Formats.Asn1'                    = 'ASN.1 parsing for certificate-based authentication'
+        'System.Memory'                          = 'Span/Memory shim required by System.Text.Json on .NET Framework'
+        'System.Buffers'                         = 'Buffer pooling shim used by System.Memory/System.Text.Json'
+        'System.Numerics.Vectors'                = 'SIMD/vector shim used by System.Memory'
+        'System.Threading.Tasks.Extensions'      = 'ValueTask support shim for System.Text.Json'
+        'Microsoft.Bcl.AsyncInterfaces'          = 'IAsyncEnumerable support shim for System.Text.Json'
+    }
+    if ($purposes.ContainsKey($Id)) { $purposes[$Id] } else { 'Transitive dependency of the MSAL net462 closure' }
 }
 
 function Get-MsalNuGetEndpoints {
