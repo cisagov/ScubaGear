@@ -59,7 +59,33 @@ const RECIPIENT_SCOPE_FIELDS = [
     "ExceptIfRecipientDomainIs"
 ];
 
+const SPAM_ACTION_FIELDS = [
+    ["Spam", "SpamAction"],
+    ["High confidence spam", "HighConfidenceSpamAction"],
+    ["Phishing", "PhishSpamAction"],
+    ["High confidence phishing", "HighConfidencePhishAction"],
+    ["Bulk", "BulkSpamAction"]
+];
+
 const ANTI_PHISH_TABLE_CLASS = "securitysuite-anti-phish-policies-table";
+const ANTI_SPAM_TABLE_CLASS = "securitysuite-anti-spam-policies-table";
+const EXPANDABLE_TABLE_CLASSES = new Set([ANTI_PHISH_TABLE_CLASS, ANTI_SPAM_TABLE_CLASS]);
+
+/**
+ * Describes how a family of protection policies is linked to its rules.
+ *
+ * Anti-phish and anti-spam policies are scoped the same way, but each is
+ * referenced by a different field on the rules that assign it.
+ */
+const ANTI_PHISH_POLICY_KIND = {
+    ruleFields: ["AntiPhishPolicy", "Policy", "PolicyName"],
+    defaultPolicyName: "Office365 AntiPhish Default"
+};
+
+const ANTI_SPAM_POLICY_KIND = {
+    ruleFields: ["HostedContentFilterPolicy", "Policy", "PolicyName"],
+    defaultPolicyName: "Default"
+};
 
 const getProtectedValues = (values) => {
     const normalizedValues = normalizeToArray(values)
@@ -81,11 +107,12 @@ const getPresetPolicyType = (policy) => {
     return null;
 };
 
-const ruleMatchesPolicy = (rule, policy) => {
+const ruleMatchesPolicy = (rule, policy, policyKind) => {
     const policyIdentifiers = [policy.Name, policy.Identity, policy.Id]
         .map(value => String(value ?? "").trim().toLowerCase())
         .filter(value => value.length > 0);
-    const rulePolicyIdentifiers = [rule.AntiPhishPolicy, rule.Policy, rule.PolicyName]
+    const rulePolicyIdentifiers = policyKind.ruleFields
+        .map(field => rule[field])
         .flatMap(getNonEmptyValues)
         .map(value => value.toLowerCase());
 
@@ -130,18 +157,18 @@ const formatScopeCounts = (rules) => {
     }).filter(Boolean);
 };
 
-const getPolicyApplicability = (policy, antiPhishRules, protectionPolicyRules, acceptedDomains) => {
+const getPolicyApplicability = (policy, policyRules, protectionPolicyRules, acceptedDomains, policyKind) => {
     const presetPolicyType = getPresetPolicyType(policy);
     const matchingProtectionPolicyRules = normalizeToArray(protectionPolicyRules)
         .filter(rule => rule && typeof rule === "object")
-        .filter(rule => ruleMatchesPolicy(rule, policy));
+        .filter(rule => ruleMatchesPolicy(rule, policy, policyKind));
     if (presetPolicyType && !matchingProtectionPolicyRules.some(isProtectionPolicyRuleEnabled)) {
         return "Not assigned";
     }
 
-    const rules = [...normalizeToArray(antiPhishRules), ...normalizeToArray(protectionPolicyRules)]
+    const rules = [...normalizeToArray(policyRules), ...normalizeToArray(protectionPolicyRules)]
         .filter(rule => rule && typeof rule === "object")
-        .filter(rule => ruleMatchesPolicy(rule, policy));
+        .filter(rule => ruleMatchesPolicy(rule, policy, policyKind));
     const tenantDomains = normalizeToArray(acceptedDomains)
         .map(domain => domain?.DomainName ?? domain?.Name ?? domain?.Identity ?? domain)
         .flatMap(getNonEmptyValues);
@@ -154,28 +181,47 @@ const getPolicyApplicability = (policy, antiPhishRules, protectionPolicyRules, a
     return policy.IsDefault ? "All Users" : "Not available";
 };
 
-const getPolicyEnabledState = (policy, protectionPolicyRules) => {
-    if (!getPresetPolicyType(policy)) return isEnabled(policy.Enabled);
-
-    return normalizeToArray(protectionPolicyRules)
-        .filter(rule => rule && typeof rule === "object")
-        .filter(rule => ruleMatchesPolicy(rule, policy))
-        .some(isProtectionPolicyRuleEnabled);
+const isDefaultPolicy = (policy, policyKind) => {
+    if (policy?.IsDefault === true) return true;
+    const policyName = String(policy?.Name ?? policy?.Identity ?? policy?.Id ?? "").trim();
+    return policyName === policyKind.defaultPolicyName;
 };
 
-const getPolicyPriority = (policy, antiPhishRules, protectionPolicyRules) => {
+const hasMatchingEnabledRule = (policy, rules, policyKind) => normalizeToArray(rules)
+    .filter(rule => rule && typeof rule === "object")
+    .filter(rule => ruleMatchesPolicy(rule, policy, policyKind))
+    .some(isProtectionPolicyRuleEnabled);
+
+const getPolicyEnabledState = (policy, policyRules, protectionPolicyRules, policyKind) => {
+    // Preset policies are turned on and off by their protection policy rule.
+    if (getPresetPolicyType(policy)) {
+        return hasMatchingEnabledRule(policy, protectionPolicyRules, policyKind);
+    }
+
+    // Anti-phish policies carry their own Enabled flag.
+    if (policy?.Enabled !== undefined && policy?.Enabled !== null) {
+        return isEnabled(policy.Enabled);
+    }
+
+    // Anti-spam policies do not. The default policy always applies to any
+    // recipient no other policy covers, and a custom policy applies when the
+    // rule that assigns it is enabled.
+    if (isDefaultPolicy(policy, policyKind)) return true;
+    return hasMatchingEnabledRule(policy, policyRules, policyKind);
+};
+
+const getPolicyPriority =(policy, policyRules, protectionPolicyRules, policyKind) => {
     const presetPolicyType = getPresetPolicyType(policy);
     if (presetPolicyType) {
         return "--";
     }
-    const policyName = String(policy?.Name ?? policy?.Identity ?? policy?.Id ?? "").trim();
-    if (policyName === "Office365 AntiPhish Default") {
+    if (isDefaultPolicy(policy, policyKind)) {
         return "Lowest";
     }
 
-    const priorities = [...normalizeToArray(antiPhishRules), ...normalizeToArray(protectionPolicyRules)]
+    const priorities = [...normalizeToArray(policyRules), ...normalizeToArray(protectionPolicyRules)]
         .filter(rule => rule && typeof rule === "object")
-        .filter(rule => ruleMatchesPolicy(rule, policy))
+        .filter(rule => ruleMatchesPolicy(rule, policy, policyKind))
         .map(rule => rule.Priority)
         .filter(priority => priority !== null && priority !== undefined && String(priority).trim() !== "");
 
@@ -184,19 +230,92 @@ const getPolicyPriority = (policy, antiPhishRules, protectionPolicyRules) => {
         : "N/A";
 };
 
-const getAntiPhishPolicySortKey = (row) => {
-    if (row.Policy.startsWith("Strict Preset Security Policy")) return [0, 0];
-    if (row.Policy.startsWith("Standard Preset Security Policy")) return [1, 0];
-    if (row.Policy === "Office365 AntiPhish Default") return [3, 0];
+/**
+ * Ranks a policy by the order Microsoft applies it: Strict preset, Standard
+ * preset, custom policies by priority, then the default policy.
+ *
+ * @param {Object} policy The exported policy.
+ * @param {string|number} priority The rendered Priority column value.
+ * @param {Object} policyKind The policy family descriptor.
+ * @returns {Array<number>} The [tier, priority] sort key.
+ */
+const getPolicySortKey = (policy, priority, policyKind) => {
+    const presetPolicyType = getPresetPolicyType(policy);
+    if (presetPolicyType === "Strict") return [0, 0];
+    if (presetPolicyType === "Standard") return [1, 0];
+    if (isDefaultPolicy(policy, policyKind)) return [3, 0];
 
-    const priority = Number(String(row.Priority).split(",")[0].trim());
-    return [2, Number.isFinite(priority) ? priority : Number.MAX_SAFE_INTEGER];
+    const firstPriority = Number(String(priority).split(",")[0].trim());
+    return [2, Number.isFinite(firstPriority) ? firstPriority : Number.MAX_SAFE_INTEGER];
+};
+
+/**
+ * Converts exported protection policies into rows for a policy table.
+ *
+ * The Policy, Enabled, Priority, and Applicability columns are shared by every
+ * policy family; getPolicyColumns supplies the columns specific to one family.
+ *
+ * @param {Array<Object>|null} policies The exported policies.
+ * @param {Array<Object>|null} policyRules The rules that assign those policies.
+ * @param {Array<Object>|null} protectionPolicyRules The exported EOP protection rules.
+ * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
+ * @param {Object} policyKind The policy family descriptor.
+ * @param {function} getPolicyColumns Returns the family-specific columns for a policy.
+ * @returns {Array<Object>} Unique policy rows, in the order the policies apply.
+ */
+const getProtectionPolicyRows = (
+    policies,
+    policyRules,
+    protectionPolicyRules,
+    acceptedDomains,
+    policyKind,
+    getPolicyColumns
+) => {
+    const seenPolicies = new Set();
+
+    const entries = normalizeToArray(policies).reduce((entries, policy) => {
+        if (!policy || typeof policy !== "object") return entries;
+
+        const policyName = String(policy.Name ?? policy.Identity ?? "Unnamed policy").trim() || "Unnamed policy";
+        const policyKey = String(policy.Identity ?? policyName).trim().toLowerCase();
+        if (seenPolicies.has(policyKey)) return entries;
+        seenPolicies.add(policyKey);
+
+        const priority = getPolicyPriority(policy, policyRules, protectionPolicyRules, policyKind);
+        entries.push({
+            sortKey: getPolicySortKey(policy, priority, policyKind),
+            row: {
+                "Policy": policyName,
+                "Enabled": getPolicyEnabledState(policy, policyRules, protectionPolicyRules, policyKind),
+                "Priority": priority,
+                "Applicability": getPolicyApplicability(
+                    policy,
+                    policyRules,
+                    protectionPolicyRules,
+                    acceptedDomains,
+                    policyKind
+                ),
+                ...getPolicyColumns(policy)
+            }
+        });
+        return entries;
+    }, []);
+
+    return entries
+        .sort((first, second) =>
+            first.sortKey[0] - second.sortKey[0] ||
+            first.sortKey[1] - second.sortKey[1] ||
+            first.row.Policy.localeCompare(second.row.Policy))
+        .map(entry => entry.row);
 };
 
 /**
  * Converts anti-phish policy settings into rows for the protection-policy table.
  *
  * @param {Array<Object>|null} antiPhishPolicies The exported anti-phish policies.
+ * @param {Array<Object>|null} antiPhishRules The exported anti-phish rules.
+ * @param {Array<Object>|null} protectionPolicyRules The exported EOP protection rules.
+ * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
  * @returns {Array<Object>} Unique policy rows.
  */
 const getAntiPhishPolicyRows = (
@@ -204,46 +323,56 @@ const getAntiPhishPolicyRows = (
     antiPhishRules,
     protectionPolicyRules,
     acceptedDomains
-) => {
-    const seenPolicies = new Set();
+) => getProtectionPolicyRows(
+    antiPhishPolicies,
+    antiPhishRules,
+    protectionPolicyRules,
+    acceptedDomains,
+    ANTI_PHISH_POLICY_KIND,
+    policy => ({
+        "Impersonation Protection": getProtectedValues(policy.TargetedUsersToProtect),
+        "Partner Domains Protected": getProtectedValues(policy.TargetedDomainsToProtect),
+        "Safety Indicators": SAFETY_TIP_FIELDS
+            .map(([label, field]) => ({
+                label,
+                enabled: isEnabled(policy[field])
+            }))
+    })
+);
 
-    const rows = normalizeToArray(antiPhishPolicies).reduce((rows, policy) => {
-        if (!policy || typeof policy !== "object") return rows;
-
-        const policyName = String(policy.Name ?? policy.Identity ?? "Unnamed policy").trim() || "Unnamed policy";
-        const policyKey = String(policy.Identity ?? policyName).trim().toLowerCase();
-        if (seenPolicies.has(policyKey)) return rows;
-        seenPolicies.add(policyKey);
-
-        rows.push({
-            "Policy": policyName,
-            "Enabled": getPolicyEnabledState(policy, protectionPolicyRules),
-            "Priority": getPolicyPriority(policy, antiPhishRules, protectionPolicyRules),
-            "Applicability": getPolicyApplicability(
-                policy,
-                antiPhishRules,
-                protectionPolicyRules,
-                acceptedDomains
-            ),
-            "Impersonation Protection": getProtectedValues(policy.TargetedUsersToProtect),
-            "Partner Domains Protected": getProtectedValues(policy.TargetedDomainsToProtect),
-            "Safety Indicators": SAFETY_TIP_FIELDS
-                .map(([label, field]) => ({
-                    label,
-                    enabled: isEnabled(policy[field])
-                }))
-        });
-        return rows;
-    }, []);
-
-    return rows.sort((first, second) => {
-        const firstKey = getAntiPhishPolicySortKey(first);
-        const secondKey = getAntiPhishPolicySortKey(second);
-        return firstKey[0] - secondKey[0] ||
-            firstKey[1] - secondKey[1] ||
-            first.Policy.localeCompare(second.Policy);
-    });
-};
+/**
+ * Converts inbound anti-spam policy settings into rows for the
+ * protection-policy table.
+ *
+ * Spam actions other than MoveToJmf, Quarantine, Redirect, and Delete leave
+ * spam in the inbox, so the actions are listed to show why
+ * MS.SECURITYSUITE.6.1v1 passes or fails. Allowed senders and allowed sender
+ * domains bypass filtering entirely, which MS.SECURITYSUITE.6.2v1 checks.
+ *
+ * @param {Array<Object>|null} antiSpamPolicies The exported hosted content filter policies.
+ * @param {Array<Object>|null} antiSpamRules The exported hosted content filter rules.
+ * @param {Array<Object>|null} protectionPolicyRules The exported EOP protection rules.
+ * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
+ * @returns {Array<Object>} Unique policy rows.
+ */
+const getAntiSpamPolicyRows = (
+    antiSpamPolicies,
+    antiSpamRules,
+    protectionPolicyRules,
+    acceptedDomains
+) => getProtectionPolicyRows(
+    antiSpamPolicies,
+    antiSpamRules,
+    protectionPolicyRules,
+    acceptedDomains,
+    ANTI_SPAM_POLICY_KIND,
+    policy => ({
+        "Spam Actions": SPAM_ACTION_FIELDS
+            .map(([label, field]) => `${label}: ${String(policy[field] ?? "N/A").trim() || "N/A"}`),
+        "Allowed Senders": getProtectedValues(policy.AllowedSenders),
+        "Allowed Sender Domains": getProtectedValues(policy.AllowedSenderDomains)
+    })
+);
 
 /**
  * Creates a simple report table that matches the static ConvertTo-Html shape
@@ -254,7 +383,7 @@ const getAntiPhishPolicyRows = (
  * @param {string} tableClass The CSS class to add to the table.
  * @returns {HTMLTableElement} The created table.
  */
-const appendAntiPhishPolicyCell = (cell, value, expanded, onExpand) => {
+const appendPolicyCell = (cell, value, expanded, onExpand) => {
     if (Array.isArray(value)) {
         const list = document.createElement("ul");
         const items = expanded ? value : value.slice(0, 1);
@@ -292,23 +421,23 @@ const appendAntiPhishPolicyCell = (cell, value, expanded, onExpand) => {
     }
 };
 
-const renderAntiPhishPolicyRow = (row, columns, data, expanded) => {
+const renderPolicyRow = (row, columns, data, expanded) => {
     row.textContent = "";
-    const expand = () => renderAntiPhishPolicyRow(row, columns, data, true);
+    const expand = () => renderPolicyRow(row, columns, data, true);
 
     const actionCell = document.createElement("td");
     actionCell.appendChild(createRowActionButton({
         title: expanded ? "Show less policy information" : "Show more policy information",
         className: "chevron",
         expanded,
-        onClick: () => renderAntiPhishPolicyRow(row, columns, data, !expanded),
+        onClick: () => renderPolicyRow(row, columns, data, !expanded),
         contentBuilder: () => createChevronIcon(expanded ? "down" : "right", expanded ? 14 : 10)
     }));
     row.appendChild(actionCell);
 
     columns.forEach(column => {
         const cell = document.createElement("td");
-        appendAntiPhishPolicyCell(cell, data[column], expanded, expand);
+        appendPolicyCell(cell, data[column], expanded, expand);
         row.appendChild(cell);
     });
 };
@@ -316,7 +445,7 @@ const renderAntiPhishPolicyRow = (row, columns, data, expanded) => {
 const createSecuritySuiteTable = (columns, rows, tableClass) => {
     const table = document.createElement("table");
     table.classList.add("alternating", tableClass);
-    const hasExpandableRows = tableClass === ANTI_PHISH_TABLE_CLASS;
+    const hasExpandableRows = EXPANDABLE_TABLE_CLASSES.has(tableClass);
 
     const tbody = document.createElement("tbody");
     const header = document.createElement("tr");
@@ -335,7 +464,7 @@ const createSecuritySuiteTable = (columns, rows, tableClass) => {
     rows.forEach(row => {
         const tr = document.createElement("tr");
         if (hasExpandableRows) {
-            renderAntiPhishPolicyRow(tr, columns, row, false);
+            renderPolicyRow(tr, columns, row, false);
             tbody.appendChild(tr);
             return;
         }
@@ -395,17 +524,21 @@ const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClas
  * @param {Array|string|null} partnerDomains The configured PartnerDomains values.
  * @param {Array<Object>|null} antiPhishPolicies The exported anti-phish policies.
  * @param {Array<Object>|null} antiPhishRules The exported anti-phish rules.
+ * @param {Array<Object>|null} antiSpamPolicies The exported hosted content filter policies.
+ * @param {Array<Object>|null} antiSpamRules The exported hosted content filter rules.
  * @param {Array<Object>|null} protectionPolicyRules The exported EOP protection rules.
  * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
  */
-const buildSecuritySuiteConfigTables = (
+const buildSecuritySuiteConfigTables = ({
     sensitiveUsers,
     partnerDomains,
     antiPhishPolicies,
     antiPhishRules,
+    antiSpamPolicies,
+    antiSpamRules,
     protectionPolicyRules,
     acceptedDomains
-) => {
+}) => {
     if (sensitiveUsers === undefined || sensitiveUsers === null ||
         partnerDomains === undefined || partnerDomains === null) {
         return;
@@ -423,8 +556,8 @@ const buildSecuritySuiteConfigTables = (
     const configNote = document.createElement("p");
     configNote.textContent =
         "Sensitive Users and Partner Domains are configured in the SecuritySuite config file. " +
-        "Anti-Phish Protection Policies are exported from the tenant, and are shown in priority " +
-        "order with the highest priority policies listed first. ";
+        "Anti-Phish and Anti-Spam Protection Policies are exported from the tenant, and are shown " +
+        "in priority order with the highest priority policies listed first. ";
     section.appendChild(configNote);
 
     appendSecuritySuiteTableSection(
@@ -450,7 +583,16 @@ const buildSecuritySuiteConfigTables = (
         "Anti-Phish Protection Policies",
         ["Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"],
         getAntiPhishPolicyRows(antiPhishPolicies, antiPhishRules, protectionPolicyRules, acceptedDomains),
-        "securitysuite-anti-phish-policies-table",
+        ANTI_PHISH_TABLE_CLASS,
         "No anti-phish policies were exported."
+    );
+
+    appendSecuritySuiteTableSection(
+        section,
+        "Anti-Spam Protection Policies",
+        ["Policy", "Enabled", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Sender Domains"],
+        getAntiSpamPolicyRows(antiSpamPolicies, antiSpamRules, protectionPolicyRules, acceptedDomains),
+        ANTI_SPAM_TABLE_CLASS,
+        "No anti-spam policies were exported."
     );
 };
