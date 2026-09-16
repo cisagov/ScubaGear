@@ -90,7 +90,7 @@ Describe 'MSAL dependency updates' {
 
     It 'round-trips the manifest block through the formatter and regex replacement' {
         $manifest = Get-MsalManifest -RepoRoot $TestDrive
-        $block = Format-MsalManifestBlock -Version $manifest.Version -Packages $manifest.Packages -Files $manifest.Files
+        $block = Format-MsalManifestBlock -Version $manifest.Version -Packages $manifest.Packages -Files $manifest.Files -LoadOrder $manifest.LoadOrder
         $block | Should -Match "Version = '4.82.0'"
 
         # The formatter output must parse back to an equivalent manifest.

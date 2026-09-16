@@ -278,7 +278,10 @@ function Format-MsalManifestBlock {
         [System.Collections.IEnumerable]$Packages,
 
         [Parameter(Mandatory = $true)]
-        [System.Collections.IEnumerable]$Files
+        [System.Collections.IEnumerable]$Files,
+
+        [Parameter(Mandatory = $true)]
+        [System.Collections.IEnumerable]$LoadOrder
     )
 
     $sb = [System.Text.StringBuilder]::new()
@@ -301,19 +304,250 @@ function Format-MsalManifestBlock {
     }
     [void]$sb.AppendLine('    )')
     [void]$sb.AppendLine('    LoadOrder = @(')
-    [void]$sb.AppendLine("        'System.Runtime.CompilerServices.Unsafe.dll'")
-    [void]$sb.AppendLine("        'System.Diagnostics.DiagnosticSource.dll'")
-    [void]$sb.AppendLine("        'Microsoft.IdentityModel.Abstractions.dll'")
-    [void]$sb.AppendLine("        'Microsoft.Identity.Client.dll'")
+    foreach ($entry in $LoadOrder) {
+        [void]$sb.AppendLine("        '$entry'")
+    }
     [void]$sb.AppendLine('    )')
     [void]$sb.AppendLine('}')
     $sb.ToString()
 }
 
+function Get-MsalNuGetEndpoints {
+    param(
+        [Parameter(Mandatory = $true)] [string]$Id,
+        [Parameter(Mandatory = $true)] [string]$Version
+    )
+    $idLower = $Id.ToLowerInvariant()
+    @(
+        "https://api.nuget.org/v3-flatcontainer/$idLower/$Version/$idLower.$Version.nupkg"
+        "https://www.nuget.org/api/v2/package/$Id/$Version"
+        "https://globalcdn.nuget.org/packages/$idLower.$Version.nupkg"
+    )
+}
+
+function Save-MsalNupkg {
+    param(
+        [Parameter(Mandatory = $true)] [string]$Id,
+        [Parameter(Mandatory = $true)] [string]$Version,
+        [Parameter(Mandatory = $true)] [string]$OutFile
+    )
+    try {
+        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+    }
+    catch { Write-Verbose "Unable to adjust TLS protocol: $($_.Exception.Message)" }
+
+    $previous = $ProgressPreference
+    $ProgressPreference = 'SilentlyContinue'
+    try {
+        $failures = @()
+        foreach ($uri in (Get-MsalNuGetEndpoints -Id $Id -Version $Version)) {
+            try {
+                Invoke-WebRequest -Uri $uri -OutFile $OutFile -UseBasicParsing -ErrorAction Stop
+                return
+            }
+            catch { $failures += "$uri -> $($_.Exception.Message)" }
+        }
+        throw "Unable to download $Id $Version from any NuGet endpoint:`n$($failures -join "`n")"
+    }
+    finally { $ProgressPreference = $previous }
+}
+
+function ConvertTo-MsalNormalizedTfm {
+    param([string]$TargetFramework)
+    if (-not $TargetFramework) { return @{ Kind = 'any'; Version = [version]'0.0' } }
+    $text = "$TargetFramework"
+    $number = [regex]::Match($text, '\d+(?:\.\d+)*').Value
+    if (-not $number) { $number = '0' }
+    if ($number -notmatch '\.' -and $number.Length -ge 2) {
+        $parts = @($number[0], $number[1])
+        if ($number.Length -ge 3) { $parts += $number.Substring(2) }
+        $number = $parts -join '.'
+    }
+    $segments = @($number.Split('.'))
+    while ($segments.Count -lt 2) { $segments += '0' }
+    $version = [version](($segments[0..([Math]::Min(2, $segments.Count - 1))]) -join '.')
+    if ($text -match 'Standard') { return @{ Kind = 'std'; Version = $version } }
+    if ($text -match 'Framework' -or $text -match 'net\d') { return @{ Kind = 'fx'; Version = $version } }
+    return @{ Kind = 'other'; Version = $version }
+}
+
+function Get-MsalTfmScore {
+    # Scores a candidate dependency-group target framework for a net462 consumer (-1 = incompatible).
+    param([hashtable]$Normalized)
+    switch ($Normalized.Kind) {
+        'fx'  { if ($Normalized.Version -le [version]'4.6.2') { return 2000 + [int]($Normalized.Version.Major * 100 + $Normalized.Version.Minor * 10 + $Normalized.Version.Build) } elseif ($Normalized.Version -le [version]'4.8.1') { return 900 + [int]($Normalized.Version.Minor * 10 + $Normalized.Version.Build) } else { return -1 } }
+        'std' { if ($Normalized.Version -le [version]'2.0') { return 500 + [int]($Normalized.Version.Major * 10 + $Normalized.Version.Minor) } else { return -1 } }
+        'any' { return 0 }
+        default { return 0 }
+    }
+}
+
+function Resolve-MsalClosure {
+    <#
+        Resolves the full net462 dependency closure for a Microsoft.Identity.Client version by
+        walking each package's .nuspec dependency graph, downloading the signed packages directly
+        from NuGet, and selecting the best net462-compatible assembly from each. Returns Packages,
+        Files, and a dependency-first LoadOrder ready for the manifest. No nuget.exe required.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidatePattern('^\d+\.\d+\.\d+$')]
+        [string]$Version
+    )
+
+    if (-not ('System.IO.Compression.ZipFile' -as [type])) {
+        Add-Type -AssemblyName System.IO.Compression.FileSystem
+    }
+
+    $libFrameworkOrder = @('net462', 'net461', 'net46', 'net452', 'net451', 'net45', 'net472', 'net471', 'net47', 'net48', 'netstandard2.0', 'netstandard1.6', 'netstandard1.3', 'netstandard1.0')
+    $work = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-closure-$([guid]::NewGuid().ToString('N'))"
+    New-Item -Path $work -ItemType Directory -Force | Out-Null
+    try {
+        $resolved = @{}          # id -> version
+        $dependencies = @{}      # id -> @(child ids)
+        $queue = New-Object System.Collections.Queue
+        $queue.Enqueue(@{ Id = 'Microsoft.Identity.Client'; Version = $Version })
+
+        while ($queue.Count -gt 0) {
+            $item = $queue.Dequeue()
+            $id = $item.Id
+            $ver = $item.Version
+            if ($resolved.ContainsKey($id) -and [version]$resolved[$id] -ge [version]$ver) { continue }
+            $resolved[$id] = $ver
+
+            $nupkg = Join-Path $work "$id.$ver.nupkg"
+            if (-not (Test-Path -Path $nupkg -PathType Leaf)) {
+                Save-MsalNupkg -Id $id -Version $ver -OutFile $nupkg
+            }
+
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($nupkg)
+            try {
+                $nuspecEntry = $archive.Entries | Where-Object { $_.FullName -like '*.nuspec' } | Select-Object -First 1
+                $reader = New-Object System.IO.StreamReader($nuspecEntry.Open())
+                [xml]$nuspec = $reader.ReadToEnd()
+                $reader.Close()
+            }
+            finally { $archive.Dispose() }
+
+            $groups = @($nuspec.package.metadata.dependencies.group)
+            $deps = @()
+            if ($groups.Count -gt 0 -and $groups[0]) {
+                $best = $null
+                $bestScore = -999
+                foreach ($group in $groups) {
+                    $score = Get-MsalTfmScore -Normalized (ConvertTo-MsalNormalizedTfm -TargetFramework $group.targetFramework)
+                    if ($score -ge 0 -and $score -ge $bestScore) { $bestScore = $score; $best = $group }
+                }
+                if ($best) { $deps = @($best.dependency) }
+            }
+            elseif ($nuspec.package.metadata.dependencies.dependency) {
+                $deps = @($nuspec.package.metadata.dependencies.dependency)
+            }
+
+            $dependencies[$id] = @()
+            foreach ($dep in $deps) {
+                if (-not $dep.id) { continue }
+                $depVersion = ($dep.version -replace '[\[\]\(\)]', '').Split(',')[0].Trim()
+                if (-not $depVersion) { continue }
+                $dependencies[$id] += [string]$dep.id
+                $queue.Enqueue(@{ Id = [string]$dep.id; Version = $depVersion })
+            }
+        }
+
+        # Build a record (hashes + Authenticode) for each package that ships a managed assembly
+        # matching its own id; framework-reference-only meta packages are skipped.
+        $records = @{}
+        foreach ($id in $resolved.Keys) {
+            $ver = $resolved[$id]
+            $nupkg = Join-Path $work "$id.$ver.nupkg"
+            $libPath = $null
+            $dllPath = Join-Path $work "$id.dll"
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($nupkg)
+            try {
+                $chosen = $null
+                $chosenScore = -999
+                foreach ($entry in $archive.Entries) {
+                    if ($entry.FullName -notmatch "^lib/[^/]+/$([regex]::Escape($id))\.dll$") { continue }
+                    $framework = ($entry.FullName -split '/')[1]
+                    $index = [array]::IndexOf($libFrameworkOrder, $framework)
+                    $score = if ($index -ge 0) { 100 - $index } else { -50 }
+                    if ($score -gt $chosenScore) { $chosenScore = $score; $chosen = $entry }
+                }
+                if ($chosen) {
+                    $libPath = $chosen.FullName
+                    [System.IO.Compression.ZipFileExtensions]::ExtractToFile($chosen, $dllPath, $true)
+                }
+            }
+            finally { $archive.Dispose() }
+
+            if (-not $libPath) { continue }
+
+            $null = Assert-MsalAuthenticodeSignature -FilePath $dllPath -SignerOrganization 'O=Microsoft Corporation'
+            $records[$id] = [pscustomobject]@{
+                Id = $id
+                Version = $ver
+                LibPath = $libPath
+                TargetDll = "$id.dll"
+                NupkgSha256 = (Get-FileHash -Path $nupkg -Algorithm SHA256).Hash
+                DllSha256 = (Get-FileHash -Path $dllPath -Algorithm SHA256).Hash
+                AssemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($dllPath).Version.ToString()
+            }
+        }
+
+        if (-not $records.ContainsKey('Microsoft.Identity.Client')) {
+            throw 'Could not resolve a managed Microsoft.Identity.Client assembly.'
+        }
+
+        # Dependency-first (post-order DFS) load order across the managed packages.
+        $order = New-Object System.Collections.Generic.List[string]
+        $state = @{}
+        foreach ($root in $records.Keys) {
+            if ($state[$root]) { continue }
+            $stack = New-Object System.Collections.Stack
+            $stack.Push($root)
+            while ($stack.Count -gt 0) {
+                $node = $stack.Peek()
+                if (-not $state[$node]) { $state[$node] = 'visiting' }
+                $next = $null
+                foreach ($child in $dependencies[$node]) {
+                    if ($records.ContainsKey($child) -and $state[$child] -ne 'done') { $next = $child; break }
+                }
+                if ($next -and $state[$next] -ne 'visiting') {
+                    $stack.Push($next)
+                }
+                else {
+                    [void]$stack.Pop()
+                    if ($state[$node] -ne 'done') { $state[$node] = 'done'; $order.Add($node) }
+                }
+            }
+        }
+
+        $packages = foreach ($id in $order) {
+            $record = $records[$id]
+            [ordered]@{ Id = $record.Id; Version = $record.Version; Sha256 = $record.NupkgSha256; LibPath = $record.LibPath; TargetDll = $record.TargetDll }
+        }
+        $files = foreach ($id in $order) {
+            $record = $records[$id]
+            [ordered]@{ File = $record.TargetDll; Sha256 = $record.DllSha256; AssemblyVersion = $record.AssemblyVersion }
+        }
+        $loadOrder = foreach ($id in $order) { $records[$id].TargetDll }
+
+        [pscustomobject]@{
+            Packages = @($packages)
+            Files = @($files)
+            LoadOrder = @($loadOrder)
+        }
+    }
+    finally {
+        Remove-Item -Path $work -Recurse -Force -ErrorAction SilentlyContinue
+    }
+}
+
 function Update-MsalDependencyVersion {
     <#
-        Resolves the dependency closure for a new MSAL version with nuget.exe, computes the hashes
-        and assembly versions, and rewrites the $MsalDependency block in RequiredVersions.ps1.
+        Resolves the full net462 dependency closure for a new MSAL version, computes hashes and
+        assembly versions, and rewrites the $MsalDependency block in RequiredVersions.ps1.
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -322,9 +556,7 @@ function Update-MsalDependencyVersion {
 
         [Parameter(Mandatory = $true)]
         [ValidatePattern('^\d+\.\d+\.\d+$')]
-        [string]$Version,
-
-        [string]$NuGetPath = 'nuget.exe'
+        [string]$Version
     )
 
     $availableVersions = @(Get-AvailableMsalVersions)
@@ -332,94 +564,24 @@ function Update-MsalDependencyVersion {
         throw "MSAL $Version is not a stable published version."
     }
 
-    # Same net-target preference the previous bundling logic used.
-    $libPreference = @{
-        'Microsoft.Identity.Client'              = @('lib/net462')
-        'Microsoft.IdentityModel.Abstractions'   = @('lib/net462', 'lib/netstandard2.0')
-        'System.Diagnostics.DiagnosticSource'    = @('lib/net461', 'lib/netstandard2.0')
-        'System.Runtime.CompilerServices.Unsafe' = @('lib/net461', 'lib/netstandard2.0')
-        'System.ValueTuple'                      = @('lib/net47', 'lib/netstandard2.0')
+    $closure = Resolve-MsalClosure -Version $Version
+    if (-not ($closure.Packages | Where-Object { $_.Id -eq 'Microsoft.Identity.Client' -and $_.Version -eq $Version })) {
+        throw 'The resolved closure did not include the requested Microsoft.Identity.Client version.'
     }
 
-    $resolveRoot = Join-Path ([System.IO.Path]::GetTempPath()) "scubagear-msal-resolve-$([guid]::NewGuid().ToString('N'))"
-    New-Item -Path $resolveRoot -ItemType Directory -Force | Out-Null
-    try {
-        & $NuGetPath install Microsoft.Identity.Client -Version $Version -OutputDirectory $resolveRoot -NonInteractive -DirectDownload
-        if ($LASTEXITCODE -ne 0) {
-            throw "NuGet dependency resolution failed with exit code $LASTEXITCODE."
+    $manifestText = Format-MsalManifestBlock -Version $Version -Packages $closure.Packages -Files $closure.Files -LoadOrder $closure.LoadOrder
+    $manifestPath = Get-MsalManifestPath -RepoRoot $RepoRoot
+    if ($PSCmdlet.ShouldProcess($manifestPath, 'Rewrite $MsalDependency manifest')) {
+        $content = Get-Content -Path $manifestPath -Raw
+        $pattern = '(?ms)^# Pinned MSAL .*?\r?\n\$MsalDependency = @\{.*?\r?\n\}\r?\n?'
+        if ($content -notmatch $pattern) {
+            throw 'Could not locate the $MsalDependency block in RequiredVersions.ps1.'
         }
-
-        $packages = @()
-        $files = @()
-        foreach ($nuspec in Get-ChildItem -Path $resolveRoot -Recurse -Filter '*.nuspec' -File) {
-            [xml]$metadata = Get-Content -Path $nuspec.FullName -Raw
-            $id = [string]$metadata.package.metadata.id
-            $ver = [string]$metadata.package.metadata.version
-            if (-not $libPreference.ContainsKey($id)) {
-                continue
-            }
-
-            $packageDir = $nuspec.Directory.FullName
-            $libPath = $null
-            $assemblyPath = $null
-            foreach ($candidate in $libPreference[$id]) {
-                $candidatePath = Join-Path $packageDir "$candidate/$id.dll"
-                if (Test-Path -Path $candidatePath -PathType Leaf) {
-                    $libPath = "$candidate/$id.dll"
-                    $assemblyPath = $candidatePath
-                    break
-                }
-            }
-            if (-not $assemblyPath) {
-                throw "Could not locate a compatible assembly for $id $ver."
-            }
-
-            $nupkgPath = Join-Path $packageDir "$id.$ver.nupkg"
-            if (-not (Test-Path -Path $nupkgPath -PathType Leaf)) {
-                throw "Downloaded package archive was not found for $id $ver."
-            }
-
-            & $NuGetPath verify -Signatures $nupkgPath
-            if ($LASTEXITCODE -ne 0) {
-                throw "NuGet signature verification failed for $id $ver."
-            }
-            $null = Assert-MsalAuthenticodeSignature -FilePath $assemblyPath -SignerOrganization 'O=Microsoft Corporation'
-
-            $packages += [ordered]@{
-                Id = $id
-                Version = $ver
-                Sha256 = (Get-FileHash -Path $nupkgPath -Algorithm SHA256).Hash
-                LibPath = $libPath
-                TargetDll = "$id.dll"
-            }
-            $files += [ordered]@{
-                File = "$id.dll"
-                Sha256 = (Get-FileHash -Path $assemblyPath -Algorithm SHA256).Hash
-                AssemblyVersion = [Reflection.AssemblyName]::GetAssemblyName($assemblyPath).Version.ToString()
-            }
-        }
-
-        if (-not ($packages | Where-Object { $_.Id -eq 'Microsoft.Identity.Client' -and $_.Version -eq $Version })) {
-            throw 'NuGet did not resolve the requested Microsoft.Identity.Client version.'
-        }
-
-        $manifestText = Format-MsalManifestBlock -Version $Version -Packages $packages -Files $files
-        $manifestPath = Get-MsalManifestPath -RepoRoot $RepoRoot
-        if ($PSCmdlet.ShouldProcess($manifestPath, 'Rewrite $MsalDependency manifest')) {
-            $content = Get-Content -Path $manifestPath -Raw
-            $pattern = '(?ms)^# Pinned MSAL .*?\r?\n\$MsalDependency = @\{.*?\r?\n\}\r?\n?'
-            if ($content -notmatch $pattern) {
-                throw 'Could not locate the $MsalDependency block in RequiredVersions.ps1.'
-            }
-            # Escape $ so the replacement text is treated literally by [regex]::Replace.
-            $replacement = $manifestText -replace '\$', '$$$$'
-            $updated = [regex]::Replace($content, $pattern, $replacement)
-            Set-Content -Path $manifestPath -Value $updated -Encoding UTF8 -NoNewline
-        }
-
-        Test-MsalDependencyIntegrity -RepoRoot $RepoRoot
+        # Escape $ so the replacement text is treated literally by [regex]::Replace.
+        $replacement = $manifestText -replace '\$', '$$$$'
+        $updated = [regex]::Replace($content, $pattern, $replacement)
+        Set-Content -Path $manifestPath -Value $updated -Encoding UTF8 -NoNewline
     }
-    finally {
-        Remove-Item -Path $resolveRoot -Recurse -Force -ErrorAction SilentlyContinue
-    }
+
+    Test-MsalDependencyIntegrity -RepoRoot $RepoRoot
 }
