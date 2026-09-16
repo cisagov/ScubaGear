@@ -111,9 +111,9 @@ This is the **recommended method** for users who prefer visual interfaces or are
 
 For complete documentation on using the Configuration UI, see the [Configuration UI Guide](scubaconfigapp.md).
 
-### Method 2: Command-Line Generation
+### Method 2: Command-Line Generation (Cross-platform)
 
-You can also generate an empty sample configuration file using the command line. The `New-SCuBAConfig` cmdlet will create a template configuration file called `SampleConfig.yaml`:
+The Configuration UI currently supports Windows only. On macOS and Linux, use the `New-SCuBAConfig` cmdlet to generate a template configuration file called `SampleConfig.yaml`. The template is built from the current ScubaGear baselines, so it automatically includes the configurable exclusion sections for the products you specify:
 
 ```powershell
 # Create an empty config file
