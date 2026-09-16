@@ -236,7 +236,7 @@ Function Start-SCuBAConfigApp {
         (Get-Module ScubaGear -ErrorAction SilentlyContinue).Version.ToString()
     }
 
-    # Store the ScubaGear module root so Build-ScubaGearCommand can import from the correct source.
+    # Store the ScubaGear module root so New-ScubaGearCommand can import from the correct source.
     # $PSScriptRoot is the ScubaConfigApp folder; the module root is two levels up.
     $resolvedScubaRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..") -ErrorAction SilentlyContinue).Path
     $syncHash.ScubaGearModulePath = if ($resolvedScubaRoot -and (Test-Path (Join-Path $resolvedScubaRoot 'ScubaGear.psd1'))) {
