@@ -71,6 +71,36 @@ InModuleScope CreateReport {
                         }
                     }
                 }
+                $ProviderSettings | Add-Member -MemberType NoteProperty -Name 'anti_malware_policies' -Value @(
+                    [pscustomobject]@{
+                        Identity        = "Custom antimalware policy 1"
+                        Name            = "Custom antimalware policy 1"
+                        EnableFileFilter = $true
+                        FileTypes       = @("exe", "cmd", "vbe")
+                        ZapEnabled      = $true
+                    },
+                    [pscustomobject]@{
+                        Identity        = "Default"
+                        Name            = "Default"
+                        EnableFileFilter = $false
+                        FileTypes       = @()
+                        ZapEnabled      = $false
+                        IsDefault       = $true
+                    }
+                ) -Force
+                $ProviderSettings | Add-Member -MemberType NoteProperty -Name 'anti_malware_rules' -Value @(
+                    [pscustomobject]@{
+                        MalwareFilterPolicy       = "Custom antimalware policy 1"
+                        Priority                  = 0
+                        State                     = "Enabled"
+                        SentTo                    = $null
+                        SentToMemberOf            = $null
+                        RecipientDomainIs         = $null
+                        ExceptIfSentTo            = $null
+                        ExceptIfSentToMemberOf    = $null
+                        ExceptIfRecipientDomainIs = $null
+                    }
+                ) -Force
                 $ProviderSettings | ConvertTo-Json -Depth 20 | Set-Content -Path $ProviderSettingsPath
             }
 
@@ -120,6 +150,8 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match "id='securitysuite-partner-domains-json'"
                 $ReportContent | Should -Match "id='securitysuite-anti-phish-policies-json'"
                 $ReportContent | Should -Match "id='securitysuite-anti-phish-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-malware-policies-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-malware-rules-json'"
                 $ReportContent | Should -Match "id='securitysuite-protection-policy-rules-json'"
                 $ReportContent | Should -Match "id='securitysuite-accepted-domains-json'"
                 $ReportContent | Should -Match "jdoe@first.example.com"
@@ -138,8 +170,14 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match 'createRowActionButton\(\{'
                 $ReportContent | Should -Match 'contentBuilder: \(\) => document\.createTextNode\("\.\.\."\)'
                 $ReportContent | Should -Match "Sensitive Users and Partner Domains are configured in the SecuritySuite config file\."
-                $ReportContent | Should -Match "Anti-Phish Protection Policies are exported from the tenant, and are shown in priority"
-                $ReportContent | Should -Match "order with the highest priority policies listed first\."
+                $ReportContent | Should -Match "Anti-Phish and Anti-Malware Protection Policies are exported from the tenant, and are"
+                $ReportContent | Should -Match "shown in priority order with the highest priority policies listed first\."
+                $ReportContent | Should -Match "Anti-Malware Protection Policies"
+                $ReportContent | Should -Match '"Common Attachments Filter"'
+                $ReportContent | Should -Match '"Zero-hour Auto Purge"'
+                $ReportContent | Should -Match "Custom antimalware policy 1"
+                $ReportContent | Should -Match '"EnableFileFilter"'
+                $ReportContent | Should -Match '"ZapEnabled"'
             }
         }
     }

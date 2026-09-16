@@ -112,7 +112,8 @@ const applyScopeAttributes = () => {
 
                 for (let tr = 1; tr < tbody.children.length; tr++) {
                     const td = tbody.children[tr].querySelectorAll("td");
-                    const hasExpandButton = table.classList.contains("securitysuite-anti-phish-policies-table");
+                    const hasExpandButton = table.classList.contains("securitysuite-anti-phish-policies-table") ||
+                        table.classList.contains("securitysuite-anti-malware-policies-table");
                     if (td.length > 0) td[hasExpandButton ? 1 : 0].setAttribute("scope", "row");
                 }
             }

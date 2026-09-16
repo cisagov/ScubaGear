@@ -251,12 +251,15 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                     }
                 }
                 # Security Suite configuration tables are appended to the Security Suite report.
-                elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
+                elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies|anti-malware-policies)-table") {
                     $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
                         "Username", "Email"
                     }
                     elseif ($TableClass -match "securitysuite-partner-domains-table") {
                         "Partner Domain"
+                    }
+                    elseif ($TableClass -match "securitysuite-anti-malware-policies-table") {
+                        "", "Policy", "Enabled", "Priority", "Applicability", "Common Attachments Filter", "Zero-hour Auto Purge"
                     }
                     else {
                         "", "Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"
@@ -277,8 +280,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
                         if ($RowData.Count -gt 0) {
                             $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
-                            if ($TableClass -match "securitysuite-anti-phish-policies-table") {
-                                $RowData[2].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
+                            if ($TableClass -match "securitysuite-(anti-phish-policies|anti-malware-policies)-table") {
+                                $RowData[2].Text | Should -BeIn @("true", "false") -Because "The policy Enabled value must be a Boolean"
                             }
                         }
                     }
@@ -289,9 +292,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
                     for ($i = 1; $i -lt $Rows.Length; $i++) {
                         $RowData = Get-SeElement -Element $Rows[$i] -By TagName 'td'
-                        # Anti-phish policy rows have an expand/collapse control in the
-                        # first cell, so their Policy value (the second cell) is the row header.
-                        $RowHeaderIndex = if ($TableClass -match "securitysuite-anti-phish-policies-table") { 1 } else { 0 }
+                        # Anti-phish/anti-malware policy rows have an expand/collapse control in
+                        # the first cell, so their Policy value (the second cell) is the row header.
+                        $RowHeaderIndex = if ($TableClass -match "securitysuite-(anti-phish-policies|anti-malware-policies)-table") { 1 } else { 0 }
                         for ($j = 0; $j -lt $RowData.Length; $j++) {
                             if ($j -eq $RowHeaderIndex) {
                                 $RowData[$j].GetAttribute("scope") | Should -Be "row" -Because "There should only be one scope attribute set for each data row"

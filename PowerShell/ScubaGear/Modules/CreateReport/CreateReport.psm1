@@ -666,6 +666,8 @@ function New-Report {
         $PartnerDomainsJson = ConvertTo-Json @($PartnerDomains)
         $AntiPhishPoliciesJson = ConvertTo-Json @($SettingsExport.anti_phish_policies) -Depth 5
         $AntiPhishRulesJson = ConvertTo-Json @($SettingsExport.anti_phish_rules) -Depth 5
+        $AntiMalwarePoliciesJson = ConvertTo-Json @($SettingsExport.anti_malware_policies) -Depth 5
+        $AntiMalwareRulesJson = ConvertTo-Json @($SettingsExport.anti_malware_rules) -Depth 5
         $ProtectionPolicyRulesJson = ConvertTo-Json @($SettingsExport.protection_policy_rules) -Depth 5
         $AcceptedDomainsJson = ConvertTo-Json @($SettingsExport.accepted_domains) -Depth 5
     }
@@ -674,6 +676,8 @@ function New-Report {
         $PartnerDomainsJson = "null"
         $AntiPhishPoliciesJson = "null"
         $AntiPhishRulesJson = "null"
+        $AntiMalwarePoliciesJson = "null"
+        $AntiMalwareRulesJson = "null"
         $ProtectionPolicyRulesJson = "null"
         $AcceptedDomainsJson = "null"
     }
@@ -738,6 +742,8 @@ function New-Report {
         "<script type='application/json' id='securitysuite-partner-domains-json'> $($PartnerDomainsJson) </script>"
         "<script type='application/json' id='securitysuite-anti-phish-policies-json'> $($AntiPhishPoliciesJson) </script>"
         "<script type='application/json' id='securitysuite-anti-phish-rules-json'> $($AntiPhishRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-malware-policies-json'> $($AntiMalwarePoliciesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-malware-rules-json'> $($AntiMalwareRulesJson) </script>"
         "<script type='application/json' id='securitysuite-protection-policy-rules-json'> $($ProtectionPolicyRulesJson) </script>"
         "<script type='application/json' id='securitysuite-accepted-domains-json'> $($AcceptedDomainsJson) </script>"
     ) -join "`n"
