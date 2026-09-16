@@ -39,3 +39,6 @@
 
 # Local debug scripts
 Testing/Functional/Products/Debug-*.ps1
+
+# New-SCuBAConfig generated sample config
+**/SampleConfig.yaml
