@@ -112,10 +112,8 @@ const applyScopeAttributes = () => {
 
                 for (let tr = 1; tr < tbody.children.length; tr++) {
                     const td = tbody.children[tr].querySelectorAll("td");
-                    const hasExpandButton = (
-                        table.classList.contains("securitysuite-anti-phish-policies-table") ||
-                        table.classList.contains("securitysuite-anti-spam-policies-table")
-                    );
+                    // An expand/collapse control in td[0] shifts the row header to td[1].
+                    const hasExpandButton = table.classList.contains("expandable-policy-rows");
                     if (td.length > 0) td[hasExpandButton ? 1 : 0].setAttribute("scope", "row");
                 }
             }
