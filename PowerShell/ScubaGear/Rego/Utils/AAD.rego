@@ -312,7 +312,7 @@ CapMissingLabels(checks) := [c.label |
 # Sets status to pass if the base check is ok and there are no missing exclusion types
 CapEval(base_ok, checks) := {
     "status": "pass",
-    "missing_exclusion_types": missing,
+    "MissingExclusionTypes": missing,
 } if {
     base_ok
     missing := CapMissingLabels(checks)
@@ -322,7 +322,7 @@ CapEval(base_ok, checks) := {
 # Sets status to near_miss if the base check is ok and there are missing exclusion types
 CapEval(base_ok, checks) := {
     "status": "near_miss",
-    "missing_exclusion_types": missing,
+    "MissingExclusionTypes": missing,
 } if {
     base_ok
     missing := CapMissingLabels(checks)
@@ -332,7 +332,7 @@ CapEval(base_ok, checks) := {
 # Sets status to fail if the base check is not ok
 CapEval(base_ok, checks) := {
     "status": "fail",
-    "missing_exclusion_types": missing,
+    "MissingExclusionTypes": missing,
 } if {
     not base_ok
     missing := CapMissingLabels(checks)
@@ -343,7 +343,7 @@ CapNearMissMessages(near_miss_objects) := [msg |
     obj := near_miss_objects[_]
     msg := sprintf(
         "%s would pass if the config file is updated to include: %s",
-        [obj.name, concat(", ", obj.missing_exclusion_types)],
+        [obj.PolicyName, concat(", ", obj.MissingExclusionTypes)],
     )
 ]
 
