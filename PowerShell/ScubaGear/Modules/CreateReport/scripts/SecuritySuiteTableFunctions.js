@@ -67,14 +67,20 @@ const SPAM_ACTION_FIELDS = [
     ["Bulk", "BulkSpamAction"]
 ];
 
+const ANTI_MALWARE_TABLE_CLASS = "securitysuite-anti-malware-policies-table";
 const ANTI_PHISH_TABLE_CLASS = "securitysuite-anti-phish-policies-table";
 const ANTI_SPAM_TABLE_CLASS = "securitysuite-anti-spam-policies-table";
-const EXPANDABLE_TABLE_CLASSES = new Set([ANTI_PHISH_TABLE_CLASS, ANTI_SPAM_TABLE_CLASS]);
+const EXPANDABLE_TABLE_CLASSES = new Set([
+    ANTI_MALWARE_TABLE_CLASS,
+    ANTI_PHISH_TABLE_CLASS,
+    ANTI_SPAM_TABLE_CLASS
+]);
 
 // Read by applyScopeAttributes so it doesn't need to know each policy table by name.
 const EXPANDABLE_ROWS_CLASS = "expandable-policy-rows";
 
 // Each policy family is referenced by a different field on its assigning rules.
+const ANTI_MALWARE_RULE_FIELDS = ["MalwareFilterPolicy", "Policy", "PolicyName"];
 const ANTI_PHISH_RULE_FIELDS = ["AntiPhishPolicy", "Policy", "PolicyName"];
 const ANTI_SPAM_RULE_FIELDS = ["HostedContentFilterPolicy", "Policy", "PolicyName"];
 
@@ -297,6 +303,40 @@ const getProtectionPolicyRows = (
         .map(entry => entry.row);
 };
 
+const getEnabledText = (value) => isEnabled(value) ? "Enabled" : "Disabled";
+
+/**
+ * Converts anti-malware policy settings into rows for the protection-policy
+ * table.
+ *
+ * Shows the common attachments filter and its file types, which
+ * MS.SECURITYSUITE.1.1v1 checks for .exe, .cmd, and .vbe, and zero-hour auto
+ * purge, which MS.SECURITYSUITE.1.2v1 requires.
+ *
+ * @param {Array<Object>|null} antiMalwarePolicies The exported malware filter policies.
+ * @param {Array<Object>|null} antiMalwareRules The exported malware filter rules.
+ * @param {Array<Object>|null} protectionPolicyRules The exported EOP protection rules.
+ * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
+ * @returns {Array<Object>} Unique policy rows.
+ */
+const getAntiMalwarePolicyRows = (
+    antiMalwarePolicies,
+    antiMalwareRules,
+    protectionPolicyRules,
+    acceptedDomains
+) => getProtectionPolicyRows(
+    antiMalwarePolicies,
+    antiMalwareRules,
+    protectionPolicyRules,
+    acceptedDomains,
+    ANTI_MALWARE_RULE_FIELDS,
+    policy => ({
+        "Common Attachments Filter": getEnabledText(policy.EnableFileFilter),
+        "Blocked File Types": getProtectedValues(policy.FileTypes),
+        "Zero-hour Auto Purge": getEnabledText(policy.ZapEnabled)
+    })
+);
+
 /**
  * Converts anti-phish policy settings into rows for the protection-policy table.
  *
@@ -512,6 +552,8 @@ const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClas
  *
  * @param {Array|string|null} sensitiveUsers The configured SensitiveUsers values.
  * @param {Array|string|null} partnerDomains The configured PartnerDomains values.
+ * @param {Array<Object>|null} antiMalwarePolicies The exported malware filter policies.
+ * @param {Array<Object>|null} antiMalwareRules The exported malware filter rules.
  * @param {Array<Object>|null} antiPhishPolicies The exported anti-phish policies.
  * @param {Array<Object>|null} antiPhishRules The exported anti-phish rules.
  * @param {Array<Object>|null} antiSpamPolicies The exported hosted content filter policies.
@@ -522,6 +564,8 @@ const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClas
 const buildSecuritySuiteConfigTables = ({
     sensitiveUsers,
     partnerDomains,
+    antiMalwarePolicies,
+    antiMalwareRules,
     antiPhishPolicies,
     antiPhishRules,
     antiSpamPolicies,
@@ -546,8 +590,8 @@ const buildSecuritySuiteConfigTables = ({
     const configNote = document.createElement("p");
     configNote.textContent =
         "Sensitive Users and Partner Domains are configured in the SecuritySuite config file. " +
-        "Anti-Phish and Anti-Spam Protection Policies are exported from the tenant, and are shown " +
-        "in priority order with the highest priority policies listed first. ";
+        "Protection Policies are exported from the tenant, and are shown in priority order with " +
+        "the highest priority policies listed first. ";
     section.appendChild(configNote);
 
     appendSecuritySuiteTableSection(
@@ -566,6 +610,15 @@ const buildSecuritySuiteConfigTables = ({
         getPartnerDomainRows(partnerDomains),
         "securitysuite-partner-domains-table",
         "No partner domains defined in the config file."
+    );
+
+    appendSecuritySuiteTableSection(
+        section,
+        "Anti-Malware Protection Policies",
+        ["Policy", "Enabled", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"],
+        getAntiMalwarePolicyRows(antiMalwarePolicies, antiMalwareRules, protectionPolicyRules, acceptedDomains),
+        ANTI_MALWARE_TABLE_CLASS,
+        "No anti-malware policies were exported."
     );
 
     appendSecuritySuiteTableSection(
