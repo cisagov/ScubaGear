@@ -11018,7 +11018,7 @@
       "IsObjectUnderSystemOperation": false
     }
   ],
-  "malware_filter_policies": [
+  "anti_malware_policies": [
     {
       "AdminDisplayName": "",
       "CustomExternalBody": "",
