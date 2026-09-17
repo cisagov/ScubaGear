@@ -196,7 +196,7 @@ function Test-ScAGrantControlRelevance {
     "about" this control - not whether it fully complies.
     #>
     param($Policy, $GrantReq)
-    
+
     # Determine if the policy is relevant to the specified grant control requirement.
     if (-not $GrantReq) { return $false }
     # Check if the grant control requirement has any alternative conditions (anyOf).

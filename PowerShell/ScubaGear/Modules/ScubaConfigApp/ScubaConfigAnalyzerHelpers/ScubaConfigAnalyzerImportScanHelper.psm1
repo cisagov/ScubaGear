@@ -140,7 +140,7 @@ function Invoke-ScubaConfigAnalysis {
                 $providerAnalysis = if ($vtype -ne 'conditionalAccessPolicy' -and $candidateExclusionField) {
                     Get-ScAProviderAnalysis -ExclusionField $candidateExclusionField -Raw $results.Raw
                 } else { $null }
-                
+
                 # Retrieve the policy analysis for CA controls based on the validation schema.
                 $policyAnalysis = if ($validationSchema -and $vtype -eq 'conditionalAccessPolicy') {
                     Get-ScAPolicyAnalysis -ControlId $controlId -Results $results -ValidationSchema $validationSchema
@@ -151,14 +151,14 @@ function Invoke-ScubaConfigAnalysis {
                 # Best-match policy = closest to compliant (fewest policy-setting changes, then fewest waivers).
                 $sortedPolicies = @($policyAnalysis.AllPolicies | Sort-Object { $_.SettingIssueCount }, { $_.ExcludedPrincipalCount }, { $_.IssueCount })
                 $bestMatch      = if (@($sortedPolicies).Count -gt 0) { $sortedPolicies[0] } else { $null }
-                
+
                 # Determine the detected exclusions based on the best-match policy.
                 $detectedExclusions = if ($bestMatch) {
                     $bestMatch.DetectedExclusions
                 } else {
                     @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
                 }
-                
+
                 # Collect all missing settings from the policy analysis for reporting purposes.
                 $missingSettings = @()
                 foreach ($p in @($policyAnalysis.AllPolicies)) { $missingSettings += $p.Issues }
@@ -167,7 +167,7 @@ function Invoke-ScubaConfigAnalysis {
                 $baselineExclusionField = if ($validationSchema -and $validationSchema.exclusionField) { $validationSchema.exclusionField } else { 'none' }
                 $remediation    = if ($validationSchema -and $validationSchema.remediationSteps) { @($validationSchema.remediationSteps) } elseif ($validationSchema -and $validationSchema.buildInstructions.configurationSteps) { @($validationSchema.buildInstructions.configurationSteps) } else { @() }
                 $requirementTxt = if ($control.Requirement) { $control.Requirement } elseif ($validationSchema) { $validationSchema.name } else { $controlId }
-                
+
                 # Remove any HTML tags from the requirement text for cleaner display.
                 $requirementTxt = Remove-ScAHtml $requirementTxt
 

@@ -146,7 +146,7 @@ function Import-ScAApiCatalog {
     # If no API catalog path is provided, resolve the default path relative to the module.
     if (-not $ApiCatalogPath) { $ApiCatalogPath = Resolve-ScASchemaPath -FileName 'ScubaGearApiCatalog.json' }
     if (-not (Test-Path $ApiCatalogPath)) { Write-Warning "API catalog not found: $ApiCatalogPath"; return }
-    
+
     try {
         # Read and parse the API catalog JSON file.
         $catalog = Get-Content $ApiCatalogPath -Raw | ConvertFrom-Json
