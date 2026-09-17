@@ -10,6 +10,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const securitySuitePartnerDomains = getJsonData('securitysuite-partner-domains-json');
     const securitySuiteAntiPhishPolicies = getJsonData('securitysuite-anti-phish-policies-json');
     const securitySuiteAntiPhishRules = getJsonData('securitysuite-anti-phish-rules-json');
+    const securitySuiteAntiMalwarePolicies = getJsonData('securitysuite-anti-malware-policies-json');
+    const securitySuiteAntiMalwareRules = getJsonData('securitysuite-anti-malware-rules-json');
     const securitySuiteProtectionPolicyRules = getJsonData('securitysuite-protection-policy-rules-json');
     const securitySuiteAcceptedDomains = getJsonData('securitysuite-accepted-domains-json');
 
@@ -21,6 +23,8 @@ window.addEventListener('DOMContentLoaded', () => {
         securitySuitePartnerDomains,
         securitySuiteAntiPhishPolicies,
         securitySuiteAntiPhishRules,
+        securitySuiteAntiMalwarePolicies,
+        securitySuiteAntiMalwareRules,
         securitySuiteProtectionPolicyRules,
         securitySuiteAcceptedDomains
     );
