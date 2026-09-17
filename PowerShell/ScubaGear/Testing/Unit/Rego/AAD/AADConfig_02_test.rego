@@ -194,8 +194,11 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-    "0 conditional access policy(s) found that meet(s) all requirements. Near miss: Test Policy would pass if the config file is updated to include: group exclusions. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -209,8 +212,11 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
                         with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
-    ReportDetailStr :=
-    "0 conditional access policy(s) found that meet(s) all requirements. Near miss: Test Policy would pass if the config file is updated to include: group exclusions. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 

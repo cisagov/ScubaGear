@@ -107,11 +107,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(LegacyAuthentication, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(LegacyAuthentication) > 0
@@ -189,11 +189,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportDetailsArrayLicenseWarning(BlockHighRisk, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Conditions := [
@@ -286,11 +286,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportDetailsArrayLicenseWarning(SignInBlocked, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Conditions := [
@@ -371,11 +371,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(PhishingResistantMFAPolicies) > 0
@@ -447,11 +447,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(NonSpecificMFAPolicies) > 0
@@ -662,11 +662,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(PhishingResistantMFAPrivilegedRoles, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(PhishingResistantMFAPrivilegedRoles) > 0
@@ -741,11 +741,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(ManagedDeviceAuth) > 0
@@ -821,11 +821,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(RequireManagedDeviceMFA) > 0
@@ -897,11 +897,11 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := [
+        some ReportDetail in [
             ReportFullDetailsArray(RequireDeviceCodeBlock, DescriptionString),
             NearMissReportDetails,
             CAPLINK
-        ][_]
+        ]
         ReportDetail != ""
     ])
     Status := Count(RequireDeviceCodeBlock) > 0
@@ -2014,12 +2014,13 @@ tests contains {
     "NearMisses": AIAgentsNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     AAD_9_1_Not_Applicable_Due_To_Environment == false
     NearMissReportDetails := CapNearMissDetails(
         AIAgents,
         AIAgentsNeedsConfigUpdate,
     )
+
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     
     ReportDetailArray := [
         ReportDetailsArrayLicenseWarning(AIAgents, DescriptionString),
@@ -2033,7 +2034,7 @@ tests contains {
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        ReportDetail := array.concat(ReportDetailArray, CapLinkArray)[_]
+        some ReportDetail in array.concat(ReportDetailArray, CapLinkArray)
         ReportDetail != ""
     ])
 

@@ -305,7 +305,7 @@ DomainReportDetails(Status, Metadata) := PASS if {
 
 # Returns a list of the labels of the exclusions types that failed
 CapMissingLabels(checks) := [c.label |
-    c := checks[_]
+    some c in checks
     not c.ok
 ]
 
@@ -314,7 +314,7 @@ CapEval(base_ok, checks) := {
     "status": "pass",
     "MissingExclusionTypes": missing,
 } if {
-    base_ok
+    base_ok == true
     missing := CapMissingLabels(checks)
     count(missing) == 0
 }
@@ -324,7 +324,7 @@ CapEval(base_ok, checks) := {
     "status": "near_miss",
     "MissingExclusionTypes": missing,
 } if {
-    base_ok
+    base_ok == true
     missing := CapMissingLabels(checks)
     count(missing) > 0
 }
@@ -334,13 +334,13 @@ CapEval(base_ok, checks) := {
     "status": "fail",
     "MissingExclusionTypes": missing,
 } if {
-    not base_ok
+    base_ok == false
     missing := CapMissingLabels(checks)
 }
 
 # Generates the near miss messages and returns them as a list of strings
 CapNearMissMessages(near_miss_objects) := [msg |
-    obj := near_miss_objects[_]
+    some obj in near_miss_objects
     msg := sprintf(
         "%s would pass if the config file is updated to include: %s",
         [obj.PolicyName, concat(", ", obj.MissingExclusionTypes)],
