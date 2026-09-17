@@ -7,7 +7,7 @@
   "ConnectHelpersPath": "..\\Connection\\ConnectHelpers.psm1",
   "BaselineSchemaPath": "..\\..\\schemas\\ScubaGearResultsBaselineSchema.json",
   "ApiCatalogPath": "..\\..\\schemas\\ScubaGearApiCatalog.json",
-  "ConfigSchemaPath": "..\\ScubaConfig\\ScubaConfigSchema.json",
+  "ConfigSchemaPath": "..\\..\\schemas\\ScubaConfigSchema.json",
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json",
   "OnlineApiCatalogURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearApiCatalog.json",
   "tenantGovernanceSchemaURL": "https://www.schemastore.org/utcm-monitor.json",
