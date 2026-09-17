@@ -1,0 +1,62 @@
+{
+    "MetaData": {
+        "Tool": "ScubaGear",
+        "ToolVersion": "1.9.0",
+        "TimestampZulu": "2026-06-01T00:00:00.000Z",
+        "ReportUUID": "cccccccc-0000-0000-0000-000000000002",
+        "ProductsAssessed": [ "Microsoft 365 Defender", "Security Suite" ],
+        "ProductAbbreviationMapping": { "Microsoft 365 Defender": "Defender", "Security Suite": "SecuritySuite" }
+    },
+    "Summary": {
+        "Defender": { "Manual": 0, "Failures": 0, "Warnings": 0, "Errors": 0, "Passes": 1, "Omits": 0, "IncorrectResults": 0 },
+        "SecuritySuite": { "Manual": 0, "Failures": 2, "Warnings": 0, "Errors": 0, "Passes": 2, "Omits": 0, "IncorrectResults": 0 }
+    },
+    "AnnotatedFailedPolicies": {},
+    "Results": {
+        "Defender": [
+            {
+                "GroupName": "Audit Logging",
+                "GroupNumber": "6",
+                "GroupReferenceURL": "https://example.com/defender#6",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.6.2v1", "Requirement": "A Defender policy that was never migrated.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Shall", "Details": "Passing after." }
+                ]
+            }
+        ],
+        "SecuritySuite": [
+            {
+                "GroupName": "Threat Protection",
+                "GroupNumber": "1",
+                "GroupReferenceURL": "https://example.com/securitysuite#1",
+                "Controls": [
+                    { "Control ID": "MS.SECURITYSUITE.1.4v1", "Requirement": "Attachments SHOULD be scanned for malware.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Should", "Details": "Passing after." }
+                ]
+            },
+            {
+                "GroupName": "Impersonation Protection",
+                "GroupNumber": "2",
+                "GroupReferenceURL": "https://example.com/securitysuite#2",
+                "Controls": [
+                    { "Control ID": "MS.SECURITYSUITE.2.1v1", "Requirement": "User impersonation protection SHOULD be enabled.", "Result": "Fail", "OriginalResult": "Fail", "Criticality": "Should", "Details": "Failing after." }
+                ]
+            },
+            {
+                "GroupName": "Data Loss Prevention",
+                "GroupNumber": "3",
+                "GroupReferenceURL": "https://example.com/securitysuite#3",
+                "Controls": [
+                    { "Control ID": "MS.SECURITYSUITE.3.1v1", "Requirement": "A custom policy SHALL be configured to protect PII.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Shall", "Details": "Passing after." }
+                ]
+            },
+            {
+                "GroupName": "Spam Filtering",
+                "GroupNumber": "6",
+                "GroupReferenceURL": "https://example.com/securitysuite#6",
+                "Controls": [
+                    { "Control ID": "MS.SECURITYSUITE.6.1v1", "Requirement": "A spam filter SHALL be enabled.", "Result": "Fail", "OriginalResult": "Fail", "Criticality": "Shall", "Details": "Failing after." }
+                ]
+            }
+        ]
+    },
+    "Raw": { "baseline_version": "2" }
+}

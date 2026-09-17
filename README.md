@@ -204,6 +204,7 @@ Reset-ScubaGearDependencies
 
 - [Execution Guide](docs/execution/execution.md)
 - [Understanding Reports](docs/execution/reports.md)
+- [Comparing Two Runs (Invoke-SCuBADiff)](docs/execution/diff.md)
 
 ### Troubleshooting & Support
 
