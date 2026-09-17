@@ -35,12 +35,12 @@ function Resolve-ScASchemaPath {
 function Resolve-ScAConfigSchemaPath {
     <#
     .SYNOPSIS
-    Resolves the canonical ScubaGear config schema (Modules/ScubaConfig/ScubaConfigSchema.json),
+    Resolves the canonical ScubaGear config schema (PowerShell/ScubaGear/schemas/ScubaConfigSchema.json),
     the single source of truth for which policies are configurable via exclusions/allow-lists.
     #>
-    # Engine lives in Modules/ScubaConfigApp/ScubaConfigAnalyzer -> config schema is two levels
+    # Engine lives in Modules/ScubaConfigApp/ScubaConfigAnalyzer -> schemas folder is three levels
     # up (resolve from the analyzer root, not this helper folder).
-    $candidate = Join-Path $syncHash.ScAModuleRoot '..\..\ScubaConfig\ScubaConfigSchema.json'
+    $candidate = Join-Path $syncHash.ScAModuleRoot '..\..\..\schemas\ScubaConfigSchema.json'
     if (Test-Path $candidate) { return (Resolve-Path $candidate).Path }
 
     # Return the candidate path even if it doesn't exist (caller can handle the missing file).
