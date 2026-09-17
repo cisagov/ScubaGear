@@ -8,56 +8,7 @@
     to make the workflow logic testable and reusable.
 #>
 
-function Get-KeyVaultInfo {
-    <#
-    .SYNOPSIS
-        Extracts Azure Key Vault information from environment variable
-    .DESCRIPTION
-        Parses the KEY_VAULT_INFO environment variable JSON and returns
-        the KeyVaultUrl and CertificateName for code signing
-    .PARAMETER KeyVaultInfo
-        The JSON string containing key vault configuration
-    .EXAMPLE
-        $info = Get-KeyVaultInfo -KeyVaultInfo $env:KEY_VAULT_INFO
-    .OUTPUTS
-        PSObject with KeyVaultUrl and KeyVaultCertificateName properties
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string]$KeyVaultInfo
-    )
-
-    try {
-        Write-Verbose "Parsing Key Vault information..."
-        $KeyVaultData = $KeyVaultInfo | ConvertFrom-Json
-
-        if (-not $KeyVaultData.KeyVault) {
-            throw "KeyVault property not found in configuration"
-        }
-
-        if (-not $KeyVaultData.KeyVault.URL) {
-            throw "KeyVault URL not found in configuration"
-        }
-
-        if (-not $KeyVaultData.KeyVault.CertificateName) {
-            throw "KeyVault CertificateName not found in configuration"
-        }
-
-        $Result = [PSCustomObject]@{
-            KeyVaultUrl = $KeyVaultData.KeyVault.URL
-            KeyVaultCertificateName = $KeyVaultData.KeyVault.CertificateName
-        }
-
-        Write-Verbose "Successfully parsed Key Vault info: URL=$($Result.KeyVaultUrl), Cert=$($Result.KeyVaultCertificateName)"
-        return $Result
-    }
-    catch {
-        Write-Error "Failed to parse Key Vault information: $($_.Exception.Message)"
-        throw
-    }
-}
+. $PSScriptRoot/Get-KeyVaultSecret.ps1
 
 function Remove-GitFiles {
     <#
@@ -275,7 +226,8 @@ function Get-PSGalleryApiKey {
     .SYNOPSIS
         Retrieves the PSGallery API key from Azure Key Vault
     .DESCRIPTION
-        Uses Azure CLI to retrieve the ScubaGear PSGallery API key from the specified Key Vault
+        Thin wrapper around Get-KeyVaultSecret that defaults to the
+        ScubaGear PSGallery API key secret name.
     .PARAMETER KeyVaultUrl
         The Azure Key Vault URL containing the API key
     .PARAMETER SecretName
@@ -297,14 +249,7 @@ function Get-PSGalleryApiKey {
 
     try {
         Write-Verbose "Retrieving PSGallery API key from Key Vault..."
-
-        $SecretUri = "$KeyVaultUrl/secrets/$SecretName"
-        $ApiKey = az keyvault secret show --id $SecretUri --query value -o tsv
-
-        if (-not $ApiKey) {
-            throw "Failed to retrieve API key from Key Vault"
-        }
-
+        $ApiKey = Get-KeyVaultSecret -KeyVaultUrl $KeyVaultUrl -SecretName $SecretName
         Write-Verbose "Successfully retrieved API key"
         return $ApiKey
     }
@@ -312,6 +257,5 @@ function Get-PSGalleryApiKey {
         Write-Error "Failed to retrieve PSGallery API key: $($_.Exception.Message)"
         throw
     }
-
 }
 

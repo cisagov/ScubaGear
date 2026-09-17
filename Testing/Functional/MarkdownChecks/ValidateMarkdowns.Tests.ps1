@@ -22,7 +22,7 @@ InModuleScope CreateReport {
     }
     Describe -tag "Markdown" -name 'Import secure baseline <Product>' -ForEach @(
         @{Product = "aad"; GroupCount = 8; PolicyCount = 30}
-        @{Product = "securitysuite"; GroupCount = 8; PolicyCount = 23}
+        @{Product = "securitysuite"; GroupCount = 8; PolicyCount = 24}
         @{Product = "exo"; GroupCount = 8; PolicyCount = 24}
         @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8}
         @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}

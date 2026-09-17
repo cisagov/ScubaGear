@@ -1,4 +1,5 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions
 
 function Get-ExchangeOnlineScope {
     <#
@@ -16,14 +17,7 @@ function Get-ExchangeOnlineScope {
         [string]$M365Environment
     )
 
-    $Scope = switch ($M365Environment.ToLower()) {
-        "commercial" { "https://outlook.office365.com/.default" }
-        "gcc"        { "https://outlook.office365.com/.default" }
-        "gcchigh"    { "https://outlook.office365.us/.default" }
-        "dod"        { "https://outlook-dod.office365.us/.default" }
-    }
-
-    return $Scope
+    return Get-ScubaGearPermissions -Product exo -OutAs oauthScope -Environment $M365Environment
 }
 
 function Get-ComplianceScope {
@@ -42,14 +36,7 @@ function Get-ComplianceScope {
         [string]$M365Environment
     )
 
-    $Scope = switch ($M365Environment.ToLower()) {
-        "commercial" { "https://ps.compliance.protection.outlook.com/.default" }
-        "gcc"        { "https://ps.compliance.protection.outlook.com/.default" }
-        "gcchigh"    { "https://ps.compliance.protection.office365.us/.default" }
-        "dod"        { "https://ps.compliance.protection.office365.us/.default" }
-    }
-
-    return $Scope
+    return Get-ScubaGearPermissions -Product securitysuite -OutAs oauthScope -Environment $M365Environment
 }
 
 function Get-ComplianceApiEndpoint {
@@ -90,19 +77,10 @@ function Get-ComplianceApiEndpoint {
         [string]$AccessToken
     )
 
-    $FrontDoorBaseUri = switch ($M365Environment.ToLower()) {
-        "commercial" { "https://ps.compliance.protection.outlook.com" }
-        "gcc"        { "https://ps.compliance.protection.outlook.com" }
-        "gcchigh"    { "https://ps.compliance.protection.office365.us" }
-        "dod"        { "https://ps.compliance.protection.office365.us" }
-    }
+    $FrontDoorBaseUri = Get-ScubaGearPermissions -Product securitysuite -OutAs endpoint -Environment $M365Environment
 
-    $BackendSuffix = switch ($M365Environment.ToLower()) {
-        "commercial" { ".ps.compliance.protection.outlook.com" }
-        "gcc"        { ".ps.compliance.protection.outlook.com" }
-        "gcchigh"    { ".ps.compliance.protection.office365.us" }
-        "dod"        { ".ps.compliance.protection.office365.us" }
-    }
+    # $BackendSuffix will end up looking like this: ".ps.compliance.protection.outlook.com"
+    $BackendSuffix = "." + ($FrontDoorBaseUri -replace '^https://', '')
 
     $DefaultEndpoint = "$FrontDoorBaseUri/adminapi/beta/$TenantId/InvokeCommand"
 
@@ -201,19 +179,10 @@ function Get-ExchangeOnlineApiEndpoint {
         [string]$AccessToken
     )
 
-    $AdminApiFrontDoorBaseUri = switch ($M365Environment.ToLower()) {
-        "commercial" { "https://outlook.office365.com" }
-        "gcc"        { "https://outlook.office365.com" }
-        "gcchigh"    { "https://outlook.office365.us" }
-        "dod"        { "https://outlook-dod.office365.us" }
-    }
+    $AdminApiFrontDoorBaseUri = Get-ScubaGearPermissions -Product exo -OutAs endpoint -Environment $M365Environment
 
-    $BackendSuffix = switch ($M365Environment.ToLower()) {
-        "commercial" { ".outlook.office365.com" }
-        "gcc"        { ".outlook.office365.com" }
-        "gcchigh"    { ".outlook.office365.us" }
-        "dod"        { ".outlook-dod.office365.us" }
-    }
+    # $BackendSuffix will end up looking like this: ".outlook.office365.com"
+    $BackendSuffix = "." + ($AdminApiFrontDoorBaseUri -replace '^https://', '')
 
     $Headers = @{
         "Authorization"   = "Bearer $AccessToken"
@@ -326,6 +295,9 @@ function Invoke-EXORestMethod {
     $MaxRetries = 3
     $RetryDelay = 5
     $TimeoutSec = 30
+
+    # Speeds up Invoke-WebRequest, disable progress bar
+    $ProgressPreference = 'SilentlyContinue'
 
     for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
         try {

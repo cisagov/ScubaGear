@@ -5,34 +5,22 @@ TestPlan:
     Tests:
       - TestDescription: MS.TEAMS.2.2v2 Non-compliant - AllowTeamsConsumerInbound; AllowTeamsConsumer
         Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: true
-              AllowTeamsConsumerInbound: true
+          - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowTeamsConsumer = $true; AllowTeamsConsumerInbound = $true }"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; AllowTeamsConsumer
         Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: true
-              AllowTeamsConsumerInbound: false
+          - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowTeamsConsumer = $true; AllowTeamsConsumerInbound = $false }"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.TEAMS.2.2v2 Compliant - AllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
         Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: false
-              AllowTeamsConsumerInbound: true
+          - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowTeamsConsumer = $false; AllowTeamsConsumerInbound = $true }"
         Postconditions: []
         ExpectedResult: true
       - TestDescription: MS.TEAMS.2.2v2 Compliant - DoNotAllowTeamsConsumerInbound; DoNotAllowTeamsConsumer
         Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: false
-              AllowTeamsConsumerInbound: false
+          - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowTeamsConsumer = $false; AllowTeamsConsumerInbound = $false }"
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.TEAMS.2.3v2
@@ -40,16 +28,12 @@ TestPlan:
     Tests:
       - TestDescription: MS.TEAMS.2.3v2 Non-compliant - AllowTeamsConsumer
         Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: true
+          - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowTeamsConsumer = $true }"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.TEAMS.2.3v2 Compliant - DoNotAllowTeamsConsumer
         Preconditions:
-          - Command: Set-CsTenantFederationConfiguration
-            Splat:
-              AllowTeamsConsumer: false
+          - Command: "Set-CsTenantFederationConfigurationRest -Identity Global -Settings @{ AllowTeamsConsumer = $false }"
         Postconditions: []
         ExpectedResult: true
   - PolicyId: MS.TEAMS.4.1v1
@@ -57,17 +41,11 @@ TestPlan:
     Tests:
       - TestDescription: MS.TEAMS.4.1v1 Non-compliant - AllowEmailIntoChannel
         Preconditions:
-          - Command: Set-CsTeamsClientConfiguration
-            Splat:
-              Identity: Global
-              AllowEmailIntoChannel: true
+          - Command: "Set-CsTeamsClientConfigurationRest -Identity Global -Settings @{ AllowEmailIntoChannel = $true }"
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.TEAMS.4.1v1 Compliant - Not AllowEmailIntoChannel
         Preconditions:
-          - Command: Set-CsTeamsClientConfiguration
-            Splat:
-              Identity: Global
-              AllowEmailIntoChannel: false
+          - Command: "Set-CsTeamsClientConfigurationRest -Identity Global -Settings @{ AllowEmailIntoChannel = $false }"
         Postconditions: []
         ExpectedResult: true

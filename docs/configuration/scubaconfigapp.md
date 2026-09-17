@@ -118,7 +118,7 @@ Start-SCuBAConfigApp
 - Begin with the "Organization" tab which is selected by default
 
 ### Step 2. Configure Organization Information
-- **Tenant Domain**: Enter your organization's primary domain (e.g., contoso.onmicrosoft.com)
+- **Tenant Domain**: Enter your organization's primary domain (e.g., contoso.onmicrosoft.com or a verified custom domain such as example.com)
 - **Display Name**: Provide a descriptive name for your organization
 - **Description**: Add optional details about this assessment configuration
 - **M365 Environment**: Select your tenant environment (Commercial, GCC, GCC High, DoD)
@@ -215,7 +215,7 @@ The integrated ScubaGear execution feature allows you to run assessments directl
 
 ### Requirements for Execution
 
-- _Initialize-Scuba_ has been ran to ensure all modules and dependencies are installed
+- _Install-ScubaDependencies_ has been ran to ensure all modules and dependencies are installed
 - Valid configuration with at least one product selected
 - Appropriate Microsoft Graph permissions for your account
 - Network connectivity to Microsoft 365 services

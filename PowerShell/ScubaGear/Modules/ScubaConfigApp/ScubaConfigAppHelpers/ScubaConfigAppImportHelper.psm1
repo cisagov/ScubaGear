@@ -334,6 +334,44 @@ Function Invoke-YamlImportWithProgress {
         # Clear in-place rather than replacing so card closures that captured these object
         # references at creation time continue to point at the live data stores.
         $syncHash.ExclusionData.Clear()
+        if ($syncHash.ExclusionComments) {
+            $syncHash.ExclusionComments.Clear()
+            # Re-harvest per-policy documentation comments (# lines directly above an exclusion
+            # policy) so they round-trip on import - ConvertFrom-Yaml strips comments.
+            try {
+                # Baseline policy id -> name, to skip the auto-emitted "# <name>" line.
+                $policyNames = @{}
+                if ($syncHash.Baselines) {
+                    foreach ($prodProp in $syncHash.Baselines.PSObject.Properties) {
+                        foreach ($pol in @($prodProp.Value)) { if ($pol.id) { $policyNames[[string]$pol.id] = [string]$pol.name } }
+                    }
+                }
+                $topKey  = $null
+                $pending = [System.Collections.Generic.List[string]]::new()
+                foreach ($rawLine in ($yamlContent -split "`r?`n")) {
+                    if ($rawLine -match '^\S[^:]*:\s*$') { $topKey = ($rawLine -replace ':\s*$', ''); $pending.Clear(); continue }
+                    $trimmed = $rawLine.Trim()
+                    if ($trimmed.StartsWith('#')) { [void]$pending.Add(($trimmed -replace '^#\s?', '')); continue }
+                    if ($rawLine -match '^\s{2}(MS\.[^:]+):\s*$') {
+                        $policyId = $matches[1]
+                        # Comments only apply to exclusion policies (a product section), not Annotate/Omit.
+                        if ($topKey -and $topKey -ne 'AnnotatePolicy' -and $topKey -ne 'OmitPolicy' -and $pending.Count -gt 0) {
+                            $lines = @($pending.ToArray())
+                            # Drop the auto-generated policy-name/requirement comment so it is not
+                            # re-imported as a user comment - both ScubaConfigApp and the Config Analyzer\
+                            if ($lines.Count -gt 0 -and $policyNames[$policyId]) {
+                                $normFirst = $lines[0].Trim().TrimEnd('.').Trim()
+                                $normName  = ([string]$policyNames[$policyId]).Trim().TrimEnd('.').Trim()
+                                if ($normFirst -ieq $normName) { $lines = @($lines | Select-Object -Skip 1) }
+                            }
+                            if ($lines.Count -gt 0) { $syncHash.ExclusionComments[$policyId] = $lines }
+                        }
+                        $pending.Clear(); continue
+                    }
+                    if ($trimmed -ne '') { $pending.Clear() }
+                }
+            } catch { Write-DebugOutput -Message "Exclusion comment harvest failed: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Warning" }
+        }
         $syncHash.OmissionData.Clear()
         $syncHash.AnnotationData.Clear()
         $syncHash.GeneralSettingsData.Clear()
@@ -805,6 +843,8 @@ Function Invoke-PolicyMigration {
         if ($policiesToMigrate.Count -eq 0) { continue }
 
         foreach ($oldPolicyId in $policiesToMigrate) {
+            # Isolate each policy so a failure on one does not abort migration of the rest.
+            try {
             $entry = $migrationMap[$oldPolicyId]
 
             if (-not $entry.newPolicyId -or -not $entry.newProduct) {
@@ -819,11 +859,17 @@ Function Invoke-PolicyMigration {
             $newPolicyId   = $entry.newPolicyId
             [void]$migratedToProducts.Add($entry.newProduct.ToLower())
 
-            # Create the target product key if it does not yet exist in the config
+            # Create the target product key if it does not yet exist in the config.
+            # Some legacy entries can be scalar strings instead of dictionaries; treat
+            # those as malformed migration targets and replace them with a clean map.
             if (-not ($Config.Keys -contains $newProductKey)) {
                 $Config[$newProductKey] = [ordered]@{}
             }
             $targetData = $Config[$newProductKey]
+            if (-not ($targetData -is [System.Collections.IDictionary])) {
+                $Config[$newProductKey] = [ordered]@{}
+                $targetData = $Config[$newProductKey]
+            }
 
             if (-not ($targetData.Keys -contains $newPolicyId)) {
                 $targetData[$newPolicyId] = $productData[$oldPolicyId]
@@ -846,6 +892,14 @@ Function Invoke-PolicyMigration {
                 Write-DebugOutput -Message "Migration skipped - target already configured: [$newProductKey][$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
             }
             $productData.Remove($oldPolicyId)
+            }
+            catch {
+                # Leave the offending policy in place and keep migrating the others.
+                [void]$syncHash.MigrationLog.Add(
+                    "$pfxDropped exclusion [$productKey][$oldPolicyId] - migration error, left in place: $($_.Exception.Message)")
+                Write-DebugOutput -Message "Error migrating exclusion [$productKey][$oldPolicyId]; skipping this policy and continuing: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                continue
+            }
         }
 
         # Remove the old product key if it is now empty (e.g., an old Defender section)
@@ -864,7 +918,10 @@ Function Invoke-PolicyMigration {
         if (-not ($Config.Keys -contains $yamlValue)) { continue }
 
         $controlData = $Config[$yamlValue]
-        if (-not ($controlData -is [System.Collections.IDictionary])) { continue }
+        if (-not ($controlData -is [System.Collections.IDictionary])) {
+            Write-DebugOutput -Message "Skipping migration for $yamlValue because the config value is not a dictionary: $($controlData.GetType().FullName)" -Source $MyInvocation.MyCommand -Level "Warning"
+            continue
+        }
 
         # Resolve controlType once per yamlValue so pending keys are scope-aware
         $yamlControlType = ($syncHash.UIConfigs.baselineControls | Where-Object { $_.yamlValue -eq $yamlValue }).controlType
@@ -872,6 +929,8 @@ Function Invoke-PolicyMigration {
         $policiesToMigrate = @($controlData.Keys) | Where-Object { $migrationMap.ContainsKey($_) }
 
         foreach ($oldPolicyId in $policiesToMigrate) {
+            # Isolate each policy so a failure on one does not abort migration of the rest.
+            try {
             $entry = $migrationMap[$oldPolicyId]
 
             if (-not $entry.newPolicyId) {
@@ -905,6 +964,14 @@ Function Invoke-PolicyMigration {
                 Write-DebugOutput -Message "Migration skipped - ${yamlValue} target exists: [$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
             }
             $controlData.Remove($oldPolicyId)
+            }
+            catch {
+                # Leave the offending policy in place and keep migrating the others.
+                [void]$syncHash.MigrationLog.Add(
+                    "$pfxDropped $yamlValue [$oldPolicyId] - migration error, left in place: $($_.Exception.Message)")
+                Write-DebugOutput -Message "Error migrating ${yamlValue} [$oldPolicyId]; skipping this policy and continuing: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                continue
+            }
         }
     }
 

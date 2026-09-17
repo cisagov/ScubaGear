@@ -39,7 +39,7 @@ DisconnectOnExit: false
 # CertificateThumbprint: fedcba9876543210fedcba9876543210fedcba98
 
 # The OPAPath field is used to specify the path to the Open Policy Agent (OPA) executable.
-# Initialize-SCuBA will attempt to download the OPA executable and place it under: $env:USERPROFILE\.scubagear\Tools
+# Install-ScubaDependencies will attempt to download the OPA executable and place it under: $env:USERPROFILE\.scubagear\Tools
 # OPAPath: .
 
 # The OutJsonFileName, OutCsvFileName, and OutActionPlanFileName fields are used to

@@ -1226,21 +1226,30 @@ Function New-FieldListCard {
     $removeButton.Visibility = "Collapsed"
 
     # Baseline Policy Viewer button
-    $baselinePolicyButton = New-Object System.Windows.Controls.Button
-    $baselinePolicyButton.Content = "View Baseline Policies"
-    $baselinePolicyButton.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_BaselinePolicyButton")
-    $baselinePolicyButton.Style = $syncHash.Window.FindResource("PrimaryButton")
-    $baselinePolicyButton.Width = 140
-    $baselinePolicyButton.Height = 28
-    $baselinePolicyButton.Margin = "0,0,10,0"
-    $baselinePolicyButton.Background = [System.Windows.Media.Brushes]::DarkBlue
-    $baselinePolicyButton.Foreground = [System.Windows.Media.Brushes]::White
-    $baselinePolicyButton.BorderThickness = "0"
-    $baselinePolicyButton.FontWeight = "SemiBold"
-    $baselinePolicyButton.Cursor = [System.Windows.Input.Cursors]::Hand
+    # Skipped for Global Settings (-OutPolicyOnly): those cards are not tied to a
+    # baseline policy, so the baseline viewer has nothing to navigate to.
+    $baselinePolicyButton = $null
+    if (-not $OutPolicyOnly) {
+        $baselinePolicyButton = New-Object System.Windows.Controls.Button
+        $baselinePolicyButton.Content = "View Baseline Policies"
+        $baselinePolicyButton.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_BaselinePolicyButton")
+        $baselinePolicyButton.Style = $syncHash.Window.FindResource("PrimaryButton")
+        $baselinePolicyButton.Width = 140
+        $baselinePolicyButton.Height = 28
+        $baselinePolicyButton.Margin = "0,0,10,0"
+        $baselinePolicyButton.Background = [System.Windows.Media.Brushes]::DarkBlue
+        $baselinePolicyButton.Foreground = [System.Windows.Media.Brushes]::White
+        $baselinePolicyButton.BorderThickness = "0"
+        $baselinePolicyButton.FontWeight = "SemiBold"
+        $baselinePolicyButton.Cursor = [System.Windows.Input.Cursors]::Hand
+    }
 
     [void]$buttonPanel.Children.Add($saveButton)
-    [void]$buttonPanel.Children.Add($baselinePolicyButton)
+    # Per-policy baseline viewer button is gated by EnablePolicyViewer (shown unless explicitly false).
+    $showBaselineButton = -not ($syncHash.UIConfigs.PSObject.Properties['EnablePolicyViewer'] -and $syncHash.UIConfigs.EnablePolicyViewer -eq $false)
+    if ($showBaselineButton) {
+        [void]$buttonPanel.Children.Add($baselinePolicyButton)
+    }
     [void]$buttonPanel.Children.Add($removeButton)
 
     # Dismiss Review button — only shown on migration-pending cards
@@ -1262,7 +1271,90 @@ Function New-FieldListCard {
         [void]$buttonPanel.Children.Add($dismissButton)
     }
 
+    # Comment (exclusions only): a hidden multi-line box toggled by an "Add comment" button.
+    # Purely YAML documentation - each non-empty line becomes a "# ..." above the policy; not a config value.
+    $commentPanel = $null
+    if ($controlType -eq 'Exclusions') {
+        $commentButton = New-Object System.Windows.Controls.Button
+        $commentButton.Content = "Add comment"
+        $commentButton.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_CommentButton")
+        $commentButton.Style = $syncHash.Window.FindResource("PrimaryButton")
+        $commentButton.Width = 120
+        $commentButton.Height = 28
+        # Left margin (the buttons before it use right-margins, and Remove/Dismiss have none) keeps the gap even.
+        $commentButton.Margin = "10,0,0,0"
+        $commentButton.Background = [System.Windows.Media.Brushes]::SlateGray
+        $commentButton.Foreground = [System.Windows.Media.Brushes]::White
+        $commentButton.BorderThickness = "0"
+        $commentButton.FontWeight = "SemiBold"
+        $commentButton.Cursor = [System.Windows.Input.Cursors]::Hand
+        [void]$buttonPanel.Children.Add($commentButton)
+
+        $commentPanel = New-Object System.Windows.Controls.StackPanel
+        $commentPanel.Visibility = "Collapsed"
+        $commentPanel.Margin = "0,10,0,0"
+
+        $commentLabel = New-Object System.Windows.Controls.TextBlock
+        $commentLabel.Text = "Comment (YAML documentation only; each line becomes a # comment above this policy):"
+        $commentLabel.FontSize = 11
+        $commentLabel.Foreground = $syncHash.Window.FindResource("MutedTextBrush")
+        $commentLabel.TextWrapping = "Wrap"
+        $commentLabel.Margin = "0,0,0,4"
+        [void]$commentPanel.Children.Add($commentLabel)
+
+        $commentBox = New-Object System.Windows.Controls.TextBox
+        $commentBox.Name = ($PolicyId.replace('.', '_') + "_" + $CardName + "_CommentBox")
+        $commentBox.AcceptsReturn = $true
+        $commentBox.TextWrapping = "Wrap"
+        $commentBox.MinHeight = 60
+        $commentBox.MaxHeight = 160
+        $commentBox.VerticalScrollBarVisibility = "Auto"
+        [void]$commentPanel.Children.Add($commentBox)
+
+        # Persist each line into ExclusionComments (ordered array) keyed by this policy id.
+        $commentBox.Add_TextChanged({
+            if ([string]::IsNullOrWhiteSpace($this.Text)) {
+                if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) { [void]$syncHash.ExclusionComments.Remove($PolicyId) }
+                $commentButton.Content = 'Add comment'
+            } else {
+                $syncHash.ExclusionComments[$PolicyId] = @($this.Text -split "`r?`n")
+                $commentButton.Content = 'Remove comment'
+            }
+        }.GetNewClosure())
+
+        # Toggle the box; focus it when shown.
+        $commentButton.Add_Click({
+            if ($commentPanel.Visibility -eq [System.Windows.Visibility]::Visible) {
+                if (-not [string]::IsNullOrWhiteSpace($commentBox.Text)) {
+                    $commentBox.Text = ''
+                    if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) { [void]$syncHash.ExclusionComments.Remove($PolicyId) }
+                    $commentPanel.Visibility = 'Collapsed'
+                    $commentButton.Content = 'Add comment'
+                } else {
+                    $commentPanel.Visibility = 'Collapsed'
+                    $commentButton.Content = 'Add comment'
+                }
+            } else {
+                $commentPanel.Visibility = 'Visible'
+                if (-not [string]::IsNullOrWhiteSpace($commentBox.Text)) {
+                    $commentButton.Content = 'Remove comment'
+                } else {
+                    $commentButton.Content = 'Add comment'
+                }
+                [void]$commentBox.Focus()
+            }
+        }.GetNewClosure())
+
+        # Restore an existing comment (e.g. after re-render) and reveal the box.
+        if ($syncHash.ExclusionComments -and $syncHash.ExclusionComments.Contains($PolicyId)) {
+            $commentBox.Text = (@($syncHash.ExclusionComments[$PolicyId]) -join [Environment]::NewLine)
+            $commentPanel.Visibility = 'Visible'
+            $commentButton.Content = 'Remove comment'
+        }
+    }
+
     [void]$detailsPanel.Children.Add($buttonPanel)
+    if ($commentPanel) { [void]$detailsPanel.Children.Add($commentPanel) }
 
     # Add elements to main grid
     [void]$cardGrid.Children.Add($headerGrid)
@@ -1503,7 +1595,7 @@ Function New-FieldListCard {
     Add-UIControlEventHandler -Control $saveButton
     Add-UIControlEventHandler -Control $removeButton
     <##>
-    Add-UIControlEventHandler -Control $baselinePolicyButton
+    if ($baselinePolicyButton) { Add-UIControlEventHandler -Control $baselinePolicyButton }
 
     # Dismiss Review button click handler — removes migrated data and clears pending state
     if ($dismissButton) {
@@ -1557,15 +1649,17 @@ Function New-FieldListCard {
     }
 
     # Create click event for baseline policy viewer button
-    $baselinePolicyButton.Add_Click({
-        try {
-            # Use the main baseline viewer function with navigation parameter via syncHash
-            & $syncHash.ShowBaselinePolicyViewer -NavigateToPolicyId $PolicyId
-        } catch {
-            Write-DebugOutput -Message "Error opening baseline policy viewer: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
-            $syncHash.ShowMessageBox.Invoke("Error opening baseline policies: $($_.Exception.Message)", "Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
-        }
-    }.GetNewClosure())
+    if ($baselinePolicyButton) {
+        $baselinePolicyButton.Add_Click({
+            try {
+                # Use the main baseline viewer function with navigation parameter via syncHash
+                & $syncHash.ShowBaselinePolicyViewer -NavigateToPolicyId $PolicyId
+            } catch {
+                Write-DebugOutput -Message "Error opening baseline policy viewer: $($_.Exception.Message)" -Source $MyInvocation.MyCommand -Level "Error"
+                $syncHash.ShowMessageBox.Invoke("Error opening baseline policies: $($_.Exception.Message)", "Error", [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Error)
+            }
+        }.GetNewClosure())
+    }
 
     # Create click event for save button
     $saveButton.Add_Click({

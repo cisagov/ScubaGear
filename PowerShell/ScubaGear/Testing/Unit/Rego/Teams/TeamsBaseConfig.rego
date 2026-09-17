@@ -35,17 +35,13 @@ ClientConfiguration := {
     "AllowEmailIntoChannel": false
 }
 
-TeamsTenantInfo := {
-    "AssignedPlan": [
-        "MCOEV",
-        "Teams",
-        "MCOProfessional"
-    ]
-}
-
 AppPolicies := {
     "Identity": "Global",
     "DefaultCatalogAppsType": "AllowedAppList",
     "GlobalCatalogAppsType": "AllowedAppList",
     "PrivateCatalogAppsType": "AllowedAppList"
+}
+
+ScubaConfig := {
+    "M365Environment": "commercial"
 }

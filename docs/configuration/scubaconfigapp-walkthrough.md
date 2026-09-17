@@ -6,7 +6,7 @@ This guide walks you through every step of creating a ScubaGear configuration fi
 
 ## Before You Begin
 
-- ScubaGear must be installed. Run `Initialize-SCuBA` if you haven't already.
+- ScubaGear must be installed. Run `Install-ScubaDependencies` if you haven't already.
 - You must have PowerShell 5.1 or later on a Windows machine with a graphical desktop.
 - To use **Graph-assisted lookups** (auto-populate users and groups), launch with `-Online`. See [Using the -Online Mode](#using-the--online-mode) for a full walkthrough of what this enables. The signed-in account must have the following Microsoft Graph **delegated** permissions:
 
@@ -48,7 +48,7 @@ The **Main** tab collects organization information and product selection. It mus
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| Tenant Domain | **Yes** | Your M365 tenant domain, e.g. `contoso.onmicrosoft.com` |
+| Tenant Domain | **Yes** | Your M365 tenant primary domain, e.g. `contoso.onmicrosoft.com` or a verified custom domain such as `example.com` |
 | Organization Name | **Yes** (BOD submissions) | Human-readable org name, e.g. `Department of Example` |
 | Org Unit Name | No | Sub-unit, e.g. `Office of IT` |
 | Description | No | Free-text note about this configuration |

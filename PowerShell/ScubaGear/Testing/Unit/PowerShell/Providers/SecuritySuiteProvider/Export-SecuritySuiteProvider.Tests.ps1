@@ -60,7 +60,16 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
                 return [MockCommandTracker]::New()
             }
             Mock -ModuleName ExportSecuritySuiteProvider Invoke-EXORestMethod {
+                Write-Information "Mocked Invoke-EXORestMethod called with CmdletName: $CmdletName" -InformationAction Continue
                 switch ($CmdletName) {
+                    'Get-AntiPhishRule' {
+                        @(
+                            [pscustomobject]@{ Name = 'Custom policy 10'; Priority = 10 }
+                            [pscustomobject]@{ Name = 'Standard Preset Security Policy'; Priority = 99 }
+                            [pscustomobject]@{ Name = 'Custom policy 0'; Priority = 0 }
+                            [pscustomobject]@{ Name = 'Strict Preset Security Policy'; Priority = 99 }
+                        )
+                    }
                     'Get-DlpComplianceRule' {
                         [pscustomobject]@{
                             Name = $CmdletName
@@ -103,6 +112,39 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AdminAuditLogConfig'
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-EOPProtectionPolicyRule'
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AntiPhishPolicy'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AntiPhishRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AcceptedDomain'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-HostedConnectionFilterPolicy'
+
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-SafeLinksPolicy'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-SafeLinksRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-HostedContentFilterPolicy'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-HostedContentFilterRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-MalwareFilterPolicy'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-MalwareFilterRule'
+
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-SafeAttachmentPolicy'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-SafeAttachmentRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-ATPBuiltInProtectionRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-AtpPolicyForO365'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-ATPProtectionPolicyRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-DlpCompliancePolicy'
+
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-DlpComplianceRule'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-ProtectionAlert'
+            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-UnifiedAuditLogRetentionPolicy'
+        }
+
+        It "When called with -M365Environment '<_>', orders policy tables by preset and priority" {
+            $Json = Export-SecuritySuiteProvider -M365Environment $_ -AccessToken 'token' -ApiEndpoint 'https://example.test/adminapi/beta/tenant/InvokeCommand'
+            $Parsed = ('{' + $Json.TrimEnd(',') + '}') | ConvertFrom-Json
+
+            $Parsed.anti_phish_rules.Name | Should -Be @(
+                'Strict Preset Security Policy'
+                'Standard Preset Security Policy'
+                'Custom policy 0'
+                'Custom policy 10'
+            )
         }
     }
 }
