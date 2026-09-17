@@ -298,3 +298,76 @@ DomainReportDetails(Status, Metadata) := PASS if {
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 } else := FAIL
+
+############################################
+# Shared helper functions for identifying near misses in CAP exclusions and reporting them
+############################################
+
+# Returns a list of the labels of the exclusions types that failed
+CapMissingLabels(checks) := [c.label |
+    some c in checks
+    not c.ok
+]
+
+# Sets status to pass if the base check is ok and there are no missing exclusion types
+CapEval(base_ok, checks) := {
+    "status": "pass",
+    "MissingExclusionTypes": missing,
+} if {
+    base_ok == true
+    missing := CapMissingLabels(checks)
+    count(missing) == 0
+}
+
+# Sets status to near_miss if the base check is ok and there are missing exclusion types
+CapEval(base_ok, checks) := {
+    "status": "near_miss",
+    "MissingExclusionTypes": missing,
+} if {
+    base_ok == true
+    missing := CapMissingLabels(checks)
+    count(missing) > 0
+}
+
+# Sets status to fail if the base check is not ok
+CapEval(base_ok, checks) := {
+    "status": "fail",
+    "MissingExclusionTypes": missing,
+} if {
+    base_ok == false
+    missing := CapMissingLabels(checks)
+}
+
+# Generates the near miss messages and returns them as a list of strings
+CapNearMissMessages(near_miss_objects) := [msg |
+    some obj in near_miss_objects
+    msg := sprintf(
+        "%s would pass if the config file is updated to include: %s",
+        [obj.PolicyName, concat(", ", obj.MissingExclusionTypes)],
+    )
+]
+
+# Returns an empty string for the near miss details because the check passed
+CapNearMissDetails(actual_value, _) := NearMissDetails if {
+    count(actual_value) > 0
+    NearMissDetails := ""
+}
+
+# Returns a string with the near miss details because 
+#   the check failed and 
+#   there are some near miss policies
+CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
+    count(actual_value) == 0
+    count(near_miss_objects) > 0
+    near_miss_messages := CapNearMissMessages(near_miss_objects)
+    NearMissDetails := sprintf("Near miss: %s", [concat("; ", near_miss_messages)])
+}
+
+# Returns an empty string for the near miss details because 
+#   the check failed and 
+#   there are no near miss policies
+CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
+    count(actual_value) == 0
+    count(near_miss_objects) == 0
+    NearMissDetails := ""
+}
