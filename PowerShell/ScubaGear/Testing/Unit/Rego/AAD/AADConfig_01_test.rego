@@ -50,8 +50,11 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -62,9 +65,11 @@ test_NoExclusionsExcludeGroups_Incorrect if {
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -165,14 +170,18 @@ test_RoleExclusions_Incorrect if {
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
+
 test_ApplicationExclusions_Incorrect if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements. ",
+        "Near miss: Test Policy would pass if the config file is updated to include:",
+        " app exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -183,9 +192,11 @@ test_UserExclusionNoExempt_Incorrect if {
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements. ",
+        "Near miss: Test Policy would pass if the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -198,8 +209,11 @@ test_UserExclusionsSingleExempt_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -212,9 +226,11 @@ test_UserExclusionsNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -257,9 +273,11 @@ test_UserExclusionsExcludeGroups_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -329,9 +347,11 @@ test_GroupExclusionNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to",
+        " include: group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -343,8 +363,11 @@ test_GroupExclusionsNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -358,8 +381,11 @@ test_GroupExclusionsSingleExempt_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -426,9 +452,11 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " user exclusions, group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -441,8 +469,11 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements. ",
+        "Near miss: Test Policy would pass if the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -456,8 +487,10 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include: user exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -472,8 +505,11 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.1.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.1.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " user exclusions, group exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
@@ -529,9 +565,11 @@ test_GuestUserTypeExclusionNoExempt_Incorrect if {
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
-
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " guest exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
 }
 #--

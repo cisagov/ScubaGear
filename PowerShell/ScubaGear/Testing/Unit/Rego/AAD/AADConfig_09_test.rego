@@ -40,6 +40,29 @@ test_BlockRiskyAgentsCAP_Correct_V1 if {
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
 }
 
+test_BlockRiskyAgentsCAPNearMiss_Incorrect_V1 if {
+    ScubaConf := json.patch(ScubaConfig,
+                [{"op": "add", "path": "M365Environment", "value": "commercial"},])
+    CAP := json.patch(ConditionalAccessPolicies,
+                [{"op": "add", "path": "Conditions/AgentIdRiskLevels", "value": "high"},
+                {"op": "add", "path": "Conditions/ClientApplications", "value": {} },
+                {"op": "add", "path": "Conditions/ClientApplications/IncludeAgentIdServicePrincipals", "value": ["All"] },
+                {"op": "add", "path": "Conditions/ClientAppTypes", "value": ["all"] },
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["SpecialApp"]}])
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config as ScubaConf
+                        with input.scuba_config.Aad["MS.AAD.9.1v1"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.9.1v1"].CapExclusions.Applications as ["NotSpecialApp"]
+
+    ReportDetailString := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " app exclusions. <a href='#caps'>View all CA policies</a>."
+    ])
+    TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
+}
+
 test_MissingHighRisk_Incorrect_V1 if {
     ScubaConf := json.patch(ScubaConfig,
                 [{"op": "add", "path": "M365Environment", "value": "commercial"},])
