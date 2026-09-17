@@ -841,6 +841,76 @@ InModuleScope Diff {
     }
 
 
+
+    Describe -Tag 'Diff' -Name 'Classification display order' {
+        BeforeAll {
+            $script:ExpectedOrder = @(
+                'Errored'
+                'NewFail'
+                'NewWarning'
+                'NewIncorrectResult'
+                'PolicyVersionUpdate'
+                'NewOmission'
+                'Other'
+                'NewAutomatedCheck'
+                'NewManualCheck'
+                'NewPass'
+                'NewPolicy'
+                'RemovedPolicy'
+                'Migrated'
+                'Unchanged'
+            )
+            $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $script:OrderDiff = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
+            $script:OrderHtml = New-ScubaDiffReport -DiffResults $script:OrderDiff
+        }
+
+        It 'Lists the taxonomy in severity tiers' {
+            @($script:ClassificationOrder) | Should -Be $ExpectedOrder
+        }
+
+        It 'Covers exactly the classifications the color map knows about' {
+            $ordered = @($script:ClassificationOrder) | Sort-Object
+            $colored = @($script:ClassificationColorMap.Keys) | Sort-Object
+            $ordered | Should -Be $colored
+        }
+
+        It 'Lists no classification twice' {
+            @($script:ClassificationOrder | Select-Object -Unique).Count |
+                Should -Be @($script:ClassificationOrder).Count
+        }
+
+        It 'Emits the summary column headers in that order' {
+            $cols = [regex]::Matches($OrderHtml, 'class="classification-col[^"]*" data-classification="([^"]+)"')
+            @($cols | ForEach-Object { $_.Groups[1].Value }) | Should -Be $ExpectedOrder
+        }
+
+        It 'Emits the filter checkboxes in that order, minus Unchanged' {
+            $toggles = [regex]::Matches($OrderHtml, 'class="classification-toggle" data-classification="([^"]+)"')
+            @($toggles | ForEach-Object { $_.Groups[1].Value }) |
+                Should -Be @($ExpectedOrder | Where-Object { $_ -ne 'Unchanged' })
+        }
+
+        It 'Puts the currently-broken tier ahead of the good-news tier' {
+            $pos = @{}
+            for ($i = 0; $i -lt $ExpectedOrder.Count; $i++) { $pos[$ExpectedOrder[$i]] = $i }
+            $pos['Errored']    | Should -BeLessThan $pos['NewWarning']
+            $pos['NewFail']    | Should -BeLessThan $pos['NewWarning']
+            $pos['NewWarning'] | Should -BeLessThan $pos['NewOmission']
+            $pos['Other']      | Should -BeLessThan $pos['NewAutomatedCheck']
+            $pos['NewManualCheck'] | Should -BeLessThan $pos['NewPass']
+            $pos['RemovedPolicy']  | Should -BeLessThan $pos['Unchanged']
+        }
+
+        It 'Orders the JSON summary counts by the same taxonomy' {
+            $seen = @($OrderDiff.Summary.AAD.Keys)
+            $seen.Count | Should -BeGreaterThan 1
+            $expectedSubset = @($ExpectedOrder | Where-Object { $seen -contains $_ })
+            $seen | Should -Be $expectedSubset
+        }
+    }
     Describe -Tag 'Diff' -Name 'Get-ScubaDiffRunTimestamp' {
         It 'Parses a ScubaResults Zulu timestamp as UTC' {
             $parsed = Get-ScubaDiffRunTimestamp -Timestamp '2026-01-01T00:00:00.000Z'

@@ -271,6 +271,32 @@ an **open string set**: any value the tool does not recognize (e.g. a future
 status) classifies as `Other` with both literal values preserved — it never
 crashes the diff.
 
+## Classification order
+
+The summary table's classification columns, and the filter checkboxes in their
+headers, are laid out in one severity order shared with ScubaGoggles, so the two
+tools' reports read the same way:
+
+| Tier | Meaning | Classifications |
+|---|---|---|
+| 1 | Broken now | `Errored`, `NewFail` |
+| 2 | Degraded | `NewWarning` |
+| 3 | Needs manual review | `NewIncorrectResult`, `PolicyVersionUpdate`, `NewOmission`, `Other` |
+| 4 | Coverage shape changed | `NewAutomatedCheck`, `NewManualCheck` |
+| 5 | Good news and administrative | `NewPass`, `NewPolicy`, `RemovedPolicy`, `Migrated` |
+| 6 | Hidden by default | `Unchanged` |
+
+The tiers roughly track the row colors below, since row color keys off Result
+(After), so column order and row color tell one severity story instead of two
+unrelated ones.
+
+`Migrated` is the one classification ScubaGoggles has no counterpart for, since
+the legacy to Security Suite migration is specific to the M365 baselines. It sits
+with the administrative classifications, because a `Migrated` stub reports a
+relocation rather than a result change.
+
+The per-product counts in `DiffResults.json` are written in this same order.
+
 ## Row coloring
 
 Report rows are colored by the **Result (After)** value, so the color reflects

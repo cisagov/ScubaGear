@@ -36,7 +36,8 @@ $script:ProductOrder = @(
 )
 
 # Classification -> row color class used by the HTML report. Keep in sync with the
-# Diff Key terminology in the ADR / usage doc.
+# Diff Key terminology in the ADR / usage doc. Key order here is incidental:
+# $script:ClassificationOrder below is what drives display order.
 $script:ClassificationColorMap = [ordered]@{
     'Errored'             = 'red'
     'NewFail'             = 'red'
@@ -53,6 +54,40 @@ $script:ClassificationColorMap = [ordered]@{
     'Migrated'            = 'neutral'
     'Unchanged'           = 'unchanged'
 }
+
+# Display order for the summary table's classification columns and their filter
+# checkboxes, shared with ScubaGoggles so the two tools' reports read the same
+# way. The order is by severity, in tiers:
+#
+#   1. Broken now:           Errored, NewFail
+#   2. Degraded:             NewWarning
+#   3. Needs manual review:  NewIncorrectResult, PolicyVersionUpdate,
+#                            NewOmission, Other
+#   4. Coverage shape:       NewAutomatedCheck, NewManualCheck
+#   5. Good news / admin:    NewPass, NewPolicy, RemovedPolicy, Migrated
+#   6. Hidden by default:    Unchanged
+#
+# The tiers track the row colors a record renders with, since row color keys off
+# Result (After), so column order and row color tell one severity story rather
+# than two unrelated ones. 'Migrated' is the one entry ScubaGoggles has no
+# counterpart for; it sits with the administrative classifications because a
+# Migrated stub reports a relocation, not a result change.
+$script:ClassificationOrder = @(
+    'Errored'
+    'NewFail'
+    'NewWarning'
+    'NewIncorrectResult'
+    'PolicyVersionUpdate'
+    'NewOmission'
+    'Other'
+    'NewAutomatedCheck'
+    'NewManualCheck'
+    'NewPass'
+    'NewPolicy'
+    'RemovedPolicy'
+    'Migrated'
+    'Unchanged'
+)
 
 # Classification -> human-friendly label for HTML display. Classifications not listed here are
 # displayed using their raw (camelCase) token.
@@ -919,8 +954,20 @@ function Compare-ScubaResults {
         # 'Migrated' stub behind for every entry it relocates.
         if ($records.Count -eq 0) { continue }
 
+        # Emit the per-product counts in the same severity order the HTML summary
+        # columns use, so a consumer reading DiffResults.json sees the taxonomy in
+        # one order rather than in whatever order the records happened to arrive.
+        # Any classification outside the taxonomy is appended rather than dropped.
+        $orderedCounts = [ordered]@{}
+        foreach ($name in $script:ClassificationOrder) {
+            if ($classificationCounts.Contains($name)) { $orderedCounts[$name] = $classificationCounts[$name] }
+        }
+        foreach ($name in @($classificationCounts.Keys)) {
+            if (-not $orderedCounts.Contains($name)) { $orderedCounts[$name] = $classificationCounts[$name] }
+        }
+
         $diff[$product] = $records
-        $summary[$product] = $classificationCounts
+        $summary[$product] = $orderedCounts
     }
 
     $timestampZulu = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ')
@@ -1064,8 +1111,9 @@ function New-ScubaDiffReport {
     $meta = $DiffResults.MetaData
     $enc = { param($s) ConvertTo-ScubaHtmlEncoded ([string]$s) }
 
-    # Ordered list of classifications for stable summary columns.
-    $classificationOrder = @($script:ClassificationColorMap.Keys)
+    # Severity-ordered list of classifications for the summary columns and their
+    # filter checkboxes (see $script:ClassificationOrder).
+    $classificationOrder = @($script:ClassificationOrder)
 
     $sb = New-Object System.Text.StringBuilder
 
