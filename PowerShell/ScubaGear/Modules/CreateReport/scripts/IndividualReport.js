@@ -14,6 +14,8 @@ window.addEventListener('DOMContentLoaded', () => {
     buildSecuritySuiteConfigTables({
         sensitiveUsers: getSecuritySuiteData('sensitive-users'),
         partnerDomains: getSecuritySuiteData('partner-domains'),
+        antiMalwarePolicies: getSecuritySuiteData('anti-malware-policies'),
+        antiMalwareRules: getSecuritySuiteData('anti-malware-rules'),
         antiPhishPolicies: getSecuritySuiteData('anti-phish-policies'),
         antiPhishRules: getSecuritySuiteData('anti-phish-rules'),
         antiSpamPolicies: getSecuritySuiteData('anti-spam-policies'),
