@@ -840,6 +840,84 @@ InModuleScope Diff {
         }
     }
 
+
+    Describe -Tag 'Diff' -Name 'Get-ScubaDiffRunTimestamp' {
+        It 'Parses a ScubaResults Zulu timestamp as UTC' {
+            $parsed = Get-ScubaDiffRunTimestamp -Timestamp '2026-01-01T00:00:00.000Z'
+            $parsed | Should -Not -BeNullOrEmpty
+            $parsed.Year | Should -Be 2026
+            $parsed.Kind | Should -Be ([System.DateTimeKind]::Utc)
+        }
+        It 'Treats an offset timestamp as the same instant in UTC' {
+            $utc = Get-ScubaDiffRunTimestamp -Timestamp '2026-01-01T00:00:00.000Z'
+            $offset = Get-ScubaDiffRunTimestamp -Timestamp '2025-12-31T19:00:00.000-05:00'
+            $offset | Should -Be $utc
+        }
+        It 'Returns null for missing or empty values' {
+            Get-ScubaDiffRunTimestamp -Timestamp $null | Should -BeNullOrEmpty
+            Get-ScubaDiffRunTimestamp -Timestamp ''    | Should -BeNullOrEmpty
+            Get-ScubaDiffRunTimestamp -Timestamp '   ' | Should -BeNullOrEmpty
+        }
+        It 'Returns null for values that are not an ISO-8601 date and time' {
+            Get-ScubaDiffRunTimestamp -Timestamp 't'          | Should -BeNullOrEmpty
+            Get-ScubaDiffRunTimestamp -Timestamp '3'          | Should -BeNullOrEmpty
+            Get-ScubaDiffRunTimestamp -Timestamp '2026-01-01' | Should -BeNullOrEmpty
+            Get-ScubaDiffRunTimestamp -Timestamp 'yesterday'  | Should -BeNullOrEmpty
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'Invoke-SCuBADiff run-order warning' {
+        BeforeAll {
+            $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $script:OutDir = Join-Path ([System.IO.Path]::GetTempPath()) ("scuba-diff-order-" + [guid]::NewGuid())
+        }
+        AfterAll {
+            Remove-Item -LiteralPath $script:OutDir -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
+        It 'Warns when the after run predates the before run' {
+            $warnings = @()
+            Invoke-SCuBADiff `
+                -BeforePath (Join-Path $FixtureDir 'PairA-After.json') `
+                -AfterPath (Join-Path $FixtureDir 'PairA-Before.json') `
+                -OutPath $OutDir -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null
+            ($warnings -join "`n") | Should -BeLike '*is older than*'
+        }
+
+        It 'Still writes all three artifacts for an out-of-order pair' {
+            $result = Invoke-SCuBADiff `
+                -BeforePath (Join-Path $FixtureDir 'PairA-After.json') `
+                -AfterPath (Join-Path $FixtureDir 'PairA-Before.json') `
+                -OutPath $OutDir -WarningAction SilentlyContinue
+            Test-Path -LiteralPath $result.JsonPath   | Should -BeTrue
+            Test-Path -LiteralPath $result.CsvPath    | Should -BeTrue
+            Test-Path -LiteralPath $result.ReportPath | Should -BeTrue
+        }
+
+        It 'Does not warn when the after run is the later one' {
+            $warnings = @()
+            Invoke-SCuBADiff `
+                -BeforePath (Join-Path $FixtureDir 'PairA-Before.json') `
+                -AfterPath (Join-Path $FixtureDir 'PairA-After.json') `
+                -OutPath $OutDir -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null
+            ($warnings -join "`n") | Should -Not -BeLike '*-BeforePath run*'
+        }
+
+        It 'Skips the check when a timestamp is not a usable date' {
+            $warnings = @()
+            $before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $after = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
+            $after.MetaData.TimestampZulu = 'not-a-date'
+            $beforeTmp = Join-Path $OutDir 'undated-before.json'
+            $afterTmp = Join-Path $OutDir 'undated-after.json'
+            New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
+            $before | ConvertTo-Json -Depth 10 | Set-Content -Path $beforeTmp
+            $after | ConvertTo-Json -Depth 10 | Set-Content -Path $afterTmp
+            Invoke-SCuBADiff -BeforePath $beforeTmp -AfterPath $afterTmp `
+                -OutPath $OutDir -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null
+            ($warnings -join "`n") | Should -Not -BeLike '*-BeforePath run*'
+        }
+    }
     Describe -Tag 'Diff' -Name 'Invoke-SCuBADiff artifacts' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'

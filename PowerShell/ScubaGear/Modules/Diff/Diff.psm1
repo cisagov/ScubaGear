@@ -714,6 +714,41 @@ function Import-ScubaResultsFile {
     return $obj
 }
 
+function Get-ScubaDiffRunTimestamp {
+    <#
+    .Description
+    Parses a ScubaResults MetaData.TimestampZulu value (e.g.
+    "2026-01-01T00:00:00.000Z") into a UTC DateTime. Returns $null when the value
+    is absent or is not an ISO-8601 date and time, so callers skip the comparison
+    rather than guess at an ordering. The leading pattern check keeps loose
+    fragments that .NET would happily coerce into a date (a bare "3", say) from
+    being read as a run timestamp.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]
+        $Timestamp
+    )
+    if ([string]::IsNullOrWhiteSpace($Timestamp)) {
+        return $null
+    }
+    if ($Timestamp -notmatch '^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}') {
+        return $null
+    }
+    $parsed = [DateTime]::MinValue
+    $styles = [System.Globalization.DateTimeStyles]::AdjustToUniversal -bor
+              [System.Globalization.DateTimeStyles]::AssumeUniversal
+    if ([DateTime]::TryParse($Timestamp, [cultureinfo]::InvariantCulture, $styles, [ref]$parsed)) {
+        return $parsed
+    }
+    return $null
+}
+
 function Compare-ScubaResults {
     <#
     .Description
@@ -1305,6 +1340,22 @@ function Invoke-SCuBADiff {
     $Before = Import-ScubaResultsFile -Path $BeforePath
     $After = Import-ScubaResultsFile -Path $AfterPath
 
+    # The after file is trusted to be the later run: nothing here enforces it,
+    # because the two files may equally be two tenants captured at the same point
+    # in time, where chronology carries no meaning. A swapped pair still produces
+    # a self-consistent report, but every change reads in reverse (a policy that
+    # was fixed is classified NewFail) and the directional legacy -> Security
+    # Suite migration alias stops aligning, so warn and carry on rather than
+    # block. Runs whose timestamps are missing or unparseable are left alone.
+    $BeforeRunTime = Get-ScubaDiffRunTimestamp -Timestamp $Before.MetaData.TimestampZulu
+    $AfterRunTime = Get-ScubaDiffRunTimestamp -Timestamp $After.MetaData.TimestampZulu
+    if ($null -ne $BeforeRunTime -and $null -ne $AfterRunTime -and $AfterRunTime -le $BeforeRunTime) {
+        $Relation = if ($AfterRunTime -eq $BeforeRunTime) { 'has the same timestamp as' } else { 'is older than' }
+        Write-Warning ("The -AfterPath run ($($After.MetaData.TimestampZulu)) $Relation the -BeforePath run " +
+            "($($Before.MetaData.TimestampZulu)). If the two files were passed in the wrong order, every change is " +
+            "reported in reverse: a policy that was fixed shows as NewFail. Comparing them as given.")
+    }
+
     # Resolve the running module version for the diff MetaData block.
     $ToolVersion = 'unknown'
     try {
@@ -1364,6 +1415,7 @@ function Invoke-SCuBADiff {
 Export-ModuleMember -Function @(
     'Invoke-SCuBADiff',
     'Import-ScubaResultsFile',
+    'Get-ScubaDiffRunTimestamp',
     'Compare-ScubaResults',
     'ConvertTo-ScubaDiffCsvRecord',
     'New-ScubaDiffReport',

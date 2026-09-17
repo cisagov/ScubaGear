@@ -38,6 +38,21 @@ Invoke-SCuBADiff -BeforePath .\before\ScubaResults.json `
                  -DarkMode
 ```
 
+### Run order
+
+The two files are compared in the order you give them: `-AfterPath` is taken as
+the later run. That order is not enforced, because the pair may equally be two
+tenants captured at the same point in time, where chronology carries no meaning.
+
+As a guard against a swapped pair, the run timestamps recorded in each file's
+`MetaData.TimestampZulu` are compared, and a warning is written when the after
+run is not later than the before run. The diff still runs. The check is skipped
+when either timestamp is missing or is not a parseable date.
+
+A swapped pair produces a self-consistent report that is semantically inverted:
+a policy that was fixed between the two runs is classified `NewFail`, and the
+legacy to Security Suite migration alias, which is directional, stops aligning.
+
 ### Parameters
 
 | Parameter | Required | Default | Description |
