@@ -818,11 +818,15 @@ tests contains {
 #
 # MS.SECURITYSUITE.5.2v1
 #--
-# At this time we are unable to test for audit log retention because the
-# requirement can be met outside the M365 cloud environment. Retaining logs
-# natively in M365 for the required duration depends on an additional add-on
-# SKU, and agencies may instead satisfy the requirement by offloading the logs
-# out of the cloud environment, which is not visible to any available API.
+# At this time we are unable to test for audit log retention because reading it
+# would require elevating ScubaGear's service principal beyond read-only.
+# Get-UnifiedAuditLogRetentionPolicy returns a 403 for a service principal
+# holding only the Entra Global Reader role, which the Security Suite checks are
+# designed to run under. Reading the policy requires the Compliance
+# Administrator and Compliance Data Administrator roles, both of which grant the
+# Purview Organization Configuration role. That role carries destructive write
+# permissions, including Remove-UnifiedAuditLogRetentionPolicy, so making it a
+# prerequisite for running ScubaGear is not an acceptable tradeoff.
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.5.2v1",
     "Criticality": "Shall/Not-Implemented",
