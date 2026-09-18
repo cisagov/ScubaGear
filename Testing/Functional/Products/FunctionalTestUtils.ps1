@@ -1843,16 +1843,9 @@ function Wait-SPOTenantSettings {
         [int]$MaxAttempts = 12,
         [int]$DelaySeconds = 5
     )
-    # Fields excluded from read-your-writes verification:
-    #  - __metadata / free-form domain lists can't be reliably string-compared.
-    #  - DefaultSharingLinkType/DefaultLinkPermission (esp. =None) are transient: SharePoint
-    #    normalizes them shortly after the write, so polling never converges and would push the
-    #    assessment read past the applied value. The assessment must read those immediately.
-    # Everything else is polled until read-your-writes consistent.
-    $SkipFields = @(
-        'SharingBlockedDomainList', 'SharingAllowedDomainList', '__metadata',
-        'DefaultSharingLinkType', 'DefaultLinkPermission'
-    )
+    # Fields that can't be reliably string-compared against the GET response (free-form lists)
+    # or aren't tenant properties. Everything else is polled until read-your-writes consistent.
+    $SkipFields = @('SharingBlockedDomainList', 'SharingAllowedDomainList', '__metadata')
     $Targets = @{}
     foreach ($Key in $Expected.Keys) {
         if ($Key -in $SkipFields) { continue }
