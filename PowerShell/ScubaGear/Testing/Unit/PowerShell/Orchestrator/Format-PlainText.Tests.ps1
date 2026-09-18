@@ -11,6 +11,10 @@ InModuleScope Orchestrator {
             $Output = Format-PlainText "Hello world. <a href='#caps'>View all CA policies</a>. 123"
             $Output | Should -Be "Hello world.  123"
         }
+        It 'Removes Security Suite policy table links' {
+            $Output = Format-PlainText "Requirement not met.<br/><a href='#securitysuite-anti-spam-policies'>View all anti-spam policies</a>"
+            $Output | Should -Be "Requirement not met. "
+        }
         It 'Removes br tags' {
             $Output = Format-PlainText "Hello world.<br/>123"
             $Output | Should -Be "Hello world. 123"

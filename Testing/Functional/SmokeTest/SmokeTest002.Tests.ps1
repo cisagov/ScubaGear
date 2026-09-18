@@ -251,15 +251,21 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                     }
                 }
                 # Security Suite configuration tables are appended to the Security Suite report.
-                elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
+                elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-malware-policies|anti-phish-policies|anti-spam-policies)-table") {
                     $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
                         "Username", "Email"
                     }
                     elseif ($TableClass -match "securitysuite-partner-domains-table") {
                         "Partner Domain"
                     }
+                    elseif ($TableClass -match "securitysuite-anti-malware-policies-table") {
+                            "", "Policy", "Status", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"
+                        }
+                        elseif ($TableClass -match "securitysuite-anti-spam-policies-table") {
+                        "", "Policy", "Status", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Domains"
+                    }
                     else {
-                        "", "Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"
+                        "", "Policy", "Status", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Tips & Indicators"
                     })
 
                     foreach ($Row in $Rows) {
@@ -277,8 +283,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
                         if ($RowData.Count -gt 0) {
                             $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
-                            if ($TableClass -match "securitysuite-anti-phish-policies-table") {
-                                $RowData[2].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
+                            if ($TableClass -match "securitysuite-(anti-malware|anti-phish|anti-spam)-policies-table") {
+                                $RowData[2].Text | Should -BeIn @("On", "Off", "Always on") -Because "The protection policy Status value must match Defender's own On/Off/Always on wording"
                             }
                         }
                     }
@@ -289,9 +295,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
                     for ($i = 1; $i -lt $Rows.Length; $i++) {
                         $RowData = Get-SeElement -Element $Rows[$i] -By TagName 'td'
-                        # Anti-phish policy rows have an expand/collapse control in the
+                        # Protection policy rows have an expand/collapse control in the
                         # first cell, so their Policy value (the second cell) is the row header.
-                        $RowHeaderIndex = if ($TableClass -match "securitysuite-anti-phish-policies-table") { 1 } else { 0 }
+                        $RowHeaderIndex = if ($TableClass -match "securitysuite-(anti-malware|anti-phish|anti-spam)-policies-table") { 1 } else { 0 }
                         for ($j = 0; $j -lt $RowData.Length; $j++) {
                             if ($j -eq $RowHeaderIndex) {
                                 $RowData[$j].GetAttribute("scope") | Should -Be "row" -Because "There should only be one scope attribute set for each data row"
@@ -341,6 +347,45 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
             }
 
             # Turn implict wait back on
+            $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
+        }
+    }
+
+    Context "Verify in-page links resolve" {
+        BeforeEach{
+            Open-SeUrl $script:url -Driver $Driver 2>$null
+        }
+        # Policy results link to the tables they were evaluated against, e.g. "View all CA
+        # policies" and the Security Suite policy tables. Those tables are built by JavaScript
+        # after the page loads, so a link can only be checked against the rendered DOM.
+        It "Check <Product> (<LinkText>) in-page links have a target" -ForEach @(
+            @{Product = "aad"; LinkText = "Azure Active Directory"}
+            @{Product = "securitysuite"; LinkText = "Security Suite"}
+            @{Product = "exo"; LinkText = "Exchange Online"}
+            @{Product = "powerbi"; LinkText = "Microsoft Power BI"}
+            @{Product = "powerplatform"; LinkText = "Microsoft Power Platform"}
+            @{Product = "sharepoint"; LinkText = "SharePoint Online"}
+            @{Product = "teams"; LinkText = "Microsoft Teams"}
+        ){
+            $DetailLink = Get-SeElement -Driver $Driver -Wait -By LinkText $LinkText
+            $DetailLink | Should -Not -BeNullOrEmpty
+            Invoke-SeClick -Element $DetailLink
+
+            $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 0
+
+            # GetAttribute resolves href to an absolute URL, so take the part after the fragment
+            # separator to recover the id the link points at.
+            $InPageLinks = Get-SeElement -Driver $Driver -By CssSelector "a[href^='#']"
+            $LinkTargets = $InPageLinks |
+                ForEach-Object { ($_.GetAttribute("href") -split '#')[-1] } |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                Select-Object -Unique
+
+            foreach ($LinkTarget in $LinkTargets) {
+                $AnchorElement = Get-SeElement -Driver $Driver -By Id $LinkTarget
+                $AnchorElement | Should -Not -BeNullOrEmpty -Because "the '#$LinkTarget' link in the $Product report should point at an element that exists"
+            }
+
             $Driver.Manage().Timeouts().ImplicitWait = New-TimeSpan -Seconds 10
         }
     }
