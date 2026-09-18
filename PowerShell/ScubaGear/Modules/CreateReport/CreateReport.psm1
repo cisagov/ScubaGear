@@ -1140,7 +1140,8 @@ function Get-PolicyTableLinkHtml {
     if ($BaselineName -ne "SecuritySuite") { return "" }
     if ($DisplayString -notin @("Fail", "Warning")) { return "" }
 
-    # Anchors are set on the table headings by SecuritySuiteTableFunctions.js.
+    # The anchor is the table's CSS class, which SecuritySuiteTableFunctions.js also sets as
+    # the id on the table heading, so the link and its target share one literal.
     $PolicyTables = @{
         "Get-MalwareFilterPolicy"       = "anti-malware"
         "Get-AntiPhishPolicy"           = "anti-phish"
@@ -1149,7 +1150,7 @@ function Get-PolicyTableLinkHtml {
     foreach ($Cmdlet in $PolicyTables.Keys) {
         if ($Test.Commandlet -contains $Cmdlet) {
             $Table = $PolicyTables[$Cmdlet]
-            return "<br/><a href='#securitysuite-$Table-policies'>View all $Table policies</a>"
+            return "<br/><a href='#securitysuite-$Table-policies-table'>View all $Table policies</a>"
         }
     }
     return ""
