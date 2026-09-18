@@ -76,6 +76,43 @@ InModuleScope Utility {
                         -MaxRetries 1 -RetryDelaySeconds 5 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
                 Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 12 }
             }
+
+            It 'Honors a PS 5.1-style HTTP-date Retry-After header value' {
+                $RetryAfter = [DateTimeOffset]::UtcNow.AddSeconds(60).ToString('R')
+                $Response = New-FakeHttpWebResponse -StatusCode 429 -RetryAfter $RetryAfter
+                $Seconds = Get-RetryAfterSeconds -HttpResponseObject $Response -DefaultSeconds 5
+                $Seconds | Should -BeGreaterOrEqual 59
+                $Seconds | Should -BeLessOrEqual 60
+            }
+
+            It 'Honors a PS 7-style HTTP-date Retry-After header value' {
+                Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
+                $Response = [System.Net.Http.HttpResponseMessage]::new()
+                try {
+                    $RetryAfter = [DateTimeOffset]::UtcNow.AddSeconds(60).ToString('R')
+                    $Response.Headers.RetryAfter = [System.Net.Http.Headers.RetryConditionHeaderValue]::Parse($RetryAfter)
+                    $Seconds = Get-RetryAfterSeconds -HttpResponseObject $Response -DefaultSeconds 5
+                    $Seconds | Should -BeGreaterOrEqual 59
+                    $Seconds | Should -BeLessOrEqual 60
+                }
+                finally {
+                    $Response.Dispose()
+                }
+            }
+
+            It 'Clamps a past HTTP-date Retry-After header value to zero' {
+                $RetryAfter = [DateTimeOffset]::UtcNow.AddMinutes(-1).ToString('R')
+                $Response = New-FakeHttpWebResponse -StatusCode 429 -RetryAfter $RetryAfter
+                Get-RetryAfterSeconds -HttpResponseObject $Response -DefaultSeconds 5 | Should -Be 0
+            }
+
+            It 'Caps an excessively large Retry-After value at 3600 seconds' {
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 429 -RetryAfter '999999999') }
+                Mock -ModuleName Utility Start-Sleep { }
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                        -MaxRetries 1 -RetryDelaySeconds 5 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
+                Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 3600 }
+            }
         }
 
         Context '500/503 retry behavior' {
@@ -170,6 +207,25 @@ InModuleScope Utility {
                     $Headers['X-Custom'] -eq 'value' -and
                     $Headers['Authorization'] -eq 'Bearer tok'
                 }
+            }
+
+            It 'Does not allow AdditionalHeaders to override the Authorization header' {
+                Mock -ModuleName Utility Invoke-RestMethod { return [pscustomobject]@{ result = 'ok' } }
+                $null = Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                    -AdditionalHeaders @{ 'Authorization' = 'Bearer spoofed' } -WarningAction SilentlyContinue
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 1 -Exactly -ParameterFilter {
+                    $Headers['Authorization'] -eq 'Bearer tok'
+                }
+            }
+        }
+
+        Context 'Parameter validation' {
+            It 'Rejects a negative MaxRetries value' {
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' -MaxRetries -1 } | Should -Throw
+            }
+
+            It 'Rejects a negative RetryDelaySeconds value' {
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' -RetryDelaySeconds -1 } | Should -Throw
             }
         }
     }
