@@ -175,24 +175,80 @@ function Invoke-GraphDirectly {
 
     This example invokes the Microsoft Graph API to create a new service principal with the specified body, using the commercial environment.
 
+    .Parameter Uri
+    An explicit Graph API URI (relative, e.g. "/v1.0/me/licenseDetails") to call when the target has
+    no registered cmdlet mapping. When supplied, the request is sent as-is without endpoint resolution,
+    response key normalization, or automatic pagination, so callers receive the raw Graph response.
+
+    .Parameter Method
+    The HTTP method to use with -Uri (default: GET). Ignored in cmdlet mode, where the method is
+    derived from the cmdlet verb.
+
+    .Parameter Headers
+    Additional request headers to send with -Uri (e.g. @{ ConsistencyLevel = 'eventual' }).
+
+    .Parameter OutputType
+    The Invoke-MgGraphRequest -OutputType to use with -Uri (e.g. "PSObject").
+
+    .Example
+    Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET
+
+    This example calls an arbitrary Graph endpoint that has no registered cmdlet mapping.
+
     #>
-    [cmdletbinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Commandlet')]
     param (
+        [Parameter(ParameterSetName = 'Commandlet')]
         [ValidateNotNullOrEmpty()]
         [string]
         $commandlet,
 
+        [Parameter(ParameterSetName = 'Commandlet')]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
 
+        [Parameter(ParameterSetName = 'Commandlet')]
         [System.Collections.Hashtable]
         $queryParams,
 
+        [Parameter(ParameterSetName = 'Commandlet')]
         [string]$ID,
 
-        [object]$Body
+        [object]$Body,
+
+        [Parameter(ParameterSetName = 'Uri', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Uri,
+
+        [Parameter(ParameterSetName = 'Uri')]
+        [string]$Method = 'GET',
+
+        [Parameter(ParameterSetName = 'Uri')]
+        [System.Collections.Hashtable]$Headers,
+
+        [Parameter(ParameterSetName = 'Uri')]
+        [string]$OutputType
     )
+
+    # Uri mode: call an arbitrary Graph endpoint directly for targets with no registered cmdlet
+    # mapping. The raw response is returned without key normalization or pagination so the caller
+    # gets exactly what the Graph API sent, matching a direct Invoke-MgGraphRequest call.
+    if ($PSCmdlet.ParameterSetName -eq 'Uri') {
+        Write-Debug "Graph Api direct (explicit Uri): $Uri"
+        $graphParams = @{
+            Uri    = $Uri
+            Method = $Method
+        }
+        if ($Headers) { $graphParams['Headers'] = $Headers }
+        if ($OutputType) { $graphParams['OutputType'] = $OutputType }
+        if ($null -ne $Body) {
+            # Accept either a pre-serialized JSON string or an object to serialize.
+            $graphParams['Body'] = if ($Body -is [string]) { $Body } else { $Body | ConvertTo-Json -Depth 10 }
+            $graphParams['ContentType'] = 'application/json'
+        }
+        return Invoke-MgGraphRequest @graphParams
+    }
 
     Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
 
@@ -221,9 +277,10 @@ function Invoke-GraphDirectly {
         foreach ($item in $queryParams.GetEnumerator()) {
             $q.Add($item.Key, $item.Value)
         }
-        $uri = [System.UriBuilder]::new("", "", 443, $endpoint)
-        $uri.Query = $q.ToString()
-        $APIFilter = $uri.Query
+        # Named $uriBuilder (not $uri) to avoid colliding with the [string]$Uri parameter (variables are case-insensitive).
+        $uriBuilder = [System.UriBuilder]::new("", "", 443, $endpoint)
+        $uriBuilder.Query = $q.ToString()
+        $APIFilter = $uriBuilder.Query
         $endpoint = $endpoint + $APIFilter
     }
     Write-Debug "Graph Api direct: $endpoint"
@@ -241,11 +298,12 @@ function Invoke-GraphDirectly {
 
     # If the API header is stored in the PermissionsHelper module for the commandlet, we add it to the request
     if ($null -ne $apiHeader.PSObject.Properties.Name) {
-        $headers = @{}
+        # Named $apiHeaders (not $headers) to avoid colliding with the [hashtable]$Headers parameter (variables are case-insensitive).
+        $apiHeaders = @{}
         foreach ($property in $apiHeader.PSObject.Properties) {
-            $headers[$property.Name] = $property.Value
+            $apiHeaders[$property.Name] = $property.Value
         }
-        $graphParams['Headers'] = $headers
+        $graphParams['Headers'] = $apiHeaders
     }
 
     # Add body if provided
@@ -428,6 +486,21 @@ function Invoke-GraphBatchRequest {
         Lower values reduce burst pressure on rate-limited endpoints (e.g. the PIM policy store
         when using $filter) at the cost of more HTTP round-trips.
 
+    .PARAMETER RetriableStatusCodes
+        Sub-response (and batch-envelope) HTTP status codes eligible for retry. Default is @(429),
+        which preserves the throttle-only behavior. Pass e.g. @(429, 500, 502, 503, 504) to also
+        retry transient server errors.
+
+    .PARAMETER UseExponentialBackoffFallback
+        When set, retriable responses that lack a parseable Retry-After header (common for 5xx) are
+        retried using exponential backoff (FallbackBaseDelaySeconds * 2^attempt, capped at 300s)
+        instead of being surfaced to the caller. Default is off, preserving the "honor Retry-After
+        or surface" behavior described in .NOTES.
+
+    .PARAMETER FallbackBaseDelaySeconds
+        Base delay in seconds for the exponential backoff fallback (default: 1). Only used when
+        -UseExponentialBackoffFallback is set and no Retry-After header is present.
+
     .EXAMPLE
         $requests = @(
             @{ id = "1"; method = "GET"; url = "/servicePrincipals/12345" }
@@ -521,7 +594,17 @@ function Invoke-GraphBatchRequest {
 
         [Parameter(Mandatory = $false)]
         [ValidateRange(1, 20)]
-        [int]$BatchSize = 20
+        [int]$BatchSize = 20,
+
+        [Parameter(Mandatory = $false)]
+        [int[]]$RetriableStatusCodes = @(429),
+
+        [Parameter(Mandatory = $false)]
+        [switch]$UseExponentialBackoffFallback,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(1, 60)]
+        [int]$FallbackBaseDelaySeconds = 1
     )
 
     # If InputObject parameter set is used, build $Requests from the collection + scriptblocks
@@ -575,33 +658,41 @@ function Invoke-GraphBatchRequest {
                 $response   = $_.Exception.Response
                 if ($response) {
                     $statusCode = [int]$response.StatusCode
-                    # Only retry HTTP 429 responses when Graph provides a parseable Retry-After delay.
-                    if ($statusCode -eq 429 -and $attempt -lt $MaxRetries -and $response.Headers) {
+                    # Retry retriable responses when Graph provides a parseable Retry-After delay.
+                    if (($RetriableStatusCodes -contains $statusCode) -and $attempt -lt $MaxRetries -and $response.Headers) {
                         $headerValue = $response.Headers['Retry-After']
                         if ($headerValue) {
                             [void][int]::TryParse([string]$headerValue, [ref]$retryAfter)
                         }
                     }
                 }
-                if ($statusCode -eq 429 -and $attempt -lt $MaxRetries -and $retryAfter -gt 0) {
-                    # First retry waits exactly the Retry-After value the server told us to wait.
-                    # Later retries double that wait time, but never sleep more than 300 seconds.
-                    # See .NOTES for why we double instead of using Retry-After every time.
-                    $waitSeconds = [int]([Math]::Min([double]$retryAfter * [Math]::Pow(2, $attempt), 300))
+                $canRetryEnvelope = ($null -ne $statusCode) -and ($RetriableStatusCodes -contains $statusCode) -and ($attempt -lt $MaxRetries)
+                if ($canRetryEnvelope -and ($retryAfter -gt 0 -or $UseExponentialBackoffFallback)) {
+                    if ($retryAfter -gt 0) {
+                        # First retry waits exactly the Retry-After value the server told us to wait.
+                        # Later retries double that wait time, but never sleep more than 300 seconds.
+                        # See .NOTES for why we double instead of using Retry-After every time.
+                        $waitSeconds = [int]([Math]::Min([double]$retryAfter * [Math]::Pow(2, $attempt), 300))
+                    }
+                    else {
+                        # No Retry-After (common for 5xx). Fall back to exponential backoff when the
+                        # caller opted in via -UseExponentialBackoffFallback.
+                        $waitSeconds = [int]([Math]::Min([double]$FallbackBaseDelaySeconds * [Math]::Pow(2, $attempt), 300))
+                    }
                     # We got throttled, so cut the batch size in half and trim the request list
                     # down to the new size before we retry. The requests we trimmed off don't get
                     # lost: this batch only advances by the number of requests we keep, so the next
                     # pass will pick up the trimmed requests in a new (smaller) batch.
                     if ($currentBatchSize -gt 1) {
                         $currentBatchSize = [Math]::Max(1, [int][Math]::Floor($currentBatchSize / 2))
-                        Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP 429." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP $statusCode." -Level Info -Source "Invoke-GraphBatchRequest"
                         $pendingRequests = @($pendingRequests | Select-Object -First $currentBatchSize)
                         $requestCountForThisBatch = $pendingRequests.Count
                     }
                     if ($attempt -eq 0) {
-                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request failed (HTTP $statusCode). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
                     } else {
-                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
+                        Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - Batch request failed (HTTP $statusCode). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$retryAfter)." -Level Info -Source "Invoke-GraphBatchRequest"
                     }
                     Start-Sleep -Seconds $waitSeconds
                     $attempt++
@@ -620,7 +711,7 @@ function Invoke-GraphBatchRequest {
             # (https://learn.microsoft.com/en-us/graph/json-batching).
             $throttled = @()
             foreach ($response in $batchResponse.responses) {
-                if ($response.status -eq 429 -and $attempt -lt $MaxRetries) {
+                if (($RetriableStatusCodes -contains [int]$response.status) -and $attempt -lt $MaxRetries) {
                     $throttled += $response
                 }
                 else {
@@ -643,30 +734,37 @@ function Invoke-GraphBatchRequest {
                 }
             }
 
-            if (-not $hasRetryAfter) {
+            if (-not $hasRetryAfter -and -not $UseExponentialBackoffFallback) {
                 # No parseable Retry-After on any throttled sub-response. Identity-and-access
                 # endpoints always return Retry-After per
                 # https://learn.microsoft.com/en-us/graph/throttling-limits, so if it is missing
-                # the wait time is unknown. Surface the 429s to the caller instead of guessing.
+                # the wait time is unknown. Surface the responses to the caller instead of guessing,
+                # unless the caller opted in to exponential backoff via -UseExponentialBackoffFallback.
                 foreach ($r in $throttled) { $allResults[$r.id] = $r }
                 break
             }
 
             # First retry honors Retry-After verbatim; subsequent retries double the wait,
-            # capped at 300 seconds per sleep. See .NOTES for rationale.
-            $waitSeconds = [int][Math]::Min($longestRetryAfterSeconds * [Math]::Pow(2, $attempt), 300)
+            # capped at 300 seconds per sleep. See .NOTES for rationale. When no Retry-After was
+            # provided (e.g. transient 5xx) and the caller opted in, fall back to exponential backoff.
+            if ($hasRetryAfter) {
+                $waitSeconds = [int][Math]::Min($longestRetryAfterSeconds * [Math]::Pow(2, $attempt), 300)
+            }
+            else {
+                $waitSeconds = [int][Math]::Min([double]$FallbackBaseDelaySeconds * [Math]::Pow(2, $attempt), 300)
+            }
 
             if ($attempt -eq 0) {
-                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) failed with a retriable status. Retrying in $waitSeconds second(s)." -Level Info -Source "Invoke-GraphBatchRequest"
             } else {
-                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) throttled (HTTP 429). Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Batch size: $($pendingRequests.Count) Request: $UrlScript - $($throttled.Count) sub-request(s) failed with a retriable status. Retrying in $waitSeconds second(s) (attempt $($attempt + 1), Retry-After=$longestRetryAfterSeconds)." -Level Info -Source "Invoke-GraphBatchRequest"
             }
             # Cut the batch size in half so later batches in this call are smaller.
             # We don't trim $pendingRequests here because it already only holds the throttled
             # requests, which is no more than the original batch size, so it still fits in one send.
             if ($currentBatchSize -gt 1) {
                 $currentBatchSize = [Math]::Max(1, [int][Math]::Floor($currentBatchSize / 2))
-                Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after HTTP 429." -Level Info -Source "Invoke-GraphBatchRequest"
+                Write-ScubaLog -Message "Reducing batch size to $currentBatchSize after a retriable failure." -Level Info -Source "Invoke-GraphBatchRequest"
             }
             Start-Sleep -Seconds $waitSeconds
 
@@ -680,6 +778,124 @@ function Invoke-GraphBatchRequest {
     }
 
     return $allResults
+}
+
+function Get-RetryAfterSeconds {
+    <#
+    .SYNOPSIS
+        Extracts the Retry-After delay (in seconds) from an HTTP response object, if present.
+    .DESCRIPTION
+        Handles both the PS 5.1 HttpWebResponse header shape (string-indexable WebHeaderCollection)
+        and the PS 7+ HttpResponseMessage shape (strongly-typed RetryConditionHeaderValue).
+    .PARAMETER HttpResponseObject
+        The response object to inspect (an exception's .Response property).
+    .PARAMETER DefaultSeconds
+        The value to return if no Retry-After header is present or it cannot be parsed.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        $HttpResponseObject,
+
+        [Parameter(Mandatory = $true)]
+        [int]$DefaultSeconds
+    )
+
+    if ($null -eq $HttpResponseObject) {
+        return $DefaultSeconds
+    }
+
+    try {
+        if ($HttpResponseObject.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
+            $RetryAfterHeader = $HttpResponseObject.Headers.RetryAfter
+            # PowerShell auto-unwraps Nullable<TimeSpan>, so .Delta is already a [TimeSpan] (not Nullable<TimeSpan>).
+            if ($RetryAfterHeader -and $RetryAfterHeader.Delta) {
+                return [Math]::Max(0, [int][Math]::Ceiling($RetryAfterHeader.Delta.TotalSeconds))
+            }
+            if ($RetryAfterHeader -and $RetryAfterHeader.Date) {
+                $DelaySeconds = ($RetryAfterHeader.Date.ToUniversalTime() - [DateTimeOffset]::UtcNow).TotalSeconds
+                return [Math]::Max(0, [int][Math]::Ceiling($DelaySeconds))
+            }
+        }
+        else {
+            $RetryAfterValue = $HttpResponseObject.Headers['Retry-After']
+            $RetryAfterSeconds = 0
+            if ($RetryAfterValue -and [int]::TryParse($RetryAfterValue, [ref]$RetryAfterSeconds)) {
+                return [Math]::Max(0, $RetryAfterSeconds)
+            }
+
+            $RetryAfterDate = [DateTimeOffset]::MinValue
+            if ($RetryAfterValue -and [DateTimeOffset]::TryParse(
+                    $RetryAfterValue,
+                    [System.Globalization.CultureInfo]::InvariantCulture,
+                    [System.Globalization.DateTimeStyles]::AssumeUniversal,
+                    [ref]$RetryAfterDate
+                )) {
+                $DelaySeconds = ($RetryAfterDate.ToUniversalTime() - [DateTimeOffset]::UtcNow).TotalSeconds
+                return [Math]::Max(0, [int][Math]::Ceiling($DelaySeconds))
+            }
+        }
+    }
+    catch {
+        Write-Verbose "Could not parse Retry-After header: $($_.Exception.Message)"
+    }
+
+    return $DefaultSeconds
+}
+
+function Test-ScubaTransientConnectionError {
+    <#
+    .SYNOPSIS
+        Determines whether a REST call failure with no HTTP response object represents a
+        transient connection-level issue (timeout, DNS blip, connection reset) worth retrying.
+
+    .DESCRIPTION
+        PS 5.1 throws System.Net.WebException with a .Status enum that reliably identifies
+        timeouts/connection failures. PS 7+ throws a mix of types (HttpRequestException,
+        TaskCanceledException, IOException, SocketException) with no single reliable status
+        enum, so those are matched by exception type name, falling back to a message-text
+        match for anything else that looks like a timeout/connection failure.
+
+    .PARAMETER ErrorRecord
+        The error record whose exception should be inspected.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        $ErrorRecord
+    )
+
+    $Exception = $ErrorRecord.Exception
+
+    if ($Exception -is [System.Net.WebException]) {
+        $TransientStatuses = @(
+            [System.Net.WebExceptionStatus]::Timeout,
+            [System.Net.WebExceptionStatus]::ConnectFailure,
+            [System.Net.WebExceptionStatus]::ConnectionClosed,
+            [System.Net.WebExceptionStatus]::KeepAliveFailure,
+            [System.Net.WebExceptionStatus]::NameResolutionFailure,
+            [System.Net.WebExceptionStatus]::ReceiveFailure,
+            [System.Net.WebExceptionStatus]::SendFailure
+        )
+        return $Exception.Status -in $TransientStatuses
+    }
+
+    $TypeName = $Exception.GetType().FullName
+    if ($TypeName -in @(
+            'System.Threading.Tasks.TaskCanceledException',
+            'System.Net.Http.HttpRequestException',
+            'System.IO.IOException',
+            'System.Net.Sockets.SocketException'
+        )) {
+        return $true
+    }
+
+    return $Exception.Message -match 'timed out|timeout|connection.*(closed|reset|refused)|name.*resolution'
 }
 
 function Invoke-ScubaRestMethod {
@@ -712,6 +928,21 @@ function Invoke-ScubaRestMethod {
     .PARAMETER Accept
         The Accept header value (optional). If not specified, not included in headers.
 
+    .PARAMETER AdditionalHeaders
+        Extra request headers to send beyond Authorization/Content-Type/Accept (optional).
+        Keys that collide with the protected Authorization/Content-Type/Accept headers are ignored.
+
+    .PARAMETER TimeoutSec
+        Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
+
+    .PARAMETER MaxRetries
+        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries; max: 100).
+
+    .PARAMETER RetryDelaySeconds
+        Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
+        header, and doubled after each successive 500/503 retry (default: 5). Any single sleep,
+        including a server-supplied Retry-After, is capped at 3600 seconds.
+
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
             -AccessToken $Token -Endpoint "/providers/PowerPlatform.Governance/v1/tenants/settings"
@@ -730,6 +961,11 @@ function Invoke-ScubaRestMethod {
             -Method "POST" -Body '{"walkMeOptOut": true}'
         Makes a POST request to the Power Platform API with a JSON body.
 
+    .EXAMPLE
+        Invoke-ScubaRestMethod -BaseUrl $ApiEndpoint -AccessToken $Token -Endpoint "" `
+            -Method "POST" -Body $Body -MaxRetries 3 -RetryDelaySeconds 5
+        Makes a POST request with up to 3 retries on throttling/transient server errors.
+
     .FUNCTIONALITY
         Internal
     #>
@@ -742,6 +978,7 @@ function Invoke-ScubaRestMethod {
         [string]$AccessToken,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]$Endpoint,
 
         [Parameter(Mandatory = $false)]
@@ -754,8 +991,26 @@ function Invoke-ScubaRestMethod {
         [string]$ContentType = "application/json",
 
         [Parameter(Mandatory = $false)]
-        [string]$Accept = $null
+        [string]$Accept = $null,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]$AdditionalHeaders = $null,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(0, [int]::MaxValue)]
+        [int]$TimeoutSec = 0,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(0, 100)]
+        [int]$MaxRetries = 0,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(0, 3600)]
+        [int]$RetryDelaySeconds = 5
     )
+
+    # Upper bound on any single sleep so a hostile or misconfigured Retry-After/backoff can't stall a scan.
+    $MaxDelaySeconds = 3600
 
     $Uri = "$BaseUrl$Endpoint"
     $Headers = @{
@@ -765,6 +1020,17 @@ function Invoke-ScubaRestMethod {
 
     if ($Accept) {
         $Headers["Accept"] = $Accept
+    }
+
+    if ($AdditionalHeaders) {
+        $ProtectedHeaders = @('Authorization', 'Content-Type', 'Accept')
+        foreach ($HeaderName in $AdditionalHeaders.Keys) {
+            if ($HeaderName -in $ProtectedHeaders) {
+                Write-Warning "Ignoring attempt to override protected header '$HeaderName' via AdditionalHeaders."
+                continue
+            }
+            $Headers[$HeaderName] = $AdditionalHeaders[$HeaderName]
+        }
     }
 
     $Params = @{
@@ -778,77 +1044,107 @@ function Invoke-ScubaRestMethod {
         $Params.Body = $Body
     }
 
-    try {
-        $Response = Invoke-RestMethod @Params
+    if ($TimeoutSec -gt 0) {
+        $Params.TimeoutSec = $TimeoutSec
     }
-    # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
-    catch {
-        $ErrorRecord = $_
-        $WebResponse = $ErrorRecord.Exception.Response
 
-        $ErrorBuffer = [System.Text.StringBuilder]::new()
-        [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
-        [void]$ErrorBuffer.AppendLine("Message       : $($ErrorRecord.Exception.Message)")
+    for ($Attempt = 1; $Attempt -le ($MaxRetries + 1); $Attempt++) {
+        try {
+            return Invoke-RestMethod @Params
+        }
+        # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
+        catch {
+            $ErrorRecord = $_
+            $WebResponse = $ErrorRecord.Exception.Response
+            $StatusCode = if ($WebResponse) { [int]$WebResponse.StatusCode } else { 0 }
+            $IsLastAttempt = $Attempt -gt $MaxRetries
 
-        if ($null -eq $WebResponse) {
-            [void]$ErrorBuffer.AppendLine("No HTTP response object was returned.")
+            if (-not $IsLastAttempt -and $StatusCode -eq 429) {
+                $RetryAfter = Get-RetryAfterSeconds -HttpResponseObject $WebResponse -DefaultSeconds $RetryDelaySeconds
+                $RetryAfter = [Math]::Min($RetryAfter, $MaxDelaySeconds)
+                Write-Warning "Request to '$Uri' throttled (HTTP 429). Retrying in ${RetryAfter}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $RetryAfter
+                continue
+            }
+
+            if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
+                $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
+                Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $Delay
+                $RetryDelaySeconds *= 2
+                continue
+            }
+
+            if (-not $IsLastAttempt -and $null -eq $WebResponse -and (Test-ScubaTransientConnectionError -ErrorRecord $ErrorRecord)) {
+                $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
+                Write-Warning "Request to '$Uri' failed with a transient connection error ($($ErrorRecord.Exception.GetType().Name): $($ErrorRecord.Exception.Message)). Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $Delay
+                $RetryDelaySeconds *= 2
+                continue
+            }
+
+            $ErrorBuffer = [System.Text.StringBuilder]::new()
+            [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
+            [void]$ErrorBuffer.AppendLine("Message       : $($ErrorRecord.Exception.Message)")
+
+            if ($null -eq $WebResponse) {
+                [void]$ErrorBuffer.AppendLine("No HTTP response object was returned.")
+                Write-Information $ErrorBuffer.ToString() -InformationAction Continue
+                throw
+            }
+
+            # PS 5.1 throws WebException -> HttpWebResponse. PS 7+ throws HttpResponseException -> HttpResponseMessage.
+            # Compare the type name as a string rather than "-is [System.Net.Http.HttpResponseMessage]" because that
+            # assembly isn't loaded by default on PS 5.1 Desktop, and the type-literal itself fails to resolve there.
+            if ($WebResponse.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
+                [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
+                [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.ReasonPhrase)")
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
+                foreach ($Header in $WebResponse.Headers) {
+                    [void]$ErrorBuffer.AppendLine("$($Header.Key): $($Header.Value -join ', ')")
+                }
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
+                # On PS 7+, Invoke-RestMethod already reads and disposes the response content internally,
+                # so re-reading $WebResponse.Content throws "Cannot access a disposed object." The body text
+                # (when PowerShell can parse it) is instead surfaced via ErrorRecord.ErrorDetails.Message.
+                $ResponseBody = $ErrorRecord.ErrorDetails.Message
+                [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
+            }
+            else {
+                [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
+                [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.StatusDescription)")
+                [void]$ErrorBuffer.AppendLine("Content Type  : $($WebResponse.ContentType)")
+                [void]$ErrorBuffer.AppendLine("Content Length: $($WebResponse.ContentLength)")
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
+                foreach ($HeaderName in $WebResponse.Headers.AllKeys) {
+                    [void]$ErrorBuffer.AppendLine("${HeaderName}: $($WebResponse.Headers[$HeaderName])")
+                }
+                [void]$ErrorBuffer.AppendLine("")
+                [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
+                $ResponseStream = $WebResponse.GetResponseStream()
+                if ($null -eq $ResponseStream) {
+                    [void]$ErrorBuffer.AppendLine("No response stream in Error.Exception.Response object.")
+                }
+                else {
+                    $Reader = New-Object System.IO.StreamReader($ResponseStream)
+                    try {
+                        $ResponseBody = $Reader.ReadToEnd()
+                    }
+                    finally {
+                        $Reader.Dispose()
+                        $ResponseStream.Dispose()
+                    }
+                    [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
+                }
+            }
+
             Write-Information $ErrorBuffer.ToString() -InformationAction Continue
             throw
         }
-
-        # PS 5.1 throws WebException -> HttpWebResponse. PS 7+ throws HttpResponseException -> HttpResponseMessage.
-        # Compare the type name as a string rather than "-is [System.Net.Http.HttpResponseMessage]" because that
-        # assembly isn't loaded by default on PS 5.1 Desktop, and the type-literal itself fails to resolve there.
-        if ($WebResponse.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
-            [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
-            [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.ReasonPhrase)")
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
-            foreach ($Header in $WebResponse.Headers) {
-                [void]$ErrorBuffer.AppendLine("$($Header.Key): $($Header.Value -join ', ')")
-            }
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
-            # On PS 7+, Invoke-RestMethod already reads and disposes the response content internally,
-            # so re-reading $WebResponse.Content throws "Cannot access a disposed object." The body text
-            # (when PowerShell can parse it) is instead surfaced via ErrorRecord.ErrorDetails.Message.
-            $ResponseBody = $ErrorRecord.ErrorDetails.Message
-            [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
-        }
-        else {
-            [void]$ErrorBuffer.AppendLine("Status Code   : $([int]$WebResponse.StatusCode)")
-            [void]$ErrorBuffer.AppendLine("Status Text   : $($WebResponse.StatusDescription)")
-            [void]$ErrorBuffer.AppendLine("Content Type  : $($WebResponse.ContentType)")
-            [void]$ErrorBuffer.AppendLine("Content Length: $($WebResponse.ContentLength)")
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Response Headers ===")
-            foreach ($HeaderName in $WebResponse.Headers.AllKeys) {
-                [void]$ErrorBuffer.AppendLine("${HeaderName}: $($WebResponse.Headers[$HeaderName])")
-            }
-            [void]$ErrorBuffer.AppendLine("")
-            [void]$ErrorBuffer.AppendLine("=== Raw Response Body ===")
-            $ResponseStream = $WebResponse.GetResponseStream()
-            if ($null -eq $ResponseStream) {
-                [void]$ErrorBuffer.AppendLine("No response stream in Error.Exception.Response object.")
-            }
-            else {
-                $Reader = New-Object System.IO.StreamReader($ResponseStream)
-                try {
-                    $ResponseBody = $Reader.ReadToEnd()
-                }
-                finally {
-                    $Reader.Dispose()
-                    $ResponseStream.Dispose()
-                }
-                [void]$ErrorBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
-            }
-        }
-
-        Write-Information $ErrorBuffer.ToString() -InformationAction Continue
-        throw
     }
-
-    return $Response
 }
 
 Export-ModuleMember -Function @(

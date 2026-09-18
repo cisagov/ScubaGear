@@ -335,7 +335,7 @@ function Connect-Tenant {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                           $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           $UserLicenseResponse = Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET -ErrorAction Stop
                            $UserPlans = $UserLicenseResponse.value |
                                Where-Object { $null -ne $_.servicePlans } |
                                ForEach-Object { $_.servicePlans } |
@@ -422,7 +422,7 @@ function Connect-Tenant {
                         $TokenData.TeamsUnifiedBaseUrl = ""
                         $TokenData.TeamsUnifiedAccessToken = ""
                     }
-                    
+
                     # MS Teams Powershell Cmdlets well-knodwn client ID used when authenticating interactively
                     $TeamsClientId = "12128f48-ec9e-42f0-b203-ea49fb6af367"
 
@@ -434,7 +434,7 @@ function Connect-Tenant {
                             -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
                             -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
                             -M365Environment $M365Environment
-                        
+
                         # Set auth return values to empty strings since Teams unified setttings API is only available for interactive auth flows.
                         $TokenData.TeamsUnifiedBaseUrl = ""
                         $TokenData.TeamsUnifiedAccessToken = ""
