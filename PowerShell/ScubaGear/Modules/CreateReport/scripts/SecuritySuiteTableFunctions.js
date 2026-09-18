@@ -173,7 +173,7 @@ const formatScopeCounts = (rules) => {
         const values = rules.flatMap(rule => getNonEmptyValues(rule[field]));
         const count = new Set(values.map(value => value.toLowerCase())).size;
         if (count === 0) return null;
-        return `${label}: ${count} ${singularNoun}${count === 1 ? "" : "s"}`;
+        return { label, value: `${count} ${singularNoun}${count === 1 ? "" : "s"}` };
     }).filter(Boolean);
 };
 
@@ -215,6 +215,14 @@ const getPolicyEnabledState = (policy, policyRules, protectionPolicyRules, ruleF
     // Anti-spam policies carry no Enabled flag, and the default one always applies.
     if (isDefaultPolicy(policy)) return true;
     return hasMatchingEnabledRule(policy, policyRules, ruleFields);
+};
+
+// Matches the values and wording the Defender admin center itself uses for this column
+// (Email & collaboration > Policies & rules > Threat policies > Anti-malware/-phishing/-spam):
+// the default policy always shows "Always on", and every other policy shows "On" or "Off".
+const getPolicyStatusText = (policy, policyRules, protectionPolicyRules, ruleFields) => {
+    if (isDefaultPolicy(policy)) return "Always on";
+    return getPolicyEnabledState(policy, policyRules, protectionPolicyRules, ruleFields) ? "On" : "Off";
 };
 
 const getPolicyPriority = (policy, policyRules, protectionPolicyRules, ruleFields) => {
@@ -285,7 +293,7 @@ const getProtectionPolicyRows = (
             sortKey: getPolicySortKey(policy, priority),
             row: {
                 "Policy": policyName,
-                "Enabled": getPolicyEnabledState(policy, policyRules, protectionPolicyRules, ruleFields),
+                "Status": getPolicyStatusText(policy, policyRules, protectionPolicyRules, ruleFields),
                 "Priority": priority,
                 "Applicability": getPolicyApplicability(
                     policy,
@@ -365,10 +373,10 @@ const getAntiPhishPolicyRows = (
     policy => ({
         "Impersonation Protection": getProtectedValues(policy.TargetedUsersToProtect),
         "Partner Domains Protected": getProtectedValues(policy.TargetedDomainsToProtect),
-        "Safety Indicators": SAFETY_TIP_FIELDS
+        "Safety Tips & Indicators": SAFETY_TIP_FIELDS
             .map(([label, field]) => ({
                 label,
-                enabled: isEnabled(policy[field])
+                value: isEnabled(policy[field]) ? "Enabled" : "Disabled"
             }))
     })
 );
@@ -400,11 +408,35 @@ const getAntiSpamPolicyRows = (
     ANTI_SPAM_RULE_FIELDS,
     policy => ({
         "Spam Actions": SPAM_ACTION_FIELDS
-            .map(([label, field]) => `${label}: ${String(policy[field] ?? "N/A").trim() || "N/A"}`),
+            .map(([label, field]) => ({ label, value: String(policy[field] ?? "N/A").trim() || "N/A" })),
         "Allowed Senders": getProtectedValues(policy.AllowedSenders),
-        "Allowed Sender Domains": getProtectedValues(policy.AllowedSenderDomains)
+        "Allowed Domains": getProtectedValues(policy.AllowedSenderDomains)
     })
 );
+
+/**
+ * Builds a <li> for one policy list item.
+ *
+ * A {label, value} object (Safety Indicators, Applicability's scope counts, Spam Actions) is a
+ * key/value pair, so the label is bolded to separate it from the value. A plain string
+ * (Impersonation Protection, Partner Domains Protected, Allowed Senders/Domains) is a single
+ * value with nothing to label, so it renders as-is.
+ *
+ * @param {{label: string, value: string}|string} item The list item to render.
+ * @returns {HTMLLIElement} The created list item.
+ */
+const createPolicyListItem = (item) => {
+    const listItem = document.createElement("li");
+    if (item && typeof item === "object") {
+        const label = document.createElement("strong");
+        label.textContent = `${item.label}:`;
+        listItem.appendChild(label);
+        listItem.appendChild(document.createTextNode(` ${item.value}`));
+    } else {
+        listItem.textContent = item;
+    }
+    return listItem;
+};
 
 /**
  * Creates a simple report table that matches the static ConvertTo-Html shape
@@ -436,13 +468,7 @@ const appendPolicyCell = (cell, value, expanded, onExpand, column) => {
     if (Array.isArray(value)) {
         const list = document.createElement("ul");
         const items = expanded ? value : value.slice(0, 1);
-        items.forEach(itemValue => {
-            const item = document.createElement("li");
-            item.textContent = typeof itemValue === "object" && itemValue !== null
-                ? `${itemValue.label}: ${itemValue.enabled ? "Enabled" : "Disabled"}`
-                : itemValue;
-            list.appendChild(item);
-        });
+        items.forEach(itemValue => list.appendChild(createPolicyListItem(itemValue)));
         cell.appendChild(list);
         if (!expanded && value.length > 1) {
             cell.appendChild(createRowActionButton({
@@ -523,13 +549,9 @@ const createSecuritySuiteTable = (columns, rows, tableClass) => {
         columns.forEach(column => {
             const td = document.createElement("td");
             const value = row[column] ?? "N/A";
-            if (column === "Safety Indicators" && Array.isArray(value)) {
+            if (column === "Safety Tips & Indicators" && Array.isArray(value)) {
                 const list = document.createElement("ul");
-                value.forEach(indicator => {
-                    const item = document.createElement("li");
-                    item.textContent = `${indicator.label}: ${indicator.enabled ? "Enabled" : "Disabled"}`;
-                    list.appendChild(item);
-                });
+                value.forEach(indicator => list.appendChild(createPolicyListItem(indicator)));
                 td.appendChild(list);
             } else {
                 td.textContent = value;
@@ -638,7 +660,7 @@ const buildSecuritySuiteConfigTables = ({
     appendSecuritySuiteTableSection(
         section,
         "Anti-Malware Protection Policies",
-        ["Policy", "Enabled", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"],
+        ["Policy", "Status", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"],
         getAntiMalwarePolicyRows(antiMalwarePolicies, antiMalwareRules, protectionPolicyRules, acceptedDomains),
         ANTI_MALWARE_TABLE_CLASS,
         "No anti-malware policies were exported."
@@ -647,7 +669,7 @@ const buildSecuritySuiteConfigTables = ({
     appendSecuritySuiteTableSection(
         section,
         "Anti-Phish Protection Policies",
-        ["Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"],
+        ["Policy", "Status", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Tips & Indicators"],
         getAntiPhishPolicyRows(antiPhishPolicies, antiPhishRules, protectionPolicyRules, acceptedDomains),
         ANTI_PHISH_TABLE_CLASS,
         "No anti-phish policies were exported."
@@ -656,7 +678,7 @@ const buildSecuritySuiteConfigTables = ({
     appendSecuritySuiteTableSection(
         section,
         "Anti-Spam Protection Policies",
-        ["Policy", "Enabled", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Sender Domains"],
+        ["Policy", "Status", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Domains"],
         getAntiSpamPolicyRows(antiSpamPolicies, antiSpamRules, protectionPolicyRules, acceptedDomains),
         ANTI_SPAM_TABLE_CLASS,
         "No anti-spam policies were exported."
