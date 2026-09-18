@@ -598,7 +598,7 @@ function Get-ScubaGearRestEndpoint {
 
     if ($PathParameters) {
         foreach ($Key in $PathParameters.Keys) {
-            $EndpointPath = $EndpointPath -replace "\{$Key\}", $PathParameters[$Key]
+            $EndpointPath = $EndpointPath.Replace("{$Key}", [string]$PathParameters[$Key])
         }
     }
 

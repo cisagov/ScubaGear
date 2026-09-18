@@ -812,13 +812,29 @@ function Get-RetryAfterSeconds {
             $RetryAfterHeader = $HttpResponseObject.Headers.RetryAfter
             # PowerShell auto-unwraps Nullable<TimeSpan>, so .Delta is already a [TimeSpan] (not Nullable<TimeSpan>).
             if ($RetryAfterHeader -and $RetryAfterHeader.Delta) {
-                return [int]$RetryAfterHeader.Delta.TotalSeconds
+                return [Math]::Max(0, [int][Math]::Ceiling($RetryAfterHeader.Delta.TotalSeconds))
+            }
+            if ($RetryAfterHeader -and $RetryAfterHeader.Date) {
+                $DelaySeconds = ($RetryAfterHeader.Date.ToUniversalTime() - [DateTimeOffset]::UtcNow).TotalSeconds
+                return [Math]::Max(0, [int][Math]::Ceiling($DelaySeconds))
             }
         }
         else {
             $RetryAfterValue = $HttpResponseObject.Headers['Retry-After']
-            if ($RetryAfterValue -and [int]::TryParse($RetryAfterValue, [ref]$null)) {
-                return [int]$RetryAfterValue
+            $RetryAfterSeconds = 0
+            if ($RetryAfterValue -and [int]::TryParse($RetryAfterValue, [ref]$RetryAfterSeconds)) {
+                return [Math]::Max(0, $RetryAfterSeconds)
+            }
+
+            $RetryAfterDate = [DateTimeOffset]::MinValue
+            if ($RetryAfterValue -and [DateTimeOffset]::TryParse(
+                    $RetryAfterValue,
+                    [System.Globalization.CultureInfo]::InvariantCulture,
+                    [System.Globalization.DateTimeStyles]::AssumeUniversal,
+                    [ref]$RetryAfterDate
+                )) {
+                $DelaySeconds = ($RetryAfterDate.ToUniversalTime() - [DateTimeOffset]::UtcNow).TotalSeconds
+                return [Math]::Max(0, [int][Math]::Ceiling($DelaySeconds))
             }
         }
     }
@@ -914,16 +930,18 @@ function Invoke-ScubaRestMethod {
 
     .PARAMETER AdditionalHeaders
         Extra request headers to send beyond Authorization/Content-Type/Accept (optional).
+        Keys that collide with the protected Authorization/Content-Type/Accept headers are ignored.
 
     .PARAMETER TimeoutSec
         Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
 
     .PARAMETER MaxRetries
-        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries).
+        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries; max: 100).
 
     .PARAMETER RetryDelaySeconds
         Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
-        header, and doubled after each successive 500/503 retry (default: 5).
+        header, and doubled after each successive 500/503 retry (default: 5). Any single sleep,
+        including a server-supplied Retry-After, is capped at 3600 seconds.
 
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
@@ -979,14 +997,20 @@ function Invoke-ScubaRestMethod {
         [hashtable]$AdditionalHeaders = $null,
 
         [Parameter(Mandatory = $false)]
+        [ValidateRange(0, [int]::MaxValue)]
         [int]$TimeoutSec = 0,
 
         [Parameter(Mandatory = $false)]
+        [ValidateRange(0, 100)]
         [int]$MaxRetries = 0,
 
         [Parameter(Mandatory = $false)]
+        [ValidateRange(0, 3600)]
         [int]$RetryDelaySeconds = 5
     )
+
+    # Upper bound on any single sleep so a hostile or misconfigured Retry-After/backoff can't stall a scan.
+    $MaxDelaySeconds = 3600
 
     $Uri = "$BaseUrl$Endpoint"
     $Headers = @{
@@ -999,7 +1023,12 @@ function Invoke-ScubaRestMethod {
     }
 
     if ($AdditionalHeaders) {
+        $ProtectedHeaders = @('Authorization', 'Content-Type', 'Accept')
         foreach ($HeaderName in $AdditionalHeaders.Keys) {
+            if ($HeaderName -in $ProtectedHeaders) {
+                Write-Warning "Ignoring attempt to override protected header '$HeaderName' via AdditionalHeaders."
+                continue
+            }
             $Headers[$HeaderName] = $AdditionalHeaders[$HeaderName]
         }
     }
@@ -1032,21 +1061,24 @@ function Invoke-ScubaRestMethod {
 
             if (-not $IsLastAttempt -and $StatusCode -eq 429) {
                 $RetryAfter = Get-RetryAfterSeconds -HttpResponseObject $WebResponse -DefaultSeconds $RetryDelaySeconds
+                $RetryAfter = [Math]::Min($RetryAfter, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' throttled (HTTP 429). Retrying in ${RetryAfter}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $RetryAfter
                 continue
             }
 
             if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
-                Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${RetryDelaySeconds}s (attempt $Attempt of $MaxRetries)..."
-                Start-Sleep -Seconds $RetryDelaySeconds
+                $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
+                Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $Delay
                 $RetryDelaySeconds *= 2
                 continue
             }
 
             if (-not $IsLastAttempt -and $null -eq $WebResponse -and (Test-ScubaTransientConnectionError -ErrorRecord $ErrorRecord)) {
-                Write-Warning "Request to '$Uri' failed with a transient connection error ($($ErrorRecord.Exception.GetType().Name): $($ErrorRecord.Exception.Message)). Retrying in ${RetryDelaySeconds}s (attempt $Attempt of $MaxRetries)..."
-                Start-Sleep -Seconds $RetryDelaySeconds
+                $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
+                Write-Warning "Request to '$Uri' failed with a transient connection error ($($ErrorRecord.Exception.GetType().Name): $($ErrorRecord.Exception.Message)). Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
+                Start-Sleep -Seconds $Delay
                 $RetryDelaySeconds *= 2
                 continue
             }
