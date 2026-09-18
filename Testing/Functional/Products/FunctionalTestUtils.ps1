@@ -1800,6 +1800,72 @@ function Set-PowerBITenantSetting {
 }
 
 # -----------------------------------------------------------------------
+# SharePoint tenant sharing changes are eventually-consistent: dependent fields
+# (ODBSharingCapability, *AnonymousLinkType, EmailAttestation*) are rejected with a
+# 400/500 until a just-changed SharingCapability finishes propagating. These helpers give
+# Set-SPOTenant the same poll/retry resilience the EXO and Power Platform wrappers have.
+function Invoke-SPOTenantPost {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)] [hashtable]$Headers,
+        [Parameter(Mandatory = $true)] [string]$Body,
+        [int]$MaxRetries = 5,
+        [int]$BaseDelaySeconds = 5
+    )
+    for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+        try {
+            return Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" `
+                -Method POST -Headers $Headers -Body $Body
+        }
+        catch {
+            $Message = $_.Exception.Message
+            $StatusCode = 0
+            if ($Message -match '\((\d{3})\)') { $StatusCode = [int]$Matches[1] }
+            elseif ($Message -match 'status code (\d+)') { $StatusCode = [int]$Matches[1] }
+            # 400/500 here are the tenant rejecting a dependent field before the SharingCapability
+            # change has propagated; retry them alongside transient throttling/5xx.
+            $Retryable = $StatusCode -in @(400, 429, 500, 502, 503, 504)
+            if ($Retryable -and $Attempt -lt $MaxRetries) {
+                $Delay = [math]::Min(60, $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1))
+                Write-Information "[SPO] SPO.Tenant POST failed with HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
+                Start-Sleep -Seconds $Delay
+                continue
+            }
+            throw
+        }
+    }
+}
+
+function Wait-SPOTenantSharingCapability {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)] [int]$TargetValue,
+        [int]$MaxAttempts = 12,
+        [int]$DelaySeconds = 5
+    )
+    $GetHeaders = @{
+        Authorization  = "Bearer $script:SPOAccessToken"
+        Accept         = "application/json;odata=verbose"
+        "Content-Type" = "application/json;odata=verbose"
+    }
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            $Response = Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" `
+                -Method GET -Headers $GetHeaders
+            $Current = $Response.d.SharingCapability
+            if ($null -ne $Current -and [int]$Current -eq $TargetValue) {
+                return
+            }
+        }
+        catch {
+            Write-Information "[SPO] Polling SharingCapability failed (attempt $Attempt/$MaxAttempts): $($_.Exception.Message)" -InformationAction Continue
+        }
+        if ($Attempt -lt $MaxAttempts) { Start-Sleep -Seconds $DelaySeconds }
+    }
+    Write-Information "[SPO] SharingCapability did not reach target $TargetValue after $MaxAttempts attempt(s); proceeding anyway." -InformationAction Continue
+}
+
+# -----------------------------------------------------------------------
 # SharePoint Online REST wrapper for functional test preconditions.
 # Replaces the removed Microsoft.Online.SharePoint.PowerShell Set-SPOTenant
 # cmdlet. $script:SPOAdminUrl and $script:SPOAccessToken must be set by
@@ -1858,8 +1924,11 @@ function Set-SPOTenant {
             SharingCapability = $SharingCapabilityMap[$SharingCapability]
         }
 
-        Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-            -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5)
+        Invoke-SPOTenantPost -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5)
+
+        # Wait for the SharingCapability change to propagate before sending dependent fields;
+        # SPO rejects ODB/anonymous-link/attestation fields until it is live.
+        Wait-SPOTenantSharingCapability -TargetValue $SharingCapabilityMap[$SharingCapability]
 
         # Second call: remaining fields (skip SharingCapability)
         $RestBody = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
@@ -1878,8 +1947,7 @@ function Set-SPOTenant {
         }
 
         if ($RestBody.Count -gt 1) {
-            Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-                -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5)
+            Invoke-SPOTenantPost -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5)
         }
         return
     }
@@ -1901,8 +1969,7 @@ function Set-SPOTenant {
         $Body[$Param] = $Mapped
     }
 
-    Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-        -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5)
+    Invoke-SPOTenantPost -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5)
 }
 
 # Helper functions for functional test
