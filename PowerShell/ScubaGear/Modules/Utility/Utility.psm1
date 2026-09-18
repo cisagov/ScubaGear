@@ -752,13 +752,39 @@ function Invoke-ScubaRestMethod {
         $Params.Body = $Body
     }
 
+    # Retry transient server/throttling errors (429/5xx) with exponential backoff; SharePoint and
+    # other admin APIs intermittently return 503 that succeeds on a subsequent attempt.
+    $MaxRetries = 4
+    $BaseDelaySeconds = 3
+    $TransientStatusCodes = @(429, 500, 502, 503, 504)
+
+    for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
     try {
         $Response = Invoke-RestMethod @Params
+        break
     }
     # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
     catch {
         $ErrorRecord = $_
         $WebResponse = $ErrorRecord.Exception.Response
+
+        # HTTP status code across PS 5.1 (HttpWebResponse) and PS 7+ (HttpResponseMessage).
+        $StatusCode = 0
+        if ($null -ne $WebResponse) { try { $StatusCode = [int]$WebResponse.StatusCode } catch { $StatusCode = 0 } }
+        if ($StatusCode -in $TransientStatusCodes -and $Attempt -lt $MaxRetries) {
+            $Delay = $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1)
+            $RetryAfterSeconds = 0
+            if ($null -ne $WebResponse) {
+                try {
+                    $RetryAfterRaw = if ($WebResponse.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') { $WebResponse.Headers.RetryAfter.Delta.TotalSeconds } else { $WebResponse.Headers['Retry-After'] }
+                    if ([int]::TryParse([string]$RetryAfterRaw, [ref]$RetryAfterSeconds) -and $RetryAfterSeconds -gt 0) { $Delay = [math]::Max($Delay, $RetryAfterSeconds) }
+                }
+                catch { $RetryAfterSeconds = 0 }
+            }
+            Write-Information "Invoke-ScubaRestMethod: $Uri returned HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in $([int]$Delay)s..." -InformationAction Continue
+            Start-Sleep -Seconds ([int]$Delay)
+            continue
+        }
 
         $ErrorBuffer = [System.Text.StringBuilder]::new()
         [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
@@ -820,6 +846,7 @@ function Invoke-ScubaRestMethod {
 
         Write-Information $ErrorBuffer.ToString() -InformationAction Continue
         throw
+    }
     }
 
     return $Response
