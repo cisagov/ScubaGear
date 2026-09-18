@@ -1836,13 +1836,23 @@ function Invoke-SPOTenantPost {
     }
 }
 
-function Wait-SPOTenantSharingCapability {
+function Wait-SPOTenantSettings {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true)] [int]$TargetValue,
+        [Parameter(Mandatory = $true)] [hashtable]$Expected,
         [int]$MaxAttempts = 12,
         [int]$DelaySeconds = 5
     )
+    # Fields that can't be reliably string-compared against the GET response (free-form lists)
+    # or aren't tenant properties. Everything else is polled until read-your-writes consistent.
+    $SkipFields = @('SharingBlockedDomainList', 'SharingAllowedDomainList', '__metadata')
+    $Targets = @{}
+    foreach ($Key in $Expected.Keys) {
+        if ($Key -in $SkipFields) { continue }
+        $Targets[$Key] = $Expected[$Key]
+    }
+    if ($Targets.Count -eq 0) { return }
+
     $GetHeaders = @{
         Authorization  = "Bearer $script:SPOAccessToken"
         Accept         = "application/json;odata=verbose"
@@ -1850,19 +1860,21 @@ function Wait-SPOTenantSharingCapability {
     }
     for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
         try {
-            $Response = Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" `
-                -Method GET -Headers $GetHeaders
-            $Current = $Response.d.SharingCapability
-            if ($null -ne $Current -and [int]$Current -eq $TargetValue) {
-                return
+            $Tenant = (Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" `
+                -Method GET -Headers $GetHeaders).d
+            $AllMatch = $true
+            foreach ($Key in $Targets.Keys) {
+                # String compare normalizes int/bool JSON values (e.g. 1, False) uniformly.
+                if ("$($Tenant.$Key)" -ne "$($Targets[$Key])") { $AllMatch = $false; break }
             }
+            if ($AllMatch) { return }
         }
         catch {
-            Write-Information "[SPO] Polling SharingCapability failed (attempt $Attempt/$MaxAttempts): $($_.Exception.Message)" -InformationAction Continue
+            Write-Information "[SPO] Polling tenant settings failed (attempt $Attempt/$MaxAttempts): $($_.Exception.Message)" -InformationAction Continue
         }
         if ($Attempt -lt $MaxAttempts) { Start-Sleep -Seconds $DelaySeconds }
     }
-    Write-Information "[SPO] SharingCapability did not reach target $TargetValue after $MaxAttempts attempt(s); proceeding anyway." -InformationAction Continue
+    Write-Information "[SPO] Tenant settings did not reach expected values after $MaxAttempts attempt(s); proceeding anyway." -InformationAction Continue
 }
 
 # -----------------------------------------------------------------------
@@ -1928,7 +1940,7 @@ function Set-SPOTenant {
 
         # Wait for the SharingCapability change to propagate before sending dependent fields;
         # SPO rejects ODB/anonymous-link/attestation fields until it is live.
-        Wait-SPOTenantSharingCapability -TargetValue $SharingCapabilityMap[$SharingCapability]
+        Wait-SPOTenantSettings -Expected @{ SharingCapability = $SharingCapabilityMap[$SharingCapability] }
 
         # Second call: remaining fields (skip SharingCapability)
         $RestBody = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
@@ -1948,6 +1960,9 @@ function Set-SPOTenant {
 
         if ($RestBody.Count -gt 1) {
             Invoke-SPOTenantPost -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5)
+            # Read-your-writes: block until the dependent settings are visible so the
+            # subsequent ScubaGear assessment doesn't read stale (pre-change) values.
+            Wait-SPOTenantSettings -Expected $RestBody
         }
         return
     }
@@ -1970,6 +1985,9 @@ function Set-SPOTenant {
     }
 
     Invoke-SPOTenantPost -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5)
+    # Read-your-writes: block until the settings are visible so the subsequent
+    # ScubaGear assessment doesn't read stale (pre-change) values.
+    Wait-SPOTenantSettings -Expected $Body
 }
 
 # Helper functions for functional test
