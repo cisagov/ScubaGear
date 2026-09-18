@@ -275,6 +275,9 @@ function New-Report {
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
 
+                # Point failing controls at the table showing the policies they were evaluated against
+                $Result.Details += Get-PolicyTableLinkHtml -BaselineName $BaselineName -Test $Test -DisplayString $Result.DisplayString
+
                 # Declare annotation fields at the top level. If they exist, these fields need to be included
                 # in the control object regardless if the control is omitted, incorrect, or normal
                 $PolicyComment = $Config.AnnotatePolicy.$($Control.Id).Comment
@@ -1106,6 +1109,50 @@ function Resolve-HTMLMarkdown{
         throw $InvalidHTMLReplace
         return $OriginalString
     }
+}
+
+function Get-PolicyTableLinkHtml {
+    <#
+    .Description
+    Generates a link from a failing Security Suite control to the report table that
+    shows the policies the control was evaluated against. The table is chosen by the
+    cmdlet the control's test ran, so a control only links to a table built from the
+    same policy objects.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $BaselineName,
+
+        [Parameter(Mandatory=$false)]
+        [object]
+        $Test,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $DisplayString
+    )
+
+    if ($BaselineName -ne "SecuritySuite") { return "" }
+    if ($DisplayString -notin @("Fail", "Warning")) { return "" }
+
+    # Anchors are set on the table headings by SecuritySuiteTableFunctions.js.
+    $PolicyTables = @{
+        "Get-MalwareFilterPolicy"       = "anti-malware"
+        "Get-AntiPhishPolicy"           = "anti-phish"
+        "Get-HostedContentFilterPolicy" = "anti-spam"
+    }
+    foreach ($Cmdlet in $PolicyTables.Keys) {
+        if ($Test.Commandlet -contains $Cmdlet) {
+            $Table = $PolicyTables[$Cmdlet]
+            return "<br/><a href='#securitysuite-$Table-policies'>View all $Table policies</a>"
+        }
+    }
+    return ""
 }
 
 function Get-IndicatorHtml {
