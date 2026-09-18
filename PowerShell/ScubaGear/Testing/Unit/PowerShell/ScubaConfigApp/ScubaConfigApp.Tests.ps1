@@ -125,6 +125,11 @@ InModuleScope ScubaConfigApp {
                 $mockBaselineData.baselines | Should -Not -BeNullOrEmpty -Because "Mock baselines should contain baseline data"
             }
 
+            It 'Should ignore blank walkthrough paths without throwing' {
+                { Resolve-ScubaConfigAppWalkthroughPath -UIConfigPath 'C:\temp\ScubaConfigApp_Control_en-US.json' -WalkthroughMarkdownPath '   ' } | Should -Not -Throw -Because "blank walkthrough paths should be treated as unavailable"
+                Resolve-ScubaConfigAppWalkthroughPath -UIConfigPath 'C:\temp\ScubaConfigApp_Control_en-US.json' -WalkthroughMarkdownPath '   ' | Should -BeNullOrEmpty -Because "blank walkthrough path should resolve to null"
+            }
+
             It 'Should contain all required UI configuration root keys' {
                 $uiConfigContent = Get-Content $uiConfigPath -Raw | ConvertFrom-Json
 

@@ -1,4 +1,34 @@
-﻿# Helper function to show message boxes on top of the main window
+﻿function Resolve-ScubaConfigAppWalkthroughPath {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$UIConfigPath,
+
+        [AllowEmptyString()]
+        [string]$WalkthroughMarkdownPath
+    )
+
+    if ([string]::IsNullOrWhiteSpace($WalkthroughMarkdownPath)) {
+        return $null
+    }
+
+    $configDirectory = Split-Path -Path $UIConfigPath -Parent
+    if ([string]::IsNullOrWhiteSpace($configDirectory)) {
+        return $null
+    }
+
+    $candidatePath = Join-Path -Path $configDirectory -ChildPath $WalkthroughMarkdownPath
+    if ([string]::IsNullOrWhiteSpace($candidatePath)) {
+        return $null
+    }
+
+    if (-not (Test-Path -LiteralPath $candidatePath)) {
+        return $null
+    }
+
+    return (Resolve-Path -LiteralPath $candidatePath).Path
+}
+
+# Helper function to show message boxes on top of the main window
 function Show-ScubaMessageBox {
     param(
         [string]$Message,
@@ -80,6 +110,16 @@ Function Start-SCuBAConfigApp {
     .PARAMETER M365Environment
     Specifies the M365 environment to use. Valid values are 'commercial', 'dod', 'gcc', 'gcchigh'. Default is 'commercial'.
 
+    .PARAMETER TenantName
+    Tenant domain (e.g. contoso.onmicrosoft.com) or tenant ID to connect to when -Online is used.
+
+    .PARAMETER AppId
+    Application (client) ID for non-interactive (app-only) Microsoft Graph auth with -Online.
+    Requires -CertificateThumbprint (and -TenantName).
+
+    .PARAMETER CertificateThumbprint
+    Thumbprint of the certificate associated with -AppId for non-interactive (app-only) Graph auth.
+
     .PARAMETER Passthru
     If specified, returns the configuration object after loading.
 
@@ -123,6 +163,16 @@ Function Start-SCuBAConfigApp {
         [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
         [string]$TenantName,
 
+        # App-only (non-interactive) certificate auth. With -Online, provide both to connect
+        # without an interactive sign-in (uses application permissions).
+        [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
+        [ValidatePattern('^[{(]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[)}]?$')]
+        [string]$AppId,
+
+        [Parameter(Mandatory = $false,ParameterSetName = 'Online')]
+        [ValidatePattern('^[A-Fa-f0-9]{40}$')]
+        [string]$CertificateThumbprint,
+
         [switch]$Passthru
     )
 
@@ -161,23 +211,33 @@ Function Start-SCuBAConfigApp {
     If($TenantName) {
         $GraphParameters.TenantId = $TenantName
     }
-    $GraphParameters.Scopes = @(
-        "User.Read.All",
-        "Group.Read.All",
-        "Organization.Read.All",
-        "Application.Read.All"
-    )
+    # App-only (non-interactive) certificate auth uses application permissions, so no scopes.
+    $AppOnlyAuth = ($AppId -and $CertificateThumbprint)
+    if ($AppOnlyAuth) {
+        $GraphParameters.ClientId = $AppId
+        $GraphParameters.CertificateThumbprint = $CertificateThumbprint
+    } else {
+        $GraphParameters.Scopes = @(
+            "User.Read.All",
+            "Group.Read.All",
+            "Organization.Read.All",
+            "Application.Read.All"
+        )
+    }
 
     # Connect to Microsoft Graph if Online parameter is used
     if ($Online) {
         try {
             #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
-            Write-Output "Connecting to Microsoft Graph..."
+            Write-Output $(if ($AppOnlyAuth) { "Connecting to Microsoft Graph (app-only certificate)..." } else { "Connecting to Microsoft Graph..." })
             Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
 
-            #ensure user is authenticated
-            Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+            # Interactive auth resolves a signed-in user; confirm it. App-only has no user
+            # context (/me returns 400), so a successful Connect-MgGraph is sufficient there.
+            if (-not $AppOnlyAuth) {
+                Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+            }
             Write-Output " - Successfully connected to Microsoft Graph"
             $GraphConnected = $true
         }
@@ -210,6 +270,9 @@ Function Start-SCuBAConfigApp {
     # Build the syncHash with necessary paths and parameters
     $syncHash.Online = $Online
     $syncHash.GraphConnected = $GraphConnected
+    # Record the auth mode so the runspace can log app-only (cert) connections to the debug log.
+    $syncHash.AppOnlyAuth = $AppOnlyAuth
+    $syncHash.ConnectedAppId = if ($AppOnlyAuth) { $AppId } else { $null }
     # Cache mapping object IDs (GUIDs) to their display names.
     # Populated when the user selects items via Graph queries or when importing YAML with inline comments.
     # Used to emit friendly-name comments in generated YAML (e.g.  - guid #DisplayName).
@@ -219,6 +282,16 @@ Function Start-SCuBAConfigApp {
     $syncHash.OrphanedIds = [hashtable]::Synchronized(@{})
     $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAppUI.xaml"
     $syncHash.ChangelogPath = "$PSScriptRoot\ScubaConfigApp_CHANGELOG.md"
+    $syncHash.WalkthroughPath = $null
+    $syncHash.WalkthroughUrl = $null
+    try {
+        $uiConfigJson = Get-Content -Path $UIConfigPath -Raw | ConvertFrom-Json
+        $syncHash.WalkthroughPath = Resolve-ScubaConfigAppWalkthroughPath -UIConfigPath $UIConfigPath -WalkthroughMarkdownPath $uiConfigJson.WalkthroughMarkdownPath
+        # GitHub-rendered walkthrough page; opened in the default browser by the walkthrough window.
+        $syncHash.WalkthroughUrl = $uiConfigJson.WalkthroughGitHubUrl
+    } catch {
+        Write-DebugOutput -Message "Unable to resolve walkthrough path from UI config: $($_.Exception.Message)" -Source "ConfigPath" -Level "Warning"
+    }
     $syncHash.ImgPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
     $syncHash.IcoPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.ico"
     $syncHash.UIConfigPath = $UIConfigPath
@@ -258,6 +331,9 @@ Function Start-SCuBAConfigApp {
     $syncHash.ExclusionData = [ordered]@{}
     $syncHash.OmissionData = [ordered]@{}
     $syncHash.AnnotationData = [ordered]@{}
+    # Per-policy documentation comments for exclusions (policyId -> ordered array of lines).
+    # Emitted as "# ..." above each policy in the generated YAML; not a ScubaGear config value.
+    $syncHash.ExclusionComments = [ordered]@{}
     #build runspace
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
@@ -313,6 +389,14 @@ Function Start-SCuBAConfigApp {
         #
         #===========================================================================
         $source = "Initialization"
+
+        # Log the Graph authentication mode (helps troubleshoot app-only certificate connections).
+        if ($syncHash.AppOnlyAuth) {
+            Write-DebugOutput -Message "Connected to Microsoft Graph using app-only certificate authentication (AppId: $($syncHash.ConnectedAppId))" -Source "Graph Connection" -Level "Info"
+        } elseif ($syncHash.GraphConnected) {
+            Write-DebugOutput -Message "Connected to Microsoft Graph using interactive authentication" -Source "Graph Connection" -Level "Info"
+        }
+
         # Set window icon from DrawingImage resource
         $syncHash.Window.Icon = $syncHash.IcoPath
         $syncHash.LogoImage.Source = $syncHash.ImgPath
@@ -744,6 +828,25 @@ Function Start-SCuBAConfigApp {
             Write-DebugOutput -Message "Changelog button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
             Show-ChangelogWindow
         }.GetNewClosure())
+
+        $syncHash.WalkthroughButton.Add_Click({
+            Write-DebugOutput -Message "Walkthrough button clicked" -Source $MyInvocation.MyCommand -Level "Verbose"
+            Show-ScubaConfigWalkthroughWindow
+        }.GetNewClosure())
+
+        # GitHub repository hyperlink: WPF Hyperlinks need an explicit RequestNavigate handler or
+        # clicking does nothing. Open the configured repo URL (control file) in the default browser.
+        if ($syncHash.GitHubRepo_Hyperlink) {
+            if ($syncHash.UIConfigs.GitHubRepoUrl) {
+                try { $syncHash.GitHubRepo_Hyperlink.NavigateUri = [Uri]$syncHash.UIConfigs.GitHubRepoUrl } catch { Write-DebugOutput -Message "Invalid GitHubRepoUrl: $($_.Exception.Message)" -Source $source -Level "Warning" }
+            }
+            $syncHash.GitHubRepo_Hyperlink.Add_RequestNavigate({
+                param($eventSender, $e)
+                $null = $eventSender
+                try { Start-Process $e.Uri.AbsoluteUri; $e.Handled = $true }
+                catch { Write-DebugOutput -Message "Failed to open GitHub repository link: $($_.Exception.Message)" -Source $source -Level "Error" }
+            }.GetNewClosure())
+        }
 
 
         # add event handlers to all buttons
@@ -1306,6 +1409,12 @@ Function Show-SCuBABaselinePolicyViewer {
     .PARAMETER NavigateToPolicyId
         If specified, the baseline viewer will automatically navigate to and highlight this specific policy ID.
 
+    .PARAMETER Online
+        When specified, the viewer pulls the latest baseline artifacts from the ScubaGear GitHub repo
+        (ScubaBaselines.json and the configuration.md sample markdown) instead of using the local schemas
+        copy, so developers can preview not-yet-published baselines. This is a plain HTTPS download of the
+        raw files - it does not connect to Microsoft Graph or any tenant.
+
     .EXAMPLE
         Show-SCuBABaselinePolicyViewer
         Launches the baseline policy viewer using default settings.
@@ -1317,6 +1426,10 @@ Function Show-SCuBABaselinePolicyViewer {
     .EXAMPLE
         Show-SCuBABaselinePolicyViewer -GitHubDirectoryUrl "https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/baselines"
         Launches the viewer using baselines downloaded from GitHub.
+
+    .EXAMPLE
+        Show-SCuBABaselinePolicyViewer -Online
+        Launches the viewer against the latest baselines pulled from the ScubaGear GitHub repo.
 
     .EXAMPLE
         Show-SCuBABaselinePolicyViewer -NavigateToPolicyId "MS.DEFENDER.1.1v1"
@@ -1335,6 +1448,9 @@ Function Show-SCuBABaselinePolicyViewer {
 
         [Parameter(Mandatory=$false)]
         [string]$NavigateToPolicyId,
+
+        [Parameter(Mandatory=$false)]
+        [switch]$Online,
 
         [Parameter(Mandatory=$false)]
         [switch]$PassThru
@@ -1406,8 +1522,31 @@ Function Show-SCuBABaselinePolicyViewer {
         $localSchemaPath = if ($hasLocalSchemaPath) { $uiConfig.LocalBaselineSchemaPath } else { "..\..\schemas\ScubaBaselines.json" }
         $SchemaBaselinePath = Join-Path $PSScriptRoot $localSchemaPath
 
+        # The -Online switch is the viewer's own developer toggle: pull the latest ScubaBaselines.json
+        # straight from the ScubaGear GitHub repo (raw URL in the viewer control file). It is a plain
+        # HTTPS download - no Graph/tenant connection - and takes precedence over PullOnlineBaselines.
+        $onlineBaselineJsonUrl = $null
+        if ($Online) {
+            $viewerControlPath = Join-Path $PSScriptRoot "ScubaBaselineViewer_Control_en-US.json"
+            if (Test-Path $viewerControlPath) {
+                $viewerControl = (Get-Content -Path $viewerControlPath -Raw | ConvertFrom-Json)
+                if ($viewerControl.PSObject.Properties.Name -contains 'configurationBaselineJsonRawOnlinePath') {
+                    $onlineBaselineJsonUrl = $viewerControl.configurationBaselineJsonRawOnlinePath
+                }
+            }
+            if (-not $onlineBaselineJsonUrl) {
+                throw "The -Online switch requires 'configurationBaselineJsonRawOnlinePath' in ScubaBaselineViewer_Control_en-US.json."
+            }
+        }
+
         if (-not $BaselineDirectory -and -not $GitHubDirectoryUrl) {
-            if ($pullOnline) {
+            if ($Online) {
+                # -Online: download the latest ScubaBaselines.json from GitHub, parse into memory
+                Write-Output "-Online specified. Downloading latest baseline from: $onlineBaselineJsonUrl"
+                $onlineBaselineData = Invoke-RestMethod -Uri $onlineBaselineJsonUrl -ErrorAction Stop
+                Write-Output "Online baseline loaded into memory."
+            }
+            elseif ($pullOnline) {
                 # PullOnlineBaselines = true: download from OnlineBaselineSchemaURL, parse into memory
                 Write-Output "PullOnlineBaselines=true. Downloading baseline from: $($uiConfig.OnlineBaselineSchemaURL)"
                 $onlineBaselineData = Invoke-RestMethod -Uri $uiConfig.OnlineBaselineSchemaURL -ErrorAction Stop
@@ -1611,9 +1750,10 @@ Function Show-SCuBABaselinePolicyViewer {
 
         Write-Output "Launching baseline policy viewer UI..."
 
-        # Find required files
-        $helperUIModulePath = Join-Path $PSScriptRoot "ScubaConfigAppHelpers\ScubaConfigAppBaselineUIViewerHelper.psm1"
-        $controlConfigPath = Join-Path $PSScriptRoot "ScubaConfigApp_Control_en-US.json"
+        # Find required files. The viewer is app-independent (its own helpers folder), imported
+        # on demand here - it is not part of the ScubaConfigApp / Analyzer helper auto-load loops.
+        # It self-resolves its own control JSON, so no ControlConfigPath is passed.
+        $helperUIModulePath = Join-Path $PSScriptRoot "ScubaBaselinePolicyViewerHelpers\ScubaBaselinePolicyViewerHelper.psm1"
 
         # Import the baseline UI helper module
         Import-Module $helperUIModulePath -Force
@@ -1626,9 +1766,6 @@ Function Show-SCuBABaselinePolicyViewer {
                 $helperParams.BaselineData = $onlineBaselineData
             } else {
                 $helperParams.BaselineFilePath = $BaselineFilePath
-            }
-            if (Test-Path $controlConfigPath) {
-                $helperParams.ControlConfigPath = $controlConfigPath
             }
             if ($NavigateToPolicyId) {
                 $helperParams.NavigateToPolicyId = $NavigateToPolicyId
@@ -1655,7 +1792,466 @@ Function Show-SCuBABaselinePolicyViewer {
     }
 }
 
+Function Start-SCuBAConfigAnalyzer {
+    <#
+    .SYNOPSIS
+    Opens the ScubaGear Config Analyzer: analyzes an M365 tenant against the ScubaGear
+    baselines and shows which exclusions (users/groups) your ScubaGear config needs.
+
+    .DESCRIPTION
+    A WPF companion to Start-SCuBAConfigApp. It can run ScubaGear from within the app
+    (in a separate, visible PowerShell window so interactive Graph authentication
+    works) and then analyze the fresh results, or analyze an existing ScubaResults
+    JSON. The analysis is entirely JSON-schema driven (schemas ship in
+    PowerShell/ScubaGear/schemas) - nothing about the baselines is hard-coded.
+
+    For each non-compliant control it shows the root cause, the best-matching
+    Conditional Access policy, step-by-step remediation, and the users/groups excluded
+    on that policy. Those exclusions are editable and are written into a ready-to-use
+    ScubaGear configuration YAML that you can copy or export into the ScubaConfig app.
+
+    The window runs in its own STA runspace and performs analysis on a background
+    runspace, so the UI stays responsive while a large tenant is analyzed.
+
+    .PARAMETER ResultsPath
+    Optional path to an existing ScubaResults_*.json to analyze immediately on launch.
+
+    .PARAMETER M365Environment
+    The M365 environment. Valid values are 'commercial', 'dod', 'gcc', 'gcchigh'.
+    Default is 'commercial'.
+
+    .PARAMETER AppId
+    Optional. Application (client) ID of an Entra app registration, for non-interactive
+    (app-only) Microsoft Graph authentication. Requires -CertificateThumbprint and -Organization.
+
+    .PARAMETER CertificateThumbprint
+    Optional. Thumbprint of the certificate (in the CurrentUser or LocalMachine 'My' store)
+    associated with -AppId, for non-interactive app-only Graph authentication.
+
+    .PARAMETER Organization
+    Tenant domain (e.g. contoso.onmicrosoft.com) or tenant ID. Required for non-interactive
+    (app-only) authentication.
+
+    .EXAMPLE
+    Start-SCuBAConfigAnalyzer
+
+    .EXAMPLE
+    Start-SCuBAConfigAnalyzer -ResultsPath .\ScubaResults_1234.json
+
+    .PARAMETER Passthru
+    Returns the analyzer instance (@{ SyncHash; Runspace; PowerShell; Handle }) so the caller can
+    inspect the shared state while the window is open - e.g. the Activity Log entries and errors.
+
+    .EXAMPLE
+    Start-SCuBAConfigAnalyzer -AppId 00000000-0000-0000-0000-000000000000 -CertificateThumbprint AABBCCDDEEFF00112233445566778899AABBCCDD -Organization contoso.onmicrosoft.com
+
+    .EXAMPLE
+    $r = Start-SCuBAConfigAnalyzer -Passthru
+    # See any launch/scan failures (module import errors, Graph/Exchange errors, ...):
+    $r.SyncHash.LogEntries | Where-Object Level -eq 'Error'
+
+    .LINK
+    Start-SCuBAConfigApp
+    #>
+    [CmdletBinding()]
+    Param(
+        [ValidateScript({ Test-Path $_ -PathType Leaf })]
+        [string]$ResultsPath,
+
+        [ValidateSet('commercial', 'dod', 'gcc', 'gcchigh')]
+        [string]$M365Environment = 'commercial',
+
+        # Non-interactive (app-only) Microsoft Graph auth: provide all three to connect with a
+        # certificate instead of an interactive browser sign-in.
+        [ValidatePattern('^[{(]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[)}]?$')]
+        [string]$AppId,
+
+        [ValidatePattern('^[A-Fa-f0-9]{40}$')]
+        [string]$CertificateThumbprint,
+
+        [string]$Organization,
+
+        [switch]$Passthru
+    )
+
+    [string]${CmdletName} = $MyInvocation.MyCommand
+    Write-Verbose ("{0}: Launching ScubaGear Config Analyzer" -f ${CmdletName})
+
+    # Non-interactive (app-only) auth needs the app id + certificate together, plus a tenant.
+    if ($AppId -xor $CertificateThumbprint) {
+        throw "For non-interactive Graph auth, provide BOTH -AppId and -CertificateThumbprint (and -Organization)."
+    }
+    if ($AppId -and $CertificateThumbprint -and -not $Organization) {
+        throw "Non-interactive (app-only) auth requires -Organization (tenant domain, e.g. contoso.onmicrosoft.com)."
+    }
+
+    # If a previous analyzer window was closed, dispose its runspace before launching a new one.
+    if ($script:ScubaConfigAnalyzerInstance) {
+        try {
+            $prev = $script:ScubaConfigAnalyzerInstance
+            $stillOpen = $false
+            try { if ($prev.SyncHash -and $prev.SyncHash.Window) { $stillOpen = ($prev.SyncHash.Window.IsVisible -eq $true) } } catch { $stillOpen = $false }
+            if (-not $stillOpen) {
+                try { $prev.PowerShell.Stop() } catch { Write-Verbose "Previous analyzer PowerShell stop cleanup: $($_.Exception.Message)" }
+                try { $prev.PowerShell.Dispose() } catch { Write-Verbose "Previous analyzer PowerShell dispose cleanup: $($_.Exception.Message)" }
+                try { $prev.Runspace.Close(); $prev.Runspace.Dispose() } catch { Write-Verbose "Previous analyzer runspace dispose cleanup: $($_.Exception.Message)" }
+                $script:ScubaConfigAnalyzerInstance = $null
+            }
+        } catch { $script:ScubaConfigAnalyzerInstance = $null }
+    }
+
+    Write-Output "Launching ScubaGear Config Analyzer...please wait."
+
+    # Synchronized state shared between the UI runspace, background analysis runspace,
+    # DispatcherTimers and event handlers.
+    $syncHash = [hashtable]::Synchronized(@{})
+    $Runspace = [runspacefactory]::CreateRunspace()
+    $Runspace.ApartmentState = "STA"
+    $Runspace.ThreadOptions = "ReuseThread"
+    $Runspace.Open()
+    $syncHash.Runspace = $Runspace
+    $syncHash.InitialResultsPath = $ResultsPath
+    $syncHash.M365Environment = $M365Environment
+    $syncHash.AppId = $AppId
+    $syncHash.CertificateThumbprint = $CertificateThumbprint
+    $syncHash.Organization = $Organization
+
+    # File locations are declared (relative to this module folder) in the control JSON and resolved
+    # here - same pattern as ScubaConfigApp_Control_*.json. AnalyzerControlPath, the window
+    # resources (XAML/logo/icon) and the helper-modules folder stay hardcoded - foundational.
+    $syncHash.AnalyzerControlPath = Join-Path $PSScriptRoot 'ScubaConfigAnalyzer_Control_en-US.json'
+    $syncHash.XamlPath = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigAnalyzerUI.xaml"
+    $syncHash.ImgPath  = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.png"
+    $syncHash.IcoPath  = "$PSScriptRoot\ScubaConfigAppResources\ScubaConfigApp_logo.ico"
+    $syncHash.HelperModulesPath = "$PSScriptRoot\ScubaConfigAnalyzerHelpers"
+    $analyzerControl = Get-Content $syncHash.AnalyzerControlPath -Raw | ConvertFrom-Json
+    $moduleRoot = $PSScriptRoot
+    $resolveScAPath = {
+        param([string]$Relative)
+        if ([string]::IsNullOrWhiteSpace($Relative)) { return $null }
+        $joined = Join-Path $moduleRoot $Relative
+        $resolved = (Resolve-Path $joined -ErrorAction SilentlyContinue).Path
+        if ($resolved) { $resolved } else { $joined }
+    }
+    $syncHash.ScubaConfigAppModulePath = & $resolveScAPath $analyzerControl.ScubaConfigAppModulePath
+    $syncHash.EXORestHelperPath        = & $resolveScAPath $analyzerControl.EXORestHelperPath
+    $syncHash.ConnectHelpersPath       = & $resolveScAPath $analyzerControl.ConnectHelpersPath
+    $syncHash.GenerateTenantGovernanceConfig = [bool]$analyzerControl.GenerateTenantGovernanceConfig
+    $syncHash.TenantGovernanceSchemaUrl = [string]$analyzerControl.tenantGovernanceSchemaURL
+
+    # Shared analyzer caches - the helper modules are Import-Module'd separately (same pattern
+    # as ScubaConfigApp), so they share state via the synchronized $syncHash, not $script:.
+    # Populated at scan time by Import-ScAAnalyzerRules / Import-ScAConfigurableMap.
+    $syncHash.ScAModuleRoot           = $syncHash.HelperModulesPath
+    $syncHash.ScAProductMap           = @{}
+    $syncHash.ScAApiOperations        = @{}
+    $syncHash.ScAExclusionDefinitions = @{}
+    $syncHash.ScACaRules              = $null
+    $syncHash.ScAApiCatalog           = @{}
+    $syncHash.ScAFriendlyNames        = $null
+    $syncHash.ScAConfigurableMap      = @{}
+    $syncHash.ScAProductCapabilities  = @{}
+
+    # In-memory activity-log record (mirrors ScubaConfigApp's $syncHash.DebugLogData) so a
+    # -Passthru caller can inspect entries. Write-ScubaAnalyzerLog updates the Activity Log directly.
+    $syncHash.LogEntries = [System.Collections.ArrayList]::Synchronized([System.Collections.ArrayList]::new())
+
+    $syncHash.BaselineSchemaPath = & $resolveScAPath $analyzerControl.BaselineSchemaPath
+    $syncHash.ApiCatalogPath     = & $resolveScAPath $analyzerControl.ApiCatalogPath
+
+    # Canonical ScubaGear config schema (single source of truth for which policies are configurable via exclusions).
+    $syncHash.ConfigSchemaPath   = & $resolveScAPath $analyzerControl.ConfigSchemaPath
+
+    # Dev toggle (mirrors ScubaConfigApp's PullOnlineBaselines): download the analyzer schemas from
+    # the URLs in the control file (to temp) instead of the local schemas folder, so developers can
+    # test not-yet-published baselines. Falls back to the local copies if a download fails.
+    if ($analyzerControl.PSObject.Properties['PullOnlineBaselines'] -and $analyzerControl.PullOnlineBaselines) {
+        try {
+            if ($analyzerControl.OnlineBaselineSchemaURL) {
+                Write-Output "PullOnlineBaselines=true. Downloading analyzer baseline schema from: $($analyzerControl.OnlineBaselineSchemaURL)"
+                $tmpBaseline = Join-Path $env:TEMP 'ScubaAnalyzer_ResultsBaselineSchema.json'
+                (Invoke-WebRequest -Uri $analyzerControl.OnlineBaselineSchemaURL -UseBasicParsing -ErrorAction Stop).Content | Out-File -FilePath $tmpBaseline -Encoding utf8 -Force
+                $syncHash.BaselineSchemaPath = $tmpBaseline
+            }
+            if ($analyzerControl.OnlineApiCatalogURL) {
+                Write-Output "PullOnlineBaselines=true. Downloading analyzer API catalog from: $($analyzerControl.OnlineApiCatalogURL)"
+                $tmpCatalog = Join-Path $env:TEMP 'ScubaAnalyzer_ApiCatalog.json'
+                (Invoke-WebRequest -Uri $analyzerControl.OnlineApiCatalogURL -UseBasicParsing -ErrorAction Stop).Content | Out-File -FilePath $tmpCatalog -Encoding utf8 -Force
+                $syncHash.ApiCatalogPath = $tmpCatalog
+            }
+        } catch {
+            Write-Warning "PullOnlineBaselines: could not download analyzer schema(s) online; using local copies. $($_.Exception.Message)"
+        }
+    }
+
+    # ScubaGear module root (two levels up) so the run can import the local branch build
+    $resolvedScubaRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..") -ErrorAction SilentlyContinue).Path
+    $syncHash.ScubaGearModulePath = if ($resolvedScubaRoot -and (Test-Path (Join-Path $resolvedScubaRoot 'ScubaGear.psd1'))) { $resolvedScubaRoot } else { $null }
+
+    # Version (from the ScubaGear manifest)
+    $scubaGearPsd1 = Join-Path $PSScriptRoot "..\..\ScubaGear.psd1"
+    $syncHash.AnalyzerVersion = if (Test-Path $scubaGearPsd1) { try { (Import-PowerShellDataFile -Path $scubaGearPsd1).ModuleVersion } catch { $null } } else { $null }
+
+    # Expose the baseline policy viewer so the analyzer can jump straight to a control
+    $syncHash.ShowBaselinePolicyViewer = ${function:Show-SCuBABaselinePolicyViewer}
+    $Runspace.SessionStateProxy.SetVariable("syncHash", $syncHash)
+    $PowerShellCommand = [PowerShell]::Create().AddScript({
+
+        [System.Reflection.Assembly]::LoadWithPartialName('PresentationFramework') | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName('PresentationCore')      | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName('WindowsBase')           | Out-Null
+        [System.Reflection.Assembly]::LoadWithPartialName('System.Windows.Forms')  | Out-Null
+
+        try {
+            # Load the XAML (same normalization the main app uses: strip design-time bits,
+            # convert x:Name to Name so FindName + attribute lookups work).
+            [string]$XAML = (Get-Content $syncHash.XamlPath -ReadCount 0) -replace 'mc:Ignorable="d"', '' -replace "x:N", 'N' -replace '^<Win.*', '<Window' -replace 'Click=".*', '/>'
+            [xml]$UIXML = $XAML
+            $reader = New-Object System.Xml.XmlNodeReader ([xml]$UIXML)
+            $syncHash.Window = [Windows.Markup.XamlReader]::Load($reader)
+
+            # Store every named control on the syncHash for easy access.
+            $UIXML.SelectNodes("//*[@Name]") | ForEach-Object {
+                $ctrlName = $_.GetAttribute('Name')
+                if ($ctrlName) { $syncHash[$ctrlName] = $syncHash.Window.FindName($ctrlName) }
+            }
+
+            # Localization: load the analyzer control JSON (also used for productMap below) and apply
+            # its locale* text so the UI is multi-language ready. A different *_<lang>.json swaps the text.
+            try { $syncHash.Locale = Get-Content $syncHash.AnalyzerControlPath -Raw | ConvertFrom-Json } catch { $syncHash.Locale = $null }
+            if ($syncHash.Locale) {
+                try { if ($syncHash.Locale.localeWindow.Title) { $syncHash.Window.Title = [string]$syncHash.Locale.localeWindow.Title } } catch { Write-Verbose "Window title locale failed: $($_.Exception.Message)" }
+                # Named-control text, applied by control type (mirrors ScubaConfigApp's localeContext loop).
+                if ($syncHash.Locale.localeContext) {
+                    foreach ($item in $syncHash.Locale.localeContext.PSObject.Properties) {
+                        $ctrl = $syncHash[$item.Name]
+                        if (-not $ctrl) { continue }
+                        switch ($ctrl.GetType().Name) {
+                            'TextBlock' { $ctrl.Text = [string]$item.Value }
+                            'Button'    { $ctrl.Content = [string]$item.Value }
+                            'CheckBox'  { $ctrl.Content = [string]$item.Value }
+                            'Label'     { $ctrl.Content = [string]$item.Value }
+                            'TabItem'   { $ctrl.Header = [string]$item.Value }
+                            'TextBox'   { $ctrl.Text = [string]$item.Value }
+                        }
+                    }
+                }
+                # Named-control tooltips (any control type).
+                if ($syncHash.Locale.localeToolTips) {
+                    foreach ($item in $syncHash.Locale.localeToolTips.PSObject.Properties) {
+                        $ctrl = $syncHash[$item.Name]
+                        if ($ctrl) { $ctrl.ToolTip = [string]$item.Value }
+                    }
+                }
+            }
+
+            try { if (Test-Path $syncHash.IcoPath) { $syncHash.Window.Icon = $syncHash.IcoPath } } catch { Write-Verbose "Analyzer window icon load failed: $($_.Exception.Message)" }
+
+            # Wire the toolbar + events (defined in the UI helper module).
+            # Logo + version
+            try { if ($syncHash.ImgPath -and (Test-Path $syncHash.ImgPath)) { $syncHash.LogoImage.Source = $syncHash.ImgPath } } catch { Write-Verbose "Logo load failed: $($_.Exception.Message)" }
+            if ($syncHash.AnalyzerVersion) { $syncHash.VersionText.Text = "v$($syncHash.AnalyzerVersion)" }
+
+            # Pre-fill the header from launch parameters: show the tenant (Organization) and, when launched
+            # with app-only creds, the app id (amber = configured but not connected until Connect & Scan).
+            if ($syncHash.Organization -and $syncHash.TenantText) {
+                $syncHash.TenantText.Text = "Tenant: $($syncHash.Organization)"
+            }
+            if ($syncHash.ConnectionText -and $syncHash.AppId -and $syncHash.CertificateThumbprint) {
+                $syncHash.ConnectionText.Text = "(not connected) App-only: $($syncHash.AppId)"
+                $syncHash.ConnectionText.Foreground = [System.Windows.Media.Brushes]::Goldenrod
+            }
+            # Environments: pull from ScubaConfigSchema.json (properties.M365Environment.enum).
+            try {
+                $cs = Get-Content $syncHash.ConfigSchemaPath -Raw | ConvertFrom-Json
+                foreach ($e in @($cs.properties.M365Environment.enum)) { [void]$syncHash.Environment_ComboBox.Items.Add($e) }
+            } catch { Write-Verbose "Could not load M365Environment enum from schema: $($_.Exception.Message)" }
+            if ($syncHash.Environment_ComboBox.Items.Count -gt 0) { $syncHash.Environment_ComboBox.SelectedIndex = 0 }
+
+             #===========================================================================
+            # Import modules
+            #===========================================================================
+            #loop thru each module and import exclude the debug helper
+            Get-ChildItem -Path $syncHash.HelperModulesPath -Filter '*.psm1' | ForEach-Object {
+                $moduleFile = $_.FullName
+                Try{
+                    Import-Module $moduleFile -Force -ErrorAction Stop
+                } Catch {
+                    # Surface the real failure in the Activity Log instead of swallowing it.
+                    $msg = "[$(Get-Date -Format 'HH:mm:ss')][Error][Module Import] $([System.IO.Path]::GetFileName($moduleFile)): $($_.Exception.Message)"
+                    [void]$syncHash.LogEntries.Add([pscustomobject]@{ Time = Get-Date; Level = 'Error'; Message = $msg })
+                    if ($syncHash.RunOutput_TextBox) { $syncHash.RunOutput_TextBox.AppendText("$msg`r`n"); $syncHash.RunOutput_TextBox.ScrollToEnd() }
+                }
+            }
+
+            # Products list: only configurable products (supportsExclusions=true in
+            # ScubaConfigSchema.json), intersected with products that have baseline validations.
+            # Items carry the product key + a friendly displayName (from the analyzer schema
+            # productMap). Multi-select; nothing hardcoded.
+
+            # 1) Which products can be fixed with exclusions? (supportsExclusions in the config schema)
+            $configurableProducts = @()
+            try {
+                $configSchema = Get-Content $syncHash.ConfigSchemaPath -Raw | ConvertFrom-Json
+                foreach ($capability in $configSchema.schemaMetadata.productCapabilities.PSObject.Properties) {
+                    if ($capability.Value.supportsExclusions -eq $true) { $configurableProducts += ([string]$capability.Name).ToLower() }
+                }
+            } catch { Write-Verbose "Configurable products load failed: $($_.Exception.Message)" }
+
+            # 2) Friendly display name for each product key (from the analyzer control schema's productMap)
+            $displayNameMap = @{}
+            try {
+                $analyzerControl = Get-Content $syncHash.AnalyzerControlPath -Raw | ConvertFrom-Json
+                foreach ($productEntry in $analyzerControl.productMap.PSObject.Properties) {
+                    if ($productEntry.Name -match '^_') { continue }
+                    $displayNameMap[([string]$productEntry.Name).ToLower()] = if ($productEntry.Value.displayName) { [string]$productEntry.Value.displayName } else { [string]$productEntry.Name }
+                }
+            } catch { Write-Verbose "Product display-name load failed: $($_.Exception.Message)" }
+
+            # 3) Show products that have baseline validations AND are configurable; fall back sensibly.
+            $products = @()
+            try {
+                $baselineSchema = Get-Content $syncHash.BaselineSchemaPath -Raw | ConvertFrom-Json
+                $baselineProducts = @($baselineSchema.baselineValidations.PSObject.Properties.Name)
+                $products = @($baselineProducts | Where-Object { $configurableProducts -contains ([string]$_).ToLower() })
+            } catch { Write-Verbose "Baseline products load failed: $($_.Exception.Message)" }
+            if (@($products).Count -eq 0) { $products = @($configurableProducts) }   # no baseline match -> show all configurable
+            if (@($products).Count -eq 0) { $products = @('aad') }                   # last-resort default
+
+            # 4) Add each product to the list box as { Key; Display }, then select them all.
+            foreach ($product in $products) {
+                $productKey  = ([string]$product).ToLower()
+                $displayName = if ($displayNameMap.ContainsKey($productKey)) { $displayNameMap[$productKey] } else { [string]$product }
+                [void]$syncHash.Product_ListBox.Items.Add([pscustomobject]@{ Key = [string]$product; Display = $displayName })
+            }
+            $syncHash.Product_ListBox.SelectAll()
+
+            # AAD is mandatory: EXO / Defender / others may be unchecked, but AAD must always stay
+            # selected. Re-select it if the user tries to uncheck it (no visible disabled state).
+            $syncHash.Product_ListBox.Add_SelectionChanged({
+                $aadItem = @($syncHash.Product_ListBox.Items | Where-Object { ([string]$_.Key).ToLower() -eq 'aad' })[0]
+                if ($aadItem -and -not $syncHash.Product_ListBox.SelectedItems.Contains($aadItem)) {
+                    [void]$syncHash.Product_ListBox.SelectedItems.Add($aadItem)
+                }
+            })
+
+            # Toolbar
+            $syncHash.Run_Button.Add_Click({ Start-ScubaAnalyzerTenantScan })
+            $syncHash.Load_Button.Add_Click({
+                try {
+                    $dlg = New-Object Microsoft.Win32.OpenFileDialog
+                    $dlg.Filter = "ScubaGear results (*.json)|*.json|All files (*.*)|*.*"
+                    $dlg.Title = "Select a ScubaResults JSON"
+                    if ($dlg.ShowDialog() -eq $true) { Start-ScubaAnalyzerAnalysis -ResultsPath $dlg.FileName }
+                } catch { Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'LoadFileError' $_.Exception.Message) }
+            })
+
+            # Filters
+            $syncHash.IssuesOnly_CheckBox.Add_Checked({ if ($syncHash.Analysis) { Update-ScubaAnalyzerFindings } })
+            $syncHash.IssuesOnly_CheckBox.Add_Unchecked({ if ($syncHash.Analysis) { Update-ScubaAnalyzerFindings } })
+            if ($syncHash.ConfigurableOnly_CheckBox) {
+                $syncHash.ConfigurableOnly_CheckBox.Add_Checked({ if ($syncHash.Analysis) { Update-ScubaAnalyzerFindings } })
+                $syncHash.ConfigurableOnly_CheckBox.Add_Unchecked({ if ($syncHash.Analysis) { Update-ScubaAnalyzerFindings } })
+            }
+            $syncHash.Search_TextBox.Add_TextChanged({ if ($syncHash.Analysis) { Update-ScubaAnalyzerFindings } })
+            $syncHash.Findings_List.Add_SelectionChanged({ Show-ScubaAnalyzerDetail })
+            $syncHash.Environment_ComboBox.Add_SelectionChanged({ if ($syncHash.Analysis) { Update-ScubaAnalyzerFullYaml } })
+
+            # YAML copy/export
+            $syncHash.CopyControlYaml_Button.Add_Click({
+                try { [System.Windows.Clipboard]::SetText($syncHash.Detail_Yaml.Text); Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ControlYamlCopied') } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
+            })
+            $syncHash.CopyAllYaml_Button.Add_Click({
+                try { [System.Windows.Clipboard]::SetText($syncHash.FullYaml_TextBox.Text); Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'ConfigYamlCopied') } catch { Write-Verbose "Clipboard copy failed: $($_.Exception.Message)" }
+            })
+            $syncHash.ExportYaml_Button.Add_Click({ Export-ScubaAnalyzerYaml })
+            if ($syncHash.TenantGovernanceTab) {
+                $syncHash.TenantGovernanceTab.Visibility = if ($syncHash.GenerateTenantGovernanceConfig) { 'Visible' } else { 'Collapsed' }
+                $syncHash.CopyTenantGovernance_Button.Add_Click({ Copy-ScubaAnalyzerTenantGovernanceJson })
+                $syncHash.ExportTenantGovernance_Button.Add_Click({ Export-ScubaAnalyzerTenantGovernanceJson })
+            }
+
+            # Jump to the current control in the ScubaGear baseline policy viewer
+            $syncHash.ViewBaseline_Button.Add_Click({
+                try {
+                    $f = $syncHash.Findings_List.SelectedItem
+                    if (-not $f) { return }
+                    if (-not $syncHash.ShowBaselinePolicyViewer) {
+                        Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'BaselineViewerUnavailable')
+                        return
+                    }
+                    Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'OpeningBaselineViewer' $f.ControlId)
+                    & $syncHash.ShowBaselinePolicyViewer -NavigateToPolicyId $f.ControlId | Out-Null
+                } catch {
+                    Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'BaselineViewerError' $_.Exception.Message)
+                    Write-ScubaAnalyzerLog "Baseline viewer error: $($_.Exception.Message)" -Level Error
+                }
+            })
+
+            # Open the ScubaConfig app (in-process) with the detected exclusions pre-loaded
+            $syncHash.OpenConfigApp_Button.Add_Click({ Open-ScubaConfigAppFromAnalyzer })
+
+            # "Use this policy" buttons live inside the policy-card template; catch their clicks
+            # at the container via the bubbling Button.Click routed event.
+            if ($syncHash.Detail_Policies) {
+                $syncHash.Detail_Policies.AddHandler(
+                    [System.Windows.Controls.Button]::ClickEvent,
+                    [System.Windows.RoutedEventHandler]{
+                        param($eventSender, $e)
+                        $null = $eventSender   # sender unused; the routed event args carry the clicked button
+                        try {
+                            $btn = ($e.Source -as [System.Windows.Controls.Button])
+                            if (-not $btn) { $btn = ($e.OriginalSource -as [System.Windows.Controls.Button]) }
+                            if ($btn -and $btn.Tag) { Select-ScubaAnalyzerPolicy -PolicyId ([string]$btn.Tag) }
+                        } catch { Write-Verbose "Use-policy click handler failed: $($_.Exception.Message)" }
+                    }
+                )
+            }
+
+            Set-ScubaAnalyzerStatus (Get-ScubaAnalyzerText 'Ready')
+
+            # Apply initial parameters.
+            if ($syncHash.M365Environment) {
+                $idx = $syncHash.Environment_ComboBox.Items.IndexOf($syncHash.M365Environment)
+                if ($idx -ge 0) { $syncHash.Environment_ComboBox.SelectedIndex = $idx }
+            }
+
+            # If an existing results file was supplied, analyze it once the window is up.
+            $syncHash.Window.Add_Loaded({
+                $syncHash.Window.Topmost = $false
+                $syncHash.Window.Dispatcher.BeginInvoke([System.Windows.Threading.DispatcherPriority]::Background, [Action] {
+                    if ($syncHash.InitialResultsPath -and (Test-Path $syncHash.InitialResultsPath)) {
+                        Start-ScubaAnalyzerAnalysis -ResultsPath $syncHash.InitialResultsPath
+                    }
+                })
+            })
+
+            $syncHash.Window.ShowDialog() | Out-Null
+        } catch {
+            [System.Windows.MessageBox]::Show("Failed to start the ScubaGear Config Analyzer:`n$($_.Exception.Message)", "ScubaGear Config Analyzer", 'OK', 'Error') | Out-Null
+        }
+        $syncHash.Error = $Error
+    })
+
+    # Launch non-blocking (like the Baseline Policy Viewer) so this PowerShell session
+    # stays available. Keep the instance referenced so the runspace isn't disposed while
+    # the window is open; it is cleaned up on the next launch after the window closes.
+    $PowerShellCommand.Runspace = $Runspace
+    $AsyncHandle = $PowerShellCommand.BeginInvoke()
+
+    $script:ScubaConfigAnalyzerInstance = @{
+        SyncHash   = $syncHash
+        Runspace   = $Runspace
+        PowerShell = $PowerShellCommand
+        Handle     = $AsyncHandle
+    }
+
+    Write-Output "ScubaGear Config Analyzer launched. This PowerShell window remains available."
+    if ($Passthru) { return $script:ScubaConfigAnalyzerInstance }
+}
+
 Export-ModuleMember -Function @(
     'Start-SCuBAConfigApp',
+    'Start-SCuBAConfigAnalyzer',
     'Show-SCuBABaselinePolicyViewer'
 )
