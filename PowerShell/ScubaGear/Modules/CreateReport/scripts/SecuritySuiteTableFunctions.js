@@ -535,6 +535,9 @@ const createSecuritySuiteTable = (columns, rows, tableClass) => {
 const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClass, emptyMessage) => {
     const h2 = document.createElement("h2");
     h2.textContent = title;
+    // Anchor target for the policy result links CreateReport.psm1 adds to failing
+    // controls, e.g. "securitysuite-anti-spam-policies-table" -> "#securitysuite-anti-spam-policies".
+    h2.id = tableClass.replace(/-table$/, "");
     parent.appendChild(h2);
 
     if (rows.length === 0) {
