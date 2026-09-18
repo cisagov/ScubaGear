@@ -81,6 +81,7 @@ FunctionsToExport = @(
     'Disconnect-SCuBATenant',
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
+    'Install-MsalForScuBA',
     'Install-ScubaDependencies',
     'Get-ScubaRequiredModuleList',
     'Get-ScubaGearDependencyStatus',

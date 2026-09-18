@@ -234,9 +234,14 @@ InModuleScope 'Support' {
 
         Context "When dependencies have multiple versions" {
             It "Should report multiple versions for real modules" {
-                # Use first two modules from actual requirements for testing
+                # Use the first real module plus a synthetic second one so this test does not
+                # depend on RequiredVersions.ps1 always containing 2+ modules.
                 $firstModule = $script:ScubaGearModuleList[0]
-                $secondModule = $script:ScubaGearModuleList[1]
+                $secondModule = [PSCustomObject]@{
+                    ModuleName = 'ScubaGearTestFixtureModule'
+                    ModuleVersion = [version]'0.4.2'
+                    MaximumVersion = [version]'0.4.12'
+                }
 
                 # Add Get-Module mock to return ScubaGear module
                 Mock Get-Module {

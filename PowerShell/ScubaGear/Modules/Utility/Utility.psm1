@@ -1,3 +1,4 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Invoke-ScubaGraphRequest
 
 function Set-Utf8NoBom {
     <#
@@ -229,7 +230,7 @@ function Invoke-GraphDirectly {
     Write-Debug "Graph Api direct: $endpoint"
 
     If ($null -eq $endpoint) {
-        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
+        throw "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
@@ -254,46 +255,10 @@ function Invoke-GraphDirectly {
         $graphParams['ContentType'] = 'application/json'
     }
 
-    # Execute the initial request
-    $resp = Invoke-MgGraphRequest @graphParams
+    # Execute the initial request (Invoke-ScubaGraphRequest handles pagination internally)
+    $resp = Invoke-ScubaGraphRequest @graphParams
 
     if ($Method -notmatch "DELETE|PATCH") {
-        # If the response is a collection (has a 'value' key)
-        if ($resp -is [hashtable] -and $resp.ContainsKey('value')) {
-            $allItems = [System.Collections.Generic.List[object]]::new()
-            foreach ($item in $resp['value']) {
-                $allItems.Add($item)
-            }
-
-            # Build paging params from the shared set (keep Headers if present, drop Body/ContentType)
-            $pageParams = @{ ErrorAction = 'Stop'; Method = 'GET' }
-            if ($graphParams.ContainsKey('Headers')) {
-                $pageParams['Headers'] = $graphParams['Headers']
-            }
-
-            # Get the next page link from the initial response
-            $nextLink = $resp['@odata.nextLink']
-
-            # Follow pagination until no more pages remain
-            while ($null -ne $nextLink -and $nextLink -ne '') {
-                Write-Debug "Following @odata.nextLink: $nextLink"
-
-                # Update the URI to the next page; all other params (Headers, Method) carry over
-                $pageParams['Uri'] = $nextLink
-                $pageResp = Invoke-MgGraphRequest @pageParams
-
-                # Accumulate results from this page
-                foreach ($item in $pageResp['value']) {
-                    $allItems.Add($item)
-                }
-
-                # Advance to the next page (null when no more pages exist)
-                $nextLink = $pageResp['@odata.nextLink']
-            }
-
-            $resp['value'] = $allItems.ToArray()
-        }
-
         return $resp | ConvertFrom-GraphHashtable
     }
 }
@@ -339,24 +304,33 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
-            if ($Item -is [hashtable]) {
+            if ($Item -is [System.Collections.IDictionary] -or $Item.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject') {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
-                # Process each property in the hashtable
-                foreach ($property in $Item.GetEnumerator()) {
-                    $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
-                    if ($property.Value -is [hashtable]) {
-                        # Recursive call to process nested hashtables
+                $Properties = if ($Item -is [System.Collections.IDictionary]) {
+                    $Item.GetEnumerator() | ForEach-Object {
+                        [pscustomobject]@{ Name = $_.Key; Value = $_.Value }
+                    }
+                }
+                else {
+                    $Item.PSObject.Properties
+                }
+
+                # Process each property in the Graph response
+                foreach ($property in $Properties) {
+                    $UpperCamelCase = ($property.Name).Substring(0,1).ToUpper() + ($property.Name).Substring(1)
+                    if ($null -ne $property.Value -and ($property.Value -is [System.Collections.IDictionary] -or $property.Value.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject')) {
+                        # Recursive call to process nested Graph objects
                         $NestedObject = ConvertFrom-GraphHashtable -GraphData @($property.Value)
 
                         $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $NestedObject
                     }
                     elseif ($property.Value -is [array]) {
-                        # Handle arrays (check if elements are hashtables)
+                        # Handle arrays (check if elements are Graph objects)
                         $ProcessedArray = @()
                         foreach ($element in $property.Value) {
-                            if ($element -is [hashtable]) {
+                            if ($null -ne $element -and ($element -is [System.Collections.IDictionary] -or $element.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject')) {
                                 $ProcessedArray += ConvertFrom-GraphHashtable -GraphData @($element)
                             } else {
                                 $ProcessedArray += $element
@@ -561,10 +535,10 @@ function Invoke-GraphBatchRequest {
             }
 
             try {
-                # Execute batch request using Invoke-MgGraphRequest
+                # Execute batch request using the internal Graph transport
                 Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
                 $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
-                $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
+                $batchResponse = Invoke-ScubaGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
             }
             catch {
                 # Entire batch request failed (e.g., network error, auth error, or even a 429 if the batch envelope itself is too large).
@@ -778,13 +752,39 @@ function Invoke-ScubaRestMethod {
         $Params.Body = $Body
     }
 
+    # Retry transient server/throttling errors (429/5xx) with exponential backoff; SharePoint and
+    # other admin APIs intermittently return 503 that succeeds on a subsequent attempt.
+    $MaxRetries = 4
+    $BaseDelaySeconds = 3
+    $TransientStatusCodes = @(429, 500, 502, 503, 504)
+
+    for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
     try {
         $Response = Invoke-RestMethod @Params
+        break
     }
     # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
     catch {
         $ErrorRecord = $_
         $WebResponse = $ErrorRecord.Exception.Response
+
+        # HTTP status code across PS 5.1 (HttpWebResponse) and PS 7+ (HttpResponseMessage).
+        $StatusCode = 0
+        if ($null -ne $WebResponse) { try { $StatusCode = [int]$WebResponse.StatusCode } catch { $StatusCode = 0 } }
+        if ($StatusCode -in $TransientStatusCodes -and $Attempt -lt $MaxRetries) {
+            $Delay = $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1)
+            $RetryAfterSeconds = 0
+            if ($null -ne $WebResponse) {
+                try {
+                    $RetryAfterRaw = if ($WebResponse.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') { $WebResponse.Headers.RetryAfter.Delta.TotalSeconds } else { $WebResponse.Headers['Retry-After'] }
+                    if ([int]::TryParse([string]$RetryAfterRaw, [ref]$RetryAfterSeconds) -and $RetryAfterSeconds -gt 0) { $Delay = [math]::Max($Delay, $RetryAfterSeconds) }
+                }
+                catch { $RetryAfterSeconds = 0 }
+            }
+            Write-Information "Invoke-ScubaRestMethod: $Uri returned HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in $([int]$Delay)s..." -InformationAction Continue
+            Start-Sleep -Seconds ([int]$Delay)
+            continue
+        }
 
         $ErrorBuffer = [System.Text.StringBuilder]::new()
         [void]$ErrorBuffer.AppendLine("Exception Type: $($ErrorRecord.Exception.GetType().FullName)")
@@ -846,6 +846,7 @@ function Invoke-ScubaRestMethod {
 
         Write-Information $ErrorBuffer.ToString() -InformationAction Continue
         throw
+    }
     }
 
     return $Response
