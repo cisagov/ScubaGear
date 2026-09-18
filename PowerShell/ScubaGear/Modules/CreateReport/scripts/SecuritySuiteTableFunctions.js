@@ -67,6 +67,11 @@ const SPAM_ACTION_FIELDS = [
     ["Bulk", "BulkSpamAction"]
 ];
 
+// This column holds 50+ short file-extension strings. A bulleted list puts one per line and
+// makes the row extremely tall when expanded; a wrapped, comma-separated line (matching how
+// the Defender admin console displays the same file types) reads far better at that volume.
+const COMMA_SEPARATED_COLUMNS = new Set(["Blocked File Types"]);
+
 const ANTI_MALWARE_TABLE_CLASS = "securitysuite-anti-malware-policies-table";
 const ANTI_PHISH_TABLE_CLASS = "securitysuite-anti-phish-policies-table";
 const ANTI_SPAM_TABLE_CLASS = "securitysuite-anti-spam-policies-table";
@@ -410,7 +415,24 @@ const getAntiSpamPolicyRows = (
  * @param {string} tableClass The CSS class to add to the table.
  * @returns {HTMLTableElement} The created table.
  */
-const appendPolicyCell = (cell, value, expanded, onExpand) => {
+const appendPolicyCell = (cell, value, expanded, onExpand, column) => {
+    if (Array.isArray(value) && COMMA_SEPARATED_COLUMNS.has(column)) {
+        const COLLAPSED_PREVIEW_COUNT = 5;
+        const items = expanded ? value : value.slice(0, COLLAPSED_PREVIEW_COUNT);
+        cell.appendChild(document.createTextNode(items.join(", ")));
+        if (!expanded && value.length > COLLAPSED_PREVIEW_COUNT) {
+            cell.appendChild(document.createTextNode(", "));
+            cell.appendChild(createRowActionButton({
+                title: "Show more policy information",
+                className: "truncated-dots",
+                expanded: false,
+                onClick: onExpand,
+                contentBuilder: () => document.createTextNode("...")
+            }));
+        }
+        return;
+    }
+
     if (Array.isArray(value)) {
         const list = document.createElement("ul");
         const items = expanded ? value : value.slice(0, 1);
@@ -466,7 +488,7 @@ const renderPolicyRow = (row, columns, data, expanded) => {
         const cell = document.createElement("td");
         // Re-rendering discards the scope applyScopeAttributes set on page load.
         if (index === 0) cell.setAttribute("scope", "row");
-        appendPolicyCell(cell, data[column], expanded, expand);
+        appendPolicyCell(cell, data[column], expanded, expand, column);
         row.appendChild(cell);
     });
 };
@@ -535,9 +557,7 @@ const createSecuritySuiteTable = (columns, rows, tableClass) => {
 const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClass, emptyMessage) => {
     const h2 = document.createElement("h2");
     h2.textContent = title;
-    // Anchor target for the policy result links CreateReport.psm1 adds to failing
-    // controls, e.g. "securitysuite-anti-spam-policies-table" -> "#securitysuite-anti-spam-policies".
-    h2.id = tableClass.replace(/-table$/, "");
+    h2.id = tableClass;
     parent.appendChild(h2);
 
     if (rows.length === 0) {
