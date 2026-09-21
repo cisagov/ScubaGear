@@ -1,0 +1,14 @@
+title = "ScubaGear config for the GitHub action named gitleaks"
+
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config:
+# https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+[allowlist]
+# Recommended practice is to add your secrets to a regexes array, 
+# not to a commits array.
+description = "Whitelist values that are not secrets to avoid false positives in scans"
+regexes = [
+  '''48ac35b8-9aa8-4d74-927d-1f4a14a0b239'''    #Teams admin REST API AppId
+]

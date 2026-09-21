@@ -10,8 +10,8 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -ModuleName Orchestrator Export-AADProvider {}
         function Export-EXOProvider {}
         Mock -ModuleName Orchestrator Export-EXOProvider {}
-        function Export-DefenderProvider {}
-        Mock -ModuleName Orchestrator Export-DefenderProvider {}
+        function Export-SecuritySuiteProvider {}
+        Mock -ModuleName Orchestrator Export-SecuritySuiteProvider {}
         function Export-PowerPlatformProvider {}
         Mock -ModuleName Orchestrator Export-PowerPlatformProvider {}
         function Export-SharePointProvider {}

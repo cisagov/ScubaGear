@@ -15,9 +15,7 @@ function Get-PowerPlatformBaseUrl {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        default { return Get-ScubaGearPermissions -Product powerplatform -OutAs endpoint -Environment $M365Environment }
-    }
+    return Get-ScubaGearPermissions -Product powerplatform -OutAs endpoint -Environment $M365Environment
 }
 
 function Get-PowerPlatformScope {
@@ -34,9 +32,7 @@ function Get-PowerPlatformScope {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        default { return Get-ScubaGearPermissions -Product powerplatform -OutAs oauthScope -Environment $M365Environment }
-    }
+    return Get-ScubaGearPermissions -Product powerplatform -OutAs oauthScope -Environment $M365Environment
 }
 
 function Get-PowerPlatformTenantSettingsRest {

@@ -340,17 +340,21 @@ TestPlan:
     Tests:
       - TestDescription: MS.POWERPLATFORM.6.1v1 Non-compliant - Share with Everyone feature is disabled
         Preconditions:
-          - Command: |
-              $tenantSettings = Get-TenantSettings
-              $tenantSettings.powerPlatform.powerApps.disableShareWithEveryone = $false
-              Set-TenantSettings $tenantSettings
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                powerPlatform:
+                  powerApps:
+                    disableShareWithEveryone: false
         Postconditions: []
         ExpectedResult: false
       - TestDescription: MS.POWERPLATFORM.6.1v1 Compliant - Share with Everyone feature is enabled
         Preconditions:
-          - Command: |
-              $tenantSettings = Get-TenantSettings
-              $tenantSettings.powerPlatform.powerApps.disableShareWithEveryone = $true
-              Set-TenantSettings $tenantSettings
+          - Command: Set-TenantSettings
+            Splat:
+              RequestBody:
+                powerPlatform:
+                  powerApps:
+                    disableShareWithEveryone: true
         Postconditions: []
         ExpectedResult: true

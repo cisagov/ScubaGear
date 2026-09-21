@@ -44,7 +44,27 @@
             $GraphParams += @{'Environment' = "USGovDoD"; }
         }
     }
-    Connect-MgGraph @GraphParams | Out-Null
+
+    ################### If we receive a very specific error from Connect-MgGraph, we will retry with the GCC High environment.
+    try {
+        $null = Connect-MgGraph @GraphParams
+    }
+    catch {
+        $ErrorText = $_.Exception.Message
+
+        $IsWrongCloudError =
+            $ErrorText -match "AADSTS900384" -and
+            $ErrorText -match "determine the corresponding service endpoint"
+
+        if (-not $IsWrongCloudError) {
+            throw
+        }
+
+        Write-Information "Detected a login to a tenant that is not Commercial or GCC. Retrying with GCC High environment login page..." -InformationAction Continue
+        $GraphParams += @{'Environment' = "USGov"; }
+        $null = Connect-MgGraph @GraphParams
+    }
+    ###################
 }
 
 function Initialize-Msal {
@@ -57,32 +77,83 @@ function Initialize-Msal {
     [CmdletBinding()]
     param()
 
+    # ------------------------------------------------------------------
+    # 1. See if the MSAL types are already resolvable
+    # ------------------------------------------------------------------
     try {
+        # If the MSAL types are already loaded, this will succeed and we can skip the rest of this function.
         $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
         return
     }
     catch {
-        Write-Verbose "MSAL types not yet resolvable. Loading Microsoft.Identity.Client.dll explicitly."
+        Write-Information "MSAL types not yet resolvable so ScubaGear is loading them..." -InformationAction Continue
     }
 
-    $GraphModule = Get-Module Microsoft.Graph.Authentication -ErrorAction SilentlyContinue
-    if (-not $GraphModule) {
-        throw "Microsoft.Graph.Authentication module is not loaded. Ensure Connect-MgGraph has been called before acquiring tokens."
+    # ------------------------------------------------------------------
+    # 2. Load the MSAL types so that they are resolvable
+    # ------------------------------------------------------------------
+
+    # We have a different solution for PowerShell 5.1 vs PowerShell 7 because the same solution didn't work for both based on testing.
+    $RuntimeVersion = if ($PSVersionTable.PSEdition -eq 'Core') { 'Core' } else { 'Desktop' }
+
+    # PowerShell 5.1 solution
+    if ($RuntimeVersion -eq 'Desktop') {
+        # Call Connect-MgGraph with a bogus thumbprint purely to force MSAL to load.
+        # We expect this to fail we just want the side effect of loading Microsoft.Identity.Client.dll.
+        try {
+            Connect-MgGraph `
+                -CertificateThumbprint '2A0268B04B9F22EFA77A0EFF01930ADE279AC072' `
+                -ClientId 'ad1cb53b92084abeb99c3acf35c91c2a' `
+                -TenantId 'bogus.onmicrosoft.com' `
+                -ErrorAction Stop
+        }
+        catch {
+            if ($_.Exception.Message -like '*was not found in certificate store*') {
+                # Do nothing - this is the expected error, and it means MSAL was loaded successfully.
+            }
+            # Some unrelated error occurred so we can't be sure MSAL was loaded. Rethrow the error so the user can see it.
+            else {
+                throw
+            }
+        }
+    }
+    # PowerShell 7 solution
+    else {
+        # If Graph auth module is not already loaded, load it so we can find the MSAL assembly.
+        $GraphModule = Get-Module Microsoft.Graph.Authentication
+        if (-not $GraphModule) {
+            Import-Module Microsoft.Graph.Authentication
+            $GraphModule = Get-Module Microsoft.Graph.Authentication
+        }
+
+        $ModulePath = $GraphModule.Path | Split-Path
+        # $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+        $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue |
+                Where-Object { $_.Directory.Name -eq $RuntimeVersion } |
+                Select-Object -First 1
+
+        if (-not $MsalDll) {
+            throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+        }
+
+        Write-Information "Loading MSAL from path: $($MsalDll.FullName)" -InformationAction Continue
+        Add-Type -Path $MsalDll.FullName
     }
 
-    $ModulePath = $GraphModule.Path | Split-Path
-    $MsalDll = Get-ChildItem -Path $ModulePath -Recurse -Filter "Microsoft.Identity.Client.dll" -ErrorAction SilentlyContinue | Select-Object -First 1
+    # ------------------------------------------------------------------
+    # 3. Verify the type is now loaded and resolvable
+    # ------------------------------------------------------------------
 
-    if (-not $MsalDll) {
-        throw "Microsoft.Identity.Client.dll not found in the Microsoft.Graph.Authentication module directory."
+    try {
+        $null = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]
+        # It is resolvable so we succeeded.
+        Write-Information "Successfully loaded MSAL types." -InformationAction Continue
+        return
     }
-
-    $Sig = Get-AuthenticodeSignature -FilePath $MsalDll.FullName
-    if ($Sig.Status -ne 'Valid') {
-        throw "Microsoft.Identity.Client.dll signature is not valid (status: $($Sig.Status)). Aborting MSAL load."
+    catch {
+        Write-Warning "MSAL still not resolvable after going through loader code!"
+        throw
     }
-
-    Add-Type -Path $MsalDll.FullName
 }
 
 function Get-MsalAccessToken {
@@ -184,7 +255,7 @@ function Get-MsalAccessToken {
                 if (-not $TokenResult) {
                     $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                         WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                        WithUseEmbeddedWebView($false).
+                        WithUseEmbeddedWebView($true).
                         ExecuteAsync().GetAwaiter().GetResult()
                 }
             }

@@ -21,6 +21,12 @@ function Invoke-PSSA {
 	Write-Warning " "
 
 	# Install PSScriptAnalyzer
+	# GitHub-hosted runners occasionally boot without the PSGallery repository
+	# registered, which makes Set-PSRepository throw "No repository with the name
+	# 'PSGallery' was found". Register the default gallery first when it is missing.
+	if (-not (Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue)) {
+		Register-PSRepository -Default -ErrorAction SilentlyContinue
+	}
 	Set-PSRepository PSGallery -InstallationPolicy Trusted
 	Install-Module -Name PSScriptAnalyzer -ErrorAction Stop
 

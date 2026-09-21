@@ -19,7 +19,7 @@ ScubaGear requires a number of dependencies to be installed before it can be inv
 
 ```powershell
 # Install the minimum required dependencies
-Initialize-SCuBA 
+Install-ScubaDependencies 
 ```
 
 ## Interactive Mode

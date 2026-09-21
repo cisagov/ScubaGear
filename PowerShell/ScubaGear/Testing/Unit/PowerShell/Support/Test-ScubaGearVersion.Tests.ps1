@@ -325,6 +325,46 @@ InModuleScope 'Support' {
             }
         }
 
+        Context "OPA presence notice" {
+            It "Should list OPA as missing in the Details section when the executable is absent" {
+                Mock Get-ScubaOpaDependencyStatus {
+                    [PSCustomObject]@{
+                        PSTypeName = 'ScubaGear.DependencyStatus'
+                        ModuleName = 'OPA'
+                        Installed = $false
+                        Action = 'Install'
+                        HighestVersionStatus = 'MISSING'
+                    }
+                }
+                Mock Write-Information { }
+
+                $null = Test-ScubaGearVersion
+
+                Should -Invoke -CommandName Write-Information -ParameterFilter {
+                    $MessageData -like '*CRITICAL: OPA - not installed*'
+                }
+            }
+
+            It "Should not list OPA when the executable is present" {
+                Mock Get-ScubaOpaDependencyStatus {
+                    [PSCustomObject]@{
+                        PSTypeName = 'ScubaGear.DependencyStatus'
+                        ModuleName = 'OPA'
+                        Installed = $true
+                        Action = 'None'
+                        HighestVersionStatus = 'UNVERIFIED'
+                    }
+                }
+                Mock Write-Information { }
+
+                $null = Test-ScubaGearVersion
+
+                Should -Invoke -CommandName Write-Information -Times 0 -ParameterFilter {
+                    $MessageData -like '*CRITICAL: OPA*'
+                }
+            }
+        }
+
         Context "Parameter validation" {
             It "Should accept CheckGitHub switch parameter" {
                 { Test-ScubaGearVersion -CheckGitHub } | Should -Not -Throw
