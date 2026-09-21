@@ -1925,6 +1925,10 @@ function IsEquivalence{
     # Normalize input strings to avoid brittle HTML comparisons
     $normalize = {
       param($s)
+      # CreateReport.psm1 appends an in-page link (e.g. "View all CA policies", the Security
+      # Suite policy tables) to the rendered Details column for some controls. Drop the
+      # whole link, the same way Format-PlainText does for the CSV/plain-text export.
+      $s = $s -replace "<a href='#[^']*'>[^<]*</a>\.?", ""
       ($s -replace '<br>', '<br/>' -replace '&amp;', '&' -replace '<[^>]+>', '').Trim()
     }
     $First = & $normalize $First
