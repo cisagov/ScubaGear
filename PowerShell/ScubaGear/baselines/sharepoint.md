@@ -72,7 +72,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 
 <!--Policy: MS.SHAREPOINT.1.3v1; Criticality: SHALL -->
 - _Rationale:_ By limiting sharing to domains or approved security groups used for interagency collaboration purposes, administrators can help prevent sharing with unknown organizations and individuals.
-- _Last modified:_ March 2025
+- _Last modified:_ September 2026
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to **Only people in your organization**. The approved-domain and approved-security-group restrictions apply only when sharing with **new** external users; they do **not** apply to **existing guests**, who are already present in the directory and are treated as approved. Sharing with an existing guest succeeds regardless of these settings.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
