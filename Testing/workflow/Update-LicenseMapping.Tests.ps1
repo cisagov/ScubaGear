@@ -15,7 +15,7 @@ Describe "Update License Mapping" {
         'Product_Display_Name,String_Id,GUID' | Set-Content -Path $MappingPath
 
         Mock -CommandName Invoke-WebRequest -MockWith {
-            param($Uri, $OutFile, $UseBasicParsing)
+            param($OutFile)
             @(
                 'Product_Display_Name,String_Id,GUID,Service_Plan_Name,Service_Plan_Id,Service_Plans_Included_Friendly_Names'
                 'Microsoft 365 E7,MICROSOFT_365_E7,9A18296A-025F-4E37-9FFA-30BF8D1CE775,PLAN_A,11111111-1111-1111-1111-111111111111,Plan A'
