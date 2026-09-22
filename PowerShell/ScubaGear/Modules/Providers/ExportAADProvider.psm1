@@ -1,5 +1,5 @@
 Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
-Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Trace-ScubaFunction
+Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Trace-ScubaFunction, Write-ScubaLog
 
 function Export-AADProvider {
     <#
@@ -113,22 +113,72 @@ function Export-AADProvider {
     ##### Retrieve application management policies - MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1
     # GraphDirect specifies that this will retrieve information from the Graph API directly (Invoke-GraphDirectly). The cmdlet is used as a reference; it looks up API details within the Permissions JSON file.
     $DefaultAppManagementPolicy = ConvertTo-Json -Depth 5 @($Tracker.TryCommand("Get-MgBetaPolicyDefaultAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
-    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-
-    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output
-    Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
-    if ($null -eq $AppPolicies -or @($AppPolicies).Count -eq 0) {
-        $AppManagementPolicies = ConvertTo-Json @()
+    #build a simplified log object for the default app management policy
+    $defaultAppPolicyObj = $DefaultAppManagementPolicy | ConvertFrom-Json
+    $defaultPolicyLog = [pscustomobject]@{
+        Id = $defaultAppPolicyObj.Id
+        DisplayName = $defaultAppPolicyObj.DisplayName
+        IsEnabled = $defaultAppPolicyObj.IsEnabled
+        ApplicationRestrictions = @(
+            $defaultPolicyObj.ApplicationRestrictions |
+            Select-Object -Property @{
+                Name = "PasswordCredentials"
+                Expression = { $_.PasswordCredentials }
+            }, @{
+                Name = "KeyCredentials"
+                Expression = { $_.KeyCredentials }
+            }
+        )
     }
-    else {
-        # $AppManagementPolicies = ConvertTo-Json -Depth 10 @(Get-AppManagementPolicies -AppPolicies @($AppPolicies) -M365Environment $M365Environment)
-        $AppManagementPolicies = $Tracker.TryCommand("Get-AppManagementPolicies", @{"M365Environment"=$M365Environment; "AppPolicies"=@($AppPolicies)})
-        if ($AppManagementPolicies.count -gt 0) {
-            $AppManagementPolicies = ConvertTo-Json -Depth 10 @($AppManagementPolicies[0])
+    # Log the default app management policy for debugging purposes
+    Write-ScubaLog -Message "Default app management policy payload" -Level Debug -Source "Get-MgBetaPolicyDefaultAppManagementPolicy" -Data @{ 
+        DefaultAppManagementPolicy = $defaultPolicyLog 
+    }
+    
+    # Retrieve all app management policies from the tenant
+    $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    # An empty graph collection return will result in $AppPolicies being $null or an empty array.
+    $RawAppPolicyCount = @($AppPolicies).Count
+    # If the tenant has no custom app management policies, Graph returns an empty "value" array, but
+    # CommandTracker's unwrap check (`if ($Result.value)`) treats an empty array as falsy, so $AppPolicies
+    # ends up holding the raw response wrapper object instead of being empty. That wrapper has no Id, so
+    # filter it out here to correctly represent "no app management policies" as an empty array.
+    $AppPolicies = @($AppPolicies | Where-Object {$null -ne $_.id})
+    $FilteredAppPolicyCount = @($AppPolicies).Count
+    # Calculate how many entries were the no-Id response wrapper rather than an actual policy
+    $DroppedAppPolicyCount = $RawAppPolicyCount - $FilteredAppPolicyCount
+    Write-ScubaLog -Message "App management policy count check." -Level Debug -Source "Get-MgBetaPolicyAppManagementPolicy" -Data @{
+        AppManagementPolicyCount = $FilteredAppPolicyCount
+    }
+
+    # Default to an empty JSON array so rego always receives valid JSON.
+    $AppManagementPolicies = ConvertTo-Json @()
+
+    # Enrich each policy with its appliesTo list (apps/SPs the policy targets) for report output.
+    if ($FilteredAppPolicyCount -gt 0) {
+        Import-Module $PSScriptRoot/ProviderHelpers/AADAppManagementPolicyHelper.psm1
+        $AppManagementPolicies = $Tracker.TryCommand("Get-AppManagementPoliciesApplyTo", @{"M365Environment" = $M365Environment;"AppPolicies" = @($AppPolicies)})
+
+        # Log the successful retrieval of app management apply-to policies if any were found
+        if (@($AppManagementPolicies).Count -gt 0) {
+            #only output the common details for logging purposes
+            $AppPoliciesLog = @()
+            foreach ($AppPolicy in $AppManagementPolicies) {
+                $AppPoliciesLog += [pscustomobject]@{
+                    Id = $AppPolicy.Id
+                    IsEnabled = $AppPolicy.IsEnabled
+                    PasswordCredentialsCount = $AppPolicy.Restrictions.PasswordCredentials.Count
+                    PasswordCredentialsApplyTo = Foreach ($App in $AppPolicy.Restrictions.PasswordCredentials.AppliesTo) { $App.DisplayName }
+                    KeyCredentialsCount = $AppPolicy.Restrictions.KeyCredentials.Count
+                    KeyCredentialsApplyTo = Foreach ($App in $AppPolicy.Restrictions.KeyCredentials) { $App.AppliesTo.DisplayName; $App.AppliesTo.MaxLifetime }
+                }
+            }
+            Write-ScubaLog -Message "Successfully retrieved $(@($AppManagementPolicies).Count) app management apply-to policy(ies)." -Level Debug -Source "Get-MgBetaPolicyAppManagementPolicyApplyTo" -Data @{
+                AppManagementPolicyApplyTo = $AppPoliciesLog
+            }
         }
-        else {
-            $AppManagementPolicies = ConvertTo-Json @()
-        }
+        # Convert the list of app management policies to JSON for rego processing (empty result serializes to [])
+        $AppManagementPolicies = ConvertTo-Json -Depth 10 @($AppManagementPolicies)
     }
     ##### End application management policies
 
