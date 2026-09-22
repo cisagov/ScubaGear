@@ -1,4 +1,43 @@
+
 :  # SCUBACONFIGAPPUI CHANGELOG
+## 2.8.12 (build 1500) [08/13/2026] - App-independent Baseline Policy Viewer, control cleanup, Analyzer online-baseline toggle
+
+### Enhancements
+- Made the Baseline Policy Viewer app-independent: moved its module into `ScubaBaselinePolicyViewerHelpers`, externalized its inline XAML to `ScubaConfigAppResources\ScubaBaselinePolicyViewerUI.xaml`, and gave it its own `ScubaBaselineViewer_Control_en-US.json` (window chrome + product/section mappings) at the module root. It is now imported on demand by both ScubaConfigApp and the Config Analyzer.
+- Wired the `EnablePolicyViewer` flag so it actually gates the per-policy **View Baseline Policies** button on each Exclusion/Annotation/Omission card (previously the flag was unused and the button always showed). Shown unless explicitly `false`.
+- Config Analyzer: externalized all file paths into `ScubaConfigAnalyzer_Control_en-US.json` (window resources — XAML/logo/icon — and the helpers folder stay hardcoded as foundational).
+- Config Analyzer: made AAD mandatory in the product selector — EXO, Defender/Security Suite, and other products can be unchecked, but AAD is re-selected if a user tries to uncheck it.
+- Config Analyzer: added an independent `PullOnlineBaselines` developer toggle (`OnlineBaselineSchemaURL` / `OnlineApiCatalogURL`) so developers can test not-yet-published analyzer schemas; downloads to `$env:TEMP` and falls back to the local schemas on failure.
+
+### Bug Fixes
+- Removed the now-dead `showInViewer` field (all products) and the entire `policyViewerSettings` block from `ScubaConfigApp_Control_en-US.json`; these only served the Baseline Policy Viewer and now live solely in `ScubaBaselineViewer_Control_en-US.json` (single source of truth, no stale duplicate).
+
+### Code Improvements
+- Added `ScubaConfigAnalyzer_Control_REFERENCE.md` and `ScubaBaselineViewer_Control_REFERENCE.md` documenting the Config Analyzer and Baseline Policy Viewer control files.
+- Updated `ScubaConfigApp_Control_REFERENCE.md`: clarified `EnablePolicyViewer` and `PullOnlineBaselines` (shared by app + viewer; Analyzer is independent), removed `showInViewer`, and noted the policy-viewer config moved to the companion control file.
+
+## 2.8.11 (build 1500) [08/11/2026] - Added comment control and walkthorugh viewer
+
+### Enhancements
+- Added support for the `ConfigLocation` parameter and related configuration-path handling improvements.
+- Added a Help / Walkthrough window that resolves the walkthrough markdown path from the config and opens in-app guidance for the Scuba Config App.
+- Updated the Scuba Config App UI to support comments on exclusion cards, including a cleaner add/remove toggle experience and preserved expanded state when comments exist.
+- Added M365 environment and app ID support updates in the config app, improving compatibility with tenant and app configuration scenarios.
+- Updated language handling and UI copy to better reflect the app’s supported configuration workflows.
+- Improved default option behavior and config analyzer integration for more predictable startup and configuration behavior.
+- Added support documentation updates and refreshed Pester validation coverage to keep the app aligned with current behavior.
+
+### Bug Fixes
+- Fixed a stale comment persistence bug where clearing a comment did not remove the stored comment entry and the old value kept reappearing in YAML output.
+- Fixed the comment panel state so it stays expanded when a comment exists and collapses cleanly when the comment is removed.
+- Hardened legacy policy migration import logic so malformed legacy config entries (string values where a dictionary was expected) are skipped safely instead of crashing with "Unable to index into an object of type System.String."
+- Removed stray debug output noise and cleaned up the app behavior around config output and UI state.
+
+### Code Improvements
+- Refreshed the config app changelog and support documentation to reflect the current branch updates.
+- Synced the UI resource, helper module, and test updates for the latest config app behavior.
+- Cleaned up unused debug output and standardized the latest config app logic around comments, migration, and support-state handling.
+
 ## 2.6.1 (build 1400) [06/01/2026] - Security Suite Baseline, Config Externalization, and UX Polish
 
 ### Bug Fixes
