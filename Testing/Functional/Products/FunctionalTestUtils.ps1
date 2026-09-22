@@ -1926,9 +1926,10 @@ function IsEquivalence{
     $normalize = {
       param($s)
       # CreateReport.psm1 appends an in-page link (e.g. "View all CA policies", the Security
-      # Suite policy tables) to the rendered Details column for some controls. Drop the
-      # whole link, the same way Format-PlainText does for the CSV/plain-text export.
-      $s = $s -replace "<a href='#[^']*'>[^<]*</a>\.?", ""
+      # Suite policy tables) to the rendered Details column for some controls. That link is
+      # not included in the rego output's ReportDetails, so we have to drop the link from
+      # the functional test output.
+      $s = $s -replace '<a\s[^>]*href\s*=\s*["'']#[^"'']*["''][^>]*>[^<]*</a>\.?', ''
       ($s -replace '<br>', '<br/>' -replace '&amp;', '&' -replace '<[^>]+>', '').Trim()
     }
     $First = & $normalize $First
