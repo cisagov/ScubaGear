@@ -20,7 +20,7 @@ ScubaGear queries various M365 APIs to gather information about their security s
 > Users with the Global Administrator role always have the necessary user permissions to run the tool.
 
 > [!NOTE]
-> <sup>1</sup> When running Power BI, the user running ScubaGear interactively must have a Power BI or Microsoft Fabric license assigned to their account (e.g., Microsoft Fabric (Free), Power BI Pro, or Power BI Premium Per User). The user must also login to the Power BI portal at least once to setup their account in Power BI before running ScubaGear.
+> <sup>1</sup> When running Power BI, the user running ScubaGear interactively must have a Power BI or Microsoft Fabric license assigned to their account (e.g., Microsoft Fabric (Free), Power BI Pro, or Power BI Premium Per User). The user must also login to the Power BI portal at least once before running ScubaGear.
 
 
 ## Application Permissions
