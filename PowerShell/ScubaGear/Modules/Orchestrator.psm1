@@ -931,6 +931,9 @@ function Invoke-ProviderList {
                                 'BaseUrl'           = $ConnectionResult.PBIBaseUrl
                                 'LicenseFound'      = $ConnectionResult.PBILicenseFound
                             }
+                            if ($ServicePrincipalAuth) {
+                                $PBIProviderParams['CertificateBasedAuth'] = $true
+                            }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }
                         "teams" {
