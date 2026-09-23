@@ -131,22 +131,18 @@ function Export-AADProvider {
         )
     }
     # Log the default app management policy for debugging purposes
-    Write-ScubaLog -Message "Default app management policy payload" -Level Debug -Source "Get-MgBetaPolicyDefaultAppManagementPolicy" -Data @{ 
-        DefaultAppManagementPolicy = $defaultPolicyLog 
+    Write-ScubaLog -Message "Default app management policy payload" -Level Debug -Source "Get-MgBetaPolicyDefaultAppManagementPolicy" -Data @{
+        DefaultAppManagementPolicy = $defaultPolicyLog
     }
-    
+
     # Retrieve all app management policies from the tenant
     $AppPolicies = $Tracker.TryCommand("Get-MgBetaPolicyAppManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
-    # An empty graph collection return will result in $AppPolicies being $null or an empty array.
-    $RawAppPolicyCount = @($AppPolicies).Count
     # If the tenant has no custom app management policies, Graph returns an empty "value" array, but
     # CommandTracker's unwrap check (`if ($Result.value)`) treats an empty array as falsy, so $AppPolicies
     # ends up holding the raw response wrapper object instead of being empty. That wrapper has no Id, so
     # filter it out here to correctly represent "no app management policies" as an empty array.
     $AppPolicies = @($AppPolicies | Where-Object {$null -ne $_.id})
     $FilteredAppPolicyCount = @($AppPolicies).Count
-    # Calculate how many entries were the no-Id response wrapper rather than an actual policy
-    $DroppedAppPolicyCount = $RawAppPolicyCount - $FilteredAppPolicyCount
     Write-ScubaLog -Message "App management policy count check." -Level Debug -Source "Get-MgBetaPolicyAppManagementPolicy" -Data @{
         AppManagementPolicyCount = $FilteredAppPolicyCount
     }
