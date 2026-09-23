@@ -361,6 +361,7 @@ function Trace-ScubaFunction {
         $exitData = @{
             ExecutionTimeMs = $stopwatch.ElapsedMilliseconds  # Performance metric
             Status = "Success"                               # Indicates successful execution
+            ResultCount = @($result).Count                   # Number of items returned, for data-volume insight
         }
 
         # Optionally log return value information if requested and result exists
