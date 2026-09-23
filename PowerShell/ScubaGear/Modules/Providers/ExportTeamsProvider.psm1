@@ -39,7 +39,10 @@ function Export-TeamsProvider {
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Write-ScubaLog
     $Tracker = Get-CommandTracker
+
+    Write-ScubaLog -Message "Starting Teams provider export." -Level Info -Source "Export-TeamsProvider"
 
     $MeetingPolicies = $Tracker.TryCommand("Get-TeamsMeetingPolicyRest", @{BaseUrl = $BaseUrl; AccessToken = $AccessToken})
     $MeetingPoliciesJson = ConvertTo-Json -Depth 5 @($MeetingPolicies)
@@ -93,6 +96,12 @@ Certificate-based authentication detected.
 
     $TeamsSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $TeamsUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
+    Write-ScubaLog -Message "Completed Teams provider export." -Level Debug -Source "Export-TeamsProvider" -Data @{
+        SuccessfulCommandCount   = @($Tracker.GetSuccessfulCommands()).Count
+        UnsuccessfulCommandCount = @($Tracker.GetUnSuccessfulCommands()).Count
+        UnsuccessfulCommands     = @($Tracker.GetUnSuccessfulCommands())
+    }
 
     # Note the spacing and the last comma in the json is important
     $json = @"
