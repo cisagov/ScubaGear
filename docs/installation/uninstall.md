@@ -5,11 +5,11 @@ To-do:
 ```
 
 # Resetting ScubaGear dependencies with Reset-ScubaGearDependencies
-To remove all installed dependencies for purpose of dependency conflict resolution, or ensuring current and proper installation, or troubleshooting ScubaGear issues then invoking Reset-ScubaGearDependencies is desired. Refer to Dependency Updating in docs / installation / update.md for usage.
+To remove all installed dependencies for purpose of dependency conflict resolution, or for ensuring current and proper installation, or troubleshooting ScubaGear issues then invoking `Reset-ScubaGearDependencies` is desired. Refer to Dependency Updating in `docs / installation / update.md` for usage.
 
 ### UninstallModules.ps1 is retired
 
-The script UninstallModules.ps1 is no longer used, and has been removed from ScubaGear. Previously, this script removed the Powershell modules required by the ScubaGear assessment tool.
+The script `UninstallModules.ps1` is no longer used, and has been removed from ScubaGear. Previously, this script removed the Powershell modules required by the ScubaGear assessment tool.
 
 
 **Note**: The ScubaGear development team is gradually decrementing the dependencies on PowerShell SDK modules in favor of direct REST API calls. While there are very few PowerShell SDK modules required to run the current release of ScubaGear, a prior release may have had multiple additional PowerShell SDK dependencies, including but not limited to (for example) several Microsoft Graph SDK modules.
