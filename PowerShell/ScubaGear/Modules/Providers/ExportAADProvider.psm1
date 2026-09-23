@@ -120,7 +120,7 @@ function Export-AADProvider {
         DisplayName = $defaultAppPolicyObj.DisplayName
         IsEnabled = $defaultAppPolicyObj.IsEnabled
         ApplicationRestrictions = @(
-            $defaultPolicyObj.ApplicationRestrictions |
+            $defaultAppPolicyObj.ApplicationRestrictions |
             Select-Object -Property @{
                 Name = "PasswordCredentials"
                 Expression = { $_.PasswordCredentials }
