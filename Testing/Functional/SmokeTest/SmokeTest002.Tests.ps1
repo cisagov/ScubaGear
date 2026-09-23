@@ -122,7 +122,8 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                     $TenantDataColumns = Get-SeElement -Target $Rows[1] -By TagName "td"
                     $Tenant = $TenantDataColumns[0].Text
                     $Tenant | Should -Be $OrganizationName -Because "Tenant is $Tenant"
-
+                    $Domain = $TenantDataColumns[1].Text
+                    $Domain | Should -Be $OrganizationDomain -Because "Domain is $Domain"
                     $RowHeaders = Get-SeElement -Element $Rows[0] -By TagName 'th'
 
                     ForEach ($Header in $RowHeaders){
