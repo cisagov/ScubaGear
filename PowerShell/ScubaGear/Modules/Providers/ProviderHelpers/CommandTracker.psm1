@@ -80,11 +80,18 @@ class CommandTracker {
                 Write-Warning "Error running $($Command): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
             }
 
+            # Trim the absolute repo path from each stack frame so the structured log stays compact and readable.
+            $CleanStackTrace = @(
+                $_.ScriptStackTrace -split "`r?`n" |
+                    ForEach-Object { ($_ -replace '(?i)^\s*at\s+', '') -replace '(?i),\s*.*?[\\/]PowerShell[\\/]ScubaGear[\\/]', ', ' } |
+                    Where-Object { $_ }
+            )
+
             # We set the log level to Info here because Write-ScubaLog will track Warning or Error as a terminating error.
-            Write-ScubaLog -Message "Error running command" -Level "Info" -Source "TryCommand" -Data @{
-                Command = $Command
-                Error   = $_.Exception.Message
-                StackTrace = $_.ScriptStackTrace
+            Write-ScubaLog -Message "Error running command '$Command': $($_.Exception.Message)" -Level "Info" -Source "TryCommand" -Data @{
+                Command    = $Command
+                Error      = $_.Exception.Message
+                StackTrace = $CleanStackTrace
             }
 
             $this.UnSuccessfulCommands += $TrackedCommand

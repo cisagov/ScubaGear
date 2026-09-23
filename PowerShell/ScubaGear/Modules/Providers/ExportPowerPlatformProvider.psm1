@@ -28,7 +28,10 @@ function Export-PowerPlatformProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "PowerPlatformRestHelper.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Write-ScubaLog
     $Tracker = Get-CommandTracker
+
+    Write-ScubaLog -Message "Starting Power Platform provider export." -Level Info -Source "Export-PowerPlatformProvider"
 
     $TenantDetails = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
     $TenantId = if ($TenantDetails.Id) { $TenantDetails.Id } else { "" }
@@ -59,6 +62,12 @@ function Export-PowerPlatformProvider {
 
     $PowerPlatformSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerPlatformUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
+    Write-ScubaLog -Message "Completed Power Platform provider export." -Level Debug -Source "Export-PowerPlatformProvider" -Data @{
+        SuccessfulCommandCount   = @($Tracker.GetSuccessfulCommands()).Count
+        UnsuccessfulCommandCount = @($Tracker.GetUnSuccessfulCommands()).Count
+        UnsuccessfulCommands     = @($Tracker.GetUnSuccessfulCommands())
+    }
 
     # tenant_id added for testing purposes
     # Note the spacing and the last comma in the json is important
