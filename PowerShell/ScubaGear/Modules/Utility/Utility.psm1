@@ -346,6 +346,38 @@ function Invoke-GraphDirectly {
         }
     }
 
+    # Wraps Invoke-MgGraphRequest with diagnostic logging on failure (e.g. HTTP 403 missing permission).
+    # Retry/backoff for throttling (HTTP 429) is intentionally not handled here; that lives in Invoke-GraphBatchRequest.
+    $invokeWithLogging = {
+        param($RequestParams)
+
+        try {
+            return Invoke-MgGraphRequest @RequestParams
+        }
+        catch {
+            $ex = $_.Exception
+
+            # Extract the HTTP status code from the various shapes the Graph SDK/.NET can throw.
+            $statusCode = $null
+            if ($null -ne $ex.Response -and $null -ne $ex.Response.StatusCode) {
+                $statusCode = [int]$ex.Response.StatusCode
+            }
+            elseif (($ex.PSObject.Properties.Name -contains 'StatusCode') -and $null -ne $ex.StatusCode) {
+                $statusCode = [int]$ex.StatusCode
+            }
+
+            # Log the endpoint, status, and response body so a missing permission is diagnosable, then rethrow.
+            Write-ScubaLog -Message "Commandlet $commandlet failed$(if ($statusCode) { " (HTTP $statusCode)" })." -Level Warning -Source "Invoke-GraphDirectly" -Data @{
+                Commandlet   = $commandlet
+                Endpoint     = $RequestParams['Uri']
+                Method       = $RequestParams['Method']
+                StatusCode   = $statusCode
+                ResponseBody = $_.ErrorDetails.Message
+            } -Exception $ex
+            throw
+        }
+    }
+
     # Execute the initial request (Invoke-ScubaGraphRequest handles pagination internally)
     $resp = Invoke-ScubaGraphRequest @graphParams
 
