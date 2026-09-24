@@ -107,7 +107,7 @@ Function Get-ScubaGearPermissions {
         apiHeader   - Returns the apiHeader value based on the CmdletName (currently only /beta/users/ has a value). Used for the HTTP header in REST API calls.
         all         - Returns all the fields from every record in the JSON that matches the product name
         The following OutAs parameter values are currently not used anywhere in ScubaGear:
-        modules     - Returns the values in the poshModule field 
+        modules     - Returns the values in the poshModule field
         appId       - Returns the resourceAPIAppId
     #>
 
