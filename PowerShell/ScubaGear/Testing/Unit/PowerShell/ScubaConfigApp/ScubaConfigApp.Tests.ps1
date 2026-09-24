@@ -666,7 +666,7 @@ InModuleScope ScubaConfigApp {
 
         Context 'Module Function Availability' {
             BeforeAll {
-                $localizedConfigDirectory = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp"
+                $script:localizedConfigDirectory = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfigApp"
             }
 
             It 'Should keep localized control metadata presentation-only' {
@@ -691,7 +691,7 @@ InModuleScope ScubaConfigApp {
                     }
                 }
 
-                Get-ChildItem $localizedConfigDirectory -Filter 'ScubaConfigApp_Language_*.json' | ForEach-Object {
+                Get-ChildItem $script:localizedConfigDirectory -Filter 'ScubaConfigApp_Language_*.json' | ForEach-Object {
                     $languageConfig = Get-Content $_.FullName -Raw | ConvertFrom-Json
                     if ($languageConfig.localizedControl) {
                         foreach ($leaf in Get-LocalizedMetadataLeaves $languageConfig.localizedControl) {
