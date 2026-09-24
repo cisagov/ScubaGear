@@ -86,6 +86,7 @@ FunctionsToExport = @(
     'Get-ScubaRequiredModuleList',
     'Get-ScubaGearDependencyStatus',
     'Start-SCuBAConfigApp',
+    'Start-SCuBAConfigAnalyzer',
     'Show-SCuBABaselinePolicyViewer',
     'Get-ScubaDebugLogReport',
     'Copy-SCuBASampleReport',
