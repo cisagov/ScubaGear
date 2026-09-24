@@ -238,6 +238,12 @@
       "caseSensitive": false
     },
 
+    "SkipLongFunctions": {
+      "_comment": "Skip long-running Entra ID risky permission checks",
+      "type": "boolean",
+      "caseSensitive": false
+    },
+
     "Aad": {
       "_comment": "Microsoft Entra ID (Azure AD) exclusion configurations",
       "type": "object",
