@@ -299,6 +299,38 @@ function ConvertTo-ScubaHtmlEncoded {
     return [System.Net.WebUtility]::HtmlEncode($Text)
 }
 
+function ConvertTo-ScubaCsvSafeText {
+    <#
+    .Description
+    Neutralizes spreadsheet formula injection for a value written to the diff CSV.
+    Excel and other spreadsheet apps evaluate a cell whose text begins with =, +,
+    - or @ (a leading tab or carriage return is skipped before that test), so a
+    free-text field such as the analyst-supplied annotation Comment can run as a
+    formula for whoever opens the file -- typically a reviewer, not the person who
+    ran the diff. Prefixing a single quote forces the value to be read as text.
+    All strings written to CSV must pass through this, the way HTML strings pass
+    through ConvertTo-ScubaHtmlEncoded. Non-strings are returned untouched so the
+    boolean columns keep their type.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [object]
+        $Value
+    )
+    if ($Value -isnot [string] -or [string]::IsNullOrEmpty($Value)) {
+        return $Value
+    }
+    if ($Value -match '^[=+\-@\t\r]') {
+        return "'" + $Value
+    }
+    return $Value
+}
+
 function Get-ScubaResultCategory {
     <#
     .Description
@@ -1049,7 +1081,7 @@ function ConvertTo-ScubaDiffCsvRecord {
                 if ($null -eq $prop) { return $null }
                 return $prop.Value
             }
-            $rows += [pscustomobject][ordered]@{
+            $row = [pscustomobject][ordered]@{
                 'Product'                = $product
                 'Control ID (Before)'    = $r.'Control ID (Before)'
                 'Control ID (After)'     = $r.'Control ID (After)'
@@ -1075,6 +1107,15 @@ function ConvertTo-ScubaDiffCsvRecord {
                 'MigratedToId'           = & $get 'MigratedToId'
                 'MigratedToProduct'      = & $get 'MigratedToProduct'
             }
+
+            # The CSV is meant to be opened in a spreadsheet, where a cell whose
+            # text begins with =, +, - or @ is evaluated as a formula. Sanitize
+            # every column rather than only the free-text annotation Comment,
+            # since the requirement and detail strings are tenant-derived too.
+            foreach ($name in @($row.PSObject.Properties.Name)) {
+                $row.$name = ConvertTo-ScubaCsvSafeText -Value $row.$name
+            }
+            $rows += $row
         }
     }
     return $rows
@@ -1473,6 +1514,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaOrderedControlIds',
     'ConvertTo-ScubaPlainText',
     'ConvertTo-ScubaHtmlEncoded',
+    'ConvertTo-ScubaCsvSafeText',
     'Get-ScubaResultCategory',
     'Get-ScubaDiffClassification',
     'Get-ScubaClassificationColor',

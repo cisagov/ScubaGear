@@ -387,6 +387,12 @@ Two differences from the HTML report worth noting:
 - The `Classification` column carries the raw token (`NewFail`), not the report's
   friendly label ("New Fail").
 
+Spreadsheets evaluate a cell whose text begins with `=`, `+`, `-`, or `@` as a
+formula, so any such value is written with a leading single quote (`'`) that
+forces it to be read as text. This is most visible on `Comment`, the free-text
+annotation field, and means a comment that starts with one of those characters
+appears with a leading quote in the file.
+
 ## The HTML report
 
 - **Unchanged rows are hidden by default.** Use the **"Show unchanged rows"**

@@ -1119,6 +1119,42 @@ InModuleScope Diff {
             $parsed[0].PSObject.Properties.Name | Should -Contain 'UnderlyingResultAfter'
             ($parsed | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.1.1v1' }).Classification | Should -Be 'NewFail'
         }
+
+        It 'Prefixes a quote on a comment a spreadsheet would run as a formula' {
+            $dir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $diff = Compare-ScubaResults `
+                -Before (Import-ScubaResultsFile -Path (Join-Path $dir 'PairA-Before.json')) `
+                -After (Import-ScubaResultsFile -Path (Join-Path $dir 'PairA-After.json'))
+            $record = @($diff.Diff.AAD) | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.13.1v1' }
+            $record.Comment = '=HYPERLINK("http://attacker.example","Click")'
+
+            $row = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $diff) |
+                Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.13.1v1' }
+            $row.Comment | Should -Be "'=HYPERLINK(""http://attacker.example"",""Click"")"
+            $row.RemediationDate | Should -Be '2026-09-01'
+        }
+    }
+
+    Describe -Tag 'Diff' -Name 'ConvertTo-ScubaCsvSafeText' {
+        It 'Prefixes a single quote on text a spreadsheet would treat as a formula' {
+            foreach ($prefix in @('=', '+', '-', '@', "`t", "`r")) {
+                ConvertTo-ScubaCsvSafeText -Value "${prefix}cmd|' /c calc'!A0" |
+                    Should -Be "'${prefix}cmd|' /c calc'!A0"
+            }
+        }
+
+        It 'Leaves ordinary text unchanged' {
+            ConvertTo-ScubaCsvSafeText -Value 'Escalated to vendor' | Should -Be 'Escalated to vendor'
+            ConvertTo-ScubaCsvSafeText -Value '2026-09-01' | Should -Be '2026-09-01'
+            ConvertTo-ScubaCsvSafeText -Value 'MS.AAD.1.1v1' | Should -Be 'MS.AAD.1.1v1'
+        }
+
+        It 'Returns non-string, empty and null values untouched' {
+            ConvertTo-ScubaCsvSafeText -Value $true | Should -BeOfType [bool]
+            ConvertTo-ScubaCsvSafeText -Value $true | Should -BeTrue
+            ConvertTo-ScubaCsvSafeText -Value '' | Should -Be ''
+            ConvertTo-ScubaCsvSafeText -Value $null | Should -BeNullOrEmpty
+        }
     }
 
     Describe -Tag 'Diff' -Name 'New-ScubaDiffReport HTML rendering' {
