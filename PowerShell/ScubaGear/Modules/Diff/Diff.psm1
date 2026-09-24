@@ -1357,6 +1357,9 @@ function Invoke-SCuBADiff {
     The HTML report hides Unchanged rows by default; a client-side toggle reveals
     them. Use -DarkMode to default the report to dark theme.
 
+    Paths are treated literally throughout, so a folder whose name contains
+    wildcard characters (for example "PR2416 [Test]") is used exactly as given.
+
     .Parameter BeforePath
     Path to the earlier ("before") ScubaResults.json file.
 
@@ -1450,7 +1453,7 @@ function Invoke-SCuBADiff {
     try {
         $ManifestPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\ScubaGear.psd1'
         if (Test-Path -LiteralPath $ManifestPath) {
-            $ToolVersion = (Import-PowerShellDataFile -Path $ManifestPath).ModuleVersion
+            $ToolVersion = (Import-PowerShellDataFile -LiteralPath $ManifestPath).ModuleVersion
         }
     }
     catch {
@@ -1465,6 +1468,13 @@ function Invoke-SCuBADiff {
 
     $Encoding = Get-ScubaDiffFileEncoding
 
+    # Read and write every path literally. The input paths, OutPath, and the three
+    # output file names all come from the caller, and a real directory such as
+    # "PR2416 [Test]" is read as a wildcard by the -Path parameters: Set-Content
+    # -Path fails outright on it, and a pattern that happens to match something
+    # else would write to the wrong target. New-Item has no -LiteralPath, but its
+    # -Path does not glob when creating an item, so it is left as is.
+
     # Write DiffResults.json.
     $JsonPath = Join-Path -Path $OutPath -ChildPath "$OutJsonFileName.json"
     $Json = $DiffResults | ConvertTo-Json -Depth 10
@@ -1472,7 +1482,7 @@ function Invoke-SCuBADiff {
     # back for readability and parity with the ScubaResults.json convention.
     $Bs = [char]0x5C  # backslash, built from a char code to keep the source literal
     $Json = $Json.Replace("${Bs}u003c", '<').Replace("${Bs}u003e", '>').Replace("${Bs}u0027", "'")
-    $Json | Set-Content -Path $JsonPath -Encoding $Encoding -ErrorAction Stop
+    $Json | Set-Content -LiteralPath $JsonPath -Encoding $Encoding -ErrorAction Stop
 
     # Write DiffResults.csv: one row per control, flattened across products.
     # ConvertTo-Csv (rather than Export-Csv) keeps the write going through
@@ -1485,12 +1495,12 @@ function Invoke-SCuBADiff {
     else {
         $Csv = @()
     }
-    $Csv | Set-Content -Path $CsvPath -Encoding $Encoding -ErrorAction Stop
+    $Csv | Set-Content -LiteralPath $CsvPath -Encoding $Encoding -ErrorAction Stop
 
     # Write DiffReport.html.
     $ReportPath = Join-Path -Path $OutPath -ChildPath "$OutReportFileName.html"
     $Html = New-ScubaDiffReport -DiffResults $DiffResults -DarkMode:$DarkMode
-    $Html | Set-Content -Path $ReportPath -Encoding $Encoding -ErrorAction Stop
+    $Html | Set-Content -LiteralPath $ReportPath -Encoding $Encoding -ErrorAction Stop
 
     Write-Information -MessageData "ScubaGear diff written to:`n  $JsonPath`n  $CsvPath`n  $ReportPath" -InformationAction Continue
 

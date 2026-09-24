@@ -1033,6 +1033,54 @@ InModuleScope Diff {
         }
     }
 
+    Describe -Tag 'Diff' -Name 'Invoke-SCuBADiff with wildcard characters in the paths' {
+        BeforeAll {
+            $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
+            $script:BracketRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("scuba-diff-bracket-" + [guid]::NewGuid())
+            # "PR2416 [Test]" is an ordinary folder name, but read as a wildcard it
+            # means "PR2416 " plus one character out of T/e/s/t -- so "PR2416 T" is
+            # a decoy the pattern would match if any path here were globbed.
+            $script:BracketDir = Join-Path $BracketRoot 'PR2416 [Test]'
+            $script:DecoyDir = Join-Path $BracketRoot 'PR2416 T'
+            New-Item -ItemType Directory -Path $BracketDir -Force | Out-Null
+            New-Item -ItemType Directory -Path $DecoyDir -Force | Out-Null
+            Copy-Item -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json') -Destination (Join-Path $BracketDir 'Before.json')
+            Copy-Item -LiteralPath (Join-Path $FixtureDir 'PairA-After.json') -Destination (Join-Path $BracketDir 'After.json')
+        }
+        AfterAll {
+            Remove-Item -LiteralPath $script:BracketRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
+
+        It 'Reads and writes through a path containing [ ] without touching the wildcard match' {
+            $out = Join-Path $BracketDir 'out'
+            $result = Invoke-SCuBADiff `
+                -BeforePath (Join-Path $BracketDir 'Before.json') `
+                -AfterPath (Join-Path $BracketDir 'After.json') `
+                -OutPath $out
+
+            Test-Path -LiteralPath $result.JsonPath   | Should -BeTrue
+            Test-Path -LiteralPath $result.CsvPath    | Should -BeTrue
+            Test-Path -LiteralPath $result.ReportPath | Should -BeTrue
+            $result.JsonPath | Should -BeLike '*PR2416 `[Test`]*'
+            @(Get-ChildItem -LiteralPath $DecoyDir -Recurse).Count | Should -Be 0
+            @(Import-Csv -LiteralPath $result.CsvPath).Count | Should -Be 14
+        }
+
+        It 'Honors output file names that contain [ ]' {
+            $out = Join-Path $BracketDir 'named'
+            $result = Invoke-SCuBADiff `
+                -BeforePath (Join-Path $BracketDir 'Before.json') `
+                -AfterPath (Join-Path $BracketDir 'After.json') `
+                -OutPath $out `
+                -OutJsonFileName 'Diff [1]' -OutCsvFileName 'Diff [1]' -OutReportFileName 'Report [1]'
+
+            Split-Path -Leaf $result.CsvPath | Should -Be 'Diff [1].csv'
+            Test-Path -LiteralPath $result.JsonPath   | Should -BeTrue
+            Test-Path -LiteralPath $result.CsvPath    | Should -BeTrue
+            Test-Path -LiteralPath $result.ReportPath | Should -BeTrue
+        }
+    }
+
     Describe -Tag 'Diff' -Name 'ConvertTo-ScubaDiffCsvRecord' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
