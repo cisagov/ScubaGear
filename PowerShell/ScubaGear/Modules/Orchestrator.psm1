@@ -1363,7 +1363,7 @@ function ConvertTo-ResultsCsv {
             $ResultsCsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
             $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutActionPlanFileName.csv"
             $Encoding = Get-FileEncoding
-            $ScubaResultsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $ResultsCsvFileName -Encoding $Encoding
+            $ScubaResultsCsv | ConvertTo-CsvSafeObject | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $ResultsCsvFileName -Encoding $Encoding
             if ($ActionPlanCsv.Length -eq 0) {
                 # If no tests failed, add the column names to ensure a file is still output
                 $Headers = $ScubaResultsCsv[0].psobject.Properties.Name -Join '","'
@@ -1372,7 +1372,7 @@ function ConvertTo-ResultsCsv {
                 $Headers | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
             }
             else {
-                $ActionPlanCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
+                $ActionPlanCsv | ConvertTo-CsvSafeObject | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $PlanCsvFileName -Encoding $Encoding
             }
         }
         catch {
@@ -1604,6 +1604,33 @@ function Get-RiskyAppsPermissionList {
     return ($FormattedPermissions -join "; ")
 }
 
+function ConvertTo-CsvSafeObject {
+    <#
+    .Description
+    Copies a report row and escapes formula-like strings before CSV serialization.
+    Property order and non-string values are preserved. The source object is unchanged.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [psobject]
+        $InputObject
+    )
+    process {
+        $SafeProperties = [ordered]@{}
+        foreach ($Property in $InputObject.PSObject.Properties) {
+            $Value = $Property.Value
+            if ($Value -is [string]) {
+                $Value = ConvertFrom-CsvValue -Value $Value
+            }
+            $SafeProperties[$Property.Name] = $Value
+        }
+        [pscustomobject]$SafeProperties
+    }
+}
+
 function ConvertFrom-CsvValue {
     <#
     .Description
@@ -1811,7 +1838,7 @@ function ConvertTo-RiskyAppsCsv {
                 $HeaderLine | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
             }
             else {
-                $RiskyAppsCsv | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
+                $RiskyAppsCsv | ConvertTo-CsvSafeObject | ConvertTo-Csv -NoTypeInformation | Set-Content -LiteralPath $RiskyAppsCsvPath -Encoding $Encoding
             }
         }
         catch {
