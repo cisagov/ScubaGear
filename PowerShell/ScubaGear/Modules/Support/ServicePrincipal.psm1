@@ -1,6 +1,7 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper -force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest -force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper, Get-MsalAccessToken -force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod -force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1") -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope -force
 
 function Compare-ScubaGearRole {
     <#
@@ -711,21 +712,16 @@ function Set-AppRegistrationPermission {
         if ($appResponse) {
             # Build the requiredResourceAccess array
             $requiredResourceAccess = @()
-            $resourceAppIds = @{}  # Track resources we've already processed
 
-            # Process each API permission set (grouped by resource API)
-            foreach ($permission in $ScubaGearSPPermissions) {
-                $resourceAppId = $permission.resourceAPIAppId
+            # A permission row's resourceAPIAppId may be a single string or an array (e.g. Exchange in
+            # gov clouds lists multiple resource app IDs). Flatten to a unique list of scalar resource
+            # IDs so each requiredResourceAccess entry serializes resourceAppId as a string, not an array.
+            $allResourceAppIds = $ScubaGearSPPermissions |
+                                 ForEach-Object { $_.resourceAPIAppId } |
+                                 Sort-Object -Unique
 
-                # Skip if we've already processed this resource API to avoid duplicates
-                if ($resourceAppIds.ContainsKey($resourceAppId)) {
-                    Write-Verbose "Resource API $resourceAppId already processed, combining permissions"
-                    continue
-                }
-
-                # Mark this resource as processed
-                $resourceAppIds[$resourceAppId] = $true
-
+            # Process each resource API
+            foreach ($resourceAppId in $allResourceAppIds) {
                 # Get the service principal for this resource API
                 $resourceSP = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
                     '$filter' = "appId eq '$resourceAppId'"
@@ -736,9 +732,10 @@ function Set-AppRegistrationPermission {
                     continue
                 }
 
-                # Get all permissions for this resource API across all entries in ScubaGearSPPermissions
+                # Get all permissions for this resource API across all entries in ScubaGearSPPermissions.
+                # Use -contains so rows whose resourceAPIAppId is an array are matched correctly.
                 $allPermissionsForResource = $ScubaGearSPPermissions |
-                                           Where-Object { $_.resourceAPIAppId -eq $resourceAppId } |
+                                           Where-Object { $_.resourceAPIAppId -contains $resourceAppId } |
                                            ForEach-Object { $_.leastPermissions } |
                                            Sort-Object -Unique
 
@@ -752,7 +749,7 @@ function Set-AppRegistrationPermission {
                     if ($appRole) {
                         # Add this permission to the resource access entries
                         $resourceAccessEntries += @{
-                            id = $appRole.id
+                            id = @($appRole.id)[0]
                             type = "Role"  # This is for application permissions
                         }
                         Write-Verbose "Added permission $permName for $($resourceSP.DisplayName)"
@@ -925,7 +922,7 @@ function Get-ScubaGearAppPermission {
     }
 
     # Check Power Platform registration - always check to report current status
-    $PowerPlatformCheck = Test-PowerPlatformAppRegistration -AppID $AppID
+    $PowerPlatformCheck = Test-PowerPlatformAppRegistration -AppID $AppID -M365Environment $M365Environment
 
     # Get permissions and roles (these are local operations)
     $ScubaGearSPPermissions = Get-ServicePrincipalPermissions -Environment $M365Environment
@@ -2008,18 +2005,17 @@ function Set-ScubaGearAppPermission {
                 try {
                     Write-Verbose "Attempting to remove Power Platform registration"
 
-                    # Get the management app
-                    $managementApp = Get-PowerAppManagementApp -ApplicationId $AppID -ErrorAction SilentlyContinue
-
-                    if ($managementApp) {
-                        # Remove the management app
-                        Remove-PowerAppManagementApp -ApplicationId $AppID -ErrorAction Stop
-                        Write-Output "Successfully removed Power Platform registration"
-                    } else {
-                        Write-Verbose "Power Platform registration not found (may have been removed already)"
-                    }
+                    # Remove the management app via the BAP REST API (replaces Remove-PowerAppManagementApp).
+                    $Token = Get-PowerPlatformAdminToken -M365Environment $M365Environment
+                    $Endpoint = "/providers/Microsoft.BusinessAppPlatform/adminApplications/$AppID`?api-version=2020-10-01"
+                    $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Endpoint $Endpoint -Method "DELETE"
+                    Write-Output "Successfully removed Power Platform registration"
                 } catch {
-                    Write-Warning "Failed to remove Power Platform registration: $($_.Exception.Message)"
+                    if ($_.Exception.Message -like "*404*" -or $_.Exception.Message -like "*Not Found*") {
+                        Write-Verbose "Power Platform registration not found (may have been removed already)"
+                    } else {
+                        Write-Warning "Failed to remove Power Platform registration: $($_.Exception.Message)"
+                    }
                 }
             } else {
                 Write-Output "WhatIf: Would remove Power Platform registration"
@@ -2066,13 +2062,76 @@ function Set-ScubaGearAppPermission {
     }
 }
 
+function Get-PowerPlatformAdminToken {
+    <#
+    .SYNOPSIS
+        Acquires a delegated admin access token for the Power Platform BAP API.
+
+    .DESCRIPTION
+        Registering, querying, and removing a Power Platform management application must be
+        performed with a delegated user (administrator) token — a service principal cannot
+        register itself. This helper acquires that token interactively via MSAL and returns
+        it alongside the environment-specific BAP base URL, replacing the interactive login
+        that Add-PowerAppsAccount previously performed.
+
+    .PARAMETER M365Environment
+        The environment the token is acquired for. The options are commercial, gcc, gcchigh, dod.
+
+    .PARAMETER Tenant
+        The tenant (GUID or domain) to authenticate against. If not supplied, it is resolved
+        from the current Microsoft Graph context.
+
+    .OUTPUTS
+        PSCustomObject with AccessToken and BaseUrl properties.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [string]$Tenant
+    )
+
+    $M365Environment = $M365Environment.ToLower()
+
+    if ([string]::IsNullOrEmpty($Tenant)) {
+        $Context = Get-MgContext
+        if ($Context -and $Context.TenantId) {
+            $Tenant = $Context.TenantId
+        }
+        else {
+            throw "Unable to determine tenant for Power Platform token acquisition. Connect to Microsoft Graph first or supply -Tenant."
+        }
+    }
+
+    # Azure PowerShell well-known public client ID, used for delegated admin auth (same as Connection.psm1).
+    $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+    $Scope = Get-PowerPlatformScope -M365Environment $M365Environment
+    $BaseUrl = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
+
+    $AccessToken = Get-MsalAccessToken -Scope $Scope -ClientId $PPClientId -Tenant $Tenant -M365Environment $M365Environment
+
+    return [PSCustomObject]@{
+        AccessToken = $AccessToken
+        BaseUrl     = $BaseUrl
+    }
+}
+
 function Connect-PowerPlatformApp {
     <#
     .SYNOPSIS
-        Sets up Power Platform for a service principal with automatic retry.
+        Registers a service principal as a Power Platform management application with automatic retry.
 
     .DESCRIPTION
-        Attempts to set up Power Platform for a service principal, with one retry attempt if the initial connection fails.
+        Registers the application as a Power Platform admin management application via a direct
+        PUT to the BAP REST API, with one retry attempt if the initial request fails. This
+        replaces the Add-PowerAppsAccount / New-PowerAppManagementApp cmdlets so the
+        Microsoft.PowerApps.Administration.PowerShell module is no longer required.
 
     .PARAMETER AppId
         The application ID of the service principal to configure for Power Platform.
@@ -2087,13 +2146,13 @@ function Connect-PowerPlatformApp {
     .EXAMPLE
         Connect-PowerPlatformApp -AppId "00000000-0000-0000-0000-000000000000" -TenantId "11111111-1111-1111-1111-111111111111" -M365Environment gcc
 
-        This example connects the service principal with AppId "00000000-0000-0000-0000-000000000000" in the tenant "11111111-1111-1111-1111-111111111111" to the GCC environment of Power Platform.
+        This example registers the service principal with AppId "00000000-0000-0000-0000-000000000000" in the tenant "11111111-1111-1111-1111-111111111111" with the GCC environment of Power Platform.
 
     .NOTES
         Author       : ScubaGear Team
         Prerequisite : PowerShell 5.1 or later
-                       PowerApps module installed (Microsoft.PowerApps.Administration.PowerShell and Microsoft.PowerApps.PowerShell)
-                       The user running this command must have appropriate permissions to register applications in Power Platform.
+                       The user running this command must be a Power Platform / tenant administrator, as a
+                       service principal cannot register itself with Power Platform.
     #>
     [CmdletBinding()]
     param (
@@ -2115,42 +2174,35 @@ function Connect-PowerPlatformApp {
         [string]$M365Environment
     )
 
-    $PowerAppsEndpoint = switch ($M365Environment) {
-        "commercial" { "prod" }
-        "gcc" { "usgov" }
-        "gcchigh" { "usgovhigh" }
-        "dod" { "dod" }
-    }
+    $M365Environment = $M365Environment.ToLower()
 
-    # Try to connect to Power Platform
-    Write-Verbose "Attempting to connect to Power Platform for App ID: $AppId"
-    try {
-        # First attempt
-        $null = Add-PowerAppsAccount -Endpoint $PowerAppsEndpoint -TenantID $TenantId -WarningAction SilentlyContinue
-        $powerAppSetup = New-PowerAppManagementApp -ApplicationId $AppId -WarningAction SilentlyContinue
+    # BAP management-app registration endpoint (see:
+    # https://learn.microsoft.com/en-us/power-platform/admin/powerplatform-api-create-service-principal).
+    $Endpoint = "/providers/Microsoft.BusinessAppPlatform/adminApplications/$AppID`?api-version=2020-10-01"
 
-        if ($powerAppSetup) {
-            Write-Output "Power Platform setup was successful!"
+    Write-Verbose "Attempting to register App ID $AppID with Power Platform via the BAP REST API"
+
+    $MaxAttempts = 2
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            $Token = Get-PowerPlatformAdminToken -M365Environment $M365Environment -Tenant $TenantId
+            $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Endpoint $Endpoint -Method "PUT"
+
+            $SuccessSuffix = if ($Attempt -gt 1) { " on retry!" } else { "!" }
+            Write-Output "Power Platform setup was successful$SuccessSuffix"
             return $true
         }
-
-        # If the first attempt failed, try once more
-        Write-Verbose "First Power Platform setup attempt failed. Retrying..."
-        $null = Add-PowerAppsAccount -Endpoint $PowerAppsEndpoint -TenantID $TenantId -WarningAction SilentlyContinue
-        $powerAppSetup = New-PowerAppManagementApp -ApplicationId $AppId -WarningAction SilentlyContinue
-
-        if ($powerAppSetup) {
-            Write-Output "Power Platform setup was successful on retry!"
-            return $true
-        } else {
-            Write-Warning "Power Platform setup failed after retry attempt."
-            return $false
+        catch {
+            if ($Attempt -ge $MaxAttempts) {
+                Write-Warning "Failed to set up Power Platform: $($_.Exception.Message)"
+                throw
+            }
+            Write-Verbose "First Power Platform setup attempt failed: $($_.Exception.Message). Retrying..."
         }
     }
-    catch {
-        Write-Warning "Failed to set up Power Platform: $($_.Exception.Message)"
-        throw
-    }
+
+    Write-Warning "Power Platform setup failed after retry attempt."
+    return $false
 }
 
 function Test-PowerPlatformAppRegistration {
@@ -2159,13 +2211,22 @@ function Test-PowerPlatformAppRegistration {
         Checks if a service principal is registered with Power Platform.
 
     .DESCRIPTION
-        Verifies whether an application ID is registered as a management app in Power Platform.
+        Verifies whether an application ID is registered as a management app in Power Platform
+        by querying the BAP admin applications REST API. This replaces Get-PowerAppManagementApp
+        so the Microsoft.PowerApps.Administration.PowerShell module is no longer required.
 
     .PARAMETER AppId
         The application ID of the service principal to check.
 
+    .PARAMETER M365Environment
+        Used to define the environment to query. The options are commercial, gcc, gcchigh, dod.
+
+    .PARAMETER Tenant
+        The tenant (GUID or domain) to authenticate against. If not supplied, it is resolved
+        from the current Microsoft Graph context.
+
     .EXAMPLE
-        Test-PowerPlatformAppRegistration -AppId "00000000-0000-0000-0000-000000000000"
+        Test-PowerPlatformAppRegistration -AppId "00000000-0000-0000-0000-000000000000" -M365Environment commercial
 
     .OUTPUTS
         Returns $true if the app is registered, $false otherwise.
@@ -2173,8 +2234,7 @@ function Test-PowerPlatformAppRegistration {
     .NOTES
         Author: ScubaGear Team
         Prerequisite : PowerShell 5.1 or later
-                       PowerApps module installed (Microsoft.PowerApps.Administration.PowerShell)
-                       The user running this command must have appropriate permissions to query applications in Power Platform.
+                       The user running this command must be a Power Platform / tenant administrator.
     #>
     [CmdletBinding()]
     param (
@@ -2185,38 +2245,37 @@ function Test-PowerPlatformAppRegistration {
             }
             throw "AppID must be a valid GUID format: $($_)"
         })]
-        [string]$AppID
+        [string]$AppID,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [string]$Tenant
     )
 
+    $M365Environment = $M365Environment.ToLower()
+
     try {
-        # Try to get the management app
-        $managementApp = Get-PowerAppManagementApp -ApplicationId $AppId -ErrorAction SilentlyContinue
+        $Token = Get-PowerPlatformAdminToken -M365Environment $M365Environment -Tenant $Tenant
+        $Endpoint = "/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-10-01"
+        $Response = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Endpoint $Endpoint -Method "GET"
 
-        # Check if the result is a valid PSCustomObject with applicationId property
-        if ($managementApp -and
-            $managementApp -is [PSCustomObject] -and
-            $managementApp.PSObject.Properties['applicationId']) {
+        $ManagementApps = if ($Response.PSObject.Properties['value']) { $Response.value } else { $Response }
 
-            Write-Verbose "Application $AppId is registered with Power Platform"
+        if ($ManagementApps | Where-Object { $_.applicationId -eq $AppID }) {
+            Write-Verbose "Application $AppID is registered with Power Platform"
             return $true
         }
-        # Check if we got an HttpWebResponse with NotFound status (not registered)
-        elseif ($managementApp -and
-                $managementApp -is [System.Net.HttpWebResponse] -and
-                $managementApp.StatusCode -eq [System.Net.HttpStatusCode]::NotFound) {
 
-            Write-Verbose "Application $AppId is NOT registered with Power Platform (NotFound response)"
-            return $false
-        }
-        else {
-            Write-Verbose "Application $AppId is NOT registered with Power Platform (no valid response)"
-            return $false
-        }
+        Write-Verbose "Application $AppID is NOT registered with Power Platform"
+        return $false
     }
     catch {
-        # If we get a 404 exception, the app is not registered
+        # A 404 means the admin applications collection could not be found for this app; treat as not registered.
         if ($_.Exception.Message -like "*404*" -or $_.Exception.Message -like "*Not Found*") {
-            Write-Verbose "Application $AppId is NOT registered with Power Platform (404 exception)"
+            Write-Verbose "Application $AppID is NOT registered with Power Platform (404 response)"
             return $false
         }
 
