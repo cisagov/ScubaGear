@@ -14,6 +14,8 @@ function Export-AADProvider {
     .PARAMETER M365Environment
         The M365 environment to run against (for example commercial, gcc, gcchigh, or dod).
         It selects the Graph endpoints used when retrieving the tenant configuration.
+    .PARAMETER SkipLongFunctions
+        Skip the application and service principal risky permission checks.
     .FUNCTIONALITY
         Internal
     #>
@@ -22,7 +24,10 @@ function Export-AADProvider {
     param (
         [ValidateNotNullOrEmpty()]
         [string]
-        $M365Environment
+        $M365Environment,
+
+        [switch]
+        $SkipLongFunctions
     )
 
     Import-Module $PSScriptRoot/ProviderHelpers/CommandTracker.psm1
@@ -190,16 +195,20 @@ function Export-AADProvider {
     # This cache is used to store the scopes for each resource application to avoid redundant calls to the Graph API for the same resource application.
     $ResourcePermissionCache = @{}
 
-    $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
-        "M365Environment"=$M365Environment;
-        "ResourcePermissionCache"=$ResourcePermissionCache;
-        "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
-    })
-    $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
-        "M365Environment"=$M365Environment;
-        "ResourcePermissionCache"=$ResourcePermissionCache;
-        "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
-    })
+    $RiskyApps = @()
+    $RiskySPs = @()
+    if (-not $SkipLongFunctions) {
+        $RiskyApps = $Tracker.TryCommand("Get-ApplicationsWithRiskyPermissions", @{
+            "M365Environment"=$M365Environment;
+            "ResourcePermissionCache"=$ResourcePermissionCache;
+            "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
+        })
+        $RiskySPs = $Tracker.TryCommand("Get-ServicePrincipalsWithRiskyPermissions", @{
+            "M365Environment"=$M365Environment;
+            "ResourcePermissionCache"=$ResourcePermissionCache;
+            "RiskyAppPermissionsJson"=$RiskyAppPermissionsJson
+        })
+    }
 
     $RiskyApps = if ($null -eq $RiskyApps -or @($RiskyApps).Count -eq 0) { @() } else { $RiskyApps }
     $RiskySPs = if ($null -eq $RiskySPs -or @($RiskySPs).Count -eq 0) { @() } else { $RiskySPs }
