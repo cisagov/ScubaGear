@@ -571,6 +571,34 @@ function Get-ScubaRowColorClass {
     }
 }
 
+function Get-ScubaResultTextClass {
+    <#
+    .Description
+    Maps a Result value to the CSS class that colors the text of a
+    Result (Before) / Result (After) cell: Pass green, Fail red, Warning amber.
+    The row background only ever shows the after state, so without this a reader
+    scanning the table cannot see which way a policy moved. Everything else
+    (N/A, Omitted, Error, Incorrect result, unknown) keeps the default text color
+    so the three states being compared are the ones that stand out.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
+        [AllowNull()]
+        [string]
+        $Result
+    )
+    switch (Get-ScubaResultCategory $Result) {
+        'Pass'    { return 'result-pass' }
+        'Fail'    { return 'result-fail' }
+        'Warning' { return 'result-warning' }
+        default   { return '' }
+    }
+}
+
 function Get-ScubaControlMap {
     <#
     .Description
@@ -1285,6 +1313,12 @@ function New-ScubaDiffReport {
                 $resultAfterCell += " <span class=""underlying"">(underlying: $(& $enc $r.UnderlyingResultAfter))</span>"
             }
 
+            # Color the result text itself, not just the row: the row background
+            # carries the after state only, so a Pass -> Fail flip is otherwise
+            # easy to read past.
+            $resultBeforeClass = ('result-cell ' + (Get-ScubaResultTextClass $r.ResultBefore)).Trim()
+            $resultAfterClass = ('result-cell ' + (Get-ScubaResultTextClass $r.ResultAfter)).Trim()
+
             # The source-side stub of a migrated policy. Name its replacement in a
             # tooltip so a reader can find where the comparison was made without
             # filling in the after columns, which belong to the target product's row.
@@ -1299,8 +1333,8 @@ function New-ScubaDiffReport {
             [void]$sb.AppendLine("  <td>$idDisplay</td>")
             [void]$sb.AppendLine("  <td>$groupDisplay</td>")
             [void]$sb.AppendLine("  <td class=""classification-label""$classificationTitle>$classificationLabel</td>")
-            [void]$sb.AppendLine("  <td>$resultBeforeCell</td>")
-            [void]$sb.AppendLine("  <td>$resultAfterCell</td>")
+            [void]$sb.AppendLine("  <td class=""$resultBeforeClass"">$resultBeforeCell</td>")
+            [void]$sb.AppendLine("  <td class=""$resultAfterClass"">$resultAfterCell</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.Requirement)</td>")
             [void]$sb.AppendLine("  <td>$(& $enc $r.DetailsAfter)</td>")
             [void]$sb.AppendLine('</tr>')
@@ -1530,6 +1564,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaClassificationColor',
     'Get-ScubaClassificationLabel',
     'Get-ScubaRowColorClass',
+    'Get-ScubaResultTextClass',
     'Get-ScubaProductDisplayName',
     'Get-ScubaOrderedProducts',
     'Get-ScubaControlMap',

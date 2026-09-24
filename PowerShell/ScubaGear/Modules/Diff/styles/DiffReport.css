@@ -19,6 +19,17 @@
     --diff-green: #d5ebd5;
     --diff-yellow: #fff7d6;
     --diff-grey: #ebebf2;
+    /* Table grid lines, matching the ScubaResults report (Main.css --border-color)
+       so the two reports read with the same weight. Kept separate from
+       --border-color, which styles the lighter report chrome (cards, buttons). */
+    --table-border-color: black;
+    /* Result (Before) / Result (After) text colors. The row background carries the
+       after state only, so coloring both result cells is what makes a Pass -> Fail
+       flip catch the eye. Each one clears 4.5:1 against every row background it can
+       land on; Fail and Warning reuse Main.css palette entries. */
+    --result-pass-color: #14532d;
+    --result-fail-color: #981d20;
+    --result-warning-color: #713f12;
 }
 
 html[data-theme='dark'] {
@@ -33,6 +44,12 @@ html[data-theme='dark'] {
     --diff-green: #1C361C;
     --diff-yellow: #524100;
     --diff-grey: #414141;
+    --table-border-color: #7b7b7b;
+    /* Lightened for dark mode so each still clears 4.5:1 on the dark row
+       backgrounds; Fail and Warning reuse the Main.css dark palette. */
+    --result-pass-color: #8fd17a;
+    --result-fail-color: #fca5a5;
+    --result-warning-color: #fde68a;
 }
 
 body {
@@ -107,7 +124,7 @@ table {
 }
 
 th, td {
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--table-border-color);
     padding: 0.5em 0.75em;
     text-align: left;
     vertical-align: top;
@@ -125,6 +142,13 @@ tr.diff-red    { background-color: var(--diff-red); }
 tr.diff-green  { background-color: var(--diff-green); }
 tr.diff-yellow { background-color: var(--diff-yellow); }
 tr.diff-grey   { background-color: var(--diff-grey); }
+
+/* Result (Before) and Result (After) cells. The row background shows the after
+   state; these colors let a reader see at a glance which way a policy moved. */
+td.result-cell { font-weight: 600; }
+td.result-pass    { color: var(--result-pass-color); }
+td.result-fail    { color: var(--result-fail-color); }
+td.result-warning { color: var(--result-warning-color); }
 
 /* Unchanged rows are hidden by default; the "Show unchanged" toggle reveals them. */
 tr.diff-unchanged-row { display: none; }
@@ -197,6 +221,7 @@ body.show-unchanged tr.diff-unchanged-row { display: table-row; }
 }
 
 .underlying {
+    font-weight: normal;
     color: var(--uuid-color);
     font-size: 0.85em;
     font-style: italic;

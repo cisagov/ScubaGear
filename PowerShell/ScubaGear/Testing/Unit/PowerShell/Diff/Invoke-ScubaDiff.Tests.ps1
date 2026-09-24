@@ -135,6 +135,25 @@ InModuleScope Diff {
             }
         }
 
+        Context 'Get-ScubaResultTextClass' {
+            It 'Colors Pass, Fail, and Warning result text' {
+                Get-ScubaResultTextClass 'Pass'    | Should -Be 'result-pass'
+                Get-ScubaResultTextClass 'Fail'    | Should -Be 'result-fail'
+                Get-ScubaResultTextClass 'Warning' | Should -Be 'result-warning'
+            }
+            It 'Is case and whitespace insensitive, like the row coloring' {
+                Get-ScubaResultTextClass ' PASS ' | Should -Be 'result-pass'
+            }
+            It 'Leaves every other result at the default text color' {
+                Get-ScubaResultTextClass 'N/A'               | Should -BeNullOrEmpty
+                Get-ScubaResultTextClass 'Omitted'           | Should -BeNullOrEmpty
+                Get-ScubaResultTextClass 'Error'             | Should -BeNullOrEmpty
+                Get-ScubaResultTextClass 'Incorrect result'  | Should -BeNullOrEmpty
+                Get-ScubaResultTextClass 'Bug'               | Should -BeNullOrEmpty
+                Get-ScubaResultTextClass ''                  | Should -BeNullOrEmpty
+            }
+        }
+
         Context 'ConvertTo-ScubaHtmlEncoded' {
             It 'Encodes HTML metacharacters' {
                 ConvertTo-ScubaHtmlEncoded '<script>&' | Should -Be '&lt;script&gt;&amp;'
@@ -1331,6 +1350,38 @@ InModuleScope Diff {
             $htmlC | Should -Match 'title="Replaced by MS\.SECURITYSUITE\.3\.1v1; compared in the Security Suite section"'
             # Migrated gets a summary column and filter checkbox like any classification.
             $htmlC | Should -Match 'class="classification-toggle" data-classification="Migrated"'
+        }
+
+        It 'Colors the before and after result text so a Pass -> Fail flip is visible' {
+            # MS.AAD.1.1v1 is Pass -> Fail: the two cells must read differently.
+            $Html | Should -Match '<td class="result-cell result-pass">Pass</td>\s*<td class="result-cell result-fail">Fail</td>'
+        }
+
+        It 'Colors a Warning result with its own class' {
+            # MS.AAD.5.1v1 is Pass -> Warning.
+            $Html | Should -Match '<td class="result-cell result-warning">Warning</td>'
+        }
+
+        It 'Leaves N/A, Omitted, and Error result text uncolored' {
+            $Html | Should -Match '<td class="result-cell">N/A</td>'
+            $Html | Should -Match '<td class="result-cell">Omitted</td>'
+            $Html | Should -Match '<td class="result-cell">Error</td>'
+            $Html | Should -Not -Match 'result-cell result-\w+">(N/A|Omitted|Error)<'
+        }
+
+        It 'Defines the result text colors in both themes' {
+            foreach ($var in @('--result-pass-color', '--result-fail-color', '--result-warning-color')) {
+                # Once under :root (light) and once under html[data-theme='dark'].
+                ([regex]::Matches($Html, [regex]::Escape($var) + ':')).Count | Should -Be 2 -Because "$var needs a light and a dark value"
+            }
+            $Html | Should -Match "html\[data-theme='dark'\][\s\S]*--result-pass-color"
+        }
+
+        It 'Draws table lines with the ScubaResults border color' {
+            # Main.css uses black in light mode and #7b7b7b in dark.
+            $Html | Should -Match '--table-border-color:\s*black;'
+            $Html | Should -Match '--table-border-color:\s*#7b7b7b;'
+            $Html | Should -Match 'th, td \{[\s\S]*?border: 1px solid var\(--table-border-color\);'
         }
     }
 }
