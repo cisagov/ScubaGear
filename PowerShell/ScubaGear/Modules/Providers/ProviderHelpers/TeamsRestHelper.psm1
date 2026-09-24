@@ -1,5 +1,5 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions, Get-ScubaGearRestEndpoint
 
 function Get-TeamsScope {
     <#
@@ -87,7 +87,7 @@ function Get-TeamsMeetingPolicyRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsMeetingPolicy"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsMeetingPolicyRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -111,7 +111,7 @@ function Get-TeamsTenantFederationConfigurationRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TenantFederationSettings"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsTenantFederationConfigurationRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -135,7 +135,7 @@ function Get-TeamsClientConfigurationRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsClientConfiguration"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsClientConfigurationRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -159,7 +159,7 @@ function Get-TeamsAppPermissionPolicyRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsAppPermissionPolicy"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsAppPermissionPolicyRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -183,7 +183,7 @@ function Get-TeamsMeetingBroadcastPolicyRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsMeetingBroadcastPolicy"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsMeetingBroadcastPolicyRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -207,7 +207,7 @@ function Get-TeamsM365UnifiedTenantSettingsRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/AdminAppCatalog/ps/v2/admin/unifiedApp/settings"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsM365UnifiedTenantSettingsRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response

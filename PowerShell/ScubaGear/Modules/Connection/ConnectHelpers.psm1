@@ -253,9 +253,11 @@ function Get-MsalAccessToken {
                 }
 
                 if (-not $TokenResult) {
+                    # Embedded web view does not support WebAuthn/FIDO2/passkey ceremonies (no real browser
+                    # context), so this must use the system (default OS) browser instead.
                     $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                         WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                        WithUseEmbeddedWebView($true).
+                        WithUseEmbeddedWebView($false).
                         ExecuteAsync().GetAwaiter().GetResult()
                 }
             }

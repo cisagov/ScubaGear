@@ -37,28 +37,20 @@ InModuleScope AADRiskyPermissionsHelper {
                 }
             } -ParameterFilter { $commandlet -eq "Get-MgBetaServicePrincipal" -or $Uri -match "/serviceprincipals" } -ModuleName AADRiskyPermissionsHelper
 
-            function Invoke-MgGraphRequest { }
-
-            Mock Invoke-MgGraphRequest {
+            Mock Invoke-GraphBatchRequest {
                 return @{
-                    responses = @(
-                        @{
-                            id = "00000000-0000-0000-0000-000000000010"
-                            status = 200
-                            body = @{
-                                value = $MockServicePrincipalAppRoleAssignments
-                            }
-                        },
-                        @{
-                            id = "00000000-0000-0000-0000-000000000020"
-                            status = 200
-                            body = @{
-                                value = $MockServicePrincipalAppRoleAssignments
-                            }
-                        }
-                    )
+                    "00000000-0000-0000-0000-000000000010" = @{
+                        id     = "00000000-0000-0000-0000-000000000010"
+                        status = 200
+                        body   = @{ value = $MockServicePrincipalAppRoleAssignments }
+                    }
+                    "00000000-0000-0000-0000-000000000020" = @{
+                        id     = "00000000-0000-0000-0000-000000000020"
+                        status = 200
+                        body   = @{ value = $MockServicePrincipalAppRoleAssignments }
+                    }
                 }
-            }
+            } -ModuleName AADRiskyPermissionsHelper
 
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache

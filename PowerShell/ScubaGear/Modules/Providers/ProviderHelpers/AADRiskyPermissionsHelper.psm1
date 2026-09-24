@@ -1,4 +1,4 @@
-Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
 
 # Module-scoped cache for RiskyAppPermissions.json - loaded once, reused across all function calls
 $script:CachedRiskyAppPermissionsJson = $null
@@ -238,138 +238,6 @@ function Get-PermissionTypeDetails {
         RoleDisplayName      = $null
         RequiresAdminConsent = $false
     }
-}
-
-function Invoke-GraphBatchRequestsWithRetry {
-    <#
-    .Description
-    Executes Graph batch requests with bounded retry/backoff for transient failures (including HTTP 429).
-    .Functionality
-    Internal
-    #>
-    param (
-        [Parameter(Mandatory = $true)]
-        [array]
-        $Requests,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
-        [string]
-        $M365Environment,
-
-        [ValidateSet("v1.0", "beta", IgnoreCase = $true)]
-        [string]
-        $ApiVersion = "beta",
-
-        [ValidateRange(0, 10)]
-        [int]
-        $MaxRetries = 6,
-
-        [ValidateRange(1, 30)]
-        [int]
-        $BaseDelaySeconds = 1
-    )
-
-    if ($null -eq $Requests -or $Requests.Count -eq 0) {
-        return @{}
-    }
-
-    $GetScubaGearPermissionsCommand = Get-Command -Name Get-ScubaGearPermissions -ErrorAction SilentlyContinue
-    $IsFallbackMode = $null -eq $GetScubaGearPermissionsCommand
-    if ($IsFallbackMode) {
-        # Unit tests can mock Invoke-MgGraphRequest without loading the permissions helper.
-        $BatchEndpoint = "/$ApiVersion/`$batch"
-        $MaxRetries = 0
-    }
-    else {
-        $EndpointRoot = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
-        $BatchEndpoint = "$EndpointRoot/$ApiVersion/`$batch"
-    }
-
-    $Completed = @{}
-    $PendingRequests = @($Requests)
-    $BatchSize = 20
-
-    for ($Attempt = 0; $Attempt -le $MaxRetries; $Attempt++) {
-        $BatchResponses = @{}
-
-        for ($Offset = 0; $Offset -lt $PendingRequests.Count; $Offset += $BatchSize) {
-            $RequestChunk = $PendingRequests[$Offset..([Math]::Min($Offset + $BatchSize - 1, $PendingRequests.Count - 1))]
-            $BatchBody = @{ requests = @($RequestChunk) }
-            $BatchResponse = Invoke-MgGraphRequest -Method POST -Uri $BatchEndpoint -Body ($BatchBody | ConvertTo-Json -Depth 10)
-
-            foreach ($Response in @($BatchResponse.responses)) {
-                $BatchResponses[[string]$Response.id] = $Response
-            }
-        }
-
-        $RetryRequests = [System.Collections.Generic.List[object]]::new()
-        $MaxRetryAfterSeconds = 0
-
-        foreach ($Request in $PendingRequests) {
-            $Response = $BatchResponses[[string]$Request.id]
-
-            if ($null -eq $Response) {
-                [void]$RetryRequests.Add($Request)
-                continue
-            }
-
-            $StatusCode = 0
-            if ($null -ne $Response.status) {
-                $StatusCode = [int]$Response.status
-            }
-
-            $IsRetriableStatus = $StatusCode -in @(429, 500, 502, 503, 504)
-
-            if ($IsRetriableStatus -and $Attempt -lt $MaxRetries) {
-                [void]$RetryRequests.Add($Request)
-
-                if ($null -ne $Response.headers) {
-                    $RetryAfterValue = $Response.headers.'Retry-After'
-                    if ($null -eq $RetryAfterValue) {
-                        $RetryAfterValue = $Response.headers.'retry-after'
-                    }
-
-                    $ParsedRetryAfter = 0
-                    if ($null -ne $RetryAfterValue -and [int]::TryParse([string]$RetryAfterValue, [ref]$ParsedRetryAfter)) {
-                        if ($ParsedRetryAfter -gt $MaxRetryAfterSeconds) {
-                            $MaxRetryAfterSeconds = $ParsedRetryAfter
-                        }
-                    }
-                }
-            }
-            else {
-                $Completed[[string]$Request.id] = $Response
-            }
-        }
-
-        if ($RetryRequests.Count -eq 0) {
-            break
-        }
-
-        $BackoffSeconds = [Math]::Pow(2, $Attempt) * $BaseDelaySeconds
-        $DelaySeconds = [Math]::Max([int][Math]::Ceiling($BackoffSeconds), $MaxRetryAfterSeconds)
-        $JitterMs = Get-Random -Minimum 100 -Maximum 900
-
-        Write-Verbose "Retrying $($RetryRequests.Count) Graph batch requests in $DelaySeconds second(s) (attempt $($Attempt + 1) of $MaxRetries)."
-        Start-Sleep -Seconds $DelaySeconds
-        Start-Sleep -Milliseconds $JitterMs
-
-        $PendingRequests = $RetryRequests.ToArray()
-    }
-
-    # Preserve non-transient failed responses so callers can log status.
-    foreach ($Request in $PendingRequests) {
-        if (-not $Completed.ContainsKey([string]$Request.id)) {
-            $Completed[[string]$Request.id] = @{
-                id = [string]$Request.id
-                status = 599
-                body = @{}
-            }
-        }
-    }
-
-    return $Completed
 }
 
 function Format-Permission {
@@ -720,7 +588,8 @@ function Get-ServicePrincipalsWithRiskyPermissions {
                     }
                 }
             )
-            $BatchResponses = Invoke-GraphBatchRequestsWithRetry -Requests $BatchRequests -M365Environment $M365Environment -ApiVersion "beta"
+            $BatchResponses = Invoke-GraphBatchRequest -Requests $BatchRequests -M365Environment $M365Environment -ApiVersion "beta" `
+                -RetriableStatusCodes @(429, 500, 502, 503, 504) -UseExponentialBackoffFallback -MaxRetries 6 -FallbackBaseDelaySeconds 1
 
             foreach ($ServicePrincipalId in @($ServicePrincipals.Id)) {
                 $Result = $BatchResponses[[string]$ServicePrincipalId]
@@ -876,7 +745,8 @@ function Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications {
                     }
                 }
             )
-            $BatchResponses = Invoke-GraphBatchRequestsWithRetry -Requests $BatchRequests -M365Environment $M365Environment -ApiVersion "beta"
+            $BatchResponses = Invoke-GraphBatchRequest -Requests $BatchRequests -M365Environment $M365Environment -ApiVersion "beta" `
+                -RetriableStatusCodes @(429, 500, 502, 503, 504) -UseExponentialBackoffFallback -MaxRetries 6 -FallbackBaseDelaySeconds 1
 
 
             $RiskyDelegatedPermissionClassificationResults = @()
