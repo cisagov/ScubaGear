@@ -127,7 +127,7 @@ Start-SCuBAConfigApp
 Navigate to the "Products" tab:
 - Check the boxes for products you want to assess:
   - **AAD (Entra)**: Azure Active Directory/Entra ID policies
-  - **Defender**: Microsoft Defender for Office 365
+  - **Security Suite**: Microsoft Security Suite, contains Defender for Office 365
   - **EXO (Exchange)**: Exchange Online configurations
   - **SharePoint**: SharePoint Online settings
   - **Teams**: Microsoft Teams policies
