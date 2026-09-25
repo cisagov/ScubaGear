@@ -641,18 +641,8 @@ function New-Report {
     # Handle SecuritySuite-specific reporting
     if ($BaselineName -eq "securitysuite") {
         $SecuritySuiteConfig = $SettingsExport.scuba_config.SecuritySuite
-        $DefenderConfig = $SettingsExport.scuba_config.Defender
-
         $SensitiveUserConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.1v1'
-        if ($null -eq $SensitiveUserConfig) {
-            $SensitiveUserConfig = $DefenderConfig.'MS.DEFENDER.2.1v1'
-        }
-
         $PartnerDomainConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.3v1'
-        if ($null -eq $PartnerDomainConfig) {
-            $PartnerDomainConfig = $DefenderConfig.'MS.DEFENDER.2.3v1'
-        }
-
         $SensitiveUsers = @()
         if ($null -ne $SensitiveUserConfig -and $null -ne $SensitiveUserConfig.SensitiveUsers) {
             $SensitiveUsers = @($SensitiveUserConfig.SensitiveUsers)
@@ -880,7 +870,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
