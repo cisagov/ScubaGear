@@ -1,0 +1,70 @@
+# Purpose: Refresh Microsoft license-to-product-name mappings used by CreateReport.
+
+name: Update license mapping if necessary
+
+# Run monthly on the 1st at 06:17 UTC, and allow manual runs.
+on:
+    schedule:
+        - cron: "17 6 1 * *"
+    workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+    update-license-mapping:
+        name: Update License Mapping
+        runs-on: windows-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        defaults:
+            run:
+                shell: powershell
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            - name: Download latest license mapping
+              run: |
+                  . utils/workflow/Update-LicenseMapping.ps1
+                  Update-LicenseMappingFile -RepoPath .
+
+            - name: Commit changes if the mapping changed
+              id: commit
+              run: |
+                  $MappingPath = 'PowerShell/ScubaGear/Modules/CreateReport/MicrosoftLicenseToProductNameMappings.csv'
+                  git add -- $MappingPath
+
+                  $Changed = git diff --cached --name-only
+                  if (-not $Changed) {
+                      Write-Output "No changes detected; license mapping is already up to date."
+                      "haschanges=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+                      exit 0
+                  }
+
+                  "haschanges=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+            - name: Check for existing pull request
+              id: check-pr
+              if: steps.commit.outputs.haschanges == 'true'
+              run: |
+                  $ExistingPrs = gh pr list --base main --state open --search "Update Microsoft license product name mappings in:title" --json number
+                  $PrCount = ($ExistingPrs | ConvertFrom-Json).Count
+                  "shouldcreatepr=$(($PrCount -eq 0).ToString().ToLower())" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+            - name: Create new PR
+              if: steps.commit.outputs.haschanges == 'true' && steps.check-pr.outputs.shouldcreatepr == 'true'
+              id: create-pr
+              run: |
+                  . utils/workflow/Update-LicenseMapping.ps1
+                  $Branch = New-LicenseMappingUpdatePr -RepoPath .
+                  "branch=$Branch" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+            - name: Auto-approve pull request
+              if: steps.create-pr.outputs.branch
+              continue-on-error: true
+              run: |
+                  . utils/workflow/Update-LicenseMapping.ps1
+                  Approve-LicenseMappingUpdatePr -LicenseMappingBumpBranch "${{ steps.create-pr.outputs.branch }}"
