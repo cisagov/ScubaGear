@@ -11,7 +11,11 @@ InModuleScope Orchestrator {
                     LogIn           = $true
                     M365Environment = 'commercial'
                 }
-                function Connect-Tenant { throw 'this will be mocked' }
+                function Connect-Tenant {
+                    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                    param($ProductNames, $M365Environment, $ServicePrincipalParams)
+                    throw 'this will be mocked'
+                }
                 Mock -ModuleName Orchestrator Connect-Tenant { @() }
                 function Get-ServicePrincipalParams { throw 'this will be mocked' }
                 Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @() }

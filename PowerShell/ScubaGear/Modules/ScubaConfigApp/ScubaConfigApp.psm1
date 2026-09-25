@@ -1,4 +1,6 @@
-﻿function Resolve-ScubaConfigAppWalkthroughPath {
+﻿Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-ScubaGraphContext, Invoke-ScubaGraphRequest -Force
+
+function Resolve-ScubaConfigAppWalkthroughPath {
     param(
         [Parameter(Mandatory = $true)]
         [string]$UIConfigPath,
@@ -141,7 +143,6 @@ Function Start-SCuBAConfigApp {
     https://github.com/cisagov/ScubaGear
 
     .LINK
-    Connect-MgGraph
     ConvertFrom-Yaml
     #>
 
@@ -228,15 +229,22 @@ Function Start-SCuBAConfigApp {
     # Connect to Microsoft Graph if Online parameter is used
     if ($Online) {
         try {
-            #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
             Write-Output $(if ($AppOnlyAuth) { "Connecting to Microsoft Graph (app-only certificate)..." } else { "Connecting to Microsoft Graph..." })
-            Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
+            if ($AppOnlyAuth) {
+                Connect-GraphHelper -M365Environment $M365Environment -ServicePrincipalParams @{
+                    CertThumbprintParams = @{
+                        CertificateThumbprint = $CertificateThumbprint
+                        AppID                 = $AppId
+                        Organization          = $TenantName
+                    }
+                }
+            } else {
+                Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphParameters.Scopes
 
-            # Interactive auth resolves a signed-in user; confirm it. App-only has no user
-            # context (/me returns 400), so a successful Connect-MgGraph is sufficient there.
-            if (-not $AppOnlyAuth) {
-                Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+                # Interactive auth resolves a signed-in user; confirm it. App-only has no user
+                # context (/me returns 400), so a successful connection is sufficient there.
+                Invoke-ScubaGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
             }
             Write-Output " - Successfully connected to Microsoft Graph"
             $GraphConnected = $true
@@ -309,7 +317,7 @@ Function Start-SCuBAConfigApp {
         (Get-Module ScubaGear -ErrorAction SilentlyContinue).Version.ToString()
     }
 
-    # Store the ScubaGear module root so Build-ScubaGearCommand can import from the correct source.
+    # Store the ScubaGear module root so New-ScubaGearCommand can import from the correct source.
     # $PSScriptRoot is the ScubaConfigApp folder; the module root is two levels up.
     $resolvedScubaRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..") -ErrorAction SilentlyContinue).Path
     $syncHash.ScubaGearModulePath = if ($resolvedScubaRoot -and (Test-Path (Join-Path $resolvedScubaRoot 'ScubaGear.psd1'))) {
@@ -724,7 +732,7 @@ Function Start-SCuBAConfigApp {
         # Handle Organization TextBox with special Graph Connected logic
         if ($syncHash.GraphConnected) {
             try {
-                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
+                $tenantDetails = (Invoke-ScubaGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
                 $tenantName = ($tenantDetails.VerifiedDomains | Where-Object { $_.IsDefault -eq $true }).Name
                 $syncHash.Organization_TextBox.Text = $tenantName
                 $syncHash.Organization_TextBox.Foreground = [System.Windows.Media.Brushes]::Gray
@@ -1305,8 +1313,8 @@ Function Start-SCuBAConfigApp {
             $syncHash.isClosing = $true
 
             # Disconnect safely
-            if (Get-MgContext) {
-                try { Disconnect-MgGraph -ErrorAction SilentlyContinue } catch {
+            if (Get-ScubaGraphContext) {
+                try { Disconnect-ScubaGraph -ErrorAction SilentlyContinue } catch {
                     Write-Error "Error disconnecting from Microsoft Graph: $($_.Exception.Message)"
                 }
             }

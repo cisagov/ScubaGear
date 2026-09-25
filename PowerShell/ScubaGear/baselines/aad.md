@@ -832,7 +832,7 @@ User passwords SHALL NOT expire.
 
 1. Sign in to the [Microsoft 365 admin center](https://admin.microsoft.com) and [configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).
 
-2. Optionally, verify and remediate all root domains via PowerShell. This is useful if any domain had a finite expiration configured explicitly. This uses `Invoke-MgGraphRequest`, which is included with the `Microsoft.Graph.Authentication` module already required by ScubaGear. To audit only, connect with `Domain.Read.All`; to also remediate, use `Domain.ReadWrite.All`.
+2. Optionally, verify and remediate all root domains with the Microsoft Graph PowerShell SDK. This optional procedure requires `Microsoft.Graph.Authentication`, which is not required by ScubaGear. To audit only, connect with `Domain.Read.All`; to also remediate, use `Domain.ReadWrite.All`.
 
   ```powershell
   Connect-MgGraph -Scopes "Domain.ReadWrite.All" # or alternatively "Domain.Read.All" for determining which domains are in a non-compliant state.
