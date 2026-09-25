@@ -80,6 +80,13 @@ InModuleScope CreateReport {
             $ReportPath = "$($IndividualReportPath)/$($ArgToProd[$Product])Report.html"
             Test-Path -Path $ReportPath -PathType leaf | Should -Be $true
 
+            #  The tenant-data table should include the tenant domain name so that
+            #  product reports identify which tenant was assessed (issue #2338).
+            $TenantDataContent = Get-Content -Path $ReportPath -Raw
+            $TenantDataTable = [regex]::Match($TenantDataContent, 'id="tenant-data".*?</table>', 'Singleline').Value
+            $TenantDataTable | Should -Match 'Tenant Domain Name'
+            $TenantDataTable | Should -Match 'onmicrosoft\.com'
+
             # The AAD report should render the "Users with Privileged Roles" table built
             # from the privileged_users data in the provider settings export.
             if ($Product -eq 'aad') {
