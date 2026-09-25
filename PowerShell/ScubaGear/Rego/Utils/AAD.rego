@@ -360,7 +360,7 @@ CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
     count(actual_value) == 0
     count(near_miss_objects) > 0
     near_miss_messages := CapNearMissMessages(near_miss_objects)
-    NearMissDetails := sprintf("Near miss: %s", [concat("; ", near_miss_messages)])
+    NearMissDetails := sprintf("<br/><br/><strong>Near miss: </strong> %s", [concat("; ", near_miss_messages)])
 }
 
 # Returns an empty string for the near miss details because 

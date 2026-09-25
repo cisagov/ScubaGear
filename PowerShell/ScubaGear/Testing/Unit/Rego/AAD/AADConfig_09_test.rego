@@ -57,7 +57,8 @@ test_BlockRiskyAgentsCAPNearMiss_Incorrect_V1 if {
 
     ReportDetailString := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " app exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
