@@ -19,7 +19,7 @@ Function Get-ScubaGearPermissions {
         The switch to indicate that the permissions are to be retrieved for a service principal
 
     .PARAMETER Product
-        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'defender', 'securitysuite', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline. 'securitysuite' is an alias for 'defender' (the Security Suite).
+        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline. 'securitysuite' replaces 'defender'.
 
     .PARAMETER Environment
         The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
@@ -121,7 +121,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', 'teamsunified', '*')]
+        [ValidateSet('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', 'teamsunified', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
