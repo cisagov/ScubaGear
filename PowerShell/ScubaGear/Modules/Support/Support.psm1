@@ -1707,8 +1707,6 @@ function New-SCuBAConfig {
             }
             $Baselines = (Get-Content -Path $BaselinePath -Raw | ConvertFrom-Json).baselines
             foreach ($Product in $Baselines.PSObject.Properties.Name) {
-                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
-                if ($Product -eq 'defender') { continue }
                 foreach ($Policy in $Baselines.$Product) {
                     if ($Policy.id -like "$WordToComplete*") {
                         [System.Management.Automation.CompletionResult]::new($Policy.id, $Policy.id, 'ParameterValue', $Policy.id)
@@ -1735,8 +1733,6 @@ function New-SCuBAConfig {
             $Mappings = (Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json).schemaMetadata.policyExclusionMappings
             foreach ($PolicyId in $Mappings.PSObject.Properties.Name) {
                 if ($PolicyId -eq '_comment') { continue }
-                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
-                if ($PolicyId -like 'MS.DEFENDER.*') { continue }
                 if ($PolicyId -like "$WordToComplete*") {
                     # Return a completion result for the current policy ID.
                     [System.Management.Automation.CompletionResult]::new($PolicyId, $PolicyId, 'ParameterValue', $PolicyId)
@@ -1761,8 +1757,6 @@ function New-SCuBAConfig {
             }
             $Baselines = (Get-Content -Path $BaselinePath -Raw | ConvertFrom-Json).baselines
             foreach ($Product in $Baselines.PSObject.Properties.Name) {
-                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
-                if ($Product -eq 'defender') { continue }
                 foreach ($Policy in $Baselines.$Product) {
                     if ($Policy.id -like "$WordToComplete*") {
                         # Return a completion result for the current policy ID.
@@ -1883,7 +1877,7 @@ function New-SCuBAConfig {
             # Note that the regex does not validate the product name
             $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not a valid "
             $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
-            $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Skipping."
+            $Warning += "e.g., 'MS.SECURITYSUITE.1.1v1'. Skipping."
             Write-Warning $Warning
             Continue
         }
