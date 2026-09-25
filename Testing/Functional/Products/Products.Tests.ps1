@@ -138,7 +138,7 @@ BeforeAll {
 
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
-        aad = "Azure Active Directory"
+        aad = "Microsoft Entra ID"
       defender = "Security Suite"
       securitysuite = "Security Suite"
         exo = "Exchange Online"
