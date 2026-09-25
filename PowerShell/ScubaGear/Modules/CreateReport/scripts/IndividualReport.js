@@ -6,24 +6,23 @@ window.addEventListener('DOMContentLoaded', () => {
     const riskyApps = getJsonData('risky-apps-json');
     const riskyThirdPartySPs = getJsonData('risky-third-party-sp-json');
     const severityScoreWeights = getJsonData('severity-score-weights-json');
-    const securitySuiteSensitiveUsers = getJsonData('securitysuite-sensitive-users-json');
-    const securitySuitePartnerDomains = getJsonData('securitysuite-partner-domains-json');
-    const securitySuiteAntiPhishPolicies = getJsonData('securitysuite-anti-phish-policies-json');
-    const securitySuiteAntiPhishRules = getJsonData('securitysuite-anti-phish-rules-json');
-    const securitySuiteProtectionPolicyRules = getJsonData('securitysuite-protection-policy-rules-json');
-    const securitySuiteAcceptedDomains = getJsonData('securitysuite-accepted-domains-json');
+    const getSecuritySuiteData = (name) => getJsonData(`securitysuite-${name}-json`);
 
     buildExpandableTable(caps, "caps");
     buildExpandableTable(riskyApps, "riskyApps", severityScoreWeights);
     buildExpandableTable(riskyThirdPartySPs, "riskyThirdPartySPs", severityScoreWeights);
-    buildSecuritySuiteConfigTables(
-        securitySuiteSensitiveUsers,
-        securitySuitePartnerDomains,
-        securitySuiteAntiPhishPolicies,
-        securitySuiteAntiPhishRules,
-        securitySuiteProtectionPolicyRules,
-        securitySuiteAcceptedDomains
-    );
+    buildSecuritySuiteConfigTables({
+        sensitiveUsers: getSecuritySuiteData('sensitive-users'),
+        partnerDomains: getSecuritySuiteData('partner-domains'),
+        antiMalwarePolicies: getSecuritySuiteData('anti-malware-policies'),
+        antiMalwareRules: getSecuritySuiteData('anti-malware-rules'),
+        antiPhishPolicies: getSecuritySuiteData('anti-phish-policies'),
+        antiPhishRules: getSecuritySuiteData('anti-phish-rules'),
+        antiSpamPolicies: getSecuritySuiteData('anti-spam-policies'),
+        antiSpamRules: getSecuritySuiteData('anti-spam-rules'),
+        protectionPolicyRules: getSecuritySuiteData('protection-policy-rules'),
+        acceptedDomains: getSecuritySuiteData('accepted-domains')
+    });
 
     colorRows();
     applyScopeAttributes();

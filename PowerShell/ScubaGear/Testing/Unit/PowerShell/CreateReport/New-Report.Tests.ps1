@@ -127,12 +127,20 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match "id='securitysuite-partner-domains-json'"
                 $ReportContent | Should -Match "id='securitysuite-anti-phish-policies-json'"
                 $ReportContent | Should -Match "id='securitysuite-anti-phish-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-spam-policies-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-spam-rules-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-malware-policies-json'"
+                $ReportContent | Should -Match "id='securitysuite-anti-malware-rules-json'"
                 $ReportContent | Should -Match "id='securitysuite-protection-policy-rules-json'"
                 $ReportContent | Should -Match "id='securitysuite-accepted-domains-json'"
                 $ReportContent | Should -Match "jdoe@first.example.com"
                 $ReportContent | Should -Match "John Doe;jdoe@second.example.com"
                 $ReportContent | Should -Match "random.mail.example.com"
                 $ReportContent | Should -Match '"EnableFirstContactSafetyTips"'
+                $ReportContent | Should -Match '"HighConfidencePhishAction"'
+                $ReportContent | Should -Match '"AllowedSenderDomains"'
+                $ReportContent | Should -Match '"EnableFileFilter"'
+                $ReportContent | Should -Match '"ZapEnabled"'
                 $ReportContent | Should -Match "buildSecuritySuiteConfigTables"
                 $ReportContent | Should -Match 'document\.createElement\("ul"\)'
                 $ReportContent | Should -Match '"Applicability"'
@@ -145,8 +153,8 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match 'createRowActionButton\(\{'
                 $ReportContent | Should -Match 'contentBuilder: \(\) => document\.createTextNode\("\.\.\."\)'
                 $ReportContent | Should -Match "Sensitive Users and Partner Domains are configured in the SecuritySuite config file\."
-                $ReportContent | Should -Match "Anti-Phish Protection Policies are exported from the tenant, and are shown in priority"
-                $ReportContent | Should -Match "order with the highest priority policies listed first\."
+                $ReportContent | Should -Match "Protection Policies are exported from the tenant, and are shown in priority order with"
+                $ReportContent | Should -Match "the highest priority policies listed first\."
             }
         }
     }
