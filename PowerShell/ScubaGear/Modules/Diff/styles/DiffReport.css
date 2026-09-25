@@ -1,0 +1,270 @@
+/*
+ * Styling for the ScubaGear diff report (Invoke-SCuBADiff).
+ * The color palette mirrors the CISA CreateReport palette (Main.css) so that
+ * the diff report reads as part of the same family of reports and honors the
+ * viewer's light/dark theme selection.
+ */
+:root {
+    --background-primary: white;
+    --background-secondary: #f2f4f6;
+    --text-color: #1a1a1a;
+    --header-color: #005288;
+    --border-color: #c2c8cc;
+    --uuid-color: #424242;
+    --link-color: #006086;
+    /* Row state colors, matching Main.css --test-* variables. Rows are colored by
+       their Result (After) value; grey (matching manual checks / --test-other) is
+       used for manual, omitted, and removed policies. */
+    --diff-red: #E5C7C7;
+    --diff-green: #d5ebd5;
+    --diff-yellow: #fff7d6;
+    --diff-grey: #ebebf2;
+    /* Table grid lines, matching the ScubaResults report (Main.css --border-color)
+       so the two reports read with the same weight. Kept separate from
+       --border-color, which styles the lighter report chrome (cards, buttons). */
+    --table-border-color: black;
+    /* Result (Before) / Result (After) text colors. The row background carries the
+       after state only, so coloring both result cells is what makes a Pass -> Fail
+       flip catch the eye. Each one clears 4.5:1 against every row background it can
+       land on; Fail and Warning reuse Main.css palette entries. */
+    --result-pass-color: #14532d;
+    --result-fail-color: #981d20;
+    --result-warning-color: #713f12;
+}
+
+html[data-theme='dark'] {
+    --background-primary: #10171D;
+    --background-secondary: #1b242c;
+    --text-color: #e6e6e6;
+    --header-color: #b7c8d2;
+    --border-color: #3a444c;
+    --uuid-color: #b0b0b0;
+    --link-color: #6fb7e6;
+    --diff-red: #381919;
+    --diff-green: #1C361C;
+    --diff-yellow: #524100;
+    --diff-grey: #414141;
+    --table-border-color: #7b7b7b;
+    /* Lightened for dark mode so each still clears 4.5:1 on the dark row
+       backgrounds; Fail and Warning reuse the Main.css dark palette. */
+    --result-pass-color: #8fd17a;
+    --result-fail-color: #fca5a5;
+    --result-warning-color: #fde68a;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--background-primary);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0 2em 4em 2em;
+}
+
+h1, h2, h3 {
+    color: var(--header-color);
+}
+
+/* Section titles (Summary and each product heading) are centered. */
+h2 { text-align: center; }
+
+a { color: var(--link-color); }
+
+.report-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding: 1em 0;
+}
+
+.report-title h1 { margin: 0; }
+
+.report-subtitle {
+    margin: 0.25em 0 0;
+    color: var(--uuid-color);
+    font-size: 0.95em;
+}
+
+.source-summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2em;
+    margin: 1em 0;
+}
+
+.source-card {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75em 1.25em;
+}
+
+.source-card h3 { text-align: center; }
+
+.source-card .uuid { color: var(--uuid-color); font-size: 0.85em; }
+
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    align-items: center;
+    margin: 1em 0;
+}
+
+.controls-bar label { cursor: pointer; user-select: none; }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0 2em 0;
+    overflow-x: auto;
+    display: block;
+}
+
+th, td {
+    border: 1px solid var(--table-border-color);
+    padding: 0.5em 0.75em;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.9em;
+}
+
+th {
+    background-color: var(--background-secondary);
+    position: sticky;
+    top: 0;
+}
+
+/* Row state coloring (driven by the Result (After) value). */
+tr.diff-red    { background-color: var(--diff-red); }
+tr.diff-green  { background-color: var(--diff-green); }
+tr.diff-yellow { background-color: var(--diff-yellow); }
+tr.diff-grey   { background-color: var(--diff-grey); }
+
+/* Result (Before) and Result (After) cells. The row background shows the after
+   state; these colors let a reader see at a glance which way a policy moved. */
+td.result-cell { font-weight: 600; }
+td.result-pass    { color: var(--result-pass-color); }
+td.result-fail    { color: var(--result-fail-color); }
+td.result-warning { color: var(--result-warning-color); }
+
+/* Unchanged rows are hidden by default; the "Show unchanged" toggle reveals them. */
+tr.diff-unchanged-row { display: none; }
+body.show-unchanged tr.diff-unchanged-row { display: table-row; }
+
+/* The summary table is centered on the page and all of its cells are
+   center-aligned (both the header row and the count cells). */
+.summary-table {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.summary-table th, .summary-table td { text-align: center; }
+
+.summary-table td.count-zero { color: var(--uuid-color); }
+
+/* Classification filters live in the summary header. Each non-Unchanged column header
+   carries a checkbox; toggling it off dims that column here (.col-off) and hides
+   the matching rows in the product tables. */
+.summary-table th.classification-filter label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.summary-table th.classification-filter input { cursor: pointer; }
+
+.summary-table .col-off { opacity: 0.3; }
+
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75em;
+    margin: 0.25em 0 0.75em;
+}
+
+.filter-hint {
+    text-align: center;
+    color: var(--uuid-color);
+    font-size: 0.85em;
+}
+
+.filter-btn {
+    font-family: inherit;
+    font-size: 0.85em;
+    color: var(--text-color);
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.35em 0.75em;
+    cursor: pointer;
+}
+
+.filter-btn:hover { border-color: var(--link-color); }
+
+/* Product diff tables: only the header row is centered; body cells keep
+   the default left alignment. */
+.policy-diff th { text-align: center; }
+
+.classification-label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.underlying {
+    font-weight: normal;
+    color: var(--uuid-color);
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+/* Marks a row whose before and after sides are different policies, aligned
+   across the legacy -> Security Suite migration. Deliberately colorless: the
+   row keeps its Result (After) color and this only annotates the ID pair. */
+.migrated-badge {
+    display: inline-block;
+    margin-left: 0.4em;
+    padding: 0 0.4em;
+    border: 1px solid var(--border-color);
+    border-radius: 0.8em;
+    background-color: var(--background-secondary);
+    color: var(--uuid-color);
+    font-size: 0.75em;
+    font-style: italic;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.legend .migrated-badge { margin-left: 0; margin-right: 0.35em; }
+
+.diff-generated { text-align: center; }
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1em;
+    margin: 1em 0;
+    font-size: 0.85em;
+}
+.legend .swatch {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 1px solid var(--border-color);
+    margin-right: 0.35em;
+    vertical-align: middle;
+}
+.legend .swatch.diff-red    { background-color: var(--diff-red); }
+.legend .swatch.diff-green  { background-color: var(--diff-green); }
+.legend .swatch.diff-yellow { background-color: var(--diff-yellow); }
+.legend .swatch.diff-grey   { background-color: var(--diff-grey); }

@@ -33,6 +33,13 @@
 /Testing/Functional/Archive*
 /Testing/Performance/
 
+# Invoke-SCuBADiff output, which lands in the current directory when -OutPath is
+# omitted. Covers the default file names only; -OutJsonFileName / -OutCsvFileName
+# / -OutReportFileName can put anything anywhere.
+**/DiffResults.json
+**/DiffResults.csv
+**/DiffReport.html
+
 # Debug Logs
 /testing/M365Baseline*
 *DebugLogs*
