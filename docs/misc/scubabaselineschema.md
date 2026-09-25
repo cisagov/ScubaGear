@@ -51,7 +51,7 @@ Current Schema Version: **1.0.0**
 The `baselines` object contains properties for each Microsoft 365 product:
 
 - `aad` - Azure Active Directory (Entra ID)
-- `defender` - Microsoft Defender
+- `securitysuite` - Microsoft Security Suite
 - `exo` - Exchange Online
 - `powerbi` - Power BI
 - `powerplatform` - Power Platform
@@ -241,7 +241,7 @@ with open('PowerShell/ScubaGear/schemas/ScubaBaselines.json', 'r') as f:
 products = baseline['baselines'].keys()
 
 # Find policies by section
-defender_policies = [p for p in baseline['baselines']['defender'] 
+securitysuite_policies = [p for p in baseline['baselines']['securitysuite'] 
                      if p['policySection'] == 'Safe Links']
 ```
 
