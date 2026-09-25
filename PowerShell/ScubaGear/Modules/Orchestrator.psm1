@@ -28,7 +28,7 @@ function Invoke-SCuBA {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Defender for Office 365: defender
+	- Security Suite: securitysuite
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -55,7 +55,6 @@ function Invoke-SCuBA {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: defender will ask for authentication even if this variable is set to `$false`
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -125,7 +124,7 @@ function Invoke-SCuBA {
     .Example
     Invoke-SCuBA
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Microsoft Security Suite, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformance_*.
     .Example
     Invoke-SCuBA -Version
@@ -134,8 +133,8 @@ function Invoke-SCuBA {
     Invoke-SCuBA -ConfigFilePath MyConfig.json
     This example uses the specified configuration file when executing SCuBAGear.
     .Example
-    Invoke-SCuBA -ProductNames aad, defender -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Defender security
+    Invoke-SCuBA -ProductNames aad, securitysuite -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Security Suite security
     baselines.
     .Example
     Invoke-SCuBA -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -156,7 +155,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -331,11 +330,11 @@ function Invoke-SCuBA {
         # Initialize logging flag - actual initialization happens after output folder is created
         $Script:ScubaLoggingEnabled = $false
 
-        # ProductNames normalization (wildcard expansion and the deprecated 'defender' ->
-        # 'securitysuite' substitution) is centralized in ConvertTo-ScubaProductNames and
-        # applied once to the resolved $ScubaConfig.ProductNames below, after the command-line
-        # parameters and any configuration file have been merged. Handling it at that single
-        # convergence point ensures products from either source are normalized identically.
+        # ProductNames normalization (wildcard expansion) is centralized in 
+        # ConvertTo-ScubaProductNames and applied once to the resolved $ScubaConfig.ProductNames 
+        # below, after the command-line parameters and any configuration file have been merged. 
+        # Handling it at that single # convergence point ensures products from either source are 
+        # normalized identically.
 
         # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
@@ -445,9 +444,7 @@ function Invoke-SCuBA {
         # Normalize the fully-resolved product list once, after command-line parameters and
         # any configuration file have been merged into $ScubaConfig. This is the single point
         # where products from the -ProductNames parameter and from an imported config file
-        # converge, so normalizing here expands the '*' wildcard and substitutes the deprecated
-        # 'defender' alias with 'securitysuite' for both sources. It runs after
-        # ValidateConfiguration so the Defender deprecation warning is still emitted first.
+        # converge, so normalizing here expands the '*' wildcard.
         $ScubaConfig.ProductNames = ConvertTo-ScubaProductNames -ProductNames $ScubaConfig.ProductNames
 
         if (-not $SilenceBODWarnings -and $null -eq $ScubaConfig.OrgName) {
@@ -1290,7 +1287,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1647,7 +1644,7 @@ function ConvertTo-RiskyAppsCsv {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1835,7 +1832,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -2301,13 +2298,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -2363,7 +2360,7 @@ function Invoke-SCuBACached {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Defender for Office 365: defender
+	- Security Suite: securitysuite
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - SharePoint Online: sharepoint
@@ -2439,14 +2436,14 @@ function Invoke-SCuBACached {
     .Example
     Invoke-SCuBACached
     Run an assessment against by default a commercial M365 Tenant against the
-    Azure Active Directory, Exchange Online, Microsoft Defender, One Drive, SharePoint Online, and Microsoft Teams
+    Azure Active Directory, Exchange Online, Microsoft Security Suite, One Drive, SharePoint Online, and Microsoft Teams
     security baselines. The output will stored in the current directory in a folder called M365BaselineConformaance_*.
     .Example
     Invoke-SCuBACached -Version
     This example returns the version of SCuBAGear.
     .Example
-    Invoke-SCuBACached -ProductNames aad, defender -OPAPath . -OutPath .
-    The example will run the tool against the Azure Active Directory, and Defender security
+    Invoke-SCuBACached -ProductNames aad, securitysuite -OPAPath . -OutPath .
+    The example will run the tool against the Azure Active Directory, and Security Suite security
     baselines.
     .Example
     Invoke-SCuBACached -ProductNames * -M365Environment dod -OPAPath . -OutPath .
@@ -2467,7 +2464,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -3107,9 +3104,7 @@ function ConvertTo-ScubaProductNames {
     regardless of whether it originates from the -ProductNames parameter or an imported
     configuration file. It:
       1. Expands the '*' wildcard to the full list of supported products.
-      2. Substitutes the deprecated 'defender' alias with its replacement 'securitysuite'
-         (adding 'securitysuite' only if not already present).
-      3. Returns a sorted, de-duplicated array.
+      2. Returns a sorted, de-duplicated array.
     .PARAMETER ProductNames
     The array of product names to normalize.
     #>
@@ -3131,15 +3126,6 @@ function ConvertTo-ScubaProductNames {
     if ($ProductNames -contains '*') {
         $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
         Write-Debug "Setting ProductNames to all products because of wildcard"
-    }
-
-    # 'defender' is a deprecated alias for 'securitysuite'
-    if ($ProductNames -contains 'defender') {
-        if (-not ($ProductNames -contains 'securitysuite')) {
-            $ProductNames = @($ProductNames) + "securitysuite"
-        }
-        $ProductNames = @($ProductNames | Where-Object { $_ -ne "defender" })
-        Write-Debug "Substituting defender with securitysuite in ProductNames"
     }
 
     return @($ProductNames | Sort-Object -Unique)
