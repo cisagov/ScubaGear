@@ -52,7 +52,8 @@ test_NoExclusionsExcludeUsers_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " user exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -67,7 +68,8 @@ test_NoExclusionsExcludeGroups_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -179,7 +181,8 @@ test_ApplicationExclusions_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements. ",
-        "Near miss: Test Policy would pass if the config file is updated to include:",
+        "<br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " app exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -194,7 +197,8 @@ test_UserExclusionNoExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements. ",
-        "Near miss: Test Policy would pass if the config file is updated to include:",
+        "<br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " user exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -211,7 +215,8 @@ test_UserExclusionsSingleExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " user exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -228,7 +233,8 @@ test_UserExclusionsNoExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " user exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -275,7 +281,8 @@ test_UserExclusionsExcludeGroups_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -349,7 +356,8 @@ test_GroupExclusionNoExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to",
         " include: group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -365,7 +373,8 @@ test_GroupExclusionsNoExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -383,7 +392,8 @@ test_GroupExclusionsSingleExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -454,7 +464,8 @@ test_UserGroupExclusionNoExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " user exclusions, group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -471,7 +482,8 @@ test_UserGroupExclusionUserExemptOnly_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements. ",
-        "Near miss: Test Policy would pass if the config file is updated to include:",
+        "<br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -489,7 +501,8 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include: user exclusions. <a href='#caps'>View all CA policies</a>."
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include: user exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
@@ -507,7 +520,8 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " user exclusions, group exclusions. <a href='#caps'>View all CA policies</a>."
     ])
 
@@ -567,7 +581,8 @@ test_GuestUserTypeExclusionNoExempt_Incorrect if {
 
     ReportDetailStr := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " Near miss: Test Policy would pass if the config file is updated to include:",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
         " guest exclusions. <a href='#caps'>View all CA policies</a>."
     ])
     TestResult("MS.AAD.1.1v1", Output, ReportDetailStr, false) == true
