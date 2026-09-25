@@ -1,6 +1,6 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly
 
-function Get-AppManagementPolicies {
+function Get-AppManagementPoliciesApplyTo {
     <#
     .Description
     Retrieves all custom app management policies and enriches each one with the
@@ -80,5 +80,5 @@ function Get-AppManagementPolicies {
 }
 
 Export-ModuleMember -Function @(
-    "Get-AppManagementPolicies"
+    "Get-AppManagementPoliciesApplyTo"
 )
