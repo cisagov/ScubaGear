@@ -25,7 +25,7 @@ jobs:
         id: get-current-opa-version
         shell: pwsh
         run: |
-          using module ${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfig.psm1
+          Import-Module ${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfig.psm1
           $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
           echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
       - name: Setup OPA
