@@ -25,8 +25,13 @@ jobs:
         id: get-current-opa-version
         shell: pwsh
         run: |
-          Import-Module ./${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfig.psm1
-          $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
+          $ScubaConfigDefaultsPath = Join-Path -Path $RepoPath -ChildPath ./${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfigDefaults.json
+          if (-not (Test-Path -PathType Leaf -Path $ScubaConfigDefaultsPath)) {
+             throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
+          }
+          $Raw = Get-Content -Path $ScubaConfigDefaultsPath -Raw
+          $ConfigDefaults = $Raw | ConvertFrom-Json
+          $CurrentOPAVersion = $ConfigDefaults.defaults.OPAVersion
           echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
       - name: Setup OPA
         uses: open-policy-agent/setup-opa@v2.4.0
