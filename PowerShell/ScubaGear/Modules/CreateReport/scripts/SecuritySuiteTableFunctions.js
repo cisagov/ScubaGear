@@ -212,8 +212,6 @@ const getPolicyEnabledState = (policy, policyRules, protectionPolicyRules, ruleF
         return isEnabled(policy.Enabled);
     }
 
-    // Anti-spam policies carry no Enabled flag, and the default one always applies.
-    if (isDefaultPolicy(policy)) return true;
     return hasMatchingEnabledRule(policy, policyRules, ruleFields);
 };
 
@@ -548,15 +546,8 @@ const createSecuritySuiteTable = (columns, rows, tableClass) => {
         }
         columns.forEach(column => {
             const td = document.createElement("td");
-            const value = row[column] ?? "N/A";
-            if (column === "Safety Tips & Indicators" && Array.isArray(value)) {
-                const list = document.createElement("ul");
-                value.forEach(indicator => list.appendChild(createPolicyListItem(indicator)));
-                td.appendChild(list);
-            } else {
-                td.textContent = value;
-                td.style.whiteSpace = "pre-line";
-            }
+            td.textContent = row[column] ?? "N/A";
+            td.style.whiteSpace = "pre-line";
             tr.appendChild(td);
         });
         tbody.appendChild(tr);
