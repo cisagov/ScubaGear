@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v7
       - name : Get current OPA version
         id: get-current-opa-version
-        shell: powershell  
+        shell: pwsh  
         run: |
           using module ${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfig.psm1
           $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
