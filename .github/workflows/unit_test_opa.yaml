@@ -21,8 +21,17 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v7
+      - name : Get current OPA version
+        id: get-current-opa-version
+        shell: PowerShell  
+        run: |
+          using module ${{ env.MODULE_ROOT }}\Modules\ScubaConfig\ScubaConfig.psm1
+          $CurrentOPAVersion = [ScubaConfig]::GetOpaVersion()
+          echo currentopaversion=$CurrentOPAVersion >> $env:GITHUB_OUTPUT
       - name: Setup OPA
         uses: open-policy-agent/setup-opa@v2.4.0
+        with: 
+          version: "${{ steps.get-current-opa-version.outputs.currentopaversion }}"
       - name: Run OPA Check
         run: opa check ${{ env.MODULE_ROOT }}/Rego ${{ env.MODULE_ROOT }}/Testing/Unit/Rego --strict
       - name: Run OPA Tests
