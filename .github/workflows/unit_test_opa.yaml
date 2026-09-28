@@ -27,7 +27,7 @@ jobs:
         run: |
           # Reading from the JSON directly instead of the module 
           # as the module cound't find the ScubaConfig type.
-          $ScubaConfigDefaultsPath = ./${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfigDefaults.json
+          $ScubaConfigDefaultsPath = "./${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfigDefaults.json"
           $Raw = Get-Content -Path $ScubaConfigDefaultsPath -Raw
           $ConfigDefaults = $Raw | ConvertFrom-Json
           $CurrentOPAVersion = $ConfigDefaults.defaults.OPAVersion
