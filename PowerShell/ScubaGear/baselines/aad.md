@@ -1255,7 +1255,7 @@ Risky AI agents SHALL be blocked.
 
 ### License Requirements
 
-- Requires a Microsoft Entra ID P2 license
+- Requires a Microsoft Entra ID P2 license and either Microsoft Agent 365 or Microsoft 365 E7.
 
 ### Implementation
 
