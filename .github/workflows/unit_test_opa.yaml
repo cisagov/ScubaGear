@@ -25,8 +25,6 @@ jobs:
         id: get-current-opa-version
         shell: pwsh
         run: |
-          # Reading from the JSON directly instead of the module 
-          # as the module cound't find the ScubaConfig type.
           $ScubaConfigDefaultsPath = "./${{ env.MODULE_ROOT }}/Modules/ScubaConfig/ScubaConfigDefaults.json"
           if (-not (Test-Path -PathType Leaf -Path $ScubaConfigDefaultsPath)) {
              throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
