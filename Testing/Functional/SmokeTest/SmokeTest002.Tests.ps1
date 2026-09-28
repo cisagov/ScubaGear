@@ -260,9 +260,9 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
                         "Partner Domain"
                     }
                     elseif ($TableClass -match "securitysuite-anti-malware-policies-table") {
-                            "", "Policy", "Status", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"
-                        }
-                        elseif ($TableClass -match "securitysuite-anti-spam-policies-table") {
+                        "", "Policy", "Status", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"
+                    }
+                    elseif ($TableClass -match "securitysuite-anti-spam-policies-table") {
                         "", "Policy", "Status", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Domains"
                     }
                     else {
