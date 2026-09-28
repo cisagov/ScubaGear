@@ -1142,7 +1142,7 @@ function Get-PolicyTableLinkHtml {
 
     # The anchor is the table's CSS class, which SecuritySuiteTableFunctions.js also sets as
     # the id on the table heading, so the link and its target share one literal.
-    $PolicyTables = @{
+    $PolicyTables = [ordered]@{
         "Get-MalwareFilterPolicy"       = "anti-malware"
         "Get-AntiPhishPolicy"           = "anti-phish"
         "Get-HostedContentFilterPolicy" = "anti-spam"
