@@ -233,17 +233,17 @@ InModuleScope Diff {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
         }
         It 'Reads a BOM-encoded ScubaResults file' {
-            $obj = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
+            $obj = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
             $obj.MetaData.ReportUUID | Should -Be 'aaaaaaaa-0000-0000-0000-000000000001'
         }
         It 'Throws on a nonexistent path' {
-            { Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'does-not-exist.json') } | Should -Throw '*not found*'
+            { Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'does-not-exist.json') } | Should -Throw '*not found*'
         }
         It 'Throws on a file missing a required top-level key' {
             $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("scuba-diff-bad-" + [guid]::NewGuid() + ".json")
-            '{ "MetaData": {}, "Summary": {} }' | Set-Content -Path $tmp
+            '{ "MetaData": {}, "Summary": {} }' | Set-Content -LiteralPath $tmp
             try {
-                { Import-ScubaResultsFile -Path $tmp } | Should -Throw '*Results*'
+                { Import-ScubaResultsFile -LiteralPath $tmp } | Should -Throw '*Results*'
             }
             finally {
                 Remove-Item $tmp -ErrorAction SilentlyContinue
@@ -251,9 +251,9 @@ InModuleScope Diff {
         }
         It 'Throws on invalid JSON' {
             $tmp = Join-Path ([System.IO.Path]::GetTempPath()) ("scuba-diff-bad-" + [guid]::NewGuid() + ".json")
-            'not json {{{' | Set-Content -Path $tmp
+            'not json {{{' | Set-Content -LiteralPath $tmp
             try {
-                { Import-ScubaResultsFile -Path $tmp } | Should -Throw '*not valid JSON*'
+                { Import-ScubaResultsFile -LiteralPath $tmp } | Should -Throw '*not valid JSON*'
             }
             finally {
                 Remove-Item $tmp -ErrorAction SilentlyContinue
@@ -264,8 +264,8 @@ InModuleScope Diff {
     Describe -Tag 'Diff' -Name 'Compare-ScubaResults on fixture pair A' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-After.json')
             $script:DiffA = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
             $script:ByBase = @{}
             foreach ($rec in $DiffA.Diff.AAD) {
@@ -382,8 +382,8 @@ InModuleScope Diff {
     Describe -Tag 'Diff' -Name 'Fixture pair B: products present in only one file (standalone)' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairB-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairB-After.json')
             $script:DiffB = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
         }
         It 'Treats Defender and SecuritySuite as separate standalone products' {
@@ -425,8 +425,8 @@ InModuleScope Diff {
     Describe -Tag 'Diff' -Name 'Fixture pair C: legacy to Security Suite migration' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairC-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairC-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairC-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairC-After.json')
             $script:DiffC = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
             $script:GetC = {
                 param($BaseId)
@@ -880,8 +880,8 @@ InModuleScope Diff {
                 'Unchanged'
             )
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-After.json')
             $script:OrderDiff = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
             $script:OrderHtml = New-ScubaDiffReport -DiffResults $script:OrderDiff
         }
@@ -994,14 +994,14 @@ InModuleScope Diff {
 
         It 'Skips the check when a timestamp is not a usable date' {
             $warnings = @()
-            $before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
-            $after = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
+            $before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-After.json')
+            $after = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
             $after.MetaData.TimestampZulu = 'not-a-date'
             $beforeTmp = Join-Path $OutDir 'undated-before.json'
             $afterTmp = Join-Path $OutDir 'undated-after.json'
             New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
-            $before | ConvertTo-Json -Depth 10 | Set-Content -Path $beforeTmp
-            $after | ConvertTo-Json -Depth 10 | Set-Content -Path $afterTmp
+            $before | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $beforeTmp
+            $after | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $afterTmp
             Invoke-SCuBADiff -BeforePath $beforeTmp -AfterPath $afterTmp `
                 -OutPath $OutDir -WarningVariable warnings -WarningAction SilentlyContinue | Out-Null
             ($warnings -join "`n") | Should -Not -BeLike '*-BeforePath run*'
@@ -1103,8 +1103,8 @@ InModuleScope Diff {
     Describe -Tag 'Diff' -Name 'ConvertTo-ScubaDiffCsvRecord' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-After.json')
             $script:DiffA = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
             $script:RowsA = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $DiffA)
         }
@@ -1155,8 +1155,8 @@ InModuleScope Diff {
         It 'Orders products by the fixed report order' {
             $FixtureDirB = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $diffB = Compare-ScubaResults `
-                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirB 'PairB-Before.json')) `
-                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirB 'PairB-After.json'))
+                -Before (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirB 'PairB-Before.json')) `
+                -After (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirB 'PairB-After.json'))
             $products = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $diffB | ForEach-Object { $_.Product } | Select-Object -Unique)
             $products -join ',' | Should -Be 'Defender,SecuritySuite'
         }
@@ -1164,8 +1164,8 @@ InModuleScope Diff {
         It 'Carries the migration fields for a migrated record and leaves them empty otherwise' {
             $FixtureDirC = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $diffC = Compare-ScubaResults `
-                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-Before.json')) `
-                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-After.json'))
+                -Before (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirC 'PairC-Before.json')) `
+                -After (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirC 'PairC-After.json'))
             $rowsC = @(ConvertTo-ScubaDiffCsvRecord -DiffResults $diffC)
 
             $migrated = $rowsC | Where-Object { $_.'Control ID (After)' -eq 'MS.SECURITYSUITE.3.1v1' }
@@ -1190,8 +1190,8 @@ InModuleScope Diff {
         It 'Prefixes a quote on a comment a spreadsheet would run as a formula' {
             $dir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $diff = Compare-ScubaResults `
-                -Before (Import-ScubaResultsFile -Path (Join-Path $dir 'PairA-Before.json')) `
-                -After (Import-ScubaResultsFile -Path (Join-Path $dir 'PairA-After.json'))
+                -Before (Import-ScubaResultsFile -LiteralPath (Join-Path $dir 'PairA-Before.json')) `
+                -After (Import-ScubaResultsFile -LiteralPath (Join-Path $dir 'PairA-After.json'))
             $record = @($diff.Diff.AAD) | Where-Object { $_.'Control ID (After)' -eq 'MS.AAD.13.1v1' }
             $record.Comment = '=HYPERLINK("http://attacker.example","Click")'
 
@@ -1227,12 +1227,12 @@ InModuleScope Diff {
     Describe -Tag 'Diff' -Name 'New-ScubaDiffReport HTML rendering' {
         BeforeAll {
             $script:FixtureDir = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-After.json')
             $diff = Compare-ScubaResults -Before $Before -After $After -ToolVersion '9.9.9'
             $script:Html = New-ScubaDiffReport -DiffResults $diff
-            $BeforeB = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-Before.json')
-            $AfterB = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairB-After.json')
+            $BeforeB = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairB-Before.json')
+            $AfterB = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairB-After.json')
             $diffB = Compare-ScubaResults -Before $BeforeB -After $AfterB -ToolVersion '9.9.9'
             $script:HtmlB = New-ScubaDiffReport -DiffResults $diffB
         }
@@ -1266,8 +1266,8 @@ InModuleScope Diff {
             $Html | Should -Match 'id="dark-mode-flag"'
         }
         It 'Defaults dark-mode flag to true when -DarkMode is set' {
-            $Before = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-Before.json')
-            $After = Import-ScubaResultsFile -Path (Join-Path $FixtureDir 'PairA-After.json')
+            $Before = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-Before.json')
+            $After = Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDir 'PairA-After.json')
             $diff = Compare-ScubaResults -Before $Before -After $After
             $dark = New-ScubaDiffReport -DiffResults $diff -DarkMode
             $dark | Should -Match '<script id="dark-mode-flag" type="application/json">true</script>'
@@ -1325,8 +1325,8 @@ InModuleScope Diff {
         It 'Badges a migrated row and shows both control IDs' {
             $FixtureDirC = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $diffC = Compare-ScubaResults `
-                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-Before.json')) `
-                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-After.json'))
+                -Before (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirC 'PairC-Before.json')) `
+                -After (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirC 'PairC-After.json'))
             $htmlC = New-ScubaDiffReport -DiffResults $diffC
             $htmlC | Should -Match 'MS\.DEFENDER\.4\.1v2 &rarr; MS\.SECURITYSUITE\.3\.1v1 <span class="migrated-badge"'
             $htmlC | Should -Match 'data-migrated="true"'
@@ -1338,8 +1338,8 @@ InModuleScope Diff {
         It 'Renders the source-side Migrated stub greyed out with empty after cells' {
             $FixtureDirC = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures'
             $diffC = Compare-ScubaResults `
-                -Before (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-Before.json')) `
-                -After (Import-ScubaResultsFile -Path (Join-Path $FixtureDirC 'PairC-After.json'))
+                -Before (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirC 'PairC-Before.json')) `
+                -After (Import-ScubaResultsFile -LiteralPath (Join-Path $FixtureDirC 'PairC-After.json'))
             $htmlC = New-ScubaDiffReport -DiffResults $diffC
             # Greyed like a removed policy, and filterable via its own classification.
             $htmlC | Should -Match '<tr class="diff-row diff-grey" data-classification="Migrated">'

@@ -781,29 +781,29 @@ function Import-ScubaResultsFile {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]
-        $Path
+        $LiteralPath
     )
-    if (-not (Test-Path -LiteralPath $Path)) {
-        throw "ScubaResults file not found: '$Path'."
+    if (-not (Test-Path -LiteralPath $LiteralPath)) {
+        throw "ScubaResults file not found: '$LiteralPath'."
     }
     try {
-        $raw = Get-Content -LiteralPath $Path -Raw -ErrorAction Stop
+        $raw = Get-Content -LiteralPath $LiteralPath -Raw -ErrorAction Stop
     }
     catch {
-        throw "Unable to read ScubaResults file '$Path': $($_.Exception.Message)"
+        throw "Unable to read ScubaResults file '$LiteralPath': $($_.Exception.Message)"
     }
     if ([string]::IsNullOrWhiteSpace($raw)) {
-        throw "ScubaResults file '$Path' is empty."
+        throw "ScubaResults file '$LiteralPath' is empty."
     }
     try {
         $obj = $raw | ConvertFrom-Json -ErrorAction Stop
     }
     catch {
-        throw "ScubaResults file '$Path' is not valid JSON: $($_.Exception.Message)"
+        throw "ScubaResults file '$LiteralPath' is not valid JSON: $($_.Exception.Message)"
     }
     foreach ($key in @('MetaData', 'Summary', 'Results')) {
         if ($null -eq $obj.PSObject.Properties[$key]) {
-            throw "ScubaResults file '$Path' is missing the required top-level key '$key'. Is this a ScubaResults.json file produced by ScubaGear?"
+            throw "ScubaResults file '$LiteralPath' is missing the required top-level key '$key'. Is this a ScubaResults.json file produced by ScubaGear?"
         }
     }
     return $obj
@@ -1463,8 +1463,8 @@ function Invoke-SCuBADiff {
         $DarkMode
     )
 
-    $Before = Import-ScubaResultsFile -Path $BeforePath
-    $After = Import-ScubaResultsFile -Path $AfterPath
+    $Before = Import-ScubaResultsFile -LiteralPath $BeforePath
+    $After = Import-ScubaResultsFile -LiteralPath $AfterPath
 
     # The after file is trusted to be the later run: nothing here enforces it,
     # because the two files may equally be two tenants captured at the same point
