@@ -43,7 +43,7 @@ function Invoke-ScubaGraphRequest {
         $Global:FakeConnectHelpersConfig = @{
             ContextResult = [pscustomobject]@{ Account = 'admin@contoso.onmicrosoft.com'; TenantId = 'ctx-tenant-guid'; ClientId = 'client-id'; AuthType = 'Delegated' }
             ConnectThrows = $null
-            GraphRequestHandler = { param($Uri, $Method) throw "No handler configured for '$Uri'" }
+            GraphRequestHandler = { param($Uri) throw "No handler configured for '$Uri'" }
         }
         $Global:syncHash = @{
             ConnectHelpersPath = $script:FakeConnectHelpersPath
@@ -95,7 +95,7 @@ function Invoke-ScubaGraphRequest {
 
     Context 'Invoke-ScubaGraphGet' {
         It 'returns a single non-collection object wrapped in an array' {
-            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { param($Uri, $Method) [pscustomobject]@{ id = 'abc'; displayName = 'Contoso' } }
+            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { [pscustomobject]@{ id = 'abc'; displayName = 'Contoso' } }
 
             $result = @(Invoke-ScubaGraphGet -Uri '/v1.0/organization/abc')
 
@@ -104,7 +104,7 @@ function Invoke-ScubaGraphRequest {
         }
 
         It 'returns the already-aggregated .value collection from Invoke-ScubaGraphRequest' {
-            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { param($Uri, $Method) [pscustomobject]@{ value = @([pscustomobject]@{ id = '1' }, [pscustomobject]@{ id = '2' }) } }
+            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { [pscustomobject]@{ value = @([pscustomobject]@{ id = '1' }, [pscustomobject]@{ id = '2' }) } }
 
             $result = @(Invoke-ScubaGraphGet -Uri '/v1.0/identity/conditionalAccess/policies')
 
@@ -113,7 +113,7 @@ function Invoke-ScubaGraphRequest {
         }
 
         It 'returns an empty array when Invoke-ScubaGraphRequest returns nothing' {
-            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { param($Uri, $Method) $null }
+            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { $null }
 
             $result = @(Invoke-ScubaGraphGet -Uri '/v1.0/organization')
 
@@ -124,7 +124,7 @@ function Invoke-ScubaGraphRequest {
     Context 'Get-ScubaTenantGraphData' {
         It 'resolves TenantId, OrgDisplayName, and the primary domain via Graph REST' {
             $Global:FakeConnectHelpersConfig.GraphRequestHandler = {
-                param($Uri, $Method)
+                param($Uri)
                 if ($Uri -like '*organization*') {
                     return [pscustomobject]@{
                         value = @([pscustomobject]@{
@@ -151,7 +151,7 @@ function Invoke-ScubaGraphRequest {
         }
 
         It 'does not throw when the organization lookup fails' {
-            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { param($Uri, $Method) throw 'Insufficient privileges' }
+            $Global:FakeConnectHelpersConfig.GraphRequestHandler = { throw 'Insufficient privileges' }
             $baselineSchema = [pscustomobject]@{ baselineValidations = [pscustomobject]@{} }
 
             { Get-ScubaTenantGraphData -Product 'aad' -BaselineSchema $baselineSchema -ApiCatalogPath $script:apiCatalogPath -AnalyzerControlPath $script:analyzerControlPath } | Should -Not -Throw

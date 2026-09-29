@@ -50,6 +50,7 @@ function Get-ExchangeOnlineApiEndpoint {
         # Connect-ScubaAnalyzerExchange's catch blocks. Stub it here rather than importing the full
         # WPF-dependent UI helper module.
         function Global:Write-ScubaAnalyzerLog {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'No-op logging stub for tests; parameters intentionally unused.')]
             param([string]$Message, [string]$Level = 'Info')
         }
     }
@@ -58,7 +59,6 @@ function Get-ExchangeOnlineApiEndpoint {
         $Global:FakeExchangeLog = [System.Collections.Generic.List[object]]::new()
         $Global:FakeExchangeConfig = @{
             GraphRequestHandler = {
-                param($Uri)
                 [pscustomobject]@{
                     value = @([pscustomobject]@{
                         id = 'org-tenant-guid'
@@ -105,7 +105,7 @@ function Get-ExchangeOnlineApiEndpoint {
         }
 
         It 'throws a clear error when no tenant id can be resolved' {
-            $Global:FakeExchangeConfig.GraphRequestHandler = { param($Uri) throw 'Insufficient privileges' }
+            $Global:FakeExchangeConfig.GraphRequestHandler = { throw 'Insufficient privileges' }
 
             { Connect-ScubaAnalyzerExchange -M365Environment 'commercial' } | Should -Throw '*no Graph tenant context*'
         }

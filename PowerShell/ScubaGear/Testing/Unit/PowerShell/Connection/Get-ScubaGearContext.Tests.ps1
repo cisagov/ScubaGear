@@ -40,7 +40,7 @@ InModuleScope ConnectHelpers {
                     }
                 }
                 Mock -ModuleName ConnectHelpers Invoke-ScubaGraphRequest {
-                    param($Uri, $Method)
+                    param($Uri)
                     if ($Uri -eq '/v1.0/organization') {
                         return [pscustomobject]@{ value = @([pscustomobject]@{ id = 'tenant-guid'; displayName = 'Contoso' }) }
                     }
@@ -76,7 +76,7 @@ InModuleScope ConnectHelpers {
                     }
                 }
                 Mock -ModuleName ConnectHelpers Invoke-ScubaGraphRequest {
-                    param($Uri, $Method)
+                    param($Uri)
                     if ($Uri -eq '/v1.0/organization') {
                         return [pscustomobject]@{ value = @([pscustomobject]@{ id = 'tenant-guid'; displayName = 'Contoso' }) }
                     }
