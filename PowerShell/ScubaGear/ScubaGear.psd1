@@ -79,6 +79,7 @@ FunctionsToExport = @(
     'Invoke-SCuBA',
     'Invoke-SCuBACached',
     'Disconnect-SCuBATenant',
+    'Get-ScubaGearContext',
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
     'Install-MsalForScuBA',

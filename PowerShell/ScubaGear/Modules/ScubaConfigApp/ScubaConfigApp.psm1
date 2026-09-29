@@ -2234,6 +2234,20 @@ Function Start-SCuBAConfigAnalyzer {
                 })
             })
 
+            # Disconnect the MSAL Graph session (if any) when the Analyzer window closes, so a
+            # closed window doesn't leave a stale session behind for the next launch/tenant -
+            # mirrors the same cleanup Start-SCuBAConfigApp performs on its own window close.
+            $syncHash.Window.Add_Closing({
+                try {
+                    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Get-ScubaGraphContext, Disconnect-ScubaGraph
+                    if (Get-ScubaGraphContext) {
+                        Disconnect-ScubaGraph -ErrorAction SilentlyContinue
+                    }
+                } catch {
+                    Write-Verbose "Analyzer Graph disconnect on close failed: $($_.Exception.Message)"
+                }
+            })
+
             $syncHash.Window.ShowDialog() | Out-Null
         } catch {
             [System.Windows.MessageBox]::Show("Failed to start the ScubaGear Config Analyzer:`n$($_.Exception.Message)", "ScubaGear Config Analyzer", 'OK', 'Error') | Out-Null

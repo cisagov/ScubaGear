@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Invoke-ScubaGraphRequest
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearContext
 
 function Connect-Tenant {
     <#
@@ -616,5 +616,6 @@ Export-ModuleMember -Function @(
     'Connect-Tenant',
     'Disconnect-SCuBATenant',
     'Get-ServicePrincipalParams',
-    'Get-M365EnvironmentByDomain'
+    'Get-M365EnvironmentByDomain',
+    'Get-ScubaGearContext'
 )

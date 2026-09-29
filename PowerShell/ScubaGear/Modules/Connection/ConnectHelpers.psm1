@@ -79,6 +79,96 @@ function Get-ScubaGraphContext {
     }
 }
 
+function Get-ScubaGearContext {
+    <#
+    .SYNOPSIS
+        Shows who (or what app) ScubaGear is currently authenticated to Microsoft Graph as.
+    .DESCRIPTION
+        ScubaGear no longer depends on the Microsoft.Graph.Authentication module, so
+        Get-MgContext is no longer available to identify the signed-in account. This
+        cmdlet is the MSAL-based replacement: it resolves the same information
+        (account/app, tenant, client ID, scopes) by making live Microsoft Graph REST
+        calls with the cached MSAL token (GET /v1.0/me for delegated/user sign-ins,
+        and a service principal lookup for certificate/app-only sign-ins) instead of
+        relying on the removed cmdlet's local SDK state.
+    .EXAMPLE
+        Get-ScubaGearContext
+
+        Displays the account or app, tenant, and scopes ScubaGear is currently using
+        to call Microsoft Graph. Useful for confirming which tenant/user a session is
+        connected to before running Invoke-SCuBA against multiple tenants or accounts.
+    .FUNCTIONALITY
+        Public
+    #>
+    [CmdletBinding()]
+    param()
+
+    if (-not $Global:ScubaGearState.Session) {
+        Write-Warning "ScubaGear is not currently connected to Microsoft Graph. Run Invoke-SCuBA or Connect-Tenant first."
+        return
+    }
+
+    $Session = $Global:ScubaGearState.Session
+    $TokenParameters = $Session.TokenParameters
+    $IsAppOnly = [bool]$TokenParameters.CertificateThumbprint
+
+    $Account = "Unknown"
+    $AppDisplayName = $null
+    $TenantId = $null
+    $TenantName = $null
+
+    try {
+        $OrgInfo = Invoke-ScubaGraphRequest -Uri '/v1.0/organization' -Method GET -ErrorAction Stop
+        $Org = @($OrgInfo.value)[0]
+        if ($Org) {
+            $TenantId = $Org.id
+            $TenantName = $Org.displayName
+        }
+    }
+    catch {
+        Write-Verbose "Get-ScubaGearContext: unable to resolve tenant details via Microsoft Graph: $($_.Exception.Message)"
+    }
+
+    if ($IsAppOnly) {
+        $Account = "$($TokenParameters.AppID) (service principal)"
+        try {
+            $ServicePrincipal = Invoke-ScubaGraphRequest -Uri "/v1.0/servicePrincipals(appId='$($TokenParameters.AppID)')" -Method GET -ErrorAction Stop
+            if ($ServicePrincipal.displayName) {
+                $AppDisplayName = $ServicePrincipal.displayName
+            }
+        }
+        catch {
+            Write-Verbose "Get-ScubaGearContext: unable to resolve service principal display name via Microsoft Graph: $($_.Exception.Message)"
+        }
+    }
+    else {
+        try {
+            $Me = Invoke-ScubaGraphRequest -Uri '/v1.0/me' -Method GET -ErrorAction Stop
+            if ($Me.userPrincipalName) {
+                $Account = $Me.userPrincipalName
+            }
+            elseif ($Me.mail) {
+                $Account = $Me.mail
+            }
+        }
+        catch {
+            Write-Verbose "Get-ScubaGearContext: unable to resolve signed-in user via Microsoft Graph /v1.0/me: $($_.Exception.Message)"
+        }
+    }
+
+    [pscustomobject]@{
+        Account        = $Account
+        AppDisplayName = $AppDisplayName
+        ClientId       = if ($IsAppOnly) { $TokenParameters.AppID } else { $TokenParameters.ClientId }
+        AuthType       = if ($IsAppOnly) { 'AppOnly' } else { 'Delegated' }
+        TenantId       = $TenantId
+        TenantName     = $TenantName
+        Scopes         = @($TokenParameters.Scope)
+        Environment    = $Session.M365Environment
+        GraphEndpoint  = $Session.GraphEndpoint
+    }
+}
+
 function Disconnect-ScubaGraph {
     <#
     .SYNOPSIS
@@ -674,6 +764,7 @@ Export-ModuleMember -Function @(
     'Connect-GraphHelper',
     'Disconnect-ScubaGraph',
     'Get-ScubaGraphContext',
+    'Get-ScubaGearContext',
     'Initialize-Msal',
     'Get-MsalAccessToken',
     'Invoke-ScubaGraphRequest',
