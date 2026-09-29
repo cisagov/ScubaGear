@@ -526,12 +526,15 @@ Describe "Policy Checks for <ProductName>" {
                         }
                     }
                     # Security Suite configuration tables are appended to the Security Suite report.
-                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
+                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies|anti-malware-policies)-table") {
                         $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
                             "Username", "Email"
                         }
                         elseif ($TableClass -match "securitysuite-partner-domains-table") {
                             "Partner Domain"
+                        }
+                        elseif ($TableClass -match "securitysuite-anti-malware-policies-table") {
+                            "", "Policy", "Enabled", "Priority", "Applicability", "Common Attachments Filter", "Zero-hour Auto Purge"
                         }
                         else {
                             "", "Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"
@@ -552,8 +555,8 @@ Describe "Policy Checks for <ProductName>" {
 
                             if ($RowData.Count -gt 0) {
                                 $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
-                                if ($TableClass -match "securitysuite-anti-phish-policies-table") {
-                                    $RowData[2].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
+                                if ($TableClass -match "securitysuite-(anti-phish-policies|anti-malware-policies)-table") {
+                                    $RowData[2].Text | Should -BeIn @("true", "false") -Because "The policy Enabled value must be a Boolean"
                                 }
                             }
                         }
