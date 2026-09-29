@@ -15,6 +15,20 @@ InModuleScope Orchestrator {
             $Output = Format-PlainText "Requirement not met.<br/><a href='#securitysuite-anti-spam-policies'>View all anti-spam policies</a>"
             $Output | Should -Be "Requirement not met. "
         }
+        It 'Removes every in-page link in the string' {
+            # The details of a single control can carry more than one link, and the text
+            # between two of them has to survive.
+            $Output = Format-PlainText "A. <a href='#caps'>View all CA policies</a>. B. <a href='#securitysuite-anti-spam-policies-table'>View all anti-spam policies</a> C."
+            $Output | Should -Be "A.  B.  C."
+        }
+        It 'Keeps links that point outside the report' {
+            # Policy indicators are anchors written with the same single quotes as the in-page
+            # links, so the in-page rule has to key off the leading '#' and leave these alone.
+            $Indicator = "<a href='https://www.cisa.gov/news-events/directives/bod-25-01' target='_blank' class='indicator'>BOD 25-01 Requirement</a>"
+            $Output = Format-PlainText "Emails SHALL NOT be delivered.$Indicator"
+            $Output | Should -Match "https://www\.cisa\.gov/news-events/directives/bod-25-01"
+            $Output | Should -Match "BOD 25-01 Requirement"
+        }
         It 'Removes br tags' {
             $Output = Format-PlainText "Hello world.<br/>123"
             $Output | Should -Be "Hello world. 123"
