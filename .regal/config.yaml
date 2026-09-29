@@ -31,6 +31,12 @@ rules:
       # compilation to Wasm/IR, but not a requirement.
       # Safe to ignore.
       level: ignore
+    # https://www.openpolicyagent.org/projects/regal/rules/idiomatic/prefer-string-interpolation
+    prefer-string-interpolation:
+      # String interpolation requires OPA 1.12+, but ScubaGear still
+      # supports older OPA versions (see compatibleOpaVersions in
+      # ScubaConfigDefaults.json), so keep using concat/sprintf.
+      level: ignore
   imports:
     # https://docs.styra.com/regal/rules/imports/prefer-package-imports
     prefer-package-imports:
