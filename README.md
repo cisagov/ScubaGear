@@ -184,6 +184,7 @@ Reset-ScubaGearDependencies
 
   - [Install from PSGallery](docs/installation/psgallery.md)
   - [Download from GitHub](docs/installation/github.md)
+  - [Run the Active Development Branch](docs/installation/activedevbranch.md)
   - [Uninstall](docs/installation/uninstall.md)
   - [Update](docs/installation/update.md)
 
