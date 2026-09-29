@@ -8,7 +8,7 @@ Import-Module -Name $PSScriptRoot/TeamsRestHelper.psm1 -Function Get-TeamsMeetin
 Import-Module -Name $PSScriptRoot/SPORestHelper.psm1 -Function Get-SPOTenantRest
 Import-Module -Name $PSScriptRoot/PowerBIRestHelper.psm1 -Function Get-PowerBITenantSettingsRest
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
-Import-Module -Name $PSScriptRoot/AADAppManagementPolicyHelper.psm1 -Function Get-AppManagementPolicies
+Import-Module -Name $PSScriptRoot/AADAppManagementPolicyHelper.psm1 -Function Get-AppManagementPoliciesApplyTo
 Import-Module -Name $PSScriptRoot/../../Utility/ScubaLogging.psm1 -Function Write-ScubaLog, Trace-ScubaFunction
 
 class CommandTracker {
