@@ -20,6 +20,15 @@ InModuleScope CreateReport {
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
             }
+            # Pulls one JSON data island out of a report. Extracted rather than matched in
+            # place so a failure reports the island's contents, not the whole report.
+            function Get-JsonIsland {
+                param([string]$ReportContent, [string]$IslandId)
+                $IslandMatch = [regex]::Match($ReportContent, "<script type='application/json' id='$IslandId'>(.*?)</script>", 'Singleline')
+                $IslandMatch.Success | Should -Be $true -Because "the report should embed a '$IslandId' data island"
+                $IslandMatch.Groups[1].Value.Trim()
+            }
+
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'ProdToFullName')]
             $ProdToFullName = @{
                 Teams         = "Microsoft Teams";
@@ -111,13 +120,22 @@ InModuleScope CreateReport {
                 # even when the provider settings export lacks the corresponding key (as the stub
                 # does for the risky app keys). If any island fails to parse, the report scripts
                 # abort before applying the pass/fail background colors (issue #2242).
-                $JsonDataIslandIds = @('cap-json', 'risky-apps-json', 'risky-third-party-sp-json', 'severity-score-weights-json')
-                foreach ($IslandId in $JsonDataIslandIds) {
-                    $IslandMatch = [regex]::Match($ReportContent, "<script type='application/json' id='$IslandId'>(.*?)</script>", 'Singleline')
-                    $IslandMatch.Success | Should -Be $true -Because "the report should embed a '$IslandId' data island"
-                    $IslandJson = $IslandMatch.Groups[1].Value
-                    $IslandJson.Trim() | Should -Not -BeNullOrEmpty -Because "the '$IslandId' data island should not be empty"
+                foreach ($IslandId in @('cap-json', 'risky-apps-json', 'risky-third-party-sp-json', 'severity-score-weights-json')) {
+                    $IslandJson = Get-JsonIsland -ReportContent $ReportContent -IslandId $IslandId
+                    $IslandJson | Should -Not -BeNullOrEmpty -Because "the '$IslandId' data island should not be empty"
                     { $IslandJson | ConvertFrom-Json -ErrorAction Stop } | Should -Not -Throw -Because "the '$IslandId' data island should be valid JSON"
+                }
+            }
+
+            # The Security Suite config tables are built from these data islands, so for every
+            # other product they have to be the literal null that makes the script building the
+            # tables bail out instead of rendering empty ones.
+            if ($Product -ne 'securitysuite') {
+                $ReportContent = Get-Content -Path $ReportPath -Raw
+                foreach ($IslandName in @('anti-malware-policies', 'anti-malware-rules', 'anti-phish-policies',
+                                          'anti-phish-rules', 'anti-spam-policies', 'anti-spam-rules')) {
+                    Get-JsonIsland -ReportContent $ReportContent -IslandId "securitysuite-$IslandName-json" |
+                        Should -Be "null" -Because "the $($ArgToProd[$Product]) report has no Security Suite tables to fill"
                 }
             }
 
@@ -155,6 +173,52 @@ InModuleScope CreateReport {
                 $ReportContent | Should -Match "Sensitive Users and Partner Domains are configured in the SecuritySuite config file\."
                 $ReportContent | Should -Match "Protection Policies are exported from the tenant, and are shown in priority order with"
                 $ReportContent | Should -Match "the highest priority policies listed first\."
+            }
+        }
+
+        Context 'When Security Suite controls fail' {
+            BeforeAll {
+                # The rego stub fails the controls each policy table covers, so these are the
+                # links a report of a failing tenant actually renders.
+                $LinkReportFile = Join-Path -Path $TestDrive -ChildPath "CreateReportStubs/CreateReportUnitFolder/IndividualReports/SecuritySuiteReport.html"
+                Test-Path -Path $LinkReportFile | Should -BeTrue -Because "these tests read the report built by 'Creates a report for securitysuite'"
+
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'LinkReportContent')]
+                $LinkReportContent = Get-Content -Path $LinkReportFile -Raw
+
+                # Pulls the details cell out of one control's row, so an assertion cannot be
+                # satisfied by a link belonging to some other control.
+                function Get-ControlDetails {
+                    param([string]$PolicyId)
+                    $Row = [regex]::Match($LinkReportContent, "<tr><td>$([regex]::Escape($PolicyId))</td>.*?</tr>", 'Singleline').Value
+                    $Row | Should -Not -BeNullOrEmpty -Because "$PolicyId should have a row in the report"
+                    ([regex]::Matches($Row, "<td>(.*?)</td>", 'Singleline') | Select-Object -Last 1).Groups[1].Value
+                }
+            }
+
+            It 'Links <PolicyId> to the <Label> policy table' -ForEach @(
+                @{ PolicyId = 'MS.SECURITYSUITE.1.1v1'; Label = 'anti-malware'; Anchor = 'securitysuite-anti-malware-policies-table' },
+                @{ PolicyId = 'MS.SECURITYSUITE.2.1v1'; Label = 'anti-phish';   Anchor = 'securitysuite-anti-phish-policies-table' },
+                @{ PolicyId = 'MS.SECURITYSUITE.6.1v1'; Label = 'anti-spam';    Anchor = 'securitysuite-anti-spam-policies-table' }
+            ) {
+                Get-ControlDetails -PolicyId $PolicyId | Should -BeLike "*<a href='#$Anchor'>View all $Label policies</a>"
+            }
+
+            It 'Does not link <PolicyId>' -ForEach @(
+                # A failed control whose policies have no table, then two that passed.
+                @{ PolicyId = 'MS.SECURITYSUITE.7.1v1' },
+                @{ PolicyId = 'MS.SECURITYSUITE.8.1v1' },
+                @{ PolicyId = 'MS.SECURITYSUITE.4.1v1' }
+            ) {
+                Get-ControlDetails -PolicyId $PolicyId | Should -Not -Match "View all"
+            }
+
+            It 'Links each policy table no more than once' {
+                # A table linked from a control it does not describe sends the reader to the
+                # wrong policies, so the set of links has to match the set of failures exactly.
+                $Links = [regex]::Matches($LinkReportContent, "View all ([a-z-]+) policies")
+                @($Links).Count | Should -Be 3
+                @($Links | ForEach-Object { $_.Groups[1].Value } | Sort-Object) | Should -Be @('anti-malware', 'anti-phish', 'anti-spam')
             }
         }
     }
