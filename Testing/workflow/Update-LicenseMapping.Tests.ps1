@@ -49,4 +49,62 @@ Describe "Update License Mapping" {
         $MissingRepoPath = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ("license-mapping-missing-{0}" -f [guid]::NewGuid())
         { Update-LicenseMappingFile -RepoPath $MissingRepoPath } | Should -Throw "*Couldn't find license mapping CSV*"
     }
+
+    It "Passes Test-LicenseMappingIsCurrent when the checked-in file matches Microsoft's latest" {
+        $RepoRootPath = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ("license-mapping-current-{0}" -f [guid]::NewGuid())
+        $MappingDir = Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear/Modules/CreateReport'
+        $MappingPath = Join-Path -Path $MappingDir -ChildPath 'MicrosoftLicenseToProductNameMappings.csv'
+        New-Item -ItemType Directory -Path $MappingDir -Force | Out-Null
+
+        @(
+            'Product_Display_Name,String_Id,GUID'
+            'Microsoft 365 E7,MICROSOFT_365_E7,9a18296a-025f-4e37-9ffa-30bf8d1ce775'
+            'Product B,PROD_B,bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
+        ) -join "`n" | Set-Content -Path $MappingPath
+
+        Mock -CommandName Invoke-WebRequest -MockWith {
+            param($OutFile)
+            @(
+                'Product_Display_Name,String_Id,GUID,Service_Plan_Name,Service_Plan_Id,Service_Plans_Included_Friendly_Names'
+                'Microsoft 365 E7,MICROSOFT_365_E7,9A18296A-025F-4E37-9FFA-30BF8D1CE775,PLAN_A,11111111-1111-1111-1111-111111111111,Plan A'
+                'Microsoft 365 E7,MICROSOFT_365_E7,9A18296A-025F-4E37-9FFA-30BF8D1CE775,PLAN_B,22222222-2222-2222-2222-222222222222,Plan B'
+                'Product B,PROD_B,bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb,PLAN_C,33333333-3333-3333-3333-333333333333,Plan C'
+            ) -join "`n" | Set-Content -Path $OutFile
+        }
+
+        try {
+            { Test-LicenseMappingIsCurrent -RepoPath $RepoRootPath } | Should -Not -Throw
+        }
+        finally {
+            Remove-Item -Path $RepoRootPath -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
+
+    It "Fails Test-LicenseMappingIsCurrent when the checked-in file is missing a product" {
+        $RepoRootPath = Join-Path -Path ([System.IO.Path]::GetTempPath()) -ChildPath ("license-mapping-stale-{0}" -f [guid]::NewGuid())
+        $MappingDir = Join-Path -Path $RepoRootPath -ChildPath 'PowerShell/ScubaGear/Modules/CreateReport'
+        $MappingPath = Join-Path -Path $MappingDir -ChildPath 'MicrosoftLicenseToProductNameMappings.csv'
+        New-Item -ItemType Directory -Path $MappingDir -Force | Out-Null
+
+        @(
+            'Product_Display_Name,String_Id,GUID'
+            'Product B,PROD_B,bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
+        ) -join "`n" | Set-Content -Path $MappingPath
+
+        Mock -CommandName Invoke-WebRequest -MockWith {
+            param($OutFile)
+            @(
+                'Product_Display_Name,String_Id,GUID,Service_Plan_Name,Service_Plan_Id,Service_Plans_Included_Friendly_Names'
+                'Microsoft 365 E7,MICROSOFT_365_E7,9A18296A-025F-4E37-9FFA-30BF8D1CE775,PLAN_A,11111111-1111-1111-1111-111111111111,Plan A'
+                'Product B,PROD_B,bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb,PLAN_C,33333333-3333-3333-3333-333333333333,Plan C'
+            ) -join "`n" | Set-Content -Path $OutFile
+        }
+
+        try {
+            { Test-LicenseMappingIsCurrent -RepoPath $RepoRootPath } | Should -Throw "*out of date*"
+        }
+        finally {
+            Remove-Item -Path $RepoRootPath -Recurse -Force -ErrorAction SilentlyContinue
+        }
+    }
 }

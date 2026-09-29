@@ -1,15 +1,98 @@
 <#
 .SYNOPSIS
-    Helpers used by the monthly license mapping update workflow.
+    Helpers used by the monthly license mapping update workflow and the
+    release build gate that verifies the mapping is current.
 .DESCRIPTION
     Downloads Microsoft's Product names and service plan identifiers CSV,
-    normalizes it to ScubaGear's three-column mapping format, and writes it
-    directly over the checked-in file. The calling workflow uses `git diff`
-    to decide whether anything actually changed and a PR is needed.
+    normalizes it to ScubaGear's three-column mapping format, and either
+    overwrites the checked-in file or fails if the checked-in file is stale.
 #>
 
 $script:LicenseMappingRelativePath = 'PowerShell/ScubaGear/Modules/CreateReport/MicrosoftLicenseToProductNameMappings.csv'
 $script:MicrosoftLicenseCsvUrl = 'https://download.microsoft.com/download/e/3/e/e3e9faf2-f28b-490a-9ada-c6089a1fc5b0/Product%20names%20and%20service%20plan%20identifiers%20for%20licensing.csv'
+
+function Get-LicenseMappingPath {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $RepoPath
+    )
+
+    return (Join-Path -Path $RepoPath -ChildPath $script:LicenseMappingRelativePath)
+}
+
+function Get-NormalizedLicenseMappingRows {
+    <#
+    .SYNOPSIS
+        Normalize Microsoft's licensing CSV into ScubaGear's product mapping rows.
+    .PARAMETER CsvPath
+        Path to a downloaded Microsoft licensing CSV (6 columns).
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $CsvPath
+    )
+
+    if (-not (Test-Path -PathType Leaf -Path $CsvPath)) {
+        throw "Fatal Error: Couldn't find licensing CSV at path $CsvPath"
+    }
+
+    # Microsoft's CSV is one row per service plan; collapse it down to ScubaGear's
+    # three columns (Product_Display_Name, String_Id, GUID), trim stray whitespace,
+    # lowercase GUIDs for consistent comparisons, and drop duplicate rows.
+    $Rows = Import-Csv -Path $CsvPath | ForEach-Object {
+        [pscustomobject]@{
+            Product_Display_Name = $_.Product_Display_Name.Trim()
+            String_Id            = $_.String_Id.Trim()
+            GUID                 = $_.GUID.Trim().ToLowerInvariant()
+        }
+    } | Sort-Object Product_Display_Name, String_Id, GUID -Unique
+
+    if (-not $Rows -or @($Rows).Count -eq 0) {
+        throw "Fatal Error: Normalized licensing CSV contained no rows"
+    }
+
+    return @($Rows)
+}
+
+function Get-LicenseMappingKeySet {
+    <#
+    .SYNOPSIS
+        Build a comparable set of Product|String_Id|GUID keys from mapping rows.
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [object[]]
+        $Rows
+    )
+
+    return [System.Collections.Generic.HashSet[string]]@(
+        $Rows | ForEach-Object {
+            '{0}|{1}|{2}' -f $_.Product_Display_Name, $_.String_Id, $_.GUID.ToLowerInvariant()
+        }
+    )
+}
+
+function Get-LatestNormalizedLicenseMappingRows {
+    <#
+    .SYNOPSIS
+        Download Microsoft's licensing CSV and return normalized product mapping rows.
+    #>
+    $TempRoot = if (-not [string]::IsNullOrWhiteSpace($env:RUNNER_TEMP)) { $env:RUNNER_TEMP } else { [System.IO.Path]::GetTempPath() }
+    $DownloadPath = Join-Path -Path $TempRoot -ChildPath ("ms-license-mapping-{0}.csv" -f [guid]::NewGuid())
+
+    try {
+        Write-Warning "Downloading Microsoft licensing CSV..."
+        Invoke-WebRequest -Uri $script:MicrosoftLicenseCsvUrl -OutFile $DownloadPath -UseBasicParsing
+        return (Get-NormalizedLicenseMappingRows -CsvPath $DownloadPath)
+    }
+    finally {
+        if (Test-Path -Path $DownloadPath) {
+            Remove-Item -Path $DownloadPath -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
 
 function Update-LicenseMappingFile {
     <#
@@ -27,44 +110,76 @@ function Update-LicenseMappingFile {
         $RepoPath
     )
 
-    $DestinationPath = Join-Path -Path $RepoPath -ChildPath $script:LicenseMappingRelativePath
+    $DestinationPath = Get-LicenseMappingPath -RepoPath $RepoPath
     if (-not (Test-Path -PathType Leaf -Path $DestinationPath)) {
         throw "Fatal Error: Couldn't find license mapping CSV at path $DestinationPath"
     }
 
-    $TempRoot = if (-not [string]::IsNullOrWhiteSpace($env:RUNNER_TEMP)) { $env:RUNNER_TEMP } else { [System.IO.Path]::GetTempPath() }
-    $DownloadPath = Join-Path -Path $TempRoot -ChildPath ("ms-license-mapping-{0}.csv" -f [guid]::NewGuid())
+    $Rows = Get-LatestNormalizedLicenseMappingRows
+    $Rows | Export-Csv -Path $DestinationPath -NoTypeInformation -Encoding UTF8
 
-    try {
-        Write-Warning "Downloading Microsoft licensing CSV..."
-        Invoke-WebRequest -Uri $script:MicrosoftLicenseCsvUrl -OutFile $DownloadPath -UseBasicParsing
+    Write-Warning "Wrote $($Rows.Count) product mappings to $DestinationPath"
+    return $Rows.Count
+}
 
-        # Microsoft's CSV is one row per service plan; collapse it down to ScubaGear's
-        # three columns (Product_Display_Name, String_Id, GUID), trim stray whitespace,
-        # lowercase GUIDs for consistent comparisons, and drop duplicate rows.
-        $Rows = Import-Csv -Path $DownloadPath | ForEach-Object {
-            [pscustomobject]@{
-                Product_Display_Name = $_.Product_Display_Name.Trim()
-                String_Id             = $_.String_Id.Trim()
-                GUID                  = $_.GUID.Trim().ToLowerInvariant()
-            }
-        } | Sort-Object Product_Display_Name, String_Id, GUID -Unique
+function Test-LicenseMappingIsCurrent {
+    <#
+    .SYNOPSIS
+        Fail if the checked-in license mapping CSV is behind Microsoft's published CSV.
+    .DESCRIPTION
+        Intended as a pre-release gate. Downloads and normalizes Microsoft's CSV,
+        compares product triples to the checked-in file, and throws if they differ.
+    .PARAMETER RepoPath
+        Path to the repo.
+    #>
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]
+        $RepoPath
+    )
 
-        if (-not $Rows -or $Rows.Count -eq 0) {
-            throw "Fatal Error: Normalized licensing CSV contained no rows"
-        }
-
-        # -NoTypeInformation drops the '#TYPE' header line; BOM matches the file's existing encoding.
-        $Rows | Export-Csv -Path $DestinationPath -NoTypeInformation -Encoding UTF8
-
-        Write-Warning "Wrote $($Rows.Count) product mappings to $DestinationPath"
-        return $Rows.Count
+    $ExistingMappingPath = Get-LicenseMappingPath -RepoPath $RepoPath
+    if (-not (Test-Path -PathType Leaf -Path $ExistingMappingPath)) {
+        throw "Fatal Error: Couldn't find license mapping CSV at path $ExistingMappingPath"
     }
-    finally {
-        if (Test-Path -Path $DownloadPath) {
-            Remove-Item -Path $DownloadPath -Force -ErrorAction SilentlyContinue
+
+    $LatestRows = Get-LatestNormalizedLicenseMappingRows
+    $CurrentRows = Import-Csv -Path $ExistingMappingPath | ForEach-Object {
+        [pscustomobject]@{
+            Product_Display_Name = $_.Product_Display_Name.Trim()
+            String_Id            = $_.String_Id.Trim()
+            GUID                 = $_.GUID.Trim().ToLowerInvariant()
         }
     }
+
+    $LatestKeys = Get-LicenseMappingKeySet -Rows $LatestRows
+    $CurrentKeys = Get-LicenseMappingKeySet -Rows $CurrentRows
+
+    $OnlyInLatest = $LatestKeys | Where-Object { -not $CurrentKeys.Contains($_) }
+    $OnlyInCurrent = $CurrentKeys | Where-Object { -not $LatestKeys.Contains($_) }
+
+    if ((@($OnlyInLatest).Count -eq 0) -and (@($OnlyInCurrent).Count -eq 0)) {
+        Write-Output "License mapping is up to date ($($CurrentKeys.Count) product mappings)."
+        return
+    }
+
+    $Message = @(
+        "License mapping is out of date and must be refreshed before release."
+        "Checked-in mappings: $($CurrentKeys.Count); Microsoft latest: $($LatestKeys.Count)."
+        "Entries only in Microsoft latest: $(@($OnlyInLatest).Count)."
+        "Entries only in checked-in file: $(@($OnlyInCurrent).Count)."
+        "Run the 'Update license mapping if necessary' workflow (or utils/workflow/Update-LicenseMapping.ps1),"
+        "merge the resulting PR, then re-run this release workflow."
+    ) -join ' '
+
+    if (@($OnlyInLatest).Count -gt 0) {
+        Write-Warning ("Sample new mappings (up to 10):`n  " + (($OnlyInLatest | Select-Object -First 10) -join "`n  "))
+    }
+    if (@($OnlyInCurrent).Count -gt 0) {
+        Write-Warning ("Sample removed mappings (up to 10):`n  " + (($OnlyInCurrent | Select-Object -First 10) -join "`n  "))
+    }
+
+    throw $Message
 }
 
 function New-LicenseMappingUpdatePr {
@@ -80,7 +195,7 @@ function New-LicenseMappingUpdatePr {
         $RepoPath
     )
 
-    $MappingPath = Join-Path -Path $RepoPath -ChildPath $script:LicenseMappingRelativePath
+    $MappingPath = Get-LicenseMappingPath -RepoPath $RepoPath
     $BranchName = "license-mapping-update-$(Get-Date -Format 'yyyyMMdd')"
 
     git config --global user.email 'action@github.com'
