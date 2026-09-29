@@ -5,7 +5,7 @@
 # an HTML report. It has NO dependency on Connection, Providers, Permissions, or
 # anything touching a live tenant session: everything here runs fully offline.
 #
-# See docs/execution/diff.md for usage and the ADR for design rationale.
+# See docs/execution/diff.md for usage.
 
 # Product abbreviation -> display title used for the HTML report headings and
 # summary table. The DiffResults.json keys remain the canonical abbreviations;
@@ -36,7 +36,7 @@ $script:ProductOrder = @(
 )
 
 # Classification -> row color class used by the HTML report. Keep in sync with the
-# Diff Key terminology in the ADR / usage doc. Key order here is incidental:
+# Diff Key terminology in the usage doc. Key order here is incidental:
 # $script:ClassificationOrder below is what drives display order.
 $script:ClassificationColorMap = [ordered]@{
     'Errored'             = 'red'

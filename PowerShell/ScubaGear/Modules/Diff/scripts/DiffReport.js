@@ -2,7 +2,7 @@
  * Client-side behavior for the ScubaGear diff report (Invoke-SCuBADiff).
  * Three controls:
  *   1. "Show unchanged rows" toggles the visibility of Unchanged rows, which
- *      are hidden by default (see decision 4 in the ADR). This follows the same
+ *      are hidden by default. This follows the same
  *      per-report script pattern used by the CreateReport module.
  *   2. Per-classification filter checkboxes in the summary-table column headers. Each one
  *      (every classification except Unchanged, which the toggle above owns) hides the
