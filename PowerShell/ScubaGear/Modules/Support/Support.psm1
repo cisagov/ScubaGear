@@ -1406,7 +1406,7 @@ function New-SCuBAConfig {
     .Description
     Using provided user input generate a config file to run ScubaGear tailored to the end user.
     The configurable exclusion sections for each product are generated dynamically from the
-    ScubaGear configuration schema (Modules/ScubaConfig/ScubaConfigSchema.json) rather than being
+    ScubaGear configuration schema (schemas/ScubaConfigSchema.json) rather than being
     hardcoded, so the generated template automatically stays in sync with what the config validator
     accepts (product namespaces, per-policy exclusion types, and their structures).
     This cmdlet is the cross-platform (macOS/Linux) alternative to the Windows-only
@@ -1726,10 +1726,10 @@ function New-SCuBAConfig {
             param($CommandName, $ParameterName, $WordToComplete, $CommandAst, $FakeBoundParameters)
             $ModuleBase = (Get-Command -Name $CommandName -ErrorAction SilentlyContinue).Module.ModuleBase
             if (-not $ModuleBase) { return }
-            $SchemaPath = Join-Path -Path $ModuleBase -ChildPath "..\ScubaConfig\ScubaConfigSchema.json"
+            $SchemaPath = Join-Path -Path $ModuleBase -ChildPath "..\..\schemas\ScubaConfigSchema.json"
             if (-not (Test-Path -Path $SchemaPath)) {
-                # When imported via the ScubaGear root module, the ScubaConfig folder is nested instead.
-                $SchemaPath = Join-Path -Path $ModuleBase -ChildPath "Modules\ScubaConfig\ScubaConfigSchema.json"
+                # When imported via the ScubaGear root module, the schemas folder is nested instead.
+                $SchemaPath = Join-Path -Path $ModuleBase -ChildPath "schemas\ScubaConfigSchema.json"
                 if (-not (Test-Path -Path $SchemaPath)) { return }
             }
             $Mappings = (Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json).schemaMetadata.policyExclusionMappings
@@ -1797,7 +1797,7 @@ function New-SCuBAConfig {
     # exclusions, which exclusion type(s) each policy supports, and the exact structure of every
     # exclusion type. Building the template from it (instead of hardcoding) keeps the generated config
     # in sync with what the config validator accepts.
-    $SchemaPath = Join-Path -Path $PSScriptRoot -ChildPath "..\ScubaConfig\ScubaConfigSchema.json"
+    $SchemaPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\schemas\ScubaConfigSchema.json"
 
     # Resolves a JSON Schema "$ref" (e.g. "#/definitions/exclusionTypes/CapExclusions") to its node.
     function Resolve-SchemaReference {

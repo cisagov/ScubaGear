@@ -69,7 +69,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
 
     Context "Navigation to detailed reports" {
         It "Navigate to <Product> (<LinkText>) details" -ForEach @(
-            @{Product = "aad"; LinkText = "Azure Active Directory"}
+            @{Product = "aad"; LinkText = "Microsoft Entra ID"}
             @{Product = "securitysuite"; LinkText = "Security Suite"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerbi"; LinkText = "Microsoft Power BI"}
@@ -90,7 +90,7 @@ Describe -Tag "UI","Chrome" -Name "Test Report with <Browser> for $Alias" -ForEa
             Open-SeUrl $script:url -Driver $Driver 2>$null
         }
         It "Check <Product> (<LinkText>) tables" -ForEach @(
-            @{Product = "aad"; LinkText = "Azure Active Directory"}
+            @{Product = "aad"; LinkText = "Microsoft Entra ID"}
             @{Product = "securitysuite"; LinkText = "Security Suite"}
             @{Product = "exo"; LinkText = "Exchange Online"}
             @{Product = "powerbi"; LinkText = "Microsoft Power BI"}

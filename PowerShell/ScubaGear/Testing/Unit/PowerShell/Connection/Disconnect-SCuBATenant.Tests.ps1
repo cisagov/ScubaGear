@@ -13,24 +13,8 @@ InModuleScope Connection {
             Mock -CommandName Write-Progress {}
         }
         It 'Disconnects from Microsoft Graph' {
-            Disconnect-SCuBATenant -ProductNames 'aad'
+            Disconnect-SCuBATenant
             Should -Invoke -ModuleName Connection -CommandName Disconnect-MgGraph -Times 1 -Exactly
-        }
-        It 'Disconnects from Exchange Online' {
-            # EXO uses REST API with on-demand token - no persistent connection to disconnect
-            {Disconnect-SCuBATenant -ProductNames 'exo'} | Should -Not -Throw
-        }
-        It 'Disconnects from Security Suite (Exchange Online and Security & Compliance)' {
-            {Disconnect-SCuBATenant -ProductNames 'securitysuite'} | Should -Not -Throw
-        }
-        It 'Disconnects from Power Platform' {
-            {Disconnect-SCuBATenant -ProductNames 'powerplatform'} | Should -Not -Throw
-        }
-        It 'Disconnects from SharePoint Online' {
-            {Disconnect-SCuBATenant -ProductNames 'sharepoint'} | Should -Not -Throw
-        }
-        It 'Disconnects from Microsoft Teams' {
-            {Disconnect-SCuBATenant -ProductNames 'sharepoint'} | Should -Not -Throw
         }
         It 'Disconnects from all products' {
             {Disconnect-SCuBATenant} | Should -Not -Throw

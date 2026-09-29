@@ -85,7 +85,7 @@ function Get-ScAExchangeData {
     }
     # Import the helper module for making REST calls to Exchange Online.
     Import-Module $syncHash.EXORestHelperPath -Force -ErrorAction Stop
-    
+
     # Invoke the specified Exchange Online cmdlet via the REST API and return the results.
     return @(Invoke-EXORestMethod -CmdletName $cmdlet -ApiEndpoint $syncHash.EXOApiEndpoint -AccessToken $syncHash.EXOAccessToken)
 }
