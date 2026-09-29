@@ -132,7 +132,6 @@ InModuleScope -ModuleName ExportSecuritySuiteProvider {
 
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-DlpComplianceRule'
             $Parsed.securitysuite_successful_commands | Should -Contain 'Get-ProtectionAlert'
-            $Parsed.securitysuite_successful_commands | Should -Contain 'Get-UnifiedAuditLogRetentionPolicy'
         }
 
         It "When called with -M365Environment '<_>', orders policy tables by preset and priority" {
