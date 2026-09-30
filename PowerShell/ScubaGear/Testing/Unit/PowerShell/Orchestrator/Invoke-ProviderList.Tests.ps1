@@ -20,10 +20,10 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -ModuleName Orchestrator Export-TeamsProvider {}
         # Declared with the real signature so Should -Invoke -ParameterFilter can bind the arguments.
         function Export-PowerBIProvider {
-            param($CertificateBasedAuth, $AccessToken, $BaseUrl, $LicenseFound)
+            param($CertificateBasedAuth, $AccessToken, $BaseUrl, $LicenseFound, $LicenseReason)
             # Pester replaces this body, so it never runs; the assignment just keeps PSSA from
             # flagging the parameters as unused.
-            $null = $CertificateBasedAuth, $AccessToken, $BaseUrl, $LicenseFound
+            $null = $CertificateBasedAuth, $AccessToken, $BaseUrl, $LicenseFound, $LicenseReason
         }
         Mock -ModuleName Orchestrator Export-PowerBIProvider {}
         function Get-ServicePrincipalParams {}
@@ -73,6 +73,7 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                                     PBIAccessToken = "mock-pbi-access-token"
                                     PBIBaseUrl = "https://api.powerbi.com"
                                     PBILicenseFound = $true
+                                    PBILicenseReason = "mock-license-reason"
                             }
         }
         It 'With -ProductNames "aad", should not throw' {
@@ -133,6 +134,15 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                   $AccessToken -eq "mock-pbi-access-token" -and
                   $BaseUrl -eq "https://api.powerbi.com" -and
                   $LicenseFound -eq $true
+              }
+        }
+        # Connect-Tenant explains why the license check failed which the Rego includes in the report details
+        It 'With -ProductNames "powerbi", forwards the license reason from the connection result' {
+              $ScubaConfig.ProductNames = @("powerbi")
+              $ScubaConfig | Add-Member -NotePropertyName AppID -NotePropertyValue $null -Force
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -ModuleName Orchestrator -CommandName Export-PowerBIProvider -Times 1 -Exactly -ParameterFilter {
+                  $LicenseReason -eq "mock-license-reason"
               }
         }
         # A Power BI 403 now surfaces as a thrown exception from the provider. Invoke-ProviderList
