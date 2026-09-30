@@ -60,6 +60,10 @@ function Export-PowerBIProvider {
         catch {
             $ErrorText = $_.Exception.Message
 
+            # Record the failure on the tracker so the command's state is accurate for any
+            # caller that inspects it, matching what CommandTracker.TryCommand does on failure.
+            $Tracker.AddUnSuccessfulCommand("Invoke-RestMethod")
+
             # Possible conditions that can occur based on hands-on testing:
             ##### Service Principal auth
             #  1 - Nobody has logged into the Power BI portal to configure the security group for the service principal: 403 Forbidden
