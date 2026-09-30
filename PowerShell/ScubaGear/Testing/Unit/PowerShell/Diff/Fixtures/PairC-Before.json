@@ -1,0 +1,60 @@
+{
+    "MetaData": {
+        "Tool": "ScubaGear",
+        "ToolVersion": "1.8.0",
+        "TimestampZulu": "2026-05-01T00:00:00.000Z",
+        "ReportUUID": "cccccccc-0000-0000-0000-000000000001",
+        "ProductsAssessed": [ "Microsoft 365 Defender" ],
+        "ProductAbbreviationMapping": { "Microsoft 365 Defender": "Defender" }
+    },
+    "Summary": {
+        "Defender": { "Manual": 0, "Failures": 2, "Warnings": 0, "Errors": 0, "Passes": 4, "Omits": 0, "IncorrectResults": 0 }
+    },
+    "AnnotatedFailedPolicies": {},
+    "Results": {
+        "Defender": [
+            {
+                "GroupName": "Preset Security Policies",
+                "GroupNumber": "1",
+                "GroupReferenceURL": "https://example.com/defender#1",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.1.1v1", "Requirement": "The standard and strict preset security policies SHALL be enabled.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Shall", "Details": "Passing before." }
+                ]
+            },
+            {
+                "GroupName": "Impersonation Protection",
+                "GroupNumber": "2",
+                "GroupReferenceURL": "https://example.com/defender#2",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.2.1v1", "Requirement": "User impersonation protection SHOULD be enabled for sensitive accounts.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Should", "Details": "Passing before." }
+                ]
+            },
+            {
+                "GroupName": "Safe Attachments",
+                "GroupNumber": "3",
+                "GroupReferenceURL": "https://example.com/defender#3",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.3.1v1", "Requirement": "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Should", "Details": "Passing before." }
+                ]
+            },
+            {
+                "GroupName": "Data Loss Prevention",
+                "GroupNumber": "4",
+                "GroupReferenceURL": "https://example.com/defender#4",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.4.1v2", "Requirement": "A custom policy SHALL be configured to protect PII.", "Result": "Fail", "OriginalResult": "Fail", "Criticality": "Shall", "Details": "Failing before." },
+                    { "Control ID": "MS.DEFENDER.4.5v1", "Requirement": "A list of apps restricted from accessing DLP-protected files SHOULD be defined.", "Result": "Fail", "OriginalResult": "Fail", "Criticality": "Should", "Details": "Failing before." }
+                ]
+            },
+            {
+                "GroupName": "Audit Logging",
+                "GroupNumber": "6",
+                "GroupReferenceURL": "https://example.com/defender#6",
+                "Controls": [
+                    { "Control ID": "MS.DEFENDER.6.2v1", "Requirement": "A Defender policy that was never migrated.", "Result": "Pass", "OriginalResult": "Pass", "Criticality": "Shall", "Details": "Passing before." }
+                ]
+            }
+        ]
+    },
+    "Raw": { "baseline_version": "1" }
+}
