@@ -280,7 +280,7 @@ InModuleScope Connection {
             @{ Environment = 'commercial'; ExpectedUrl = 'https://api.powerbi.com' }
             @{ Environment = 'gcc';        ExpectedUrl = 'https://api.powerbigov.us' }
             @{ Environment = 'gcchigh';    ExpectedUrl = 'https://api.high.powerbigov.us' }
-            @{ Environment = 'dod';        ExpectedUrl = 'https://app.mil.powerbigov.us' }
+            @{ Environment = 'dod';        ExpectedUrl = 'https://api.mil.powerbigov.us' }
         ) {
             It 'uses <ExpectedUrl> for <Environment>' {
                 $Result = Connect-Tenant -ProductNames @('powerbi') -M365Environment $Environment -ServicePrincipalParams $script:ServicePrincipalParams

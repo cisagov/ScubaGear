@@ -16,7 +16,7 @@ function Get-PowerBIBaseUrl {
         "commercial" { return "https://api.powerbi.com" }
         "gcc"        { return "https://api.powerbigov.us" }
         "gcchigh"    { return "https://api.high.powerbigov.us" }
-        "dod"        { return "https://app.mil.powerbigov.us" }
+        "dod"        { return "https://api.mil.powerbigov.us" }
     }
 }
 
