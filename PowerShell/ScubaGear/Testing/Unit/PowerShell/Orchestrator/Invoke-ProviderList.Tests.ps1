@@ -18,6 +18,22 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         Mock -ModuleName Orchestrator Export-SharePointProvider {}
         function Export-TeamsProvider {}
         Mock -ModuleName Orchestrator Export-TeamsProvider {}
+        # Declared with the real signature so Should -Invoke -ParameterFilter can bind the arguments.
+        function Export-PowerBIProvider {
+            param($CertificateBasedAuth, $AccessToken, $BaseUrl, $LicenseFound)
+            # Pester replaces this body, so it never runs; the assignment just keeps PSSA from
+            # flagging the parameters as unused.
+            $null = $CertificateBasedAuth, $AccessToken, $BaseUrl, $LicenseFound
+        }
+        Mock -ModuleName Orchestrator Export-PowerBIProvider {}
+        function Get-ServicePrincipalParams {}
+        Mock -ModuleName Orchestrator Get-ServicePrincipalParams {
+            @{ CertThumbprintParams = @{
+                CertificateThumbprint = "0000000000000000000000000000000000000000"
+                AppID                 = "00000000-0000-0000-0000-000000000000"
+                Organization          = "example.onmicrosoft.com"
+            } }
+        }
         function Get-FileEncoding {}
         Mock -ModuleName Orchestrator Get-FileEncoding {}
 
@@ -54,6 +70,9 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
                             $ConnectionResult = @{
                                     EXOAccessToken = "mock-access-token"
                                     EXOApiEndpoint = "https://outlook.office365.com/adminapi/beta/mock-tenant/InvokeCommand"
+                                    PBIAccessToken = "mock-pbi-access-token"
+                                    PBIBaseUrl = "https://api.powerbi.com"
+                                    PBILicenseFound = $true
                             }
         }
         It 'With -ProductNames "aad", should not throw' {
@@ -80,9 +99,49 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
               $ScubaConfig.ProductNames = @("teams")
                         { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
         }
-        It 'With all products, should not throw' {
-              $ScubaConfig.ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams")
+        It 'With -ProductNames "powerbi", should not throw' {
+              $ScubaConfig.ProductNames = @("powerbi")
                         { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
+        }
+        It 'With all products, should not throw' {
+              $ScubaConfig.ProductNames = @("aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi")
+                        { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
+        }
+        # The Power BI provider picks which 403/401 remediation message to show based on
+        # CertificateBasedAuth, so the orchestrator must only set it for service principal auth.
+        It 'With -ProductNames "powerbi" and interactive auth, does not pass CertificateBasedAuth' {
+              $ScubaConfig.ProductNames = @("powerbi")
+              $ScubaConfig | Add-Member -NotePropertyName AppID -NotePropertyValue $null -Force
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -ModuleName Orchestrator -CommandName Export-PowerBIProvider -Times 1 -Exactly -ParameterFilter {
+                  -not $CertificateBasedAuth
+              }
+        }
+        It 'With -ProductNames "powerbi" and service principal auth, passes CertificateBasedAuth' {
+              $ScubaConfig.ProductNames = @("powerbi")
+              $ScubaConfig | Add-Member -NotePropertyName AppID -NotePropertyValue "00000000-0000-0000-0000-000000000000" -Force
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -ModuleName Orchestrator -CommandName Export-PowerBIProvider -Times 1 -Exactly -ParameterFilter {
+                  $CertificateBasedAuth -eq $true
+              }
+        }
+        It 'With -ProductNames "powerbi", forwards the connection token, base URL, and license state' {
+              $ScubaConfig.ProductNames = @("powerbi")
+              $ScubaConfig | Add-Member -NotePropertyName AppID -NotePropertyValue $null -Force
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -ModuleName Orchestrator -CommandName Export-PowerBIProvider -Times 1 -Exactly -ParameterFilter {
+                  $AccessToken -eq "mock-pbi-access-token" -and
+                  $BaseUrl -eq "https://api.powerbi.com" -and
+                  $LicenseFound -eq $true
+              }
+        }
+        # A Power BI 403 now surfaces as a thrown exception from the provider. Invoke-ProviderList
+        # must absorb it and continue so the remaining products still produce a report.
+        It 'With a Power BI provider failure, does not throw and still runs the other products' {
+              Mock -ModuleName Orchestrator Export-PowerBIProvider { throw "The remote server returned an error: (403) Forbidden." }
+              $ScubaConfig.ProductNames = @("powerbi", "aad")
+              { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult -WarningAction SilentlyContinue } | Should -Not -Throw
+              Should -Invoke -ModuleName Orchestrator -CommandName Export-AADProvider -Times 1 -Exactly
         }
     }
 }
