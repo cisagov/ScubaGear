@@ -131,6 +131,46 @@ InModuleScope -ModuleName ExportPowerBIProvider {
             }
         }
 
+        # The Rego composes its report details from powerbi_license_reason, so the reason has to
+        # survive the trip from Connect-Tenant through this provider and into the JSON verbatim.
+        Context 'When reporting why the license check failed' {
+            BeforeEach {
+                Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod { throw "should not be called" }
+            }
+
+            It 'emits the tenant-level reason' {
+                $Reason = 'No Power BI or Fabric license found in the tenant.'
+                $Json = Export-PowerBIProvider -LicenseFound $false -LicenseReason $Reason | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_license_reason | Should -Be $Reason
+            }
+
+            It 'emits the per-user reason' {
+                $Reason = 'Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user.'
+                $Json = Export-PowerBIProvider -LicenseFound $false -LicenseReason $Reason | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_license_reason | Should -Be $Reason
+            }
+
+            # Parentheses and commas in the per-user reason must not break the JSON fragment.
+            It 'produces valid JSON for a reason containing punctuation' {
+                $Reason = 'Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the "running" user.'
+                $Json = Export-PowerBIProvider -LicenseFound $false -LicenseReason $Reason | Select-Object -Last 1
+                { ConvertFrom-ProviderJson -Json $Json } | Should -Not -Throw
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_license_reason | Should -Be $Reason
+            }
+
+            # Empty is what makes the Rego fall back to its original generic message.
+            It 'emits an empty reason when none is supplied' {
+                $Json = Export-PowerBIProvider -LicenseFound $false | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_license_reason | Should -Be ''
+            }
+
+            It 'emits an empty reason on the licensed path' {
+                Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod { New-MockAdminSettings }
+                $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_license_reason | Should -Be ''
+            }
+        }
+
         Context 'When LicenseFound is true but credentials are incomplete' {
             BeforeEach {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod { throw "should not be called" }

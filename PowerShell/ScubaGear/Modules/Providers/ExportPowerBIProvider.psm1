@@ -25,7 +25,12 @@ function Export-PowerBIProvider {
 
         [Parameter(Mandatory = $true)]
         [bool]
-        $LicenseFound
+        $LicenseFound,
+
+        # This is ingested by the powerbi rego and displayed to the user in the report output
+        [Parameter(Mandatory = $false)]
+        [string]
+        $LicenseReason = ""
     )
 
     # Initialize the tenant settings to create an empty JSON if there was an error or no license.
@@ -116,6 +121,7 @@ function Export-PowerBIProvider {
     $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
 
     $LicenseFoundJson = ConvertTo-Json $LicenseFound
+    $LicenseReasonJson = ConvertTo-Json $LicenseReason
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -124,6 +130,7 @@ function Export-PowerBIProvider {
     "powerbi_successful_commands": $PowerBISuccessfulCommands,
     "powerbi_unsuccessful_commands": $PowerBIUnSuccessfulCommands,
     "powerbi_license_found": $LicenseFoundJson,
+    "powerbi_license_reason": $LicenseReasonJson,
 "@
 
     $json

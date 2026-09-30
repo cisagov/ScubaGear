@@ -930,6 +930,7 @@ function Invoke-ProviderList {
                                 'AccessToken'       = $ConnectionResult.PBIAccessToken
                                 'BaseUrl'           = $ConnectionResult.PBIBaseUrl
                                 'LicenseFound'      = $ConnectionResult.PBILicenseFound
+                                'LicenseReason'     = $ConnectionResult.PBILicenseReason
                             }
                             if ($ServicePrincipalAuth) {
                                 $PBIProviderParams['CertificateBasedAuth'] = $true
