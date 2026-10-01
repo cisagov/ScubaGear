@@ -20,7 +20,9 @@ REPORTARRAYMAXCOUNT := 20
 P2WARNINGSTR :=
     "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 
-CAPLINK := "<a href='#caps'>View all CA policies</a>."
+CAPLINK := "<a href='#caps'>View all CA policies</a>"
+
+ANALYZERURL := "https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md"
 
 INT_MAX := 2147483647
 
@@ -371,3 +373,8 @@ CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
     count(near_miss_objects) == 0
     NearMissDetails := ""
 }
+
+ScubaAnalyzerDetails := sprintf(
+    `<a href="%s" target="_blank">Run the Start-SCuBAConfigAnalyzer cmdlet</a> and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file.`,
+    [ANALYZERURL]
+)

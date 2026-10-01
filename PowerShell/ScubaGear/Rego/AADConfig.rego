@@ -24,6 +24,7 @@ import data.utils.key.Count
 import data.utils.aad.EnsureTrimmedArray
 import data.utils.aad.CapEval
 import data.utils.aad.CapNearMissDetails
+import data.utils.aad.ScubaAnalyzerDetails
 
 
 #############
@@ -89,6 +90,10 @@ LegacyAuthenticationNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(LegacyAuthenticationNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.1.1v1",
@@ -110,7 +115,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(LegacyAuthentication, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -170,6 +176,10 @@ BlockHighRiskNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(BlockHighRiskNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
@@ -192,7 +202,8 @@ tests contains {
         some ReportDetail in [
             ReportDetailsArrayLicenseWarning(BlockHighRisk, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -267,6 +278,11 @@ SignInBlockedNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(SignInBlockedNeedsConfigUpdate) > 0
+}
+
+
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
@@ -289,7 +305,8 @@ tests contains {
         some ReportDetail in [
             ReportDetailsArrayLicenseWarning(SignInBlocked, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -353,6 +370,10 @@ PhishingResistantMFAPoliciesNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(PhishingResistantMFAPoliciesNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.3.1v1",
@@ -374,7 +395,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -429,6 +451,10 @@ NonSpecificMFAPoliciesNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(NonSpecificMFAPoliciesNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.3.2v2",
@@ -450,7 +476,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -644,6 +671,11 @@ PhishingResistantMFAPrivilegedRolesNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(PhishingResistantMFAPrivilegedRolesNeedsConfigUpdate) > 0
+}
+
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.3.6v1",
@@ -665,7 +697,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(PhishingResistantMFAPrivilegedRoles, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -726,6 +759,10 @@ ManagedDeviceAuthNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(ManagedDeviceAuthNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.3.7v1",
@@ -747,7 +784,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -806,6 +844,10 @@ RequireManagedDeviceMFANeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(RequireManagedDeviceMFANeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.3.8v1",
@@ -827,7 +869,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -882,6 +925,10 @@ RequireDeviceCodeBlockNeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(RequireDeviceCodeBlockNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions
 tests contains {
     "PolicyId": "MS.AAD.3.9v1",
@@ -903,7 +950,8 @@ tests contains {
         some ReportDetail in [
             ReportFullDetailsArray(RequireDeviceCodeBlock, DescriptionString),
             NearMissReportDetails,
-            CAPLINK
+            CAPLINK,
+            NearMissAnalyzerDetails
         ]
         ReportDetail != ""
     ])
@@ -2006,6 +2054,10 @@ tests contains {
     AAD_9_1_Not_Applicable_Due_To_Environment == true
 }
 
+NearMissAnalyzerDetails := ScubaAnalyzerDetails if {
+    count(AIAgentsNeedsConfigUpdate) > 0
+}
+
 # Pass if at least 1 policy meets all conditions & has correct
 # license.
 tests contains {
@@ -2027,17 +2079,22 @@ tests contains {
     
     ReportDetailArray := [
         ReportDetailsArrayLicenseWarning(AIAgents, DescriptionString),
-        NearMissReportDetails,
+        NearMissReportDetails
     ]
     # Only include the CAP link if there are is a valid P2 license
     CapLinkArray := [
         CAPLINK |
         Count(Aad2P2Licenses) > 0
     ]
+
+    NearMissAnalyzerReportArray := [
+        NearMissAnalyzerDetails
+    ]
+
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        some ReportDetail in array.concat(ReportDetailArray, CapLinkArray)
+        some ReportDetail in array.concat(array.concat(ReportDetailArray, CapLinkArray), NearMissAnalyzerReportArray)
         ReportDetail != ""
     ])
 
