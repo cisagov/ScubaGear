@@ -32,6 +32,79 @@ root.
 | Analyzer exclusion detection and YAML rendering | Analyzer control metadata plus the config-schema mapping | `PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigAnalyzer_Control_en-US.json` and `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json` |
 | Analyzer API operations and permissions | API catalog | `PowerShell/ScubaGear/schemas/ScubaGearApiCatalog.json` |
 
+### Exclusion metadata flow
+
+```mermaid
+flowchart LR
+   subgraph Authoring[Policy authoring]
+      Markdown["baselines/&lt;product&gt;.md<br/>Policy documentation and UI control marker"]
+      Rego["Rego/&lt;Product&gt;Config.rego<br/>Authoritative pass/fail logic"]
+      RegoTests["Testing/Unit/Rego/&lt;Product&gt;/<br/>Verifies policy and exclusion behavior"]
+   end
+
+   subgraph Contracts[Configuration contracts]
+      ConfigSchema["ScubaConfigSchema.json<br/>Maps policies to YAML keys and validates values"]
+      AppControls["ScubaConfigApp_Control_en-US.json<br/>Defines UI fields and emitted YAML keys"]
+   end
+
+   subgraph Generated[Generated assets]
+      Generator["Generate-ScubaBaseline.ps1<br/>Builds the baseline asset from markdown"]
+      Baselines["ScubaBaselines.json<br/>Generated policy catalog and identifies UI selection"]
+   end
+
+   subgraph Runtime[Runtime consumers]
+      Validator["ScubaConfigValidator.psm1<br/>Validates policy-specific exclusion YAML"]
+      ConfigTemplate["Support.psm1 / New-SCuBAConfig<br/>Generates YAML configuration templates"]
+      ConfigApp["Start-SCuBAConfigApp<br/>Displays controls and builds configuration YAML"]
+   end
+
+   subgraph Analyzer[Start-ScubaConfigAnalyzer]
+      ResultsSchema["ScubaGearResultsBaselineSchema.json<br/>Models requirements and remediation from machine code (replaces Rego)"]
+      AnalyzerControls["ScubaConfigAnalyzer_Control_en-US.json<br/>Defines detectors and YAML rendering"]
+      AnalyzerEngine["ScubaConfigAnalyzer*Helper.psm1<br/>Collects data and evaluates modeled controls"]
+      ApiCatalog["ScubaGearApiCatalog.json<br/>Resolves API operations and permissions"]
+   end
+
+   Markdown --> Generator --> Baselines
+   Markdown -. documents .-> Rego
+   RegoTests --> Rego
+
+   Baselines --> ConfigApp
+   AppControls --> ConfigApp
+   ConfigApp --> ConfigYaml["ScubaConfig YAML<br/>Runtime exclusion values"]
+
+   ConfigSchema --> Validator
+   ConfigSchema --> ConfigTemplate
+   ConfigSchema --> ConfigApp
+   ConfigTemplate --> ConfigYaml
+   Validator --> ConfigYaml
+   ConfigYaml --> Rego
+
+   ConfigSchema --> AnalyzerEngine
+   ResultsSchema --> AnalyzerEngine
+   AnalyzerControls --> AnalyzerEngine
+   ApiCatalog --> AnalyzerEngine
+   ResultsSchema -. design-time synchronization only .-> Rego
+
+   classDef authority fill:#dcefe2,stroke:#2f6f44,color:#173a25
+   classDef generated fill:#fff2cc,stroke:#8a6d1d,color:#4a390d
+   classDef consumer fill:#dbeafe,stroke:#315f91,color:#18344f
+   class Rego,ConfigSchema authority
+   class Baselines generated
+   class Validator,ConfigTemplate,ConfigApp,AnalyzerEngine consumer
+   linkStyle default stroke-width:3px
+   linkStyle 2,17 stroke-width:1.5px
+```
+
+Solid arrows show data used directly at generation or runtime. Dotted arrows show maintenance
+relationships only. `Start-SCuBAConfigAnalyzer` never invokes Rego or OPA. Offline analysis reads
+the verdict already stored in a ScubaResults file by a prior ScubaGear run. Live analysis evaluates
+the JSON requirements directly against collected tenant data, so those requirements must remain
+behaviorally aligned with Rego even though there is no runtime connection between them.
+
+`Show-SCuBABaselinePolicyViewer` directly reads `ScubaBaselines.json`. Both the Config App and the
+Config Analyzer can open the viewer on demand, but the analyzer does not use that file for analysis.
+
 When values conflict, do not silently copy one value over another. First determine whether the
 value is a UI control name, a YAML key, or analyzer metadata.
 
