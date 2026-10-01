@@ -42,9 +42,12 @@ flowchart LR
       RegoTests["Testing/Unit/Rego/&lt;Product&gt;/<br/>Verifies policy and exclusion behavior"]
    end
 
-   subgraph Contracts[Configuration contracts]
+   subgraph Contracts[Configuration controls]
       ConfigSchema["ScubaConfigSchema.json<br/>Maps policies to YAML keys and validates values"]
       AppControls["ScubaConfigApp_Control_en-US.json<br/>Defines UI fields and emitted YAML keys"]
+      ResultsSchema["ScubaGearResultsBaselineSchema.json<br/>Models requirements and remediation from machine code (replaces Rego)"]
+      AnalyzerControls["ScubaConfigAnalyzer_Control_en-US.json<br/>Defines detectors and YAML rendering"]
+      ApiCatalog["ScubaGearApiCatalog.json<br/>Resolves API operations and permissions"]
    end
 
    subgraph Generated[Generated assets]
@@ -57,13 +60,7 @@ flowchart LR
       Validator["ScubaConfigValidator.psm1<br/>Validates policy-specific exclusion YAML"]
       ConfigTemplate["Support.psm1 / New-SCuBAConfig<br/>Generates YAML configuration templates"]
       ConfigApp["Start-SCuBAConfigApp<br/>Displays controls and builds configuration YAML"]
-   end
-
-   subgraph Analyzer[Start-ScubaConfigAnalyzer]
-      ResultsSchema["ScubaGearResultsBaselineSchema.json<br/>Models requirements and remediation from machine code (replaces Rego)"]
-      AnalyzerControls["ScubaConfigAnalyzer_Control_en-US.json<br/>Defines detectors and YAML rendering"]
-      AnalyzerEngine["ScubaConfigAnalyzer*Helper.psm1<br/>Collects data and evaluates modeled controls"]
-      ApiCatalog["ScubaGearApiCatalog.json<br/>Resolves API operations and permissions"]
+      AnalyzerEngine["Start-ScubaConfigAnalyzer<br/>Collects data and evaluates results"]
    end
 
    Markdown --> Generator --> Baselines
@@ -86,16 +83,15 @@ flowchart LR
    ResultsSchema --> AnalyzerEngine
    AnalyzerControls --> AnalyzerEngine
    ApiCatalog --> AnalyzerEngine
-   ResultsSchema -. design-time synchronization only .-> Rego
 
    classDef authority fill:#dcefe2,stroke:#2f6f44,color:#173a25
    classDef generated fill:#fff2cc,stroke:#8a6d1d,color:#4a390d
    classDef consumer fill:#dbeafe,stroke:#315f91,color:#18344f
-   class Rego,ConfigSchema authority
+   class Rego,ConfigSchema,ResultsSchema authority
    class Baselines generated
    class Validator,ConfigTemplate,ConfigApp,AnalyzerEngine,PolicyViewer consumer
    linkStyle default stroke-width:3px
-   linkStyle 2,17 stroke-width:1.5px
+   linkStyle 2,6,16,17 stroke-width:1.5px
 ```
 
 Solid arrows show data used directly at generation or runtime. Dotted arrows show maintenance
