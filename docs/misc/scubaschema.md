@@ -58,7 +58,7 @@ flowchart LR
    subgraph Runtime[Runtime consumers]
       PolicyViewer["Show-SCuBABaselinePolicyViewer<br/>Displays baseline policies"]
       Validator["ScubaConfigValidator.psm1<br/>Validates policy-specific exclusion YAML"]
-      ConfigTemplate["Support.psm1 / New-SCuBAConfig<br/>Generates YAML configuration templates"]
+      ConfigTemplate["New-SCuBAConfig<br/>Generates YAML configuration templates"]
       ConfigApp["Start-SCuBAConfigApp<br/>Displays controls and builds configuration YAML"]
       AnalyzerEngine["Start-ScubaConfigAnalyzer<br/>Collects data and evaluates results"]
    end
