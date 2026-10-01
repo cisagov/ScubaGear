@@ -372,8 +372,9 @@ function Get-ScubaAnalyzerConfigYaml {
         if (@($vals.Keys | Where-Object { @($vals[$_]).Count -gt 0 }).Count -eq 0) { continue }
 
         # Determine the selected policy and its display name for the current finding.
-        $selId  = [string]$f.SelectedPolicyId
-        $selPol = @($f.AllPolicies | Where-Object { [string]$_.Id -eq $selId }) | Select-Object -First 1
+        # Match on the unique CandidateKey so a repeated Graph Id can't resolve the wrong policy.
+        $selKey = [string]$f.SelectedPolicyKey
+        $selPol = @($f.AllPolicies | Where-Object { [string]$_.CandidateKey -eq $selKey }) | Select-Object -First 1
         $caName = if ($selPol) { $selPol.DisplayName } elseif ($f.BestMatch) { $f.BestMatch.DisplayName } else { $null }
 
         # Initialize the product config key in the grouping dictionary if it doesn't already exist.

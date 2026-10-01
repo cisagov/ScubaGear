@@ -240,7 +240,7 @@ function Get-ScAPolicyAnalysis {
     .OUTPUTS
     @{ AllPolicies = @( <PolicyCandidate> ); TotalPoliciesFound = <int> }  e.g.
       @{ TotalPoliciesFound = 1; AllPolicies = @(@{
-           DisplayName='Block legacy auth'; Id='...'; State='enabled';
+           CandidateKey='...#0'; DisplayName='Block legacy auth'; Id='...'; State='enabled';
            MeetsCriteria=$false; IssueCount=1; SettingIssueCount=0; ExcludedPrincipalCount=2;
            Issues=@('WARNING: Policy has 2 excluded user(s)|DETAILS:IDs: a,b|SUGGESTION:...');
            DetectedExclusions=@{ Users=@('a','b'); Groups=@(); Applications=@(); GuestUserTypes=@() } }) }
@@ -343,6 +343,10 @@ function Get-ScAPolicyAnalysis {
         # Only include policies that are relevant to this control and within the required scope.
         if ($hasRelevantConfig -and $inScope) {
             $allPoliciesData += @{
+                # Unique per-candidate key. The Graph Id is NOT guaranteed unique across the
+                # matched set (exported/test data can repeat an Id on distinct policies), so a
+                # positional suffix keeps best-match / in-use selection unambiguous downstream.
+                CandidateKey  = "$($policy.Id)#$(@($allPoliciesData).Count)"
                 DisplayName   = $policy.DisplayName
                 Id            = $policy.Id
                 State         = (Get-ScAValueAtPath -Object $policy -Path $stateProp)

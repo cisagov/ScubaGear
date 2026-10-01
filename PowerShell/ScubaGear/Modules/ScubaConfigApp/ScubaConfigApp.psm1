@@ -2202,7 +2202,7 @@ Function Start-SCuBAConfigAnalyzer {
                         try {
                             $btn = ($e.Source -as [System.Windows.Controls.Button])
                             if (-not $btn) { $btn = ($e.OriginalSource -as [System.Windows.Controls.Button]) }
-                            if ($btn -and $btn.Tag) { Select-ScubaAnalyzerPolicy -PolicyId ([string]$btn.Tag) }
+                            if ($btn -and $btn.Tag) { Select-ScubaAnalyzerPolicy -PolicyKey ([string]$btn.Tag) }
                         } catch { Write-Verbose "Use-policy click handler failed: $($_.Exception.Message)" }
                     }
                 )

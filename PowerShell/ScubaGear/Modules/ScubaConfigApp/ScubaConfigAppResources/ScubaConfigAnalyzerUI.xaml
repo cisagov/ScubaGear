@@ -128,7 +128,7 @@
                     </Expander.Header>
                     <StackPanel Margin="26,4,8,8">
                         <TextBlock Text="{Binding IssuesText}" Foreground="#B23B3B" FontSize="12" TextWrapping="Wrap" Visibility="{Binding IssuesVisibility}"/>
-                        <Button Content="Use this policy" Tag="{Binding PolicyId}" Visibility="{Binding UseButtonVisibility}" HorizontalAlignment="Left" Margin="0,8,0,0" Padding="10,3" Background="#3D5B96" Foreground="White" BorderThickness="0" Cursor="Hand" ToolTip="Base the ScubaGear config exclusions on this policy instead of the best match"/>
+                        <Button Content="Use this policy" Tag="{Binding CandidateKey}" Visibility="{Binding UseButtonVisibility}" HorizontalAlignment="Left" Margin="0,8,0,0" Padding="10,3" Background="#3D5B96" Foreground="White" BorderThickness="0" Cursor="Hand" ToolTip="Base the ScubaGear config exclusions on this policy instead of the best match"/>
                     </StackPanel>
                 </Expander>
             </Border>

@@ -76,11 +76,12 @@
         DetectedExclusions = @{ Users=@(); Groups=@(); Applications=@(); GuestUserTypes=@() }
         AllPolicies        = @( <PolicyCandidate>, ... )   # matching CA policies
         BestMatch          = <PolicyCandidate> | $null     # closest to compliant
-        SelectedPolicyId   = '<policy id>'      # which candidate the YAML follows
+        SelectedPolicyId   = '<policy id>'      # Graph Id of the chosen candidate (governance/comment)
+        SelectedPolicyKey  = '<candidate key>'  # unique key of the chosen candidate (drives IN USE)
         RootCause, Recommendations, RemediationSteps, Details, Criticality, ...
 
     <PolicyCandidate> (one Conditional Access policy that relates to the control):
-        Id, DisplayName, State
+        CandidateKey (unique - Id may repeat), Id, DisplayName, State
         Issues = @( 'WARNING: <msg>|DETAILS:<k>: <v>|SUGGESTION:<text>', ... )
         IssueCount, DetectedExclusions = @{ Users; Groups; Applications; GuestUserTypes }
 
@@ -234,8 +235,9 @@ function New-ScubaAnalyzerControlYamlText {
 
     # Resolve the name of the CA policy the exclusions are based on (the user's selected
     # candidate if any, otherwise the best match) - emitted as a '# CA policy:' comment.
-    $selId  = [string]$Finding.SelectedPolicyId
-    $selPol = @($Finding.AllPolicies | Where-Object { [string]$_.Id -eq $selId }) | Select-Object -First 1
+    # Match on the unique CandidateKey so a repeated Graph Id can't resolve the wrong policy.
+    $selKey = [string]$Finding.SelectedPolicyKey
+    $selPol = @($Finding.AllPolicies | Where-Object { [string]$_.CandidateKey -eq $selKey }) | Select-Object -First 1
     $caName = if ($selPol) { $selPol.DisplayName } elseif ($Finding.BestMatch) { $Finding.BestMatch.DisplayName } else { $null }
 
     $sb = [System.Text.StringBuilder]::new()
@@ -402,17 +404,19 @@ function Select-ScubaAnalyzerPolicy {
     of excluded users/groups. The user clicks "Use this policy" on a card to pick which
     one the generated config should mirror; this copies that candidate's exclusions onto
     the finding, then re-renders the detail pane and the aggregate YAML.
-    .PARAMETER PolicyId
-    The Id of the candidate policy (from the card's button Tag) to adopt.
+    .PARAMETER PolicyKey
+    The unique CandidateKey of the policy (from the card's button Tag) to adopt. Keyed on
+    CandidateKey rather than the Graph Id because an Id can repeat across matched policies.
     #>
-    param([Parameter(Mandatory)][string]$PolicyId)
+    param([Parameter(Mandatory)][string]$PolicyKey)
     try {
         $finding = $syncHash.Findings_List.SelectedItem
         if (-not $finding) { return }
-        # Find the chosen candidate among this finding's matching policies.
-        $chosen = @($finding.AllPolicies | Where-Object { [string]$_.Id -eq $PolicyId }) | Select-Object -First 1
+        # Find the chosen candidate among this finding's matching policies (by unique key).
+        $chosen = @($finding.AllPolicies | Where-Object { [string]$_.CandidateKey -eq $PolicyKey }) | Select-Object -First 1
         if (-not $chosen) { return }
-        $finding.SelectedPolicyId = $PolicyId
+        $finding.SelectedPolicyKey = $PolicyKey
+        $finding.SelectedPolicyId  = [string]$chosen.Id   # keep the Graph Id in sync (governance + YAML comment)
         # Copy the candidate's exclusions onto the finding (fresh arrays so later edits
         # don't mutate the candidate). This is what the YAML builders read.
         $ex = if ($chosen.DetectedExclusions) { $chosen.DetectedExclusions } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
@@ -481,12 +485,16 @@ function Show-ScubaAnalyzerDetail {
         # pre-computed Visibility flags (WPF binds to these; it can't run logic itself).
         $policyItems = @()
         $best = $finding.BestMatch
+        # Identify best + selected by the unique per-candidate key, NOT the Graph Id: an Id
+        # can repeat across distinct matched policies (seen in exported data), and matching on
+        # Id would light up BEST MATCH / IN USE on every same-Id card.
+        $bestKey = if ($best) { [string]$best.CandidateKey } else { $null }
         # Selected = the user's explicit choice, else the engine's best match.
-        $selectedId = if ($finding.SelectedPolicyId) { [string]$finding.SelectedPolicyId } elseif ($best) { [string]$best.Id } else { $null }
+        $selectedKey = if ($finding.SelectedPolicyKey) { [string]$finding.SelectedPolicyKey } else { $bestKey }
         $multiple = (@($finding.AllPolicies).Count -gt 1)   # only offer a choice when >1
         foreach ($p in @($finding.AllPolicies)) {
-            $isBest     = ($best -and $p.Id -eq $best.Id)
-            $isSelected = ($selectedId -and [string]$p.Id -eq $selectedId)
+            $isBest     = ($bestKey -and [string]$p.CandidateKey -eq $bestKey)
+            $isSelected = ($selectedKey -and [string]$p.CandidateKey -eq $selectedKey)
             # Turn the raw issue strings into readable bullets; if none, the policy is clean.
             $issuesText = Format-ScubaAnalyzerIssues -Issues @($p.Issues)
             if (-not $issuesText) { $issuesText = "This policy meets the baseline requirement - no changes needed." }
@@ -494,6 +502,7 @@ function Show-ScubaAnalyzerDetail {
             $showUse = ($multiple -and -not $isSelected)
             $policyItems += [pscustomobject]@{
                 PolicyId            = [string]$p.Id
+                CandidateKey        = [string]$p.CandidateKey
                 DisplayName         = $p.DisplayName
                 StateText           = "State: $($p.State)   -   Issues: $($p.IssueCount)"
                 IssuesText          = $issuesText
@@ -1133,7 +1142,7 @@ function Initialize-ScubaConfigAnalyzerUI {
                 try {
                     $btn = ($e.Source -as [System.Windows.Controls.Button])
                     if (-not $btn) { $btn = ($e.OriginalSource -as [System.Windows.Controls.Button]) }
-                    if ($btn -and $btn.Tag) { Select-ScubaAnalyzerPolicy -PolicyId ([string]$btn.Tag) }
+                    if ($btn -and $btn.Tag) { Select-ScubaAnalyzerPolicy -PolicyKey ([string]$btn.Tag) }
                 } catch { Write-ScubaAnalyzerLog "Use-policy click handler failed: $($_.Exception.Message)" -Level Error }
             }
         )

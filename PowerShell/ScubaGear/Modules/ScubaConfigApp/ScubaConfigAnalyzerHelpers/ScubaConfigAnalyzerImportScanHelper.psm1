@@ -277,6 +277,7 @@ function Invoke-ScubaConfigAnalysis {
                     AllPolicies        = @($sortedPolicies)
                     BestMatch          = $bestMatch
                     SelectedPolicyId   = if ($bestMatch) { $bestMatch.Id } else { $null }
+                    SelectedPolicyKey  = if ($bestMatch) { $bestMatch.CandidateKey } else { $null }
                     DetectedExclusions = $detectedExclusions
                     DetectedExclusionValues = $exclusionValues
                     YamlBlock          = $yamlBlock
@@ -569,6 +570,7 @@ function Invoke-ScubaTenantScan {
                 AllPolicies        = @($sortedPolicies)
                 BestMatch          = $bestMatch
                 SelectedPolicyId   = if ($bestMatch) { $bestMatch.Id } else { $null }
+                SelectedPolicyKey  = if ($bestMatch) { $bestMatch.CandidateKey } else { $null }
                 DetectedExclusions = $detectedExclusions
                 DetectedExclusionValues = $exclusionValues
                 YamlBlock          = $yamlBlock
