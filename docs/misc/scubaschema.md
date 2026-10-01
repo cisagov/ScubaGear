@@ -7,7 +7,7 @@ multiple files, and what developers must update when adding or changing a policy
 configuration exclusions.
 
 The current design has several related schemas and generated assets. They are not all duplicates:
-some describe the accepted ScubaGear YAML contract, some select Config App controls, some drive
+some describe the accepted ScubaGear YAML configuration, some select Config App controls, some drive
 the Config Analyzer, and some describe the policy evaluation itself. However, the similar names
 make accidental drift easy. Use the ownership rules and checklists below instead of assuming that
 an `exclusionField` has the same meaning everywhere.
@@ -41,7 +41,7 @@ value is a UI control name, a YAML key, or analyzer metadata.
 
 | File | Generated? | Exclusion responsibility |
 | --- | --- | --- |
-| `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json` | No | Canonical configuration contract: policy mappings, product properties, capabilities, and exclusion value definitions. |
+| `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json` | No | Canonical configuration: policy mappings, product properties, capabilities, and exclusion value definitions. |
 | `PowerShell/ScubaGear/schemas/ScubaBaselines.json` | Yes | Generated policy catalog and Config App control selector. Do not edit directly. |
 | `PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json` | No | Analyzer-specific policy requirements, remediation, and exclusion-type context. |
 | `PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigApp_Control_en-US.json` | No | Config App control aliases, visible fields, validation hints, and emitted YAML key. |
@@ -81,7 +81,7 @@ value is a UI control name, a YAML key, or analyzer metadata.
 
 ### Focused tests
 
-| Contract checked | Repository location |
+| Configuration checked | Repository location |
 | --- | --- |
 | Config schema structure | `PowerShell/ScubaGear/Testing/Unit/PowerShell/ScubaConfig/ScubaConfig.JsonSchema.Tests.ps1` |
 | Config validator behavior | `PowerShell/ScubaGear/Testing/Unit/PowerShell/ScubaConfig/ScubaConfigValidator.Tests.ps1` |
@@ -171,7 +171,7 @@ Location:
 PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json
 ```
 
-This schema owns the accepted ScubaGear configuration contract. Its exclusion metadata has four
+This schema owns the accepted ScubaGear configuration. Its exclusion metadata has four
 separate responsibilities.
 
 #### `policyExclusionMappings`
@@ -188,7 +188,7 @@ The mapping is consumed by:
 - `New-SCuBAConfig` to generate exclusion templates and complete policy IDs.
 - The Config Analyzer to determine whether configuration can make a control pass.
 
-The value is an array because the configuration contract can support more than one exclusion type
+The value is an array because the configuration can support more than one exclusion type
 for a policy even though `ScubaBaselines.json` currently has one UI-control selector.
 
 #### Product properties
@@ -226,6 +226,7 @@ The analyzer treats `ScubaConfigSchema.json` policy mappings as authoritative wh
 are present. The results schema value is retained as a compatibility fallback and as context for
 Conditional Access exclusion detection.
 
+[!NOTE]
 The nested `buildInstructions.exclusionHandling` arrays are not currently consumed by the Config
 Analyzer. They appear to describe Graph payload paths for a future policy-building workflow. Do
 not rely on them for current exclusion validation or YAML generation.
@@ -319,7 +320,7 @@ Use this procedure when a new policy uses an already-supported type such as `Cap
 
 ## Adding a new exclusion type
 
-Adding a new exclusion type changes more contracts and requires broader testing.
+Adding a new exclusion type changes more configurations and requires broader testing.
 
 1. Define the real YAML key and its data shape under
    `ScubaConfigSchema.json/definitions/exclusionTypes`.
@@ -354,7 +355,7 @@ When a policy ID changes, treat the new ID as a new mapping and review every con
 When only supported exclusion fields change, review both layers:
 
 - Change the Config App control selector or fields to control what users can enter.
-- Change the configuration schema and Rego when the actual accepted YAML contract changes.
+- Change the configuration schema and Rego when the actual accepted YAML configuration changes.
 
 Changing only the Config App control does not prevent hand-authored YAML from containing a field.
 Changing only the schema does not ensure Rego evaluates that field correctly.
