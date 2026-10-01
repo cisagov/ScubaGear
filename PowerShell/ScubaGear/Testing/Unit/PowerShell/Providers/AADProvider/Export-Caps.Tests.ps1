@@ -472,6 +472,21 @@ Describe "GetAccessControls" {
         $Controls | Should -Be "Allow access but require password change, AND authentication strength (Multi-factor authentication)"
     }
 
+    It "handles risk remediation with authentication strength" {
+        $Cap.GrantControls.BuiltInControls = @("riskRemediation")
+        $Cap.GrantControls.AuthenticationStrength.DisplayName = "Multifactor authentication"
+        $Cap.GrantControls.Operator = "AND"
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require risk remediation, AND authentication strength (Multifactor authentication)"
+    }
+
+    It "handles MFA with risk remediation" {
+        $Cap.GrantControls.BuiltInControls = @("mfa", "riskRemediation")
+        $Cap.GrantControls.Operator = "AND"
+        $Controls = $($CapHelper.GetAccessControls($Cap))
+        $Controls | Should -Be "Allow access but require multifactor authentication, AND risk remediation"
+    }
+
     It "handles using no access controls" {
         $Cap.GrantControls.BuiltInControls = $null
         $Controls = $($CapHelper.GetAccessControls($Cap))
