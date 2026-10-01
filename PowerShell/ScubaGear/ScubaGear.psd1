@@ -12,7 +12,7 @@
 RootModule = './ScubaGear.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.8.0'
+ModuleVersion = '2.0.0'
 
 # Supported PSEditions
 CompatiblePSEditions = 'Desktop'
@@ -78,6 +78,7 @@ NestedModules = @('Modules\Support\Support.psm1','Modules\Utility\ScubaLogging.p
 FunctionsToExport = @(
     'Invoke-SCuBA',
     'Invoke-SCuBACached',
+    'Invoke-SCuBADiff',
     'Disconnect-SCuBATenant',
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
