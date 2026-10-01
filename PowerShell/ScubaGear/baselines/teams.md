@@ -463,7 +463,7 @@ MS Teams email integration SHALL be disabled.
 <!--Policy: MS.TEAMS.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Microsoft Teams email integration associates a Microsoft (not tenant domain) email address with a Teams channel. Channel emails are addressed using the Microsoft-owned domain <code>&lt;teams.ms&gt;</code>. By disabling Teams email integration, the agency prevents potentially sensitive Teams messages from being sent through external email gateways.
 - _Last modified:_ July 2023
-- _Note:_ MS Teams email integration availability may vary by Microsoft 365 environment and tenant, particularly within Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
+- _Note:_ Teams email integration availability may vary by Microsoft 365 environment and tenant, particularly within Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) tenants.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8, SC-7(10)(a), AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
@@ -542,7 +542,7 @@ Agencies SHOULD only allow installation of custom applications approved by the a
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.3v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing the integration of custom applications can expose the agency to potential vulnerabilities present in an application, since the application is not managed by the agency. By allowing only specific, agency-approved applications and blocking all others, the agency can limit its exposure to custom application vulnerabilities.
+- _Rationale:_ Allowing Teams integration with custom applications can expose the agency to potential vulnerabilities present in an application not managed by the agency. By allowing only specific applications approved by the agency and blocking all others, the agency can limit its exposure to custom application vulnerabilities.
 - _Last modified:_ August 2026
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Custom apps may not be available in the Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) regions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
@@ -562,11 +562,11 @@ Agencies SHOULD only allow installation of custom applications approved by the a
 
 ### Implementation
 
-**INTERFACE NOTE:** The Teams administrative portal interface has been updated, and the manner in which applications are controlled has changed. The MS.TEAMS.5.x v2 policies now follow the new manner of implementing the policies. Newer tenants, created in 2024 or later, should follow the v2 policy implementation steps, while older tenants should follow the legacy implementation steps, only if the newer settings are not available.
+**INTERFACE NOTE:** The Teams administrative portal interface has been updated, and the manner in which applications are controlled has changed. The MS.TEAMS.5.x v2 policies now follow the new manner of implementing the policies. Newer Tenants created after 2024 should follow the v2 policy implementation steps, while older tenants should follow the legacy implementation steps, only if the newer settings are not available.
 
 Legacy implementation instructions for this section are now located in Appendix B at the end of this document. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions. These instructions will remain only until they are fully depreciated.
 
-**For agencies using ScubaGear: ScubaGear will continue to look for and gather legacy policies when running in any mode. However, there is a limitation in the API when gathering the data for the report. Users must utilize interactive mode to allow ScubaGear to gather data for the new portal-based settings. Use of ScubaGear is strongly recommended but remains optional.**
+**For agencies using ScubaGear: ScubaGear will continue to look for and gather legacy policies when running in any mode. However, there is a limitation in the API when gathering the data for the report. Users must utilize "interactive mode" to allow ScubaGear to gather data for the new portal-based settings. Use of ScubaGear is strongly recommended but remains optional.**
 
 #### MS.TEAMS.5.1v2 Instructions
 
