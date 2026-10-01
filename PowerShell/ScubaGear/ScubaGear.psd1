@@ -92,6 +92,7 @@ FunctionsToExport = @(
     'Copy-SCuBASampleReport',
     'Copy-SCuBASampleConfigFile',
     'New-SCuBAConfig',
+    'Get-ScubaHelp',
     'Get-ScubaGearPermissions',
     'Get-ScubaGearEntraMinimumPermissions',
     'Get-ScubaGearEndpointRest',

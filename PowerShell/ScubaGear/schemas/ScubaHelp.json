@@ -1,0 +1,115 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Source for Get-ScubaHelp and docs/misc/command-selection-matrix.md. One entry per user-facing command.",
+    "docsPage": "https://github.com/cisagov/ScubaGear/blob/main/docs/misc/command-selection-matrix.md",
+    "commands": [
+        {
+            "name": "New-SCuBAConfig",
+            "category": "Configuration",
+            "summary": "Generates a blank or pre-seeded config YAML from the command line.",
+            "useWhen": "You want a template fast, or you are scripting config creation in a pipeline.",
+            "why": "Zero UI, fully automatable - the quickest way to a valid starting config.",
+            "online": "No",
+            "docs": "docs/configuration/configuration.md"
+        },
+        {
+            "name": "Start-SCuBAConfigApp",
+            "category": "Configuration",
+            "summary": "WPF UI to build, validate, and export a config YAML (and optionally run ScubaGear).",
+            "useWhen": "You are authoring or editing a config by hand and want validation, pickers, and live YAML preview.",
+            "why": "Catches bad policy IDs and product names before they cost you a failed run; friendliest on-ramp for new users.",
+            "online": "Optional (-Online pulls users/groups from Graph)",
+            "docs": "docs/configuration/scubaconfigapp.md"
+        },
+        {
+            "name": "Start-SCuBAConfigAnalyzer",
+            "category": "Configuration",
+            "summary": "WPF companion that runs (or reads) an assessment, then shows which exclusions your config needs and why.",
+            "useWhen": "A control failed and you need the root cause plus the exact users/groups to exclude.",
+            "why": "Turns raw failures into a ready-to-use exclusion config - closes the loop between 'it failed' and 'here is the fix'.",
+            "online": "Optional (interactive or app-only Graph auth)",
+            "docs": "docs/configuration/scubaconfiganalyzer.md"
+        },
+        {
+            "name": "Show-SCuBABaselinePolicyViewer",
+            "category": "Configuration",
+            "summary": "Read-only UI to browse every baseline policy and its rationale.",
+            "useWhen": "You need to look up what a policy ID means without opening markdown.",
+            "why": "Fast reference while you configure or triage - no scanning, no auth, just the baselines.",
+            "online": "No (can pull baselines from GitHub if asked)",
+            "docs": "docs/configuration/scubaconfigapp.md"
+        },
+        {
+            "name": "Invoke-SCuBADiff",
+            "category": "Configuration",
+            "summary": "Offline compare of two ScubaResults.json files into JSON, CSV, and HTML deltas.",
+            "useWhen": "You want to prove what changed between two runs (before/after a fix, or tenant vs. tenant).",
+            "why": "Evidence of progress or regression without re-scanning; fully offline, no tenant contact.",
+            "online": "No",
+            "docs": "docs/misc/command-selection-matrix.md"
+        },
+        {
+            "name": "Invoke-SCuBA",
+            "category": "Core",
+            "summary": "The main event - assesses your tenant against the baselines and writes JSON and HTML reports.",
+            "useWhen": "Any time you want a fresh, full assessment.",
+            "why": "This is ScubaGear; everything else supports this command.",
+            "online": "Yes",
+            "docs": "docs/execution/execution.md"
+        },
+        {
+            "name": "Invoke-SCuBACached",
+            "category": "Core",
+            "summary": "Re-runs the Rego/report step against already-exported provider data (flat output folder).",
+            "useWhen": "You are iterating on config or rego and do not want to re-hit the tenant each time.",
+            "why": "Fast dev/test loop; export provider data once, re-evaluate many times.",
+            "online": "Optional (when using -ExportProvider:$true)",
+            "docs": "docs/execution/scubacached.md"
+        },
+        {
+            "name": "Disconnect-SCuBATenant",
+            "category": "Core",
+            "summary": "Tears down the Graph/EXO/etc. sessions ScubaGear opened.",
+            "useWhen": "You are done, or need a clean auth state before switching tenants.",
+            "why": "Prevents stale or leaked sessions from bleeding into the next run.",
+            "online": "Yes",
+            "docs": "docs/execution/execution.md"
+        },
+        {
+            "name": "Install-ScubaDependencies",
+            "category": "Setup",
+            "summary": "Installs the required PowerShell modules.",
+            "useWhen": "First-time setup, or after a version bump changes requirements.",
+            "why": "Nothing runs until dependencies are present; this is step one.",
+            "online": "Yes (downloads modules from PowerShellGallery)",
+            "docs": "docs/prerequisites/dependencies.md"
+        },
+        {
+            "name": "Install-OPAforSCuBA",
+            "category": "Setup",
+            "summary": "Downloads the OPA/Rego executable ScubaGear evaluates policies with.",
+            "useWhen": "First-time setup, or OPA is missing or outdated.",
+            "why": "No OPA, no policy evaluation - required for any assessment.",
+            "online": "Yes (downloads OPA)",
+            "docs": "docs/prerequisites/dependencies.md"
+        },
+        {
+            "name": "Get-ScubaGearDependencyStatus",
+            "category": "Setup",
+            "summary": "Reports which modules and OPA are present and at what version.",
+            "useWhen": "A run failed and you suspect a missing or mismatched dependency.",
+            "why": "Diagnose environment problems before blaming the config.",
+            "online": "No",
+            "docs": "docs/prerequisites/dependencies.md"
+        },
+        {
+            "name": "Update-ScubaGear",
+            "category": "Setup",
+            "summary": "Updates the ScubaGear module to the latest published version.",
+            "useWhen": "You want the newest baselines, fixes, and tooling.",
+            "why": "Keeps you current with evolving M365 baselines.",
+            "online": "Yes (downloads from PowerShellGallery)",
+            "docs": "docs/installation/update.md"
+        }
+    ]
+}
