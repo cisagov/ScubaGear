@@ -7,7 +7,7 @@ multiple files, and what developers must update when adding or changing a policy
 configuration exclusions.
 
 The current design has several related schemas and generated assets. They are not all duplicates:
-some describe the accepted ScubaGear YAML contract, some select Config App controls, some drive
+some describe the accepted ScubaGear YAML configuration, some select Config App controls, some drive
 the Config Analyzer, and some describe the policy evaluation itself. However, the similar names
 make accidental drift easy. Use the ownership rules and checklists below instead of assuming that
 an `exclusionField` has the same meaning everywhere.
@@ -41,7 +41,7 @@ value is a UI control name, a YAML key, or analyzer metadata.
 
 | File | Generated? | Exclusion responsibility |
 | --- | --- | --- |
-| `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json` | No | Canonical configuration contract: policy mappings, product properties, capabilities, and exclusion value definitions. |
+| `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json` | No | Canonical configuration: policy mappings, product properties, capabilities, and exclusion value definitions. |
 | `PowerShell/ScubaGear/schemas/ScubaBaselines.json` | Yes | Generated policy catalog and Config App control selector. Do not edit directly. |
 | `PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json` | No | Analyzer-specific policy requirements, remediation, and exclusion-type context. |
 | `PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigApp_Control_en-US.json` | No | Config App control aliases, visible fields, validation hints, and emitted YAML key. |
@@ -81,7 +81,7 @@ value is a UI control name, a YAML key, or analyzer metadata.
 
 ### Focused tests
 
-| Contract checked | Repository location |
+| Configuration checked | Repository location |
 | --- | --- |
 | Config schema structure | `PowerShell/ScubaGear/Testing/Unit/PowerShell/ScubaConfig/ScubaConfig.JsonSchema.Tests.ps1` |
 | Config validator behavior | `PowerShell/ScubaGear/Testing/Unit/PowerShell/ScubaConfig/ScubaConfigValidator.Tests.ps1` |
@@ -171,7 +171,7 @@ Location:
 PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json
 ```
 
-This schema owns the accepted ScubaGear configuration contract. Its exclusion metadata has four
+This schema owns the accepted ScubaGear configuration. Its exclusion metadata has four
 separate responsibilities.
 
 #### `policyExclusionMappings`
@@ -188,7 +188,7 @@ The mapping is consumed by:
 - `New-SCuBAConfig` to generate exclusion templates and complete policy IDs.
 - The Config Analyzer to determine whether configuration can make a control pass.
 
-The value is an array because the configuration contract can support more than one exclusion type
+The value is an array because the configuration can support more than one exclusion type
 for a policy even though `ScubaBaselines.json` currently has one UI-control selector.
 
 #### Product properties
@@ -226,6 +226,7 @@ The analyzer treats `ScubaConfigSchema.json` policy mappings as authoritative wh
 are present. The results schema value is retained as a compatibility fallback and as context for
 Conditional Access exclusion detection.
 
+[!NOTE]
 The nested `buildInstructions.exclusionHandling` arrays are not currently consumed by the Config
 Analyzer. They appear to describe Graph payload paths for a future policy-building workflow. Do
 not rely on them for current exclusion validation or YAML generation.
@@ -319,7 +320,7 @@ Use this procedure when a new policy uses an already-supported type such as `Cap
 
 ## Adding a new exclusion type
 
-Adding a new exclusion type changes more contracts and requires broader testing.
+Adding a new exclusion type changes more configurations and requires broader testing.
 
 1. Define the real YAML key and its data shape under
    `ScubaConfigSchema.json/definitions/exclusionTypes`.
@@ -354,7 +355,7 @@ When a policy ID changes, treat the new ID as a new mapping and review every con
 When only supported exclusion fields change, review both layers:
 
 - Change the Config App control selector or fields to control what users can enter.
-- Change the configuration schema and Rego when the actual accepted YAML contract changes.
+- Change the configuration schema and Rego when the actual accepted YAML configuration changes.
 
 Changing only the Config App control does not prevent hand-authored YAML from containing a field.
 Changing only the schema does not ensure Rego evaluates that field correctly.
@@ -422,3 +423,165 @@ repeated mappings during the build. A safe direction is:
 
 Do not remove `policyExclusionMappings` until its validator, template-generation, argument
 completion, and analyzer consumers have been migrated and covered by tests.
+
+## Sample: add exclusions to MS.AAD.9.1v1
+
+This example shows how to make the existing `MS.AAD.9.1v1` policy configurable.
+
+### First confirm the supported fields
+
+The current policy checks only application exclusions:
+
+```rego
+AppExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
+```
+
+Therefore, this example keeps the YAML key `CapExclusions` but exposes only its `Applications`
+field. Do not offer Users, Groups, or GuestUserTypes unless the Rego policy is also changed to
+evaluate them.
+
+The intended YAML is:
+
+```yaml
+Aad:
+   MS.AAD.9.1v1:
+      CapExclusions:
+         Applications:
+            - 00000000-0000-0000-0000-000000000000
+```
+
+### Required changes
+
+| Step | File | Change |
+| --- | --- | --- |
+| 1 | `PowerShell/ScubaGear/baselines/aad.md` | Mark the policy configurable and select an applications-only Config App control. |
+| 2 | `PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigApp_Control_en-US.json` | Define that applications-only control and map it to the real `CapExclusions` YAML key. |
+| 3 | `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json` | Map `MS.AAD.9.1v1` to `CapExclusions`. |
+| 4 | `PowerShell/ScubaGear/schemas/ScubaBaselines.json` | Regenerate this file from markdown; do not edit it manually. |
+| 5 | Rego tests | Confirm an approved application exclusion passes and an unapproved one fails. |
+
+#### 1. Update the baseline markdown
+
+Add the Configurable badge and a restricted control marker near the existing policy metadata in
+`PowerShell/ScubaGear/baselines/aad.md`:
+
+```markdown
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
+<!--Policy: MS.AAD.9.1v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusionsApplicationsOnly-->
+```
+
+`CapExclusionsApplicationsOnly` is a Config App control name, not a YAML key.
+
+#### 2. Add the restricted Config App control
+
+Add this sibling of `CapExclusions` in
+`PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigApp_Control_en-US.json`:
+
+```json
+"CapExclusionsApplicationsOnly": {
+   "name": "Conditional Access Policy Excluded Applications",
+   "value": "CapExclusions",
+   "description": "Exclude specific applications from this conditional access policy",
+   "fields": [
+      {
+         "type": "array",
+         "name": "Cloud Applications",
+         "value": "Applications",
+         "description": "Cloud applications to exclude from this policy",
+         "valueType": "guidOrName",
+         "required": false
+      }
+   ]
+}
+```
+
+The control name limits the UI, while `"value": "CapExclusions"` emits the real YAML key.
+
+#### 3. Add the policy mapping
+
+Add one entry under `schemaMetadata.policyExclusionMappings` in
+`PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json`:
+
+```json
+"MS.AAD.9.1v1": ["CapExclusions"]
+```
+
+No change is required in `ScubaConfigValidator.psm1`. The validator reads this map generically.
+After the entry is added, it recognizes `CapExclusions` as an allowed exclusion type for 9.1.
+
+No new exclusion definition is required either. The existing Aad schema already permits
+`CapExclusions`, and `definitions.exclusionTypes.CapExclusions` already validates Applications.
+
+#### 4. Regenerate ScubaBaselines.json
+
+Run the same generator used by CI from the repository root:
+
+```powershell
+./utils/workflow/Generate-ScubaBaseline.ps1 `
+      -OutputPath "PowerShell/ScubaGear/schemas/ScubaBaselines.json" `
+      -Validate
+```
+
+The generated 9.1 object should then contain:
+
+```json
+"id": "MS.AAD.9.1v1",
+"exclusionField": "CapExclusionsApplicationsOnly"
+```
+
+Do not replace that generated value with `CapExclusions`. It selects the restricted UI control;
+the control's `value` property performs the translation to the YAML key.
+
+#### 5. Confirm Rego behavior
+
+`AADConfig.rego` already calls `AppExclusionsFullyExempt` for 9.1, and
+`AADConfig_09_test.rego` already has an approved application-exclusion test. For a newly created
+policy, both the helper call and tests would need to be added.
+
+At minimum, test these cases:
+
+- The policy has no application exclusions and otherwise meets the baseline.
+- An excluded application appears in `CapExclusions.Applications` and passes.
+- An excluded application is absent from `CapExclusions.Applications` and fails.
+
+### Optional: add Config Analyzer coverage
+
+The changes above make ScubaGear configuration, validation, Config App generation, and Rego
+evaluation work. They do not automatically add 9.1 to the Config Analyzer's modeled controls.
+
+To add analyzer coverage:
+
+1. Add an `MS.AAD.9.1v1` control to
+    `PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json`.
+2. Set its `exclusionField` to the actual YAML key, `CapExclusions`.
+3. Model all current Rego requirements, including applications, client app types, agent risk,
+    included agent service principals, grant controls, license behavior, and unsupported M365
+    environments.
+4. Confirm the generic Applications detector in
+    `ScubaConfigAnalyzer_Control_en-US.json` recognizes `conditions.applications.excludeApplications`.
+5. Add analyzer tests for live and imported-results behavior.
+
+This analyzer step is conditional because the analyzer intentionally models only a subset of
+baseline policies. Do not add a partial requirements object merely to expose exclusions; in live
+mode that object becomes an independent implementation of the pass/fail rule.
+
+### What does not change
+
+For this example, these implementations remain unchanged:
+
+- `ScubaConfigValidator.psm1`: already interprets `policyExclusionMappings`.
+- `ScubaConfigAnalyzerExclusionHelper.psm1`: already renders `CapExclusions`.
+- `ScubaConfigAnalyzer_Control_en-US.json`: already defines the analyzer's `CapExclusions`
+   shape and application detector.
+- `definitions.exclusionTypes.CapExclusions`: already defines the Applications value shape.
+
+### Important current limitation
+
+`policyExclusionMappings` validates exclusion types at the policy level, not individual subfields.
+Mapping 9.1 to `CapExclusions` means hand-authored YAML containing Users or Groups still satisfies
+the schema shape even though current 9.1 Rego only uses Applications. The restricted Config App
+control prevents the UI from generating those fields, but it does not make the base schema
+policy-field-aware. Solving that requires a larger schema change and should be covered by tests
+before altering the current contract.
