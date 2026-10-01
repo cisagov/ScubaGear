@@ -46,6 +46,10 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
 
   - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 
+## Where Do I Begin?
+
+New to ScubaGear or unsure which command to run? Start with the **[Command Selection Matrix](docs/misc/command-selection-matrix.md)** - a one-screen cheat sheet showing each command's BLUF, when to use it, and why it matters.
+
 ### Scuba Configuration UI
 
 SCuBA now includes a graphical user interface that makes it easier than ever to create and manage your YAML configuration files. This intuitive tool helps reduce the complexity of manual editing and streamlines the configuration process for your organization.
@@ -226,6 +230,7 @@ Reset-ScubaGearDependencies
 - [Assumptions](docs/misc/assumptions.md)
 - [Mappings](docs/misc/mappings.md)
 - [Service Principal Assistance](docs/prerequisites/serviceprincipal-workflows.md)
+- [Command Selection Matrix](docs/misc/command-selection-matrix.md)
 
 ## Project License
 

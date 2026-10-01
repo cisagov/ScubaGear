@@ -3206,6 +3206,80 @@ function Update-ScubaGearFromGitHub {
     }
 }
 
+function Get-ScubaHelp {
+    <#
+    .SYNOPSIS
+        Prints a quick reference of the main ScubaGear commands: what each does, when to use it, and why.
+
+    .DESCRIPTION
+        Get-ScubaHelp is an offline, at-a-glance guide to the user-facing ScubaGear commands.
+        It reads the command catalog from schemas\ScubaHelp.json - the same source of truth
+        that backs docs/misc/command-selection-matrix.md - and emits one object per command so the
+        output can be filtered, sorted, and piped. It makes no tenant or Graph calls.
+
+    .PARAMETER Command
+        Return only the entry whose name matches this value (wildcards allowed).
+
+    .PARAMETER Category
+        Return only commands in this category. Valid values: Configuration, Core, Setup, All. Default is All.
+
+    .EXAMPLE
+        Get-ScubaHelp
+
+    .EXAMPLE
+        Get-ScubaHelp -Category Core
+
+    .EXAMPLE
+        Get-ScubaHelp -Command Invoke-SCuBA*
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [SupportsWildcards()]
+        [string]
+        $Command,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Configuration', 'Core', 'Setup', 'All')]
+        [string]
+        $Category = 'All'
+    )
+
+    $CatalogPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\schemas\ScubaHelp.json'
+    if (-not (Test-Path -Path $CatalogPath)) {
+        # Fall back to the published-module layout (schemas alongside the module root).
+        $CatalogPath = Join-Path -Path $PSScriptRoot -ChildPath 'schemas\ScubaHelp.json'
+    }
+    if (-not (Test-Path -Path $CatalogPath)) {
+        Write-Error -Message "ScubaGear command catalog not found: ScubaHelp.json"
+        return
+    }
+
+    $Catalog = Get-Content -Path $CatalogPath -Raw | ConvertFrom-Json
+
+    $Entries = $Catalog.commands
+    if ($Category -ne 'All') {
+        $Entries = $Entries | Where-Object { $_.category -eq $Category }
+    }
+    if ($Command) {
+        $Entries = $Entries | Where-Object { $_.name -like $Command }
+    }
+
+    foreach ($Entry in $Entries) {
+        [PSCustomObject]@{
+            PSTypeName = 'ScubaGear.CommandHelp'
+            Command    = $Entry.name
+            Category   = $Entry.category
+            Summary    = $Entry.summary
+            UseWhen    = $Entry.useWhen
+            Why        = $Entry.why
+            Online     = $Entry.online
+            Docs       = $Entry.docs
+        }
+    }
+}
+
 # Backward-compatible alias: Initialize-SCuBA was renamed to Install-ScubaDependencies
 # to better describe what it does and align with Reset-ScubaGearDependencies.
 Set-Alias -Name Initialize-SCuBA -Value Install-ScubaDependencies
@@ -3222,7 +3296,8 @@ Export-ModuleMember -Function @(
     'New-SCuBAConfig',
     'Update-ScubaGear',
     'Test-ScubaGearVersion',
-    'Reset-ScubaGearDependencies'
+    'Reset-ScubaGearDependencies',
+    'Get-ScubaHelp'
 ) -Alias @(
     'Initialize-SCuBA'
 )

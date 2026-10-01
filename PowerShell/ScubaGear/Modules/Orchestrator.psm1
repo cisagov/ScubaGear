@@ -191,6 +191,11 @@ function Invoke-SCuBA {
         [switch]
         $Version,
 
+        [Parameter(ParameterSetName = 'HelpOnly')]
+        [ValidateNotNullOrEmpty()]
+        [switch]
+        $Help,
+
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -325,6 +330,11 @@ function Invoke-SCuBA {
         $ModuleVersion = $ScubaManifest.ModuleVersion
         if ($Version) {
             Write-Output("SCuBA Gear v$ModuleVersion")
+            return
+        }
+
+        if ($Help) {
+            Get-ScubaHelp
             return
         }
 

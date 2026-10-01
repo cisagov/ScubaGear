@@ -196,5 +196,46 @@
         </CustomEntries>
       </CustomControl>
     </View>
+    <View>
+      <Name>ScubaGear.CommandHelp</Name>
+      <ViewSelectedBy>
+        <TypeName>ScubaGear.CommandHelp</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <PropertyName>Category</PropertyName>
+        <Label>Category</Label>
+      </GroupBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <PropertyName>Command</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Summary</Label>
+                <PropertyName>Summary</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Use when</Label>
+                <PropertyName>UseWhen</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Why</Label>
+                <PropertyName>Why</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Online</Label>
+                <PropertyName>Online</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Docs</Label>
+                <PropertyName>Docs</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
   </ViewDefinitions>
 </Configuration>
