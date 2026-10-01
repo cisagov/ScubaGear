@@ -692,6 +692,9 @@ ManagedDeviceAuthBaseCheck(policy) if {
     "domainJoinedDevice" in policy.GrantControls.BuiltInControls
     Count(policy.GrantControls.BuiltInControls) == 2
     policy.GrantControls.Operator == "OR"
+
+    ### not a policy scoped to a specific user action
+    Count(policy.Conditions.Applications.IncludeUserActions) == 0
     ###
 }
 
