@@ -53,6 +53,7 @@ flowchart LR
    end
 
    subgraph Runtime[Runtime consumers]
+      PolicyViewer["Show-SCuBABaselinePolicyViewer<br/>Displays baseline policies"]
       Validator["ScubaConfigValidator.psm1<br/>Validates policy-specific exclusion YAML"]
       ConfigTemplate["Support.psm1 / New-SCuBAConfig<br/>Generates YAML configuration templates"]
       ConfigApp["Start-SCuBAConfigApp<br/>Displays controls and builds configuration YAML"]
@@ -69,6 +70,7 @@ flowchart LR
    Markdown -. documents .-> Rego
    RegoTests --> Rego
 
+   Baselines --> PolicyViewer  
    Baselines --> ConfigApp
    AppControls --> ConfigApp
    ConfigApp --> ConfigYaml["ScubaConfig YAML<br/>Runtime exclusion values"]
@@ -91,7 +93,7 @@ flowchart LR
    classDef consumer fill:#dbeafe,stroke:#315f91,color:#18344f
    class Rego,ConfigSchema authority
    class Baselines generated
-   class Validator,ConfigTemplate,ConfigApp,AnalyzerEngine consumer
+   class Validator,ConfigTemplate,ConfigApp,AnalyzerEngine,PolicyViewer consumer
    linkStyle default stroke-width:3px
    linkStyle 2,17 stroke-width:1.5px
 ```
