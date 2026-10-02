@@ -184,7 +184,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/teams-live-events/live-e
 To help ensure external participants do not have the ability to request
 control of the shared desktop or window in the meeting:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Meeting policies**.
 
@@ -200,7 +200,7 @@ control of the shared desktop or window in the meeting:
 
 To configure settings for anonymous users so that they cannot start meetings:
 
-1.	Sign in to the **Microsoft Teams administrative center**.
+1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
 
@@ -216,7 +216,7 @@ To configure settings for anonymous users so that they cannot start meetings:
 
 To configure settings for anonymous users so that they are not admitted automatically:
 
-1.	Sign in to the **Microsoft Teams administrative center**.
+1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
 
@@ -234,7 +234,7 @@ To configure settings for anonymous users so that they are not admitted automati
 
 To configure settings so that internal users are admitted automatically:
 
-1.	Sign in to the **Microsoft Teams administrative center**.
+1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
 
@@ -252,7 +252,7 @@ To configure settings so that internal users are admitted automatically:
 
 To configure settings for anonymous users so that they are not able to bypass the lobby:
 
-1.	Sign in to the **Microsoft Teams administrative center**.
+1.	Sign in to the **Microsoft Teams admin center**.
 
 2.	Select **Meetings** > **Meeting policies**.
 
@@ -268,7 +268,7 @@ To configure settings for anonymous users so that they are not able to bypass th
 
 To configure the settings that control meeting recordings:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Meeting policies**.
 
@@ -284,7 +284,7 @@ To configure the settings that control meeting recordings:
 
 To configure the settings that control "live events" meeting recordings:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Live events policies**.
 
@@ -394,7 +394,7 @@ organization](https://learn.microsoft.com/en-us/microsoftteams/manage-external-a
 
 To enable external access for specific domains only:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **External collaboration** > **External access** > **Organization settings** (Tab).
 
@@ -412,7 +412,7 @@ To enable external access for specific domains only:
 
 To ensure unmanaged users cannot initiate contact with internal users:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **External collaboration** > **External access** > **Policies** (Tab).
 
@@ -434,7 +434,7 @@ To ensure unmanaged users cannot initiate contact with internal users:
 
 To ensure internal users cannot initiate contact with unmanaged users:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **External collaboration** > **External access** > **Policies** (Tab).
 
@@ -485,7 +485,7 @@ Learn](https://learn.microsoft.com/en-us/microsoftteams/settings-policies-refere
 
 To ensure users cannot send emails and their contents to a channel email address:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams** > **Teams Settings**.
 
@@ -562,7 +562,7 @@ Agencies SHOULD only allow installation of custom applications approved by the a
 
 ### Implementation
 
-**INTERFACE NOTE:** The Teams administrative portal interface has been updated, and the manner in which applications are controlled has changed. The MS.TEAMS.5.x v2 policies now follow the new manner of implementing the policies. Newer Tenants created after 2024 should follow the v2 policy implementation steps, while older tenants should follow the legacy implementation steps, only if the newer settings are not available.
+**INTERFACE NOTE:** The Teams admin portal interface has been updated, and the manner in which applications are controlled has changed. The MS.TEAMS.5.x v2 policies now follow the new manner of implementing the policies. Newer Tenants created after 2024 should follow the v2 policy implementation steps, while older tenants should follow the legacy implementation steps, only if the newer settings are not available.
 
 Legacy implementation instructions for this section are now located in Appendix B at the end of this document. If your tenant has the Version 2 settings available, there is no need to perform the legacy implementation instructions. These instructions will remain only until they are fully depreciated.
 
@@ -572,7 +572,7 @@ Legacy implementation instructions for this section are now located in Appendix 
 
 To ensure users can only install Microsoft apps approved by the agency:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 
@@ -606,7 +606,7 @@ To ensure users can only install Microsoft apps approved by the agency:
 
 To ensure users can only install third-party apps approved by the agency:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 
@@ -640,7 +640,7 @@ To ensure users can only install third-party apps approved by the agency:
 
 To ensure users can only install custom apps approved by the agency:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 
@@ -676,7 +676,7 @@ To ensure users can only install custom apps approved by the agency:
 
 If there is a legitimate business need, custom meeting policies can be defined with _specific_ users assigned to them for narrowly scoped purposes. For example, custom meeting policies can be configured for _specific_ users granting them permission to record meetings. To allow _specific_ users the ability to record meetings:
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Meetings** > **Meeting policies**.
 
@@ -701,7 +701,7 @@ If there is a legitimate business need, custom meeting policies can be defined w
 
 #### Legacy MS.TEAMS.5.1v1 Instructions
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Permission policies**.
 
@@ -724,7 +724,7 @@ If there is a legitimate business need, custom meeting policies can be defined w
 
 #### Legacy MS.TEAMS.5.2v1 Instructions
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 
@@ -759,7 +759,7 @@ If there is a legitimate business need, custom meeting policies can be defined w
 
 #### Legacy MS.TEAMS.5.3v1 Instructions
 
-1.  Sign in to the **Microsoft Teams administrative center**.
+1.  Sign in to the **Microsoft Teams admin center**.
 
 2.  Select **Teams apps** > **Manage apps**.
 

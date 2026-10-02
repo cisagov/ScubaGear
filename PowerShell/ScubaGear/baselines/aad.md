@@ -477,7 +477,7 @@ We recommend using a custom authentication strength to enforce the specific meth
 #### MS.AAD.3.3v2 Instructions
 If Microsoft Authenticator is in use, configure Authenticator to display context information to users when they log in.
 
-1. In **Microsoft Entra administrative center**, click **Authentication methods > Microsoft Authenticator**.
+1. In **Microsoft Entra admin center**, click **Authentication methods > Microsoft Authenticator**.
 2. Click the **Configure** tab.
 3. For **Allow use of Microsoft Authenticator OTP**, select *No*.
 4. Under **Show application name in push and passwordless notifications**, select **Status > Enabled** and **Target > Include > All users**.
@@ -490,7 +490,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 2. Once ready to finish the migration, [set the **Manage migration** option to **Migration complete**](https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-authentication-methods-manage#finish-the-migration).
 
 #### MS.AAD.3.5v2 Instructions
-1. In **Microsoft Entra administrative center**, click **Authentication methods**
+1. In **Microsoft Entra admin center**, click **Authentication methods**
 2. Click on the **SMS**, **voice call**, and **email OTP** authentication methods and disable each of them. Their statuses should be **Enabled > No** on the **Authentication methods > Policies** page.
 
 #### MS.AAD.3.6v1 Instructions
@@ -696,7 +696,7 @@ Application certificate lifetime SHOULD be restricted to 365 days or less.
 
 #### MS.AAD.5.1v1 Instructions
 
-1.  In the **Microsoft Entra administrative center**, select **Users**.
+1.  In the **Microsoft Entra admin center**, select **Users**.
 
 2. Select **User settings**.
 
@@ -709,11 +709,11 @@ Application certificate lifetime SHOULD be restricted to 365 days or less.
 There are a couple of configuration options to restrict user consent. Each option is described below, followed by its respective instructions.
 
 - **Option 1** - Most restrictive - Do not allow user consent for applications. An administrator is required to consent for all applications. Users can submit requests to use an application via the admin consent workflow but they cannot perform the consent themselves.
-- **Option 2** - More flexible - Allow users to consent to applications from Microsoft verified publishers that use low-risk permissions. When selecting this option, an administrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the Microsoft Entra administrative center.
+- **Option 2** - More flexible - Allow users to consent to applications from Microsoft verified publishers that use low-risk permissions. When selecting this option, an administrator must configure a set of permissions considered low risk in the **Consent and permissions** > **Permission classifications** page in the Microsoft Entra admin center.
 
 **Option 1**. Do not allow user consent.
 
-1.  In the **Microsoft Entra administrative center**, select **Enterprise applications**.
+1.  In the **Microsoft Entra admin center**, select **Enterprise applications**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User consent settings**.
 
@@ -723,7 +723,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 **Option 2**. Allow restricted user consent.
 
-1.  In the **Microsoft Entra administrative center**, select **Enterprise applications**.
+1.  In the **Microsoft Entra admin center**, select **Enterprise applications**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User consent settings**.
 
@@ -739,9 +739,9 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 #### MS.AAD.5.3v1 Instructions
 
-1.  In the **Microsoft Entra administrative center**, create a new Microsoft Entra ID Group that contains administrative users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
+1.  In the **Microsoft Entra admin center**, create a new Microsoft Entra ID Group that contains administrative users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
-2. Then, in **Microsoft Entra administrative center** under **Applications**, select **Enterprise applications**.
+2. Then, in **Microsoft Entra admin center** under **Applications**, select **Enterprise applications**.
 
 3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
@@ -753,7 +753,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 #### MS.AAD.5.5v1 Instructions
 
-1. In the **Microsoft Entra administrative center**, select **Enterprise applications**.
+1. In the **Microsoft Entra admin center**, select **Enterprise applications**.
 
 2. Under **Security**, select **Application policies**.
 
@@ -767,7 +767,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 #### MS.AAD.5.6v1 Instructions
 
-1. In the **Microsoft Entra administrative center**, select **Enterprise applications**.
+1. In the **Microsoft Entra admin center**, select **Enterprise applications**.
 
 2. Under **Security**, select **Application policies**.
 
@@ -781,7 +781,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 #### MS.AAD.5.7v1 Instructions
 
-1. In the **Microsoft Entra administrative center**, select **Enterprise applications**.
+1. In the **Microsoft Entra admin center**, select **Enterprise applications**.
 
 2. Under **Security**, select **Application policies**.
 
@@ -830,9 +830,9 @@ User passwords SHALL NOT expire.
 
 #### MS.AAD.6.1v1 Instructions
 
-> **Note:** Tenants created after October 2021 have password expiration disabled by default (`passwordValidityPeriodInDays = null`), which Microsoft treats as equivalent to "never expire." Tenants created before October 2021, or any tenant where the policy was explicitly configured and then reverted, will show `2147483647` (INT_MAX). ScubaGear treats both values as compliant. The M365 administrative center password expiration checkbox applies to all managed domains in the tenant. If a tenant has **multiple root domains**, use the PowerShell in Step 2 to audit all of them and remediate any that have a finite expiration period set.
+> **Note:** Tenants created after October 2021 have password expiration disabled by default (`passwordValidityPeriodInDays = null`), which Microsoft treats as equivalent to "never expire." Tenants created before October 2021, or any tenant where the policy was explicitly configured and then reverted, will show `2147483647` (INT_MAX). ScubaGear treats both values as compliant. The M365 admin center password expiration checkbox applies to all managed domains in the tenant. If a tenant has **multiple root domains**, use the PowerShell in Step 2 to audit all of them and remediate any that have a finite expiration period set.
 
-1. Sign in to the [Microsoft 365 administrative center](https://admin.microsoft.com) and [configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).
+1. Sign in to the [Microsoft 365 admin center](https://admin.microsoft.com) and [configure the **Password expiration policy** to **Set passwords to never expire**](https://learn.microsoft.com/en-us/microsoft-365/admin/manage/set-password-expiration-policy?view=o365-worldwide#set-password-expiration-policy).
 
 2. Optionally, verify and remediate all root domains via PowerShell. This is useful if any domain had a finite expiration configured explicitly. This uses `Invoke-MgGraphRequest`, which is included with the `Microsoft.Graph.Authentication` module already required by ScubaGear. To audit only, connect with `Domain.Read.All`. To remediate, use `Domain.ReadWrite.All`.
 
@@ -945,7 +945,7 @@ Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM s
 
 
 <!--Policy: MS.AAD.7.5v1; Criticality: SHALL -->
-- _Rationale:_ Provisioning users to privileged roles within a PAM system enables enforcement of numerous privileged access policies and monitoring. If privileged users are assigned directly to roles in the M365 administrative center or via PowerShell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
+- _Rationale:_ Provisioning users to privileged roles within a PAM system enables enforcement of numerous privileged access policies and monitoring. If privileged users are assigned directly to roles in the M365 admin center or via PowerShell outside of the context of a PAM system, a significant set of critical security capabilities are bypassed.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2
 - _MITRE ATT&CK TTP Mapping:_
@@ -1038,7 +1038,7 @@ The following implementation instructions that reference the Microsoft Entra ID 
 
 When counting the number of users assigned to the Global Administrator role, count each user only once.
 
-1. In the **Microsoft Entra administrative center**, count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
+1. In the **Microsoft Entra admin center**, count the number of users assigned to the **Global Administrator** role. Count users that are assigned directly to the role and users assigned via group membership. If you have Microsoft Entra ID PIM, count both the **Eligible assignments** and **Active assignments**. If any of the groups assigned to Global Administrator are enrolled in PIM for Groups, also count the number of group members from the PIM for Groups portal **Eligible** assignments.
 
 2. Validate that there are a total of two to eight users assigned to the Global Administrator role.
 
@@ -1071,7 +1071,7 @@ Perform the steps below for each highly privileged role. We reference the Global
 
 #### MS.AAD.7.4v1 Instructions
 
-1. In **Microsoft Entra administrative center**, select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
+1. In **Microsoft Entra admin center**, select **Roles and admins**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
 2. Select the **Global Administrator** role.
 
@@ -1088,7 +1088,7 @@ Exception cases:
 
 Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example.
 
-1. In **Microsoft Entra administrative center**, select **Roles and admins**.
+1. In **Microsoft Entra admin center**, select **Roles and admins**.
 
 2. Select the **Global Administrator** role.
 
@@ -1098,7 +1098,7 @@ Perform the steps below for each highly privileged role. We reference the Global
 
 #### MS.AAD.7.6v1 Instructions
 
-1. In **Microsoft Entra administrative center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
+1. In **Microsoft Entra admin center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**.
 
@@ -1112,7 +1112,7 @@ Perform the steps below for each highly privileged role. We reference the Global
 
 #### MS.AAD.7.7v1 Instructions
 
-1.  In **Microsoft Entra administrative center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
+1.  In **Microsoft Entra admin center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**, and then select **Microsoft Entra roles**.
 
 2. Under **Manage**, select **Roles**. Perform the steps below for each highly privileged role. We reference the Global Administrator role as an example:
 
@@ -1127,7 +1127,7 @@ Perform the steps below for each highly privileged role. We reference the Global
 
 #### MS.AAD.7.8v1 Instructions
 
-1. In **Microsoft Entra administrative center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Select **Microsoft Entra roles**.
+1. In **Microsoft Entra admin center**, under **Identity Governance**, select **Privileged Identity Management (PIM)**. Select **Microsoft Entra roles**.
 
 2. Click the **Global Administrator** role.
 
@@ -1207,7 +1207,7 @@ Guest invites SHOULD only be allowed to be sent to specific external domains tha
 
 #### MS.AAD.8.1v1 Instructions
 
-1. Open the **Microsoft Entra administrative center**.
+1. Open the **Microsoft Entra admin center**.
 
 2. Select **External Identities > External collaboration settings**.
 
@@ -1217,7 +1217,7 @@ Guest invites SHOULD only be allowed to be sent to specific external domains tha
 
 #### MS.AAD.8.2v1 Instructions
 
-1. Open the **Microsoft Entra administrative center**.
+1. Open the **Microsoft Entra admin center**.
 
 2. Select **External Identities > External collaboration settings**.
 
@@ -1227,7 +1227,7 @@ Guest invites SHOULD only be allowed to be sent to specific external domains tha
 
 #### MS.AAD.8.3v1 Instructions
 
-1. Open the **Microsoft Entra administrative center**.
+1. Open the **Microsoft Entra admin center**.
 
 2. Select **External Identities > External collaboration settings**.
 

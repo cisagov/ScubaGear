@@ -103,7 +103,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 
 #### MS.SHAREPOINT.1.1v1 Instructions
 
-1. Sign in to the **SharePoint administrative center**.
+1. Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**.
 
@@ -114,7 +114,7 @@ External sharing SHALL be restricted to approved external domains and/or users i
 #### MS.SHAREPOINT.1.2v1 Instructions
 
 
-1.  Sign in to the **SharePoint administrative center**.
+1.  Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**.
 
@@ -195,7 +195,7 @@ File and folder default sharing permissions SHALL be set to "view only."
 
 #### MS.SHAREPOINT.2.1v1 Instructions
 
-1.  Sign in to the **SharePoint administrative center**.
+1.  Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**
 
@@ -205,7 +205,7 @@ File and folder default sharing permissions SHALL be set to "view only."
 
 #### MS.SHAREPOINT.2.2v1 Instructions
 
-1.  Sign in to the **SharePoint administrative center**.
+1.  Sign in to the **SharePoint admin center**.
 
 2. Select **Policies** \> **Sharing**.
 
@@ -282,7 +282,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 #### MS.SHAREPOINT.3.1v1 Instructions
 
-1.  Sign in to the **SharePoint administrative center**.
+1.  Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**.
 
@@ -296,7 +296,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 #### MS.SHAREPOINT.3.2v1 Instructions
 
-1.  Sign in to the **SharePoint administrative center**.
+1.  Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**.
 
@@ -312,7 +312,7 @@ Reauthentication days for people who use a verification code SHALL be set to 30 
 
 #### MS.SHAREPOINT.3.3v2 Instructions
 
-1.  Sign in to the **SharePoint administrative center**.
+1.  Sign in to the **SharePoint admin center**.
 
 2.  Select **Policies** \> **Sharing**.
 

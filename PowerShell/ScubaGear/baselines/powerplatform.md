@@ -231,7 +231,7 @@ Non-default environments SHOULD have at least one DLP policy.
 ### Implementation
 
 #### MS.POWERPLATFORM.2.1v1 Instructions
-1.  Sign in to your tenant environment's respective [Power Platform administrative
+1.  Sign in to your tenant environment's respective [Power Platform admin
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  On the left pane, select **Security** -\> **Data and privacy.**
@@ -333,7 +333,7 @@ An inbound/outbound connection allowlist SHOULD be configured.
 ### Implementation
 
 #### MS.POWERPLATFORM.3.1v1 Instructions
-1.  Sign in to your tenant environment's respective [Power Platform administrative
+1.  Sign in to your tenant environment's respective [Power Platform admin
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  On the left pane, select **Policies -\> Tenant isolation**.
@@ -387,7 +387,7 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 ### Implementation
 
 #### MS.POWERPLATFORM.4.1v1 Instructions
-1.  Sign in to your tenant environment's respective [Power Platform administrative
+1.  Sign in to your tenant environment's respective [Power Platform admin
 center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  On the left-hand pane, click on **Environments**, then select an environment from the list.
