@@ -34,16 +34,9 @@ function Export-PowerBIProvider {
             throw "AccessToken and BaseUrl must be provided when LicenseFound is true."
         }
 
-        $Headers = @{
-            Authorization  = "Bearer $AccessToken"
-            "Content-Type" = "application/json"
-        }
-
-        $Uri = "$BaseUrl/v1/admin/tenantsettings"
-        $AdminSettings = $Tracker.TryCommand("Invoke-RestMethod", @{
-            "Uri" = $Uri
-            "Method" = "Get"
-            "Headers" = $Headers
+        $AdminSettings = $Tracker.TryCommand("Get-PowerBITenantSettingsRest", @{
+            "BaseUrl" = $BaseUrl
+            "AccessToken" = $AccessToken
         })
 
         if ($AdminSettings.Count -gt 0) {
@@ -52,7 +45,7 @@ function Export-PowerBIProvider {
         }
     }
     else {
-        $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
+        $Tracker.AddSuccessfulCommand("Get-PowerBITenantSettingsRest")
     }
 
     $LicenseFoundJson = ConvertTo-Json $LicenseFound

@@ -36,38 +36,30 @@ InModuleScope AADRiskyPermissionsHelper {
 
             function Get-ServicePrincipalAll { $MockServicePrincipals }
 
-            Mock Invoke-MgGraphRequest {
+            Mock Invoke-GraphBatchRequest {
                 return @{
-                    responses = @(
-                        @{
-                            id = "00000000-0000-0000-0000-000000000030"
-                            status = 200
-                            body = @{
-                                value = $MockServicePrincipalAppRoleAssignments
-                            }
-                        },
-                        @{
-                            id = "00000000-0000-0000-0000-000000000040"
-                            status = 200
-                            body = @{
-                                value = $MockServicePrincipalAppRoleAssignments
-                            }
-                        },
-                        @{
-                            id = "00000000-0000-0000-0000-000000000050"
-                            status = 200
-                            body = @{
-                                value = $MockServicePrincipalAppRoleAssignments
-                            }
-                        },
-                        @{
-                            id     = "00000000-0000-0000-0000-000000000060"
-                            status = 200
-                            body   = @{ value = $MockServicePrincipalAppRoleAssignments }
-                        }
-                    )
+                    "00000000-0000-0000-0000-000000000030" = @{
+                        id     = "00000000-0000-0000-0000-000000000030"
+                        status = 200
+                        body   = @{ value = $MockServicePrincipalAppRoleAssignments }
+                    }
+                    "00000000-0000-0000-0000-000000000040" = @{
+                        id     = "00000000-0000-0000-0000-000000000040"
+                        status = 200
+                        body   = @{ value = $MockServicePrincipalAppRoleAssignments }
+                    }
+                    "00000000-0000-0000-0000-000000000050" = @{
+                        id     = "00000000-0000-0000-0000-000000000050"
+                        status = 200
+                        body   = @{ value = $MockServicePrincipalAppRoleAssignments }
+                    }
+                    "00000000-0000-0000-0000-000000000060" = @{
+                        id     = "00000000-0000-0000-0000-000000000060"
+                        status = 200
+                        body   = @{ value = $MockServicePrincipalAppRoleAssignments }
+                    }
                 }
-            }
+            } -ModuleName AADRiskyPermissionsHelper
             Mock Invoke-GraphDirectly {
                 return @{
                     "Value" = @{
