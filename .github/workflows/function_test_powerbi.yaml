@@ -18,6 +18,16 @@ on:
         description: "The name of a GitHub event"
         required: true
         type: string
+      SelectedProduct:
+        description: "The product selected for testing"
+        required: false
+        type: string
+        default: "all"
+      RefName:
+        description: "The branch or tag that triggered the workflow"
+        required: false
+        type: string
+        default: ""
     secrets:
       PfxBase64:
         required: true
@@ -31,8 +41,6 @@ on:
         required: true
       NotifierPassword:
         required: true
-  workflow_dispatch:
-
 permissions:
   id-token: write
   contents: write
@@ -48,6 +56,11 @@ jobs:
     concurrency:
       group: PowerBI_Tenant1
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v7
@@ -79,6 +92,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -94,6 +108,11 @@ jobs:
     concurrency:
       group: PowerBI_Tenant2
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v7
@@ -125,6 +144,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -140,6 +160,11 @@ jobs:
     concurrency:
       group: PowerBI_Tenant6
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v7
@@ -171,6 +196,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -186,6 +212,11 @@ jobs:
     concurrency:
       group: PowerBI_Tenant7
       cancel-in-progress: false
+    outputs:
+      passed: ${{ steps.run-tests.outputs.passed }}
+      failed: ${{ steps.run-tests.outputs.failed }}
+      skipped: ${{ steps.run-tests.outputs.skipped }}
+      total: ${{ steps.run-tests.outputs.total }}
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v7
@@ -217,6 +248,7 @@ jobs:
           path: C:\Users\runneradmin\.scubagear\Tools
           key: opa-directory-
       - name: Test
+        id: run-tests
         uses: ./repo/.github/actions/test-product
         with:
           Thumbprint: ${{ steps.get-thumbprint.outputs.thumbprint }}
@@ -248,6 +280,18 @@ jobs:
           server_port: 465
           username: ${{ secrets.NotifierUsername }}
           password: ${{ secrets.NotifierPassword }}
-          subject: ScubaGear Functional Test Failure
+          subject: "ScubaGear Functional Test Failure - Power BI - branch: ${{ inputs.RefName || github.ref_name }}"
           to: ${{ steps.extract-email.outputs.emails }}
           from: ${{ format('ScubaGear Notifier <{0}>', secrets.NotifierUsername) }}
+          body: |
+            ScubaGear Functional Test Failure
+
+            Product: Power BI
+            Branch: ${{ inputs.RefName || github.ref_name }}
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Tenant Job Results:
+              PBI_Tenant1: ${{ needs.PBI_Tenant1.result }} (${{ needs.PBI_Tenant1.outputs.passed }}/${{ needs.PBI_Tenant1.outputs.total }} passing, ${{ needs.PBI_Tenant1.outputs.failed }} failed)
+              PBI_Tenant2: ${{ needs.PBI_Tenant2.result }} (${{ needs.PBI_Tenant2.outputs.passed }}/${{ needs.PBI_Tenant2.outputs.total }} passing, ${{ needs.PBI_Tenant2.outputs.failed }} failed)
+              PBI_Tenant6: ${{ needs.PBI_Tenant6.result }} (${{ needs.PBI_Tenant6.outputs.passed }}/${{ needs.PBI_Tenant6.outputs.total }} passing, ${{ needs.PBI_Tenant6.outputs.failed }} failed)
+              PBI_Tenant7: ${{ needs.PBI_Tenant7.result }} (${{ needs.PBI_Tenant7.outputs.passed }}/${{ needs.PBI_Tenant7.outputs.total }} passing, ${{ needs.PBI_Tenant7.outputs.failed }} failed)
