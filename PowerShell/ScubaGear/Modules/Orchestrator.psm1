@@ -930,6 +930,10 @@ function Invoke-ProviderList {
                                 'AccessToken'       = $ConnectionResult.PBIAccessToken
                                 'BaseUrl'           = $ConnectionResult.PBIBaseUrl
                                 'LicenseFound'      = $ConnectionResult.PBILicenseFound
+                                'LicenseReason'     = $ConnectionResult.PBILicenseReason
+                            }
+                            if ($ServicePrincipalAuth) {
+                                $PBIProviderParams['CertificateBasedAuth'] = $true
                             }
                             $RetVal = Export-PowerBIProvider @PBIProviderParams | Select-Object -Last 1
                         }

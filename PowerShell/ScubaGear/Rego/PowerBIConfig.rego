@@ -6,7 +6,18 @@ import data.utils.report.ReportDetailsBoolean
 
 # Some global variables
 
-PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluate tenant setting."
+# Connect-Tenant reports why the license check failed, so the report can distinguish a tenant
+# with no Power BI licenses from a running user who simply has none assigned
+PowerbiLicenseReason := object.get(input, "powerbi_license_reason", "")
+
+# The reason is optional: when it is absent or empty the original generic message is used unchanged
+PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluate tenant setting." if {
+    PowerbiLicenseReason == ""
+}
+
+PowerbiLicenseErrorMessage := sprintf("Unable to evaluate tenant setting. %v", [PowerbiLicenseReason]) if {
+    PowerbiLicenseReason != ""
+}
 
 # object.get returns the actual value from the input if the key exists, otherwise it returns the default value specified (false in this case)
 PowerbiLicenseFound := object.get(input, "powerbi_license_found", false)
