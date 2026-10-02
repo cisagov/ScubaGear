@@ -17,22 +17,6 @@ test_SensitiveUsers_EmptyConfig if {
     TestResult("MS.SECURITYSUITE.2.1v1", Output, ReportDetailString, false) == true
 }
 
-test_SensitiveUsers_DefenderConfigAlias if {
-    Output := securitysuite.tests with input.anti_phish_policies as AntiPhishPolicies
-                            with input.anti_phish_rules as AntiPhishRules
-                            with input.protection_policy_rules as ProtectionPolicyRules
-                            with input.accepted_domains as AcceptedDomains
-                            with input.scuba_config as ScubaConfig
-                            with input.scuba_config.SecuritySuite as {}
-                            with input.scuba_config.Defender["MS.DEFENDER.2.1v1"].SensitiveUsers as [
-                                "John Doe;jdoe@someemail.com",
-                                "Jane Doe;jadoe@someemail.com"
-                            ]
-                            with input.defender_license as true
-
-    TestResult("MS.SECURITYSUITE.2.1v1", Output, PASS, true) == true
-}
-
 test_SensitiveUsers_EmailOnlyConfig if {
     Output := securitysuite.tests with input.anti_phish_policies as AntiPhishPolicies
                             with input.anti_phish_rules as AntiPhishRules
