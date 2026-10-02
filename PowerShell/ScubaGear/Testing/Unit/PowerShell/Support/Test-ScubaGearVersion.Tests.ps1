@@ -52,19 +52,9 @@ InModuleScope 'Support' {
                 ModuleBase = "$env:USERPROFILE\Documents\PowerShell\Modules\ScubaGear\$($script:CurrentScubaGearVersion)"
             }
 
-            # Simulate a newer version for update testing using ScubaGear's versioning pattern
-            # ScubaGear uses versions like 1.4.0, 1.5.0, 1.6.0, so increment minor version
-            $script:MockNewerScubaGearVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor + 1).0"
-
-            # Create an older version using ScubaGear's versioning pattern
-            # For current version 1.6.0, older would be 1.5.0
-            if ($script:CurrentScubaGearVersion.Minor -eq 0) {
-                # If we're at X.0.0, go to (X-1).9.0 (though this is unlikely for ScubaGear)
-                $script:MockOlderScubaGearVersion = [version]"$($script:CurrentScubaGearVersion.Major - 1).9.0"
-            } else {
-                # Normal case: 1.6.0 -> 1.5.0
-                $script:MockOlderScubaGearVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor - 1).0"
-            }
+            # Used only for ordering against the installed version.
+            $script:MockOlderScubaGearVersion = [version]'1.9.0'  # a stale install left on disk
+            $script:MockNewerScubaGearVersion = [version]'9.0.0'  # a newer release on PSGallery
 
             # Set up default mocks at BeforeAll level to ensure they're available
             Mock Get-DependencyStatus {

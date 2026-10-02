@@ -1206,9 +1206,9 @@ function Format-PlainText {
         # Multi-line strings (e.g., the requirment string for MS.EXO.16.1v1) need to be merged into a single
         # line, otherwise the single control will be split into multiple rows in the CSV output
         $CleanString = $CleanString.Replace("`n", " ")
-        # The "View all CA policies" link needs to be removed from the spreadsheet as what it links to
-        # does not exist in the spreadsheet
-        $CleanString = $CleanString.Replace("<a href='#caps'>View all CA policies</a>.", "")
+        # Links to tables elsewhere in the HTML report (e.g. "View all CA policies", the Security
+        # Suite policy tables) have no target in the spreadsheet, so drop them entirely
+        $CleanString = $CleanString -replace "<a href='#[^']*'>[^<]*</a>\.?", ""
         # Remove HTML tags that won't render properly in the spreadsheet and whose removal won't affect the
         # overall meaning of the string
         $CleanString = $CleanString.Replace("<br/>", " ")
