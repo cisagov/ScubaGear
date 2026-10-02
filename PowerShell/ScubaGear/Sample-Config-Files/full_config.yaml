@@ -258,7 +258,7 @@ OmitPolicy:
   # -------------------------------------
   # OMIT POLICY : POWERPLATFORM SAMPLE
   # -------------------------------------
-  # Non-default environments SHOULD have at least one DLP policy affecting them.
+  # Non-default environments SHOULD have at least one DLP policy.
   MS.POWERPLATFORM.2.2v1:
     Rationale: *DLPRationale
 

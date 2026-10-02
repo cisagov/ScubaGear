@@ -2,20 +2,20 @@
 
 # CISA M365 Secure Configuration Baseline for Power Platform
 
-Microsoft 365 (M365) Power Platform is a cloud-based enterprise group of applications comprised of a low-code application development toolkit, business intelligence software, a custom chat bot creator, and app connectivity software.  This Secure Configuration Baseline (SCB) provides specific policies to help secure Power Platform security.
+Microsoft 365 (M365) Power Platform is a cloud-based enterprise group of applications comprised of a low-code application development toolkit, business intelligence software, a custom chatbot creator, and application connectivity software. This secure configuration baseline (SCB) provides specific policies to help secure Power Platform security.
 
-The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+The Cybersecurity and Infrastructure Security Agency’s Secure Cloud Business Applications (SCuBA) project provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian federal government agencies, organizations outside of the federal government may also find these baselines to be useful references to help reduce risks.
 
-For non-Federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+For non-federal users, the information in this document is being provided “as is” for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products. CISA has no control over vendor changes to products offerings or features. Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
 
 ## License Compliance and Copyright
 
-Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States Government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
+Portions of this document are adapted from documents in Microsoft’s [Microsoft 365](https://github.com/MicrosoftDocs/microsoft-365-docs/blob/public/LICENSE) and [Azure](https://github.com/MicrosoftDocs/azure-docs/blob/main/LICENSE) GitHub repositories. The respective documents are subject to copyright and are adapted under the terms of the Creative Commons Attribution 4.0 International license. Source documents are linked throughout this document. The United States government has adapted selections of these documents to develop innovative and scalable configuration standards to strengthen the security of widely used cloud-based software services.
 
 ## Assumptions
 
@@ -23,8 +23,8 @@ The **License Requirements** sections of this document assume the organization i
 
 ## Key Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD,"
+"SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be
 interpreted as described in
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
@@ -32,82 +32,86 @@ interpreted as described in
 The following section summarizes the various Power Platform applications referenced in this baseline:
 
 1. **Power Apps**: Low-code application development software used
-to create custom business applications. The apps can be developed as desktop,
-mobile, and even web apps. Three different types of Power Apps can be
+to create custom business applications. The applications can be developed as desktop,
+mobile, and web-based applications. Three different types of Power Apps can be
 created:
 
-   1. [**Canvas Apps**](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/): These are drag and
-    drop style developed apps, where
+   1. [**Canvas Apps**](https://learn.microsoft.com/en-us/power-apps/maker/canvas-apps/): These are drag-and-drop
+    style developed applications, where
     users drag and add User Interface (UI) components to the screen.
     Users can then connect the components to data sources to display
-    data in the canvas app.
+    data in the canvas application.
 
-   2. [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These are apps developed from an existing
-    data source. They can be thought of as the inverse of a Canvas App.
-    Since, you build the app from the source rather than building the UI and then connecting to the source like
-    Canvas apps.
+   2. [**Model-Driven Apps**](https://learn.microsoft.com/en-us/power-apps/maker/model-driven-apps/): These are applications developed from an existing
+    data source. They can be thought of as the inverse of a canvas application
+    since it is built from the source rather than building the UI before connecting to the source,
+    as is the case with canvas applications.
 
-   3. [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These apps that are developed to function as either internal or external facing websites.
+   3. [**Power Pages**](https://learn.microsoft.com/en-us/power-pages/): These applications are developed to function as either internal or external facing websites.
 
-2. [**Power Automate**](https://learn.microsoft.com/en-us/power-automate/): This is an online tool within Microsoft 365 and add-ins used to create automated workflows between apps
-and services to synchronize files, get notifications, and collect data.
+2. [**Power Automate**](https://learn.microsoft.com/en-us/power-automate/): This is an online tool within Microsoft 365 that provides add-ins used to create automated workflows between applications
+and services, helping users synchronize files, get notifications, and collect data.
 
-3. [**Power Virtual Agents**](https://learn.microsoft.com/en-us/power-virtual-agents/): These are custom chat bots for use in the stand-alone Power Virtual Agents web app or in a Microsoft Teams
+3. [**Power Virtual Agents**](https://learn.microsoft.com/en-us/power-virtual-agents/): These are custom chatbots for use in the stand-alone Power Virtual Agents web application or in a Microsoft Teams
 channel.
 
-4. [**Connectors**](https://learn.microsoft.com/en-us/connectors/connector-reference/): These are proxies or wrappers around an API that allow the underlying service to be accessed from Power Automate Workflows, Power Apps, or Azure Logic Apps.
+4. [**Connectors**](https://learn.microsoft.com/en-us/connectors/connector-reference/): These are proxies or wrappers around an Application Programming Interface (API) that allow the underlying service to be accessed from Power Automate Workflows, Power Apps, or Azure Logic Apps.
 
 5. [**Microsoft Dataverse**](https://learn.microsoft.com/en-us/power-apps/maker/data-platform/): This is a cloud database management system most
 often used to store data in SQL-like tables. A Power App would then use
 a connector to connect to the Dataverse table and perform create, read,
 update, and delete (CRUD) operations.
 
-**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
+**BOD 25-01 Requirement**: This indicator means that the policy is required under [CISA BOD 25-01](https://www.cisa.gov/news-events/directives/bod-25-01-implementing-secure-practices-cloud-services).
 
 **Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
+
+**Configurable**: This indicator means that the policy can be customized via a configuration file.
+
+**Requires Configuration**: This indicator means that ScubaGear requires configuration via configuration file in order to check the policy.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
 # Baseline Policies
 
-Baseline Policies in this document are targeted towards administrative controls that apply to
+Baseline policies in this document are targeted towards administrative controls that apply to
 Power Platform applications at either the tenant or Power Platform
 environment level. Additional Power Platform security settings can be
-implemented at the app level, connector level, or Dataverse table level.
+implemented at the application level, connector level, or Dataverse table level.
 Refer to [Power Platform Microsoft Learn documentation](https://learn.microsoft.com/en-us/power-platform/) for those additional controls.
 
 ## 1. Creation of Power Platform Environments
 
-By default, any user in the Microsoft Entra ID Tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following admin roles: Global admins, Dynamics 365 admins, and Power Platform admins.
+By default, any user in the Microsoft Entra ID tenant can create additional environments. Enabling these controls will restrict the creation of new environments to users with the following administrator roles: Global administrators, Dynamics 365 administrators, and Power Platform administrators.
 
 ### Policies
 
 #### MS.POWERPLATFORM.1.1v1
-The ability to create production and sandbox environments SHALL be restricted to admins.
+The ability to create production and sandbox environments SHALL be restricted to administrators.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 
 <!--Policy: MS.POWERPLATFORM.1.1v1; Criticality: SHALL -->
-- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass data loss prevention (DLP) policy settings or misconfigure the security settings of their environment.
-- _Last Modified:_ June 2023
-- Note: This control restricts creating environments to users with Global admin, Dynamics 365 service admin, Power Platform service admins, or Delegated admin roles.
+- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass data loss prevention (DLP) policy settings or misconfigure their environment's security settings.
+- _Last Modified:_ April 2026
+- Note: This control restricts the ability to create environments to users with Global administrator, Dynamics 365 service administrator, Power Platform service administrator, or Delegated administrator roles.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
 
 #### MS.POWERPLATFORM.1.2v1
-The ability to create trial environments SHALL be restricted to admins.
+The ability to create trial environments SHALL be restricted to administrators.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERPLATFORM.1.2v1; Criticality: SHALL -->
-- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the security settings of their environment.
-- _Last Modified:_ June 2023
-- Note: This control restricts creating environments to users with Global admin, Dynamics 365 service admin, Power Platform service admins, or Delegated admin roles.
+- _Rationale:_ Users creating new Power Platform environments may inadvertently bypass DLP policy settings or misconfigure the environment's security settings.
+- _Last Modified:_ April 2026
+- Note: This control restricts the ability to create environments to users with Global administrator, Dynamics 365 service administrator, Power Platform service administrator, or Delegated administrator roles.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -151,14 +155,14 @@ The ability to create trial environments SHALL be restricted to admins.
 
 To secure Power Platform environments, DLP
 policies can be created to restrict the connectors used with
-Power Apps created in an environment. A DLP policy can be created to
-affect all or some environments or exclude certain environments. The
-more restrictive policy will be enforced when there is a conflict.
+Power Apps created within a given environment. A DLP policy can be created to
+affect all or some environments and can exclude certain environments. When
+there is a conflict between DLP policies, the more restrictive policy will be enforced.
 
 Connectors can be separated by creating a DLP policy assigning them
-to one of three groups: Business, Non-Business, and Blocked. Connectors
+to one of three groups: "Business," "Non-Business," and "Blocked." Connectors
 in different groups cannot be used in the same Power App. Connectors in
-the Blocked group cannot be used at all. (Note: Some M365 connectors
+the "Blocked" group cannot be used at all. (Note: Some M365 connectors
 cannot be blocked, such as Teams and SharePoint connectors).
 
 In the DLP policy, connectors can be configured to restrict read
@@ -166,14 +170,14 @@ and write permissions to the data source/service. Connectors that cannot
 be blocked cannot be configured. Agencies should evaluate the
 connectors and configure them to fit agency needs and security
 requirements. The agency should then create a DLP policy to only allow
-those connectors to be used in Power Platform.
+those specific connectors to be used in Power Platform.
 
-When the Microsoft Entra ID tenant is created, by default, a Power Platform
+When the Microsoft Entra ID tenant is created, by default, an
 environment is created in Power Platform. This Power Platform
 environment will bear the name of the tenant. There is no way to
-restrict users in the Microsoft Entra ID tenant from creating Power Apps in the
-default Power Platform environment. Admins can restrict users from
-creating apps in all other created environments.
+restrict Microsoft Entra ID tenant users from creating Power Apps in the
+default Power Platform environment. Administrators can restrict users from
+creating applications in all other created environments.
 
 ### Policies
 
@@ -184,21 +188,21 @@ A DLP policy SHALL be created to restrict connector access in the default Power 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERPLATFORM.2.1v1; Criticality: SHALL -->
-- _Rationale:_ All users in the tenant have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access to it. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs while also maintaining the agency's security posture.
+- _Rationale:_ All tenant users have access to the default Power Platform environment. Those users may inadvertently use connectors that share sensitive information with others who should not have access. Users requiring Power Apps should be directed to conduct development in other Power Platform environments with DLP connector policies customized to suit the user's needs, while also maintaining the agency's security posture.
 - _Last Modified:_ June 2023
-- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such these connectors remain non-blockable to maintain core user scenario functions.
+- _Note:_ The following connectors drive core Power Platform functionality and enable core Office customization scenarios: Approvals, Dynamics 365 Customer Voice, Excel Online (Business), Microsoft Dataverse, Microsoft Dataverse (legacy), Microsoft Teams, Microsoft To-Do (Business), Office 365 Groups, Office 365 Outlook, Office 365 Users, OneDrive for Business, OneNote (Business), Planner, Power Apps Notification, Power BI, SharePoint, Shifts for Microsoft Teams, and Yammer. As such, these connectors remain non-blockable to maintain core user scenario functions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
   - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
 
 #### MS.POWERPLATFORM.2.2v1
-Non-default environments SHOULD have at least one DLP policy affecting them.
+Non-default environments SHOULD have at least one DLP policy.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERPLATFORM.2.2v1; Criticality: SHOULD -->
-- _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access to it. DLP policies provide a way for agencies to detect and prevent unauthorized disclosures.
+- _Rationale:_ Users may inadvertently use connectors that share sensitive information with others who should not have access. DLP policies enable agencies to detect and prevent unauthorized disclosures.
 - _Last Modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-7(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -219,7 +223,7 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 
 - [DLP for custom connectors \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol)
-  
+
 ### License Requirements
 
 - N/A
@@ -227,62 +231,62 @@ Non-default environments SHOULD have at least one DLP policy affecting them.
 ### Implementation
 
 #### MS.POWERPLATFORM.2.1v1 Instructions
-1.  Sign in to your tenant environment's respective [Power Platform admin
+1.  Sign in to your tenant environment's respective [Power Platform administrative
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
 2.  On the left pane, select **Security** -\> **Data and privacy.**
 
-3.   Select **Data policy,** then select **+ New Policy** icon to create a new policy.
+3.  Select **Data policy,** then select the **+ New Policy** icon to create a new policy.
 
 4.  Give the policy a suitable agency name and click **Next.**
 
-5.  At the **Prebuilt connectors** section, search and select the connectors currently in the **Non-business | default** tab containing sensitive data that can be utilized to create flows and apps.
+5.  In the **Prebuilt connectors** section, search for and select the connectors currently in the **Non-business | default** tab that contain sensitive data which could be utilized to create flows and applications.
 
-6.  Click **Move to Business.** Connectors added to this group can not share data with connectors in other groups because connectors can reside in only one data group at a time. 
+6.  Click **Move to Business.** Connectors added to this group cannot share data with connectors in other groups because connectors can only reside in one data group at a time.
 
-7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows greater flexibility for the agency to allow and block certain connector actions for additional customization. 
+7.  If necessary (and possible) for the connector, click **Configure connector** at the top of the screen to change connector permissions. This allows the agency to allow and block certain connector actions for additional customization.
 
-8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the Block action will be grayed out and a warning will appear.
+8.  For the default environment, move all other connectors to the **Blocked** category. For non-blockable connectors noted above, the "Block" action will be grayed out and a warning will appear.
 
 9.  At the bottom of the screen, select **Next** to move on.
 
-10.  Add a custom connector pattern. Custom connectors allow admins to specify an ordered list of Allow and Deny URL patterns for custom connectors.  View [DLP for custom connectors \| Microsoft
+10.  Add a custom connector pattern. Custom connectors allow administrators to specify an ordered list of "Allow" and "Deny" URL patterns for custom connectors. View [DLP for custom connectors \| Microsoft
   Learn](https://learn.microsoft.com/en-us/power-platform/admin/dlp-custom-connector-parity?WT.mc_id=ppac_inproduct_datapol) for more information.
 
 11.  Click **Next**.
 
-12.  At the **Scope** section for the default environment, select **Add multiple environments** then click **Next**.
+12.  In the **Scope** section for the default environment, select **Add multiple environments**, then click **Next**.
 
-13.  Select the default environment, then select the **+ Add to policy** button at the top of the screen, then select **Next**.
+13.  Select the default environment, then select the **+ Add to policy** button at the top of the screen. Then select **Next**.
 
-14. Select **Next**-\> **Create Policy** to finish.
+14. Select **Next** and **Create policy** to finish.
 
 #### MS.POWERPLATFORM.2.2v1 Instructions
-1.  Repeat steps 1 to 11 in the MS.POWERPLATFORM.2.1v1 instructions.
+1.  Repeat steps one through 11 in the MS.POWERPLATFORM.2.1v1 instructions.
 
-2.  At the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments where you wish to enforce a DLP policy upon. If you wish to apply the DLP policy for all environments including environments created in the future select **Add all environments**.
+2.  In the **Scope** section for the default environment, select **Add multiple environments** and select the non-default environments that you wish to enforce a DLP policy upon. If you wish to apply the DLP policy for all environments, including environments created in the future, select **Add all environments**.
 
-4.  Select **Next**-\> **Create Policy** to finish.
+3.  Select **Next** and **Create policy** to finish.
 
 
 ## 3. Power Platform Tenant Isolation
 
-Power Platform tenant isolation is different from Microsoft Entra ID wide tenant
-restriction. It does not impact Microsoft Entra-based access outside of Power
+Power Platform tenant isolation is different from Microsoft Entra ID-wide tenant
+restriction. Tenant isolation does not impact Microsoft Entra ID-based access outside of Power
 Platform. Power Platform tenant isolation only works for connectors
-using Microsoft Entra-based authentication, such as Office 365 Outlook or
+using Microsoft Entra ID-based authentication, such as Microsoft 365 Outlook or
 SharePoint. The default configuration in Power Platform has tenant
 isolation set to **Off**, allowing for cross-tenant connections to
-be established. A user from tenant A using a Power App with a connector
-can seamlessly establish a connection to tenant B if using appropriate
+be established. A user from tenant A, using a Power App with a connector,
+can seamlessly establish a connection to tenant B if using the appropriate
 Microsoft Entra ID credentials.
 
-If admins want to allow only a select set of tenants to establish
-connections to or from their tenant, they can turn on tenant isolation.
+If administrators want to allow only a select set of tenants to establish
+connections with their tenant, they can turn on tenant isolation.
 Once tenant isolation is turned on, inbound (connections to the tenant
 from external tenants) and outbound (connections from the tenant to
-external tenants) cross-tenant connections are blocked by Power Platform
-even if the user presents valid credentials to the Microsoft Entra-secured data
+external tenants) cross-tenant connections are blocked by Power Platform,
+even if the user presents valid credentials to the Microsoft Entra ID-secured data
 source.
 
 ### Policies
@@ -294,8 +298,8 @@ Power Platform tenant isolation SHALL be enabled.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERPLATFORM.3.1v1; Criticality: SHALL -->
-- _Rationale:_ Provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation specifically for Power Platform applications to prevent accidental or malicious cross tenant information sharing.
-- _Last modified:_ June 2023
+- _Rationale:_ Enabling Power Platform tenant isolation provides an additional tenant isolation control on top of Microsoft Entra ID tenant isolation, specifically for Power Platform applications. This control helps prevent accidental or malicious cross-tenant information sharing.
+- _Last modified:_ April 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(5)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
@@ -310,9 +314,9 @@ An inbound/outbound connection allowlist SHOULD be configured.
 
 
 <!--Policy: MS.POWERPLATFORM.3.2v1; Criticality: SHOULD -->
-- _Rationale:_ Depending on agency needs an allowlist can be configured to allow cross tenant collaboration via connectors.
-- _Last modified:_ June 2023
-- Note: The allowlist may be empty if the agency has no need for cross tenant collaboration.
+- _Rationale:_ Depending on agency needs, an allowlist can be configured to allow cross-tenant collaboration via connectors.
+- _Last modified:_ April 2026
+- Note: The allowlist may be empty if the agency has no need for cross-tenant collaboration.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(5)
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -329,32 +333,32 @@ An inbound/outbound connection allowlist SHOULD be configured.
 ### Implementation
 
 #### MS.POWERPLATFORM.3.1v1 Instructions
-1.  Sign in to your tenant environment's respective [Power Platform admin
+1.  Sign in to your tenant environment's respective [Power Platform administrative
     center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
-2.  On the left pane, select **Security -\> Identity and access -\> Tenant Isolation**.
+2.  On the left pane, select **Policies -\> Tenant isolation**.
 
-3.  Set the slider **Restrict cross-tenant connections** to **On,** then click **Save**
-    on the bottom of the screen.
+3.  Set the slider labeled **Restrict cross-tenant connections** and move it to **On,** then click **Save**
+    at the bottom of the screen.
 
 #### MS.POWERPLATFORM.3.2v1 Instructions
-1.  Follow steps **1 and 2** in **MS.POWERPLATFORM.3.1v1 instructions** to
-arrive at the same page.
+1.  Follow steps one and two in the **MS.POWERPLATFORM.3.1v1 instructions** to
+arrive at the "Tenant isolation" page.
 
 2.  The tenant isolation exceptions can be configured by clicking **+ Add exceptions**
-on the Tenant Isolation page.
+on the "Tenant isolation" page.
 
-3.  Select the **Direction** of the rule and add the **Tenant Domain or ID** this rule applies to.
+3.  Select the direction of the rule and add the tenant domain or ID to which the rule applies.
 
-4.  If Tenant Isolation is switched **Off**, these rules will not be enforced until tenant
-isolation is turned **On**.
+4.  If "tenant isolation" is switched to **Off**, these rules will not be enforced until "tenant
+isolation" is turned **On**.
 
 ## 4. Power Apps Content Security Policy
 
-Content Security Policy (CSP) is an added security layer that helps
-to detect and mitigate certain types of attacks, including Cross-Site
+Content Security Policy (CSP) is an added security layer to help
+detect and mitigate certain types of attacks, including Cross-Site
 Scripting (XSS), clickjacking, and data injection attacks. When enabled, this setting can apply to all
-current canvas apps and model-driven apps at the Power Platform environment level.
+current canvas applications and model-driven applications at the Power Platform environment level.
 
 ### Policies
 
@@ -364,8 +368,8 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#mspowerplatform41v1-instructions)
 
 <!--Policy: MS.POWERPLATFORM.4.1v1; Criticality: SHALL -->
-- _Rationale:_ Adds CSP as a defense mechanism for Power Apps against common website attacks.
-- _Last Modified:_ March 2025
+- _Rationale:_ Enforcing CSP for model-driven and canvas Power Apps adds a defense mechanism against common website attacks.
+- _Last Modified:_ April 2026
 - _Note:_ This policy is only applicable to environments using Dataverse.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-10
 - _MITRE ATT&CK TTP Mapping:_
@@ -383,34 +387,34 @@ Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Powe
 ### Implementation
 
 #### MS.POWERPLATFORM.4.1v1 Instructions
-1.  Sign in to your tenant environment's respective [Power Platform admin
+1.  Sign in to your tenant environment's respective [Power Platform administrative
 center](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-us-government#power-apps-us-government-service-urls).
 
-2.  On the left-hand pane click on **Manage -\> Environments** and then select an environment from the list.
+2.  On the left-hand pane, click on **Environments**, then select an environment from the list.
 
 3.  Select the **Settings** icon at the top of the page.
 
-4.  Click on **Product** then click on **Privacy + Security** from the options that appear.
+4.  Click on **Product**, then click on **Privacy + Security** from the options that appear.
 
-5.  At the bottom of the page under the **Content security policy** section, set **Enforce content security policy** to **On** for **Model-driven** and **Canvas**.
+5.  At the bottom of the page, under the **Content security policy** section, set **Enforce content security policy** to **On** for **Model-driven** and **Canvas**.
 
-6.  At the same location, set **Enable reporting**  to **On** and add an appropriate endpoint for reporting CSP violations can be reported to.
+6.  Set **Enable reporting** to **On** and add an appropriate endpoint for reporting CSP violations.
 
-7.  Repeat steps 2 to 6 for all active Power Platform environments.
+7.  Repeat steps two through six for all active Power Platform environments.
 
 ## 5. Power Pages Creation
 
-Power Pages formerly known as Power Portals are Power Apps specifically designed to act as external facing websites. By default any user in the tenant can create a Power Page. Admins can restrict the creation of new Power Pages to only admins.
+Power Pages, formerly known as Power Portals, are Power Apps specifically designed to act as external-facing websites. By default, any user in the tenant can create a Power Page. Administrators can restrict the creation of new Power Pages to administrator-level users only.
 
 ### Policies
 
 #### MS.POWERPLATFORM.5.1v1
-The ability to create Power Pages sites SHOULD be restricted to admins.
+The ability to create Power Pages sites SHOULD be restricted to administrators.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERPLATFORM.5.1v1; Criticality: SHOULD -->
-- _Rationale:_ Users may unintentionally misconfigure their Power Pages to expose sensitive information or leave the website in a vulnerable state.
+- _Rationale:_ Users may unintentionally misconfigure their Power Pages, exposing sensitive information or leaving the website in a vulnerable state.
 - _Last Modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -427,12 +431,12 @@ The ability to create Power Pages sites SHOULD be restricted to admins.
 ### Implementation
 
 #### MS.POWERPLATFORM.5.1v1 Instructions
-1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+1.  This setting can currently only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
-2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
-Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint` to authenticate to your tenant's Power Platform.
+Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, while GCC tenants use `-Endpoint usgov`.
 
-3. Then run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users.
+3. Run the following PowerShell command to disable the creation of Power Pages sites by non-administrative users:
 
     ```
     Set-TenantSettings -RequestBody @{ “disablePortalsCreationByNonAdminUsers” = $true }
@@ -445,12 +449,12 @@ Power Apps supports discovery of apps by allowing makers to share canvas apps wi
 ### Policies
 
 #### MS.POWERPLATFORM.6.1v1
-The Share with Everyone feature SHOULD be disabled.
+The "Share with everyone" feature SHOULD be disabled.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.POWERPLATFORM.6.1v1; Criticality: SHOULD -->
-- _Rationale:_ Prevents tenant-wide exposure of applications with unintended users. If enabled, this setting grants application access to the **Everyone** group for your organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The **Everyone** group is not a standard Microsoft Entra ID security group and can't be edited or viewed, complicating auditing and access governance. The configuration setting is disabled by default; however, this is a defense-in-depth policy to protect against misconfigurations or malicious actors.
+- _Rationale:_ Disabling the "Share with everyone" feature prevents tenant-wide application exposure with unintended users. If enabled, this setting grants application access to the "Everyone" group for an organization. Its membership contains all users present in the directory, including B2B guest accounts and internal members. The "Everyone" group is not a standard Microsoft Entra ID security group and can't be edited or viewed, complicating auditing and access governance. The configuration setting is disabled by default. However, this is a defense-in-depth policy to protect against misconfigurations or malicious actors.
 - _Last Modified:_ October 2025
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6(5), AC-6(10)
 - _MITRE ATT&CK TTP Mapping:_
@@ -470,12 +474,12 @@ The Share with Everyone feature SHOULD be disabled.
 ### Implementation
 
 #### MS.POWERPLATFORM.6.1v1 Instructions
-1.  This setting currently can only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
+1.  This setting can currently only be enabled through the [Power Apps PowerShell modules](https://learn.microsoft.com/en-us/power-platform/admin/powerapps-powershell#installation).
 
-2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint`. To authenticate to your tenant's Power Platform.
-Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, GCC tenants use `-Endpoint usgov` and so on.
+2. After installing the Power Apps PowerShell modules, run `Add-PowerAppsAccount -Endpoint $YourTenantsEndpoint` to authenticate to your tenant's Power Platform.
+Discover the valid endpoint parameter [here](https://learn.microsoft.com/en-us/powershell/module/microsoft.powerapps.administration.powershell/add-powerappsaccount?view=pa-ps-latest#-endpoint). Commercial tenants use `-Endpoint prod`, while GCC tenants use `-Endpoint usgov`.
 
-3. Then run the following PowerShell commands to get the settings object and set the variable `disableShareWithEveryone` to `$true`.
+3. Run the following PowerShell commands to get the settings object and set the variable `disableShareWithEveryone` to `$true`.
 
     ```
     $tenantSettings = Get-TenantSettings
