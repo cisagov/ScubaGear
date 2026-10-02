@@ -269,6 +269,9 @@ const buildExpandableTable = (data, tableType, severityScoreWeights) => {
         section.appendChild(document.createElement("hr"));
         const h2 = document.createElement("h2");
         h2.textContent = metadata.title;
+        // Anchor target for policy result links, e.g. the "View all CA policies"
+        // link AAD.rego adds to failing conditional access controls.
+        h2.id = tableType;
         section.appendChild(h2);
 
         if (data.length === 0) {
