@@ -99,7 +99,7 @@ Aad:
   # Users detected as high risk SHALL be blocked.
   MS.AAD.2.1v1: *CommonCapExclusions
 
-  # Sign-ins detected as high-risk SHALL be blocked.
+  # Sign-ins detected as high risk SHALL be blocked.
   MS.AAD.2.3v1: *CommonCapExclusions
 
   # Phishing-resistant MFA SHALL be enforced for all users.
@@ -124,7 +124,7 @@ Aad:
   # Managed devices SHOULD be required for authentication.
   MS.AAD.3.7v1: *CommonCapExclusions
 
-  # Managed devices SHOULD be required to register MFA
+  # Managed Devices SHOULD be required to register MFA
   MS.AAD.3.8v1: *CommonCapExclusions
 
   # Deviceflow block SHALL be enforced for all users.
@@ -258,7 +258,7 @@ OmitPolicy:
   # -------------------------------------
   # OMIT POLICY : POWERPLATFORM SAMPLE
   # -------------------------------------
-  # Non-default environments SHOULD have at least one DLP policy.
+  # Non-default environments SHOULD have at least one DLP policy affecting them.
   MS.POWERPLATFORM.2.2v1:
     Rationale: *DLPRationale
 
