@@ -3,7 +3,8 @@
     "servicePrincipal": {
         "id": "sp-ppunneeded-1",
         "appId": "00000000-0000-0000-0000-000000000005",
-        "displayName": "ScubaGear Test SP - PP Unneeded"
+        "displayName": "ScubaGear Test SP - PP Unneeded",
+        "appOwnerOrganizationId": "11111111-1111-1111-1111-111111111111"
     },
     "application": {
         "id": "app-ppunneeded-1",
@@ -38,6 +39,6 @@
     "productNames": ["aad", "exo", "securitysuite", "sharepoint", "teams"],
     "expectedResult": {
         "hasFixPermissionIssues": true,
-        "statusPattern": "Action needed.*Power Platform registered but not required"
+        "statusPattern": "Action needed.*remove Power Platform registration"
     }
 }
