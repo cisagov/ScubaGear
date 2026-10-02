@@ -32,7 +32,10 @@ function Export-EXOProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "EXORestHelper.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Write-ScubaLog
     $Tracker = Get-CommandTracker
+
+    Write-ScubaLog -Message "Starting EXO provider export." -Level Info -Source "Export-EXOProvider"
 
     <#
     MS.EXO.1.1v2
@@ -118,6 +121,12 @@ function Export-EXOProvider {
     # Used in the reporter to check successful cmdlet invocation
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
+    Write-ScubaLog -Message "Completed EXO provider export." -Level Debug -Source "Export-EXOProvider" -Data @{
+        SuccessfulCommandCount   = @($Tracker.GetSuccessfulCommands()).Count
+        UnsuccessfulCommandCount = @($Tracker.GetUnSuccessfulCommands()).Count
+        UnsuccessfulCommands     = @($Tracker.GetUnSuccessfulCommands())
+    }
 
     # Note the spacing and the last comma in the json is important
     $json = @"

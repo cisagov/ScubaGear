@@ -27,7 +27,10 @@ function Export-PowerBIProvider {
 
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Write-ScubaLog
     $Tracker = Get-CommandTracker
+
+    Write-ScubaLog -Message "Starting Power BI provider export." -Level Info -Source "Export-PowerBIProvider"
 
     if ($LicenseFound) {
         if ([string]::IsNullOrEmpty($AccessToken) -or [string]::IsNullOrEmpty($BaseUrl)) {
@@ -58,6 +61,12 @@ function Export-PowerBIProvider {
     $LicenseFoundJson = ConvertTo-Json $LicenseFound
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
+    Write-ScubaLog -Message "Completed Power BI provider export." -Level Debug -Source "Export-PowerBIProvider" -Data @{
+        SuccessfulCommandCount   = @($Tracker.GetSuccessfulCommands()).Count
+        UnsuccessfulCommandCount = @($Tracker.GetUnSuccessfulCommands()).Count
+        UnsuccessfulCommands     = @($Tracker.GetUnSuccessfulCommands())
+    }
 
     $json = @"
     "powerbi_tenant_settings": $TenantSettingsJson,
