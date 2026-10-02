@@ -469,7 +469,7 @@ Function Start-ScubaGearExecution {
         Update-ScubaRunStatus -Message "Starting ScubaGear execution..." -Level "Info"
 
         # Build PowerShell command
-        $command = Build-ScubaGearCommand -ConfigFilePath $tempConfigPath
+        $command = New-ScubaGearCommand -ConfigFilePath $tempConfigPath
 
         # Debug: Show commands in output
         $syncHash.ScubaRunOutput_TextBox.AppendText("=== SCUBAGEAR EXECUTION STARTING ===`r`n")
@@ -530,7 +530,7 @@ Function Export-TempYamlConfiguration {
     }
 }
 
-Function Build-ScubaGearCommand {
+Function New-ScubaGearCommand {
     <#
     .SYNOPSIS
     Builds the PowerShell command to execute ScubaGear with required defaults and optional parameters.

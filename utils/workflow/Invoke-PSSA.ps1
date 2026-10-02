@@ -43,7 +43,20 @@ function Invoke-PSSA {
 
 	# Analyze each file and collect results
 	foreach ($PsFile in $PsFiles) {
-		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
+		$Results = $null
+		foreach ($Attempt in 1..2) {
+			try {
+				$Results = Invoke-ScriptAnalyzer -Path $PsFile.FullName -Settings $ConfigPath -ErrorAction Stop
+				break
+			}
+			catch {
+				$IsTransientNullReference = $_.Exception.Message -match 'Object reference not set to an instance of an object'
+				if (-not $IsTransientNullReference -or $Attempt -eq 2) {
+					throw "PSScriptAnalyzer failed for '$($PsFile.FullName)': $($_.Exception.Message)"
+				}
+				Write-Warning "PSScriptAnalyzer encountered a transient null reference for '$($PsFile.FullName)'; retrying."
+			}
+		}
 		foreach ($Result in $Results) {
 			Write-Warning "File:     $($Result.ScriptPath)"
 			Write-Warning "Line:     $($Result.Line)"

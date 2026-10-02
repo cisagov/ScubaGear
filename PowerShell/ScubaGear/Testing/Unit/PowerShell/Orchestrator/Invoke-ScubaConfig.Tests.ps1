@@ -269,6 +269,8 @@ InModuleScope Orchestrator {
 
     # Cleanup - remove dummy OPA executables
     AfterAll {
+        Remove-Module Orchestrator -ErrorAction SilentlyContinue
+
         # Clean up default location OPA
         if ($script:DummyOPACreatedByTests -and (Test-Path $script:DummyOPAPath)) {
             Remove-Item -Path $script:DummyOPAPath -Force -ErrorAction SilentlyContinue
@@ -279,34 +281,31 @@ InModuleScope Orchestrator {
         if ($script:InModuleTestOPACreatedByTests -and (Test-Path $TestOPAPath)) {
             Remove-Item -Path $TestOPAPath -Force -ErrorAction SilentlyContinue
         }
-    }
-}
-AfterAll {
-    Remove-Module Orchestrator -ErrorAction SilentlyContinue
 
-    # Clean up dummy OPA executables created in BeforeDiscovery
-    # Default location
-    $DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
-    $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
-    $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
-    if ($IsLinuxOS) {
-        $OPAExeName = "opa_linux_amd64"
-    }
-    elseif ($IsMacOSOS) {
-        $OPAExeName = "opa_darwin_amd64"
-    }
-    else {
-        $OPAExeName = "opa_windows_amd64.exe"
-    }
+        # Clean up dummy OPA executables created in BeforeDiscovery
+        # Default location
+        $DefaultOPAPath = Join-Path -Path $env:USERPROFILE -ChildPath ".scubagear\Tools"
+        $IsLinuxOS = (Test-Path variable:IsLinux) -and $IsLinux
+        $IsMacOSOS = (Test-Path variable:IsMacOS) -and $IsMacOS
+        if ($IsLinuxOS) {
+            $OPAExeName = "opa_linux_amd64"
+        }
+        elseif ($IsMacOSOS) {
+            $OPAExeName = "opa_darwin_amd64"
+        }
+        else {
+            $OPAExeName = "opa_windows_amd64.exe"
+        }
 
-    $OPAExePath = Join-Path -Path $DefaultOPAPath -ChildPath $OPAExeName
-    if ($script:DiscoveryDefaultOPACreatedByTests -and (Test-Path $OPAExePath)) {
-        Remove-Item -Path $OPAExePath -Force -ErrorAction SilentlyContinue
-    }
+        $OPAExePath = Join-Path -Path $DefaultOPAPath -ChildPath $OPAExeName
+        if ($script:DiscoveryDefaultOPACreatedByTests -and (Test-Path $OPAExePath)) {
+            Remove-Item -Path $OPAExePath -Force -ErrorAction SilentlyContinue
+        }
 
-    # Test directory OPA (for OPAPath: . in orchestrator_config_test.yaml)
-    $TestOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $OPAExeName
-    if ($script:DiscoveryTestOPACreatedByTests -and (Test-Path $TestOPAPath)) {
-        Remove-Item -Path $TestOPAPath -Force -ErrorAction SilentlyContinue
+        # Test directory OPA (for OPAPath: . in orchestrator_config_test.yaml)
+        $DiscoveryTestOPAPath = Join-Path -Path $PSScriptRoot -ChildPath $OPAExeName
+        if ($script:DiscoveryTestOPACreatedByTests -and (Test-Path $DiscoveryTestOPAPath)) {
+            Remove-Item -Path $DiscoveryTestOPAPath -Force -ErrorAction SilentlyContinue
+        }
     }
 }

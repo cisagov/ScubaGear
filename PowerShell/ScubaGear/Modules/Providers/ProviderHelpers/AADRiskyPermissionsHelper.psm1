@@ -1,4 +1,5 @@
 Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+Import-Module -Name $PSScriptRoot/../../Connection/ConnectHelpers.psm1 -Function Invoke-ScubaGraphRequest
 
 # Module-scoped cache for RiskyAppPermissions.json - loaded once, reused across all function calls
 $script:CachedRiskyAppPermissionsJson = $null
@@ -277,7 +278,7 @@ function Invoke-GraphBatchRequestsWithRetry {
     $GetScubaGearPermissionsCommand = Get-Command -Name Get-ScubaGearPermissions -ErrorAction SilentlyContinue
     $IsFallbackMode = $null -eq $GetScubaGearPermissionsCommand
     if ($IsFallbackMode) {
-        # Unit tests can mock Invoke-MgGraphRequest without loading the permissions helper.
+        # Unit tests can mock the internal Graph transport without loading the permissions helper.
         $BatchEndpoint = "/$ApiVersion/`$batch"
         $MaxRetries = 0
     }
@@ -296,7 +297,7 @@ function Invoke-GraphBatchRequestsWithRetry {
         for ($Offset = 0; $Offset -lt $PendingRequests.Count; $Offset += $BatchSize) {
             $RequestChunk = $PendingRequests[$Offset..([Math]::Min($Offset + $BatchSize - 1, $PendingRequests.Count - 1))]
             $BatchBody = @{ requests = @($RequestChunk) }
-            $BatchResponse = Invoke-MgGraphRequest -Method POST -Uri $BatchEndpoint -Body ($BatchBody | ConvertTo-Json -Depth 10)
+            $BatchResponse = Invoke-ScubaGraphRequest -Method POST -Uri $BatchEndpoint -Body ($BatchBody | ConvertTo-Json -Depth 10)
 
             foreach ($Response in @($BatchResponse.responses)) {
                 $BatchResponses[[string]$Response.id] = $Response
