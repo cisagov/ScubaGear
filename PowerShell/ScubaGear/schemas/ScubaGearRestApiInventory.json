@@ -1,5 +1,14 @@
 [
     {
+        "_meta": "inventoryScope",
+        "description": "Inventory of every REST/HTTP-calling function in ScubaGear. Entries whose category begins with 'Out of pattern' are intentionally NOT routed through the central Invoke-ScubaRestMethod/Invoke-GraphDirectly primitives; each entry's notes explain why. This file is also consumed at runtime by Get-ScubaGearRestEndpoint (Modules/Permissions/PermissionsHelper.psm1), which filters by functionName - objects without a functionName (like this one) are ignored.",
+        "scope": {
+            "inScopeDetailed": "Functions reachable from the assessment pipeline (Invoke-SCuBA / Invoke-SCuBACached) and the install/update/dependency tooling are inventoried individually.",
+            "configAppCoverage": "The ScubaConfigApp WPF authoring GUI and the Config Analyzer are a separate interactive subsystem (some calls run in isolated runspaces) and are inventoried at module granularity rather than per call site - one entry per helper module enumerating its HTTP call sites in 'operations'.",
+            "excluded": "Static URL strings in *_Control_*.json UI config files are data, not call sites, and are not inventoried."
+        }
+    },
+    {
         "functionName": "Invoke-ScubaRestMethod",
         "filePath": "Modules/Utility/Utility.psm1",
         "category": "Central REST primitive",
@@ -55,6 +64,21 @@
         "scubaGearProducts": [],
         "unitTests": "Testing/Unit/PowerShell/Utility/Invoke-ScubaRestMethod.Tests.ps1",
         "notes": "Not independently exported; only reachable from within Invoke-ScubaRestMethod's retry loop."
+    },
+    {
+        "functionName": "Test-ScubaTransientConnectionError",
+        "filePath": "Modules/Utility/Utility.psm1",
+        "category": "Internal helper",
+        "description": "Decides whether a REST failure that produced NO HTTP response object (timeout, DNS blip, connection reset) is transient and worth retrying. Inspects PS5.1 System.Net.WebException.Status and, on PS7, matches exception type names (HttpRequestException/TaskCanceledException/IOException/SocketException) with a message-text fallback.",
+        "httpMethods": [],
+        "parameters": [
+            { "name": "ErrorRecord", "type": "object", "required": true, "description": "The error record whose .Exception should be inspected." }
+        ],
+        "returns": "bool (true if the failure looks transient).",
+        "calledBy": ["Invoke-ScubaRestMethod"],
+        "scubaGearProducts": [],
+        "unitTests": "Testing/Unit/PowerShell/Utility/Invoke-ScubaRestMethod.Tests.ps1",
+        "notes": "Non-HTTP sibling of Get-RetryAfterSeconds; only reachable from Invoke-ScubaRestMethod's retry loop. Documented for the same completeness reason Get-RetryAfterSeconds is."
     },
     {
         "functionName": "Invoke-GraphDirectly",
@@ -411,5 +435,156 @@
         "calledBy": ["Show-GraphProgressWindow (ScubaConfigApp UI)"],
         "scubaGearProducts": [],
         "notes": "Reviewed for centralization and rejected: this is the Graph PowerShell SDK's own session-based cmdlet used from an interactive desktop app, a fundamentally different auth/call pattern than the app-only Bearer-token model Invoke-ScubaRestMethod/Invoke-GraphDirectly use for the CLI scan engine."
+    },
+    {
+        "functionName": "Get-ScubaGearRestEndpoint",
+        "filePath": "Modules/Permissions/PermissionsHelper.psm1",
+        "category": "Internal helper",
+        "description": "Resolves the fixed REST endpoint path for a provider REST helper by reading THIS inventory file (ScubaGearRestApiInventory.json) and returning the matching entry's endpointPath, with optional {placeholder} substitution. Makes no HTTP call itself.",
+        "httpMethods": [],
+        "parameters": [
+            { "name": "FunctionName", "type": "string", "required": true, "description": "REST helper name matching an inventory entry's functionName (e.g. Get-SPOTenantRest)." },
+            { "name": "PathParameters", "type": "hashtable", "required": false, "description": "Optional {placeholder} substitutions in the endpoint path (e.g. @{ TenantId = $TenantId })." }
+        ],
+        "returns": "string (the resolved endpoint path). Throws if no entry matches or the entry has no endpointPath.",
+        "calledBy": ["Get-SPOTenantRest", "Get-PowerPlatform*Rest", "Get-Teams*Rest", "Get-PowerBITenantSettingsRest"],
+        "scubaGearProducts": ["sharepoint", "powerplatform", "teams", "powerbi"],
+        "notes": "Not an HTTP caller - it is the runtime consumer of this inventory. Documented here so the inventory describes its own resolver, consistent with listing the non-HTTP helper Get-RetryAfterSeconds."
+    },
+    {
+        "functionName": "Get-M365EnvironmentByDomain",
+        "filePath": "Modules/Connection/Connection.psm1",
+        "category": "Out of pattern - anonymous OpenID/tenant discovery",
+        "description": "Auto-detects the M365 cloud environment (commercial/gcc/gcchigh/dod) for a tenant by GETting the tenant's unauthenticated OpenID Connect metadata document and inspecting the returned authorization endpoints.",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://login.microsoftonline.com/{TenantDomain}/.well-known/openid-configuration",
+        "authTokenSource": "None - anonymous, pre-authentication discovery call",
+        "parameters": [
+            { "name": "TenantDomain", "type": "string", "required": true, "description": "The tenant's <name>.onmicrosoft.com domain." }
+        ],
+        "returns": "string environment name (commercial | gcc | gcchigh | dod).",
+        "calledBy": ["Invoke-SCuBA", "Invoke-SCuBACached", "Connect-Tenant"],
+        "scubaGearProducts": [],
+        "notes": "Reviewed for centralization and left out of the Bearer-token primitive: this is an anonymous pre-auth discovery GET, not an authenticated product REST call. See Test-M365EnvironmentConfiguration for near-duplicate logic flagged for later consolidation."
+    },
+    {
+        "functionName": "Test-M365EnvironmentConfiguration",
+        "filePath": "Modules/Providers/ExportPowerPlatformProvider.psm1",
+        "category": "Out of pattern - anonymous OpenID/tenant discovery",
+        "description": "Validates/derives the M365 environment for the Power Platform provider by GETting the tenant's unauthenticated OpenID Connect metadata document (same endpoint family as Get-M365EnvironmentByDomain).",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://login.microsoftonline{TLD}/{TenantDomain}/.well-known/openid-configuration",
+        "authTokenSource": "None - anonymous, pre-authentication discovery call",
+        "calledBy": ["Export-PowerPlatformProvider"],
+        "scubaGearProducts": ["powerplatform"],
+        "notes": "DUPLICATE LOGIC: hits the same .well-known/openid-configuration endpoint as Get-M365EnvironmentByDomain (Connection.psm1). Tracked for consolidation in a follow-up cleanup issue - PowerPlatform should call Get-M365EnvironmentByDomain rather than carry its own copy."
+    },
+    {
+        "functionName": "Test-ScubaGearVersion",
+        "filePath": "Modules/Support/Support.psm1",
+        "category": "Out of pattern - dev/doc/update tooling (GitHub API)",
+        "description": "When -CheckGitHub is supplied, compares the installed ScubaGear version against the latest published GitHub release.",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://api.github.com/repos/cisagov/ScubaGear/releases/latest",
+        "authTokenSource": "None (uses GitHub's unauthenticated rate limit)",
+        "calledBy": ["User-invoked / update workflow"],
+        "scubaGearProducts": [],
+        "notes": "GitHub update-tooling call, deliberately left out of the REST centralization effort (GitHub was explicitly out of scope). Documented here for inventory completeness."
+    },
+    {
+        "functionName": "Update-ScubaGearFromGitHub",
+        "filePath": "Modules/Support/Support.psm1",
+        "category": "Out of pattern - dev/doc/update tooling (GitHub API)",
+        "description": "Self-update helper: looks up the latest GitHub release (API) then downloads that release's ScubaGear zip asset to a temp file.",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://api.github.com/repos/cisagov/ScubaGear/releases/latest (release lookup) + https://github.com/cisagov/ScubaGear/releases/download/v{version}/ScubaGear-{version}.zip (zip download)",
+        "authTokenSource": "None (anonymous GitHub)",
+        "calledBy": ["User-invoked self-update"],
+        "scubaGearProducts": [],
+        "notes": "Two calls: a GitHub API release lookup plus an anonymous zip download (-OutFile), analogous to the Get-OPAFile binary-download pattern. GitHub was out of scope for centralization; documented for completeness."
+    },
+    {
+        "functionName": "Get-ScubaBaselineHeaderContent",
+        "filePath": "Modules/Support/ScubaBaselineSchemaHelper.psm1",
+        "category": "Out of pattern - dev/doc tooling (GitHub API)",
+        "description": "Schema-generation dev tooling: fetches baseline markdown from the GitHub Contents API and downloads the file's raw content to extract the baseline header section.",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch} (then the returned download_url)",
+        "authTokenSource": "None (unauthenticated GitHub rate limit)",
+        "calledBy": ["Baseline schema-generation tooling (not part of the tenant-scan runtime path)"],
+        "scubaGearProducts": [],
+        "notes": "Sibling of Get-ScubaConfigExclusionMappingsFromMarkdown and Get-ScubaBaselinePolicy in the same module. Internal dev/doc tooling, not a product baseline scan."
+    },
+    {
+        "functionName": "Get-ScubaBaselinePolicy",
+        "filePath": "Modules/Support/ScubaBaselineSchemaHelper.psm1",
+        "category": "Out of pattern - dev/doc tooling (GitHub API)",
+        "description": "Schema-generation dev tooling: fetches baseline markdown from the GitHub Contents API and downloads the file's raw content to extract individual policy definitions.",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://api.github.com/repos/{owner}/{repo}/contents/{path}?ref={branch} (then the returned download_url)",
+        "authTokenSource": "None (unauthenticated GitHub rate limit)",
+        "calledBy": ["Baseline schema-generation tooling (not part of the tenant-scan runtime path)"],
+        "scubaGearProducts": [],
+        "notes": "Sibling of Get-ScubaConfigExclusionMappingsFromMarkdown and Get-ScubaBaselineHeaderContent in the same module. Internal dev/doc tooling, not a product baseline scan."
+    },
+    {
+        "functionName": "ScubaConfigApp.psm1 (WPF app shell)",
+        "filePath": "Modules/ScubaConfigApp/ScubaConfigApp.psm1",
+        "category": "Out of pattern - interactive SDK session call (WPF config app)",
+        "description": "Module-granularity entry (per the inventory scope note) for the ScubaConfigApp WPF authoring GUI shell. Mixes interactive Graph SDK session calls with anonymous raw-content downloads of online baseline/catalog data.",
+        "httpMethods": ["GET"],
+        "authTokenSource": "Interactive Connect-MgGraph session for Graph calls; none (anonymous raw.githubusercontent) for the online baseline/catalog downloads",
+        "operations": [
+            { "callSite": "Start-SCuBAConfigApp ~L239", "call": "Invoke-MgGraphRequest GET /v1.0/me", "purpose": "sign-in / connectivity check" },
+            { "callSite": "~L463", "call": "Invoke-RestMethod OnlineBaselineSchemaURL", "purpose": "download online baseline list (.baselines)" },
+            { "callSite": "~L727", "call": "Invoke-MgGraphRequest GET /v1.0/organization", "purpose": "tenant details / org lookup" },
+            { "callSite": "~L1546/L1552", "call": "Invoke-RestMethod online baseline JSON", "purpose": "load baseline definitions" },
+            { "callSite": "~L1973/L1979", "call": "Invoke-WebRequest OnlineBaselineSchemaURL + OnlineApiCatalogURL", "purpose": "stage analyzer baseline schema + API catalog to temp files" }
+        ],
+        "scubaGearProducts": [],
+        "notes": "Interactive GUI subsystem, separate from the Invoke-SCuBA scan engine; intentionally not routed through the central REST primitives."
+    },
+    {
+        "functionName": "ScubaConfigAppGraphHelper.psm1 (object-picker Graph calls)",
+        "filePath": "Modules/ScubaConfigApp/ScubaConfigAppHelpers/ScubaConfigAppGraphHelper.psm1",
+        "category": "Out of pattern - interactive SDK session call (WPF config app)",
+        "description": "Module-granularity entry for the config app's Graph object-picker helpers. See the dedicated Invoke-GraphQueryWithFilter entry for the primary filtered-query path; this entry covers the remaining call sites.",
+        "httpMethods": ["GET", "POST"],
+        "authTokenSource": "Interactive Connect-MgGraph session",
+        "operations": [
+            { "callSite": "Invoke-GraphQueryWithFilter ~L186", "call": "Invoke-MgGraphRequest GET (filtered)", "purpose": "object-picker queries (see dedicated inventory entry)" },
+            { "callSite": "~L923", "call": "Invoke-MgGraphRequest POST /directoryObjects/getByIds", "purpose": "batch-resolve selected directory object IDs to display names" }
+        ],
+        "scubaGearProducts": [],
+        "notes": "Interactive GUI subsystem; same rationale as Invoke-GraphQueryWithFilter."
+    },
+    {
+        "functionName": "ScubaBaselinePolicyViewerHelper.psm1 (policy viewer)",
+        "filePath": "Modules/ScubaConfigApp/ScubaBaselinePolicyViewerHelpers/ScubaBaselinePolicyViewerHelper.psm1",
+        "category": "Out of pattern - dev/doc tooling (GitHub raw content)",
+        "description": "Module-granularity entry for the WPF baseline policy viewer (Show-ScubaBaselinePolicyHelper). Downloads sample configuration markdown from raw.githubusercontent for display.",
+        "httpMethods": ["GET"],
+        "baseUrlSource": "https://raw.githubusercontent.com/cisagov/ScubaGear/refs/heads/main/docs/configuration/configuration.md",
+        "authTokenSource": "None (anonymous raw content)",
+        "operations": [
+            { "callSite": "~L198", "call": "Invoke-WebRequest configurationSampleMarkdownRawOnlinePath", "purpose": "fetch sample config markdown for the viewer" }
+        ],
+        "scubaGearProducts": [],
+        "notes": "Interactive GUI subsystem; anonymous doc fetch, not a product scan call."
+    },
+    {
+        "functionName": "ScubaConfigAnalyzer Graph/Exchange helpers",
+        "filePath": "Modules/ScubaConfigApp/ScubaConfigAnalyzerHelpers/ (ScubaConfigAnalyzerGraphHelper.psm1, ScubaConfigAnalyzerExchangeHelper.psm1)",
+        "category": "Out of pattern - interactive SDK session call (WPF config app)",
+        "description": "Module-granularity entry for the Config Analyzer's live tenant lookups. Uses raw Invoke-MgGraphRequest GETs against an interactive Graph session to resolve tenant/org details and display-name/UPN lookups during analysis.",
+        "httpMethods": ["GET"],
+        "authTokenSource": "Interactive Connect-MgGraph session (Connect-ScubaAnalyzerGraph / Connect-ScubaAnalyzerExchange)",
+        "operations": [
+            { "callSite": "ScubaConfigAnalyzerGraphHelper Invoke-ScubaGraphGet ~L144", "call": "Invoke-MgGraphRequest GET (paged)", "purpose": "generic paged Graph GET used by the analyzer" },
+            { "callSite": "ScubaConfigAnalyzerGraphHelper ~L196/L259", "call": "Invoke-MgGraphRequest GET", "purpose": "display-name / userPrincipalName lookups (Get-ScADisplayNameLookup / Get-ScAUserPrincipalNameLookup)" },
+            { "callSite": "ScubaConfigAnalyzerExchangeHelper Connect-ScubaAnalyzerExchange ~L41", "call": "Invoke-MgGraphRequest GET v1.0/organization", "purpose": "tenant/org lookup for the Exchange analyzer" }
+        ],
+        "scubaGearProducts": [],
+        "notes": "Interactive analyzer subsystem; runs separately from the Invoke-SCuBA scan engine and intentionally not routed through the central REST primitives."
     }
 ]
