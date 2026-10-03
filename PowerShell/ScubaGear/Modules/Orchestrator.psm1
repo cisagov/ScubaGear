@@ -119,6 +119,8 @@ function Invoke-SCuBA {
     .Parameter SkipDoH
     If true, do not fallback to DoH should the traditional DNS requests fail
     when retrieving any DNS records required by specific SCuBA policies.
+    .Parameter SkipLongFunctions
+    Skip the Entra ID checks for applications and service principals with risky permissions.
     .Parameter Transcript
     Enable PowerShell transcript logging for complete console output capture. When specified, a transcript log file will be created in addition to the default ScubaDebug log.
     Note: Debug logs are always created in the output folder's DebugLogs subfolder.
@@ -316,6 +318,11 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [switch]
+        $SkipLongFunctions,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [switch]
         $Transcript
     )
     process {
@@ -361,6 +368,7 @@ function Invoke-SCuBA {
                 'Organization' = $Organization
                 'PreferredDnsResolvers' = $PreferredDnsResolvers
                 'SkipDoH' = $SkipDoH
+                'SkipLongFunctions' = $SkipLongFunctions
             }
 
             $ScubaConfig = New-Object -Type PSObject -Property $ProvidedParameters
@@ -886,7 +894,7 @@ function Invoke-ProviderList {
                     $RetVal = ""
                     switch ($Product) {
                         "aad" {
-                            $RetVal = Export-AADProvider -M365Environment $ScubaConfig.M365Environment | Select-Object -Last 1
+                            $RetVal = Export-AADProvider -M365Environment $ScubaConfig.M365Environment -SkipLongFunctions:$ScubaConfig.SkipLongFunctions | Select-Object -Last 1
                         }
                         "exo" {
                             $EXOProviderParams = @{

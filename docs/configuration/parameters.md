@@ -533,6 +533,24 @@ Invoke-SCuBA -ProductNames exo `
   -SkipDoH $true
 ```
 
+## SkipLongFunctions
+
+**SkipLongFunctions** skips the Entra ID checks for applications and service
+principals with risky permissions. Other Entra ID checks still run. The
+corresponding risky application and third-party service principal report data
+will be empty for that run.
+
+| Parameter   | Value   |
+|-------------|---------|
+| Optional    | Yes     |
+| Datatype    | Switch  |
+| Default     | $false  |
+| Config File | Yes     |
+
+```powershell
+Invoke-SCuBA -ProductNames aad -SkipLongFunctions
+```
+
 ## Version
 
 **Version** writes the current ScubaGear version to the console.  ScubaGear will not be run.  When the `Version` parameter is used, no other parameters should be included.
