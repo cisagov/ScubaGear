@@ -527,8 +527,13 @@ function Get-ScubaSpfRecord {
         $DomainName = $d.DomainName
         if ($Response.Answers.Length -gt 0) {
             # We got some answers - are they SPF records?
-            $SPFAnswers = ($Response.Answers | Where-Object { $_.StartsWith("v=spf1 ") }  )
-            if ($SPFAnswers.Length -gt 0) {
+            $SPFAnswers = @($Response.Answers | Where-Object { $_.StartsWith("v=spf1 ") }  )
+            if ($SPFAnswers.Length -gt 1) {
+                # RFC 7208 section 4.5: more than one SPF record results in a
+                # permerror, so receivers will not apply any of them
+                $Message = "Multiple SPF records found. A domain must publish exactly one SPF record."
+            }
+            elseif ($SPFAnswers.Length -eq 1) {
                 # We have an SPF record - does it fail?
                 $SPFReject = ($SPFAnswers | Where-Object { $_.Contains("-all") -or $_.Contains("~all") -or $_.Contains("redirect") }  )
                 if ($SPFReject.Length -gt 0) {

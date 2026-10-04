@@ -72,6 +72,47 @@ InModuleScope 'ExportEXOProvider' {
                     Should -Be "Domain name exists but no SPF records returned."
             }
 
+            It "Handles multiple SPF records" {
+                # RFC 7208 section 4.5: if more than one SPF record is returned,
+                # SPF evaluation results in a permerror, so the domain is not compliant
+                Mock -CommandName Invoke-RobustDnsTxt {
+                    @{
+                        "Answers" = @(
+                            "v=spf1 include:spf.protection.outlook.com -all",
+                            "v=spf1 include:example.net -all"
+                        );
+                        "Errors" = @();
+                        "NXDomain" = $false
+                        "LogEntries" = @()
+                    }
+                }
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
+                $Response.Compliant | Should -Be $false
+                $Response.Message |
+                    Should -Be "Multiple SPF records found. A domain must publish exactly one SPF record."
+            }
+
+            It "Ignores non-SPF records when exactly one SPF record is found" {
+                Mock -CommandName Invoke-RobustDnsTxt {
+                    @{
+                        "Answers" = @(
+                            "something else, like a domain verification record",
+                            "v=spf1 include:spf.protection.outlook.com -all"
+                        );
+                        "Errors" = @();
+                        "NXDomain" = $false
+                        "LogEntries" = @()
+                    }
+                }
+                $Response = Get-ScubaSpfRecord -Domains @(@{"DomainName" = "example.com"}) `
+                    -PreferredDnsResolvers @() -SkipDoH $false
+                Should -Invoke -CommandName Invoke-RobustDnsTxt -Exactly -Times 1
+                $Response.Compliant | Should -Be $true
+                $Response.Message | Should -Be "SPF record found."
+            }
+
             It "Handles some errors but answer still found" {
                 # There can be errors but still have a valid answer. For example, if the traditional DNS query failed
                 # but DoH worked
