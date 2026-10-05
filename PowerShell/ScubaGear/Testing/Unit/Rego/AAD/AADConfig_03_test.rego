@@ -1794,7 +1794,8 @@ test_GuestUserTypeExclusionNoExempt_Incorrect_V6 if {
 test_ConditionalAccessPolicies_Correct_V3 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
-                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}
                 ])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
@@ -1810,8 +1811,8 @@ test_ConditionalAccessPolicies_Correct_V3 if {
 test_BuiltInControls_Correct if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
-                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
-                ])
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
     ReportDetailStr := concat("", [
@@ -1826,7 +1827,8 @@ test_ExcludeUserCorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson"]},
-                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}])
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
@@ -1840,8 +1842,8 @@ test_ExcludeGroup_Correct_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups","value": ["SpecialGroup"]},
-                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}
-                ])
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
@@ -1909,7 +1911,8 @@ test_ExcludeUserIncorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": ["SpecialPerson"]},
-                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}])
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
@@ -1931,7 +1934,8 @@ test_ExcludeGroupIncorrect_V1 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": ["SpecialGroup"]},
-                {"op": "add", "path": "GrantControls/Operator", "value": "OR"}])
+                {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
@@ -1991,7 +1995,8 @@ test_AppExclusionConditions_Correct_V7 if {
     CAP := json.patch(ConditionalAccessPolicies,
                 [{"op": "add", "path": "GrantControls/BuiltInControls", "value": ["compliantDevice", "domainJoinedDevice"]},
                 {"op": "add", "path": "GrantControls/Operator", "value": "OR"},
-                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]}])
+                {"op": "add", "path": "Conditions/Applications/ExcludeApplications", "value": ["Office365"]},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
@@ -2014,7 +2019,8 @@ test_GuestUserTypeExclusionConditions_Correct_V7 if {
                 "value": {
                     "GuestOrExternalUserTypes": "b2bCollaborationGuest,internalGuest",
                     "ExternalTenants": {"MembershipKind": "all"}
-                }}])
+                }},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.scuba_config.Aad["MS.AAD.3.7v1"] as ScubaConfig
@@ -2039,7 +2045,8 @@ test_GuestUserTypeExclusionNoExempt_Incorrect_V7 if {
                 "value": {
                     "GuestOrExternalUserTypes": "b2bCollaborationGuest",
                     "ExternalTenants": {"MembershipKind": "all"}
-                }}])
+                }},
+                {"op": "replace", "path": "Conditions/Applications/IncludeUserActions", "value": []}])
 
     Output := aad.tests with input.conditional_access_policies as [CAP]
 
