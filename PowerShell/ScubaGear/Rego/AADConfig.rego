@@ -2034,25 +2034,21 @@ tests contains {
     )
 
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
-    
-    ReportDetailArray := [
-        ReportDetailsArrayLicenseWarning(AIAgents, DescriptionString),
-        NearMissReportDetails
-    ]
+
     # Only include the CAP link if there are is a valid P2 license
     CapLinkArray := [
         CAPLINK |
         Count(Aad2P2Licenses) > 0
     ]
-
-    NearMissAnalyzerReportArray := [
-        NearMissAnalyzerDetails(AIAgentsNeedsConfigUpdate)
-    ]
-
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
-        some ReportDetail in array.concat(array.concat(ReportDetailArray, CapLinkArray), NearMissAnalyzerReportArray)
+        some ReportDetail in array.flatten([
+            ReportDetailsArrayLicenseWarning(AIAgents, DescriptionString),
+            NearMissReportDetails,
+            CapLinkArray,
+            NearMissAnalyzerDetails(AIAgentsNeedsConfigUpdate)
+        ])
         ReportDetail != ""
     ])
 
