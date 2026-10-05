@@ -36,6 +36,9 @@ function Export-PowerBIProvider {
     # Initialize the tenant settings to create an empty JSON if there was an error or no license.
     $TenantSettingsJson = ConvertTo-Json @()
 
+    # Set when the Power BI API returns 401/403; ingested by the powerbi rego and shown in the report
+    $AccessDeniedReason = ""
+
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     $Tracker = Get-CommandTracker
@@ -48,12 +51,14 @@ function Export-PowerBIProvider {
         $Endpoint = "/v1/admin/tenantsettings"
 
         # Call the Power BI Admin REST API to get the tenant settings.
+        $ApiCallSucceeded = $false
         try {
             $AdminSettings = Invoke-ScubaRestMethod `
                 -BaseUrl $BaseUrl `
                 -AccessToken $AccessToken `
                 -Endpoint $Endpoint `
                 -Method Get
+            $ApiCallSucceeded = $true
         }
         catch {
             $ErrorText = $_.Exception.Message
@@ -71,9 +76,21 @@ function Export-PowerBIProvider {
             #  1 - Nobody has logged into the Power BI portal before in the target tenant: 403 Forbidden
             #  2 - Someone has signed into the Power BI portal, but the user running ScubaGear does not have Fabric Administrator role: 403 Forbidden
 
+            # Use the HTTP status code when there's a response, since the message text varies with the OS
+            # language and PowerShell version. Otherwise fall back to the (401)/(403) in the message.
+            $StatusCode = $null
+            if ($null -ne $_.Exception.Response) {
+                $StatusCode = [int]$_.Exception.Response.StatusCode
+            }
+            elseif ($ErrorText -match '\((401|403)\)') {
+                $StatusCode = [int]$Matches[1]
+            }
+
             # Display a custom fix message to the user when permissions are missing or the user hasn't logged into the Power BI portal at least once.
-            if ( ($ErrorText -match "403" -and $ErrorText -match "Forbidden") -or ($ErrorText -match "401" -and $ErrorText -match "Unauthorized") ) {
+            if ($StatusCode -in @(401, 403)) {
                 # Build the guidance once so the console output and the debug log cannot drift apart.
+                $StatusText = if ($StatusCode -eq 403) { "403 Forbidden" } else { "401 Unauthorized" }
+
                 # Custom message for service principal auth because for this flow the security groups setting is needed.
                 if ($CertificateBasedAuth) {
                     $AuthType = "ServicePrincipal"
@@ -81,6 +98,7 @@ function Export-PowerBIProvider {
                         "- You must sign into the Power BI portal to configure a security group for the service principal. See link below for details:"
                         "  https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/noninteractive.md#power-bi-tenant-setting"
                     )
+                    $AccessDeniedReason = "The Power BI Admin API denied access ($StatusText). Sign into the Power BI portal and configure a security group for the service principal, and make sure the app registration is not granted the Power BI Tenant.Read.All permission. See <a href=`"https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/noninteractive.md#power-bi-tenant-setting`" target=`"_blank`">Power BI tenant setting</a> for details."
                 }
                 # Custom message for interactive auth because for this flow the role is needed plus login to the Power BI portal.
                 else {
@@ -89,6 +107,7 @@ function Export-PowerBIProvider {
                         "- You must have a minimum of the Fabric Administrator role for ScubaGear to read the Power BI configurations"
                         "- You must also sign into the Power BI portal at least once"
                     )
+                    $AccessDeniedReason = "The Power BI Admin API denied access ($StatusText). The user running ScubaGear needs a minimum of the Fabric Administrator role and must sign into the Power BI portal at least once."
                 }
 
                 Write-Information "`n********** ATTENTION ScubaGear user ********************" -InformationAction Continue
@@ -100,28 +119,40 @@ function Export-PowerBIProvider {
                 # Also capture the guidance in the debug log so support bundles contain the remediation
                 # steps, not just the raw HTTP error. Level is Info rather than Warning to match the
                 # convention in CommandTracker: Warning/Error set the session error flag, and the
-                # orchestrator already logs the provider failure itself.
+                # report already shows the remediation on every Power BI policy.
                 Write-ScubaLog -Message "Power BI permissions guidance" -Level "Info" -Source "PowerBIProvider" -Data @{
                     AuthType = $AuthType
                     Guidance = ($GuidanceLines -join " ")
                     Error    = $ErrorText
                 }
             }
-            throw
+            else {
+                Write-Warning "Error running Invoke-RestMethod against the Power BI Admin REST API: $ErrorText"
+                Write-ScubaLog -Message "Error running command" -Level "Info" -Source "PowerBIProvider" -Data @{
+                    Command = "Invoke-RestMethod"
+                    Error   = $ErrorText
+                }
+            }
         }
 
-        if ($AdminSettings.Count -eq 0) {
-            throw "No tenant settings were returned from the Power BI Admin REST API. Report this to the ScubaGear team for troubleshooting."
-        }
+        # Invoke-RestMethod stays unsuccessful on any failure so the report shows these policies as errors
+        if ($ApiCallSucceeded) {
+            if ($AdminSettings.Count -eq 0) {
+                throw "No tenant settings were returned from the Power BI Admin REST API. Report this to the ScubaGear team for troubleshooting."
+            }
 
-        $TenantSettings = $AdminSettings[0].tenantSettings
-        $TenantSettingsJson = ConvertTo-Json @($TenantSettings) -Depth 10
+            $TenantSettings = $AdminSettings[0].tenantSettings
+            $TenantSettingsJson = ConvertTo-Json @($TenantSettings) -Depth 10
+            $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
+        }
     }
-
-    $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
+    else {
+        $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
+    }
 
     $LicenseFoundJson = ConvertTo-Json $LicenseFound
     $LicenseReasonJson = ConvertTo-Json $LicenseReason
+    $AccessDeniedReasonJson = ConvertTo-Json $AccessDeniedReason
     $PowerBISuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerBIUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
@@ -131,6 +162,7 @@ function Export-PowerBIProvider {
     "powerbi_unsuccessful_commands": $PowerBIUnSuccessfulCommands,
     "powerbi_license_found": $LicenseFoundJson,
     "powerbi_license_reason": $LicenseReasonJson,
+    "powerbi_access_denied_reason": $AccessDeniedReasonJson,
 "@
 
     $json
