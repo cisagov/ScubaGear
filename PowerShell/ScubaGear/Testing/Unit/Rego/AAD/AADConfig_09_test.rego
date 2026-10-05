@@ -16,7 +16,7 @@ test_NoBlockRiskyAgentsCAP_Incorrect_V1 if {
 
     ReportDetailString := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " <a href='#caps'>View all CA policies</a>."
+        " <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -35,7 +35,7 @@ test_BlockRiskyAgentsCAP_Correct_V1 if {
 
     ReportDetailString := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
 }
@@ -59,7 +59,10 @@ test_BlockRiskyAgentsCAPNearMiss_Incorrect_V1 if {
         "0 conditional access policy(s) found that meet(s) all requirements.",
         " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
         "the config file is updated to include:",
-        " app exclusions. <a href='#caps'>View all CA policies</a>."
+        " app exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -78,7 +81,7 @@ test_MissingHighRisk_Incorrect_V1 if {
 
     ReportDetailString := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " <a href='#caps'>View all CA policies</a>."
+        " <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -97,7 +100,7 @@ test_MultipleRiskLevels_Correct_V1 if {
 
     ReportDetailString := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
 }
@@ -116,7 +119,7 @@ test_MissingAgentIdServicePrincipals_Incorrect_V1 if {
 
     ReportDetailString := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " <a href='#caps'>View all CA policies</a>."
+        " <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -135,7 +138,7 @@ test_MissingClientAppTypes_Incorrect_V1 if {
 
     ReportDetailString := concat("", [
         "0 conditional access policy(s) found that meet(s) all requirements.",
-        " <a href='#caps'>View all CA policies</a>."
+        " <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
 }
@@ -211,7 +214,7 @@ test_PrioritizePolicyOverEnvironment_Correct_V1 if {
 
     ReportDetailString := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
 }
@@ -233,7 +236,7 @@ test_AppExclusions_Correct_V1 if {
 
     ReportDetailString := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.9.1v1", Output, ReportDetailString, true) == true
 }
