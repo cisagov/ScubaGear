@@ -18,7 +18,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
     Describe -Tag 'PowerBIProvider' -Name "Export-PowerBIProvider" {
         BeforeAll {
             class MockCommandTracker {
-                # The provider throws on failure, so its tracker instance is discarded before the
+                # The provider throws on unexpected failures, so its tracker instance is discarded before the
                 # caller can inspect it. These static logs capture what was recorded anyway.
                 static [System.Collections.Generic.List[string]]$Successful = [System.Collections.Generic.List[string]]::new()
                 static [System.Collections.Generic.List[string]]$UnSuccessful = [System.Collections.Generic.List[string]]::new()
@@ -100,6 +100,21 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 param ([string]$Message)
                 [System.Net.WebException]::new($Message)
             }
+
+            # Mimics an HTTP failure that carries a response, where the provider reads the status code
+            # instead of the message text.
+            class MockHttpException : System.Exception {
+                [object]$Response
+
+                MockHttpException([string]$Message, [int]$StatusCode) : base($Message) {
+                    $this.Response = [pscustomobject]@{ StatusCode = $StatusCode }
+                }
+            }
+
+            function New-RestErrorWithStatus {
+                param ([string]$Message, [int]$StatusCode)
+                [MockHttpException]::new($Message, $StatusCode)
+            }
         }
 
         Context 'When the tenant has no Power BI license' {
@@ -168,6 +183,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod { New-MockAdminSettings }
                 $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
                 (ConvertFrom-ProviderJson -Json $Json).powerbi_license_reason | Should -Be ''
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_access_denied_reason | Should -Be ''
             }
         }
 
@@ -295,27 +311,31 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Write-Information {}
             }
 
-            It 'rethrows so the orchestrator marks the product as failed' {
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } |
-                    Should -Throw '*403*'
+            It 'returns the interactive fix in powerbi_access_denied_reason' {
+                $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                $Result = ConvertFrom-ProviderJson -Json $Json
+                $Result.powerbi_access_denied_reason | Should -Match '403 Forbidden'
+                $Result.powerbi_access_denied_reason | Should -Match 'Fabric Administrator role'
+                @($Result.powerbi_tenant_settings).Count | Should -Be 0
+                $Result.powerbi_successful_commands | Should -Not -Contain 'Invoke-RestMethod'
             }
 
             It 'tells the user they need the Fabric Administrator role' {
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'Fabric Administrator role'
                 }
             }
 
             It 'tells the user to sign into the Power BI portal at least once' {
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'sign into the Power BI portal at least once'
                 }
             }
 
             It 'does not show the service principal security group guidance' {
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly -ParameterFilter {
                     $MessageData -match 'security group for the service principal'
                 }
@@ -330,34 +350,37 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Write-Information {}
             }
 
-            It 'rethrows so the orchestrator marks the product as failed' {
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } |
-                    Should -Throw '*403*'
+            It 'returns the service principal fix in powerbi_access_denied_reason' {
+                $Json = Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                $Result = ConvertFrom-ProviderJson -Json $Json
+                $Result.powerbi_access_denied_reason | Should -Match 'security group for the service principal'
+                $Result.powerbi_access_denied_reason | Should -Match 'noninteractive\.md#power-bi-tenant-setting'
+                $Result.powerbi_access_denied_reason | Should -Match 'Tenant.Read.All'
             }
 
             It 'tells the user to configure a security group for the service principal' {
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'security group for the service principal'
                 }
             }
 
             It 'links to the noninteractive Power BI tenant setting documentation' {
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'noninteractive\.md#power-bi-tenant-setting'
                 }
             }
 
             It 'does not show the interactive Fabric Administrator guidance' {
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly -ParameterFilter {
                     $MessageData -match 'Fabric Administrator role'
                 }
             }
 
             It 'treats -CertificateBasedAuth:$false as interactive auth' {
-                { Export-PowerBIProvider -CertificateBasedAuth:$false -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth:$false -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'Fabric Administrator role'
                 }
@@ -372,24 +395,71 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Write-Information {}
             }
 
+
+            It 'reports 401 Unauthorized in powerbi_access_denied_reason' {
+                $Json = Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_access_denied_reason | Should -Match '401 Unauthorized'
+            }
+
             It 'shows the service principal guidance under service principal auth' {
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw '*401*'
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'security group for the service principal'
                 }
             }
 
             It 'shows the interactive guidance under interactive auth' {
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw '*401*'
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'Fabric Administrator role'
                 }
             }
         }
 
+        # When there's a response, its status code decides rather than the message text
+        Context 'When the failure carries an HTTP response' {
+            BeforeEach {
+                Mock -ModuleName ExportPowerBIProvider Write-Information {}
+                Mock -ModuleName ExportPowerBIProvider Write-Warning {}
+            }
+
+            # PS 7 formats this as "403 (Forbidden)", so the (403) message fallback would not match it
+            It 'shows the fix for a 403 using the status code' {
+                Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
+                    throw (New-RestErrorWithStatus -Message "Response status code does not indicate success: 403 (Forbidden)." -StatusCode 403)
+                }
+                $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_access_denied_reason | Should -Match '403 Forbidden.*Fabric Administrator role'
+            }
+
+            It 'does not show guidance for a 500 whose message contains (403)' {
+                Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
+                    throw (New-RestErrorWithStatus -Message "Upstream call failed with (403) while proxying" -StatusCode 500)
+                }
+                $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                (ConvertFrom-ProviderJson -Json $Json).powerbi_access_denied_reason | Should -Be ''
+                Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
+            }
+        }
+
         Context 'When the Power BI API fails for a reason unrelated to permissions' {
             BeforeEach {
                 Mock -ModuleName ExportPowerBIProvider Write-Information {}
+                Mock -ModuleName ExportPowerBIProvider Write-Warning {}
+            }
+
+            # Matches what TryCommand did before, so the report shows these policies as errors
+            # instead of leaving Power BI out
+            It 'still returns JSON with Invoke-RestMethod unsuccessful and no access denied reason' {
+                Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
+                    throw (New-RestError -Message "The remote server returned an error: (429) Too Many Requests.")
+                }
+                $Json = Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Select-Object -Last 1
+                $Result = ConvertFrom-ProviderJson -Json $Json
+                $Result.powerbi_unsuccessful_commands | Should -Contain 'Invoke-RestMethod'
+                $Result.powerbi_successful_commands | Should -Not -Contain 'Invoke-RestMethod'
+                $Result.powerbi_access_denied_reason | Should -Be ''
+                Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Warning -Times 1 -Exactly
             }
 
             # Guards against the guidance banner firing on any failure, which would send
@@ -398,7 +468,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (500) Internal Server Error.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw '*500*'
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
             }
 
@@ -406,7 +476,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (429) Too Many Requests.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw '*429*'
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
             }
 
@@ -414,7 +484,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (404) Not Found.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw '*404*'
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
             }
 
@@ -422,17 +492,18 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "Unable to connect to the remote server")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw '*Unable to connect*'
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
             }
 
-            # "403" and "Forbidden" are matched as independent substrings, so an unrelated
-            # message that happens to contain only one of them must not trigger guidance.
-            It 'does not emit guidance when a message contains 403 but not Forbidden' {
+            # When the exception has no HTTP response, the provider falls back to looking for "(401)" or
+            # "(403)" in the error message. These messages mention 403 or Forbidden without that exact
+            # form, so they must not be mistaken for a permissions error.
+            It 'does not emit guidance when a message contains 403 outside of parentheses' {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "Correlation id 4030f1ac-0000-0000-0000-000000000000 request failed")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
             }
 
@@ -440,7 +511,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "Operation Forbidden by tenant policy")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -Times 0 -Exactly
             }
         }
@@ -448,6 +519,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
         Context 'Debug logging of the permissions guidance' {
             BeforeEach {
                 Mock -ModuleName ExportPowerBIProvider Write-Information {}
+                Mock -ModuleName ExportPowerBIProvider Write-Warning {}
                 Mock -ModuleName ExportPowerBIProvider Write-ScubaLog {}
             }
 
@@ -455,7 +527,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (403) Forbidden.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-ScubaLog -Times 1 -Exactly -ParameterFilter {
                     $Data.AuthType -eq 'Interactive' -and
                     $Data.Guidance -match 'Fabric Administrator role' -and
@@ -467,7 +539,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (403) Forbidden.")
                 }
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-ScubaLog -Times 1 -Exactly -ParameterFilter {
                     $Data.AuthType -eq 'ServicePrincipal' -and
                     $Data.Guidance -match 'security group for the service principal' -and
@@ -479,7 +551,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (401) Unauthorized.")
                 }
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-ScubaLog -Times 1 -Exactly
             }
 
@@ -487,7 +559,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (403) Forbidden.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-ScubaLog -Times 1 -Exactly -ParameterFilter {
                     $Level -eq 'Info'
                 }
@@ -497,8 +569,10 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (500) Internal Server Error.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
-                Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-ScubaLog -Times 0 -Exactly
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
+                Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-ScubaLog -Times 0 -Exactly -ParameterFilter {
+                    $Message -eq 'Power BI permissions guidance'
+                }
             }
 
             It 'does not log guidance when the API call succeeds' {
@@ -512,7 +586,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (403) Forbidden.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 Should -Invoke -ModuleName ExportPowerBIProvider -CommandName Write-Information -ParameterFilter {
                     $MessageData -match 'Fabric Administrator role'
                 }
@@ -526,13 +600,14 @@ InModuleScope -ModuleName ExportPowerBIProvider {
             BeforeEach {
                 [MockCommandTracker]::Reset()
                 Mock -ModuleName ExportPowerBIProvider Write-Information {}
+                Mock -ModuleName ExportPowerBIProvider Write-Warning {}
             }
 
             It 'records Invoke-RestMethod as unsuccessful when the API returns 403 Forbidden' {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (403) Forbidden.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 [MockCommandTracker]::UnSuccessful | Should -Contain 'Invoke-RestMethod'
                 [MockCommandTracker]::Successful | Should -Not -Contain 'Invoke-RestMethod'
             }
@@ -541,7 +616,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (401) Unauthorized.")
                 }
-                { Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -CertificateBasedAuth -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 [MockCommandTracker]::UnSuccessful | Should -Contain 'Invoke-RestMethod'
                 [MockCommandTracker]::Successful | Should -Not -Contain 'Invoke-RestMethod'
             }
@@ -550,7 +625,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (500) Internal Server Error.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null } | Should -Not -Throw
                 [MockCommandTracker]::UnSuccessful | Should -Contain 'Invoke-RestMethod'
                 [MockCommandTracker]::Successful | Should -Not -Contain 'Invoke-RestMethod'
             }
@@ -566,7 +641,7 @@ InModuleScope -ModuleName ExportPowerBIProvider {
                 Mock -ModuleName ExportPowerBIProvider Invoke-ScubaRestMethod {
                     throw (New-RestError -Message "The remote server returned an error: (403) Forbidden.")
                 }
-                { Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' } | Should -Throw
+                Export-PowerBIProvider -LicenseFound $true -AccessToken 'mock-token' -BaseUrl 'https://api.powerbi.com' | Out-Null
                 @([MockCommandTracker]::UnSuccessful).Count | Should -Be 1
             }
         }
