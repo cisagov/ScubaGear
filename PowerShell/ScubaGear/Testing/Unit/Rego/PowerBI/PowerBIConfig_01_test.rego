@@ -128,6 +128,51 @@ test_LicenseFound_ReasonIgnored if {
 
     TestResult("MS.POWERBI.1.1v1", Output, PASS, true) == true
 }
+
+# A 401/403 from the Power BI Admin API surfaces the provider's fix instead of "Setting Not Found in JSON"
+test_AccessDenied_ReasonSurfaced if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": []},
+        {"op": "add", "path": "/powerbi_access_denied_reason", "value": "The Power BI Admin API denied access (403 Forbidden)."}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.POWERBI.1.1v1"]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].ActualValue == "Access Denied"
+    RuleOutput[0].ErrorDetails == "Unable to evaluate tenant setting. The Power BI Admin API denied access (403 Forbidden)."
+}
+
+# Access denied wins over any tenant settings present, so the core policy never adds a second result
+test_AccessDenied_IgnoresTenantSettings if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "add", "path": "/powerbi_access_denied_reason", "value": "The Power BI Admin API denied access (401 Unauthorized)."}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.POWERBI.1.1v1"]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].ActualValue == "Access Denied"
+}
+
+# No license is reported over access denied, since a 401/403 is only meaningful once a license was found
+test_NoLicense_TakesPrecedence_OverAccessDenied if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": false},
+        {"op": "add", "path": "/powerbi_access_denied_reason", "value": "The Power BI Admin API denied access (403 Forbidden)."}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.POWERBI.1.1v1"]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].ActualValue == "No License"
+    RuleOutput[0].ReportDetails == PowerbiLicenseErrorMessage
+}
 ###
 
 
