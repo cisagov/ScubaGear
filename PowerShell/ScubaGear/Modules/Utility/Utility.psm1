@@ -1,3 +1,4 @@
+Import-Module -Name $PSScriptRoot/ScubaLogging.psm1 -Function Write-ScubaLog
 
 function Set-Utf8NoBom {
     <#
@@ -787,12 +788,14 @@ function Invoke-ScubaRestMethod {
         $WebResponse = $ErrorRecord.Exception.Response
 
         if ($null -eq $WebResponse) {
-            Write-Information "No HTTP response object was returned.`nException Type: $($ErrorRecord.Exception.GetType().FullName)`nMessage       : $($ErrorRecord.Exception.Message)" -InformationAction Continue
+            # Capture the full response detail in the debug log only, keeping it off the console.
+            Write-ScubaLog -Message "No HTTP response object was returned.`nException Type: $($ErrorRecord.Exception.GetType().FullName)`nMessage       : $($ErrorRecord.Exception.Message)" -Level "Info" -Source "Invoke-ScubaRestMethod"
             throw
         }
 
         $DetailedHttpMessage = Get-HttpResponseDetails -HttpResponseObject $WebResponse -ErrorDetailsMessage $ErrorRecord.ErrorDetails.Message
-        Write-Information $DetailedHttpMessage -InformationAction Continue
+        # Capture the full response detail in the debug log only, keeping it off the console.
+        Write-ScubaLog -Message $DetailedHttpMessage -Level "Info" -Source "Invoke-ScubaRestMethod"
         throw
     }
 
