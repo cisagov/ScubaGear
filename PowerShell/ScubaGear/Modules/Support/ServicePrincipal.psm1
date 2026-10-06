@@ -1592,7 +1592,7 @@ function Set-ScubaGearAppPermission {
                         foreach ($grant in $CurrentDelegatedGrants) {
                             try {
                                 $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgOauth2PermissionGrant -Environment $M365Environment -outAs api -id $grant.Id)
-                                Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                                $null = Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
                                 Write-Verbose "Removed OAuth2 grant: $($grant.Id) with scopes: $($grant.Scope)"
                             } catch {
                                 Write-Warning "Failed to remove OAuth2 grant $($grant.Id): $($_.Exception.Message)"
@@ -1637,7 +1637,7 @@ function Set-ScubaGearAppPermission {
                             requiredResourceAccess = $updatedResourceAccess
                         }
 
-                        Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
+                        $null =Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
                         Write-Output "Removed delegated permissions from app registration manifest"
                     }
                 } catch {
@@ -1660,7 +1660,7 @@ function Set-ScubaGearAppPermission {
                     if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
                         foreach ($extraPerm in $ExtraPermissionsDetails) {
                             $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -outAs api -id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
-                            Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                            $null = Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
                             Write-Output "Removed consented extra permission: $($extraPerm.PermissionName)"
                         }
                     }
@@ -1763,7 +1763,7 @@ function Set-ScubaGearAppPermission {
                             requiredResourceAccess = $updatedResourceAccess
                         }
 
-                        Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
+                        $null = Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
 
                         foreach ($permName in $extraPermNames) {
                             Write-Output "Removed extra permission from manifest: $permName"
@@ -1857,7 +1857,7 @@ function Set-ScubaGearAppPermission {
                             requiredResourceAccess = $updatedResourceAccess
                         }
 
-                        Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
+                        $null = Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
 
                         foreach ($permName in $PermissionsNotInManifest) {
                             Write-Output "Added granted permission to manifest: $permName"
@@ -1945,7 +1945,7 @@ function Set-ScubaGearAppPermission {
                                 requiredResourceAccess = $updatedResourceAccess
                             }
 
-                            Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
+                            $null = Invoke-GraphDirectly -Commandlet Update-MgApplication -Body $Body -M365Environment $M365Environment -id $appResponse.id
                             Write-Verbose "Updated app registration manifest with missing permissions"
                         }
                     }
@@ -1975,7 +1975,7 @@ function Set-ScubaGearAppPermission {
                             }
 
                             try {
-                                Invoke-GraphDirectly -Commandlet New-MgServicePrincipalAppRoleAssignedTo -Body $body -M365Environment $M365Environment -id $ServicePrincipalID
+                                $null = Invoke-GraphDirectly -Commandlet New-MgServicePrincipalAppRoleAssignedTo -Body $body -M365Environment $M365Environment -id $ServicePrincipalID
                                 Write-Output "Added missing permission: $($missingPerm.Permission)"
                             } catch {
                                 if ($_.Exception.Message -match "Permission entry already exists") {
