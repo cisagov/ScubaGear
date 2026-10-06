@@ -318,39 +318,48 @@ function Connect-Tenant {
                        $PBIServicePlans = $ServicePlans | Where-Object -Property ServicePlanName -Match -Value "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)"
                        if ($PBIServicePlans) {
                            $TenantHasPBILicense = $true
+                           # Get the unique names of the detected Power BI service plans.
                            $PlanNames = ($PBIServicePlans | ForEach-Object { $_.ServicePlanName } | Select-Object -Unique) -join ", "
-                           Write-Information "Power BI license found: $PlanNames" -InformationAction Continue
+
+                           # Log to debug log only (kept off the console to reduce noise)
                            Write-ScubaLog -Message "Power BI license found: $PlanNames" -Level "Info" -Source "Connect-Tenant"
                        }
                    }
 
                    if (-not $TenantHasPBILicense) {
-                       Write-Warning "No Power BI or Fabric license found in the tenant."
-                       Write-ScubaLog -Message "No Power BI or Fabric license found in the tenant." -Level "Info" -Source "Connect-Tenant"
+                       $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
+                       # Shown in the report, and logged to the debug log instead of the console
+                       Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
                        # Mark license as not found to avoid attempting Power BI API calls later, which would trigger consent/sign-in without a license.
                        $PBILicenseFound = $false
-                       $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
                    }
                    else {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
                            $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           # Collect every successfully provisioned service plan assigned to the current user.
                            $UserPlans = $UserLicenseResponse.value |
                                Where-Object { $null -ne $_.servicePlans } |
                                ForEach-Object { $_.servicePlans } |
                                Where-Object { $_.provisioningStatus -eq "Success" }
+
+                           # Filter the user's service plans to include only those related to Power BI or Fabric.
                            $UserPBIPlans = @($UserPlans |Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
                            if ($UserPBIPlans.Count -eq 0) {
-                               Write-Warning "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
-                               Write-ScubaLog -Message "Current user does not have a Power BI or Fabric license assigned." -Level "Info" -Source "Connect-Tenant"
                                $PBILicenseFound = $false
-                               $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+
+                               # Shown in the report, and logged to the debug log instead of the console
+                               $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+                               Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
                            }
                            else {
                                $PBILicenseFound = $true
+                               # Get the unique names of the user's Power BI/Fabric service plans.
                                $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
-                               Write-Information "User Power BI/Fabric license found: $UserPlanNames" -InformationAction Continue
+
+                               # Log the user's Power BI/Fabric license status to the debug log only.
+                               # PBILicenseReason stays empty here because it is only set when the license check fails.
                                Write-ScubaLog -Message "User Power BI/Fabric license found: $UserPlanNames" -Level "Info" -Source "Connect-Tenant"
                            }
                        }

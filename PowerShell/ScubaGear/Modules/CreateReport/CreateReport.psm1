@@ -39,8 +39,14 @@ function Get-RegoResult {
     elseif ($MissingCommands.Count -gt 0) {
         $Result.DisplayString = "Error"
         $Result.SummaryKey = "Errors"
-        $MissingString = $MissingCommands -Join ", "
-        $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        # The Rego can supply ErrorDetails to explain a known failure and how to fix it
+        if (-not [string]::IsNullOrEmpty($Test.ErrorDetails)) {
+            $Result.Details = $Test.ErrorDetails
+        }
+        else {
+            $MissingString = $MissingCommands -Join ", "
+            $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        }
     }
     elseif ($Test.RequirementMet) {
         $Result.DisplayString = "Pass"
