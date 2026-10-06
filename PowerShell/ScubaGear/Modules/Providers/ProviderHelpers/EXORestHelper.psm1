@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-HttpRetryInfo
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions
 
 function Get-ExchangeOnlineScope {
@@ -306,32 +306,29 @@ function Invoke-EXORestMethod {
             return $Parsed.value
         }
         catch {
-            $StatusCode = 0
-            if ($_.Exception.Response) {
-                $StatusCode = [int]$_.Exception.Response.StatusCode
-            }
+            # Every cmdlet sent through here is a read (Get-*), so retrying is always safe.
+            $RetryInfo = Get-HttpRetryInfo -Exception $_.Exception
+            $StatusCode = $RetryInfo.StatusCode
+            $IsTransient = $RetryInfo.IsNetworkError -or ($StatusCode -in @(429, 500, 502, 503, 504))
 
-            # Rate limited (429) - respect Retry-After header
-            if ($StatusCode -eq 429 -and $Attempt -lt $MaxRetries) {
-                $RetryAfter = $RetryDelay
-                try {
-                    $RaHeader = $_.Exception.Response.Headers | Where-Object { $_.Key -eq 'Retry-After' } | Select-Object -ExpandProperty Value -First 1
-                    if ($RaHeader -and [int]::TryParse($RaHeader, [ref]$null)) {
-                        $RetryAfter = [int]$RaHeader
-                    }
+            if ($IsTransient -and $Attempt -lt $MaxRetries) {
+                $Delay = $RetryDelay
+                if ($RetryInfo.RetryAfterSeconds -gt 0) {
+                    $Delay = $RetryInfo.RetryAfterSeconds
                 }
-                catch {
-                    Write-Verbose "Could not parse Retry-After header: $($_.Exception.Message)"
-                }
-                Write-Warning "EXO REST '$CmdletName' throttled (429). Retrying in ${RetryAfter}s (attempt $Attempt/$MaxRetries)..."
-                Start-Sleep -Seconds $RetryAfter
-                continue
-            }
 
-            # Transient server errors (500, 503) - retry with backoff
-            if ($StatusCode -in @(500, 503) -and $Attempt -lt $MaxRetries) {
-                Write-Warning "EXO REST '$CmdletName' returned $StatusCode. Retrying in ${RetryDelay}s (attempt $Attempt/$MaxRetries)..."
-                Start-Sleep -Seconds $RetryDelay
+                $Reason = if ($RetryInfo.IsNetworkError) {
+                    "did not get a response ($($_.Exception.Message))"
+                }
+                elseif ($StatusCode -eq 429) {
+                    "was throttled (429)"
+                }
+                else {
+                    "returned $StatusCode"
+                }
+
+                Write-Warning "EXO REST '$CmdletName' $Reason. Retrying in ${Delay}s (attempt $Attempt/$MaxRetries)..."
+                Start-Sleep -Seconds $Delay
                 $RetryDelay *= 2
                 continue
             }
