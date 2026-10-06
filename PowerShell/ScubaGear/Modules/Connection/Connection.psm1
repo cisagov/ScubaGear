@@ -98,8 +98,8 @@ function Connect-Tenant {
        }
        Write-Progress @ProgressParams
        try {
-            switch ($Product) {
-                "aad" {
+           switch ($Product) {
+               "aad" {
                    $GraphScopes = Get-ScubaGearEntraMinimumPermissions
                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes $GraphScopes
                    $MsGraphAuthRequired = $false
@@ -113,8 +113,8 @@ function Connect-Tenant {
                         $AutodetectEnvironmentCompleted = $true
                         Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
                     }
-                }
-                {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
+               }
+               {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
                    if ($EXOAuthRequired) {
                        #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for EXO / Security Suite auth
                        Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
@@ -200,8 +200,8 @@ function Connect-Tenant {
 
                        $EXOAuthRequired = $false
                    }
-                }
-                "powerplatform" {
+               }
+               "powerplatform" {
                     #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Power Platform auth
                     Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                     $MsGraphAuthRequired = $false
@@ -246,8 +246,8 @@ function Connect-Tenant {
                            -M365Environment $M365Environment
                    }
                    Write-Verbose "Power Platform token acquired successfully"
-                }
-                "sharepoint" {
+               }
+               "sharepoint" {
                     #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Sharepoint auth
                     Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                     $MsGraphAuthRequired = $false
@@ -291,14 +291,14 @@ function Connect-Tenant {
                             -M365Environment $M365Environment
                     }
                     Write-Verbose "SharePoint token acquired successfully"
-                }
-                "powerbi" {
-                    #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Powerbi auth
-                    # /subscribedSkus API requires the Organization.Read.All permission.
-                    Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes @("Organization.Read.All","LicenseAssignment.Read.All")
-                    $MsGraphAuthRequired = $false
+               }
+               "powerbi" {
+                   #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Powerbi auth
+                   # /subscribedSkus API requires the Organization.Read.All permission.
+                   Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams -Scopes @("Organization.Read.All")
+                   $MsGraphAuthRequired = $false
 
-                    # Dynamically determine the M365Environment for interactive auth
+                   # Dynamically determine the M365Environment for interactive auth
                     if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
                         $UserAuthInfo = Get-MgContext
                         $TenantId = $UserAuthInfo.TenantId
@@ -308,101 +308,100 @@ function Connect-Tenant {
                         Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
                     }
 
-                    # Check for Power BI license before attempting token acquisition.
-                    # This prevents triggering a second consent/browser window for the
-                    # Power BI API scope when the tenant has no PBI license at all.
-                    $TenantHasPBILicense = $false
-                    $SubscribedSku = (Invoke-GraphDirectly -Commandlet Get-MgBetaSubscribedSku -M365Environment $M365Environment).Value
-                    $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
-                    if ($ServicePlans) {
-                        $PBIServicePlans = $ServicePlans | Where-Object -Property ServicePlanName -Match -Value "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)"
-                        if ($PBIServicePlans) {
-                            $TenantHasPBILicense = $true
-                            # Get the unique names of the detected Power BI service plans.
-                            $PlanNames = ($PBIServicePlans | ForEach-Object { $_.ServicePlanName } | Select-Object -Unique) -join ", "
-                            $PBIMessage = "Power BI license found: $PlanNames"
+                   # Check for Power BI license before attempting token acquisition.
+                   # This prevents triggering a second consent/browser window for the
+                   # Power BI API scope when the tenant has no PBI license at all.
+                   $TenantHasPBILicense = $false
+                   $SubscribedSku = (Invoke-GraphDirectly -Commandlet Get-MgBetaSubscribedSku -M365Environment $M365Environment).Value
+                   $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
+                   if ($ServicePlans) {
+                       $PBIServicePlans = $ServicePlans | Where-Object -Property ServicePlanName -Match -Value "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)"
+                       if ($PBIServicePlans) {
+                           $TenantHasPBILicense = $true
+                           # Get the unique names of the detected Power BI service plans.
+                           $PlanNames = ($PBIServicePlans | ForEach-Object { $_.ServicePlanName } | Select-Object -Unique) -join ", "
 
-                            # Log to debug log only (kept off the console to reduce noise)
-                            Write-ScubaLog -Message "$PBIMessage" -Level "Info" -Source "Connect-Tenant"
-                        }
-                    }
+                           # Log to debug log only (kept off the console to reduce noise)
+                           Write-ScubaLog -Message "Power BI license found: $PlanNames" -Level "Info" -Source "Connect-Tenant"
+                       }
+                   }
 
-                    if (-not $TenantHasPBILicense) {
-                        $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
-                        # Log to debug log only (kept off the console to reduce noise)
-                        Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
-                        # Mark license as not found to avoid attempting Power BI API calls later, which would trigger consent/sign-in without a license.
-                        $PBILicenseFound = $false
-                    }
-                    else {
-                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
-                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
-                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                            $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
-                            # Get the unique names of the Power BI service plans assigned to the current user.
-                            $UserPlans = $UserLicenseResponse.value |
-                                Where-Object { $null -ne $_.servicePlans } |
-                                ForEach-Object { $_.servicePlans } |
-                                Where-Object { $_.provisioningStatus -eq "Success" }
+                   if (-not $TenantHasPBILicense) {
+                       $PBILicenseReason = "No Power BI or Fabric license found in the tenant."
+                       # Shown in the report, and logged to the debug log instead of the console
+                       Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
+                       # Mark license as not found to avoid attempting Power BI API calls later, which would trigger consent/sign-in without a license.
+                       $PBILicenseFound = $false
+                   }
+                   else {
+                       # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
+                       # The Power BI Admin API requires the calling user to have a license even for Global Admin.
+                       if (-not $ServicePrincipalParams.CertThumbprintParams) {
+                           $UserLicenseResponse = Invoke-MgGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           # Collect every successfully provisioned service plan assigned to the current user.
+                           $UserPlans = $UserLicenseResponse.value |
+                               Where-Object { $null -ne $_.servicePlans } |
+                               ForEach-Object { $_.servicePlans } |
+                               Where-Object { $_.provisioningStatus -eq "Success" }
 
-                            # Filter the user's service plans to include only those related to Power BI or Fabric.
-                            $UserPBIPlans = @($UserPlans |Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
-                            if ($UserPBIPlans.Count -eq 0) {
-                                $PBILicenseFound = $false
+                           # Filter the user's service plans to include only those related to Power BI or Fabric.
+                           $UserPBIPlans = @($UserPlans |Where-Object { $_.servicePlanName -match "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)" })
+                           if ($UserPBIPlans.Count -eq 0) {
+                               $PBILicenseFound = $false
 
-                                # Log the reason for the missing Power BI/Fabric license to the debug log only
-                                $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
-                                Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
-                            }
-                            else {
-                                $PBILicenseFound = $true
-                                # Get the unique names of the user's Power BI/Fabric service plans.
-                                $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
+                               # Shown in the report, and logged to the debug log instead of the console
+                               $PBILicenseReason = "Current user does not have a Power BI or Fabric license assigned. To include Power BI, assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+                               Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
+                           }
+                           else {
+                               $PBILicenseFound = $true
+                               # Get the unique names of the user's Power BI/Fabric service plans.
+                               $UserPlanNames = ($UserPBIPlans | ForEach-Object { $_.servicePlanName } | Select-Object -Unique) -join ", "
 
-                                # Log the user's Power BI/Fabric license status to the debug log only
-                                $PBILicenseReason = "User Power BI/Fabric license found: $UserPlanNames"
-                                Write-ScubaLog -Message $PBILicenseReason -Level "Info" -Source "Connect-Tenant"
-                            }
-                        }
-                        # Skip this check for service principal auth (SPs use tenant setting + security group).
-                        else {
-                            $PBILicenseFound = $true
-                        }
+                               # Log the user's Power BI/Fabric license status to the debug log only.
+                               # PBILicenseReason stays empty here because it is only set when the license check fails.
+                               Write-ScubaLog -Message "User Power BI/Fabric license found: $UserPlanNames" -Level "Info" -Source "Connect-Tenant"
+                           }
+                       }
+                       # Skip this check for service principal auth (SPs use tenant setting + security group).
+                       else {
+                           $PBILicenseFound = $true
+                       }
 
-                        if ($PBILicenseFound) {
-                            # Acquire Power BI access token
-                            $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
-                            $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
-                            if ($ServicePrincipalParams.CertThumbprintParams) {
-                                $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                                    -Scope $PBIScope `
-                                    -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
-                                    -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
-                                    -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
-                                    -M365Environment $M365Environment
-                            }
-                            else {
-                                # Resolve tenant name if not already cached from a previous product
-                                if ([string]::IsNullOrEmpty($TenantName)) {
-                                    $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
-                                    $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
-                                    $TenantName = $InitialDomain.Name
-                                    $InitialDomainPrefix = $TenantName.split(".")[0]
-                                }
-                                # Same ClientId as PowerPlatform - MSAL cache and SSO enable silent acquisition
-                                # if PowerPlatform already signed in interactively this session.
-                                $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
-                                $TokenData.PBIAccessToken = Get-MsalAccessToken `
-                                    -Scope $PBIScope `
-                                    -ClientId $PBIClientId `
-                                    -Tenant $TenantName `
-                                    -M365Environment $M365Environment
-                            }
-                            Write-Verbose "Power BI token acquired successfully"
-                        }
-                    }
-                }
-                "teams" {
+                       if ($PBILicenseFound) {
+                           # Acquire Power BI access token
+                           $PBIScope = Get-PowerBIScope -M365Environment $M365Environment
+                           $TokenData.PBIBaseUrl = Get-PowerBIBaseUrl -M365Environment $M365Environment
+                           if ($ServicePrincipalParams.CertThumbprintParams) {
+                               $TokenData.PBIAccessToken = Get-MsalAccessToken `
+                                   -Scope $PBIScope `
+                                   -CertificateThumbprint $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint `
+                                   -AppID $ServicePrincipalParams.CertThumbprintParams.AppID `
+                                   -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
+                                   -M365Environment $M365Environment
+                           }
+                           else {
+                               # Resolve tenant name if not already cached from a previous product
+                               if ([string]::IsNullOrEmpty($TenantName)) {
+                                   $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                                   $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
+                                   $TenantName = $InitialDomain.Name
+                                   $InitialDomainPrefix = $TenantName.split(".")[0]
+                               }
+                               # Same ClientId as PowerPlatform - MSAL cache and SSO enable silent acquisition
+                               # if PowerPlatform already signed in interactively this session.
+                               $PBIClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+                               $TokenData.PBIAccessToken = Get-MsalAccessToken `
+                                   -Scope $PBIScope `
+                                   -ClientId $PBIClientId `
+                                   -Tenant $TenantName `
+                                   -M365Environment $M365Environment
+                           }
+                           Write-Verbose "Power BI token acquired successfully"
+                       }
+                   }
+               }
+               "teams" {
                     #### Authenticate to MS Graph with min permissions to be able to get Tenant domain information for Teams auth
                     Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
                     $MsGraphAuthRequired = $false
@@ -475,20 +474,20 @@ function Connect-Tenant {
                                 -M365Environment $M365Environment
                         }
                    }
-                }
-                default {
-                    throw "Invalid ProductName argument"
-                }
+               }
+               default {
+                   throw "Invalid ProductName argument"
+               }
            }
-        }
-        catch {
-            $ErrorDetails = @{
-                Product = $Product
-                ErrorMessage = $_.Exception.Message
-                ErrorType = $_.Exception.GetType().FullName
-                ScriptStackTrace = $_.ScriptStackTrace
-                TargetObject = if ($_.TargetObject) { $_.TargetObject.ToString() } else { "N/A" }
-            }
+       }
+       catch {
+           $ErrorDetails = @{
+               Product = $Product
+               ErrorMessage = $_.Exception.Message
+               ErrorType = $_.Exception.GetType().FullName
+               ScriptStackTrace = $_.ScriptStackTrace
+               TargetObject = if ($_.TargetObject) { $_.TargetObject.ToString() } else { "N/A" }
+           }
 
            # Log detailed error information for troubleshooting
            Write-ScubaLog -Message "Authentication failed for product: $Product" -Level "Error" -Source "ConnectTenant" -Data $ErrorDetails
@@ -496,29 +495,29 @@ function Connect-Tenant {
            Write-Warning "Error establishing a connection with $($Product): $($_.Exception.Message)`n$($_.ScriptStackTrace)"
            $ProdAuthFailed += $Product
            Write-Warning "$($Product) will be omitted from the output because of failed authentication"
-        }
-    }
-    Write-Progress -Activity "Authenticating to each service" -Status "Ready" -Completed
-    @{
-        ProdAuthFailed   = $ProdAuthFailed
-        PBILicenseFound  = $PBILicenseFound
-        PBILicenseReason = $PBILicenseReason
-        SPOAccessToken   = $TokenData.SPOAccessToken
-        SPOAdminUrl      = $TokenData.SPOAdminUrl
-        PPAccessToken    = $TokenData.PPAccessToken
-        PPBaseUrl        = $TokenData.PPBaseUrl
-        PBIAccessToken   = $TokenData.PBIAccessToken
-        PBIBaseUrl       = $TokenData.PBIBaseUrl
-        EXOAccessToken   = $TokenData.EXOAccessToken
-        ComplianceAccessToken = $TokenData.ComplianceAccessToken
-        ComplianceApiEndpoint = $TokenData.ComplianceApiEndpoint
-        EXOApiEndpoint   = $TokenData.EXOApiEndpoint
-        TeamsAccessToken = $TokenData.TeamsAccessToken
-        TeamsBaseUrl = $TokenData.TeamsBaseUrl
-        TeamsUnifiedAccessToken   = $TokenData.TeamsUnifiedAccessToken
-        TeamsUnifiedBaseUrl     = $TokenData.TeamsUnifiedBaseUrl
-        DetectedM365Environment = $DetectedM365Environment
-    }
+       }
+   }
+   Write-Progress -Activity "Authenticating to each service" -Status "Ready" -Completed
+   @{
+       ProdAuthFailed   = $ProdAuthFailed
+       PBILicenseFound  = $PBILicenseFound
+       PBILicenseReason = $PBILicenseReason
+       SPOAccessToken   = $TokenData.SPOAccessToken
+       SPOAdminUrl      = $TokenData.SPOAdminUrl
+       PPAccessToken    = $TokenData.PPAccessToken
+       PPBaseUrl        = $TokenData.PPBaseUrl
+       PBIAccessToken   = $TokenData.PBIAccessToken
+       PBIBaseUrl       = $TokenData.PBIBaseUrl
+       EXOAccessToken   = $TokenData.EXOAccessToken
+       ComplianceAccessToken = $TokenData.ComplianceAccessToken
+       ComplianceApiEndpoint = $TokenData.ComplianceApiEndpoint
+       EXOApiEndpoint   = $TokenData.EXOApiEndpoint
+       TeamsAccessToken = $TokenData.TeamsAccessToken
+       TeamsBaseUrl = $TokenData.TeamsBaseUrl
+       TeamsUnifiedAccessToken   = $TokenData.TeamsUnifiedAccessToken
+       TeamsUnifiedBaseUrl     = $TokenData.TeamsUnifiedBaseUrl
+       DetectedM365Environment = $DetectedM365Environment
+   }
 }
 
 function Disconnect-SCuBATenant {
