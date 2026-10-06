@@ -34,13 +34,7 @@ This guide helps resolve common issues when working with ScubaGear service princ
 
 **Solutions:**
 
-#### 1. Install Required Module
-
-```powershell
-Install-ScubaDependencies
-```
-
-#### 2. Verify you have the correct permissions to register the Service Principal with Power Platform
+#### 1. Verify you have the correct permissions to register the Service Principal with Power Platform
 - You will need to be a `Global Administrator` or `Power Platform Administrator`
 
 ## Frequently Asked Questions (FAQ)
