@@ -895,6 +895,92 @@ function Get-HttpResponseDetails {
     return $StringBuffer.ToString()
 }
 
+function Get-HttpRetryInfo {
+    <#
+    .SYNOPSIS
+        Pulls out what a REST caller needs to decide whether a failed request is worth retrying.
+
+    .DESCRIPTION
+        Returns the HTTP status code (0 when the request never got a response), the Retry-After
+        delay in seconds (0 when the header is missing), and whether the failure was a network-level
+        error such as a timeout, dropped connection or DNS failure.
+
+        Works with the exception shapes Invoke-WebRequest and Invoke-RestMethod throw on both
+        PS 5.1 (WebException with an HttpWebResponse) and PS 7+ (HttpResponseException with an
+        HttpResponseMessage, or TaskCanceledException on timeout).
+
+    .PARAMETER Exception
+        The exception caught from Invoke-WebRequest or Invoke-RestMethod.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Exception]
+        $Exception
+    )
+
+    $StatusCode = 0
+    $RetryAfterSeconds = 0
+    $IsNetworkError = $false
+
+    $ResponseProperty = $Exception.PSObject.Properties['Response']
+    $Response = if ($null -ne $ResponseProperty) { $ResponseProperty.Value } else { $null }
+
+    if ($null -ne $Response) {
+        $StatusCode = [int]$Response.StatusCode
+        $Headers = $Response.Headers
+
+        if ($null -ne $Headers) {
+            # PS 7+ HttpResponseHeaders exposes Retry-After as a typed header and returns nothing from the indexer.
+            # PS 5.1 WebHeaderCollection (and hashtables) only work through the indexer.
+            if ($null -ne $Headers.PSObject.Properties['RetryAfter']) {
+                $TypedRetryAfter = $Headers.RetryAfter
+                if ($null -ne $TypedRetryAfter -and $null -ne $TypedRetryAfter.Delta) {
+                    $RetryAfterSeconds = [int][Math]::Ceiling($TypedRetryAfter.Delta.TotalSeconds)
+                }
+                elseif ($null -ne $TypedRetryAfter -and $null -ne $TypedRetryAfter.Date) {
+                    $RetryAfterSeconds = [int][Math]::Ceiling(($TypedRetryAfter.Date - [DateTimeOffset]::UtcNow).TotalSeconds)
+                }
+            }
+            else {
+                $RetryAfterValue = [string]$Headers['Retry-After']
+                $ParsedSeconds = 0
+                $ParsedDate = [DateTimeOffset]::MinValue
+                if ([int]::TryParse($RetryAfterValue, [ref]$ParsedSeconds)) {
+                    $RetryAfterSeconds = $ParsedSeconds
+                }
+                elseif ([DateTimeOffset]::TryParse($RetryAfterValue, [ref]$ParsedDate)) {
+                    $RetryAfterSeconds = [int][Math]::Ceiling(($ParsedDate - [DateTimeOffset]::UtcNow).TotalSeconds)
+                }
+            }
+        }
+    }
+    else {
+        # No response at all. Walk the inner exceptions since PS 7 wraps socket and timeout errors.
+        # HttpRequestException is compared by name because System.Net.Http isn't loaded by default on PS 5.1.
+        $Current = $Exception
+        while ($null -ne $Current -and -not $IsNetworkError) {
+            $IsNetworkError = ($Current -is [System.Net.WebException]) -or
+                ($Current -is [System.TimeoutException]) -or
+                ($Current -is [System.Threading.Tasks.TaskCanceledException]) -or
+                ($Current -is [System.Net.Sockets.SocketException]) -or
+                ($Current -is [System.IO.IOException]) -or
+                ($Current.GetType().FullName -eq 'System.Net.Http.HttpRequestException')
+            $Current = $Current.InnerException
+        }
+    }
+
+    [pscustomobject]@{
+        StatusCode        = $StatusCode
+        RetryAfterSeconds = [Math]::Max(0, $RetryAfterSeconds)
+        IsNetworkError    = $IsNetworkError
+    }
+}
+
 Export-ModuleMember -Function @(
     'Get-Utf8NoBom',
     'Set-Utf8NoBom',
@@ -902,5 +988,6 @@ Export-ModuleMember -Function @(
     'ConvertFrom-GraphHashtable',
     'Invoke-GraphBatchRequest',
     'Invoke-ScubaRestMethod',
-    'Get-HttpResponseDetails'
+    'Get-HttpResponseDetails',
+    'Get-HttpRetryInfo'
 )
