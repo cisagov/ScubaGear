@@ -1,3 +1,5 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Utility/Utility.psm1') -Function Get-ScubaGearCatalog
+
 Function Get-ScubaGearPermissions {
     <#
     .SYNOPSIS
@@ -359,19 +361,6 @@ Function Get-ServicePrincipalPermissions {
 
     # Display the filtered permissions - return deduplicated results
     return $deduplicatedPermissions | Select-Object -Property LeastPermissions, ResourceAPIAppID, scubaGearProduct -Unique
-}
-
-function Get-ScubaGearCatalog {
-    <#
-    .SYNOPSIS
-        Loads the full ScubaGear API catalog (schemas/ScubaGearApiCatalog.json).
-    .FUNCTIONALITY
-        Internal
-    #>
-    [CmdletBinding()]
-    param()
-    [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-    return (Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" -Raw | ConvertFrom-Json)
 }
 
 function Get-ScubaGearProductRecord {
