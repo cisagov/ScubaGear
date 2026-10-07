@@ -161,8 +161,10 @@ Function Get-ScubaGearPermissions {
 
         [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
 
-        $permissionSet = Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json
-        Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json"
+        # The catalog also holds REST call entries keyed by functionName (see Get-ScubaGearRestEndpoint);
+        # only the per-cmdlet records keyed by moduleCmdlet describe Graph/REST resources and permissions.
+        $permissionSet = (Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json) | Where-Object { $_.moduleCmdlet }
+        Write-Verbose "Command: `$permissionSet = (Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json) | Where-Object { `$_.moduleCmdlet }"
 
         # This hashtable contains the Entra AppId values for MS Graph (aad), Office 365 Exchange Online and SharePoint.
         # The New-ScubaGearServicePrincipal cmdlet references these AppIds and their respective permissions from ScubaGearApiCatalog.json to
@@ -548,13 +550,14 @@ function Get-ScubaGearRestEndpoint {
     <#
     .SYNOPSIS
         Looks up the REST endpoint path for a ScubaGear provider REST helper function
-        from the ScubaGearRestApiInventory.json catalog.
+        from the functionName entries in ScubaGearApiCatalog.json.
 
     .DESCRIPTION
         Centralizes the REST endpoint paths used by the non-Graph provider REST helpers
         (EXO/SecuritySuite excluded - their endpoint is resolved dynamically per-tenant,
         not a fixed catalog path) so each path is defined in exactly one place, the same
-        way ScubaGearApiCatalog.json centralizes Graph resource paths for Invoke-GraphDirectly.
+        way the moduleCmdlet entries in ScubaGearApiCatalog.json centralize Graph resource
+        paths for Invoke-GraphDirectly.
 
     .PARAMETER FunctionName
         The REST helper function name, matching the catalog's functionName field
@@ -583,17 +586,17 @@ function Get-ScubaGearRestEndpoint {
     )
 
     [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-    $CatalogPath = "$ResourceRoot\..\..\schemas\ScubaGearRestApiInventory.json"
+    $CatalogPath = "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json"
     $Catalog = Get-Content -Path $CatalogPath -Raw | ConvertFrom-Json
 
     $Entry = $Catalog | Where-Object { $_.functionName -eq $FunctionName }
     if (-not $Entry) {
-        throw "No REST API inventory entry found for function '$FunctionName' in $CatalogPath"
+        throw "No REST API catalog entry found for function '$FunctionName' in $CatalogPath"
     }
 
     $EndpointPath = $Entry.endpointPath
     if ([string]::IsNullOrWhiteSpace($EndpointPath)) {
-        throw "Function '$FunctionName' has no fixed endpointPath in the REST API inventory."
+        throw "Function '$FunctionName' has no fixed endpointPath in the REST API catalog."
     }
 
     if ($PathParameters) {
