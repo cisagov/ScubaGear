@@ -87,7 +87,7 @@ InModuleScope Connection {
                 throw 'this will be mocked'
             }
 
-            function Invoke-MgGraphRequest {
+            function Invoke-ScubaGraphRequest {
                 [CmdletBinding()]
                 param($Method, $Uri)
                 $null = $Method, $Uri
@@ -113,7 +113,7 @@ InModuleScope Connection {
                 if ($Commandlet -eq 'Get-MgBetaSubscribedSku') { return New-SubscribedSku }
                 return New-OrgDetails
             }
-            Mock Invoke-MgGraphRequest -MockWith { return New-UserLicense }
+            Mock Invoke-ScubaGraphRequest -MockWith { return New-UserLicense }
         }
 
         Context 'When the tenant has a Power BI license and the user is licensed' {
@@ -143,7 +143,7 @@ InModuleScope Connection {
                     if ($Commandlet -eq 'Get-MgBetaSubscribedSku') { return New-SubscribedSku -PlanName 'FABRIC_FREE' }
                     return New-OrgDetails
                 }
-                Mock Invoke-MgGraphRequest -MockWith { return New-UserLicense -PlanName 'FABRIC_FREE' }
+                Mock Invoke-ScubaGraphRequest -MockWith { return New-UserLicense -PlanName 'FABRIC_FREE' }
                 $Result = Connect-Tenant -ProductNames @('powerbi') -M365Environment 'commercial'
                 $Result.PBILicenseFound | Should -BeTrue
             }
@@ -153,7 +153,7 @@ InModuleScope Connection {
                     if ($Commandlet -eq 'Get-MgBetaSubscribedSku') { return New-SubscribedSku -PlanName 'PBI_PREMIUM_PER_USER' }
                     return New-OrgDetails
                 }
-                Mock Invoke-MgGraphRequest -MockWith { return New-UserLicense -PlanName 'PBI_PREMIUM_PER_USER' }
+                Mock Invoke-ScubaGraphRequest -MockWith { return New-UserLicense -PlanName 'PBI_PREMIUM_PER_USER' }
                 $Result = Connect-Tenant -ProductNames @('powerbi') -M365Environment 'commercial'
                 $Result.PBILicenseFound | Should -BeTrue
             }
@@ -189,7 +189,7 @@ InModuleScope Connection {
 
             It 'does not check the per-user license once the tenant has none' {
                 Connect-Tenant -ProductNames @('powerbi') -M365Environment 'commercial' -WarningAction SilentlyContinue | Out-Null
-                Should -Invoke -CommandName Invoke-MgGraphRequest -Times 0 -Exactly
+                Should -Invoke -CommandName Invoke-ScubaGraphRequest -Times 0 -Exactly
             }
 
             It 'does not report an auth failure' {
@@ -212,7 +212,7 @@ InModuleScope Connection {
 
         Context 'When the tenant is licensed but the interactive user is not' {
             BeforeEach {
-                Mock Invoke-MgGraphRequest -MockWith { return [pscustomobject]@{ value = @() } }
+                Mock Invoke-ScubaGraphRequest -MockWith { return [pscustomobject]@{ value = @() } }
             }
 
             It 'sets PBILicenseFound to false' {
@@ -232,13 +232,13 @@ InModuleScope Connection {
             }
 
             It 'ignores user plans that are not provisioned successfully' {
-                Mock Invoke-MgGraphRequest -MockWith { return New-UserLicense -Status 'PendingActivation' }
+                Mock Invoke-ScubaGraphRequest -MockWith { return New-UserLicense -Status 'PendingActivation' }
                 $Result = Connect-Tenant -ProductNames @('powerbi') -M365Environment 'commercial' -WarningAction SilentlyContinue
                 $Result.PBILicenseFound | Should -BeFalse
             }
 
             It 'ignores user plans unrelated to Power BI' {
-                Mock Invoke-MgGraphRequest -MockWith { return New-UserLicense -PlanName 'EXCHANGE_S_STANDARD' }
+                Mock Invoke-ScubaGraphRequest -MockWith { return New-UserLicense -PlanName 'EXCHANGE_S_STANDARD' }
                 $Result = Connect-Tenant -ProductNames @('powerbi') -M365Environment 'commercial' -WarningAction SilentlyContinue
                 $Result.PBILicenseFound | Should -BeFalse
             }
@@ -249,7 +249,7 @@ InModuleScope Connection {
             # tenant setting plus a security group, so the per-user check must be skipped entirely.
             It 'does not perform the per-user license check' {
                 Connect-Tenant -ProductNames @('powerbi') -M365Environment 'commercial' -ServicePrincipalParams $script:ServicePrincipalParams | Out-Null
-                Should -Invoke -CommandName Invoke-MgGraphRequest -Times 0 -Exactly
+                Should -Invoke -CommandName Invoke-ScubaGraphRequest -Times 0 -Exactly
             }
 
             It 'sets PBILicenseFound to true when the tenant is licensed' {
