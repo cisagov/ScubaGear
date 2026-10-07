@@ -1375,6 +1375,7 @@ Export-ModuleMember -Function @(
     'Invoke-GraphBatchRequest',
     'Invoke-ScubaRestMethod',
     'Get-HttpResponseDetails',
+    'Get-ScubaGearCatalog',
     'Get-ScubaGearServiceEndpoint',
     'Get-ScubaGearOAuthScope',
     'Get-ScubaGearGraphEndpoint',
