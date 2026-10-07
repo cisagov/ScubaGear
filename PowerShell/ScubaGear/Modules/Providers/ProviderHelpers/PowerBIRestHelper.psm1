@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearRestEndpoint
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearRestEndpoint, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope
 
 function Get-PowerBIBaseUrl {
     <#
@@ -14,12 +14,7 @@ function Get-PowerBIBaseUrl {
         [string]$M365Environment
     )
 
-    switch ($M365Environment) {
-        "commercial" { return "https://api.powerbi.com" }
-        "gcc"        { return "https://api.powerbigov.us" }
-        "gcchigh"    { return "https://api.high.powerbigov.us" }
-        "dod"        { return "https://api.mil.powerbigov.us" }
-    }
+    return Get-ScubaGearServiceEndpoint -Product powerbi -Environment $M365Environment
 }
 
 function Get-PowerBIScope {
@@ -35,12 +30,7 @@ function Get-PowerBIScope {
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
         [string]$M365Environment
     )
-    switch ($M365Environment) {
-        "commercial" { return "https://analysis.windows.net/powerbi/api/.default" }
-        "gcc"        { return "https://analysis.usgovcloudapi.net/powerbi/api/.default" }
-        "gcchigh"    { return "https://high.analysis.usgovcloudapi.net/powerbi/api/.default" }
-        "dod"        { return "https://mil.analysis.usgovcloudapi.net/powerbi/api/.default" }
-    }
+    return Get-ScubaGearOAuthScope -Product powerbi -Environment $M365Environment
 }
 
 function Get-PowerBITenantSettingsRest {
