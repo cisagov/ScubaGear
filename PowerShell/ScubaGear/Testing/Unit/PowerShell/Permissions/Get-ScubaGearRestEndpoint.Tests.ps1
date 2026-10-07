@@ -76,7 +76,6 @@ InModuleScope PermissionsHelper {
 
         Context 'Production callers' {
             It 'has a fixed endpointPath for <FunctionName>, which production code requests' -TestCases $CallerCases {
-                param($FunctionName)
                 { Get-ScubaGearRestEndpoint -FunctionName $FunctionName } | Should -Not -Throw
             }
 
