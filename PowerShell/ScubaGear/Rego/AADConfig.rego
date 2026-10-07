@@ -112,7 +112,7 @@ tests contains {
             ReportFullDetailsArray(LegacyAuthentication, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(LegacyAuthenticationNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -195,7 +195,7 @@ tests contains {
             ReportDetailsArrayLicenseWarning(BlockHighRisk, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(BlockHighRiskNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -293,7 +293,7 @@ tests contains {
             ReportDetailsArrayLicenseWarning(SignInBlocked, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(SignInBlockedNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -379,7 +379,7 @@ tests contains {
             ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(PhishingResistantMFAPoliciesNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -456,7 +456,7 @@ tests contains {
             ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(NonSpecificMFAPoliciesNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -672,7 +672,7 @@ tests contains {
             ReportFullDetailsArray(PhishingResistantMFAPrivilegedRoles, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(PhishingResistantMFAPrivilegedRolesNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -755,7 +755,7 @@ tests contains {
             ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(ManagedDeviceAuthNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -836,7 +836,7 @@ tests contains {
             ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(RequireManagedDeviceMFANeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -913,7 +913,7 @@ tests contains {
             ReportFullDetailsArray(RequireDeviceCodeBlock, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
-            NearMissAnalyzerDetails(RequireDeviceCodeBlockNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ]
         ReportDetail != ""
     ])
@@ -2047,7 +2047,7 @@ tests contains {
             ReportDetailsArrayLicenseWarning(AIAgents, DescriptionString),
             NearMissReportDetails,
             CapLinkArray,
-            NearMissAnalyzerDetails(AIAgentsNeedsConfigUpdate)
+            NearMissAnalyzerDetails(NearMissReportDetails)
         ])
         ReportDetail != ""
     ])
