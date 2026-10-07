@@ -1,5 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions, Get-ScubaGearRestEndpoint
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint
 
 function Get-PowerPlatformBaseUrl {
     <#
@@ -15,7 +14,7 @@ function Get-PowerPlatformBaseUrl {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product powerplatform -OutAs endpoint -Environment $M365Environment
+    return Get-ScubaGearServiceEndpoint -Product powerplatform -Environment $M365Environment
 }
 
 function Get-PowerPlatformScope {
@@ -32,7 +31,7 @@ function Get-PowerPlatformScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product powerplatform -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product powerplatform -Environment $M365Environment
 }
 
 function Get-PowerPlatformTenantSettingsRest {

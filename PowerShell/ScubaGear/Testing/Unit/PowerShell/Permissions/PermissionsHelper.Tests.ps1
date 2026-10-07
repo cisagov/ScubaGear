@@ -60,7 +60,7 @@ InModuleScope PermissionsHelper {
                 $filteredPermissions = @()
 
                 # get all modules with least and higher permissions
-                $allPermissions = Get-ScubaGearPermissions -Product aad -OutAs all
+                $allPermissions = Get-ScubaGearProductRecord -Product aad
 
                 # Compare the permissions to find the redundant ones
                 $comparedPermissions = Compare-Object $allPermissions.leastPermissions $allPermissions.higherPermissions -IncludeEqual
@@ -133,7 +133,7 @@ InModuleScope PermissionsHelper {
                 # gcchigh requires Exchange.ManageAsApp on BOTH
                 #   00000002-0000-0ff1-ce00-000000000000 (Exchange Online)
                 #   00000007-0000-0ff1-ce00-000000000000 (Exchange Online Protection)
-                $result = Get-ScubaGearPermissions -Product securitysuite -ServicePrincipal -OutAs appId -Environment gcchigh
+                $result = Get-ScubaGearResourceAppId -Product securitysuite -ServicePrincipal -Environment gcchigh
                 $result | Should -Contain "00000002-0000-0ff1-ce00-000000000000"
                 $result | Should -Contain "00000007-0000-0ff1-ce00-000000000000"
             }
@@ -144,7 +144,7 @@ InModuleScope PermissionsHelper {
                 $expected = @(
                     "Global Reader"
                 )
-                $result = Get-ScubaGearPermissions -Product securitysuite -OutAs role
+                $result = Get-ScubaGearServicePrincipalRole -Product securitysuite
                 $result | Should -Be $expected
             }
         }

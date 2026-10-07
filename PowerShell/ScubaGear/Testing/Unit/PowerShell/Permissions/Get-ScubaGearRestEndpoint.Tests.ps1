@@ -1,9 +1,9 @@
 BeforeDiscovery {
-    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Permissions' -Resolve
-    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'PermissionsHelper.psm1') -Force
+    $ModuleRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Utility' -Resolve
+    Import-Module (Join-Path -Path $ModuleRootPath -ChildPath 'Utility.psm1') -Force
 }
 
-InModuleScope PermissionsHelper {
+InModuleScope Utility {
     # Each fixed endpoint path is pinned here, the same way Invoke-GraphDirectly.Tests.ps1 pins every
     # Graph URL, so an edit to the catalog JSON that changes a path fails a test instead of the live call.
     $EndpointCases = @(
@@ -24,7 +24,7 @@ InModuleScope PermissionsHelper {
     # added without a catalog entry fails here rather than at runtime.
     $ModulesRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules' -Resolve
     $CallerCases = Get-ChildItem -Path $ModulesRoot -Include '*.psm1', '*.ps1' -Recurse -File |
-        Where-Object { $_.Name -ne 'PermissionsHelper.psm1' } |
+        Where-Object { $_.Name -ne 'Utility.psm1' } |
         Select-String -Pattern "Get-ScubaGearRestEndpoint\s+-FunctionName\s+'([^']+)'" |
         ForEach-Object { $_.Matches[0].Groups[1].Value } |
         Sort-Object -Unique |
@@ -63,10 +63,10 @@ InModuleScope PermissionsHelper {
                     Should -Throw "*No REST API * entry found for function 'Get-DoesNotExistRest'*"
             }
 
-            It 'throws when the entry exists but has no fixed endpointPath' {
-                # Dynamic endpoint, resolved per tenant rather than stored in the catalog.
+            It 'throws for a dynamic endpoint that is not stored in the catalog' {
+                # Get-ExchangeOnlineApiEndpoint is resolved per tenant, so it has no catalog entry.
                 { Get-ScubaGearRestEndpoint -FunctionName 'Get-ExchangeOnlineApiEndpoint' } |
-                    Should -Throw "*has no fixed endpointPath*"
+                    Should -Throw "*No REST API * entry found for function 'Get-ExchangeOnlineApiEndpoint'*"
             }
 
             It 'is case-insensitive on the function name, matching PowerShell conventions' {
@@ -90,5 +90,5 @@ InModuleScope PermissionsHelper {
 }
 
 AfterAll {
-    Remove-Module PermissionsHelper -ErrorAction SilentlyContinue
+    Remove-Module Utility -ErrorAction SilentlyContinue
 }

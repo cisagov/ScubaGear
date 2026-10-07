@@ -1,5 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions, Get-ScubaGearRestEndpoint
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint
 
 function Get-TeamsScope {
     <#
@@ -15,7 +14,7 @@ function Get-TeamsScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teams -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product teams -Environment $M365Environment
 }
 
 function Get-TeamsBaseUrl {
@@ -32,7 +31,7 @@ function Get-TeamsBaseUrl {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teams -OutAs endpoint -Environment $M365Environment
+    return Get-ScubaGearServiceEndpoint -Product teams -Environment $M365Environment
 }
 
 function Get-TeamsUnifiedScope {
@@ -49,7 +48,7 @@ function Get-TeamsUnifiedScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teamsunified -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product teamsunified -Environment $M365Environment
 }
 
 function Get-TeamsUnifiedBaseUrl {
@@ -66,7 +65,7 @@ function Get-TeamsUnifiedBaseUrl {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teamsunified -OutAs endpoint -Environment $M365Environment
+    return Get-ScubaGearServiceEndpoint -Product teamsunified -Environment $M365Environment
 }
 
 function Get-TeamsMeetingPolicyRest {

@@ -2,9 +2,6 @@ $ProviderPath = '../../../../../Modules/Utility'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Utility.psm1") -Function 'Invoke-GraphDirectly' -Force
 
 InModuleScope Utility {
-    $ProviderPath = '../../../../../Modules/Permissions'
-    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/PermissionsHelper.psm1") -Function 'Get-ScubaGearPermissions' -Force
-
     $ID = [guid]::NewGuid().Guid
 
     $testCases = @(
@@ -62,10 +59,10 @@ InModuleScope Utility {
                 $Commandlet = ""
                 if(-not $ID){
                     # Mock Invoke-GraphDirectly to retrieve the Graph API URL to verify the configuration file hasn't been modified
-                    return (Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs api -Environment $M365Environment)
+                    return (Get-ScubaGearGraphEndpoint -CmdletName $Cmdlet -Environment $M365Environment)
                 }else{
                     # Mock Invoke-GraphDirectly to retrieve the Graph API URL and insert the ID to verify the configuration file hasn't been modified
-                    return (Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs api -Environment $M365Environment -ID $ID)
+                    return (Get-ScubaGearGraphEndpoint -CmdletName $Cmdlet -Environment $M365Environment -Id $ID)
                 }
             }
         }
@@ -102,7 +99,7 @@ InModuleScope Utility {
         It "should return the expected API header for <Cmdlet>" -TestCases $combinedApiHeaderCases {
             param($Cmdlet, $apiHeaderKey, $apiHeaderValue)
 
-            $expected = Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs apiheader
+            $expected = Get-ScubaGearApiHeader -CmdletName $Cmdlet
 
             $expectedKey = $expected.psobject.Properties.name
             $expectedValue = $expected.psobject.Properties.value
