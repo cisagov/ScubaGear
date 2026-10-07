@@ -89,11 +89,9 @@ Function Get-ScubaGearPermissions {
             $Product = @('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform')
         }
 
-        [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-
         # Permission records are every entry except the restHelper path-only records (those carry no grantable permission of their own).
-        $permissionSet = (Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json) | Where-Object { $_.entryType -ne 'restHelper' }
-        Write-Verbose "Command: `$permissionSet = (Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json) | Where-Object { `$_.entryType -ne 'restHelper' }"
+        $permissionSet = Get-ScubaGearCatalog | Where-Object { $_.entryType -ne 'restHelper' }
+        Write-Verbose "Command: `$permissionSet = Get-ScubaGearCatalog | Where-Object { `$_.entryType -ne 'restHelper' }"
 
         # This hashtable contains the Entra AppId values for MS Graph (aad), Office 365 Exchange Online and SharePoint.
         # The New-ScubaGearServicePrincipal cmdlet references these AppIds and their respective permissions from ScubaGearApiCatalog.json to
@@ -441,6 +439,8 @@ function Get-ScubaGearResourceAppId {
         [string]$Environment = 'commercial'
     )
     process {
+        # -ServicePrincipal is accepted so callers can pass it, but the app IDs do not depend on the auth mode.
+        $null = $ServicePrincipal
         Get-ScubaGearCatalog | Where-Object {
             $item = $_
             ($item.entryType -ne 'restHelper') -and
