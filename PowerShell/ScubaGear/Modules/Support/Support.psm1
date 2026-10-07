@@ -3222,7 +3222,8 @@ Export-ModuleMember -Function @(
     'New-SCuBAConfig',
     'Update-ScubaGear',
     'Test-ScubaGearVersion',
-    'Reset-ScubaGearDependencies'
+    'Reset-ScubaGearDependencies',
+    'Remove-ScubaModuleVersion'
 ) -Alias @(
     'Initialize-SCuBA'
 )
