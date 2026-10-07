@@ -32,7 +32,7 @@ function Connect-Tenant {
    $ServicePrincipalParams
    )
    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "ConnectHelpers.psm1")
-   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Get-ScubaGearServiceEndpoint
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl, Get-TeamsUnifiedScope, Get-TeamsUnifiedBaseUrl
@@ -270,7 +270,7 @@ function Connect-Tenant {
                         $InitialDomainPrefix = $TenantName.split(".")[0]
                     }
 
-                    $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
+                    $TokenData.SPOAdminUrl = Get-ScubaGearServiceEndpoint -Product sharepoint -Environment $M365Environment -Domain $InitialDomainPrefix
                     $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
 
                     if ($ServicePrincipalParams.CertThumbprintParams) {

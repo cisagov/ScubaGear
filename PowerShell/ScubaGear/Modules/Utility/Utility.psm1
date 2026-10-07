@@ -266,9 +266,9 @@ function Invoke-GraphDirectly {
 
     # Determine endpoint
     if ($ID) {
-        $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment -id $ID
+        $endpoint = Get-ScubaGearGraphEndpoint -CmdletName $commandlet -Environment $M365Environment -Id $ID
     } else {
-        $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment
+        $endpoint = Get-ScubaGearGraphEndpoint -CmdletName $commandlet -Environment $M365Environment
     }
 
     if ($queryParams) {
@@ -289,7 +289,7 @@ function Invoke-GraphDirectly {
         Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
-    $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
+    $apiHeader = Get-ScubaGearApiHeader -CmdletName $commandlet -Environment $M365Environment
 
     $graphParams = @{
         Uri         = $endpoint
@@ -646,7 +646,7 @@ function Invoke-GraphBatchRequest {
             try {
                 # Execute batch request using Invoke-MgGraphRequest
                 Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
-                $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
+                $endpoint = Get-ScubaGearServiceEndpoint -Product aad -Environment $M365Environment
                 $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
             }
             catch {
@@ -1191,6 +1191,182 @@ function Get-HttpResponseDetails {
     return $StringBuffer.ToString()
 }
 
+function Get-ScubaGearCatalog {
+    <#
+    .Description
+    Loads the full ScubaGear API catalog (schemas/ScubaGearApiCatalog.json).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param()
+    [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+    return (Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" -Raw | ConvertFrom-Json)
+}
+
+function Get-ScubaGearServiceEndpoint {
+    <#
+    .Description
+    Returns the base service URL(s) for a product/environment (Graph connect or REST API host),
+    substituting the {domain} placeholder (SharePoint) when supplied.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string[]]$Product,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [string]$Domain
+    )
+    process {
+        if (($Product -contains 'sharepoint') -and -not $Domain) {
+            Write-Error -Message "Parameter [-Domain] is required when resolving the SharePoint endpoint."
+        }
+        Get-ScubaGearCatalog | Where-Object {
+            $item = $_
+            ($item.entryType -in @('graphConnect', 'restBase')) -and
+            ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+            ($item.supportedEnv -contains $Environment)
+        } | ForEach-Object { $_.endpointPath -replace '\{domain\}', $Domain } | Select-Object -Unique
+    }
+}
+
+function Get-ScubaGearOAuthScope {
+    <#
+    .Description
+    Returns the OAuth2 scope(s) used to mint a token for a product/environment.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string[]]$Product,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [string]$Domain
+    )
+    process {
+        Get-ScubaGearCatalog | Where-Object {
+            $item = $_
+            ($item.entryType -ne 'restHelper') -and
+            ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+            ($item.supportedEnv -contains $Environment)
+        } | ForEach-Object { $_.oauthScope -replace '\{domain\}', $Domain } |
+            Where-Object { $_ -ne '' } | Select-Object -Unique
+    }
+}
+
+function Get-ScubaGearGraphEndpoint {
+    <#
+    .Description
+    Returns the full Microsoft Graph request URI for a given cmdlet name: the graphConnect base URL
+    for the environment combined with the cmdlet's resource path and filter, substituting {id}.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CmdletName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [string]$Id
+    )
+    $catalog = Get-ScubaGearCatalog
+    $base = $catalog | Where-Object { $_.entryType -eq 'graphConnect' -and $_.supportedEnv -contains $Environment } |
+        ForEach-Object { $_.endpointPath } | Select-Object -Unique
+
+    $catalog | Where-Object {
+        $_.functionName -eq $CmdletName -and $_.entryType -ne 'graphConnect' -and $_.supportedEnv -contains $Environment
+    } | ForEach-Object {
+        $resource = $_.endpointPath -replace '\{id\}', $Id
+        if ($_.apiFilter) {
+            "$base$resource" + ($_.apiFilter -replace '\{id\}', $Id)
+        } else {
+            "$base$resource"
+        }
+    } | Select-Object -Unique
+}
+
+function Get-ScubaGearApiHeader {
+    <#
+    .Description
+    Returns the HTTP header object(s) a given Graph cmdlet requires, if any.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CmdletName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
+    )
+    Get-ScubaGearCatalog | Where-Object {
+        $_.functionName -eq $CmdletName -and $_.supportedEnv -contains $Environment
+    } | Where-Object { @($_.apiHeader).Count -gt 0 } | ForEach-Object { $_.apiHeader } | Select-Object -Unique
+}
+
+function Get-ScubaGearRestEndpoint {
+    <#
+    .Description
+    Looks up the fixed REST endpoint path for a ScubaGear provider REST helper function from the
+    restHelper entries in ScubaGearApiCatalog.json, substituting any supplied {placeholder} values.
+    .Parameter FunctionName
+    The REST helper function name, matching the catalog's functionName field (e.g. "Get-SPOTenantRest").
+    .Parameter PathParameters
+    Optional hashtable of {placeholder} substitutions, e.g. @{ TenantId = $TenantId }.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FunctionName,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]$PathParameters
+    )
+
+    $Catalog = Get-ScubaGearCatalog
+    $Entry = $Catalog | Where-Object { $_.functionName -eq $FunctionName }
+    if (-not $Entry) {
+        throw "No REST API catalog entry found for function '$FunctionName' in ScubaGearApiCatalog.json"
+    }
+
+    $EndpointPath = $Entry.endpointPath
+    if ([string]::IsNullOrWhiteSpace($EndpointPath)) {
+        throw "Function '$FunctionName' has no fixed endpointPath in the REST API catalog."
+    }
+
+    # The catalog declares the placeholder keys this endpoint expects in $Entry.parameters; callers
+    # supply their values via -PathParameters. Unsupplied placeholders are left intact.
+    if ($PathParameters) {
+        foreach ($Key in $PathParameters.Keys) {
+            $EndpointPath = $EndpointPath.Replace("{$Key}", [string]$PathParameters[$Key])
+        }
+    }
+
+    return $EndpointPath
+}
+
 Export-ModuleMember -Function @(
     'Get-Utf8NoBom',
     'Set-Utf8NoBom',
@@ -1198,5 +1374,10 @@ Export-ModuleMember -Function @(
     'ConvertFrom-GraphHashtable',
     'Invoke-GraphBatchRequest',
     'Invoke-ScubaRestMethod',
-    'Get-HttpResponseDetails'
+    'Get-HttpResponseDetails',
+    'Get-ScubaGearServiceEndpoint',
+    'Get-ScubaGearOAuthScope',
+    'Get-ScubaGearGraphEndpoint',
+    'Get-ScubaGearApiHeader',
+    'Get-ScubaGearRestEndpoint'
 )

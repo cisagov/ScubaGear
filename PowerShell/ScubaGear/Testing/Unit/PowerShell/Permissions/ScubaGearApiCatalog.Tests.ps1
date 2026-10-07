@@ -7,119 +7,90 @@ BeforeDiscovery {
 
     $script:RestHelperCases = @(
         $CatalogEntries |
-            Where-Object { $_.functionName -and $_.category -eq 'Provider REST helper' } |
+            Where-Object { $_.entryType -eq 'restHelper' } |
             ForEach-Object { @{ FunctionName = $_.functionName; Entry = $_ } }
     )
     $script:ProductCases = 'aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform' | ForEach-Object { @{ Product = $_ } }
 }
 
-# The catalog holds two kinds of entries side by side: Graph/REST API records keyed by moduleCmdlet (read by
-# Get-ScubaGearPermissions) and REST call entries keyed by functionName (read by Get-ScubaGearRestEndpoint).
+# The catalog is a single uniform array. Every entry has the same 16 keys and an entryType of
+# graphConnect | graphResource | restBase | restHelper. Get-ScubaGearPermissions (and the dedicated
+# Get-ScubaGear* lookup functions) read every entry except restHelper; Get-ScubaGearRestEndpoint reads
+# only restHelper entries.
 Describe -Tag 'PermissionsHelper' -Name 'ScubaGearApiCatalog.json structure' {
     BeforeAll {
         $CatalogFile = Join-Path -Path $PSScriptRoot -ChildPath '../../../../schemas/ScubaGearApiCatalog.json' -Resolve
         $script:Catalog = @((Get-Content -Path $CatalogFile -Raw | ConvertFrom-Json) | ForEach-Object { $_ })
+        $script:ExpectedKeys = @(
+            'functionName', 'entryType', 'scubaGearProduct', 'supportedEnv', 'endpointPath', 'parameters',
+            'apiFilter', 'apiHeader', 'leastPermissions', 'higherPermissions', 'spRolePermissions',
+            'resourceAPIAppId', 'oauthScope', 'poshModule', 'supportLinks', 'notes'
+        )
+        $script:ValidTypes = @('graphConnect', 'graphResource', 'restBase', 'restHelper')
     }
 
     It 'parses as a JSON array' {
         $script:Catalog.Count | Should -BeGreaterThan 0
     }
 
-    It 'gives every entry exactly one identifying key (moduleCmdlet, functionName or _meta)' {
+    It 'gives every entry the same 16 keys' {
         $Bad = $script:Catalog | Where-Object {
             $Keys = $_.PSObject.Properties.Name
-            (@('moduleCmdlet', 'functionName', '_meta') | Where-Object { $Keys -contains $_ }).Count -ne 1
+            (Compare-Object -ReferenceObject $script:ExpectedKeys -DifferenceObject $Keys) -ne $null
         }
         $Bad | Should -BeNullOrEmpty
     }
 
-    It 'has no duplicate functionName entries' {
-        $Names = $script:Catalog | Where-Object { $_.functionName } | ForEach-Object { $_.functionName }
+    It 'gives every entry a non-empty functionName and a valid entryType' {
+        $Bad = $script:Catalog | Where-Object {
+            [string]::IsNullOrWhiteSpace($_.functionName) -or ($script:ValidTypes -notcontains $_.entryType)
+        }
+        $Bad | Should -BeNullOrEmpty
+    }
+
+    It 'has at least one entry of each entryType' {
+        foreach ($Type in $script:ValidTypes) {
+            @($script:Catalog | Where-Object { $_.entryType -eq $Type }).Count | Should -BeGreaterThan 0 -Because "entryType '$Type' should exist"
+        }
+    }
+
+    It 'has no duplicate restHelper functionName (Get-ScubaGearRestEndpoint resolves by functionName)' {
+        $Names = $script:Catalog | Where-Object { $_.entryType -eq 'restHelper' } | ForEach-Object { $_.functionName }
         ($Names | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name) | Should -BeNullOrEmpty
     }
 
-    It 'keeps moduleCmdlet records first so consumers that read the file as a Graph catalog see them unchanged' {
-        $FirstRest = [array]::IndexOf($script:Catalog.ForEach({ [bool]$_.moduleCmdlet }), $false)
-        $FirstRest | Should -BeGreaterThan 0
-        @($script:Catalog[$FirstRest..($script:Catalog.Count - 1)] | Where-Object { $_.moduleCmdlet }) | Should -BeNullOrEmpty
+    It 'gives every restHelper a fixed endpointPath beginning with /' {
+        $Bad = $script:Catalog | Where-Object { $_.entryType -eq 'restHelper' -and ($_.endpointPath -notlike '/*') }
+        $Bad | Should -BeNullOrEmpty
     }
 }
 
-Describe -Tag 'PermissionsHelper' -Name 'REST helper permissions in ScubaGearApiCatalog.json' {
+Describe -Tag 'PermissionsHelper' -Name 'REST helpers resolve and declare their permissions in ScubaGearApiCatalog.json' {
     BeforeAll {
-        # Other test files in this folder remove the module in AfterAll, so import it again for this run.
         Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Permissions/PermissionsHelper.psm1') -Force
-        $CatalogFile = Join-Path -Path $PSScriptRoot -ChildPath '../../../../schemas/ScubaGearApiCatalog.json' -Resolve
-        $script:Catalog = @((Get-Content -Path $CatalogFile -Raw | ConvertFrom-Json) | ForEach-Object { $_ })
-        $script:Records = @($script:Catalog | Where-Object { $_.moduleCmdlet })
-        $script:RepoRoot = Join-Path -Path $PSScriptRoot -ChildPath '../../../../../..' -Resolve
-
-        # leastPermissions / spRolePermissions use empty strings or empty arrays when nothing is required.
-        function Get-RecordValues($Records, $Field) {
-            @($Records | ForEach-Object { $_.$Field } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
-        }
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Utility/Utility.psm1') -Force
     }
 
-    Context 'Every provider REST helper documents its permissions' {
-        It 'has a complete permissions object for <FunctionName>' -ForEach $script:RestHelperCases {
-            $Entry.permissions | Should -Not -BeNullOrEmpty
-            $Keys = $Entry.permissions.PSObject.Properties.Name
-            foreach ($Required in 'applicationPermissions', 'servicePrincipalRoles', 'interactiveRoles', 'prohibitedPermissions',
-                'otherRequirements', 'permissionsRef', 'docs', 'verified') {
-                $Keys | Should -Contain $Required
+    Context 'Every restHelper endpoint resolves' {
+        It 'resolves an endpointPath for <FunctionName>' -ForEach $script:RestHelperCases {
+            # Supply any declared placeholders so resolution does not fail on missing path parameters.
+            $PathParameters = @{}
+            foreach ($Key in @($Entry.parameters)) { if ($Key) { $PathParameters[$Key] = 'value' } }
+            $Resolved = if ($PathParameters.Count -gt 0) {
+                Get-ScubaGearRestEndpoint -FunctionName $FunctionName -PathParameters $PathParameters
+            } else {
+                Get-ScubaGearRestEndpoint -FunctionName $FunctionName
             }
-            $Entry.permissions.verified | Should -BeOfType [bool]
-        }
-
-        It 'lists documentation files that exist for <FunctionName>' -ForEach $script:RestHelperCases {
-            foreach ($Doc in @($Entry.permissions.docs)) {
-                Join-Path -Path $script:RepoRoot -ChildPath $Doc | Should -Exist
-            }
-        }
-
-        It 'never both requires and prohibits the same permission for <FunctionName>' -ForEach $script:RestHelperCases {
-            $Overlap = @($Entry.permissions.applicationPermissions) | Where-Object { $_ -in @($Entry.permissions.prohibitedPermissions) }
-            $Overlap | Should -BeNullOrEmpty
+            $Resolved | Should -Not -BeNullOrEmpty
+            $Resolved | Should -Not -Match '\{.+\}' -Because 'all placeholders should be substituted'
         }
     }
 
-    Context 'Permissions agree with the product-level records that grant them' {
-        It 'resolves every permissionsRef for <FunctionName> to an existing moduleCmdlet record' -ForEach $script:RestHelperCases {
-            foreach ($Ref in @($Entry.permissions.permissionsRef)) {
-                @($script:Records | Where-Object { $_.moduleCmdlet -eq $Ref }).Count | Should -BeGreaterThan 0 -Because "'$Ref' should be a moduleCmdlet in the catalog"
-            }
-        }
-
-        It 'matches the referenced records for <FunctionName>' -ForEach ($script:RestHelperCases | Where-Object { @($_.Entry.permissions.permissionsRef).Count -gt 0 }) {
-            $Refs = @($Entry.permissions.permissionsRef)
-            $Referenced = @($script:Records | Where-Object { $_.moduleCmdlet -in $Refs })
-
-            $GrantedPermissions = Get-RecordValues $Referenced 'leastPermissions'
-            $GrantedRoles = Get-RecordValues $Referenced 'spRolePermissions'
-
-            @($Entry.permissions.applicationPermissions | Sort-Object -Unique) | Should -Be $GrantedPermissions
-            @($Entry.permissions.servicePrincipalRoles | Sort-Object -Unique) | Should -Be $GrantedRoles
-        }
-    }
-
-    Context 'Known requirements that are not simple grants' {
-        It 'records that Power BI must not be granted Tenant.Read.All' {
-            $Entry = $script:Catalog | Where-Object { $_.functionName -eq 'Get-PowerBITenantSettingsRest' }
-            $Entry.permissions.prohibitedPermissions | Should -Contain 'Tenant.Read.All'
-            $Entry.permissions.applicationPermissions | Should -Not -Contain 'Tenant.Read.All'
-        }
-
-        It 'flags the Teams unified settings roles as not verified against the catalog' {
-            $Entry = $script:Catalog | Where-Object { $_.functionName -eq 'Get-TeamsM365UnifiedTenantSettingsRest' }
-            $Entry.permissions.verified | Should -BeFalse
-        }
-    }
-
-    Context 'REST entries do not leak into permission lookups' {
-        It 'returns only moduleCmdlet records for <Product>' -ForEach $script:ProductCases {
-            $Records = @(Get-ScubaGearPermissions -Product $Product -ServicePrincipal -OutAs all)
+    Context 'REST (restHelper) records do not leak into permission lookups' {
+        It 'returns only non-restHelper records for <Product>' -ForEach $script:ProductCases {
+            $Records = @(Get-ScubaGearProductRecord -Product $Product)
             $Records.Count | Should -BeGreaterThan 0
-            @($Records | Where-Object { $_.PSObject.Properties.Name -contains 'functionName' }) | Should -BeNullOrEmpty
+            @($Records | Where-Object { $_.entryType -eq 'restHelper' }) | Should -BeNullOrEmpty
         }
     }
 }

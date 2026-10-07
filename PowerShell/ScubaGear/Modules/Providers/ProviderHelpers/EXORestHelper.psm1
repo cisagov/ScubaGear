@@ -1,5 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearOAuthScope, Get-ScubaGearServiceEndpoint
 
 function Get-ExchangeOnlineScope {
     <#
@@ -17,7 +16,7 @@ function Get-ExchangeOnlineScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product exo -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product exo -Environment $M365Environment
 }
 
 function Get-ComplianceScope {
@@ -36,7 +35,7 @@ function Get-ComplianceScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product securitysuite -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product securitysuite -Environment $M365Environment
 }
 
 function Resolve-ScubaFrontDoorEndpoint {
@@ -193,7 +192,7 @@ function Get-ComplianceApiEndpoint {
         [string]$AccessToken
     )
 
-    $FrontDoorBaseUri = Get-ScubaGearPermissions -Product securitysuite -OutAs endpoint -Environment $M365Environment
+    $FrontDoorBaseUri = Get-ScubaGearServiceEndpoint -Product securitysuite -Environment $M365Environment
 
     # $BackendSuffix will end up looking like this: ".ps.compliance.protection.outlook.com"
     $BackendSuffix = "." + ($FrontDoorBaseUri -replace '^https://', '')
@@ -238,7 +237,7 @@ function Get-ExchangeOnlineApiEndpoint {
         [string]$AccessToken
     )
 
-    $AdminApiFrontDoorBaseUri = Get-ScubaGearPermissions -Product exo -OutAs endpoint -Environment $M365Environment
+    $AdminApiFrontDoorBaseUri = Get-ScubaGearServiceEndpoint -Product exo -Environment $M365Environment
 
     # $BackendSuffix will end up looking like this: ".outlook.office365.com"
     $BackendSuffix = "." + ($AdminApiFrontDoorBaseUri -replace '^https://', '')

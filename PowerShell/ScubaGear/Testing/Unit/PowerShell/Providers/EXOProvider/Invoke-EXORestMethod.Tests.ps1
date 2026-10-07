@@ -47,14 +47,14 @@ InModuleScope EXORestHelper {
     Describe -Tag 'EXORestHelper', 'Network' -Name 'Resolve-ScubaFrontDoorEndpoint (via Get-ComplianceApiEndpoint / Get-ExchangeOnlineApiEndpoint)' {
         Context 'Front-door does not redirect (falls back to default endpoint)' {
             It 'Get-ExchangeOnlineApiEndpoint falls back to the default InvokeCommand endpoint' {
-                Mock -ModuleName EXORestHelper Get-ScubaGearPermissions { return 'https://httpbin.org' }
+                Mock -ModuleName EXORestHelper Get-ScubaGearServiceEndpoint { return 'https://httpbin.org' }
                 $Endpoint = Get-ExchangeOnlineApiEndpoint -TenantId 'tenant123' -TenantDomain 'contoso.onmicrosoft.com' `
                     -M365Environment 'commercial' -AccessToken 'tok'
                 $Endpoint | Should -Be 'https://httpbin.org/adminapi/beta/tenant123/InvokeCommand'
             }
 
             It 'Get-ComplianceApiEndpoint falls back to the default InvokeCommand endpoint without throwing' {
-                Mock -ModuleName EXORestHelper Get-ScubaGearPermissions { return 'https://httpbin.org' }
+                Mock -ModuleName EXORestHelper Get-ScubaGearServiceEndpoint { return 'https://httpbin.org' }
                 $Endpoint = Get-ComplianceApiEndpoint -TenantId 'tenant123' -TenantDomain 'contoso.onmicrosoft.com' `
                     -M365Environment 'commercial' -AccessToken 'tok'
                 $Endpoint | Should -Be 'https://httpbin.org/adminapi/beta/tenant123/InvokeCommand'
@@ -63,13 +63,13 @@ InModuleScope EXORestHelper {
 
         Context 'Discovery call fails outright' {
             It 'Get-ExchangeOnlineApiEndpoint throws' {
-                Mock -ModuleName EXORestHelper Get-ScubaGearPermissions { return 'https://this-host-does-not-exist-scubagear-test.invalid' }
+                Mock -ModuleName EXORestHelper Get-ScubaGearServiceEndpoint { return 'https://this-host-does-not-exist-scubagear-test.invalid' }
                 { Get-ExchangeOnlineApiEndpoint -TenantId 'tenant123' -TenantDomain 'contoso.onmicrosoft.com' `
                         -M365Environment 'commercial' -AccessToken 'tok' } | Should -Throw
             }
 
             It 'Get-ComplianceApiEndpoint does not throw and falls back to the default endpoint' {
-                Mock -ModuleName EXORestHelper Get-ScubaGearPermissions { return 'https://this-host-does-not-exist-scubagear-test.invalid' }
+                Mock -ModuleName EXORestHelper Get-ScubaGearServiceEndpoint { return 'https://this-host-does-not-exist-scubagear-test.invalid' }
                 $Endpoint = Get-ComplianceApiEndpoint -TenantId 'tenant123' -TenantDomain 'contoso.onmicrosoft.com' `
                     -M365Environment 'commercial' -AccessToken 'tok' -WarningAction SilentlyContinue
                 $Endpoint | Should -Be 'https://this-host-does-not-exist-scubagear-test.invalid/adminapi/beta/tenant123/InvokeCommand'
