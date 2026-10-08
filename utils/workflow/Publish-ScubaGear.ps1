@@ -42,14 +42,12 @@ function New-PrivateGallery {
     $AlreadyRegistered = (Get-PSRepository).Name -contains $GalleryName
   }
   catch {
-    Write-Error "An error occurred when checking if $GalleryName is already registered."
-    Write-Error $_.Exception
+    Write-Error "An error occurred when checking if $GalleryName is already registered.`nError details: $($_.Exception.Message)"
     exit 1
   }
 
   if ($AlreadyRegistered) {
-    Write-Error "Private gallery was not created because $GalleryName is already registered."
-    Write-Error "To unregister: `nUnregister-PSRepository -Name $GalleryName"
+    Write-Error "Private gallery was not created because $GalleryName is already registered.`nTo unregister: `nUnregister-PSRepository -Name $GalleryName"
     exit 1
   }
 
@@ -201,8 +199,7 @@ function Publish-ScubaGearModule {
     Publish-Module @Parameters -Force
   }
   catch {
-    Write-Error "An error occurred when publishing ScubaGear.  Exiting..."
-    Write-Error "Error details: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+    Write-Error "An error occurred when publishing ScubaGear.  Exiting...`nError details: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
     exit 1
   }
   $ModuleVersion
