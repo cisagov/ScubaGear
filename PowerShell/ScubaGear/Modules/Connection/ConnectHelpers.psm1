@@ -257,7 +257,7 @@ function Get-MsalAccessToken {
                     # context), so this must use the system (default OS) browser instead.
                     $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                         WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
-                        WithUseEmbeddedWebView($false).
+                        WithUseEmbeddedWebView($true).
                         ExecuteAsync().GetAwaiter().GetResult()
                 }
             }
