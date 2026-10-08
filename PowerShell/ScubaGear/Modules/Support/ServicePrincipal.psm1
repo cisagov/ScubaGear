@@ -1,6 +1,6 @@
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper, Get-MsalAccessToken -force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod -force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod, Get-ScubaGearGraphEndpoint -force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1") -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope -Force
 
 function Compare-ScubaGearRole {
@@ -949,7 +949,7 @@ function Get-ScubaGearAppPermission {
 
     # Get permissions and roles (these are local operations)
     $ScubaGearSPPermissions = Get-ServicePrincipalPermissions -Environment $M365Environment
-    $ScubaGearSPRole = Get-ScubaGearPermissions -OutAs role -Product $ProductNames
+    $ScubaGearSPRole = Get-ScubaGearServicePrincipalRole -Product $ProductNames
 
     # STEP 1: Get the service principal (needed to get its ID)
     $SP = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
@@ -1591,8 +1591,7 @@ function Set-ScubaGearAppPermission {
 
                         foreach ($grant in $CurrentDelegatedGrants) {
                             try {
-                                $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgOauth2PermissionGrant -Environment $M365Environment -outAs api -id $grant.Id)
-                                $null = Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                                Invoke-GraphDirectly -Commandlet Remove-MgOauth2PermissionGrant -M365Environment $M365Environment -id $grant.Id
                                 Write-Verbose "Removed OAuth2 grant: $($grant.Id) with scopes: $($grant.Scope)"
                             } catch {
                                 Write-Warning "Failed to remove OAuth2 grant $($grant.Id): $($_.Exception.Message)"
@@ -1659,8 +1658,8 @@ function Set-ScubaGearAppPermission {
                     # Part 1: Remove app role assignments (admin consent) - only for consented extra permissions
                     if ($ExtraPermissionsDetails -ne $false -and @($ExtraPermissionsDetails).Count -gt 0) {
                         foreach ($extraPerm in $ExtraPermissionsDetails) {
-                            $deleteUri = (Get-ScubaGearPermissions -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -outAs api -id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
-                            $null = Invoke-MgGraphRequest -Method DELETE -Uri $deleteUri
+                            $deleteUri = (Get-ScubaGearGraphEndpoint -CmdletName Remove-MgServicePrincipalAppRoleAssignment -Environment $M365Environment -Id $ServicePrincipalID) + '/' + $extraPerm.AssignmentId
+                            Invoke-GraphDirectly -Uri $deleteUri -Method DELETE
                             Write-Output "Removed consented extra permission: $($extraPerm.PermissionName)"
                         }
                     }
@@ -2358,7 +2357,7 @@ function New-ScubaGearServicePrincipal {
         }
 
         # Note: There are Entra role requirements for certain products
-        $PermissionFileRole = Get-ScubaGearPermissions -OutAs role -Product $ProductNames
+        $PermissionFileRole = Get-ScubaGearServicePrincipalRole -Product $ProductNames
 
         # Create an object to store output
         $AppInfo = @()

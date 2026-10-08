@@ -1,5 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint
 
 function Get-PowerPlatformBaseUrl {
     <#
@@ -15,7 +14,7 @@ function Get-PowerPlatformBaseUrl {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product powerplatform -OutAs endpoint -Environment $M365Environment
+    return Get-ScubaGearServiceEndpoint -Product powerplatform -Environment $M365Environment
 }
 
 function Get-PowerPlatformScope {
@@ -32,7 +31,7 @@ function Get-PowerPlatformScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product powerplatform -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product powerplatform -Environment $M365Environment
 }
 
 function Get-PowerPlatformTenantSettingsRest {
@@ -53,7 +52,7 @@ function Get-PowerPlatformTenantSettingsRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformTenantSettingsRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "POST"
     return $Response
@@ -78,7 +77,7 @@ function Get-PowerPlatformEnvironmentsRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformEnvironmentsRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
 
@@ -117,7 +116,7 @@ function Get-PowerPlatformDlpPoliciesRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformDlpPoliciesRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
 
@@ -177,7 +176,7 @@ function Get-PowerPlatformTenantIsolationRest {
 
     # Correct endpoint sourced from Microsoft.PowerApps.Administration.PowerShell v2.0.216
     # provider: PowerPlatform.Governance/v1, not Microsoft.BusinessAppPlatform
-    $Endpoint = "/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformTenantIsolationRest' -PathParameters @{ TenantId = $TenantId }
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response

@@ -194,6 +194,7 @@ Reset-ScubaGearDependencies
   - [Required Permissions](docs/prerequisites/permissions.md)
     - [Interactive Permissions](docs/prerequisites/interactive.md)
     - [Non-Interactive Permissions](docs/prerequisites/noninteractive.md)
+  - [Network Access](docs/prerequisites/networkaccess.md)
 
 ## Configuration & Usage
 

@@ -1,2142 +1,1424 @@
-﻿[
+[
     {
-        "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleDefinition",
-        "apiResource": "/v1.0/roleManagement/directory/roleDefinitions/{id}",
+        "functionName": "Get-MgRoleManagementDirectoryRoleDefinition",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["scubatank"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/roleManagement/directory/roleDefinitions/{id}",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "RoleManagement.Read.Directory"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "RoleManagement.ReadWrite.Directory",
-            "Directory.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagement.Read.Directory"],
+        "higherPermissions": ["Directory.Read.All","RoleManagement.ReadWrite.Directory","Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "scubatank"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/unifiedroledefinition-get?view=graph-rest-1.0"
-        ],
-        "notes": "Used by the Service Principal module for role assignment details",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/unifiedroledefinition-get?view=graph-rest-1.0"],
+        "notes": "Used by the Service Principal module for role assignment details"
     },
-
     {
-        "moduleCmdlet": "Get-MgServicePrincipal",
-        "apiResource": "/v1.0/servicePrincipals/{id}",
+        "functionName": "Get-MgServicePrincipal",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["scubatank","aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals/{id}",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.ReadWrite.All","Directory.Read.All","Application.ReadWrite.OwnedBy","Application.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "scubatank",
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
-        ],
-        "notes": "Used by the Service Principal module to retrieve service principal details",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"],
+        "notes": "Used by the Service Principal module to retrieve service principal details"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaServicePrincipal",
-        "apiResource": "/beta/servicePrincipals/{id}",
+        "functionName": "Get-MgBetaServicePrincipal",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/servicePrincipals/{id}",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.ReadWrite.All","Directory.Read.All","Application.ReadWrite.OwnedBy","Application.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/serviceprincipal-get?view=graph-rest-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaServicePrincipalDelagatedPermissionClassifications",
-        "apiResource": "/beta/servicePrincipals/{id}/delegatedPermissionClassifications",
+        "functionName": "Get-MgBetaServicePrincipalDelagatedPermissionClassifications",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/servicePrincipals/{id}/delegatedPermissionClassifications",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.Read.All","Application.ReadWrite.OwnedBy"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-delegatedpermissionclassifications?view=graph-rest-1.0&tabs=http"
-        ],
-        "notes": "Related to Entra 5.2",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-delegatedpermissionclassifications?view=graph-rest-1.0&tabs=http"],
+        "notes": "Related to Entra 5.2"
     },
-
     {
-        "moduleCmdlet": "Get-MgServicePrincipalOAuth2PermissionGrant",
-        "apiResource": "/v1.0/servicePrincipals/{id}/oauth2PermissionGrants",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Directory.Read.All"
-        ],
-        "higherPermissions": [
-            "DelegatedPermissionGrant.ReadWrite.All",
-            "Directory.ReadWrite.All"
-        ],
-        "spRolePermissions": [],
+        "functionName": "Get-MgServicePrincipalOAuth2PermissionGrant",
+        "entryType": "graphResource",
         "scubaGearProduct": [],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-oauth2permissiongrants?view=graph-rest-1.0"
-        ],
-        "notes": "Used by Service Principal module to retrieve delegated permissions assignment",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "New-MgServicePrincipal",
-        "apiResource": "/v1.0/servicePrincipals",
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals/{id}/oauth2PermissionGrants",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.ReadWrite.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Directory.Read.All"],
+        "higherPermissions": ["DelegatedPermissionGrant.ReadWrite.All","Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "ServicePrincipal"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-post-serviceprincipals?view=graph-rest-1.0&tabs=http"
-        ],
-        "notes": "Used by the Service Principal module to create new service principals",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-oauth2permissiongrants?view=graph-rest-1.0"],
+        "notes": "Used by Service Principal module to retrieve delegated permissions assignment"
     },
-
     {
-        "moduleCmdlet": "Get-MgServicePrincipalAppRoleAssignment",
-        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "functionName": "New-MgServicePrincipal",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["ServicePrincipal"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.ReadWrite.All"],
+        "higherPermissions": ["Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "scubatank"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0"
-        ],
-        "notes": "Used by the Service Principal module to retrieve assigned permissions",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/serviceprincipal-post-serviceprincipals?view=graph-rest-1.0&tabs=http"],
+        "notes": "Used by the Service Principal module to create new service principals"
     },
-
     {
-        "moduleCmdlet": "Remove-MgServicePrincipalAppRoleAssignment",
-        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "functionName": "Get-MgServicePrincipalAppRoleAssignment",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["scubatank"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "AppRoleAssignment.ReadWrite.All"
-        ],
-        "higherPermissions": [
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.ReadWrite.All","Directory.Read.All","Application.ReadWrite.OwnedBy","Application.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "ServicePrincipal"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete-approleassignments?view=graph-rest-1.0&tabs=http"
-        ],
-        "notes": "Used by the Service Principal to remove assigned permissions",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignments?view=graph-rest-1.0"],
+        "notes": "Used by the Service Principal module to retrieve assigned permissions"
     },
-
     {
-        "moduleCmdlet": "Remove-MgOauth2PermissionGrant",
-        "apiResource": "/v1.0/oauth2PermissionGrants/{id}",
+        "functionName": "Remove-MgServicePrincipalAppRoleAssignment",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["ServicePrincipal"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "DelegatedPermissionGrant.ReadWrite.All"
-        ],
-        "higherPermissions": [
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["AppRoleAssignment.ReadWrite.All"],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "ServicePrincipal"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0&tabs=http"
-        ],
-        "notes": "Used by the Service Principal module to remove delegated permissions assignment",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/serviceprincipal-delete-approleassignments?view=graph-rest-1.0&tabs=http"],
+        "notes": "Used by the Service Principal to remove assigned permissions"
     },
-
     {
-        "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignedTo",
-        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignedTo",
+        "functionName": "Remove-MgOauth2PermissionGrant",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["ServicePrincipal"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/oauth2PermissionGrants/{id}",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Directory.Read.All"
-        ],
-        "higherPermissions": [
-            "AppRoleAssignment.ReadWrite.All",
-            "Application.Read.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["DelegatedPermissionGrant.ReadWrite.All"],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "ServicePrincipal"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
-        ],
-        "notes": "Used by the Service Principal module to assign missing permissions",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0&tabs=http"],
+        "notes": "Used by the Service Principal module to remove delegated permissions assignment"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaServicePrincipalAppRoleAssignedTo",
-        "apiResource": "/beta/servicePrincipals/{id}/appRoleAssignedTo",
+        "functionName": "New-MgServicePrincipalAppRoleAssignedTo",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["ServicePrincipal"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals/{id}/appRoleAssignedTo",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Directory.ReadWrite.All",
-            "AppRoleAssignment.ReadWrite.All",
-            "Application.ReadWrite.All",
-            "Application.ReadWrite.OwnedBy"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Directory.Read.All"],
+        "higherPermissions": ["AppRoleAssignment.ReadWrite.All","Application.Read.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignedto?view=graph-rest-beta&tabs=http"
-        ],
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"],
+        "notes": "Used by the Service Principal module to assign missing permissions"
+    },
+    {
+        "functionName": "Get-MgBetaServicePrincipalAppRoleAssignedTo",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/servicePrincipals/{id}/appRoleAssignedTo",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","AppRoleAssignment.ReadWrite.All","Application.ReadWrite.All","Application.ReadWrite.OwnedBy"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/serviceprincipal-list-approleassignedto?view=graph-rest-beta&tabs=http"],
         "notes": "Used by AADHybridExchangeHelper to find tenant-owned service principals granted full_access_as_app on the Office 365 Exchange Online service principal."
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaApplication",
-        "apiResource": "/beta/applications",
+        "functionName": "Get-MgBetaApplication",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/applications",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.ReadWrite.All","Directory.Read.All","Application.ReadWrite.OwnedBy","Application.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"
-        ],
-        "notes": "Used by the Service Principal and RiskyPermissions modules to retrieve application details",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Applications/Get-MgBetaApplication?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/application-get?view=graph-rest-beta&tabs=http"],
+        "notes": "Used by the Service Principal and RiskyPermissions modules to retrieve application details"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaApplicationFederatedIdentityCredential",
-        "apiResource": "/beta/applications/{id}/federatedIdentityCredentials",
+        "functionName": "Get-MgBetaApplicationFederatedIdentityCredential",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/applications/{id}/federatedIdentityCredentials",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Directory.Read.All",
-            "Application.ReadWrite.OwnedBy",
-            "Application.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Application.Read.All"],
+        "higherPermissions": ["Directory.ReadWrite.All","Directory.Read.All","Application.ReadWrite.OwnedBy","Application.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/federatedidentitycredential-get?view=graph-rest-beta&tabs=http"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/federatedidentitycredential-get?view=graph-rest-beta&tabs=http"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignment",
-        "apiResource": "/v1.0/roleManagement/directory/roleAssignments",
+        "functionName": "New-MgRoleManagementDirectoryRoleAssignment",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["scubatank"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/roleManagement/directory/roleAssignments",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "RoleManagement.ReadWrite.Directory"
-        ],
-        "higherPermissions": null,
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagement.ReadWrite.Directory"],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "scubatank"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments?view=graph-rest-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/rbacapplication-post-roleassignments?view=graph-rest-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest",
-        "apiResource": "/v1.0/roleManagement/directory/roleAssignmentScheduleRequests",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "RoleAssignmentSchedule.ReadWrite.Directory"
-        ],
-        "higherPermissions": [
-            "RoleManagement.ReadWrite.Directory"
-        ],
-        "spRolePermissions": [],
+        "functionName": "New-MgRoleManagementDirectoryRoleAssignmentScheduleRequest",
+        "entryType": "graphResource",
         "scubaGearProduct": [],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/rbacapplication-post-roleassignmentschedulerequests?view=graph-rest-1.0"
-        ],
-        "notes": "This is used by the service principal module for assigning roles.",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "New-MgServicePrincipalAppRoleAssignment",
-        "apiResource": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/roleManagement/directory/roleAssignmentScheduleRequests",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "AppRoleAssignment.ReadWrite.All",
-            "Application.Read.All"
-        ],
-        "higherPermissions": null,
+        "apiHeader": [],
+        "leastPermissions": ["RoleAssignmentSchedule.ReadWrite.Directory"],
+        "higherPermissions": ["RoleManagement.ReadWrite.Directory"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "scubatank"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/rbacapplication-post-roleassignmentschedulerequests?view=graph-rest-1.0"],
+        "notes": "This is used by the service principal module for assigning roles."
     },
-
     {
-        "moduleCmdlet": "Invoke-MgGraphRequest",
-        "apiResource": "/v1.0/me",
+        "functionName": "New-MgServicePrincipalAppRoleAssignment",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["scubatank"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/servicePrincipals/{id}/appRoleAssignments",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "User.Read"
-        ],
-        "higherPermissions": [
-            "User.Read.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "scubatank"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyRule",
-        "apiResource": "/beta/policies/roleManagementPolicies/{id}/rules",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "RoleManagementPolicy.Read.AzureADGroup"
-        ],
-        "higherPermissions": [
-            "RoleManagementPolicy.ReadWrite.Directory",
-            "RoleManagement.ReadWrite.Directory",
-            "RoleManagement.Read.All",
-            "RoleManagementPolicy.ReadWrite.AzureADGroup"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": ["aad"],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyrule-get?view=graph-rest-beta&tabs=http",
-            "https://learn.microsoft.com/en-us/graph/api/policyroot-list-rolemanagementpolicies?view=graph-rest-beta&tabs=http"
-        ],
-        "notes": [
-            "Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."
-        ],
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet" : "Get-MgBetaDirectoryObject",
-        "apiResource" : "/beta/directoryObjects/{id}",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule" : [
-            "Microsoft.Graph.Beta.DirectoryObjects"
-        ],
-        "leastPermissions" : [
-            "Directory.Read.All"
-        ],
-        "higherPermissions" : [
-        ],
-        "spRolePermissions" : [],
-        "scubaGearProduct" : [
-            "aad"
-        ],
-        "supportedEnv" : [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId" : "00000003-0000-0000-c000-000000000000",
-        "supportLinks" : [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.DirectoryObjects/Get-MgBetaDirectoryObject?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/directoryobject-get?view=graph-rest-beta&tabs=http"
-        ],
-        "notes" : [
-        ],
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaDirectoryRole",
-        "apiResource": "/beta/directoryRoles",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "RoleManagement.Read.Directory"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Directory.ReadWrite.All",
-            "RoleManagement.ReadWrite.Directory"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": ["aad"],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRole?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/directoryrole-list?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaDirectoryRoleMember",
-        "apiResource": "/beta/directoryRoles/{id}/members",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "RoleManagement.Read.Directory"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Directory.ReadWrite.All",
-            "RoleManagement.ReadWrite.Directory"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.directorymanagement/get-mgbetadirectoryrolemember?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/directoryrole-list-members?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaDirectoryRoleTemplate",
-        "apiResource": "/beta/directoryRoleTemplates",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "RoleManagement.Read.Directory"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Directory.ReadWrite.All",
-            "RoleManagement.ReadWrite.Directory"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRoleTemplate?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/directoryroletemplate-list?view=graph-rest-beta"
-        ],
-        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaDirectorySetting",
-        "apiResource": "/beta/settings",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "Directory.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.ReadWrite.All",
-            "Group.Read.All",
-            "Group.ReadWrite.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.directorymanagement/get-mgbetadirectorysetting?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/group-list-settings?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaDomain",
-        "apiResource": "/beta/domains",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "Domain.Read.All"
-        ],
-        "higherPermissions": [
-            "Domain.ReadWrite.All",
-            "Directory.Read.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDomain?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/domain-list?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaGroup",
-        "apiResource": "/beta/groups",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Groups"
-        ],
-        "leastPermissions": [
-            "GroupMember.Read.All"
-        ],
-        "higherPermissions": [
-            "Group.ReadWrite.All",
-            "Directory.Read.All",
-            "Directory.ReadWrite.All",
-            "Group.Read.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.groups/get-mgbetagroup?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/group-list?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaGroupMember",
-        "apiResource": "/beta/groups/{id}/members",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Groups"
-        ],
-        "leastPermissions": [
-            "GroupMember.Read.All"
-        ],
-        "higherPermissions": [
-            "Group.Read.All",
-            "Group.ReadWrite.All",
-            "Directory.Read.All",
-            "GroupMember.ReadWrite.All"
-        ],
-        "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Groups/Get-MgBetaGroupMember?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/group-list-members?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaIdentityConditionalAccessPolicy",
-        "apiResource": "/beta/identity/conditionalAccess/policies",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["AppRoleAssignment.ReadWrite.All","Application.Read.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaIdentityConditionalAccessPolicy?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaIdentityConditionalAccessNamedLocation",
-        "apiResource": "/beta/identity/conditionalAccess/namedLocations/{id}",
+        "functionName": "Invoke-MgGraphRequest",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["scubatank"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/me",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["User.Read"],
+        "higherPermissions": ["User.Read.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/serviceprincipal-post-approleassignments?view=graph-rest-1.0"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaPolicyRoleManagementPolicyRule",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/roleManagementPolicies/{id}/rules",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagementPolicy.Read.AzureADGroup"],
+        "higherPermissions": ["RoleManagementPolicy.ReadWrite.Directory","RoleManagement.ReadWrite.Directory","RoleManagement.Read.All","RoleManagementPolicy.ReadWrite.AzureADGroup"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyrule-get?view=graph-rest-beta&tabs=http","https://learn.microsoft.com/en-us/graph/api/policyroot-list-rolemanagementpolicies?view=graph-rest-beta&tabs=http"],
+        "notes": "Documentation lists the leastPermissions as RoleManagementPolicy.Read.Directory, but the cmdlet requires RoleManagementPolicy.Read.AzureADGroup. If you don't use the RoleManagementPolicy.Read.AzureADGroup permission, you will receive a 403 error."
+    },
+    {
+        "functionName": "Get-MgBetaDirectoryObject",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/directoryObjects/{id}",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Directory.Read.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/graph/api/conditionalaccessroot-list-namedlocations?view=graph-rest-beta"
-        ],
-        "notes": "Resolves named location display names for the Config Analyzer / tenant governance monitor.",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.DirectoryObjects"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.DirectoryObjects/Get-MgBetaDirectoryObject?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/directoryobject-get?view=graph-rest-beta&tabs=http"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance",
-        "apiResource": "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances/",
+        "functionName": "Get-MgBetaDirectoryRole",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/directoryRoles",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagement.Read.Directory"],
+        "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","RoleManagement.ReadWrite.Directory"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRole?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/directoryrole-list?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaDirectoryRoleMember",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/directoryRoles/{id}/members",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagement.Read.Directory"],
+        "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","RoleManagement.ReadWrite.Directory"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.directorymanagement/get-mgbetadirectoryrolemember?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/directoryrole-list-members?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaDirectoryRoleTemplate",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/directoryRoleTemplates",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagement.Read.Directory"],
+        "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All","RoleManagement.ReadWrite.Directory"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDirectoryRoleTemplate?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/directoryroletemplate-list?view=graph-rest-beta"],
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
+    },
+    {
+        "functionName": "Get-MgBetaDirectorySetting",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/settings",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Directory.Read.All"],
+        "higherPermissions": ["Directory.ReadWrite.All","Group.Read.All","Group.ReadWrite.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.directorymanagement/get-mgbetadirectorysetting?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/group-list-settings?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaDomain",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/domains",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Domain.Read.All"],
+        "higherPermissions": ["Domain.ReadWrite.All","Directory.Read.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaDomain?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/domain-list?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaGroup",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/groups",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["GroupMember.Read.All"],
+        "higherPermissions": ["Group.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All","Group.Read.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Groups"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.groups/get-mgbetagroup?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/group-list?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaGroupMember",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/groups/{id}/members",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["GroupMember.Read.All"],
+        "higherPermissions": ["Group.Read.All","Group.ReadWrite.All","Directory.Read.All","GroupMember.ReadWrite.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Groups"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Groups/Get-MgBetaGroupMember?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/group-list-members?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/identity/conditionalAccess/policies",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaIdentityConditionalAccessPolicy?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta"],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-MgBetaIdentityConditionalAccessNamedLocation",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/identity/conditionalAccess/namedLocations/{id}",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/graph/api/conditionalaccessroot-list-namedlocations?view=graph-rest-beta"],
+        "notes": "Resolves named location display names for the Config Analyzer / tenant governance monitor."
+    },
+    {
+        "functionName": "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/identityGovernance/privilegedAccess/group/eligibilityScheduleInstances/",
+        "parameters": ["id"],
         "apiFilter": "?$filter=groupId eq '{id}'",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "PrivilegedEligibilitySchedule.Read.AzureADGroup"
-        ],
-        "higherPermissions": [
-            "PrivilegedEligibilitySchedule.ReadWrite.AzureADGroup"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["PrivilegedEligibilitySchedule.Read.AzureADGroup"],
+        "higherPermissions": ["PrivilegedEligibilitySchedule.ReadWrite.AzureADGroup"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/get-mgbetaidentitygovernanceprivilegedaccessgroupeligibilityschedule?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/privilegedaccessgroup-list-eligibilityscheduleinstances?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/get-mgbetaidentitygovernanceprivilegedaccessgroupeligibilityschedule?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/privilegedaccessgroup-list-eligibilityscheduleinstances?view=graph-rest-beta"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaIdentityGovernancePrivilegedAccessGroup",
-        "apiResource": "/beta/identityGovernance/privilegedAccess/group/resources",
+        "functionName": "Get-MgBetaIdentityGovernancePrivilegedAccessGroup",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/identityGovernance/privilegedAccess/group/resources",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "PrivilegedAccess.Read.AzureADGroup"
-        ],
-        "higherPermissions": [
-            "PrivilegedAccess.ReadWrite.AzureADGroup"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["PrivilegedAccess.Read.AzureADGroup"],
+        "higherPermissions": ["PrivilegedAccess.ReadWrite.AzureADGroup"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaIdentityGovernancePrivilegedAccessGroup?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/resources/privilegedaccessroot?view=graph-rest-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaIdentityGovernancePrivilegedAccessGroup?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/resources/privilegedaccessroot?view=graph-rest-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaOrganization",
-        "apiResource": "/beta/organization",
+        "functionName": "Get-MgBetaOrganization",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad","sharepoint","exo","securitysuite","powerplatform","teams","powerbi"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/organization",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "Organization.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Organization.ReadWrite.All",
-            "Directory.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Organization.Read.All"],
+        "higherPermissions": ["Directory.Read.All","Organization.ReadWrite.All","Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad",
-            "sharepoint",
-            "exo",
-            "securitysuite",
-            "powerplatform",
-            "teams",
-            "powerbi"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaOrganization?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/organization-list?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaOrganization?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/organization-list?view=graph-rest-beta"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaPolicyAuthenticationMethodPolicy",
-        "apiResource": "/beta/policies/authenticationMethodsPolicy",
+        "functionName": "Get-MgBetaPolicyAuthenticationMethodPolicy",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/authenticationMethodsPolicy",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
-        "higherPermissions": [
-            "Policy.ReadWrite.AuthenticationMethod"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": ["Policy.ReadWrite.AuthenticationMethod"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAuthenticationMethodPolicy?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/authenticationmethodspolicy-get?view=graph-rest-beta&tabs=http"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAuthenticationMethodPolicy?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/authenticationmethodspolicy-get?view=graph-rest-beta&tabs=http"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaPolicyAuthorizationPolicy",
-        "apiResource": "/beta/policies/authorizationPolicy",
+        "functionName": "Get-MgBetaPolicyAuthorizationPolicy",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/authorizationPolicy",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
-        "higherPermissions": [
-            "Policy.ReadWrite.Authorization"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": ["Policy.ReadWrite.Authorization"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicyauthorizationpolicy?view=graph-powershell-1.0",
-            "https://learn.microsoft.com/graph/api/authorizationpolicy-get?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicyauthorizationpolicy?view=graph-powershell-1.0","https://learn.microsoft.com/graph/api/authorizationpolicy-get?view=graph-rest-beta"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaPolicyDefaultAppManagementPolicy",
-        "apiResource": "/beta/policies/defaultAppManagementPolicy",
+        "functionName": "Get-MgBetaPolicyDefaultAppManagementPolicy",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/defaultAppManagementPolicy",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
-        "higherPermissions": [
-            "Policy.Read.ApplicationConfiguration",
-            "Policy.ReadWrite.ApplicationConfiguration"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": ["Policy.Read.ApplicationConfiguration","Policy.ReadWrite.ApplicationConfiguration"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/tenantappmanagementpolicy-get",
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicydefaultappmanagementpolicy?view=graph-powershell-beta"
-        ],
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/tenantappmanagementpolicy-get","https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.signins/get-mgpolicydefaultappmanagementpolicy?view=graph-powershell-beta"],
         "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaPolicyAppManagementPolicy",
-        "apiResource": "/beta/policies/appManagementPolicies",
+        "functionName": "Get-MgBetaPolicyAppManagementPolicy",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/appManagementPolicies",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
-        "higherPermissions": [
-            "Policy.Read.ApplicationConfiguration",
-            "Policy.ReadWrite.ApplicationConfiguration"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": ["Policy.Read.ApplicationConfiguration","Policy.ReadWrite.ApplicationConfiguration"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAppManagementPolicy?view=graph-powershell-beta"
-        ],
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyAppManagementPolicy?view=graph-powershell-beta"],
         "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaPolicyAppManagementPolicyApplyTo",
-        "apiResource": "/beta/policies/appManagementPolicies/{id}/appliesTo",
+        "functionName": "Get-MgBetaPolicyAppManagementPolicyApplyTo",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/appManagementPolicies/{id}/appliesTo",
+        "parameters": ["id"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "Policy.Read.All"
-        ],
-        "higherPermissions": [
-            "Policy.Read.ApplicationConfiguration",
-            "Policy.ReadWrite.ApplicationConfiguration"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Policy.Read.All"],
+        "higherPermissions": ["Policy.Read.ApplicationConfiguration","Policy.ReadWrite.ApplicationConfiguration"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.signins/get-mgbetapolicyappmanagementpolicyapplyto?view=graph-powershell-beta"
-        ],
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.identity.signins/get-mgbetapolicyappmanagementpolicyapplyto?view=graph-powershell-beta"],
         "notes": "Required for MS.AAD.5.5v1, MS.AAD.5.6v1, MS.AAD.5.7v1 - Application Management Policy checks"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaPolicyRoleManagementPolicyAssignment",
-        "apiResource": "/beta/policies/roleManagementPolicyAssignments",
+        "functionName": "Get-MgBetaPolicyRoleManagementPolicyAssignment",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/policies/roleManagementPolicyAssignments",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.SignIns"
-        ],
-        "leastPermissions": [
-            "RoleManagementPolicy.Read.Directory"
-        ],
-        "higherPermissions": [
-            "RoleManagementPolicy.ReadWrite.Directory",
-            "RoleManagement.ReadWrite.Directory",
-            "RoleManagement.Read.Directory"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagementPolicy.Read.Directory"],
+        "higherPermissions": ["RoleManagementPolicy.ReadWrite.Directory","RoleManagement.ReadWrite.Directory","RoleManagement.Read.Directory"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyRoleManagementPolicyAssignment?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyassignment-get?view=graph-rest-beta"
-        ],
-        "notes": [
-            "If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'",
-            "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
-        ],
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaPolicyRoleManagementPolicyAssignment?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/unifiedrolemanagementpolicyassignment-get?view=graph-rest-beta"],
+        "notes": ["If using API call, ensure you are using the correct filter to get the correct data; use: scopeId eq '/' and scopeType eq 'DirectoryRole'","Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"]
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
-        "apiResource": "/beta/roleManagement/directory/roleAssignmentScheduleInstances",
+        "functionName": "Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/roleManagement/directory/roleAssignmentScheduleInstances",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "RoleAssignmentSchedule.Read.Directory"
-        ],
-        "higherPermissions": [
-            "RoleAssignmentSchedule.ReadWrite.Directory",
-            "RoleManagement.ReadWrite.Directory",
-            "RoleManagement.Read.All",
-            "RoleManagement.Read.Directory"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["RoleAssignmentSchedule.Read.Directory"],
+        "higherPermissions": ["RoleAssignmentSchedule.ReadWrite.Directory","RoleManagement.ReadWrite.Directory","RoleManagement.Read.All","RoleManagement.Read.Directory"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/rbacapplication-list-roleassignmentscheduleinstances?view=graph-rest-beta&tabs=http"
-        ],
-        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.Governance/Get-MgBetaRoleManagementDirectoryRoleAssignmentScheduleInstance?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/rbacapplication-list-roleassignmentscheduleinstances?view=graph-rest-beta&tabs=http"],
+        "notes": "Used within the ScubaGear function: Get-PriviledgeRole within the AADProvider module"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance",
-        "apiResource": "/beta/roleManagement/directory/roleEligibilityScheduleInstances",
+        "functionName": "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/roleManagement/directory/roleEligibilityScheduleInstances",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "RoleEligibilitySchedule.Read.Directory"
-        ],
-        "higherPermissions": [
-            "RoleEligibilitySchedule.ReadWrite.Directory",
-            "RoleManagement.Read.All",
-            "RoleManagement.Read.Directory",
-            "RoleManagement.ReadWrite.Directory"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["RoleEligibilitySchedule.Read.Directory"],
+        "higherPermissions": ["RoleEligibilitySchedule.ReadWrite.Directory","RoleManagement.Read.All","RoleManagement.Read.Directory","RoleManagement.ReadWrite.Directory"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.governance/get-mgrolemanagementdirectoryroleeligibilityscheduleinstance?view=graph-powershell-1.0",
-            "https://learn.microsoft.com/graph/api/rbacapplication-list-roleeligibilityscheduleinstances?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.identity.governance/get-mgrolemanagementdirectoryroleeligibilityscheduleinstance?view=graph-powershell-1.0","https://learn.microsoft.com/graph/api/rbacapplication-list-roleeligibilityscheduleinstances?view=graph-rest-beta"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgRoleManagementDirectoryRoleAssignment",
-        "apiResource": "/v1.0/rolemanagement/directory/roleAssignments",
-        "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.Governance"
-        ],
-        "leastPermissions": [
-            "RoleManagement.Read.Directory"
-        ],
-        "higherPermissions": [
-            "RoleManagement.Read.All",
-            "Directory.Read.All",
-            "RoleManagement.ReadWrite.Directory",
-            "Directory.ReadWrite.All"
-        ],
-        "spRolePermissions": [],
+        "functionName": "Get-MgRoleManagementDirectoryRoleAssignment",
+        "entryType": "graphResource",
         "scubaGearProduct": [],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/unifiedroleassignment-get?view=graph-rest-1.0"
-        ],
-        "notes": "Used by the Service Principal module to assign the role assignment",
-        "oauthScope": ""
-    },
-
-    {
-        "moduleCmdlet": "Get-MgBetaSubscribedSku",
-        "apiResource": "/beta/subscribedSkus",
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/rolemanagement/directory/roleAssignments",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Identity.DirectoryManagement"
-        ],
-        "leastPermissions": [
-            "Organization.Read.All"
-        ],
-        "higherPermissions": [
-            "Directory.Read.All",
-            "Directory.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["RoleManagement.Read.Directory"],
+        "higherPermissions": ["RoleManagement.Read.All","Directory.Read.All","RoleManagement.ReadWrite.Directory","Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad",
-            "securitysuite"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaSubscribedSku?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/subscribedsku-list?view=graph-rest-beta"
-        ],
-        "notes": "The leastPermissions LicenseAssignment.Read.All does not work for this cmdlet. The cmdlet requires Organization.Read.All permission.",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.Governance"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/unifiedroleassignment-get?view=graph-rest-1.0"],
+        "notes": "Used by the Service Principal module to assign the role assignment"
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaUser",
-        "apiResource": "/beta/users",
+        "functionName": "Get-MgBetaSubscribedSku",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad","securitysuite"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/subscribedSkus",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Organization.Read.All"],
+        "higherPermissions": ["Directory.Read.All","Directory.ReadWrite.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Identity.DirectoryManagement"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.DirectoryManagement/Get-MgBetaSubscribedSku?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/subscribedsku-list?view=graph-rest-beta"],
+        "notes": "The leastPermissions LicenseAssignment.Read.All does not work for this cmdlet. The cmdlet requires Organization.Read.All permission."
+    },
+    {
+        "functionName": "Get-MgBetaUser",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/users",
+        "parameters": ["id"],
         "apiFilter": "/{id}",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Users"
-        ],
-        "leastPermissions": [
-            "User.Read.All"]
-            ,
-        "higherPermissions": [
-            "User.ReadWrite.All",
-            "Directory.Read.All",
-            "Directory.ReadWrite.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["User.Read.All"],
+        "higherPermissions": ["User.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.users/get-mgbetauser?view=graph-powershell-beta",
-            "https://learn.microsoft.com/graph/api/user-list?view=graph-rest-beta"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Users"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.beta.users/get-mgbetauser?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/user-list?view=graph-rest-beta"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet": "Get-MgBetaUserCount",
-        "apiResource": "/beta/users/",
+        "functionName": "Get-MgBetaUserCount",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/beta/users/",
+        "parameters": [],
         "apiFilter": "$count",
-        "apiHeader": [
-            {
-                "ConsistencyLevel" : "eventual"
-            }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Beta.Users"
-        ],
-        "leastPermissions": [
-            "User.Read.All"
-        ],
-        "higherPermissions": [
-            "User.ReadWrite.All",
-            "Directory.Read.All",
-            "Directory.ReadWrite.All"
-        ],
+        "apiHeader": [{"ConsistencyLevel":"eventual"}],
+        "leastPermissions": ["User.Read.All"],
+        "higherPermissions": ["User.ReadWrite.All","Directory.Read.All","Directory.ReadWrite.All"],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Users/Get-MgBetaUserCount?view=graph-powershell-beta",
-            "https://learn.microsoft.com/en-us/graph/api/user-list?view=graph-rest-beta&tabs=powershell#example-6-get-only-a-count-of-users"
-        ],
-        "notes": "There is no graph api that mimics this cmdlet besides including the query: $count=true and the consistencyLevel: eventual in the api call header.",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Beta.Users"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Users/Get-MgBetaUserCount?view=graph-powershell-beta","https://learn.microsoft.com/en-us/graph/api/user-list?view=graph-rest-beta&tabs=powershell#example-6-get-only-a-count-of-users"],
+        "notes": "There is no graph api that mimics this cmdlet besides including the query: $count=true and the consistencyLevel: eventual in the api call header."
     },
-
     {
-        "moduleCmdlet": "SharePoint REST API",
-        "apiResource": "https://{domain}-admin.sharepoint.com",
+        "functionName": "Get-SharePointAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["sharepoint"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "https://{domain}-admin.sharepoint.com",
+        "parameters": ["domain"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Sites.FullControl.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc"
-        ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
-        ],
-        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API.",
-        "oauthScope": "https://{domain}-admin.sharepoint.com/.default"
+        "oauthScope": "https://{domain}-admin.sharepoint.com/.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"],
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API."
     },
-
     {
-        "moduleCmdlet": "SharePoint REST API",
-        "apiResource": "https://{domain}-admin.sharepoint.us",
+        "functionName": "Get-SharePointAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["sharepoint"],
+        "supportedEnv": ["gcchigh"],
+        "endpointPath": "https://{domain}-admin.sharepoint.us",
+        "parameters": ["domain"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Sites.FullControl.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
-            "gcchigh"
-        ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
-        ],
-        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API.",
-        "oauthScope": "https://{domain}-admin.sharepoint.us/.default"
+        "oauthScope": "https://{domain}-admin.sharepoint.us/.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"],
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API."
     },
-
     {
-        "moduleCmdlet": "SharePoint REST API",
-        "apiResource": "https://{domain}-admin.sharepoint-mil.us",
+        "functionName": "Get-SharePointAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["sharepoint"],
+        "supportedEnv": ["dod"],
+        "endpointPath": "https://{domain}-admin.sharepoint-mil.us",
+        "parameters": ["domain"],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions": [
-            "Sites.FullControl.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": ["Sites.FullControl.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "sharepoint"
-        ],
-        "supportedEnv": [
-            "dod"
-        ],
         "resourceAPIAppId": "00000003-0000-0ff1-ce00-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"
-        ],
-        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API.",
-        "oauthScope": "https://{domain}-admin.sharepoint-mil.us/.default"
+        "oauthScope": "https://{domain}-admin.sharepoint-mil.us/.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/working-with-folders-and-files-with-rest"],
+        "notes": "SharePoint data is retrieved via direct REST API calls to the SharePoint Admin API."
     },
-
     {
-        "moduleCmdlet":  "PowerPlatform REST API",
-        "apiResource":  "https://api.bap.microsoft.com",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [],
-        "scubaGearProduct":  [
-            "powerplatform"
-        ],
-        "supportedEnv":  [
-            "commercial"
-        ],
-        "resourceAPIAppId":  "",
-        "supportLinks":  [
-            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
-        ],
-        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
-        "oauthScope":  "https://service.powerapps.com//.default"
-    },
-
-    {
-        "moduleCmdlet":  "PowerPlatform REST API",
-        "apiResource":  "https://gov.api.bap.microsoft.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [],
-        "scubaGearProduct":  [
-            "powerplatform"
-        ],
-        "supportedEnv":  [
-            "gcc"
-        ],
-        "resourceAPIAppId":  "",
-        "supportLinks":  [
-            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
-        ],
-        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
-        "oauthScope":  "https://gov.service.powerapps.us//.default"
-    },
-
-    {
-        "moduleCmdlet":  "PowerPlatform REST API",
-        "apiResource":  "https://high.api.bap.microsoft.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [],
-        "scubaGearProduct":  [
-            "powerplatform"
-        ],
-        "supportedEnv":  [
-            "gcchigh"
-        ],
-        "resourceAPIAppId":  "",
-        "supportLinks":  [
-            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
-        ],
-        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
-        "oauthScope":  "https://high.service.powerapps.us//.default"
-    },
-
-    {
-        "moduleCmdlet":  "PowerPlatform REST API",
-        "apiResource":  "https://api.appsplatform.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [],
-        "scubaGearProduct":  [
-            "powerplatform"
-        ],
-        "supportedEnv":  [
-            "dod"
-        ],
-        "resourceAPIAppId":  "",
-        "supportLinks":  [
-            "https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"
-        ],
-        "notes":  "Power Platform data is retrieved via direct REST API calls to the BAP API.",
-        "oauthScope":  "https://service.apps.appsplatform.us//.default"
-    },
-
-    {
-        "moduleCmdlet":  "Teams admin REST API",
-        "apiResource":  "https://api.interfaces.records.teams.microsoft.com",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "teams"
-        ],
-        "supportedEnv":  [
-            "commercial", "gcc"
-        ],
-        "resourceAPIAppId":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239",
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the Teams API.",
-        "oauthScope":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default"
-    },
-
-    {
-        "moduleCmdlet":  "Teams admin REST API",
-        "apiResource":  "https://api.interfaces.records.gov.teams.microsoft.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "teams"
-        ],
-        "supportedEnv":  [
-            "gcchigh", "dod"
-        ],
-        "resourceAPIAppId":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239",
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the Teams API.",
-        "oauthScope":  "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default"
-    },
-
-    {
-        "moduleCmdlet":  "Teams unified settings REST API",
-        "apiResource":  "https://substrate.office.com",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [],
-        "higherPermissions":  [],
-        "spRolePermissions":  [],
-        "scubaGearProduct":  [
-            "teamsunified"
-        ],
-        "supportedEnv":  [
-            "commercial", "gcc"
-        ],
-        "resourceAPIAppId":  "",
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the Teams API.",
-        "oauthScope":  "08ff1ce2-4973-4b08-86a3-ebed13badc7f/.default"
-    },
-
-    {
-        "moduleCmdlet": "Connect-MgGraph",
-        "apiResource": "https://graph.microsoft.com",
+        "functionName": "Get-PowerPlatformBapApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["commercial"],
+        "endpointPath": "https://api.bap.microsoft.com",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Authentication"
-        ],
-        "leastPermissions": [
-            "User.Read"
-        ],
-        "higherPermissions": [
-            "User.Read.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "resourceAPIAppId": "",
+        "oauthScope": "https://service.powerapps.com//.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"],
+        "notes": "Power Platform data is retrieved via direct REST API calls to the BAP API."
     },
-
     {
-        "moduleCmdlet": "Connect-MgGraph",
-        "apiResource": "https://graph.microsoft.us",
+        "functionName": "Get-PowerPlatformBapApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["gcc"],
+        "endpointPath": "https://gov.api.bap.microsoft.us",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Authentication"
-        ],
-        "leastPermissions": [
-            "User.Read"
-        ],
-        "higherPermissions": [
-            "User.Read.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "gcchigh"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "resourceAPIAppId": "",
+        "oauthScope": "https://gov.service.powerapps.us//.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"],
+        "notes": "Power Platform data is retrieved via direct REST API calls to the BAP API."
     },
-
     {
-        "moduleCmdlet": "Connect-MgGraph",
-        "apiResource": "https://dod-graph.microsoft.us",
+        "functionName": "Get-PowerPlatformBapApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["gcchigh"],
+        "endpointPath": "https://high.api.bap.microsoft.us",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Authentication"
-        ],
-        "leastPermissions": [
-            "User.Read"
-        ],
-        "higherPermissions": [
-            "User.Read.All"
-        ],
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "aad"
-        ],
-        "supportedEnv": [
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"
-        ],
-        "notes": "",
-        "oauthScope": ""
+        "resourceAPIAppId": "",
+        "oauthScope": "https://high.service.powerapps.us//.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"],
+        "notes": "Power Platform data is retrieved via direct REST API calls to the BAP API."
     },
-
     {
-        "moduleCmdlet": "New-MgApplication",
-        "apiResource": "/v1.0/applications",
+        "functionName": "Get-PowerPlatformBapApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["dod"],
+        "endpointPath": "https://api.appsplatform.us",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.ReadWrite.All"
-        ],
-        "higherPermissions": [
-        ],
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "ServicePrincipal"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
-        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/application-post-applications?view=graph-rest-1.0&tabs=http"
-        ],
-        "notes": "Used by the Service Principal module to create a new Application registration",
-        "oauthScope": ""
+        "resourceAPIAppId": "",
+        "oauthScope": "https://service.apps.appsplatform.us//.default",
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/power-platform/admin/programmability-tutorial-getting-started"],
+        "notes": "Power Platform data is retrieved via direct REST API calls to the BAP API."
     },
-
     {
-        "moduleCmdlet": "Update-MgApplication",
-        "apiResource": "/v1.0/applications/{id}",
+        "functionName": "Get-TeamsAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "https://api.interfaces.records.teams.microsoft.com",
+        "parameters": [],
         "apiFilter": "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "Microsoft.Graph.Applications"
-        ],
-        "leastPermissions": [
-            "Application.ReadWrite.All"
-        ],
-        "higherPermissions": [
-        ],
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "48ac35b8-9aa8-4d74-927d-1f4a14a0b239",
+        "oauthScope": "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the Teams API."
+    },
+    {
+        "functionName": "Get-TeamsAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["gcchigh","dod"],
+        "endpointPath": "https://api.interfaces.records.gov.teams.microsoft.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "48ac35b8-9aa8-4d74-927d-1f4a14a0b239",
+        "oauthScope": "48ac35b8-9aa8-4d74-927d-1f4a14a0b239/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the Teams API."
+    },
+    {
+        "functionName": "Get-TeamsUnifiedApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["teamsunified"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "https://substrate.office.com",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
         "spRolePermissions": [],
-        "scubaGearProduct": [
-            "ServicePrincipal"
-        ],
-        "supportedEnv": [
-            "commercial",
-            "gcc",
-            "gcchigh",
-            "dod"
-        ],
+        "resourceAPIAppId": "",
+        "oauthScope": "08ff1ce2-4973-4b08-86a3-ebed13badc7f/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the Teams API."
+    },
+    {
+        "functionName": "Connect-MgGraph",
+        "entryType": "graphConnect",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "https://graph.microsoft.com",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["User.Read"],
+        "higherPermissions": ["User.Read.All"],
+        "spRolePermissions": [],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
-        "supportLinks": [
-            "https://learn.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http"
-        ],
-        "notes": "Used by the Service Principal module to add permissions.",
-        "oauthScope": ""
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Authentication"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet":  "Exchange Online admin REST API",
-        "apiResource":  "https://outlook.office365.com",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [
-            "Exchange.ManageAsApp"
-        ],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "exo"
-        ],
-        "supportedEnv":  [
-            "commercial", "gcc"
-        ],
-        "resourceAPIAppId":  [
-            "00000002-0000-0ff1-ce00-000000000000"        
-        ],
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the EXO API.",
-        "oauthScope":  "https://outlook.office365.com/.default"
+        "functionName": "Connect-MgGraph",
+        "entryType": "graphConnect",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["gcchigh"],
+        "endpointPath": "https://graph.microsoft.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["User.Read"],
+        "higherPermissions": ["User.Read.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Authentication"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet":  "Exchange Online admin REST API",
-        "apiResource":  "https://outlook.office365.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [
-            "Exchange.ManageAsApp"
-        ],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "exo"
-        ],
-        "supportedEnv":  [
-            "gcchigh"
-        ],
-        "resourceAPIAppId":  [
-            "00000002-0000-0ff1-ce00-000000000000",
-            "00000007-0000-0ff1-ce00-000000000000"
-        ],
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the EXO API.",
-        "oauthScope":  "https://outlook.office365.us/.default"
+        "functionName": "Connect-MgGraph",
+        "entryType": "graphConnect",
+        "scubaGearProduct": ["aad"],
+        "supportedEnv": ["dod"],
+        "endpointPath": "https://dod-graph.microsoft.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["User.Read"],
+        "higherPermissions": ["User.Read.All"],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Authentication"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"],
+        "notes": ""
     },
-
     {
-        "moduleCmdlet":  "Exchange Online admin REST API",
-        "apiResource":  "https://outlook-dod.office365.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [
-            "Exchange.ManageAsApp"
-        ],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "exo"
-        ],
-        "supportedEnv":  [
-            "dod"
-        ],
-        "resourceAPIAppId":  [
-            "00000002-0000-0ff1-ce00-000000000000",
-            "00000007-0000-0ff1-ce00-000000000000"
-        ],
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the EXO API.",
-        "oauthScope":  "https://outlook-dod.office365.us/.default"
+        "functionName": "New-MgApplication",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["ServicePrincipal"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/applications",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Application.ReadWrite.All"],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/application-post-applications?view=graph-rest-1.0&tabs=http"],
+        "notes": "Used by the Service Principal module to create a new Application registration"
     },
-
     {
-        "moduleCmdlet":  "Security and Compliance admin REST API",
-        "apiResource":  "https://ps.compliance.protection.outlook.com",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [
-            "Exchange.ManageAsApp"
-        ],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "securitysuite"
-        ],
-        "supportedEnv":  [
-            "commercial", "gcc"
-        ],
-        "resourceAPIAppId":  [
-            "00000002-0000-0ff1-ce00-000000000000"        
-        ],
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the Security and Compliance API.",
-        "oauthScope":  "https://ps.compliance.protection.outlook.com/.default"
+        "functionName": "Update-MgApplication",
+        "entryType": "graphResource",
+        "scubaGearProduct": ["ServicePrincipal"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1.0/applications/{id}",
+        "parameters": ["id"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Application.ReadWrite.All"],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
+        "oauthScope": "",
+        "poshModule": ["Microsoft.Graph.Applications"],
+        "supportLinks": ["https://learn.microsoft.com/en-us/graph/api/application-update?view=graph-rest-1.0&tabs=http"],
+        "notes": "Used by the Service Principal module to add permissions."
     },
-
     {
-        "moduleCmdlet":  "Security and Compliance admin REST API",
-        "apiResource":  "https://ps.compliance.protection.office365.us",
-        "apiFilter":  "",
-        "apiHeader": [
-            { }
-        ],
-        "poshModule": [
-            "None - Direct REST API"
-        ],
-        "leastPermissions":  [
-            "Exchange.ManageAsApp"
-        ],
-        "higherPermissions":  [],
-        "spRolePermissions":  [
-            "Global Reader"
-        ],
-        "scubaGearProduct":  [
-            "securitysuite"
-        ],
-        "supportedEnv":  [
-            "gcchigh", "dod"
-        ],
-        "resourceAPIAppId":  [
-            "00000002-0000-0ff1-ce00-000000000000",
-            "00000007-0000-0ff1-ce00-000000000000"
-        ],
-        "supportLinks":  [
-        ],
-        "notes":  "Data is retrieved via direct REST API calls to the Security and Compliance API.",
-        "oauthScope":  "https://ps.compliance.protection.office365.us/.default"
+        "functionName": "Get-ExchangeOnlineAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["exo"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "https://outlook.office365.com",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Exchange.ManageAsApp"],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "00000002-0000-0ff1-ce00-000000000000",
+        "oauthScope": "https://outlook.office365.com/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the EXO API."
+    },
+    {
+        "functionName": "Get-ExchangeOnlineAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["exo"],
+        "supportedEnv": ["gcchigh"],
+        "endpointPath": "https://outlook.office365.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Exchange.ManageAsApp"],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": ["00000002-0000-0ff1-ce00-000000000000","00000007-0000-0ff1-ce00-000000000000"],
+        "oauthScope": "https://outlook.office365.us/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the EXO API."
+    },
+    {
+        "functionName": "Get-ExchangeOnlineAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["exo"],
+        "supportedEnv": ["dod"],
+        "endpointPath": "https://outlook-dod.office365.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Exchange.ManageAsApp"],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": ["00000002-0000-0ff1-ce00-000000000000","00000007-0000-0ff1-ce00-000000000000"],
+        "oauthScope": "https://outlook-dod.office365.us/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the EXO API."
+    },
+    {
+        "functionName": "Get-SecurityComplianceAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["securitysuite"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "https://ps.compliance.protection.outlook.com",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Exchange.ManageAsApp"],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "00000002-0000-0ff1-ce00-000000000000",
+        "oauthScope": "https://ps.compliance.protection.outlook.com/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the Security and Compliance API."
+    },
+    {
+        "functionName": "Get-SecurityComplianceAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["securitysuite"],
+        "supportedEnv": ["gcchigh","dod"],
+        "endpointPath": "https://ps.compliance.protection.office365.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Exchange.ManageAsApp"],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": ["00000002-0000-0ff1-ce00-000000000000","00000007-0000-0ff1-ce00-000000000000"],
+        "oauthScope": "https://ps.compliance.protection.office365.us/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Data is retrieved via direct REST API calls to the Security and Compliance API."
+    },
+    {
+        "functionName": "Get-PowerBIAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerbi"],
+        "supportedEnv": ["commercial"],
+        "endpointPath": "https://api.powerbi.com",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "https://analysis.windows.net/powerbi/api/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Power BI data is retrieved via direct REST API calls to the Power BI Admin API. Service principal access requires the Power BI tenant setting 'Service principals can access read-only admin APIs'; do not grant Tenant.Read.All."
+    },
+    {
+        "functionName": "Get-PowerBIAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerbi"],
+        "supportedEnv": ["gcc"],
+        "endpointPath": "https://api.powerbigov.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "https://analysis.usgovcloudapi.net/powerbi/api/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Power BI data is retrieved via direct REST API calls to the Power BI Admin API. Service principal access requires the Power BI tenant setting 'Service principals can access read-only admin APIs'; do not grant Tenant.Read.All."
+    },
+    {
+        "functionName": "Get-PowerBIAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerbi"],
+        "supportedEnv": ["gcchigh"],
+        "endpointPath": "https://api.high.powerbigov.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "https://high.analysis.usgovcloudapi.net/powerbi/api/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Power BI data is retrieved via direct REST API calls to the Power BI Admin API. Service principal access requires the Power BI tenant setting 'Service principals can access read-only admin APIs'; do not grant Tenant.Read.All."
+    },
+    {
+        "functionName": "Get-PowerBIAdminApiEndpoint",
+        "entryType": "restBase",
+        "scubaGearProduct": ["powerbi"],
+        "supportedEnv": ["dod"],
+        "endpointPath": "https://api.mil.powerbigov.us",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "https://mil.analysis.usgovcloudapi.net/powerbi/api/.default",
+        "poshModule": [""],
+        "supportLinks": [],
+        "notes": "Power BI data is retrieved via direct REST API calls to the Power BI Admin API. Service principal access requires the Power BI tenant setting 'Service principals can access read-only admin APIs'; do not grant Tenant.Read.All."
+    },
+    {
+        "functionName": "Get-SPOTenantRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["sharepoint"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/_api/SPO.Tenant",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": ["Sites.FullControl.All"],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": "Uses ContentType/Accept = application/json;odata=verbose to get the strongly-typed 'd' envelope rather than a flat object."
+    },
+    {
+        "functionName": "Get-PowerPlatformTenantSettingsRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-PowerPlatformEnvironmentsRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-PowerPlatformDlpPoliciesRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-PowerPlatformTenantIsolationRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["powerplatform"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/providers/PowerPlatform.Governance/v1/tenants/{TenantId}/tenantIsolationPolicy?api-version=2020-06-01",
+        "parameters": ["TenantId"],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": "Endpoint is under the PowerPlatform.Governance provider, not Microsoft.BusinessAppPlatform like the other three PowerPlatform calls."
+    },
+    {
+        "functionName": "Get-TeamsMeetingPolicyRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/Skype.Policy/configurations/TeamsMeetingPolicy",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-TeamsTenantFederationConfigurationRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/Skype.Policy/configurations/TenantFederationSettings",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-TeamsClientConfigurationRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/Skype.Policy/configurations/TeamsClientConfiguration",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-TeamsAppPermissionPolicyRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/Skype.Policy/configurations/TeamsAppPermissionPolicy",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-TeamsMeetingBroadcastPolicyRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/Skype.Policy/configurations/TeamsMeetingBroadcastPolicy",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": ["Global Reader"],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": ""
+    },
+    {
+        "functionName": "Get-TeamsM365UnifiedTenantSettingsRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["teams"],
+        "supportedEnv": ["commercial","gcc"],
+        "endpointPath": "/AdminAppCatalog/ps/v2/admin/unifiedApp/settings",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": "Not called for gcchigh/dod or certificate-based (app-only) auth - Export-TeamsProvider substitutes legacy policy data in those cases instead."
+    },
+    {
+        "functionName": "Get-PowerBITenantSettingsRest",
+        "entryType": "restHelper",
+        "scubaGearProduct": ["powerbi"],
+        "supportedEnv": ["commercial","gcc","gcchigh","dod"],
+        "endpointPath": "/v1/admin/tenantsettings",
+        "parameters": [],
+        "apiFilter": "",
+        "apiHeader": [],
+        "leastPermissions": [],
+        "higherPermissions": [],
+        "spRolePermissions": [],
+        "resourceAPIAppId": "",
+        "oauthScope": "",
+        "poshModule": [],
+        "supportLinks": [],
+        "notes": "Given a dedicated wrapper function (matching Get-SPOTenantRest/Get-PowerPlatform*Rest/Get-Teams*Rest) so CommandTracker tracks a meaningful, product-specific command name instead of the generic Invoke-ScubaRestMethod primitive name. Previously calling Invoke-ScubaRestMethod directly caused the Rego dependency-check 'Commandlet' metadata to reference the primitive itself, which broke when it didn't match the tracked command name."
     }
 ]
