@@ -96,6 +96,7 @@ FunctionsToExport = @(
     'New-SCuBAConfig',
     'Get-ScubaGearPermissions',
     'Get-ScubaGearEntraMinimumPermissions',
+    'Get-ScubaGearEndpointRest',
     'Test-ScubaGearVersion',
     'Update-ScubaGear',
     'Reset-ScubaGearDependencies',

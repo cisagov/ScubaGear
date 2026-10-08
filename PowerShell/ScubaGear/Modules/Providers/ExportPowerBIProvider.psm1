@@ -1,5 +1,4 @@
 Import-Module -Name $PSScriptRoot/ProviderHelpers/PowerBIRestHelper.psm1 -Force
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-ScubaRestMethod
 Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
 
 function Export-PowerBIProvider {
@@ -48,16 +47,11 @@ function Export-PowerBIProvider {
             throw "AccessToken and BaseUrl must be provided when LicenseFound is true."
         }
 
-        $Endpoint = "/v1/admin/tenantsettings"
-
-        # Call the Power BI Admin REST API to get the tenant settings.
+        # Call the Power BI Admin REST API to get the tenant settings. The helper is called directly
+        # (not via Tracker.TryCommand) so the HTTP status code is available to classify 401/403 failures.
         $ApiCallSucceeded = $false
         try {
-            $AdminSettings = Invoke-ScubaRestMethod `
-                -BaseUrl $BaseUrl `
-                -AccessToken $AccessToken `
-                -Endpoint $Endpoint `
-                -Method Get
+            $AdminSettings = Get-PowerBITenantSettingsRest -BaseUrl $BaseUrl -AccessToken $AccessToken
             $ApiCallSucceeded = $true
         }
         catch {
@@ -65,7 +59,7 @@ function Export-PowerBIProvider {
 
             # Record the failure on the tracker so the command's state is accurate for any
             # caller that inspects it, matching what CommandTracker.TryCommand does on failure.
-            $Tracker.AddUnSuccessfulCommand("Invoke-RestMethod")
+            $Tracker.AddUnSuccessfulCommand("Get-PowerBITenantSettingsRest")
 
             # Possible conditions that can occur based on hands-on testing:
             ##### Service Principal auth
@@ -127,15 +121,15 @@ function Export-PowerBIProvider {
                 }
             }
             else {
-                Write-Warning "Error running Invoke-RestMethod against the Power BI Admin REST API: $ErrorText"
+                Write-Warning "Error running Get-PowerBITenantSettingsRest against the Power BI Admin REST API: $ErrorText"
                 Write-ScubaLog -Message "Error running command" -Level "Info" -Source "PowerBIProvider" -Data @{
-                    Command = "Invoke-RestMethod"
+                    Command = "Get-PowerBITenantSettingsRest"
                     Error   = $ErrorText
                 }
             }
         }
 
-        # Invoke-RestMethod stays unsuccessful on any failure so the report shows these policies as errors
+        # Get-PowerBITenantSettingsRest stays unsuccessful on any failure so the report shows these policies as errors
         if ($ApiCallSucceeded) {
             if ($AdminSettings.Count -eq 0) {
                 throw "No tenant settings were returned from the Power BI Admin REST API. Report this to the ScubaGear team for troubleshooting."
@@ -143,11 +137,11 @@ function Export-PowerBIProvider {
 
             $TenantSettings = $AdminSettings[0].tenantSettings
             $TenantSettingsJson = ConvertTo-Json @($TenantSettings) -Depth 10
-            $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
+            $Tracker.AddSuccessfulCommand("Get-PowerBITenantSettingsRest")
         }
     }
     else {
-        $Tracker.AddSuccessfulCommand("Invoke-RestMethod")
+        $Tracker.AddSuccessfulCommand("Get-PowerBITenantSettingsRest")
     }
 
     $LicenseFoundJson = ConvertTo-Json $LicenseFound

@@ -1,46 +1,37 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Utility/Utility.psm1') -Function Get-ScubaGearCatalog
+
 Function Get-ScubaGearPermissions {
     <#
     .SYNOPSIS
-        This Function is used to retrieve the permissions of the SCuBAGear module
+        Retrieves the Graph/REST permission scopes required by ScubaGear.
 
     .DESCRIPTION
-        This Function is used to retrieve the permissions of the SCuBAGear module
-
-    .PARAMETER Domain
-        The domain to be used in the apiResource
+        Returns the leastPermissions (or higherPermissions) scopes for a product or a specific
+        cmdlet. Base URLs, Graph request URIs, OAuth scopes, service principal roles and API
+        headers are produced by the dedicated Get-ScubaGear* functions (Get-ScubaGearServiceEndpoint,
+        Get-ScubaGearGraphEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearServicePrincipalRole,
+        Get-ScubaGearApiHeader, Get-ScubaGearResourceAppId).
 
     .PARAMETER CmdletName
-        The name of the cmdlet for which the permissions are to be retrieved
+        The name of the cmdlet for which the permissions are to be retrieved.
 
     .PARAMETER PermissionLevel
-        The level of permission to be retrieved. The possible values are 'least' and 'higher'. Default is 'least'
+        The level of permission to be retrieved. The possible values are 'least' and 'higher'. Default is 'least'.
 
     .PARAMETER ServicePrincipal
-        The switch to indicate that the permissions are to be retrieved for a service principal
+        The switch to indicate that the permissions are to be retrieved for a service principal.
 
     .PARAMETER Product
         The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'defender', 'securitysuite', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline. 'securitysuite' is an alias for 'defender' (the Security Suite).
 
     .PARAMETER Environment
-        The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'
-
-    .PARAMETER OutAs
-        The output format. The possible values are 'perms', 'endpoint', 'modules', 'api', 'support'. Default is 'perms'
+        The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'.
 
     .EXAMPLE
-        Get-ScubaGearPermissions -CmdletName Get-MgBetaDirectorySettings
+        Get-ScubaGearPermissions -CmdletName Get-MgBetaDirectorySetting
 
     .EXAMPLE
-        Get-ScubaGearPermissions -CmdletName Get-MgBetaDirectorySettings -PermissionLevel higher
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product aad -OutAs all
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -CmdletName Get-MgBetaPrivilegedAccessResource -OutAs support
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -CmdletName Get-MgBetaGroupMember -OutAs api -id '559aabe6-7ef4-4fb6-b271-fa3d19e76017'
+        Get-ScubaGearPermissions -CmdletName Get-MgBetaDirectorySetting -PermissionLevel higher
 
     .EXAMPLE
         Get-ScubaGearPermissions -Product aad
@@ -48,63 +39,20 @@ Function Get-ScubaGearPermissions {
         Get-ScubaGearPermissions -Product securitysuite
 
     .EXAMPLE
-        Get-ScubaGearPermissions -CmdletName Get-MgBetaUser -OutAs modules
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product aad -OutAs modules
-
-    .EXAMPLE
         Get-ScubaGearPermissions -Product aad -servicePrincipal
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product exo -servicePrincipal
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product exo -OutAs appId
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product exo -OutAs endpoint
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product aad -OutAs api -id '559aabe6-7ef4-4fb6-b271-fa3d19e76017'
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment gcchigh -Domain contoso
-
-    .EXAMPLE
-        Get-ScubaGearPermissions -OutAs endpoint -Domain contoso
-
-    .EXAMPLE
-        'teams' | Get-ScubaGearPermissions -OutAs role
 
     .EXAMPLE
         'aad','scubatank' | Get-ScubaGearPermissions
 
     .NOTES
         NAME: Get-ScubaGearPermissions
-        VERSION: 2.0
+        VERSION: 3.0
 
         CHANGELOG:
         2024-10-03 - Initial version
-        2024-11-05 - Added support for ServicePrincipal with id's and typos
-        2024-11-07 - Added support for Domain, and beta api.
-        2024-11-15 - Removed redundantpermissions and added verbose messages
-        2024-12-20 - Added version and changelog. Added support for pipeline and for multiple products. Fixed issue with role output for null values
-        2024-12-23 - Adjusted endpoint output based on structure changes in the permissions file
+        2024-12-20 - Added pipeline and multi-product support
         2026-06-19 - Added SecuritySuite and removed ScubaTank to product list
-
-        DEVELOPER EXPLANATION OF the possible OutAs parameter values since they is hard to discern from the code alone:
-        perms       - Returns the value in the leastPermissions field
-        api         - Returns a conglomerate set of values from  the apiResource field
-                        Pass the -id field with this and it will place the value into the URI "/v1.0/roleManagement/directory/roleDefinitions/{id}"
-        role        - Returns the values in the spRolePermissions field (these are the roles that the service principal needs to be assigned) (details in /docs/prerequisites/noninteractive.md).
-        oauthScope  - Returns the values in the oauthScope field (used to mint tokens by MSAL for the various products)
-        endpoint    - Returns the value in the apiResource field where $_.moduleCmdlet -like 'Connect-*' -or $_.moduleCmdlet -like '*REST API' (this is the base URI used by the Export Providers to call REST APIs)
-        apiHeader   - Returns the apiHeader value based on the CmdletName (currently only /beta/users/ has a value). Used for the HTTP header in REST API calls.
-        all         - Returns all the fields from every record in the JSON that matches the product name
-        The following OutAs parameter values are currently not used anywhere in ScubaGear:
-        modules     - Returns the values in the poshModule field
-        appId       - Returns the resourceAPIAppId
+        2026-10-07 - Split -OutAs output modes into dedicated Get-ScubaGear* functions; catalog now keyed by functionName/entryType
     #>
 
     [CmdletBinding(DefaultParameterSetName = 'CmdletName')]
@@ -121,23 +69,13 @@ Function Get-ScubaGearPermissions {
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
-        [string]$Domain,
-
-        [Parameter(Mandatory = $false)]
-        [string]$Id,
-
-        [Parameter(Mandatory = $false)]
         [ValidateSet('least', 'higher')]
         [Alias('PermissionType')]
         [string]$PermissionLevel = 'least',
 
         [Parameter(Mandatory = $false)]
         [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
-        [string]$Environment = 'commercial',
-
-        [Parameter(Mandatory = $false)]
-        [ValidateSet('perms','modules', 'api', 'endpoint', 'support', 'role' , 'appId', 'all', 'apiHeader', 'oauthScope')]
-        [string]$OutAs ='perms'
+        [string]$Environment = 'commercial'
     )
     Begin{
         $ErrorActionPreference = 'Stop'
@@ -147,18 +85,9 @@ Function Get-ScubaGearPermissions {
             $Product = @('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform')
         }
 
-        if($OutAs -eq "endpoint" -and $Product -eq 'sharepoint' -and !$Domain){
-            Write-Error -Message "Parameter [-Domain] is required when OutAs is endpoint"
-        }
-
-        if($OutAs -eq 'api' -and $Product -match 'aad' -and !$Id){
-            Write-Error -Message "Parameter [-id] is required when OutAs is api or endpoint and Product is aad"
-        }
-
-        [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
-
-        $permissionSet = Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" | ConvertFrom-Json
-        Write-Verbose "Command: `$permissionSet = Get-Content -Path '$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json' | ConvertFrom-Json"
+        # Permission records are every entry except the restHelper path-only records (those carry no grantable permission of their own).
+        $permissionSet = Get-ScubaGearCatalog | Where-Object { $_.entryType -ne 'restHelper' }
+        Write-Verbose "Command: `$permissionSet = Get-ScubaGearCatalog | Where-Object { `$_.entryType -ne 'restHelper' }"
 
         # This hashtable contains the Entra AppId values for MS Graph (aad), Office 365 Exchange Online and SharePoint.
         # The New-ScubaGearServicePrincipal cmdlet references these AppIds and their respective permissions from ScubaGearApiCatalog.json to
@@ -186,8 +115,8 @@ Function Get-ScubaGearPermissions {
 
         switch($PSBoundParameters.Keys){
             'CmdletName' {
-                $conditions += {$_.moduleCmdlet -eq $CmdletName}
-                $conditionsmsg += '`$_.moduleCmdlet -eq "' + $CmdletName + '"'
+                $conditions += {$_.functionName -eq $CmdletName}
+                $conditionsmsg += '`$_.functionName -eq "' + $CmdletName + '"'
             }
 
             'Product' {
@@ -206,7 +135,7 @@ Function Get-ScubaGearPermissions {
                 $conditions += $productCondition
                 $conditionsmsg += '`$_.scubaGearProduct -contains any of "' + ($Product -join '", "') + '"'
 
-                If($OutAs -eq 'perms'){
+                If($true){
                     Foreach($ProductItem in $Product){
                         If($ServicePrincipal -or $ProductItem -eq 'aad'){
                             # When running non-interactive, fetch the permissions associated with with the product's REST API record in the JSON (e.g. "Teams admin REST API").
@@ -250,128 +179,16 @@ Function Get-ScubaGearPermissions {
 
         $collection = $permissionSet | Where-Object $filterScript
 
-        # Apply the dynamically built filter in Where-Object
-        switch ($OutAs) {
-            'perms' {
-                If($PermissionLevel -eq 'least'){
-                    Write-Verbose -Message "Command: `$collection | Where-Object {`$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty leastPermissions -Unique"
-                    $output += $collection | Where-Object {$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty leastPermissions -Unique
-                }
-                else{
-                    Write-Verbose -Message "Command: `$collection  | Where-Object {`$_.moduleCmdlet -notlike 'Connect-Mg*'}| Select-Object -ExpandProperty higherPermissions -Unique"
-                    $output += $collection | Where-Object {$_.moduleCmdlet -notlike 'Connect-Mg*'} | Select-Object -ExpandProperty higherPermissions -Unique
-                }
-            }
-            'modules' {
-                Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty poshModule -Unique"
-                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty poshModule -Unique
-            }
-            'endpoint' {
-
-                #only get the api
-                Write-Verbose -Message "Command: `$collection | Where-Object {`$_.moduleCmdlet -like 'Connect-*'} | foreach-object {`$_.apiResource -replace '{id}',$Id -replace '{domain}',$Domain} | Select-Object -Unique"
-                #combine the apiResource and api filter if exists
-                $output += $collection | Where-Object $filterScript | Where-Object {$_.moduleCmdlet -like 'Connect-*' -or $_.moduleCmdlet -like '*REST API'} | foreach-object {
-                    #$apiResource = $_.'apiResource'
-
-                    If($_.apifilter){
-                        ($_.apiResource -replace "{id}",$Id -replace '{domain}',$Domain) + '?$filter=' + $_.apifilter
-                    }else{
-                        $_.apiResource -replace '{id}',$Id -replace '{domain}',$Domain
-                    }
-                } | Select-Object -Unique
-
-            }
-            'api'{
-
-                If($PSBoundParameters.ContainsKey('CmdletName') -and $CmdletName -match '-Mg'){
-                    #if cmdlete is a graph cmdlet, then get the connect-* cmdlet
-                    Write-Verbose -Message "Command: `$connecturi = `$permissionSet | Where-Object {`$_.moduleCmdlet -eq 'Connect-MgGraph' -and `$_.supportedEnv -eq '$Environment'} | foreach-object {`$_.apiResource} | Select-Object -Unique"
-                    $connecturi = $permissionSet | Where-Object {$_.moduleCmdlet -eq 'Connect-MgGraph' -and $_.supportedEnv -eq $Environment} | foreach-object {$_.apiResource} | Select-Object -Unique
-                }Else{
-                    #get the connect-* cmdlet:
-                    Write-Verbose -Message "Command: `$connecturi = `$collection | Where-Object {`$_.moduleCmdlet -like 'Connect-*'} | foreach-object {`$_.apiResource} | Select-Object -Unique"
-                    $connecturi = $collection | Where-Object $filterScript | Where-Object {$_.moduleCmdlet -like 'Connect-*'} | foreach-object {$_.apiResource} | Select-Object -Unique
-                }
-
-                #only get the api
-                Write-Verbose -Message "Command: `$collection | Where-Object {`$_.moduleCmdlet -notlike 'Connect-*'} | foreach-object {'$connecturi + ($_.apiResource -replace '{id}',$Id -replace '{domain}',$Domain)'} | Select-Object -Unique"
-                #combine the apiResource and api filter if exists
-                $output += $collection | Where-Object $filterScript | Where-Object {$_.moduleCmdlet -notlike 'Connect-*'} | foreach-object {
-                    #$apiResource = $_.'apiResource'
-
-                    If($_.apifilter){
-                        if($_.apifilter -match '{id}'){
-                            #if the apifilter contains {id}, then replace it with the id
-                            $connecturi + ($_.apiResource -replace "{id}",$Id -replace '{domain}',$Domain) + $_.apifilter -replace '{id}',$Id
-                        }else{
-                            $connecturi + ($_.apiResource -replace "{id}",$Id -replace '{domain}',$Domain) + $_.apifilter
-                        }
-                    }else{
-                        $connecturi + $_.apiResource -replace '{id}',$Id -replace '{domain}',$Domain
-                    }
-                } | Select-Object -Unique
-
-            }
-            'apiHeader'{
-                If ($PSBoundParameters.ContainsKey('CmdletName') -and $CmdletName -match '-Mg') {
-                    # if cmdlet is a graph cmdlet, then get the connect-* cmdlet
-                    Write-Verbose -Message "Command: `$connecturi = `$permissionSet | Where-Object {`$_.moduleCmdlet -eq 'Connect-MgGraph' -and `$_.supportedEnv -eq '$Environment'} | foreach-object {`$_.apiResource} | Select-Object -Unique"
-                    $apiHeader = $permissionSet | Where-Object { $_.moduleCmdlet -eq 'Connect-MgGraph' -and $_.supportedEnv -eq $Environment } | foreach-object { $_.apiResource } | Select-Object -Unique
-                    $output += $apiHeader
-                }
-                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty apiHeader -Unique
-                # Filter out any unwanted values
-                $output = $output | Where-Object { $_ -isnot [string] -or $_ -notlike 'https://*graph.microsoft.*' }
-            }
-            'support' {
-                Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty supportLinks -Unique"
-                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty supportLinks -Unique
-            }
-            'appId'{
-                Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty resourceAPIAppId -Unique"
-                $output += $collection | Where-Object $filterScript | Select-Object -ExpandProperty resourceAPIAppId -Unique | ForEach-Object { $_.Split('#')[0] }
-            }
-            'role' {
-                Try{
-                    Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty sprolePermissions -Unique"
-                    $output += $collection | Where-Object $filterScript | Where-Object { $null -ne $_.sprolePermissions } | Select-Object -ExpandProperty sprolePermissions -Unique
-                }Catch{
-                    $output += $null
-                }
-            }
-            'oauthScope' {
-                Write-Verbose -Message "Command: `$collection | Select-Object -ExpandProperty oauthScope -Unique"
-                $output += $collection | Where-Object $filterScript | ForEach-Object {
-                    $_.oauthScope -replace '{domain}',$Domain
-                } | Where-Object { $_ -ne '' } | Select-Object -Unique
-            }
-            'all' {
-                Write-Verbose -Message "Command: `$collection | Sort-Object"
-                $objects += $collection | Where-Object $filterScript
-
-                #replace domain and id if found in objects
-                foreach ($object in $objects) {
-                    $properties = $object.PSObject.Properties
-                    foreach ($property in $properties) {
-                        if ($property.Value -is [string]) {
-                            # Replace in string values
-                            $property.Value = ($property.Value -replace '{id}',$Id -replace '{domain}',$Domain -split '#')[0]
-                        } elseif ($property.Value -is [array]) {
-                            # Replace in array values while keeping it as an array
-                            $property.Value = @($property.Value | ForEach-Object {
-                                if ($_ -is [string]) {
-                                    $_ -replace '{id}',$Id -replace '{domain}',$Domain
-                                } else {
-                                    $_
-                                }
-                            })
-                        }
-                    }
-                }
-
-                $output = $objects
-            }
+        # This function now returns only permission scopes. The former -OutAs modes (endpoint, api,
+        # apiHeader, oauthScope, role, appId) each have a dedicated Get-ScubaGear* function.
+        # The Graph connect record (graphConnect) carries only the auth-time User.Read scope, so it is excluded.
+        If($PermissionLevel -eq 'least'){
+            Write-Verbose -Message "Command: `$collection | Where-Object {`$_.entryType -ne 'graphConnect'} | Select-Object -ExpandProperty leastPermissions -Unique"
+            $output += $collection | Where-Object {$_.entryType -ne 'graphConnect'} | Select-Object -ExpandProperty leastPermissions -Unique
+        }
+        else{
+            Write-Verbose -Message "Command: `$collection | Where-Object {`$_.entryType -ne 'graphConnect'} | Select-Object -ExpandProperty higherPermissions -Unique"
+            $output += $collection | Where-Object {$_.entryType -ne 'graphConnect'} | Select-Object -ExpandProperty higherPermissions -Unique
         }
     }
     End{
@@ -404,7 +221,7 @@ Function Get-ScubaGearEntraMinimumPermissions{
     $filteredPermissions = @()
 
     # get all modules with least and higher permissions
-    $allPermissions = Get-ScubaGearPermissions -Product aad -OutAs all -Environment $Environment
+    $allPermissions = Get-ScubaGearProductRecord -Product aad -Environment $Environment
 
     # Compare the permissions to find the redundant ones
     $comparedPermissions = Compare-Object $allPermissions.leastPermissions $allPermissions.higherPermissions -IncludeEqual
@@ -462,7 +279,7 @@ Function Get-ServicePrincipalPermissions {
     $filteredPermissions = @()
 
     # get all modules with least and higher permissions
-    $allPermissions = $ProductNames | Get-ScubaGearPermissions -OutAs all -Environment $Environment -servicePrincipal
+    $allPermissions = Get-ScubaGearProductRecord -Product $ProductNames -Environment $Environment
 
     # Only get overwrite higher permissions if AAD is in the product list
     if ($ProductNames -contains 'aad') {
@@ -540,4 +357,250 @@ Function Get-ServicePrincipalPermissions {
     return $deduplicatedPermissions | Select-Object -Property LeastPermissions, ResourceAPIAppID, scubaGearProduct -Unique
 }
 
-Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions
+function Get-ScubaGearProductRecord {
+    <#
+    .SYNOPSIS
+        Returns the full catalog records for the given product(s) and environment.
+    .DESCRIPTION
+        Replaces the former 'Get-ScubaGearPermissions -OutAs all' usage. restHelper path-only
+        records are excluded automatically because they carry no supportedEnv.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Product,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
+    )
+    Get-ScubaGearCatalog | Where-Object {
+        $item = $_
+        ($item.entryType -ne 'restHelper') -and
+        ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+        ($item.supportedEnv -contains $Environment)
+    }
+}
+
+function Get-ScubaGearServicePrincipalRole {
+    <#
+    .SYNOPSIS
+        Returns the Entra directory role(s) a service principal needs for the given product(s).
+    .DESCRIPTION
+        Replaces the former 'Get-ScubaGearPermissions -OutAs role'.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string[]]$Product,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
+    )
+    process {
+        Get-ScubaGearCatalog | Where-Object {
+            $item = $_
+            ($item.entryType -ne 'restHelper') -and
+            ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+            ($item.supportedEnv -contains $Environment) -and
+            (@($item.spRolePermissions).Count -gt 0)
+        } | Select-Object -ExpandProperty spRolePermissions -Unique
+    }
+}
+
+function Get-ScubaGearResourceAppId {
+    <#
+    .SYNOPSIS
+        Returns the resource API application ID(s) for the given product(s)/environment.
+    .DESCRIPTION
+        Replaces the former 'Get-ScubaGearPermissions -OutAs appId'.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string[]]$Product,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$ServicePrincipal,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
+    )
+    process {
+        # -ServicePrincipal is accepted so callers can pass it, but the app IDs do not depend on the auth mode.
+        $null = $ServicePrincipal
+        Get-ScubaGearCatalog | Where-Object {
+            $item = $_
+            ($item.entryType -ne 'restHelper') -and
+            ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+            ($item.supportedEnv -contains $Environment)
+        } | Select-Object -ExpandProperty resourceAPIAppId -Unique | ForEach-Object { ($_ -split '#')[0] }
+    }
+}
+
+function Get-ScubaGearEndpointRest {
+    <#
+    .SYNOPSIS
+        Lists the REST API hosts that ScubaGear connects to, for building firewall or proxy allow lists.
+
+    .DESCRIPTION
+        Returns the service hosts ScubaGear calls to assess the selected products in the selected
+        Microsoft 365 environment: Microsoft Graph plus each product's admin API. The list is read
+        from ScubaGearApiCatalog.json, so it reflects the version of ScubaGear that is installed.
+
+        Sign-in (Entra ID) hosts and hosts used only to install or update ScubaGear are not included.
+        All connections use HTTPS on port 443.
+
+        SharePoint admin hosts include the tenant name. Pass -Domain to get the real host name;
+        otherwise the host is shown with a <tenant> placeholder.
+
+    .PARAMETER ProductNames
+        The products to include. Accepts the same values as Invoke-SCuBA. 'defender' is treated as
+        'securitysuite', and '*' (the default) selects every product ScubaGear tests.
+
+    .PARAMETER M365Environment
+        The Microsoft 365 environment: 'commercial' (default), 'gcc', 'gcchigh' or 'dod'.
+
+    .PARAMETER Domain
+        The tenant name used in SharePoint admin host names, for example 'contoso' for contoso.onmicrosoft.com.
+
+    .PARAMETER Format
+        'Object' (default) returns one object per host and product. 'Hosts' returns the unique host names,
+        one per line. 'Csv', 'Json' and 'Markdown' return text that can be pasted into a ticket or document.
+
+    .PARAMETER OutFile
+        Writes the output to this file as UTF-8 without a byte order mark. With -Format Object the file
+        contains the 'Hosts' format.
+
+    .PARAMETER Clipboard
+        Copies the output to the clipboard. With -Format Object the clipboard receives the 'Hosts' format.
+
+    .EXAMPLE
+        Get-ScubaGearEndpointRest
+
+        Lists the hosts for all products in a commercial tenant.
+
+    .EXAMPLE
+        Get-ScubaGearEndpointRest -ProductNames exo, teams -M365Environment gcchigh -Format Hosts
+
+    .EXAMPLE
+        Get-ScubaGearEndpointRest -M365Environment gcc -Domain contoso -Format Markdown -OutFile .\scubagear-hosts.md
+
+    .FUNCTIONALITY
+        Public
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject], [string])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('teams', 'exo', 'defender', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
+        [string[]]$ProductNames = '*',
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$M365Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [ValidatePattern('^[A-Za-z0-9-]+$')]
+        [string]$Domain,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Object', 'Hosts', 'Csv', 'Json', 'Markdown')]
+        [string]$Format = 'Object',
+
+        [Parameter(Mandatory = $false)]
+        [string]$OutFile,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Clipboard
+    )
+
+    $AllProducts = 'aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi'
+    $Products = if ($ProductNames -contains '*') { $AllProducts } else { $ProductNames -replace '^defender$', 'securitysuite' }
+    $Products = @($Products | Sort-Object -Unique)
+
+    # Teams also reads its tenant settings from the unified settings host, which the catalog lists as its own product.
+    $CatalogProducts = @($Products | ForEach-Object { $_; if ($_ -eq 'teams') { 'teamsunified' } })
+
+    $Catalog = @(Get-ScubaGearCatalog)
+
+    # Every product's data comes from Microsoft Graph, so its host is needed whenever the catalog
+    # has Graph resources for a selected product in this environment.
+    $UsesGraph = [bool]($Catalog | Where-Object {
+            $Item = $_
+            $Item.entryType -eq 'graphResource' -and
+            $Item.supportedEnv -contains $M365Environment -and
+            ($Products | Where-Object { $Item.scubaGearProduct -contains $_ })
+        })
+
+    $Inventory = foreach ($Entry in $Catalog) {
+        if ($Entry.entryType -notin 'graphConnect', 'restBase' -or $Entry.supportedEnv -notcontains $M365Environment) { continue }
+
+        $EntryProducts = @($CatalogProducts | Where-Object { $Entry.scubaGearProduct -contains $_ })
+        if ($Entry.entryType -eq 'graphConnect') {
+            if (-not $UsesGraph) { continue }
+            $Label = 'Microsoft Graph'
+            $EntryProducts = $Products
+        }
+        elseif ($EntryProducts.Count -eq 0) { continue }
+        else {
+            # Purpose is the API named in the catalog note, e.g. "SharePoint Admin API".
+            $Sentence = (([string]$Entry.notes) -split '(?<=\.)\s', 2)[0].Trim()
+            $Label = if ($Sentence -match 'calls to the (.+?)\.?$') { $Matches[1] } else { $Sentence }
+            # The unified settings host is listed under its own catalog product but belongs to Teams.
+            $EntryProducts = @($EntryProducts -replace '^teamsunified$', 'teams')
+        }
+
+        $Placeholder = $Entry.endpointPath -match '\{domain\}'
+        $BaseUrl = $Entry.endpointPath -replace '\{domain\}', $(if ($Domain) { $Domain } else { '<tenant>' })
+        $HostName = ($BaseUrl -replace '^https?://', '') -replace '/.*$', ''
+
+        [PSCustomObject]@{
+            Host        = $HostName
+            Port        = 443
+            BaseUrl     = $BaseUrl
+            Products    = ($EntryProducts | Sort-Object -Unique) -join ', '
+            Environment = $M365Environment
+            Purpose     = $Label
+            Note        = $(if ($Placeholder -and -not $Domain) { 'Replace <tenant> with your tenant name, or pass -Domain.' } else { '' })
+        }
+    }
+    $Inventory = @($Inventory | Sort-Object -Property Host, Products -Unique)
+
+    $TextFormat = if ($Format -eq 'Object') { 'Hosts' } else { $Format }
+    $Text = switch ($TextFormat) {
+        'Hosts' { (@($Inventory.Host | Sort-Object -Unique)) -join [Environment]::NewLine }
+        'Csv' { ($Inventory | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine }
+        'Json' { ConvertTo-Json -InputObject @($Inventory) }
+        'Markdown' {
+            $Escape = { param($Value) ([string]$Value) -replace '\|', '\|' }
+            $Lines = @('| Host | Port | Products | Purpose | Note |', '| --- | --- | --- | --- | --- |')
+            $Lines += foreach ($Row in $Inventory) {
+                "| $(& $Escape $Row.Host) | $($Row.Port) | $(& $Escape $Row.Products) | $(& $Escape $Row.Purpose) | $(& $Escape $Row.Note) |"
+            }
+            $Lines -join [Environment]::NewLine
+        }
+    }
+
+    if ($OutFile) {
+        $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFile)
+        [System.IO.File]::WriteAllText($Path, $Text + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
+    }
+    if ($Clipboard) {
+        if (Get-Command -Name Set-Clipboard -ErrorAction SilentlyContinue) { Set-Clipboard -Value $Text }
+        else { Write-Warning 'Set-Clipboard is not available on this system; the clipboard was not changed.' }
+    }
+
+    if ($Format -eq 'Object') { return $Inventory }
+    return $Text
+}
+
+Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions, Get-ScubaGearServicePrincipalRole, Get-ScubaGearResourceAppId, Get-ScubaGearProductRecord, Get-ScubaGearEndpointRest

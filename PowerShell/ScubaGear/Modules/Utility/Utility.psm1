@@ -268,9 +268,9 @@ function Invoke-GraphDirectly {
 
     # Determine endpoint
     if ($ID) {
-        $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment -id $ID
+        $endpoint = Get-ScubaGearGraphEndpoint -CmdletName $commandlet -Environment $M365Environment -Id $ID
     } else {
-        $endpoint = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs api -Environment $M365Environment
+        $endpoint = Get-ScubaGearGraphEndpoint -CmdletName $commandlet -Environment $M365Environment
     }
 
     if ($queryParams) {
@@ -291,7 +291,7 @@ function Invoke-GraphDirectly {
         throw "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
-    $apiHeader = Get-ScubaGearPermissions -CmdletName $commandlet -OutAs apiheader -Environment $M365Environment
+    $apiHeader = Get-ScubaGearApiHeader -CmdletName $commandlet -Environment $M365Environment
 
     $graphParams = @{
         Uri         = $endpoint
@@ -621,7 +621,7 @@ function Invoke-GraphBatchRequest {
             try {
                 # Execute batch request using the internal Graph transport
                 Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
-                $endpoint = Get-ScubaGearPermissions -CmdletName Connect-MgGraph -Environment $M365Environment -OutAs endpoint
+                $endpoint = Get-ScubaGearServiceEndpoint -Product aad -Environment $M365Environment
                 $batchResponse = Invoke-ScubaGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
             }
             catch {
@@ -972,7 +972,7 @@ function Invoke-ScubaRestMethod {
         [hashtable]$AdditionalHeaders = $null,
 
         [Parameter(Mandatory = $false)]
-        [ValidateRange(0, [int]::MaxValue)]
+        [ValidateRange(0, 300)]
         [int]$TimeoutSec = 0,
 
         [Parameter(Mandatory = $false)]
@@ -1166,100 +1166,180 @@ function Get-HttpResponseDetails {
     return $StringBuffer.ToString()
 }
 
-function Get-HttpResponseDetails {
+function Get-ScubaGearCatalog {
     <#
-    .SYNOPSIS
-        Formats an HTTP response object into a human-readable diagnostic string.
+    .Description
+    Loads the full ScubaGear API catalog (schemas/ScubaGearApiCatalog.json).
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param()
+    [string]$ResourceRoot = ($PWD.ProviderPath, $PSScriptRoot)[[bool]$PSScriptRoot]
+    return (Get-Content -Path "$ResourceRoot\..\..\schemas\ScubaGearApiCatalog.json" -Raw | ConvertFrom-Json)
+}
 
-    .DESCRIPTION
-        Handles the three response object shapes ScubaGear's REST callers actually encounter:
-        the WebResponseObject Invoke-WebRequest returns directly on success, System.Net.HttpWebResponse
-        (PS 5.1 exception .Response), and System.Net.Http.HttpResponseMessage (PS 7+ exception .Response).
+function Get-ScubaGearServiceEndpoint {
+    <#
+    .Description
+    Returns the base service URL(s) for a product/environment (Graph connect or REST API host),
+    substituting the {domain} placeholder (SharePoint) when supplied.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string[]]$Product,
 
-    .PARAMETER HttpResponseObject
-        The response object to format (either a direct Invoke-WebRequest return value, or an
-        exception's .Response property).
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial',
 
-    .PARAMETER ErrorDetailsMessage
-        Only used for HttpResponseMessage: PS 7+ disposes the response content stream by the time
-        the catch block runs, so the body (when parseable) has to come from the caller's
-        $ErrorRecord.ErrorDetails.Message instead.
+        [Parameter(Mandatory = $false)]
+        [string]$Domain
+    )
+    process {
+        if (($Product -contains 'sharepoint') -and -not $Domain) {
+            Write-Error -Message "Parameter [-Domain] is required when resolving the SharePoint endpoint."
+        }
+        Get-ScubaGearCatalog | Where-Object {
+            $item = $_
+            ($item.entryType -in @('graphConnect', 'restBase')) -and
+            ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+            ($item.supportedEnv -contains $Environment)
+        } | ForEach-Object { $_.endpointPath -replace '\{domain\}', $Domain } | Select-Object -Unique
+    }
+}
 
-    .FUNCTIONALITY
-        Internal
+function Get-ScubaGearOAuthScope {
+    <#
+    .Description
+    Returns the OAuth2 scope(s) used to mint a token for a product/environment.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string[]]$Product,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [string]$Domain
+    )
+    process {
+        Get-ScubaGearCatalog | Where-Object {
+            $item = $_
+            ($item.entryType -ne 'restHelper') -and
+            ($Product | Where-Object { $item.scubaGearProduct -contains $_ }) -and
+            ($item.supportedEnv -contains $Environment)
+        } | ForEach-Object { $_.oauthScope -replace '\{domain\}', $Domain } |
+            Where-Object { $_ -ne '' } | Select-Object -Unique
+    }
+}
+
+function Get-ScubaGearGraphEndpoint {
+    <#
+    .Description
+    Returns the full Microsoft Graph request URI for a given cmdlet name: the graphConnect base URL
+    for the environment combined with the cmdlet's resource path and filter, substituting {id}.
+    .Functionality
+    Internal
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        $HttpResponseObject,
+        [string]$CmdletName,
 
         [Parameter(Mandatory = $false)]
-        [string]$ErrorDetailsMessage
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [string]$Id
+    )
+    $catalog = Get-ScubaGearCatalog
+    $base = $catalog | Where-Object { $_.entryType -eq 'graphConnect' -and $_.supportedEnv -contains $Environment } |
+        ForEach-Object { $_.endpointPath } | Select-Object -Unique
+
+    $catalog | Where-Object {
+        $_.functionName -eq $CmdletName -and $_.entryType -ne 'graphConnect' -and $_.supportedEnv -contains $Environment
+    } | ForEach-Object {
+        $resource = $_.endpointPath -replace '\{id\}', $Id
+        if ($_.apiFilter) {
+            "$base$resource" + ($_.apiFilter -replace '\{id\}', $Id)
+        } else {
+            "$base$resource"
+        }
+    } | Select-Object -Unique
+}
+
+function Get-ScubaGearApiHeader {
+    <#
+    .Description
+    Returns the HTTP header object(s) a given Graph cmdlet requires, if any.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CmdletName,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$Environment = 'commercial'
+    )
+    Get-ScubaGearCatalog | Where-Object {
+        $_.functionName -eq $CmdletName -and $_.supportedEnv -contains $Environment
+    } | Where-Object { @($_.apiHeader).Count -gt 0 } | ForEach-Object { $_.apiHeader } | Select-Object -Unique
+}
+
+function Get-ScubaGearRestEndpoint {
+    <#
+    .Description
+    Looks up the fixed REST endpoint path for a ScubaGear provider REST helper function from the
+    restHelper entries in ScubaGearApiCatalog.json, substituting any supplied {placeholder} values.
+    .Parameter FunctionName
+    The REST helper function name, matching the catalog's functionName field (e.g. "Get-SPOTenantRest").
+    .Parameter PathParameters
+    Optional hashtable of {placeholder} substitutions, e.g. @{ TenantId = $TenantId }.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$FunctionName,
+
+        [Parameter(Mandatory = $false)]
+        [hashtable]$PathParameters
     )
 
-    $StringBuffer = [System.Text.StringBuilder]::new()
-    [void]$StringBuffer.AppendLine("`nResponse Type : $($HttpResponseObject.GetType().FullName)")
+    $Catalog = Get-ScubaGearCatalog
+    $Entry = $Catalog | Where-Object { $_.functionName -eq $FunctionName }
+    if (-not $Entry) {
+        throw "No REST API catalog entry found for function '$FunctionName' in ScubaGearApiCatalog.json"
+    }
 
-    if ($HttpResponseObject -is [Microsoft.PowerShell.Commands.WebResponseObject]) {
-        # Direct return value of Invoke-WebRequest (e.g. HTTP 202/3xx) - Content is already a string.
-        [void]$StringBuffer.AppendLine("Status Code   : $([int]$HttpResponseObject.StatusCode)")
-        [void]$StringBuffer.AppendLine("Status Text   : $($HttpResponseObject.StatusDescription)")
-        [void]$StringBuffer.AppendLine("")
-        [void]$StringBuffer.AppendLine("=== Response Headers ===")
-        foreach ($HeaderName in $HttpResponseObject.Headers.Keys) {
-            [void]$StringBuffer.AppendLine("${HeaderName}: $($HttpResponseObject.Headers[$HeaderName])")
-        }
-        [void]$StringBuffer.AppendLine("")
-        [void]$StringBuffer.AppendLine("=== Raw Response Body ===")
-        [void]$StringBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($HttpResponseObject.Content)) { "Empty response body." } else { $HttpResponseObject.Content }))
+    $EndpointPath = $Entry.endpointPath
+    if ([string]::IsNullOrWhiteSpace($EndpointPath)) {
+        throw "Function '$FunctionName' has no fixed endpointPath in the REST API catalog."
     }
-    elseif ($HttpResponseObject.GetType().FullName -eq 'System.Net.Http.HttpResponseMessage') {
-        # PowerShell 7+ HttpResponseException.Response
-        [void]$StringBuffer.AppendLine("Status Code   : $([int]$HttpResponseObject.StatusCode)")
-        [void]$StringBuffer.AppendLine("Status Text   : $($HttpResponseObject.ReasonPhrase)")
-        [void]$StringBuffer.AppendLine("")
-        [void]$StringBuffer.AppendLine("=== Response Headers ===")
-        foreach ($Header in $HttpResponseObject.Headers) {
-            [void]$StringBuffer.AppendLine("$($Header.Key): $($Header.Value -join ', ')")
-        }
-        [void]$StringBuffer.AppendLine("")
-        [void]$StringBuffer.AppendLine("=== Raw Response Body ===")
-        # On PS 7+, Invoke-RestMethod already reads and disposes the response content internally,
-        # so re-reading .Content throws "Cannot access a disposed object." The body text (when
-        # PowerShell can parse it) is instead surfaced via ErrorRecord.ErrorDetails.Message.
-        [void]$StringBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ErrorDetailsMessage)) { "Empty response body." } else { $ErrorDetailsMessage }))
-    }
-    else {
-        # PowerShell 5.1 WebException.Response (System.Net.HttpWebResponse)
-        [void]$StringBuffer.AppendLine("Status Code   : $([int]$HttpResponseObject.StatusCode)")
-        [void]$StringBuffer.AppendLine("Status Text   : $($HttpResponseObject.StatusDescription)")
-        [void]$StringBuffer.AppendLine("Content Type  : $($HttpResponseObject.ContentType)")
-        [void]$StringBuffer.AppendLine("Content Length: $($HttpResponseObject.ContentLength)")
-        [void]$StringBuffer.AppendLine("")
-        [void]$StringBuffer.AppendLine("=== Response Headers ===")
-        foreach ($HeaderName in $HttpResponseObject.Headers.AllKeys) {
-            [void]$StringBuffer.AppendLine("${HeaderName}: $($HttpResponseObject.Headers[$HeaderName])")
-        }
-        [void]$StringBuffer.AppendLine("")
-        [void]$StringBuffer.AppendLine("=== Raw Response Body ===")
-        $HttpResponseStream = $HttpResponseObject.GetResponseStream()
-        if ($null -eq $HttpResponseStream) {
-            [void]$StringBuffer.AppendLine("No response stream in Error.Exception.Response object.")
-        }
-        else {
-            $HttpResponseReader = New-Object System.IO.StreamReader($HttpResponseStream)
-            try {
-                $ResponseBody = $HttpResponseReader.ReadToEnd()
-            }
-            finally {
-                $HttpResponseReader.Dispose()
-                $HttpResponseStream.Dispose()
-            }
-            [void]$StringBuffer.AppendLine($(if ([string]::IsNullOrWhiteSpace($ResponseBody)) { "Empty response body." } else { $ResponseBody }))
+
+    # The catalog declares the placeholder keys this endpoint expects in $Entry.parameters; callers
+    # supply their values via -PathParameters. Unsupplied placeholders are left intact.
+    if ($PathParameters) {
+        foreach ($Key in $PathParameters.Keys) {
+            $EndpointPath = $EndpointPath.Replace("{$Key}", [string]$PathParameters[$Key])
         }
     }
 
-    return $StringBuffer.ToString()
+    return $EndpointPath
 }
 
 Export-ModuleMember -Function @(
@@ -1269,5 +1349,11 @@ Export-ModuleMember -Function @(
     'ConvertFrom-GraphHashtable',
     'Invoke-GraphBatchRequest',
     'Invoke-ScubaRestMethod',
-    'Get-HttpResponseDetails'
+    'Get-HttpResponseDetails',
+    'Get-ScubaGearCatalog',
+    'Get-ScubaGearServiceEndpoint',
+    'Get-ScubaGearOAuthScope',
+    'Get-ScubaGearGraphEndpoint',
+    'Get-ScubaGearApiHeader',
+    'Get-ScubaGearRestEndpoint'
 )

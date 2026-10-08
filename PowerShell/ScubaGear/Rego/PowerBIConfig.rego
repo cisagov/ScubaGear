@@ -63,7 +63,7 @@ PublishToWebSetting := object.get(PowerbiTenantSettings, "PublishToWeb", null)
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PublishToWebSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -80,7 +80,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -93,7 +93,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or PublishToWeb are missing from input JSON",
     "RequirementMet": false
@@ -131,7 +131,7 @@ AllowGuestAccessSecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": AllowGuestAccessSharedContentSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -154,7 +154,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -167,7 +167,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or AllowGuestUserToAccessSharedContent are missing from input JSON",
     "RequirementMet": false
@@ -206,7 +206,7 @@ ExternalSharingV2SecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": ExternalSharingV2Setting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -228,7 +228,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -241,7 +241,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or ExternalSharingV2 are missing from input JSON",
     "RequirementMet": false
@@ -280,7 +280,7 @@ ServicePrincipalAccessPermissionApisSecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": ServicePrincipalAccessPermissionApisSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -302,7 +302,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -315,7 +315,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or ServicePrincipalAccessPermissionAPIs are missing from input JSON",
     "RequirementMet": false
@@ -353,7 +353,7 @@ AllowServicePrincipalsCreateAndUseProfilesSecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": AllowServicePrincipalsCreateAndUseProfilesSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -375,7 +375,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -388,7 +388,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or AllowServicePrincipalsCreateAndUseProfiles are missing from input JSON",
     "RequirementMet": false
@@ -417,7 +417,7 @@ BlockResourceKeyAuthenticationSetting := object.get(PowerbiTenantSettings, "Bloc
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": BlockResourceKeyAuthenticationSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -434,7 +434,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -447,7 +447,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON",
     "RequirementMet": false
@@ -475,7 +475,7 @@ RScriptVisualSetting := object.get(PowerbiTenantSettings, "RScriptVisual", null)
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": RScriptVisualSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -492,7 +492,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -505,7 +505,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or RScriptVisual are missing from input JSON",
     "RequirementMet": false
@@ -534,7 +534,7 @@ EimInformationProtectionEditSetting := object.get(PowerbiTenantSettings, "EimInf
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": EimInformationProtectionEditSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
@@ -551,7 +551,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PowerbiUnavailableActualValue,
     "ReportDetails": PowerbiUnavailableMessage,
     "ErrorDetails": PowerbiUnavailableMessage,
@@ -564,7 +564,7 @@ tests contains {
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or EimInformationProtectionEdit are missing from input JSON",
     "RequirementMet": false

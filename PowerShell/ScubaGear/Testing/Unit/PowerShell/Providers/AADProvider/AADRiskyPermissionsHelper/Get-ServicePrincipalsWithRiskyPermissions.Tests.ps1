@@ -152,7 +152,7 @@ InModuleScope AADRiskyPermissionsHelper {
         It "returns a list of service principals with valid properties" {
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
 
-            Mock Invoke-GraphBatchRequestsWithRetry {
+            Mock Invoke-GraphBatchRequest {
                 $responses = @{}
                 foreach ($response in $MockAppRoleAssignmentResponses) {
                     $responses[[string]$response.id] = $response
@@ -209,7 +209,7 @@ InModuleScope AADRiskyPermissionsHelper {
             # Set to $SafePermissions instead of $MockServicePrincipalAppRoleAssignments
             # to simulate service principals assigned to safe permissions
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockSafePermissions
-            Mock Invoke-GraphBatchRequestsWithRetry {
+            Mock Invoke-GraphBatchRequest {
                 $responses = @{}
                 foreach ($response in $MockAppRoleAssignmentResponses) {
                     $responses[[string]$response.id] = $response
@@ -232,7 +232,7 @@ InModuleScope AADRiskyPermissionsHelper {
             $MockServicePrincipalAppRoleAssignments | Should -HaveCount 11
 
             $MockAppRoleAssignmentResponses = New-MockMgGraphResponseAppRoleAssignments -Size 5 -MockBody $MockServicePrincipalAppRoleAssignments
-            Mock Invoke-GraphBatchRequestsWithRetry {
+            Mock Invoke-GraphBatchRequest {
                 $responses = @{}
                 foreach ($response in $MockAppRoleAssignmentResponses) {
                     $responses[[string]$response.id] = $response

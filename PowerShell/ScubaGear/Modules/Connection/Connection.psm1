@@ -33,7 +33,7 @@ function Connect-Tenant {
    [hashtable]
     $ServicePrincipalParams
    )
-   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable
+   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Get-ScubaGearServiceEndpoint
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl, Get-TeamsUnifiedScope, Get-TeamsUnifiedBaseUrl
@@ -261,7 +261,7 @@ function Connect-Tenant {
                            $InitialDomainPrefix = $TenantName.split(".")[0]
                        }
 
-                       $TokenData.SPOAdminUrl = Get-ScubaGearPermissions -Product sharepoint -OutAs endpoint -Environment $M365Environment -Domain $InitialDomainPrefix
+                       $TokenData.SPOAdminUrl = Get-ScubaGearServiceEndpoint -Product sharepoint -Environment $M365Environment -Domain $InitialDomainPrefix
                        $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
 
                        if ($ServicePrincipalParams.CertThumbprintParams) {
@@ -330,7 +330,8 @@ function Connect-Tenant {
                        # For interactive mode, also check that the current user has a PBI/Fabric license assigned.
                        # The Power BI Admin API requires the calling user to have a license even for Global Admin.
                        if (-not $ServicePrincipalParams.CertThumbprintParams) {
-                           $UserLicenseResponse = Invoke-ScubaGraphRequest -Method GET -Uri "/v1.0/me/licenseDetails" -ErrorAction Stop
+                           $UserLicenseResponse = Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET -ErrorAction Stop
+                           # Collect every successfully provisioned service plan assigned to the current user.
                            $UserPlans = $UserLicenseResponse.value |
                                Where-Object { $null -ne $_.servicePlans } |
                                ForEach-Object { $_.servicePlans } |

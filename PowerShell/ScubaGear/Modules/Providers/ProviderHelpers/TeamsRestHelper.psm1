@@ -1,5 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Permissions/PermissionsHelper.psm1") -Function Get-ScubaGearPermissions
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint
 
 function Get-TeamsScope {
     <#
@@ -15,7 +14,7 @@ function Get-TeamsScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teams -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product teams -Environment $M365Environment
 }
 
 function Get-TeamsBaseUrl {
@@ -32,7 +31,7 @@ function Get-TeamsBaseUrl {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teams -OutAs endpoint -Environment $M365Environment
+    return Get-ScubaGearServiceEndpoint -Product teams -Environment $M365Environment
 }
 
 function Get-TeamsUnifiedScope {
@@ -49,7 +48,7 @@ function Get-TeamsUnifiedScope {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teamsunified -OutAs oauthScope -Environment $M365Environment
+    return Get-ScubaGearOAuthScope -Product teamsunified -Environment $M365Environment
 }
 
 function Get-TeamsUnifiedBaseUrl {
@@ -66,7 +65,7 @@ function Get-TeamsUnifiedBaseUrl {
         [string]$M365Environment
     )
 
-    return Get-ScubaGearPermissions -Product teamsunified -OutAs endpoint -Environment $M365Environment
+    return Get-ScubaGearServiceEndpoint -Product teamsunified -Environment $M365Environment
 }
 
 function Get-TeamsMeetingPolicyRest {
@@ -87,7 +86,7 @@ function Get-TeamsMeetingPolicyRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsMeetingPolicy"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsMeetingPolicyRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -111,7 +110,7 @@ function Get-TeamsTenantFederationConfigurationRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TenantFederationSettings"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsTenantFederationConfigurationRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -135,7 +134,7 @@ function Get-TeamsClientConfigurationRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsClientConfiguration"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsClientConfigurationRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -159,7 +158,7 @@ function Get-TeamsAppPermissionPolicyRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsAppPermissionPolicy"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsAppPermissionPolicyRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -183,7 +182,7 @@ function Get-TeamsMeetingBroadcastPolicyRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/Skype.Policy/configurations/TeamsMeetingBroadcastPolicy"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsMeetingBroadcastPolicyRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
@@ -207,7 +206,7 @@ function Get-TeamsM365UnifiedTenantSettingsRest {
         [string]$AccessToken
     )
 
-    $Endpoint = "/AdminAppCatalog/ps/v2/admin/unifiedApp/settings"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsM365UnifiedTenantSettingsRest'
 
     $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
     return $Response
