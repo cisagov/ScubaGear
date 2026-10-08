@@ -291,6 +291,9 @@ InModuleScope Utility {
         It 'calls <ExpectedUri> with <ExpectedMethod> for <Function> in <EnvName>' -TestCases $combinedRestCases {
             param($EnvName, $Function, $Product, $ExpectedMethod, $ExpectedUri, $TenantId)
 
+            # ExpectedMethod and ExpectedUri are only read inside the -ParameterFilter below, which PSScriptAnalyzer cannot see.
+            $null = $ExpectedMethod, $ExpectedUri
+
             $BaseUrl = Get-ScubaGearServiceEndpoint -Product $Product -Environment $EnvName -Domain 'contoso'
             $Params = @{ AccessToken = 'tok' }
             switch ($Function) {
