@@ -450,4 +450,161 @@ function Get-ScubaGearResourceAppId {
     }
 }
 
-Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions, Get-ScubaGearServicePrincipalRole, Get-ScubaGearResourceAppId, Get-ScubaGearProductRecord
+function Get-ScubaGearEndpointRest {
+    <#
+    .SYNOPSIS
+        Lists the REST API hosts that ScubaGear connects to, for building firewall or proxy allow lists.
+
+    .DESCRIPTION
+        Returns the service hosts ScubaGear calls to assess the selected products in the selected
+        Microsoft 365 environment: Microsoft Graph plus each product's admin API. The list is read
+        from ScubaGearApiCatalog.json, so it reflects the version of ScubaGear that is installed.
+
+        Sign-in (Entra ID) hosts and hosts used only to install or update ScubaGear are not included.
+        All connections use HTTPS on port 443.
+
+        SharePoint admin hosts include the tenant name. Pass -Domain to get the real host name;
+        otherwise the host is shown with a <tenant> placeholder.
+
+    .PARAMETER ProductNames
+        The products to include. Accepts the same values as Invoke-SCuBA. 'defender' is treated as
+        'securitysuite', and '*' (the default) selects every product ScubaGear tests.
+
+    .PARAMETER M365Environment
+        The Microsoft 365 environment: 'commercial' (default), 'gcc', 'gcchigh' or 'dod'.
+
+    .PARAMETER Domain
+        The tenant name used in SharePoint admin host names, for example 'contoso' for contoso.onmicrosoft.com.
+
+    .PARAMETER Format
+        'Object' (default) returns one object per host and product. 'Hosts' returns the unique host names,
+        one per line. 'Csv', 'Json' and 'Markdown' return text that can be pasted into a ticket or document.
+
+    .PARAMETER OutFile
+        Writes the output to this file as UTF-8 without a byte order mark. With -Format Object the file
+        contains the 'Hosts' format.
+
+    .PARAMETER Clipboard
+        Copies the output to the clipboard. With -Format Object the clipboard receives the 'Hosts' format.
+
+    .EXAMPLE
+        Get-ScubaGearEndpointRest
+
+        Lists the hosts for all products in a commercial tenant.
+
+    .EXAMPLE
+        Get-ScubaGearEndpointRest -ProductNames exo, teams -M365Environment gcchigh -Format Hosts
+
+    .EXAMPLE
+        Get-ScubaGearEndpointRest -M365Environment gcc -Domain contoso -Format Markdown -OutFile .\scubagear-hosts.md
+
+    .FUNCTIONALITY
+        Public
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject], [string])]
+    param(
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('teams', 'exo', 'defender', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
+        [string[]]$ProductNames = '*',
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$M365Environment = 'commercial',
+
+        [Parameter(Mandatory = $false)]
+        [ValidatePattern('^[A-Za-z0-9-]+$')]
+        [string]$Domain,
+
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Object', 'Hosts', 'Csv', 'Json', 'Markdown')]
+        [string]$Format = 'Object',
+
+        [Parameter(Mandatory = $false)]
+        [string]$OutFile,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Clipboard
+    )
+
+    $AllProducts = 'aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi'
+    $Products = if ($ProductNames -contains '*') { $AllProducts } else { $ProductNames -replace '^defender$', 'securitysuite' }
+    $Products = @($Products | Sort-Object -Unique)
+
+    # Teams also reads its tenant settings from the unified settings host, which the catalog lists as its own product.
+    $CatalogProducts = @($Products | ForEach-Object { $_; if ($_ -eq 'teams') { 'teamsunified' } })
+
+    $Catalog = @(Get-ScubaGearCatalog)
+
+    # Every product's data comes from Microsoft Graph, so its host is needed whenever the catalog
+    # has Graph resources for a selected product in this environment.
+    $UsesGraph = [bool]($Catalog | Where-Object {
+            $Item = $_
+            $Item.entryType -eq 'graphResource' -and
+            $Item.supportedEnv -contains $M365Environment -and
+            ($Products | Where-Object { $Item.scubaGearProduct -contains $_ })
+        })
+
+    $Inventory = foreach ($Entry in $Catalog) {
+        if ($Entry.entryType -notin 'graphConnect', 'restBase' -or $Entry.supportedEnv -notcontains $M365Environment) { continue }
+
+        $EntryProducts = @($CatalogProducts | Where-Object { $Entry.scubaGearProduct -contains $_ })
+        if ($Entry.entryType -eq 'graphConnect') {
+            if (-not $UsesGraph) { continue }
+            $Label = 'Microsoft Graph'
+            $EntryProducts = $Products
+        }
+        elseif ($EntryProducts.Count -eq 0) { continue }
+        else {
+            # Purpose is the API named in the catalog note, e.g. "SharePoint Admin API".
+            $Sentence = (([string]$Entry.notes) -split '(?<=\.)\s', 2)[0].Trim()
+            $Label = if ($Sentence -match 'calls to the (.+?)\.?$') { $Matches[1] } else { $Sentence }
+            # The unified settings host is listed under its own catalog product but belongs to Teams.
+            $EntryProducts = @($EntryProducts -replace '^teamsunified$', 'teams')
+        }
+
+        $Placeholder = $Entry.endpointPath -match '\{domain\}'
+        $BaseUrl = $Entry.endpointPath -replace '\{domain\}', $(if ($Domain) { $Domain } else { '<tenant>' })
+        $HostName = ($BaseUrl -replace '^https?://', '') -replace '/.*$', ''
+
+        [PSCustomObject]@{
+            Host        = $HostName
+            Port        = 443
+            BaseUrl     = $BaseUrl
+            Products    = ($EntryProducts | Sort-Object -Unique) -join ', '
+            Environment = $M365Environment
+            Purpose     = $Label
+            Note        = $(if ($Placeholder -and -not $Domain) { 'Replace <tenant> with your tenant name, or pass -Domain.' } else { '' })
+        }
+    }
+    $Inventory = @($Inventory | Sort-Object -Property Host, Products -Unique)
+
+    $TextFormat = if ($Format -eq 'Object') { 'Hosts' } else { $Format }
+    $Text = switch ($TextFormat) {
+        'Hosts' { (@($Inventory.Host | Sort-Object -Unique)) -join [Environment]::NewLine }
+        'Csv' { ($Inventory | ConvertTo-Csv -NoTypeInformation) -join [Environment]::NewLine }
+        'Json' { ConvertTo-Json -InputObject @($Inventory) }
+        'Markdown' {
+            $Escape = { param($Value) ([string]$Value) -replace '\|', '\|' }
+            $Lines = @('| Host | Port | Products | Purpose | Note |', '| --- | --- | --- | --- | --- |')
+            $Lines += foreach ($Row in $Inventory) {
+                "| $(& $Escape $Row.Host) | $($Row.Port) | $(& $Escape $Row.Products) | $(& $Escape $Row.Purpose) | $(& $Escape $Row.Note) |"
+            }
+            $Lines -join [Environment]::NewLine
+        }
+    }
+
+    if ($OutFile) {
+        $Path = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutFile)
+        [System.IO.File]::WriteAllText($Path, $Text + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
+    }
+    if ($Clipboard) {
+        if (Get-Command -Name Set-Clipboard -ErrorAction SilentlyContinue) { Set-Clipboard -Value $Text }
+        else { Write-Warning 'Set-Clipboard is not available on this system; the clipboard was not changed.' }
+    }
+
+    if ($Format -eq 'Object') { return $Inventory }
+    return $Text
+}
+
+Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions, Get-ScubaGearServicePrincipalRole, Get-ScubaGearResourceAppId, Get-ScubaGearProductRecord, Get-ScubaGearEndpointRest
