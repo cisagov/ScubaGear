@@ -136,6 +136,44 @@ function Add-Annotation {
     $Details
 }
 
+function Write-AadNearMissMessages {
+
+    <#
+    .Description
+    Writes PowerShell information messages for AAD conditional access
+    policy near misses returned by Rego.
+
+    .Functionality
+    Internal
+    #>
+
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNull()]
+        [object]$Test
+    )
+
+    if ($null -eq $Test.NearMisses) {
+        return
+    }
+
+    foreach ($NearMiss in @($Test.NearMisses)) {
+
+        if ($null -eq $NearMiss) {
+            continue
+        }
+
+        $MissingExclusions = $NearMiss.MissingExclusionTypes -join ", "
+
+        Write-Information (
+            "AAD policy near miss for $($Test.PolicyId): " +
+            "'$($NearMiss.PolicyName)' would pass if the config file is updated " +
+            "to include: $MissingExclusions"
+        ) -InformationAction Continue
+    }
+}
+
 function New-Report {
      <#
     .Description
@@ -266,7 +304,11 @@ function New-Report {
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
                 
-                $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
+                if ($BaselineName -eq "aad") {
+                    Write-AadNearMissMessages -Test $Test
+                }
+
+                $Result = Get-RegoResult $Test $MissingCommands $Control
 
                 $Config = $SettingsExport.scuba_config
 
