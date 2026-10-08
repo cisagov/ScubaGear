@@ -1,68 +1,94 @@
-# Setup an AAD app to Run the Functional Test Orchestrator with a Service Principal
+# Setup an AAD app to Run the Scuba Functional Test Orchestrator with a Service Principal
 
-This section describes how to setup an AAD application in the tenant when you want to run the test orchestrator using a **service principal (non interactive login)**. Setup for user interactive login is documented in a separate section.
+This document describes how to setup an Entra registered application identity to run the Scuba Functional Tests GitHub action using a **service principal (non interactive login)**. We refer to this identity as the functional test orchestrator.
 
-Go to Azure AD > App Registrations and click New registration
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/ad9f7a2b-587b-4c06-b08a-8075e68c7df4)
+## Multi-tenant application architecture across the test tenants
 
-Enter the name "Scuba Functional Test Orchestrator"
-Under Who can use this application or API select Single tenant
-Click Register
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/835d9eff-911b-4f3c-beda-ca0c65286ead)
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/cbd602c0-998e-435a-b621-621aee0a9aff)
+The functional test orchestrator is designed as a multi-tenant app to reduce administrative configuration overhead across the test tenants. It is easier to manage a central identity instead of re-creating one for each tenant. A common app named Scuba **Multitenant** Functional Test Orchestrator is created in the G5 tenant and used to authenticate the functional tests in the G5, E5 and G3 test tenants. All three of these tenants use the same cloud identity endpoint (login.microsoft.com) and can share an app. The GCC high tenant must use its own app (named Scuba Functional Test Orchestrator) since it is in a separate cloud identity endpoint (login.microsoftonline.us).
 
-Click on the API permissions page
-Click Add a permission then select Microsoft Graph in the popup page. Note some of the permissions are not Graph so pay attention to special instructions below for those.
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/2640bf0b-4ebb-48a2-9f46-29f942f648fd)
+![image](./images/scuba_test_orchestrator_app_registrations.png)
 
-Select Application permissions and then add all of the required permissions in the list below which are required for AAD. Once you have selected all of the permissions, click the Add permissions button.
+## Creating and configuring the registered apps in Entra
 
-## Microsoft Graph API permissions
+These instructions describe the steps to create a new App Registration in Entra that will represent the identity used to authenticate the functional test orchestrator.
 
-- Directory.Read.All
-- Policy.Read.All
-- PrivilegedEligibilitySchedule.Read.AzureADGroup
-- RoleManagement.Read.Directory
-- RoleManagementPolicy.Read.AzureADGroup
-- User.Read.All
+1. Perform the app registration in this section steps to create a multi-tenant app named "Scuba **Multitenant** Functional Test Orchestrator" in the G5 tenant
+2. For the GCC high tenant you will repeat the steps but create a regular app named "Scuba Functional Test Orchestrator"
 
-## Office 365 Exchange Online API permissions (select from APIs my organization users)
+Go to Entra > App Registrations and click New registration.
+Enter the app name as described at the beginning of this section.
+Under Supported account types select Multiple Entra ID tenants and then Allow only certain tenants.
+Click on the Manage allowed tenants hyperlink and then enter the tenant identifiers for the E5 and G3 tenants.
+Click Register.
 
-- Exchange.ManageAsApp (so the application can run cmdlets in Exchange Online)
+*For the GCC High app you will select Single tenant only as the application type.
 
-## Sharepoint API permissions (select from Microsoft APIs)
+![image](./images/register-app-1.png)
 
-- Sites.FullControl.All (so the application can update Sharepoint settings)
+Once the properties page opens for the new app, click on Manage > Authentication.
+Click Add Redirect URI and select Web, then enter the value "https://localhost" for the redirect URI
 
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/998d4549-d31f-49a0-8d39-e75858dc8ae8)
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/8ead310d-4d66-4bab-a476-72e373c73cd1)
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/d51ccbc5-4c76-4989-9708-2a7b058e2244)
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/e4d2a461-6486-4666-970f-c94a24a5717d)
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/d6246581-483b-4cfb-8def-cdbc42589e36)
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/6d6081d3-b1a9-4d5b-abb1-41fa8ecc4005)
+![image](./images/register-app-2.png)
 
-Click the Grant admin consent button on the API permissions page and click Yes in the popup
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/f5bcf13d-1cc4-4fa6-8750-1d7059f0ec6b)
+Click on Manage > API permissions.
+Add the permissions needed for the following resources: Microsoft Graph, Office 365 Exchange Online, and SharePoint.
+Refer to the [ScubaGear non-interactive authentication permissions page](https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/noninteractive.md) for a list of permissions that must be added. Make sure to add the permissions as Application permissions, not Delegated.
+Once the permissions have been added, make sure to click on Grant admin consent at the top of the permissions page.
 
-The permissions page should now show that admin consent was granted for each of the permissions
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/6065fcba-f3c3-4a37-944f-f19c4c7e0e7a)
+![image](./images/register-app-3.png)
 
-## Assigning user roles to the Scuba Functional Test Orchestrator application
+## Authorizing the multi-tenant app in the E5 and G3 tenants
 
-Some of the products also need an AAD user role assigned to the application in order for it to be able to update the tenant settings when executing the functional tests.
+In this section you are in effect "installing" the multi tenant app so that it can be used inside the E5 and G3 tenants.
 
-## Assign the following user roles to the "Scuba Functional Test Orchestrator" application using the AAD role assignments page.  Note that these should be active assignments in tenants that include PIM
+Copy the hyperlink below into a text editor and replace the following variables with the correct values from your environment:
+- {tenant-id} Is the tenant identifier of the target tenant where the multi-tenant app is being installed.
+- {client-id} Is the Application (client) ID of the multi-tenant app from the home tenant's registered app configuration page.
 
-- Exchange Administrator (for EXO and most of the Defender cmdlets except for the compliance ones)
-- Compliance Data Administrator (for Defender since it uses Purview compliance center cmdlets such as Set-DlpCompliancePolicy, Set-DlpComplianceRule, Set-ProtectionAlert)
+Make sure to paste the hyperlink into a browser that is already authenticated to the target tenant to make the experience smoother. You will need to consent to the permissions when the popup page occurs.
+
+https://login.microsoftonline.com/{tenant-id}/v2.0/adminconsent?client_id={client-id}&scope=https://graph.microsoft.com/.default&redirect_uri=https://localhost
+
+![image](./images/register-app-6.png)
+
+This will create an "Enterprise Application" in the target tenant.
+
+![image](./images/register-app-7.png)
+
+
+> [!IMPORTANT]
+> Repeat the same instructions in each of the sections below against each tenant.
+
+## Assign the necessary Entra user roles to the test orchestrator
+
+When a multi-tenant app is authorized (installed) in a tenant, the app will inherit the API permissions defined in the home tenant's application manifest (which we configured in the steps above). However the app needs some Entra roles in the target tenant that are required to A) execute ScubaGear and B) modify the tenant during the functional tests.
+
+Go to the Entra Roles and Administrators page for each of the roles listed below and assign the service principal associated with the registered app we created earlier.
+
+- Global Reader
 - Teams Administrator
 
-Here is an example screenshot that shows the service principal assigned to the Exchange Administrator role
+![image](./images/register-app-4.png)
 
-![image](https://github.com/cisagov/ScubaGear/assets/107076927/6b90524a-0888-4201-80b1-0216bec5a503)
+## PowerPlatform API configuration
 
-To complete the setup for PowerPlatform you must also execute the code below to register the service principal with Power Platform:
+Follow [the steps at this page](https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/noninteractive.md#power-platform-registration) to configure PowerPlatform for the functional test orchestrator.
 
-``` PowerShell
-Add-PowerAppsAccount -Endpoint prod -TenantID $tenantId # use -Endpoint usgov for gcc tenants
-New-PowerAppManagementApp -ApplicationId $appId
+## Power BI API configuration
+
+Follow [the steps at this page](https://github.com/cisagov/ScubaGear/blob/main/docs/prerequisites/noninteractive.md#power-bi-tenant-setting) to configure Power BI for the functional test orchestrator.
+
+To create consistent configurations that are easy to manage across tenants follow these guidelines when setting up the functional test orchestrator to work with Power BI.
+
+1. Create a security group with the standard name "Power BI Service Principals". This will be the security group assigned in the Power BI admin page described in the instructions.
+2. Put the functional test orchestrator service principal in the security group.
+
+## Power BI Extra configuration for E5 tenant
+
+The Power BI functional tests modify the tenant in E5, therefore an addition permission configuration is needed. 
+
+1. On the Power BI admin page, navigate to the configuration named "Service principals can access admin APIs used for updates".
+2. Enable the setting, select Specific security groups and then enter the name "Power BI Service Principals".
+3. Click Apply.
+
+![image](./images/register-app-5.png)
