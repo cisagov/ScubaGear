@@ -911,11 +911,12 @@ function Invoke-ScubaRestMethod {
         Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
 
     .PARAMETER MaxRetries
-        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries; max: 100).
+        Number of retry attempts on HTTP 408/429/500/502/503/504 responses and transient connection
+        errors (default: 0, i.e. no retries; max: 100).
 
     .PARAMETER RetryDelaySeconds
         Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
-        header, and doubled after each successive 500/503 retry (default: 5). Any single sleep,
+        header, and doubled after each successive 408/5xx retry (default: 5). Any single sleep,
         including a server-supplied Retry-After, is capped at 3600 seconds.
 
     .EXAMPLE
@@ -1042,7 +1043,7 @@ function Invoke-ScubaRestMethod {
                 continue
             }
 
-            if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
+            if (-not $IsLastAttempt -and $StatusCode -in @(408, 500, 502, 503, 504)) {
                 $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $Delay

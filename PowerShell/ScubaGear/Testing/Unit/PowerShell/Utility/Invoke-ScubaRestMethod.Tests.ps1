@@ -115,7 +115,29 @@ InModuleScope Utility {
             }
         }
 
-        Context '500/503 retry behavior' {
+        Context '408/5xx retry behavior' {
+            It 'Retries on HTTP <StatusCode> and succeeds once the error clears' -TestCases @(
+                @{ StatusCode = 408 }, @{ StatusCode = 500 }, @{ StatusCode = 502 }, @{ StatusCode = 503 }, @{ StatusCode = 504 }
+            ) {
+                param($StatusCode)
+                $script:CallCount = 0
+                $script:FailStatus = $StatusCode
+                Mock -ModuleName Utility Start-Sleep { }
+                Mock -ModuleName Utility Invoke-RestMethod {
+                    $script:CallCount++
+                    if ($script:CallCount -eq 1) {
+                        throw (New-FakeRestException -StatusCode $script:FailStatus)
+                    }
+                    return [pscustomobject]@{ result = 'ok' }
+                }
+                $Result = Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                    -MaxRetries 2 -RetryDelaySeconds 1 -WarningAction SilentlyContinue
+                $Result.result | Should -Be 'ok'
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
+                Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly
+            }
+
+
             It 'Retries on 503 with backoff and eventually throws after exhausting retries' {
                 Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 503) }
                 Mock -ModuleName Utility Start-Sleep { }
