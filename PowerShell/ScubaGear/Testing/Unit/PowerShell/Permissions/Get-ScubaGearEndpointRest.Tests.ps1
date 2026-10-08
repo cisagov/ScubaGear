@@ -138,7 +138,9 @@ Describe -Tag 'PermissionsHelper' -Name 'Get-ScubaGearEndpointRest' {
 
         It 'Json parses to one entry per object' {
             $Rows = @(Get-ScubaGearEndpointRest -Domain contoso)
-            @(Get-ScubaGearEndpointRest -Domain contoso -Format Json | ConvertFrom-Json).Count | Should -Be $Rows.Count
+            # Assign first: Windows PowerShell 5.1 sends the parsed array down a pipeline as a single item.
+            $Parsed = Get-ScubaGearEndpointRest -Domain contoso -Format Json | ConvertFrom-Json
+            @($Parsed).Count | Should -Be $Rows.Count
         }
 
         It 'Json is still an array when only one host matches' {
@@ -179,7 +181,9 @@ Describe -Tag 'PermissionsHelper' -Name 'Get-ScubaGearEndpointRest' {
     Context 'Stays in step with the catalog and the module manifest' {
         It 'lists every graphConnect and restBase host in the catalog for some product and environment' {
             $CatalogFile = Join-Path -Path $PSScriptRoot -ChildPath '../../../../schemas/ScubaGearApiCatalog.json'
-            $FromCatalog = Get-Content -Path $CatalogFile -Raw | ConvertFrom-Json |
+            # Assign first: Windows PowerShell 5.1 sends the parsed array down a pipeline as a single item.
+            $CatalogEntries = Get-Content -Path $CatalogFile -Raw | ConvertFrom-Json
+            $FromCatalog = @($CatalogEntries) |
                 Where-Object { $_.entryType -in 'graphConnect', 'restBase' } |
                 ForEach-Object { ($_.endpointPath -replace '\{domain\}', 'contoso' -replace '^https?://', '') -replace '/.*$', '' } |
                 Sort-Object -Unique
