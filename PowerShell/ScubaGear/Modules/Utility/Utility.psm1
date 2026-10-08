@@ -997,7 +997,7 @@ function Invoke-ScubaRestMethod {
         [hashtable]$AdditionalHeaders = $null,
 
         [Parameter(Mandatory = $false)]
-        [ValidateRange(0, [int]::MaxValue)]
+        [ValidateRange(0, 300)]
         [int]$TimeoutSec = 0,
 
         [Parameter(Mandatory = $false)]
