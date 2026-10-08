@@ -229,4 +229,97 @@ InModuleScope Utility {
             }
         }
     }
+
+    $TenantId = '11111111-2222-3333-4444-555555555555'
+
+    $restApiCases = @(
+        @{ Function = 'Get-SPOTenantRest'; Product = 'sharepoint'; Method = 'GET'; Path = '/_api/SPO.Tenant' },
+        @{ Function = 'Get-PowerPlatformTenantSettingsRest'; Product = 'powerplatform'; Method = 'POST'; Path = '/providers/Microsoft.BusinessAppPlatform/listTenantSettings?api-version=2023-06-01' },
+        @{ Function = 'Get-PowerPlatformEnvironmentsRest'; Product = 'powerplatform'; Method = 'GET'; Path = '/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments?api-version=2023-06-01' },
+        @{ Function = 'Get-PowerPlatformDlpPoliciesRest'; Product = 'powerplatform'; Method = 'GET'; Path = '/providers/Microsoft.BusinessAppPlatform/scopes/admin/apiPolicies?api-version=2016-11-01' },
+        @{ Function = 'Get-PowerPlatformTenantIsolationRest'; Product = 'powerplatform'; Method = 'GET'; Path = "/providers/PowerPlatform.Governance/v1/tenants/$TenantId/tenantIsolationPolicy?api-version=2020-06-01" },
+        @{ Function = 'Get-TeamsMeetingPolicyRest'; Product = 'teams'; Method = 'GET'; Path = '/Skype.Policy/configurations/TeamsMeetingPolicy' },
+        @{ Function = 'Get-TeamsTenantFederationConfigurationRest'; Product = 'teams'; Method = 'GET'; Path = '/Skype.Policy/configurations/TenantFederationSettings' },
+        @{ Function = 'Get-TeamsClientConfigurationRest'; Product = 'teams'; Method = 'GET'; Path = '/Skype.Policy/configurations/TeamsClientConfiguration' },
+        @{ Function = 'Get-TeamsAppPermissionPolicyRest'; Product = 'teams'; Method = 'GET'; Path = '/Skype.Policy/configurations/TeamsAppPermissionPolicy' },
+        @{ Function = 'Get-TeamsMeetingBroadcastPolicyRest'; Product = 'teams'; Method = 'GET'; Path = '/Skype.Policy/configurations/TeamsMeetingBroadcastPolicy' },
+        @{ Function = 'Get-TeamsM365UnifiedTenantSettingsRest'; Product = 'teamsunified'; Method = 'GET'; Path = '/AdminAppCatalog/ps/v2/admin/unifiedApp/settings' },
+        @{ Function = 'Get-PowerBITenantSettingsRest'; Product = 'powerbi'; Method = 'GET'; Path = '/v1/admin/tenantsettings' },
+        # EXO and Security & Compliance post to the default (non-redirected) InvokeCommand endpoint.
+        @{ Function = 'Invoke-EXORestMethod'; Product = 'exo'; Method = 'POST'; Path = "/adminapi/beta/$TenantId/InvokeCommand" },
+        @{ Function = 'Invoke-EXORestMethod'; Product = 'securitysuite'; Method = 'POST'; Path = "/adminapi/beta/$TenantId/InvokeCommand" }
+    )
+
+    # SharePoint URLs use 'contoso' for the {domain} placeholder.
+    $serviceBaseUrls = @{
+        sharepoint    = [ordered]@{ commercial = 'https://contoso-admin.sharepoint.com'; gcc = 'https://contoso-admin.sharepoint.com'; gcchigh = 'https://contoso-admin.sharepoint.us'; dod = 'https://contoso-admin.sharepoint-mil.us' }
+        powerplatform = [ordered]@{ commercial = 'https://api.bap.microsoft.com'; gcc = 'https://gov.api.bap.microsoft.us'; gcchigh = 'https://high.api.bap.microsoft.us'; dod = 'https://api.appsplatform.us' }
+        teams         = [ordered]@{ commercial = 'https://api.interfaces.records.teams.microsoft.com'; gcc = 'https://api.interfaces.records.teams.microsoft.com'; gcchigh = 'https://api.interfaces.records.gov.teams.microsoft.us'; dod = 'https://api.interfaces.records.gov.teams.microsoft.us' }
+        teamsunified  = [ordered]@{ commercial = 'https://substrate.office.com'; gcc = 'https://substrate.office.com' }
+        powerbi       = [ordered]@{ commercial = 'https://api.powerbi.com'; gcc = 'https://api.powerbigov.us'; gcchigh = 'https://api.high.powerbigov.us'; dod = 'https://api.mil.powerbigov.us' }
+        exo           = [ordered]@{ commercial = 'https://outlook.office365.com'; gcc = 'https://outlook.office365.com'; gcchigh = 'https://outlook.office365.us'; dod = 'https://outlook-dod.office365.us' }
+        securitysuite = [ordered]@{ commercial = 'https://ps.compliance.protection.outlook.com'; gcc = 'https://ps.compliance.protection.outlook.com'; gcchigh = 'https://ps.compliance.protection.office365.us'; dod = 'https://ps.compliance.protection.office365.us' }
+    }
+
+    # Build a case for each API in every environment its product supports
+    $combinedRestCases = [System.Collections.ArrayList]::new()
+    foreach ($testCase in $restApiCases) {
+        foreach ($env in $serviceBaseUrls[$testCase.Product].GetEnumerator()) {
+            $null = $combinedRestCases.Add(@{
+                EnvName        = $env.Key
+                Function       = $testCase.Function
+                Product        = $testCase.Product
+                ExpectedMethod = $testCase.Method
+                ExpectedUri    = "$($env.Value)$($testCase.Path)"
+                TenantId       = $TenantId
+            })
+        }
+    }
+
+    $coverageCase = @{ Covered = @($combinedRestCases | ForEach-Object { "$($_.Function)|$($_.EnvName)" }) }
+
+    Describe -Tag 'Utility' -Name 'Invoke-ScubaRestMethod API endpoints' {
+        BeforeAll {
+            $HelperPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Providers/ProviderHelpers'
+            foreach ($Helper in 'SPORestHelper', 'PowerPlatformRestHelper', 'TeamsRestHelper', 'PowerBIRestHelper', 'EXORestHelper') {
+                Import-Module (Join-Path -Path $HelperPath -ChildPath "$Helper.psm1") -Force
+            }
+            Mock -ModuleName Utility Invoke-RestMethod { return [pscustomobject]@{ value = @(); d = [pscustomobject]@{} } }
+        }
+
+        # Tests that each REST helper sends the expected URL and method. The base URL and path come from ScubaGearApiCatalog.json.
+        It 'calls <ExpectedUri> with <ExpectedMethod> for <Function> in <EnvName>' -TestCases $combinedRestCases {
+            param($EnvName, $Function, $Product, $ExpectedMethod, $ExpectedUri, $TenantId)
+
+            $BaseUrl = Get-ScubaGearServiceEndpoint -Product $Product -Environment $EnvName -Domain 'contoso'
+            $Params = @{ AccessToken = 'tok' }
+            switch ($Function) {
+                'Get-SPOTenantRest' { $Params.AdminUrl = $BaseUrl }
+                'Get-PowerPlatformTenantIsolationRest' { $Params.BaseUrl = $BaseUrl; $Params.TenantId = $TenantId }
+                'Invoke-EXORestMethod' { $Params.ApiEndpoint = "$BaseUrl/adminapi/beta/$TenantId/InvokeCommand"; $Params.CmdletName = 'Get-OrganizationConfig' }
+                default { $Params.BaseUrl = $BaseUrl }
+            }
+
+            $null = & $Function @Params
+
+            Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 1 -Exactly -ParameterFilter {
+                $Uri -eq $ExpectedUri -and $Method -eq $ExpectedMethod -and $Headers['Authorization'] -eq 'Bearer tok'
+            }
+        }
+
+        It 'covers every REST helper in the catalog for each supported environment' -TestCases @($coverageCase) {
+            param($Covered)
+
+            $Missing = Get-ScubaGearCatalog | Where-Object { $_.entryType -eq 'restHelper' } | ForEach-Object {
+                $Entry = $_
+                $Entry.supportedEnv | ForEach-Object { "$($Entry.functionName)|$_" }
+            } | Where-Object { $_ -notin $Covered }
+
+            $Missing | Should -BeNullOrEmpty -Because 'each REST helper and environment in the catalog should have an expected URL above'
+        }
+    }
+}
+
+AfterAll {
+    Remove-Module SPORestHelper, PowerPlatformRestHelper, TeamsRestHelper, PowerBIRestHelper, EXORestHelper -Force -ErrorAction SilentlyContinue
 }
