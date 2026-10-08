@@ -1026,7 +1026,14 @@ function Invoke-ScubaRestMethod {
 
     for ($Attempt = 1; $Attempt -le ($MaxRetries + 1); $Attempt++) {
         try {
-            return Invoke-RestMethod @Params
+            $Response = Invoke-RestMethod @Params
+            # Some services (e.g. the Teams admin API) send gzip bodies that Invoke-RestMethod does not
+            # decompress, yielding the compressed bytes as a string that starts with the 0x1F magic byte.
+            if ($Response -is [string] -and $Response.Length -gt 0 -and $Response[0] -eq [char]0x1F) {
+                Write-Verbose "Response from '$Uri' was not decompressed; re-reading it as gzip."
+                $Response = Read-ScubaCompressedRestResponse -RequestParams $Params
+            }
+            return $Response
         }
         # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
         catch {
@@ -1068,6 +1075,60 @@ function Invoke-ScubaRestMethod {
             Write-Information $DetailedHttpMessage -InformationAction Continue
             throw
         }
+    }
+}
+
+function Read-ScubaCompressedRestResponse {
+    <#
+    .SYNOPSIS
+        Re-issues a REST request with Invoke-WebRequest and returns the gzip-decompressed body,
+        parsed as JSON when possible.
+
+    .DESCRIPTION
+        Used by Invoke-ScubaRestMethod when Invoke-RestMethod returns a gzip body as an undecoded
+        string. The string form cannot be decompressed because text decoding has already corrupted
+        the bytes, so the request is repeated and the raw bytes are read from RawContentStream.
+
+    .PARAMETER RequestParams
+        The Invoke-RestMethod parameter hashtable (Uri, Method, Headers, Body, TimeoutSec, ...).
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$RequestParams
+    )
+
+    $WebParams = $RequestParams.Clone()
+    $WebParams.UseBasicParsing = $true
+    $WebResponse = Invoke-WebRequest @WebParams
+    $Bytes = $WebResponse.RawContentStream.ToArray()
+
+    if ($Bytes.Length -ge 2 -and $Bytes[0] -eq 0x1F -and $Bytes[1] -eq 0x8B) {
+        $GzipStream = [System.IO.Compression.GZipStream]::new(
+            [System.IO.MemoryStream]::new($Bytes), [System.IO.Compression.CompressionMode]::Decompress)
+        $Reader = [System.IO.StreamReader]::new($GzipStream, [System.Text.Encoding]::UTF8)
+        try {
+            $Text = $Reader.ReadToEnd()
+        }
+        finally {
+            $Reader.Dispose()
+        }
+    }
+    else {
+        $Text = [System.Text.Encoding]::UTF8.GetString($Bytes)
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Text)) {
+        return $Text
+    }
+    try {
+        return ($Text | ConvertFrom-Json -ErrorAction Stop)
+    }
+    catch {
+        return $Text
     }
 }
 

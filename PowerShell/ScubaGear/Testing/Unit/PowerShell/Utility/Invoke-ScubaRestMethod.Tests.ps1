@@ -150,6 +150,41 @@ InModuleScope Utility {
             }
         }
 
+        Context 'Undecoded gzip response fallback' {
+            BeforeAll {
+                function New-GzipBytes {
+                    param([string]$Text)
+                    $Output = [System.IO.MemoryStream]::new()
+                    $Gzip = [System.IO.Compression.GZipStream]::new($Output, [System.IO.Compression.CompressionMode]::Compress)
+                    $Payload = [System.Text.Encoding]::UTF8.GetBytes($Text)
+                    $Gzip.Write($Payload, 0, $Payload.Length)
+                    $Gzip.Dispose()
+                    return , $Output.ToArray()
+                }
+            }
+
+            It 'Re-reads and decompresses a gzip body that Invoke-RestMethod returned as a string' {
+                $script:GzipBytes = New-GzipBytes -Text '[{"Identity":"Global","AutoAdmittedUsers":"EveryoneInCompany"}]'
+                Mock -ModuleName Utility Invoke-RestMethod { return ([string][char]0x1F + [char]0xFFFD + 'garbled') }
+                Mock -ModuleName Utility Invoke-WebRequest {
+                    [pscustomobject]@{ RawContentStream = [System.IO.MemoryStream]::new($script:GzipBytes) }
+                }
+                $Result = @(Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x')
+                $Result[0].Identity | Should -Be 'Global'
+                $Result[0].AutoAdmittedUsers | Should -Be 'EveryoneInCompany'
+                Should -Invoke -ModuleName Utility Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
+                    $Uri -eq 'https://example.com/x' -and $Headers['Authorization'] -match 'tok'
+                }
+            }
+
+            It 'Does not re-issue the request for ordinary string responses' {
+                Mock -ModuleName Utility Invoke-RestMethod { return 'plain text' }
+                Mock -ModuleName Utility Invoke-WebRequest { throw 'should not be called' }
+                Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' | Should -Be 'plain text'
+                Should -Invoke -ModuleName Utility Invoke-WebRequest -Times 0 -Exactly
+            }
+        }
+
         Context 'Transient connection error retry behavior' {
             BeforeAll {
                 Add-Type -AssemblyName System.Net.Http -ErrorAction SilentlyContinue
