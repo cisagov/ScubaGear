@@ -379,6 +379,6 @@ ScubaAnalyzerDetails := sprintf(
     [ANALYZERURL]
 )
 
-NearMissAnalyzerDetails(near_misses) := ScubaAnalyzerDetails if {
-    count(near_misses) > 0
+NearMissAnalyzerDetails(near_miss_details) := ScubaAnalyzerDetails if {
+    near_miss_details != ""
 } else := ""
