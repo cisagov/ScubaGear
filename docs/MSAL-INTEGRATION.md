@@ -35,6 +35,8 @@ git worktree add ..\SCUBA2305-pre-msal 721e7e1e544c8ec507a0b0b9c02c73e73ff10550
 
 ScubaGear pins `Microsoft.Identity.Client` 4.89.0. The signed assemblies are not bundled in the repo; they are downloaded from NuGet on first use and cached under `~/.scubagear/MSAL/<version>/net462`, mirroring how the OPA executable is handled. Interactive authentication uses the system browser only (loopback redirect); the WAM broker and its native runtime are not used. Newer MSAL versions are advisory until signature and hash integrity validation passes.
 
+When the environment is omitted, interactive scans bootstrap with the first-party Microsoft Graph PowerShell client and MSAL multi-cloud support at the public `organizations` authority. The returned account cloud and tenant ID select the tenant metadata endpoint; `tenant_region_sub_scope` distinguishes GCC, GCC High, and DoD. Subsequent Graph requests use a tenant-specific authority and reuse the bootstrap token cache in memory. Both `Invoke-SCuBA` and provider-exporting `Invoke-SCuBACached` runs propagate the detected environment to product endpoints and reports. Explicit environment settings bypass interactive discovery. Unknown clouds, missing metadata, or conflicting cloud information are errors, not a commercial fallback.
+
 ## Migration status
 
 - [x] Lock the complete NuGet dependency closure.

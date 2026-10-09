@@ -43,6 +43,18 @@ InModuleScope ConnectHelpers {
                     $M365Environment -eq 'dod'
                 }
             }
+            It 'pins the discovered tenant and uses <GraphEndpoint> for <Environment>' -TestCases @(
+                @{ Environment = 'gcchigh'; GraphEndpoint = 'https://graph.microsoft.us' },
+                @{ Environment = 'dod'; GraphEndpoint = 'https://dod-graph.microsoft.us' }
+            ) {
+                param($Environment, $GraphEndpoint)
+                Connect-GraphHelper -M365Environment $Environment -TenantId '305102d0-7ccc-4007-83bb-ac1f44f8d620'
+                $Global:ScubaGearState.Session.GraphEndpoint | Should -Be $GraphEndpoint
+                $Global:ScubaGearState.Session.TokenParameters.Tenant | Should -Be '305102d0-7ccc-4007-83bb-ac1f44f8d620'
+                Should -Invoke Get-MsalAccessToken -Times 1 -Exactly -ParameterFilter {
+                    $Tenant -eq '305102d0-7ccc-4007-83bb-ac1f44f8d620'
+                }
+            }
         }
         context 'With Service Principal'{
             It 'Invoke with Service Principal parameters'{

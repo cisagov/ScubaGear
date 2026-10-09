@@ -27,7 +27,10 @@ function Connect-GraphHelper {
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
         [hashtable]
-        $ServicePrincipalParams
+        $ServicePrincipalParams,
+
+        [Parameter(Mandatory = $false)]
+        [string]$TenantId
     )
     if ($ServicePrincipalParams.CertThumbprintParams) {
         $TokenParameters = @{
@@ -44,7 +47,7 @@ function Connect-GraphHelper {
         $TokenParameters = @{
             Scope = if ($Scopes) { $Scopes } else { @('Organization.Read.All') }
             ClientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
-            Tenant = 'organizations'
+            Tenant = if ($TenantId) { $TenantId } else { 'organizations' }
         }
     }
 
@@ -649,6 +652,12 @@ function Get-MsalAccessToken {
         Acquires an OAuth2 access token via MSAL using certificate or interactive auth.
         Reuses cached MSAL app instances and attempts silent token acquisition before
         prompting interactively, minimizing the number of browser popups per session.
+    .PARAMETER MultiCloudSupport
+        Enables instance-aware discovery at the public common/organizations authority.
+        Only supported for first-party Microsoft clients registered with the same ID across clouds.
+    .PARAMETER PassThru
+        Returns the MSAL authentication result, including the selected tenant and account cloud,
+        instead of only the access token.
     .FUNCTIONALITY
         Internal
     #>
@@ -671,10 +680,20 @@ function Get-MsalAccessToken {
 
         [Parameter(Mandatory = $true)]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
-        [string]$M365Environment
+        [string]$M365Environment,
+
+        [Parameter(ParameterSetName = 'Interactive')]
+        [switch]$MultiCloudSupport,
+
+        [Parameter(ParameterSetName = 'Interactive')]
+        [switch]$PassThru
     )
 
     Initialize-Msal
+
+    if ($MultiCloudSupport -and ($Tenant -notin @('common', 'organizations') -or $M365Environment -ne 'commercial')) {
+        throw 'Multi-cloud discovery requires the public common or organizations authority.'
+    }
 
     $Authority = switch ($M365Environment) {
         { $_ -in @("commercial", "gcc") } { "https://login.microsoftonline.com/$Tenant" }
@@ -716,12 +735,24 @@ function Get-MsalAccessToken {
             }
             else {
                 $CacheKey = "PUB:$ClientId|$Authority"
+                if ($MultiCloudSupport) {
+                    $CacheKey += '|multicloud'
+                }
                 if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
                     # Loopback redirect + system browser (no WAM broker)
-                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+                    $NewMsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
                         WithAuthority($Authority).
                         WithRedirectUri('http://localhost').
+                        WithMultiCloudSupport($MultiCloudSupport.IsPresent).
                         Build()
+                    $DiscoveryCacheKey = "PUB:$ClientId|https://login.microsoftonline.com/organizations|multicloud"
+                    if (-not $MultiCloudSupport -and $Global:ScubaGearState.MsalAppCache.ContainsKey($DiscoveryCacheKey)) {
+                        # Keep the bootstrap cache in memory while pinning later requests to the discovered tenant/cloud.
+                        $DiscoveryApp = $Global:ScubaGearState.MsalAppCache[$DiscoveryCacheKey]
+                        $NewMsalApp.UserTokenCache.DeserializeMsalV3(
+                            $DiscoveryApp.UserTokenCache.SerializeMsalV3(), $true)
+                    }
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = $NewMsalApp
                 }
                 $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
 
@@ -730,8 +761,11 @@ function Get-MsalAccessToken {
                 try {
                     $Accounts = $MsalApp.GetAccountsAsync().GetAwaiter().GetResult()
                     if ($Accounts -and $Accounts.Count -gt 0) {
-                        $TokenResult = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $Accounts[0]).
-                            ExecuteAsync().GetAwaiter().GetResult()
+                        $SilentRequest = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $Accounts[0])
+                        if ($Tenant -notin @('common', 'organizations')) {
+                            $SilentRequest = $SilentRequest.WithTenantId($Tenant)
+                        }
+                        $TokenResult = $SilentRequest.ExecuteAsync().GetAwaiter().GetResult()
                     }
                 }
                 catch {
@@ -742,12 +776,18 @@ function Get-MsalAccessToken {
                 if (-not $TokenResult) {
                     # Embedded web view does not support WebAuthn/FIDO2/passkey ceremonies (no real browser
                     # context), so this must use the system (default OS) browser instead.
-                    $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
-                        WithUseEmbeddedWebView($false).
-                        ExecuteAsync().GetAwaiter().GetResult()
+                    $InteractiveRequest = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
+                        WithUseEmbeddedWebView($false)
+                    if ($Tenant -notin @('common', 'organizations')) {
+                        $InteractiveRequest = $InteractiveRequest.WithTenantId($Tenant)
+                    }
+                    $TokenResult = $InteractiveRequest.ExecuteAsync().GetAwaiter().GetResult()
                 }
             }
 
+            if ($PassThru) {
+                return $TokenResult
+            }
             return $TokenResult.AccessToken
         }
         catch {

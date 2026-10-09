@@ -36,12 +36,14 @@ function Invoke-SCuBA {
     Use '*' to run all baselines.
     .Parameter M365Environment
     This parameter is used to authenticate to the different commercial/government environments.
+    When omitted for interactive scans, the environment is detected during system-browser sign-in.
+    An explicitly supplied command-line or configuration-file value bypasses interactive detection.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
     - For M365 Government Community Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
     - For M365 Government Community Cloud High tenants enter the value **"gcchigh"**.
     - For M365 Department of Defense tenants enter the value **"dod"**.
-    Default value is 'commercial'.
+    The default configuration value is 'commercial'; interactive discovery replaces it when omitted.
     .Parameter OPAPath
     The folder location of the OPA Rego executable file.
     The OPA Rego executable embedded with this project is located in the project's root folder.
@@ -541,9 +543,9 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $false
         }
 
-        # If user supplied the $M365Environment parameter, let them know that it is no longer necessary
-        if ($PSBoundParameters.ContainsKey('M365Environment')) {
-            Write-Information "`nStarting in ScubaGear v2.0.0 the -M365Environment parameter is no longer necessary.`n" -InformationAction Continue
+        $AutoDetectEnvironment = -not $PSBoundParameters.ContainsKey('M365Environment')
+        if ($PSCmdlet.ParameterSetName -eq 'Configuration' -and [ScubaConfig]::GetInstance().M365EnvironmentProvided) {
+            $AutoDetectEnvironment = $false
         }
 
         # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
@@ -561,7 +563,7 @@ function Invoke-SCuBA {
             UsesServicePrincipal = (-not [string]::IsNullOrEmpty($ScubaConfig.AppID))
         }
 
-        $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig
+        $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig -AutoDetectEnvironment:$AutoDetectEnvironment
         # If Connect-Tenant automatically detected the M365Environment during interactive auth, change the ScubaConfig value to the detected value.
         if ($ConnectionResult.DetectedM365Environment) {
             $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
@@ -2267,7 +2269,9 @@ function Invoke-Connection {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScubaConfig
+        $ScubaConfig,
+
+        [switch]$AutoDetectEnvironment
     )
 
     $ConnectTenantParams = @{
@@ -2278,6 +2282,9 @@ function Invoke-Connection {
     if ($ScubaConfig.AppID) {
         $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
         $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
+    }
+    elseif ($AutoDetectEnvironment) {
+        $ConnectTenantParams.Remove('M365Environment')
     }
 
     $ConnectionResult = @{
@@ -2730,7 +2737,12 @@ function Invoke-SCuBACached {
                     UsesServicePrincipal = ($null -ne $TempScubaConfig.AppID)
                 }
 
-                $ConnectionResult = Invoke-Connection -ScubaConfig $TempScubaConfig
+                $ConnectionResult = Invoke-Connection -ScubaConfig $TempScubaConfig `
+                    -AutoDetectEnvironment:(-not $PSBoundParameters.ContainsKey('M365Environment'))
+                if ($ConnectionResult.DetectedM365Environment) {
+                    $TempScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
+                    $M365Environment = $ConnectionResult.DetectedM365Environment
+                }
                 $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
                 if ($ProdAuthFailed.Count -gt 0) {
                     Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "ScubaCached" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}

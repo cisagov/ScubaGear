@@ -4,11 +4,20 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $OrchestratorPath) -Func
 InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-SCuBACached' {
         BeforeAll {
-            function Invoke-Connection {}
+            function Invoke-Connection {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($ScubaConfig, $AutoDetectEnvironment)
+            }
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
-            function Get-TenantDetail {}
+            function Get-TenantDetail {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($M365Environment)
+            }
             Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
-            function Invoke-ProviderList {}
+            function Invoke-ProviderList {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($ScubaConfig, $TenantDetails, $ModuleVersion, $OutFolderPath, $Guid, $ConnectionResult)
+            }
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
             function Invoke-RunRego {}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
@@ -48,6 +57,33 @@ InModuleScope Orchestrator {
         Context 'When checking module version' {
             It 'Given -Version should not throw' {
                 {Invoke-SCuBACached -Version -SilenceBODWarnings} | Should -Not -Throw
+            }
+        }
+
+        Context 'Interactive environment discovery' {
+            BeforeEach {
+                Mock Repair-ScubaGearJson {
+                    @{
+                        JsonObject = @{
+                            report_uuid = '00000000-0000-0000-0000-000000000000'
+                            Raw = @{ report_uuid = '00000000-0000-0000-0000-000000000000' }
+                        }
+                        RepairedJson = $false
+                    }
+                }
+            }
+
+            It 'propagates the detected cloud before exporting provider data' {
+                Mock Invoke-Connection { @{ DetectedM365Environment = 'dod'; ProdAuthFailed = @() } }
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { $AutoDetectEnvironment }
+                Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'dod' }
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'dod' }
+            }
+
+            It 'bypasses discovery when an environment is explicitly provided' {
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -M365Environment gcc -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { -not $AutoDetectEnvironment }
             }
         }
 

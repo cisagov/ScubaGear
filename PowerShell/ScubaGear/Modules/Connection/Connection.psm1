@@ -21,7 +21,7 @@ function Connect-Tenant {
 
    [Parameter(ParameterSetName = 'Auto')]
    [Parameter(ParameterSetName = 'Manual')]
-   [Parameter(Mandatory = $true)]
+   [Parameter(Mandatory = $false)]
    [ValidateNotNullOrEmpty()]
    [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
    [string]
@@ -54,6 +54,22 @@ function Connect-Tenant {
 
    # Clear prior session so consecutive Invoke-SCuBA calls don't leak tokens across tenants
    Disconnect-ScubaGraph
+
+   $DetectedM365Environment = $null
+   if (-not $PSBoundParameters.ContainsKey('M365Environment')) {
+       if ($ServicePrincipalParams.CertThumbprintParams) {
+           $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ServicePrincipalParams.CertThumbprintParams.Organization
+       }
+       else {
+           $GraphScopes = if ($ProductNames -contains 'aad') { Get-ScubaGearEntraMinimumPermissions } else { @('Organization.Read.All') }
+           $Discovery = Get-ScubaInteractiveEnvironment -Scopes $GraphScopes
+           $M365Environment = $Discovery.M365Environment
+           $DetectedM365Environment = $M365Environment
+           Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphScopes -TenantId $Discovery.TenantId -ErrorAction Stop
+           $AADAuthRequired = $false
+           Write-Information "Automatically determined M365Environment: $M365Environment" -InformationAction Continue
+       }
+   }
 
    # Tenant name, domain prefix, and login hint resolved lazily and shared across PowerPlatform, PowerBI, and SharePoint
    $TenantName = $null
@@ -102,7 +118,9 @@ function Connect-Tenant {
                    if($ServicePrincipalParams) {
                     $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                    }
-                   Connect-GraphHelper @GraphParams
+                   if ($AADAuthRequired) {
+                       Connect-GraphHelper @GraphParams
+                   }
                    $AADAuthRequired = $false
                }
                {($_ -eq "exo") -or ($_ -eq "securitysuite")} {
@@ -492,6 +510,7 @@ function Connect-Tenant {
    }
    Write-Progress -Activity "Authenticating to each service" -Status "Ready" -Completed
    @{
+       DetectedM365Environment = $DetectedM365Environment
        ProdAuthFailed   = $ProdAuthFailed
        PBILicenseFound  = $PBILicenseFound
        PBILicenseReason = $PBILicenseReason
@@ -579,6 +598,44 @@ function Get-ServicePrincipalParams {
     $ServicePrincipalParams
 }
 
+function Get-ScubaInteractiveEnvironment {
+    <#
+    .SYNOPSIS
+        Discovers the signed-in tenant's M365 environment using system-browser MSAL authentication.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string[]]$Scopes
+    )
+
+    # Microsoft Graph PowerShell is a first-party client with the same ID across clouds.
+    $ClientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
+    $Result = Get-MsalAccessToken -ClientId $ClientId -Tenant organizations -M365Environment commercial `
+        -Scope $Scopes -MultiCloudSupport -PassThru -ErrorAction Stop
+
+    $TenantId = [guid]::Empty
+    if (-not [guid]::TryParse([string]$Result.TenantId, [ref]$TenantId) -or $TenantId -eq [guid]::Empty) {
+        throw 'Interactive cloud discovery did not return a valid tenant ID.'
+    }
+    $AuthorityHost = switch ($Result.Account.Environment) {
+        { $_ -in @('login.microsoftonline.com', 'login.windows.net', 'sts.windows.net') } { 'login.microsoftonline.com' }
+        'login.microsoftonline.us' { 'login.microsoftonline.us' }
+        default { throw "Interactive cloud discovery returned an unsupported authority: '$($Result.Account.Environment)'." }
+    }
+    $Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId.ToString() -AuthorityHost $AuthorityHost
+    if (($AuthorityHost -eq 'login.microsoftonline.us') -ne ($Environment -in @('gcchigh', 'dod'))) {
+        throw "Detected environment '$Environment' does not match the sign-in authority '$AuthorityHost'."
+    }
+
+    [pscustomobject]@{
+        M365Environment = $Environment
+        TenantId = $TenantId.ToString()
+    }
+}
+
 function Get-M365EnvironmentByDomain {
     <#
     .SYNOPSIS
@@ -599,10 +656,13 @@ function Get-M365EnvironmentByDomain {
     [CmdletBinding(DefaultParameterSetName = 'Interactive')]
     param(
         [Parameter(Mandatory = $true)]
-        [string]$TenantDomain
+        [string]$TenantDomain,
+
+        [ValidateSet('login.microsoftonline.com', 'login.microsoftonline.us')]
+        [string]$AuthorityHost = 'login.microsoftonline.com'
     )
 
-    $MetadataUri = "https://login.microsoftonline.com/$TenantDomain/.well-known/openid-configuration"
+    $MetadataUri = "https://$AuthorityHost/$TenantDomain/.well-known/openid-configuration"
 
     $Metadata = Invoke-RestMethod -Uri $MetadataUri -Method Get -ErrorAction Stop
 
@@ -612,7 +672,12 @@ function Get-M365EnvironmentByDomain {
         "DODCON" { "gcchigh" }
         "GCC"    { "gcc" }
         "DOD"    { "dod" }
-        $null    { "commercial" }
+        $null    {
+            if ([string]::IsNullOrWhiteSpace($Metadata.tenant_region_scope) -or $Metadata.tenant_region_scope -eq 'USGov') {
+                throw 'Tenant metadata does not identify a supported M365 environment.'
+            }
+            "commercial"
+        }
         default  {
             throw "Unknown tenant_region_sub_scope value: '$TenantRegionSubScope'"
         }
