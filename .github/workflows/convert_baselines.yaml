@@ -26,15 +26,6 @@ jobs:
             -t plain
             PowerShell/ScubaGear/baselines/aad.md
             --output=baselines/aad.txt
-      - name: Convert Defender to Text
-        uses: docker://pandoc/core:3.9.0.2
-        with:
-          args: >-
-            --standalone
-            -f markdown
-            -t plain
-            PowerShell/ScubaGear/baselines/defender.md
-            --output=baselines/defender.txt
       - name: Convert Exchange to Text
         uses: docker://pandoc/core:3.9.0.2
         with:
@@ -85,7 +76,6 @@ jobs:
       - name: Convert to HTML
         run: |
           markdown-to-html --source PowerShell/ScubaGear/baselines/aad.md --output baselines/aad.html
-          markdown-to-html --source PowerShell/ScubaGear/baselines/defender.md --output baselines/defender.html
           markdown-to-html --source PowerShell/ScubaGear/baselines/exo.md --output baselines/exo.html
           markdown-to-html --source PowerShell/ScubaGear/baselines/powerbi.md --output baselines/powerbi.html
           markdown-to-html --source PowerShell/ScubaGear/baselines/powerplatform.md --output baselines/powerplatform.html
