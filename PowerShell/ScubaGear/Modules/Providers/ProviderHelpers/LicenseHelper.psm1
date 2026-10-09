@@ -85,4 +85,53 @@ function Get-AADLicenseState {
 }
 
 
+function Get-CachedSubscribedSku {
+    <#
+    .SYNOPSIS
+        Returns subscribed SKUs, cached per M365Environment for the current run.
+    .DESCRIPTION
+        Memoizes GET /subscribedSkus so Connect-Tenant and Export-AADProvider
+        share one Graph call instead of hitting the API twice per run (#2338).
+        The caller injects -Fetcher; this module never calls Graph itself.
+        Empty/null results are NOT cached: TryCommand returns @() on failure
+        and caching that would poison later calls with fail-open data.
+        Call Clear-SkuCache at run start (Connect-Tenant) for long sessions.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [string]$M365Environment = "commercial",
+        [Parameter(Mandatory = $false)]
+        [switch]$Reset,
+        [Parameter(Mandatory = $false)]
+        [scriptblock]$Fetcher = $null
+    )
+    if (-not (Test-Path variable:script:__SkuCache)) {
+        $script:__SkuCache = @{}
+    }
+    if ($Reset) {
+        $script:__SkuCache.Remove($M365Environment)
+        return $null
+    }
+    if ($script:__SkuCache.ContainsKey($M365Environment)) {
+        return $script:__SkuCache[$M365Environment]
+    }
+    if ($null -eq $Fetcher) {
+        throw "Get-CachedSubscribedSku: cache miss and no -Fetcher provided."
+    }
+    $result = & $Fetcher $M365Environment
+    if ($null -ne $result -and @($result).Count -gt 0) {
+        $script:__SkuCache[$M365Environment] = $result
+    }
+    return $result
+}
 
+function Clear-SkuCache {
+    <#
+    .SYNOPSIS
+        Empties the SubscribedSku cache for all environments.
+    #>
+    [CmdletBinding()]
+    param()
+    $script:__SkuCache = @{}
+}
