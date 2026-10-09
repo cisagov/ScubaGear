@@ -10,7 +10,11 @@ InModuleScope Connection {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            function Connect-GraphHelper {throw 'this will be mocked'}
+            function Connect-GraphHelper {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($ServicePrincipalParams, $M365Environment, $Scopes)
+                throw 'this will be mocked'
+            }
             Mock Connect-GraphHelper -MockWith {}
             # SharePoint now uses REST API - no PnP/SPO connection needed
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
@@ -35,15 +39,13 @@ InModuleScope Connection {
                     }
                 }
             }
-            function Get-MsalAccessToken {throw 'this will be mocked'}
+            function Get-MsalAccessToken {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($Scope, $ClientId, $Tenant, $M365Environment, $CertificateThumbprint, $AppID)
+                throw 'this will be mocked'
+            }
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
             Mock -CommandName Write-Progress {
-            }
-            function Get-MgContext {throw 'this will be mocked'}
-            Mock Get-MgContext -MockWith { return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" } }
-            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
-            Mock Get-M365EnvironmentByDomain -MockWith {
-                return (Get-Random -InputObject @('commercial', 'gcc', 'gcchigh', 'dod'))
             }
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(

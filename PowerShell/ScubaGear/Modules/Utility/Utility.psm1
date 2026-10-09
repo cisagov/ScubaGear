@@ -1,3 +1,4 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Invoke-ScubaGraphRequest
 
 function Set-Utf8NoBom {
     <#
@@ -177,8 +178,9 @@ function Invoke-GraphDirectly {
 
     .Parameter Uri
     An explicit Graph API URI (relative, e.g. "/v1.0/me/licenseDetails") to call when the target has
-    no registered cmdlet mapping. When supplied, the request is sent as-is without endpoint resolution,
-    response key normalization, or automatic pagination, so callers receive the raw Graph response.
+    no registered cmdlet mapping. When supplied, the request is sent as-is without endpoint resolution
+    or response key normalization, so callers receive the raw Graph response (GET requests are still
+    paginated automatically, since Invoke-ScubaGraphRequest handles pagination internally).
 
     .Parameter Method
     The HTTP method to use with -Uri (default: GET). Ignored in cmdlet mode, where the method is
@@ -188,7 +190,7 @@ function Invoke-GraphDirectly {
     Additional request headers to send with -Uri (e.g. @{ ConsistencyLevel = 'eventual' }).
 
     .Parameter OutputType
-    The Invoke-MgGraphRequest -OutputType to use with -Uri (e.g. "PSObject").
+    The Invoke-ScubaGraphRequest -OutputType to use with -Uri (e.g. "PSObject").
 
     .Example
     Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET
@@ -232,8 +234,8 @@ function Invoke-GraphDirectly {
     )
 
     # Uri mode: call an arbitrary Graph endpoint directly for targets with no registered cmdlet
-    # mapping. The raw response is returned without key normalization or pagination so the caller
-    # gets exactly what the Graph API sent, matching a direct Invoke-MgGraphRequest call.
+    # mapping. The raw response is returned without key normalization so the caller gets what the
+    # Graph API sent, matching a direct Invoke-ScubaGraphRequest call.
     if ($PSCmdlet.ParameterSetName -eq 'Uri') {
         Write-Debug "Graph Api direct (explicit Uri): $Uri"
         $graphParams = @{
@@ -247,7 +249,7 @@ function Invoke-GraphDirectly {
             $graphParams['Body'] = if ($Body -is [string]) { $Body } else { $Body | ConvertTo-Json -Depth 10 }
             $graphParams['ContentType'] = 'application/json'
         }
-        return Invoke-MgGraphRequest @graphParams
+        return Invoke-ScubaGraphRequest @graphParams
     }
 
     Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
@@ -286,7 +288,7 @@ function Invoke-GraphDirectly {
     Write-Debug "Graph Api direct: $endpoint"
 
     If ($null -eq $endpoint) {
-        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
+        throw "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     $apiHeader = Get-ScubaGearApiHeader -CmdletName $commandlet -Environment $M365Environment
@@ -312,46 +314,10 @@ function Invoke-GraphDirectly {
         $graphParams['ContentType'] = 'application/json'
     }
 
-    # Execute the initial request
-    $resp = Invoke-MgGraphRequest @graphParams
+    # Execute the initial request (Invoke-ScubaGraphRequest handles pagination internally)
+    $resp = Invoke-ScubaGraphRequest @graphParams
 
     if ($Method -notmatch "DELETE|PATCH") {
-        # If the response is a collection (has a 'value' key)
-        if ($resp -is [hashtable] -and $resp.ContainsKey('value')) {
-            $allItems = [System.Collections.Generic.List[object]]::new()
-            foreach ($item in $resp['value']) {
-                $allItems.Add($item)
-            }
-
-            # Build paging params from the shared set (keep Headers if present, drop Body/ContentType)
-            $pageParams = @{ ErrorAction = 'Stop'; Method = 'GET' }
-            if ($graphParams.ContainsKey('Headers')) {
-                $pageParams['Headers'] = $graphParams['Headers']
-            }
-
-            # Get the next page link from the initial response
-            $nextLink = $resp['@odata.nextLink']
-
-            # Follow pagination until no more pages remain
-            while ($null -ne $nextLink -and $nextLink -ne '') {
-                Write-Debug "Following @odata.nextLink: $nextLink"
-
-                # Update the URI to the next page; all other params (Headers, Method) carry over
-                $pageParams['Uri'] = $nextLink
-                $pageResp = Invoke-MgGraphRequest @pageParams
-
-                # Accumulate results from this page
-                foreach ($item in $pageResp['value']) {
-                    $allItems.Add($item)
-                }
-
-                # Advance to the next page (null when no more pages exist)
-                $nextLink = $pageResp['@odata.nextLink']
-            }
-
-            $resp['value'] = $allItems.ToArray()
-        }
-
         return $resp | ConvertFrom-GraphHashtable
     }
 }
@@ -397,24 +363,33 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
-            if ($Item -is [hashtable]) {
+            if ($Item -is [System.Collections.IDictionary] -or $Item.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject') {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
-                # Process each property in the hashtable
-                foreach ($property in $Item.GetEnumerator()) {
-                    $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
-                    if ($property.Value -is [hashtable]) {
-                        # Recursive call to process nested hashtables
+                $Properties = if ($Item -is [System.Collections.IDictionary]) {
+                    $Item.GetEnumerator() | ForEach-Object {
+                        [pscustomobject]@{ Name = $_.Key; Value = $_.Value }
+                    }
+                }
+                else {
+                    $Item.PSObject.Properties
+                }
+
+                # Process each property in the Graph response
+                foreach ($property in $Properties) {
+                    $UpperCamelCase = ($property.Name).Substring(0,1).ToUpper() + ($property.Name).Substring(1)
+                    if ($null -ne $property.Value -and ($property.Value -is [System.Collections.IDictionary] -or $property.Value.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject')) {
+                        # Recursive call to process nested Graph objects
                         $NestedObject = ConvertFrom-GraphHashtable -GraphData @($property.Value)
 
                         $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $NestedObject
                     }
                     elseif ($property.Value -is [array]) {
-                        # Handle arrays (check if elements are hashtables)
+                        # Handle arrays (check if elements are Graph objects)
                         $ProcessedArray = @()
                         foreach ($element in $property.Value) {
-                            if ($element -is [hashtable]) {
+                            if ($null -ne $element -and ($element -is [System.Collections.IDictionary] -or $element.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject')) {
                                 $ProcessedArray += ConvertFrom-GraphHashtable -GraphData @($element)
                             } else {
                                 $ProcessedArray += $element
@@ -644,10 +619,10 @@ function Invoke-GraphBatchRequest {
             }
 
             try {
-                # Execute batch request using Invoke-MgGraphRequest
+                # Execute batch request using the internal Graph transport
                 Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
                 $endpoint = Get-ScubaGearServiceEndpoint -Product aad -Environment $M365Environment
-                $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
+                $batchResponse = Invoke-ScubaGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
             }
             catch {
                 # Entire batch request failed (e.g., network error, auth error, or even a 429 if the batch envelope itself is too large).
@@ -936,11 +911,12 @@ function Invoke-ScubaRestMethod {
         Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
 
     .PARAMETER MaxRetries
-        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries; max: 100).
+        Number of retry attempts on HTTP 408/429/500/502/503/504 responses and transient connection
+        errors (default: 0, i.e. no retries; max: 100).
 
     .PARAMETER RetryDelaySeconds
         Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
-        header, and doubled after each successive 500/503 retry (default: 5). Any single sleep,
+        header, and doubled after each successive 408/5xx retry (default: 5). Any single sleep,
         including a server-supplied Retry-After, is capped at 3600 seconds.
 
     .EXAMPLE
@@ -1050,7 +1026,14 @@ function Invoke-ScubaRestMethod {
 
     for ($Attempt = 1; $Attempt -le ($MaxRetries + 1); $Attempt++) {
         try {
-            return Invoke-RestMethod @Params
+            $Response = Invoke-RestMethod @Params
+            # Some services (e.g. the Teams admin API) send gzip bodies that Invoke-RestMethod does not
+            # decompress, yielding the compressed bytes as a string that starts with the 0x1F magic byte.
+            if ($Response -is [string] -and $Response.Length -gt 0 -and $Response[0] -eq [char]0x1F) {
+                Write-Verbose "Response from '$Uri' was not decompressed; re-reading it as gzip."
+                $Response = Read-ScubaCompressedRestResponse -RequestParams $Params
+            }
+            return $Response
         }
         # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
         catch {
@@ -1067,7 +1050,7 @@ function Invoke-ScubaRestMethod {
                 continue
             }
 
-            if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
+            if (-not $IsLastAttempt -and $StatusCode -in @(408, 500, 502, 503, 504)) {
                 $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $Delay
@@ -1092,6 +1075,60 @@ function Invoke-ScubaRestMethod {
             Write-Information $DetailedHttpMessage -InformationAction Continue
             throw
         }
+    }
+}
+
+function Read-ScubaCompressedRestResponse {
+    <#
+    .SYNOPSIS
+        Re-issues a REST request with Invoke-WebRequest and returns the gzip-decompressed body,
+        parsed as JSON when possible.
+
+    .DESCRIPTION
+        Used by Invoke-ScubaRestMethod when Invoke-RestMethod returns a gzip body as an undecoded
+        string. The string form cannot be decompressed because text decoding has already corrupted
+        the bytes, so the request is repeated and the raw bytes are read from RawContentStream.
+
+    .PARAMETER RequestParams
+        The Invoke-RestMethod parameter hashtable (Uri, Method, Headers, Body, TimeoutSec, ...).
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$RequestParams
+    )
+
+    $WebParams = $RequestParams.Clone()
+    $WebParams.UseBasicParsing = $true
+    $WebResponse = Invoke-WebRequest @WebParams
+    $Bytes = $WebResponse.RawContentStream.ToArray()
+
+    if ($Bytes.Length -ge 2 -and $Bytes[0] -eq 0x1F -and $Bytes[1] -eq 0x8B) {
+        $GzipStream = [System.IO.Compression.GZipStream]::new(
+            [System.IO.MemoryStream]::new($Bytes), [System.IO.Compression.CompressionMode]::Decompress)
+        $Reader = [System.IO.StreamReader]::new($GzipStream, [System.Text.Encoding]::UTF8)
+        try {
+            $Text = $Reader.ReadToEnd()
+        }
+        finally {
+            $Reader.Dispose()
+        }
+    }
+    else {
+        $Text = [System.Text.Encoding]::UTF8.GetString($Bytes)
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Text)) {
+        return $Text
+    }
+    try {
+        return ($Text | ConvertFrom-Json -ErrorAction Stop)
+    }
+    catch {
+        return $Text
     }
 }
 

@@ -152,7 +152,7 @@ Invoke-SCuBA -ProductNames teams `
 
 ## M365Environment
 
-**M365Environment** is used to authenticate to the various M365 commercial/government environments. It is not required when authenticating using non-interactive (service principal) authentication.
+**M365Environment** selects the M365 commercial/government environment. When omitted during interactive authentication, ScubaGear discovers the cloud through the normal system-browser sign-in and resolves the tenant's OpenID metadata. No separate tenant-domain or environment prompt is required. Service-principal authentication continues to detect the environment from the configured tenant.
 
 | Parameter   | Value        |
 |-------------|--------------|
@@ -161,10 +161,13 @@ Invoke-SCuBA -ProductNames teams `
 | Default     | `commercial` |
 | Config File | Yes          |
 
-> **Note**: This parameter is required if authenticating to a GCC, GCC High or DoD tenants.
+> **Note**: An explicit command-line or configuration-file value bypasses interactive discovery. Discovery uses the system browser, not the embedded web view or WAM, and stops with an error if the tenant environment cannot be determined.
 
 ```powershell
-# Assess a government community cloud (gcc) tenant
+# Discover the environment of the tenant selected during browser sign-in
+Invoke-SCuBA -ProductNames teams
+
+# Explicitly select a government community cloud (gcc) tenant
 Invoke-SCuBA -ProductNames teams `
   -M365Environment gcc
 ```

@@ -241,7 +241,7 @@
                     'Test-ScubaRunReadiness',
                     'Start-ScubaGearExecution',
                     'Export-TempYamlConfiguration',
-                    'Build-ScubaGearCommand',
+                    'New-ScubaGearCommand',
                     'Start-ScubaGearJob',
                     'Write-TimestampedOutput',
                     'Find-ScubaGearResultFolder',

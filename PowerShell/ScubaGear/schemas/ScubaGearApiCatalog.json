@@ -967,9 +967,9 @@
         "spRolePermissions": [],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "oauthScope": "",
-        "poshModule": ["Microsoft.Graph.Authentication"],
-        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"],
-        "notes": ""
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam"],
+        "notes": "ScubaGear connects through its bundled MSAL and Graph REST transport."
     },
     {
         "functionName": "Connect-MgGraph",
@@ -985,9 +985,9 @@
         "spRolePermissions": [],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "oauthScope": "",
-        "poshModule": ["Microsoft.Graph.Authentication"],
-        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"],
-        "notes": ""
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam"],
+        "notes": "ScubaGear connects through its bundled MSAL and Graph REST transport."
     },
     {
         "functionName": "Connect-MgGraph",
@@ -1003,9 +1003,9 @@
         "spRolePermissions": [],
         "resourceAPIAppId": "00000003-0000-0000-c000-000000000000",
         "oauthScope": "",
-        "poshModule": ["Microsoft.Graph.Authentication"],
-        "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph?view=graph-powershell-1.0"],
-        "notes": ""
+        "poshModule": [""],
+        "supportLinks": ["https://learn.microsoft.com/en-us/entra/msal/dotnet/acquiring-tokens/desktop-mobile/wam"],
+        "notes": "ScubaGear connects through its bundled MSAL and Graph REST transport."
     },
     {
         "functionName": "New-MgApplication",

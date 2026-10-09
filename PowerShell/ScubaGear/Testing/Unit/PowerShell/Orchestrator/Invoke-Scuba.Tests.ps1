@@ -5,9 +5,17 @@ InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba' {
         BeforeAll {
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
-            function Get-TenantDetail {throw 'this will be mocked'}
+            function Get-TenantDetail {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($M365Environment)
+                throw 'this will be mocked'
+            }
             Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
-            function Invoke-ProviderList {throw 'this will be mocked'}
+            function Invoke-ProviderList {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($ScubaConfig, $TenantDetails, $ModuleVersion, $OutFolderPath, $Guid, $ConnectionResult)
+                throw 'this will be mocked'
+            }
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
             function Invoke-RunRego {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
@@ -63,6 +71,20 @@ InModuleScope Orchestrator {
 
             function Get-ServicePrincipalParams {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
+        }
+        Context 'Interactive environment discovery' {
+            It 'uses the detected environment for tenant details and providers' {
+                Mock Invoke-Connection { @{ DetectedM365Environment = 'gcchigh'; ProdAuthFailed = @() } }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { $AutoDetectEnvironment }
+                Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'gcchigh' }
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'gcchigh' }
+            }
+
+            It 'preserves an explicit environment override' {
+                Invoke-SCuBA -ProductNames aad -M365Environment dod -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { -not $AutoDetectEnvironment }
+            }
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {

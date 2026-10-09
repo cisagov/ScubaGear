@@ -15,7 +15,7 @@
 #>
 
 $ModuleList = @(
-    "Microsoft.Graph.Authentication",
+    # MicrosoftTeams, ExchangeOnlineManagement, Microsoft.Graph.Authentication, SharePoint, and PnP modules no longer required (using bundled MSAL + REST)
     "powershell-yaml"
     )
 
