@@ -62,7 +62,7 @@ ProductNames:
 ```
 
 > [!NOTE]
-> For backwards compatibility, if you run ScubaGear with `defender` in `ProductNames`, ScubaGear will automatically substitute `securitysuite` and emit a warning. Updating the configuration file removes the warning and reflects the current product name.
+> Beginning in release 2.0.0, Defender is no longer accepted in assessments performed with ScubaGear. Updating a configuration that used Defender to instead use Security Suite is necessary to align configurations with the removal of Defender from the ScubaGear platform.
 
 ### 2. Rename the product exclusion section
 
