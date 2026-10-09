@@ -468,7 +468,7 @@ function Get-ScubaGearEndpointRest {
         otherwise the host is shown with a <tenant> placeholder.
 
     .PARAMETER ProductNames
-        The products to include. Accepts the same values as Invoke-SCuBA. 'defender' is treated as
+        The products to include. Accepts the same values as Invoke-SCuBA. 'defender' has been replaced by
         'securitysuite', and '*' (the default) selects every product ScubaGear tests.
 
     .PARAMETER M365Environment
@@ -506,7 +506,7 @@ function Get-ScubaGearEndpointRest {
     [OutputType([PSCustomObject], [string])]
     param(
         [Parameter(Mandatory = $false)]
-        [ValidateSet('teams', 'exo', 'defender', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
+        [ValidateSet('teams', 'exo', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory = $false)]
@@ -529,8 +529,7 @@ function Get-ScubaGearEndpointRest {
     )
 
     $AllProducts = 'aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi'
-    $Products = if ($ProductNames -contains '*') { $AllProducts } else { $ProductNames -replace '^defender$', 'securitysuite' }
-    $Products = @($Products | Sort-Object -Unique)
+    $Products = @($AllProducts | Sort-Object -Unique)
 
     # Teams also reads its tenant settings from the unified settings host, which the catalog lists as its own product.
     $CatalogProducts = @($Products | ForEach-Object { $_; if ($_ -eq 'teams') { 'teamsunified' } })
