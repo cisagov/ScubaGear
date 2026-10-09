@@ -1416,7 +1416,7 @@ function New-SCuBAConfig {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Microsoft Defender stack: securitysuite
+    - Microsoft Security Suite stack: securitysuite
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - Power BI: powerbi
@@ -1448,7 +1448,7 @@ function New-SCuBAConfig {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: defender will ask for authentication even if this variable is set to `$false`
+    Note: securitysuite will ask for authentication even if this variable is set to `$false`
     ;;;.Parameter Version
     ;;;Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
