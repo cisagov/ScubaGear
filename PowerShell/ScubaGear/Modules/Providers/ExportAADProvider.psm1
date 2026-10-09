@@ -53,7 +53,10 @@ function Export-AADProvider {
 
     $AllPolicies = ConvertTo-Json -Depth 10 @($AllPolicies)
 
-    $SubscribedSku = $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $SubscribedSku = Get-CachedSubscribedSku -M365Environment $M365Environment -Fetcher {
+        param($Env)
+        $Tracker.TryCommand("Get-MgBetaSubscribedSku", @{"M365Environment"=$Env; "GraphDirect"=$true})
+    }
 
     # Determine tenant license state based on subscribed SKUs/service plans
     $LicenseStateObj = Get-AADLicenseState -SubscribedSku $SubscribedSku

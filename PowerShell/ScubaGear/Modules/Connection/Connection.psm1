@@ -39,6 +39,9 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint, Get-ComplianceScope, Get-ComplianceApiEndpoint
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/LicenseHelper.psm1 -Function Get-CachedSubscribedSku, Clear-SkuCache
+
+   Clear-SkuCache # Fresh license cache per run (#2339)
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
@@ -312,7 +315,10 @@ function Connect-Tenant {
                    # This prevents triggering a second consent/browser window for the
                    # Power BI API scope when the tenant has no PBI license at all.
                    $TenantHasPBILicense = $false
-                   $SubscribedSku = (Invoke-GraphDirectly -Commandlet Get-MgBetaSubscribedSku -M365Environment $M365Environment).Value
+                   $SubscribedSku = Get-CachedSubscribedSku -M365Environment $M365Environment -Fetcher {
+                       param($Env)
+                       (Invoke-GraphDirectly -Commandlet Get-MgBetaSubscribedSku -M365Environment $Env).Value
+                   }
                    $ServicePlans = $SubscribedSku.ServicePlans | Where-Object -Property ProvisioningStatus -eq -Value "Success"
                    if ($ServicePlans) {
                        $PBIServicePlans = $ServicePlans | Where-Object -Property ServicePlanName -Match -Value "(POWER_BI|BI_AZURE_P_?[0-9]|PBI_PREMIUM|FABRIC)"
