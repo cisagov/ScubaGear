@@ -936,12 +936,18 @@ function Invoke-ScubaRestMethod {
         Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
 
     .PARAMETER MaxRetries
-        Number of retry attempts on HTTP 429/500/503 responses (default: 0, i.e. no retries; max: 100).
+        Number of retry attempts on HTTP 429/500/502/503/504 responses and transient connection errors
+        (default: 0, i.e. no retries; max: 100).
 
     .PARAMETER RetryDelaySeconds
         Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
-        header, and doubled after each successive 500/503 retry (default: 5). Any single sleep,
-        including a server-supplied Retry-After, is capped at 3600 seconds.
+        header, and doubled after each successive 500/502/503/504 retry (default: 5). Any single sleep,
+        including a server-supplied Retry-After, is capped at MaxDelaySeconds.
+
+    .PARAMETER MaxDelaySeconds
+        Upper bound in seconds on any single sleep between retries (default: 3600; range 1-3600).
+        Keeps a large or hostile Retry-After value from stalling a scan. The Teams, SharePoint,
+        Power Platform and Power BI helpers use a lower cap, see Get-ScubaRestRetryDefaults.
 
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
@@ -1006,11 +1012,12 @@ function Invoke-ScubaRestMethod {
 
         [Parameter(Mandatory = $false)]
         [ValidateRange(0, 3600)]
-        [int]$RetryDelaySeconds = 5
-    )
+        [int]$RetryDelaySeconds = 5,
 
-    # Upper bound on any single sleep so a hostile or misconfigured Retry-After/backoff can't stall a scan.
-    $MaxDelaySeconds = 3600
+        [Parameter(Mandatory = $false)]
+        [ValidateRange(1, 3600)]
+        [int]$MaxDelaySeconds = 3600
+    )
 
     $Uri = "$BaseUrl$Endpoint"
     $Headers = @{
@@ -1067,7 +1074,7 @@ function Invoke-ScubaRestMethod {
                 continue
             }
 
-            if (-not $IsLastAttempt -and $StatusCode -in @(500, 503)) {
+            if (-not $IsLastAttempt -and $StatusCode -in @(500, 502, 503, 504)) {
                 $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $Delay
@@ -1092,6 +1099,35 @@ function Invoke-ScubaRestMethod {
             Write-Information $DetailedHttpMessage -InformationAction Continue
             throw
         }
+    }
+}
+
+function Get-ScubaRestRetryDefaults {
+    <#
+    .SYNOPSIS
+        Returns the throttling/transient-error retry settings that the Teams, SharePoint, Power Platform and Power BI REST helpers pass to Invoke-ScubaRestMethod.
+
+    .DESCRIPTION
+        Defined once so those provider REST helpers retry the same way: up to 3 retries, honoring a
+        server-supplied Retry-After on HTTP 429, with no single wait longer than 120 seconds. Splat the
+        result onto Invoke-ScubaRestMethod. The Exchange Online helper keeps its own settings (3 retries,
+        5 second delay, default wait cap) and does not use this function.
+
+    .EXAMPLE
+        $Retry = Get-ScubaRestRetryDefaults
+        Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param()
+
+    return @{
+        MaxRetries        = 3
+        RetryDelaySeconds = 5
+        MaxDelaySeconds   = 120
     }
 }
 
@@ -1374,6 +1410,7 @@ Export-ModuleMember -Function @(
     'ConvertFrom-GraphHashtable',
     'Invoke-GraphBatchRequest',
     'Invoke-ScubaRestMethod',
+    'Get-ScubaRestRetryDefaults',
     'Get-HttpResponseDetails',
     'Get-ScubaGearCatalog',
     'Get-ScubaGearServiceEndpoint',
