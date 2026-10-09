@@ -43,7 +43,18 @@ function Invoke-PSSA {
 
 	# Analyze each file and collect results
 	foreach ($PsFile in $PsFiles) {
-		$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath
+		try {
+			$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath -ErrorAction Stop
+		}
+		catch {
+			Write-Warning "PSScriptAnalyzer failed while analyzing '$($PsFile.FullName)'. Retrying once. $($_.Exception.Message)"
+			try {
+				$Results = Invoke-ScriptAnalyzer -Path $PsFile -Settings $ConfigPath -ErrorAction Stop
+			}
+			catch {
+				throw "PSScriptAnalyzer failed twice while analyzing '$($PsFile.FullName)': $($_.Exception.Message)"
+			}
+		}
 		foreach ($Result in $Results) {
 			Write-Warning "File:     $($Result.ScriptPath)"
 			Write-Warning "Line:     $($Result.Line)"
