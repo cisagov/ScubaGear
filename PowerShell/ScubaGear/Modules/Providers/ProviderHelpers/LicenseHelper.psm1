@@ -91,7 +91,7 @@ function Get-CachedSubscribedSku {
         Returns subscribed SKUs, cached per M365Environment for the current run.
     .DESCRIPTION
         Memoizes GET /subscribedSkus so Connect-Tenant and Export-AADProvider
-        share one Graph call instead of hitting the API twice per run (#2338).
+        share one Graph call instead of hitting the API twice per run (#2339).
         The caller injects -Fetcher; this module never calls Graph itself.
         Empty/null results are NOT cached: TryCommand returns @() on failure
         and caching that would poison later calls with fail-open data.

@@ -41,7 +41,7 @@ function Connect-Tenant {
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint, Get-ComplianceScope, Get-ComplianceApiEndpoint
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/LicenseHelper.psm1 -Function Get-CachedSubscribedSku, Clear-SkuCache
 
-   Clear-SkuCache # Fresh license cache per run (#2338)
+   Clear-SkuCache # Fresh license cache per run (#2339)
 
    # Prevent duplicate sign ins
    $EXOAuthRequired = $true
