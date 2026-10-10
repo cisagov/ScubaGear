@@ -2,23 +2,28 @@
 
 # CISA M365 Secure Configuration Security Suite Baseline
 
-Several essential security functions for M365 services require a dedicated security suite, e.g., for
+Several essential security functions for Microsoft 365 (M365) services require a dedicated security suite, e.g., for
 data loss prevention. M365 provides these security functions natively via Defender for Office 365
 and Microsoft Purview. Notably, some of these capabilities require licenses not included by default
-with E3 or G3, such Defender for Office 365 Plan 1 and 2. These licenses are included with E5 and G5
+with E3 or G3, such as Defender for Office 365 Plan 1 and 2. These licenses are included with E5 and G5
 and are available as add-ons for E3 and G3. However, third-party solutions that offer comparable
-security functions can be used in lieu of Defender and Purview. The Security Suite Baseline
-enumerates a set of required security functions agencies should configure, be it through Defender
-and Purview or third-party tools of their choice. Should an agency elect to use Defender and
-Purview, agencies should follow the implementation guidance included with this baseline. However,
-regardless of whether Defender and Purview are used, the policies in this baseline are applicable
-to all M365 users.
+security functions can be used in lieu of Defender and Purview. ScubaGear v2.0.0 introduces the
+Security Suite baseline, unifying Defender, Purview, Exchange Online, and Teams controls.
+Consolidating these areas is necessary to eliminate redundant manual checks, such as duplicative DLP
+policies across products, and simplify implementation. By moving away from product-specific
+baselines, Security Suite reduces confusion, offers greater implementation flexibility, and provides
+a clearer, more consistent architecture for organizations across their M365 environment. This
+Security Suite secure configuration baseline (SCB) enumerates a set of required security functions
+agencies should configure, be it through Defender and Purview or third-party tools of their choice.
+If an agency elects to use Defender and Purview, they should follow the implementation guidance
+included with this baseline. Regardless of whether Defender and Purview are used, the policies in
+this baseline are applicable to all M365 users.
 
-The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+The Cybersecurity and Infrastructure Security Agency’s (CISA) Secure Cloud Business Applications (SCuBA) project provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian federal government agencies, organizations outside of the federal government may also find these baselines to be useful references to help reduce risks.
 
-For non-Federal users, the information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+For non-federal users, the information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products. CISA has no control over vendor changes to products offerings or features. Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 
 
@@ -33,7 +38,7 @@ The agency has identified a set of user accounts that are considered sensitive a
 The **License Requirements** sections of this document assume the organization is using an [M365 E3](https://www.microsoft.com/en-us/microsoft-365/compare-microsoft-365-enterprise-plans) or [G3](https://www.microsoft.com/en-us/microsoft-365/government) license level at a minimum. Therefore, only licenses not included in E3/G3 are listed.
 
 ## Key Terminology
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 The following are key terms and descriptions used in this document.
 
@@ -47,23 +52,25 @@ compromise.
 
 **Threat Policies**: Much of Microsoft Defender for Office 365's configuration
 is managed through threat policies. Users, groups, and domains can be added to
-or excluded from threat security polices. Users added to a policy receive the
+or excluded from threat security policies. Users added to a policy receive the
 protections configured for that policy.
-While users can create custom threat polices, Microsoft Defender defines three
+While users can create custom threat policies, Microsoft Defender defines three
 [preset security policies](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/preset-security-policies?view=o365-worldwide):
 built-in protection, standard, and strict. These preset policies are informed by
-Microsoft's observations, and are designed to strike the balance between usability
+Microsoft's observations and are designed to strike the balance between usability
 and security. They allow administrators to enable the full feature set of Defender
 by adding users to the policies rather than manually configuring each setting.
 One simple method of meeting many requirements of this baseline is to add users
 to the standard or strict preset policies, though some organizations may require
 the flexibility afforded by custom policies.
 
-**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
+**BOD 25-01 Requirement**: This indicator means that the policy is required under [CISA BOD 25-01](https://www.cisa.gov/news-events/directives/bod-25-01-implementing-secure-practices-cloud-services).
 
 **Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
 
-**Requires Configuration**: This indicator means that ScubaGear requires configuration via config file in order to check the policy.
+**Configurable**: This indicator means that the policy can be customized via a configuration file.
+
+**Requires Configuration**: This indicator means that ScubaGear requires configuration via configuration file in order to check the policy.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
@@ -77,28 +84,28 @@ been identified, the scanner should drop or quarantine the associated messages.
 Because malware detections may be updated, it is also important that messages
 that were already delivered to users are also scanned and removed.
 
-The Safe Attachments feature included with Defender will scan messages for
+The "Safe Attachments" feature included with Defender will scan messages for
 attachments with malicious content. All messages with attachments not already
 flagged by anti-malware protections in EOP are downloaded to a Microsoft virtual
-environment for further analysis. Safe Attachments then uses machine learning and
-other analysis techniques to detect malicious intent. While Safe Attachments for
+environment for further analysis. "Safe Attachments" then uses machine learning and
+other analysis techniques to detect malicious intent. While "Safe Attachments" for
 Exchange Online is automatically configured in the preset policies, separate
 action is needed to enable it for other products.
 
 ### Policies
 
 #### MS.SECURITYSUITE.1.1v1
-Emails with click-to-run file attachments SHALL be blocked, including at a minimum .exe, .cmd, and .vbe files.
+Emails with click-to-run file attachments SHALL be blocked including, at a minimum, .exe, .cmd, and .vbe files.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.1.1v1; Criticality: SHALL -->
 - _Rationale:_ Malicious attachments often take the form of click-to-run files.
-Sharing high risk file types, when necessary, is better left to a means other
-than email; the dangers of allowing them to be sent over email outweigh
+When necessary to share high risk file types, it is better to share them via a means other
+than email. The dangers of allowing high risk file types to be sent over email outweigh
 any potential benefits. Filtering email attachments based on file types can
-prevent spread of malware distributed via click-to-run email attachments.
+prevent the spread of malware distributed via click-to-run email attachments.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
@@ -169,27 +176,27 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
-As the steps for MS.SECURITYSUITE.1.1v1 and MS.SECURITYSUITE.1.2v1 share many steps in common,
+Because the steps for MS.SECURITYSUITE.1.1v1 and MS.SECURITYSUITE.1.2v1 share similarities,
 steps for both policies are included in this section. Steps that do not strictly apply to
-MS.SECURITYSUITE.1.1v1 are followed by the applicable SCuBA policy in parenthesis.
+MS.SECURITYSUITE.1.1v1 are followed by the applicable SCuBA policy in parentheses.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-malware**.
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
-    2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
+    2. Click **Edit user and domains**. _Note:_ The **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
         - Add users, groups, and domains as needed. To make the policy apply to all users, under
           **Domains**, enter all the tenant domains.
         - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
           to be exempted from this policy.
         - Click **Save**.
-    3. Click **Edit protection settings**
+    3. Click **Edit protection settings**.
     4. Check **Enable zero-hour auto purge for malware (Recommended)**. (_MS.SECURITYSUITE.1.2v1_)
     5. Check **Enable the common attachments filter**.
-    6. Click **Customize file types** and ensure that at a minimum .exe, .cmd, and .vbe are selected.
+    6. Click **Customize file types** and select at a minimum .exe, .cmd, and .vbe.
     7. Click **Save**.
 6.  If creating a new policy:
     1. Click **Create**.
@@ -201,8 +208,8 @@ For users not added to the standard or strict preset policies:
     5. Click **Next**.
     6. Check **Enable zero-hour auto purge for malware (Recommended)**. (_MS.SECURITYSUITE.1.2v1_)
     7. Check **Enable the common attachments filter**.
-    8. Click **Select file types** and ensure that at a minimum .exe, .cmd, and .vbe are selected, then click **Done**.
-    9. Click **Next** then **Submit**.
+    8. Click **Select file types** and select, at a minimum, .exe, .cmd, and .vbe. Then click **Done**.
+    9. Click **Next**, then click **Submit**.
 
 #### MS.SECURITYSUITE.1.2v1 Instructions
 Both the standard and strict preset policies meet this baseline policy requirement,
@@ -221,19 +228,19 @@ for instructions on adding users to these policies.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
-4.  Under **Policies**, select **Safe Attachments**.
+4.  Under **Policies**, select **Safe attachments**.
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
-    2. Click **Edit user and domains**. _Note:_ the **Default (default)** policy applies to all users, so skip this step if modifying the default policy.
+    2. Click **Edit user and domains**. _Note:_ The **Default (default)** policy applies to all users. Skip this step if modifying the default policy.
         - Add users, groups, and domains as needed. To make the policy apply to all users, under
           **Domains**, enter all the tenant domains.
         - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
           to be exempted from this policy.
         - Click **Save**.
-    3. Click **Edit settings**
-    4. Under **Safe Attachments unknown malware response**, select **Block** or **Dynamic Delivery**.
+    3. Click **Edit settings**.
+    4. Under **Safe Attachments unknown malware response**, select **Block** or **Dynamic delivery**.
     5. Click **Save**.
 6.  If creating a new policy:
     1. Click **Create**.
@@ -243,8 +250,8 @@ For users not added to the standard or strict preset policies:
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
-    4. Under **Safe Attachments unknown malware response**, select **Block** or **Dynamic Delivery**.
-    5. Click **Next** then **Submit**.
+    6. Under **Safe Attachments unknown malware response**, select **Block** or **Dynamic delivery**.
+    7. Click **Next**, then click **Submit**.
 
 #### MS.SECURITYSUITE.1.4v1 Instructions
 
@@ -253,11 +260,11 @@ need to be taken even if the standard or strict policies are used.
 
 1.  Sign in to **Microsoft 365 Defender**.
 
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 
 3.  Select **Threat policies**.
 
-4.  Under **Policies**, select **Safe Attachments**.
+4.  Under **Policies**, select **Safe attachments**.
 
 5.  Select **Global settings**.
 
@@ -269,7 +276,7 @@ need to be taken even if the standard or strict policies are used.
 ## 2. Impersonation Protection
 Impersonation protection checks incoming emails to see if the sender
 address is similar to the users or domains on an agency-defined list. If
-the sender address is significantly similar, as to indicate an
+the sender address is significantly similar, indicating a potential
 impersonation attempt, the email is quarantined.
 
 ### Policies
@@ -331,7 +338,7 @@ User warnings, comparable to the user safety tips included with EOP, SHOULD be d
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.2.4v1; Criticality: SHOULD -->
-- _Rationale:_ Many tasks are better suited for automated processes, such as identifying
+- _Rationale:_ Some tasks are better suited for automated processes, such as identifying
 unusual characters in the `FROM` address or identifying a first-time sender.
 User warnings can handle these tasks, reducing the burden on end users and the risk of
 successful phishing attempts.
@@ -364,29 +371,28 @@ When evaluating an email for impersonation, both the email *sender* and the
 *recipient* are factors. Impersonation protection is only applied if the *sender*
 has been added to a threat policy's **Users to protect** list and the *recipient*
 has been added to the threat policy where that list is defined.
-As such, one simple way of ensuring the **Users to protect** list applies to all
-recipients is to define the list in the default anti-phish policy, as that applies
-to all recipients. For simplicity, the implementation steps that follow just
+As such, one simple way of applying the **Users to protect** list to all
+recipients is to define the list in the default anti-phishing policy. For simplicity, the implementation steps that follow just
 instruct users to configure impersonation protection in the default anti-phish
-policy. However, agencies are welcome to instead configure it in the other
-policies if desired, as long as ultimately all recipients recieve the
+policy. However, agencies can configure it in the other
+policies, if desired, as long as all recipients ultimately receive the
 impersonation protection checks.
 
-**Note**: If the preset security policies are used, both the standard and strict preset policies meet the requirements for MS.SECURITYSUITE.2.2v1 and MS.SECURITYSUITE.2.4v1. However, additional configuration is required for MS.SECURITYSUITE.2.1v1 and MS.SECURITYSUITE.2.3v1, as the sensitive users need to be added on the **Add email addresses to flag when impersonated by attackers** page and the parner domains need to be added on the **Add domains to flag when impersonated by attackers** page. See [Preset security policies in cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies) for detailed instructions.
+**Note**: If the preset security policies are used, both the standard and strict preset policies meet the requirements for MS.SECURITYSUITE.2.2v1 and MS.SECURITYSUITE.2.4v1. However, additional configuration is required for MS.SECURITYSUITE.2.1v1 and MS.SECURITYSUITE.2.3v1, as the sensitive users need to be added to the **Add email addresses to flag when impersonated by attackers** page and the partner domains need to be added on the **Add domains to flag when impersonated by attackers** page. See [Preset security policies in cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies) for detailed instructions.
 
 #### MS.SECURITYSUITE.2.1v1 Instructions
 
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Select the **Office365 AntiPhish Default (Default)** policy.
+5.  Select the **Office365 Anti-phish Default (Default)** policy.
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, select **Enable users to protect**.
 8.  Click **Manage [x] sender(s)**.
-9.  On the **Manage senders for impersonation protection** page, click **Add user**
-then add a name and valid email address for each sensitive account and click **Add** after each.
-10. Click **Done** then **Save**.
+9.  On the **Manage senders for impersonation protection** page, click **Add user**,
+then add a name and valid email address for each sensitive account. Click **Add** after each added account.
+10. Click **Done**, then click **Save**.
 11. Click **Edit actions**.
 12. Under **If a message is detected as user impersonation**, select one of the following:
     - **Redirect the message to other email addresses**
@@ -395,15 +401,15 @@ then add a name and valid email address for each sensitive account and click **A
     - **Delete the message before it's delivered**
 13. Click **Save**.
 
-**Note**: In order for ScubaGear to evaluate MS.SECURITYSUITE.2.1v1, it needs to know which users are considered sensitive. To configure this, use the `SensitiveUsers` config file option. If this config file option is not used or is empty, ScubaGear will report this policy as non-compliant. See [Security Suite Configuration](/docs/configuration/configuration.md#security-suite-configuration) for more details.
+**Note for ScubaGear users**: In order for ScubaGear to evaluate MS.SECURITYSUITE.2.1v1, it needs to know which users are considered sensitive. To configure this, use the `SensitiveUsers` configuration file option. If this configuration file option is not used or is empty, ScubaGear will report this policy as non-compliant. See [Security Suite Configuration](/docs/configuration/configuration.md#security-suite-configuration) for more details.
 
 #### MS.SECURITYSUITE.2.2v1 Instructions
 
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Select the **Office365 AntiPhish Default (Default)** policy.
+5.  Select the **Office365 Anti-phish Default (Default)** policy.
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include domains I own**.
 8.  Click **Save**.
@@ -413,21 +419,21 @@ then add a name and valid email address for each sensitive account and click **A
     - **Move the message to the recipients' Junk Email folders**
     - **Quarantine the message**
     - **Delete the message before it's delivered**
-11.  Click **Done** then **Save**.
+11.  Click **Done**, then click **Save**.
 
 #### MS.SECURITYSUITE.2.3v1 Instructions
 
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Select the **Office365 AntiPhish Default (Default)** policy.
+5.  Select the **Office365 Anti-phish Default (Default)** policy.
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include custom domains**.
 8.  Click **Manage [x] custom domain(s)**.
 9.  On the **Manage custom domains for impersonation protection** page, click **Add domain**.
 10. Under **Domain**, enter each partner domain, then click **Add domains**.
-11. Click **Done** then **Save**.
+11. Click **Done**, then click **Save**.
 12. Click **Edit actions**.
 13. Under **If a message is detected as domain impersonation**, select one of the following:
     - **Redirect the message to other email addresses**
@@ -436,26 +442,25 @@ then add a name and valid email address for each sensitive account and click **A
     - **Delete the message before it's delivered**
 14. Click **Save**.
 
-**Note**: In order for ScubaGear to evaluate MS.SECURITYSUITE.2.3v1, it needs to know which domains should be protected. To configure this, use the `PartnerDomains` config file option. If this config file option is not used or is empty, ScubaGear will report this policy as non-compliant. See [Security Suite Configuration](/docs/configuration/configuration.md#security-suite-configuration) for more details.
+**Note for ScubaGear users**: In order for ScubaGear to evaluate MS.SECURITYSUITE.2.3v1, it needs to know which domains should be protected. To configure this, use the `PartnerDomains` configuration file option. If this configuration file option is not used or is empty, ScubaGear will report this policy as non-compliant. See [Security Suite Configuration](/docs/configuration/configuration.md#security-suite-configuration) for more details.
 
 #### MS.SECURITYSUITE.2.4v1 Instructions
 
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Select the **Office365 AntiPhish Default (Default)** policy.
+5.  Select the **Office365 Anti-phish Default (Default)** policy.
 6.  Click **Edit actions**.
-7.  Under **Safety tips & indicators**, ensure each safety tip and indicator is enabled.
+7.  Under **Safety tips and indicators**, enable each safety tip and indicator.
 8.  Click **Save**.
 
 ## 3. Data Loss Prevention
 
 There are several approaches to securing sensitive information, such
-as warning users, encryption, or blocking attempts to share. Agency
-policies for sensitive information, such as personally identifiable
-information (PII), should dictate how that information is handled and
-inform associated data loss prevention (DLP) policies. Defender can detect
+as warning users, encryption, or blocking attempts to share. Data loss prevention (DLP)
+policies should follow agency policies for sensitive information, such as personally identifiable
+information (PII). Defender can detect
 sensitive information and associates a default confidence level with
 this detection based on the sensitive information type matched.
 Confidence levels are used to reduce false positives in detecting access
@@ -521,7 +526,7 @@ Notifications to inform users and help educate them on the proper use of sensiti
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.3.4v1; Criticality: SHOULD -->
-- _Rationale:_ Some users may not be aware of agency policies on
+- _Rationale:_ Some users may not be aware of agency policies regarding
                proper use of sensitive information. Enabling
                notifications provides positive feedback to users when
                accessing sensitive information.
@@ -531,20 +536,20 @@ Notifications to inform users and help educate them on the proper use of sensiti
   - None
 
 #### MS.SECURITYSUITE.3.5v1
-The DLP policy SHOULD include an action to block access to sensitive information by restricted apps
+The DLP policy SHOULD include an action to block access to sensitive information by restricted applications
 and unwanted Bluetooth applications.
 
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite35v1-instructions)
 
 <!--Policy: MS.SECURITYSUITE.3.5v1; Criticality: SHOULD -->
-- _Rationale:_ Some apps may inappropriately share accessed files or not conform to agency policies
+- _Rationale:_ Some applications may inappropriately share accessed files or not conform to agency policies
                for access to sensitive information. Defining a DLP policy with an action to block
-               access from restricted apps and unwanted Bluetooth applications prevents unauthorized
+               access from restricted applications and unwanted Bluetooth applications prevents unauthorized
                disclosure by those programs.
 - _Last modified:_ March 2026
 - _Note:_
   - This action can only be included if at least one device is onboarded
-    to the agency tenant. Otherwise, the option to block restricted apps will
+    to the agency tenant. Otherwise, the option to block restricted applications will
     not be available.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-19a
 - _MITRE ATT&CK TTP Mapping:_
@@ -574,13 +579,13 @@ and unwanted Bluetooth applications.
 
 - DLP for Teams requires an E5 or G5 license. See [Microsoft Purview Data Loss Prevention: Data Loss Prevention for Teams \| Microsoft
   Learn](https://learn.microsoft.com/en-us/office365/servicedescriptions/microsoft-365-service-descriptions/microsoft-365-tenantlevel-services-licensing-guidance/microsoft-365-security-compliance-licensing-guidance#microsoft-purview-data-loss-prevention-data-loss-prevention-dlp-for-teams)
-  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
+  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then an E5 or G5 license is not required for the respective policies.
 
 - DLP for Endpoint, needed for MS.SECURITYSUITE.3.5v1, requires an E5 or G5 license. See [Get started with
   Endpoint data loss prevention - Microsoft Purview (compliance) \|
   Microsoft
   Learn](https://learn.microsoft.com/en-us/purview/endpoint-dlp-getting-started?view=o365-worldwide)
-  for more information. However, this requirement can also be met through a third-party solution. If a third-party solution is used, then a E5 or G5 license is not required for the respective policies.
+  for more information. However, this requirement can also be met through a compliant third-party solution. If a third-party solution is used, then an E5 or G5 license is not required for the respective policies.
 
 ### Implementation
 
@@ -589,10 +594,10 @@ and unwanted Bluetooth applications.
 DLP is _not_ covered by the preset policies, so these steps need to be taken even if the standard
 or strict policies are used.
 
-As the steps for MS.SECURITYSUITE.3.1v1, MS.SECURITYSUITE.3.2v1, MS.SECURITYSUITE.3.3v1, and
-MS.SECURITYSUITE.3.4v1 share many steps in common, steps for all these policies are included in
+Since the steps for MS.SECURITYSUITE.3.1v1, MS.SECURITYSUITE.3.2v1, MS.SECURITYSUITE.3.3v1, and
+MS.SECURITYSUITE.3.4v1 share similarities, steps for all of these policies are included in
 this section. Steps that do not strictly apply to MS.SECURITYSUITE.3.1v1 are followed by the
-applicable SCuBA policy in parenthesis.
+applicable SCuBA policy in parentheses.
 
 1. Sign in to the **Microsoft Purview portal**.
 
@@ -605,28 +610,28 @@ applicable SCuBA policy in parenthesis.
 
 5. From the **Categories** list, select **Custom**.
 
-6. From the **Regulations** list, select **Custom policy** and then click
+6. From the **Regulations** list, select **Custom policy**, then click
    **Next**.
 
 7. Edit the name and description of the policy if desired, then click
    **Next**.
 
-8. Under **Assign admin units**,  ensure **Admin units** is set to **Full directory** by default, then click **Next**.
+8. Under **Assign admin units**, ensure **Admin units** is set to **Full directory** by default, then click **Next**.
 
 9. Under **Choose where to apply the policy**, set **Status** to **On**
    for at least the Exchange email, OneDrive accounts, SharePoint
-   sites, Teams chat and channel messages, and Devices locations, then
+   sites, Teams chat and channel messages, and Devices locations. Then
    click **Next**. (_MS.SECURITYSUITE.3.2v1_)
 
 10. Under **Define policy settings**, select **Create or customize advanced
-   DLP rules**, and then click **Next**.
+   DLP rules**, then click **Next**.
 
 11. Click **Create rule**. Assign the rule an appropriate name and
    description.
 
-12. Click **Add condition**, then **Content contains**.
+12. Click **Add condition**, then click **Content contains**.
 
-13. Click **Add**, then **Sensitive info types**.
+13. Click **Add**, then click **Sensitive info types**.
 
 14. Add information types that protect information sensitive to the agency.
     At a minimum, the agency should protect:
@@ -643,13 +648,13 @@ applicable SCuBA policy in parenthesis.
 17. Check **Restrict Access or encrypt the content in Microsoft 365
     locations**.
 
-18. Under this action, select **Block Everyone**. (_MS.SECURITYSUITE.3.3v1_)
+18. Under this action, select **Block everyone**. (_MS.SECURITYSUITE.3.3v1_)
 
 19. Under **User notifications**, turn on **Use notifications to inform your users and help educate them on the proper use of sensitive info**. (_MS.SECURITYSUITE.3.4v1_)
 
 20. Under **Microsoft 365 services** if using a GCC environment or under **Microsoft 365 files and Microsoft Fabric items** if using a Commercial environment, a section that appears after user notifications are turned on, check the box next to **Notify users in Office 365 service with a policy tip or email notifications**. (_MS.SECURITYSUITE.3.4v1_)
 
-21. Click **Save**, then **Next**.
+21. Click **Save**, then click **Next**.
 
 22. Select **Turn the policy on immediately**, then click **Next**.
 
@@ -679,9 +684,9 @@ Defender for Endpoint.
 
 1. Sign in to the **Microsoft Purview portal**.
 2. Under **Settings**, select **Data Loss Prevention**.
-3. (Optional) Select **Restricted apps and app groups**. Add or edit restricted apps per agency
+3. (Optional) Select **Restricted apps and app groups**. Add or edit restricted applications per agency
   discretion.
-4. Select **Unallowed Bluetooth apps** then **Add or edit unallowed Bluetooth apps**.
+4. Select **Unallowed Bluetooth apps**, then click **Add or edit unallowed Bluetooth apps**.
 5. Ensure **Include Bluetooth apps recommended by Microsoft** is **On**.
 6. (Optional) Add other apps to restrict, per agency discretion.
 7. Click **Save**.
@@ -690,12 +695,12 @@ Defender for Endpoint.
 10. Find the custom DLP policy configured under
    [MS.SECURITYSUITE.3.1v1 Instructions](#mssecuritysuite31v1-instructions) in the list
    and click the Policy name to select.
-11. Select **Edit Policy**.
+11. Select **Edit policy**.
 12. Click **Next** on each page in the policy wizard until you reach the
    **Advanced DLP rules page**.
 13. Select the relevant rule and click the pencil icon to edit it.
 14. Under **Actions**, click **Add an action**.
-15. Choose **Audit or restrict activities on device**
+15. Choose **Audit or restrict activities on device**.
 16. Under **File activities for all apps**, select
     **Apply restrictions to specific activity**.
 17. Check the box next to **Copy or move using unallowed Bluetooth app**
@@ -710,14 +715,13 @@ Defender for Endpoint.
 ## 4. Alerts
 
 Managing and monitoring Exchange mailboxes and user activity requires a means
-to define activity of concern and notify administrators.  Alerts can be
+to define activity of concern and notify administrators. Alerts can be
 generated to help identify suspicious or malicious activity in Exchange Online.
-These alerts give administrators better real-time insight into possible
+These alerts give administrators real-time insight into possible
 security incidents.
 
 There are several pre-built alert policies available pertaining to
-various apps in the M365 suite. These alerts give administrators better
-real-time insight into possible security incidents.
+various M365 applications.
 
 ### Policies
 #### MS.SECURITYSUITE.4.1v1
@@ -741,7 +745,7 @@ At a minimum, the following alerts SHALL be enabled:
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-- _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to them to minimize any impact to users and the agency.
+- _Rationale:_ Potentially malicious or service-impacting events may go undetected without a means of detecting these events. Setting up a mechanism to alert administrators to the list of events linked above draws attention to the events and can help minimize user/agency impact.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
@@ -754,7 +758,7 @@ The alerts SHOULD be sent to a monitored address or incorporated into a Security
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite42v1-instructions)
 
 <!--Policy: MS.SECURITYSUITE.4.2v1; Criticality: SHOULD -->
-- _Rationale:_ Suspicious or malicious events, if not resolved promptly, may have a greater impact to users and the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
+- _Rationale:_ If not resolved promptly, suspicious or malicious events may have an even greater impact on users/the agency. Sending alerts to a monitored email address or SIEM system helps ensure events are acted upon in a timely manner to limit overall impact.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
@@ -776,11 +780,11 @@ The alerts SHOULD be sent to a monitored address or incorporated into a Security
 
 1. Sign in to **Microsoft 365 Defender**.
 
-2. Under **Email & collaboration**, select **Policies & rules**.
+2. Under **Email and collaboration**, select **Policies and rules**.
 
-3. Select **Alert Policy**.
+3. Select **Alert policy**.
 
-4. Select the checkbox next to each alert to enable as determined by the
+4. Select the checkbox next to each alert to enable, as determined by the
    agency and at a minimum the following:
 
    a. **Suspicious email sending patterns detected.**
@@ -808,7 +812,7 @@ For each enabled alert, to add one or more email recipients:
 
 1. Sign in to **Microsoft 365 Defender**.
 
-2. Under **Email & collaboration**, select **Policies & rules**.
+2. Under **Email and collaboration**, select **Policies and rules**.
 
 3. Select **Alert Policy**.
 
@@ -837,13 +841,13 @@ by users with E5 licenses is logged for one year.
 
 ### Policies
 #### MS.SECURITYSUITE.5.1v1
-Unified Audit logging SHALL be enabled.
+Unified audit logging SHALL be enabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.5.1v1; Criticality: SHALL -->
-- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling Unified Audit logging helps ensure agencies have visibility into user actions.
+- _Rationale:_ Responding to incidents without detailed information about activities that took place slows response actions. Enabling unified audit logging helps ensure agencies have visibility into user actions.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-12
 - _MITRE ATT&CK TTP Mapping:_
@@ -856,9 +860,9 @@ Audit logs SHALL be retained and searchable for a minimum of 3 months and retrie
 [![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssecuritysuite52v1-instructions)
 
 <!--Policy: MS.SECURITYSUITE.5.2v1; Criticality: SHALL -->
-- _Rationale:_ Audit logs may no longer be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred some time ago.
+- _Rationale:_ Audit logs may not be available when needed if they are not retained for a sufficient time. Increased log retention time gives an agency the necessary visibility to investigate incidents that occurred in the past.
 - _Last modified:_ September 2026
-- _Note:_ To maintain logs in M365 for longer than 180 days, the user generating the logs must meet the license requirement described below. If the user does not meet these requirements, their data is retained according to the highest priority retention policy. This retention might be either the default retention policy for the user's license or the highest priority policy that matches the user and its record type.
+- _Note:_ Retaining logs in M365 for longer than 180 days requires meeting the license requirement described below. Without the necessary licenses, data is retained according to the highest priority retention policy. This retention might be either the default retention policy for the user's license or the highest priority policy that matches the user and its record type.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AU-11
 - _MITRE ATT&CK TTP Mapping:_
   - [T1070: Indicator Removal](https://attack.mitre.org/techniques/T1070/)
@@ -906,12 +910,12 @@ To enable auditing via the **Microsoft Purview portal**:
 2. Under **Solutions**, select **Audit**.
 
 3. If auditing is not enabled, a banner is displayed to notify the
-administrator to start recording user and admin activity.
+administrator to start recording user and administrator activity.
 
 4. Click the **Start recording user and admin activity**.
 
 #### MS.SECURITYSUITE.5.2v1 Instructions
-One option for controlling how long logs are retained in M365 is to create one or more custom audit
+One option for controlling log retention times in M365 is to create one or more custom audit
 retention policies. For more details, see [Create an audit log retention policy](https://learn.microsoft.com/en-us/purview/audit-log-retention-policies?view=o365-worldwide#create-an-audit-log-retention-policy)
 instructions.
 
@@ -929,7 +933,7 @@ Junk email, or spam, can clutter user mailboxes and hamper communications
 across an agency. Implementing a spam filter helps to identify inbound spam and
 quarantine or move those messages. Microsoft Defender includes several
 capabilities for protecting against inbound spam emails. Using Microsoft
-Defender is not strictly required for this purpose; any product that
+Defender is not strictly required for this purpose. Any product that
 fulfills the requirements outlined in this baseline policy group may be
 used.
 
@@ -942,8 +946,8 @@ Emails detected as spam and phishing SHALL NOT be delivered to the user's inbox.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.6.1v1; Criticality: SHALL -->
-- _Rationale:_ Spam is a constant threat as junk mail can reduce user productivity, fill up mailboxes unnecessarily, and in some cases include malicious links or attachments.
-Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages, as needed, in case a message is filtered incorrectly.
+- _Rationale:_ Spam is a constant threat because junk mail can reduce user productivity, fill up mailboxes unnecessarily, and potentially include malicious links or attachments.
+Moving spam messages to a separate junk or quarantine folder helps users filter out spam while still giving them the ability to review messages in case a message is filtered incorrectly.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -958,11 +962,11 @@ Allowed domains SHALL NOT be added to inbound anti-spam protection policies.
 <!--Policy: MS.SECURITYSUITE.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Legitimate emails may be incorrectly filtered
 by spam protections. Adding allowed senders is an acceptable method of
-combating these false positives. Allowing an entire domain, especially
-a common domain like office.com, however, provides for a large number of
+combating these false positives. However, allowing an entire domain, especially
+a common domain like office.com, could allow a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ March 2026
-- _Note:_ Allowed senders MAY be added.
+- _Note:_ Allowed senders may be added.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
@@ -984,31 +988,31 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
-As the steps for MS.SECURITYSUITE.6.1v1 and MS.SECURITYSUITE.6.2v1 share many steps in common,
+Because the steps for MS.SECURITYSUITE.6.1v1 and MS.SECURITYSUITE.6.2v1 share similarities,
 steps for both policies are included in this section. Steps that do not strictly apply to
-MS.SECURITYSUITE.6.1v1 are followed by the applicable SCuBA policy in parenthesis.
+MS.SECURITYSUITE.6.1v1 are followed by the applicable SCuBA policy in parentheses.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-spam**.
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary. Note: be sure to
     select an *inbound* policy. If it's a custom policy, it will say "Custom anti-spam policy"
-    under **Type** instead of of **Custom output spam policy**.
-    2. Click **Edit users, groups, and domains**. _Note:_ the **Anti-spam inbound policy (Default)** policy applies to all users, so skip this step if modifying the default policy.
+    under **Type** instead of **Custom output spam policy**.
+    2. Click **Edit users, groups, and domains**. Note: The **Anti-spam inbound (Default)** policy applies to all users, so skip this step if modifying the default policy.
       - Add users, groups, and domains as needed. To make the policy apply to all users, under
         **Domains**, enter all the tenant domains.
       - (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
         to be exempted from this policy.
       - Click **Save**.
-    3. Click **Edit spam threshold and properties** See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
+    3. Click **Edit spam threshold and properties**. See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
     for configuration guidance. We recommend mirroring the values used for either the standard or
     strict preset policies. Click **Save**.
     4. Click **Edit actions**.
     5. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
-      - **Move message to Junk Email folder**
+      - **Move message to junk email folder**
       - **Redirect message to email address**
       - **Delete message**
       - **Quarantine message**
@@ -1020,7 +1024,7 @@ For users not added to the standard or strict preset policies:
       spam and phishing messages.
     7. Click **Edit allowed and blocked senders and domains**.
     8. Under **Allowed**, click **Allow domains**. Select any domains that have been allowed, then
-        **Delete** (the trash icon). (_MS.SECURITYSUITE.6.2v1_)
+        click **Delete** (the trash icon). (_MS.SECURITYSUITE.6.2v1_)
     9. Click **Save**.
 7.  If creating a new policy:
     1. Click **Create**, then **Inbound**.
@@ -1030,21 +1034,21 @@ For users not added to the standard or strict preset policies:
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
-    6. On the **Bulk email threshold & spam properties** page, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
+    6. On the **Bulk email threshold and spam properties** page, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
     for configuration guidance. We recommend mirroring the values used for either the standard or
     strict preset policies.
     7. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
-      - **Move message to Junk Email folder**
+      - **Move message to junk email folder**
       - **Redirect message to email address**
       - **Delete message**
       - **Quarantine message**
     8. If you selected **Redirect message to email address**, also fill in an appropriate email for
       the **Redirect to this email address** field, such as a mailbox set up for monitoring incoming
       spam and phishing messages.
-    9. Click **Next**
-    10. On the **Allow & block list** page, do not click **Allow domains** under **Allowed**. It
+    9. Click **Next**.
+    10. On the **Allow and block list** page, do not click **Allow domains** under **Allowed**. It
     should read **Domains (0)** under **Allowed**. (_MS.SECURITYSUITE.6.2v1_)
-    11. **Next**, then **Submit**.
+    11. Click **Next**, then click **Submit**.
 
 #### MS.SECURITYSUITE.6.2v1 Instructions
 
@@ -1059,11 +1063,11 @@ For users not added to the standard or strict preset policies, see [MS.SECURITYS
 ## 7. Link Protection
 
 Several technologies exist for protecting users from malicious links. For example,
-Microsoft Defender accomplishes this by prepending:
+Microsoft Defender accomplishes this by prepending the following to any URLs included in emails:
 
 `https://*.safelinks.protection.outlook.com/?url=`
 
-to any URLs included in emails. By prepending the safe links URL,
+By prepending the safe links URL,
 Microsoft can proxy the initial URL through their scanning service.
 Their proxy can perform the following actions:
 
@@ -1077,8 +1081,8 @@ Their proxy can perform the following actions:
 If all checks pass, the user is redirected to the original URL.
 
 Microsoft Defender for Office 365 includes link scanning capabilities.
-Using Microsoft Defender is not strictly required for this purpose;
-any product fulfilling the requirements outlined in this baseline policy group may be used.
+Using Microsoft Defender is not strictly required for this purpose.
+Any product meeting the requirements outlined in this baseline policy group may be used.
 If the agency uses Microsoft Defender for Office 365 to meet this baseline policy group,
 implementations steps are provided below.
 
@@ -1090,7 +1094,7 @@ URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams mes
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.7.1v1; Criticality: SHOULD -->
-- _Rationale:_ Users may be directed to malicious websites via links in email. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
+- _Rationale:_ Links in email may direct users to malicious websites. Blocking access to known, malicious URLs can prevent users from accessing known malicious websites.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3
 - _MITRE ATT&CK TTP Mapping:_
@@ -1102,7 +1106,7 @@ Direct download links SHOULD be scanned for malware.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
-<!--Policy: MS.SECURITYSUITE.15.2v1; Criticality: SHOULD -->
+<!--Policy: MS.SECURITYSUITE.7.2v1; Criticality: SHOULD -->
 - _Rationale:_ URLs in emails may direct users to download and run malware.
 Scanning direct download links in real-time for known malware and blocking access can prevent
 users from infecting their devices.
@@ -1118,7 +1122,7 @@ User click tracking SHOULD be enabled.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SECURITYSUITE.7.3v1; Criticality: SHOULD -->
-- _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know if a malicious link may have been visited after the fact to help tailor a response to a potential incident.
+- _Rationale:_ Users may click on malicious links in emails, leading to compromise or unauthorized data disclosure. Enabling user click tracking lets agencies know after the fact if a malicious link may have been visited, helping to tailor a potential incident response.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, AU-12c
 - _MITRE ATT&CK TTP Mapping:_
@@ -1143,15 +1147,15 @@ so no further actions are needed for users added to those policies. See
 [Adding Users to the Preset Security Policies](#appendix-a-adding-users-to-the-preset-security-policies)
 for instructions on adding users to these policies.
 
-As the steps for MS.SECURITYSUITE.7.1v1, MS.SECURITYSUITE.7.2v1, and MS.SECURITYSUITE.7.3v1 share
-many steps in common, steps for all three policies are included in this section. Steps that do not
-strictly apply to MS.SECURITYSUITE.7.1v1 are followed by the applicable SCuBA policy in parenthesis.
+Because the steps for MS.SECURITYSUITE.7.1v1, MS.SECURITYSUITE.7.2v1, and MS.SECURITYSUITE.7.3v1 share
+similarities, steps for all three policies are included in this section. Steps that do not
+strictly apply to MS.SECURITYSUITE.7.1v1 are followed by the applicable SCuBA policy in parentheses.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email & collaboration**, select **Policies & rules**.
+2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
-4.  Under **Policies**, select **Safe-links**.
+4.  Under **Policies**, select **Safe links**.
 5.  If modifying an existing policy:
     1. Click the name of the policy from the policy list to open the policy summary.
     2. Click **Edit users and domains**.
@@ -1161,13 +1165,13 @@ For users not added to the standard or strict preset policies:
           to be exempted from this policy.
         - Click **Save**.
     3. Click **Edit protection settings**.
-    4. Under **Email**, ensure the following options are selected:
+    4. Under **Email**, select the following options:
         - **On: Safe Links checks a list of known, malicious links when users click links in email. URLs are rewritten by default.**
         - **Apply Safe Links to email messages sent within the organization**
         - **Apply real-time URL scanning for suspicious links and links that point to files** (_MS.SECURITYSUITE.7.2v1_)
         - **Wait for URL scanning to complete before delivering the message** (_MS.SECURITYSUITE.7.2v1_)
     5. Under **Teams**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Teams. URLs are not rewritten.**
-    6. Under **Office 365 Apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office Apps. URLs are not rewritten.**
+    6. Under **Office 365 apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office apps. URLs are not rewritten.**
     7. Under **Click protection settings**, select **Track user clicks**. (_MS.SECURITYSUITE.7.3v1_)
     8. Click **Save**.
 6. If creating a new policy:
@@ -1178,15 +1182,15 @@ For users not added to the standard or strict preset policies:
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
-    6. Under **Email**, ensure the following options are selected:
+    6. Under **Email**, select the following options:
         - **On: Safe Links checks a list of known, malicious links when users click links in email. URLs are rewritten by default.**
         - **Apply Safe Links to email messages sent within the organization**
         - **Apply real-time URL scanning for suspicious links and links that point to files** (_MS.SECURITYSUITE.7.2v1_)
         - **Wait for URL scanning to complete before delivering the message** (_MS.SECURITYSUITE.7.2v1_)
     7. Under **Teams**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Teams. URLs are not rewritten.**
-    8. Under **Office 365 Apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office Apps. URLs are not rewritten.**
+    8. Under **Office 365 apps**, select **On: Safe Links checks a list of known, malicious links when users click links in Microsoft Office apps. URLs are not rewritten.**
     9. Under **Click protection settings**, select **Track user clicks**. (_MS.SECURITYSUITE.7.3v1_)
-    10. Click **Next**, **Next**, and **Submit**.
+    10. Click **Next**, then click **Submit**.
 
 
 #### MS.SECURITYSUITE.7.2v1 Instructions
@@ -1212,7 +1216,7 @@ For users not added to the standard or strict preset policies, see [MS.SECURITYS
 Microsoft Defender supports creating IP allow lists intended
 to prevent blocking emails from *specific* senders. However,
 as a result, emails from these senders bypass important security
-mechanisms, such as spam filtering, SPF, DKIM, DMARC, and [FROM address
+mechanisms, such as spam filtering, SPF, DKIM, DMARC, and ["From" address
 enforcement](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/anti-phishing-from-email-address-validation?view=o365-worldwide#override-from-address-enforcement).
 
 IP block lists block email from listed IP addresses. Although we have no specific guidance on which IP addresses to add, block lists can be used to block mail from known spammers.
@@ -1228,7 +1232,7 @@ IP allow lists SHOULD NOT be created.
 
 <!--Policy: MS.SECURITYSUITE.8.1v1; Criticality: SHOULD -->
 - _Rationale:_ Messages sent from IP addresses on an allow list bypass important
-security mechanisms, including spam filtering and sender authentication checks.  Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
+security mechanisms, including spam filtering and sender authentication checks. Avoiding use of IP allow lists prevents potential threats from circumventing security mechanisms.
 - _Last modified:_ March 2026
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
@@ -1247,7 +1251,7 @@ security mechanisms. While blocking all malicious senders is not feasible,
 blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
 - _Last modified:_ March 2026
-- _Note:_ A connection filter MAY be implemented to create an IP block list.
+- _Note:_ A connection filter may be implemented to create an IP block list.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - None
@@ -1278,9 +1282,9 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 1. Sign in to **Microsoft 365 Defender portal**.
 
-2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.
+2. From the left-hand menu, find **Email and collaboration** and select **Policies and rules**.
 
-3. Select **Threat Policies** from the list of policy names.
+3. Select **Threat policies** from the list of policy names.
 
 4. Under **Policies**, select **Anti-spam**.
 
@@ -1297,9 +1301,9 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 1. Sign in to **Microsoft 365 Defender portal**.
 
-2. From the left-hand menu, find **Email & collaboration** and select **Policies and Rules**.
+2. From the left-hand menu, find **Email and collaboration** and select **Policies and rules**.
 
-3. Select **Threat Policies** from the list of policy names.
+3. Select **Threat policies** from the list of policy names.
 
 4. Under **Policies**, select **Anti-spam**.
 
@@ -1314,15 +1318,15 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 # Appendix A: Adding Users to the Preset Security Policies
 As many controls in this baseline can be satisfied by adding users to the standard
-or strict security policies, we describe this process once here, rather than
-duplicating it in each applicable control.
+or strict security policies, this process is described once rather than in
+duplicative sections for each applicable control.
 
 To add users to the standard policy:
 1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under **Standard protection**, ensure the toggle is enabled such that it reads "Standard protection is on."
+2. In the left-hand menu, click on **Email and collaboration**, then click on **Policies and rules**.
+3. Select **Threat policies**.
+4. From the **Templated policies** section, select **Preset security policies**.
+5. Under **Standard protection**, enable the toggle so that it reads "Standard protection is on."
 6. Under **Standard protection is on**, select **Manage protection settings**.
 7. On the **Apply Exchange Online Protection** page, select **All recipients**.
 8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
@@ -1330,15 +1334,15 @@ To add users to the standard policy:
 9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
 10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
    to be exempted from the preset policies.
-11. Select **Next** on each page until the **Review and confirm your changes** page.
+11. Select **Next** on each page until the **Review and confirm your changes** page appears.
 12. On the **Review and confirm your changes** page, select **Confirm**.
 
 To add users to the strict policy:
 1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, go to **Email & Collaboration** > **Policies & Rules**.
-3. Select **Threat Policies**.
-4. From the **Templated policies** section, select **Preset Security Policies**.
-5. Under **Strict protection**, ensure the toggle is enabled such that it reads "Strict protection is on."
+2. In the left-hand menu, click on **Email and collaboration**, then click on **Policies and rules**.
+3. Select **Threat policies**.
+4. From the **Templated policies** section, select **Preset security policies**.
+5. Under **Strict protection**, ensure the toggle is enabled so that it reads "Strict protection is on."
 6. Under **Strict protection is on**, select **Manage protection settings**.
 7. On the **Apply Exchange Online Protection** page, select **All recipients**.
 8. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
@@ -1346,15 +1350,15 @@ To add users to the strict policy:
 9. Select **Next**, then on the **Apply Defender for Office 365 protection** page, select **All recipients**.
 10. (Optional) Under **Exclude these recipients**, add **Users** and **Groups**
    to be exempted from the preset policies.
-11. Select **Next** on each page until the **Review and confirm your changes** page.
+11. Select **Next** on each page until the **Review and confirm your changes** page appears.
 12. On the **Review and confirm your changes** page, select **Confirm**.
 
 See [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365) to understand the
 differences between the two preset policies.
 
 Note that a user can be added to multiple policies. In that case, the policies
-are applied in order of precedence, as desribed by
-[Order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
+are applied in order of precedence, as described by the
+[order of precedence for preset security policies and other threat policies](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies#order-of-precedence-for-preset-security-policies-and-other-threat-policies).
 
 
 **`TLP:CLEAR`**

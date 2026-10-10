@@ -2,23 +2,13 @@
 
 # CISA M365 Secure Configuration Baseline for Exchange Online
 
-Microsoft 365 (M365) Exchange Online is a cloud-based messaging platform that gives users easy access to their email and supports organizational meetings, contacts, and calendars. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Exchange Online security.
+Microsoft 365 (M365) Exchange Online is a cloud-based messaging platform that gives users easy access to their email and supports organizational meetings, contacts, and calendars. This secure configuration baseline (SCB) provides specific policies to strengthen Exchange Online security.
 
-Many admin controls for Exchange Online are found in the **Exchange admin center**.
-However, several essential security functions for Exchange Online require a dedicated security
-tool, e.g., for data loss prevention. M365 provides these security functions
-natively via Defender for Office 365. Notably, Defender for Office 365 capabilities
-require Defender for Office 365 Plan 1 or 2. These are included with E5 and G5
-and are available as add-ons for E3 and G3. However, third-party solutions that
-offer comparable security functions can be used in lieu of Defender.
-Refer to the [CISA M365 Secure Configuration Security Suite Baseline](securitysuite.md)
-for additional guidance.
+The Cybersecurity and Infrastructure Security Agency’s (CISA) Secure Cloud Business Applications (SCuBA) project provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
 
-The Secure Cloud Business Applications (SCuBA) project, run by the Cybersecurity and Infrastructure Security Agency (CISA), provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies’ cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian federal government agencies, organizations outside of the federal government may also find these baselines to be useful references to help reduce risks.
 
-The CISA SCuBA SCBs for M365 help secure federal information assets stored within M365 cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government’s threats and risk tolerance with the knowledge that every organization has different threat models and risk tolerance. While use of these baselines will be mandatory for civilian Federal Government agencies, organizations outside of the Federal Government may also find these baselines to be useful references to help reduce risks.
-
-For non-Federal users, the information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products; CISA has no control over vendor changes to products offerings or features.  Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+For non-federal users, the information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products. CISA has no control over vendor changes to products offerings or features. Accordingly, these SCuBA SCBs for M365 may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
 
 > This document is marked TLP:CLEAR. Recipients may share this information without restriction. Information is subject to standard copyright rules. For more information on the Traffic Light Protocol, see https://www.cisa.gov/tlp.
 
@@ -46,16 +36,18 @@ listed.
 
 ## Key Terminology
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD,"
+"SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be
 interpreted as described in
 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-**BOD 25-01 Requirement**: This indicator means that the policy is required under CISA BOD 25-01.
+**BOD 25-01 Requirement**: This indicator means that the policy is required under [CISA BOD 25-01](https://www.cisa.gov/news-events/directives/bod-25-01-implementing-secure-practices-cloud-services).
 
 **Automated Check**: This indicator means that the policy can be automatically checked via ScubaGear. See the [Quick Start Guide](../../../README.md#quick-start-guide) for help getting started.
 
-**Configurable**: This indicator means that the policy can be customized via config file.
+**Configurable**: This indicator means that the policy can be customized via a configuration file.
+
+**Requires Configuration**: This indicator means that ScubaGear requires configuration via configuration file in order to check the policy.
 
 **Manual**: This indicator means that the policy requires manual verification of configuration settings.
 
@@ -83,7 +75,7 @@ external domains prevents this technique when the adversary is
 external to the organization but does not impede legitimate
 internal forwarding.
 - _Last modified:_ March 2025
-- _Note:_ Automatic forwarding MAY be enabled with specific, agency-approved domains.
+- _Note:_ Automatic forwarding may be enabled with specific, agency-approved domains.
 There may be cases where an external domain is operationally needed and has an acceptable
 degree of risk, e.g., a domain controlled by the same agency that hasn't been added
 as an accepted domain in M365.
@@ -107,11 +99,11 @@ as an accepted domain in M365.
 ### Implementation
 
 #### MS.EXO.1.1v2 Instructions
-To disallow automatic forwarding to external domains:
+To disable automatic forwarding to external domains:
 
 1.  Sign in to the **Exchange admin center**.
 
-2.  Select **Mail flow**, then **Remote domains**.
+2.  Select **Mail flow**, then select **Remote domains**.
 
 3.  Select **Default**.
 
@@ -131,8 +123,8 @@ administrators to specify which IP addresses are explicitly approved to
 send email on behalf of the domain, facilitating detection of spoofed
 emails. SPF is not configured through the Exchange admin center, but
 rather via Domain Name System (DNS) records hosted by the agency's
-domain. Thus, the exact steps needed to set up SPF vary from agency to
-agency, but Microsoft's documentation provides some helpful starting
+domain. The exact steps needed to set up SPF vary from agency to
+agency. Microsoft's documentation provides some helpful starting
 points.
 
 ### Policies
@@ -145,11 +137,11 @@ An SPF policy SHALL be published for each domain that fails all non-approved sen
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/parameters.md#preferreddnsresolvers)
 
 <!--Policy: MS.EXO.2.2v3; Criticality: SHALL -->
-- _Rationale:_ An adversary may modify the `FROM` field
-of an email such that it appears to be a legitimate email sent by an
-agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged `FROM` fields by providing a means for recipients to detect emails spoofed in this way.  SPF is required for FCEB departments and agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security".
+- _Rationale:_ An adversary may modify the "From" field
+of an email so it appears to be a legitimate email sent by an
+agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged "From" fields by providing a means for recipients to detect emails spoofed in this way. SPF is required for FCEB agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security."
 - _Last modified:_ October 2025
-- _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Either hard or soft fail may be used to comply with this baseline policy.
+- _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Either hardfail or softfail may be used to comply with this baseline policy.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2d
 - _MITRE ATT&CK TTP Mapping:_
   - [T1656: Impersonation](https://attack.mitre.org/techniques/T1656/)
@@ -180,8 +172,8 @@ agency, facilitating phishing attacks. Publishing an SPF policy for each agency 
 #### MS.EXO.2.2v3 Instructions
 First, identify any approved senders specific to your agency, e.g., any on-premises mail servers. SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, referred to by domain name. See [External DNS records required for SPF](https://learn.microsoft.com/en-us/microsoft-365/enterprise/external-domain-name-system-records?view=o365-worldwide#external-dns-records-required-for-spf) for inclusions required for M365 to send email on behalf of your domain.
 
-SPF is not configured through the Exchange admin center, but rather via
-DNS records hosted by the agency's domain. Thus, the exact steps needed
+SPF is not configured through the Exchange admin center but rather via
+DNS records hosted by the agency's domain. The exact steps needed
 to set up SPF varies from agency to agency. See [Add or edit an SPF TXT record to help prevent email spam (Outlook, Exchange Online) \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/admin/get-help-with-domains/create-dns-records-at-any-dns-hosting-provider?view=o365-worldwide#add-or-edit-an-spf-txt-record-to-help-prevent-email-spam-outlook-exchange-online) for more details.
 
 To test your SPF configuration, consider using a web-based tool, such as
@@ -194,11 +186,11 @@ Resolve-DnsName example.onmicrosoft.com txt
 ```
 
 If SPF is configured, you will see a response resembling `v=spf1 include:spf.protection.outlook.com -all`
-returned; though by necessity, the contents of the SPF
+returned. The contents of the SPF
 policy may vary by agency. In this example, the SPF policy indicates
 the IP addresses listed by the policy for "spf.protection.outlook.com" are
 the only approved senders for "example.onmicrosoft.com." These IPs can be determined
-via an additional SPF lookup, this time for "spf.protection.outlook.com." Ensure the IP addresses listed as approved senders for your domains are correct. Additionally, ensure that each policy either ends in `-all` or `~all` or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does; these directives indicates that all IPs that don't match the policy should fail. See [SPF TXT record syntax for Microsoft 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-anti-spoofing?view=o365-worldwide#spf-txt-record-syntax-for-microsoft-365) for a more in-depth discussion
+via an additional SPF lookup, this time for "spf.protection.outlook.com." Ensure the IP addresses listed as approved senders for your domain are correct. Additionally, ensure that each policy either ends in `-all` or `~all`, or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does. This directive indicates that all IPs that don't match the policy should fail. See [SPF TXT record syntax for Microsoft 365 \| Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/email-authentication-anti-spoofing?view=o365-worldwide#spf-txt-record-syntax-for-microsoft-365) for a more in-depth discussion
 of SPF record syntax.
 
 ## 3. DomainKeys Identified Mail
@@ -206,7 +198,7 @@ of SPF record syntax.
 DomainKeys Identified Mail (DKIM) allows digital signatures to be added
 to email messages in the message header, providing a layer of both
 authenticity and integrity to emails. As with SPF, DKIM relies on DNS
-records; thus, its deployment depends on how an agency manages its DNS.
+records. The deployment of DKIM depends on how an agency manages its DNS.
 Exchange Online Protection (EOP) features include DKIM signing capabilities.
 
 ### Policies
@@ -218,8 +210,8 @@ DKIM SHOULD be enabled for all domains.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/parameters.md#preferreddnsresolvers)
 
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
-- _Rationale:_ An adversary may modify the `FROM` field
-of an email such that it appears to be a legitimate email sent by an
+- _Rationale:_ An adversary may modify the "From" field
+of an email so it appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Enabling DKIM is another means for
 recipients to detect spoofed emails and verify the integrity of email content.
 - _Last modified:_ June 2023
@@ -276,7 +268,7 @@ A DMARC policy SHALL be published for every second-level domain.
 
 <!--Policy: MS.EXO.4.1v1; Criticality: SHALL -->
 - _Rationale:_ Without a DMARC policy available for each domain, recipients
-may improperly handle SPF and DKIM failures, possibly enabling spoofed
+may improperly handle SPF and DKIM failures. This mishandling could allow spoofed
 emails to reach end users' mailboxes. Publishing DMARC records at the
 second-level domain protects the second-level domains and all subdomains.
 - _Last modified:_ June 2023
@@ -295,8 +287,8 @@ The DMARC message rejection option SHALL be p=reject.
 
 <!--Policy: MS.EXO.4.2v1; Criticality: SHALL -->
 - _Rationale:_ Of the three policy options (i.e., none, quarantine, and reject),
-reject provides the strongest protection. Reject is the level of protection
-required by BOD 18-01 for FCEB departments and agencies.
+reject provides the strongest protection. BOD 18-01 requires the "reject" level of protection
+for FCEB agencies.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -314,9 +306,9 @@ The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cy
 <!--Policy: MS.EXO.4.3v1; Criticality: SHALL -->
 - _Rationale:_ Email spoofing attempts are not inherently visible to domain
 owners. DMARC provides a mechanism to receive reports of spoofing attempts.
-Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports gives CISA insight into spoofing attempts and is required by BOD 18-01 for FCEB departments and agencies.
+Including <reports@dmarc.cyber.dhs.gov> as a point of contact for these reports gives CISA insight into spoofing attempts. This is required by BOD 18-01 for FCEB agencies.
 - _Last modified:_ June 2023
-- _Note:_ Only federal, executive branch, departments and agencies should
+- _Note:_ Only federal civilian executive branch (FCEB) departments and agencies should
           include this email address in their DMARC record.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
 - _MITRE ATT&CK TTP Mapping:_
@@ -382,7 +374,7 @@ Resolve-DnsName _dmarc.example.com txt
 ```
 
 If DMARC is configured, a response resembling `v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com`
-will be returned, though by necessity, the contents of the record will vary
+will be returned. Though, by necessity, the contents of the record will vary
 by agency. In this example, the policy indicates all emails failing the
 SPF/DKIM checks are to be rejected and aggregate reports sent to
 reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be
@@ -403,11 +395,11 @@ See [MS.EXO.4.1v1 Instructions](#msexo41v1-instructions) for an overview of how 
 
 ## 5. Simple Mail Transfer Protocol Authentication
 
-Modern email clients that connect to Exchange Online mailboxes—including
+Modern email clients that connect to Exchange Online mailboxes, including
 Outlook, Outlook on the web, iOS Mail, and Outlook for iOS and
-Android—do not use Simple Mail Transfer Protocol Authentication (SMTP
+Android, do not use Simple Mail Transfer Protocol Authentication (SMTP
 AUTH) to send email messages. SMTP AUTH is only needed for applications
-outside of Outlook that send email messages. Multi-factor authentication
+outside of Outlook that send email messages. Multifactor authentication
 (MFA) cannot be enforced while using SMTP Auth. Proceed with caution if
 SMTP Auth needs to be enabled for any use case.
 
@@ -446,13 +438,13 @@ To disable SMTP AUTH for the organization:
 
 1. Sign in to the **Exchange admin center**.
 
-2. On the left hand pane, select **Settings**; then from the settings list, select **Mail Flow**.
+2. On the left-hand pane, select **Settings**. Then select **Mail flow** from the settings list.
 
 3. Make sure the setting **Turn off SMTP AUTH protocol for your organization** is checked.
 
 ## 6. Calendar and Contact Sharing
 
-Exchange Online allows creation of sharing polices that soften default restrictions on contact and calendar details sharing. These policies should be enabled with caution and only after considering the following policies.
+MS Exchange Online allows creation of sharing polices that soften default restrictions on contact and calendar details sharing. These policies should be enabled with caution and only after considering the following policies.
 
 ### Policies
 
@@ -464,9 +456,9 @@ Contact folders SHALL NOT be shared with all domains.
 
 <!--Policy: MS.EXO.6.1v1; Criticality: SHALL -->
 - _Rationale:_ Contact folders may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
-for specific legitimate use as needed.
+specific legitimate use as needed.
 - _Last modified:_ June 2023
-- _Note:_ Contact folders MAY be shared with specific domains.
+- _Note:_ Contact folders may be shared with specific domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -481,9 +473,9 @@ Calendar details SHALL NOT be shared with all domains.
 
 <!--Policy: MS.EXO.6.2v1; Criticality: SHALL -->
 - _Rationale:_ Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
-for legitimate use as needed.
+legitimate use as needed.
 - _Last modified:_ June 2023
-- _Note:_ Calendar details MAY be shared with specific domains.
+- _Note:_ Calendar details may be shared with specific domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
@@ -513,7 +505,7 @@ To restrict sharing with all domains:
 
 2. On the left-hand pane under **Organization**, select **Sharing**.
 
-3. Select **Individual Sharing**.
+3. Select **Individual sharing**.
 
 4. For all existing policies, select the policy, then select **Manage domains**.
 
@@ -528,7 +520,7 @@ this policy.
 
 ## 7. External Sender Warnings
 
-Mail flow rules allow incoming email modification, such that email from external users can be easily identified (e.g., by prepending the subject line with "\[External\]").
+Mail flow rules allow incoming email modification so that emails from external users can be easily identified (e.g., by prepending the subject line with "\[External\]").
 
 ### Policies
 
@@ -540,7 +532,7 @@ External sender warnings SHALL be implemented.
 
 
 <!--Policy: MS.EXO.7.1v1; Criticality: SHALL -->
-- _Rationale:_ Alerting users when email originates from outside their organization can encourage them to exercise increased caution, especially if an email is one they expected from an internal sender.
+- _Rationale:_ Alerting users when emails originate from outside their organization can encourage them to exercise increased caution, especially if they expected to receive the email from an internal sender.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
@@ -580,24 +572,24 @@ To create a mail flow rule to produce external sender warnings:
 
 6.  Under **Apply this rule if…,** select **The sender is external/internal**.
 
-7.  Under **select sender location**, select **Outside the organization**, then click **OK**.
+7.  Under **Select sender location**, select **Outside the organization**, then click **OK**.
 
 8.  Under **Do the following…,** select **Prepend the subject of the message with…**.
 
-9.  Under **specify subject prefix**, enter a message such as
+9.  Under **Specify subject prefix**, enter a message such as
     "\[External\]" (without the quotation marks), then click **OK**.
 
 10. Click **Next**.
 
 11. Under **Choose a mode for this rule**, select **Enforce**.
 
-12. Leave the **Severity** as **Not Specified**.
+12. Leave the **Severity** level as **Not specified**.
 
 13. Leave the **Match sender address in message** as **Header** and click **Next**.
 
-14. Click **Finish** and then **Done**.
+14. Click **Finish**, then click **Done**.
 
-15. The new rule will be disabled.  Re-select the new rule to show its
+15. The new rule will be disabled. Re-select the new rule to show its
     settings and slide the **Enable or disable rule** slider to the right
     until it shows as **Enabled**.
 
