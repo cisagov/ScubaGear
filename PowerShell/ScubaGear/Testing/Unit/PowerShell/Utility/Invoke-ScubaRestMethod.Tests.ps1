@@ -113,11 +113,54 @@ InModuleScope Utility {
                         -MaxRetries 1 -RetryDelaySeconds 5 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
                 Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 3600 }
             }
+
+            It 'Caps the Retry-After wait at a lower MaxDelaySeconds when one is supplied' {
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 429 -RetryAfter '999999999') }
+                Mock -ModuleName Utility Start-Sleep { }
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                        -MaxRetries 1 -RetryDelaySeconds 5 -MaxDelaySeconds 120 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
+                Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 120 }
+            }
+
+            It 'Does not lengthen a Retry-After that is already below MaxDelaySeconds' {
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 429 -RetryAfter '30') }
+                Mock -ModuleName Utility Start-Sleep { }
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                        -MaxRetries 1 -RetryDelaySeconds 5 -MaxDelaySeconds 120 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
+                Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 30 }
+            }
         }
 
-        Context '500/503 retry behavior' {
-            It 'Retries on 503 with backoff and eventually throws after exhausting retries' {
-                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 503) }
+        Context 'Standard provider retry settings' {
+            It 'Get-ScubaRestRetryDefaults returns 3 retries, a 5 second delay and a 120 second cap' {
+                $Defaults = Get-ScubaRestRetryDefaults
+                $Defaults.MaxRetries | Should -Be 3
+                $Defaults.RetryDelaySeconds | Should -Be 5
+                $Defaults.MaxDelaySeconds | Should -Be 120
+                $Defaults.Keys.Count | Should -Be 3
+            }
+
+            It 'Accepts the defaults as a splat and keeps every wait at or below 120 seconds' {
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 429 -RetryAfter '999999999') }
+                Mock -ModuleName Utility Start-Sleep { }
+                $Retry = Get-ScubaRestRetryDefaults
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' @Retry `
+                        -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
+                # 1 initial attempt + 3 retries
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 4 -Exactly
+                Should -Invoke -ModuleName Utility Start-Sleep -Times 3 -Exactly -ParameterFilter { $Seconds -eq 120 }
+            }
+        }
+
+        Context '5xx retry behavior' {
+            It 'Retries on <Code> with backoff and eventually throws after exhausting retries' -ForEach @(
+                @{ Code = 500 }
+                @{ Code = 502 }
+                @{ Code = 503 }
+                @{ Code = 504 }
+            ) {
+                $script:RetryCode = $Code
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode $script:RetryCode) }
                 Mock -ModuleName Utility Start-Sleep { }
                 { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
                         -MaxRetries 2 -RetryDelaySeconds 5 -WarningAction SilentlyContinue -InformationAction SilentlyContinue } | Should -Throw
@@ -125,6 +168,26 @@ InModuleScope Utility {
                 # First retry waits 5s, second retry doubles to 10s
                 Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 5 }
                 Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq 10 }
+            }
+
+            It 'Retries on <Code> and succeeds once the gateway recovers' -ForEach @(
+                @{ Code = 502 }
+                @{ Code = 504 }
+            ) {
+                $script:RetryCode = $Code
+                $script:CallCount = 0
+                Mock -ModuleName Utility Invoke-RestMethod {
+                    $script:CallCount++
+                    if ($script:CallCount -eq 1) {
+                        throw (New-FakeRestException -StatusCode $script:RetryCode)
+                    }
+                    return [pscustomobject]@{ result = 'ok' }
+                }
+                Mock -ModuleName Utility Start-Sleep { }
+                $Result = Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                    -MaxRetries 2 -RetryDelaySeconds 5 -WarningAction SilentlyContinue
+                $Result.result | Should -Be 'ok'
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
             }
         }
 
@@ -187,6 +250,18 @@ InModuleScope Utility {
                 Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 1 -Exactly
             }
 
+            It 'Does not retry on <Code> and throws immediately' -ForEach @(
+                @{ Code = 400 }
+                @{ Code = 401 }
+                @{ Code = 403 }
+            ) {
+                $script:RetryCode = $Code
+                Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode $script:RetryCode) }
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                        -MaxRetries 3 -InformationAction SilentlyContinue } | Should -Throw
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 1 -Exactly
+            }
+
             It 'Does not retry when MaxRetries is not specified (defaults to 0)' {
                 Mock -ModuleName Utility Invoke-RestMethod { throw (New-FakeRestException -StatusCode 429) }
                 { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
@@ -226,6 +301,23 @@ InModuleScope Utility {
 
             It 'Rejects a negative RetryDelaySeconds value' {
                 { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' -RetryDelaySeconds -1 } | Should -Throw
+            }
+
+            It 'Rejects a MaxDelaySeconds value of <Value>' -ForEach @(
+                @{ Value = 0 }
+                @{ Value = -1 }
+                @{ Value = 3601 }
+            ) {
+                { Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' -MaxDelaySeconds $Value } | Should -Throw
+            }
+
+            It 'Accepts a MaxDelaySeconds value of <Value>' -ForEach @(
+                @{ Value = 1 }
+                @{ Value = 120 }
+                @{ Value = 3600 }
+            ) {
+                Mock -ModuleName Utility Invoke-RestMethod { return [pscustomobject]@{ result = 'ok' } }
+                (Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' -MaxDelaySeconds $Value).result | Should -Be 'ok'
             }
         }
     }
@@ -332,6 +424,63 @@ Describe -Tag 'Utility' -Name 'Invoke-ScubaRestMethod API endpoints' {
         } | Where-Object { $_ -notin $Covered }
 
         $Missing | Should -BeNullOrEmpty -Because 'each REST helper and environment in the catalog should have an expected URL above'
+    }
+
+    Context 'Retry when throttled' {
+        BeforeAll {
+            function New-RestHelperParams {
+                param($Function, $BaseUrl, $TenantId)
+                $Params = @{ AccessToken = 'tok' }
+                switch ($Function) {
+                    'Get-SPOTenantRest' { $Params.AdminUrl = $BaseUrl }
+                    'Get-PowerPlatformTenantIsolationRest' { $Params.BaseUrl = $BaseUrl; $Params.TenantId = $TenantId }
+                    'Invoke-EXORestMethod' { $Params.ApiEndpoint = "$BaseUrl/adminapi/beta/$TenantId/InvokeCommand"; $Params.CmdletName = 'Get-OrganizationConfig' }
+                    default { $Params.BaseUrl = $BaseUrl }
+                }
+                return $Params
+            }
+        }
+
+        # Every provider REST helper must hold off and retry on HTTP 429 instead of failing the check on the first throttle.
+        # The first response asks for an enormous wait, which must be shortened to the helper's cap before the retry.
+        # Exchange Online keeps its original settings (default 3600 second cap); the other helpers cap waits at 120 seconds.
+        $RetryCases = @($combinedRestCases | Where-Object { $_.EnvName -eq 'commercial' } | ForEach-Object {
+                $Case = $_.Clone()
+                $Case.ExpectedWait = if ($Case.Function -eq 'Invoke-EXORestMethod') { 3600 } else { 120 }
+                $Case
+            })
+
+        It 'retries once after an HTTP 429 and waits at most <ExpectedWait> seconds for <Function> (<Product>)' -TestCases $RetryCases {
+            $BaseUrl = Get-ScubaGearServiceEndpoint -Product $Product -Environment 'commercial' -Domain 'contoso'
+            $Params = New-RestHelperParams -Function $Function -BaseUrl $BaseUrl -TenantId $TenantId
+
+            $script:ThrottledCalls = 0
+            Mock -ModuleName Utility Invoke-RestMethod {
+                $script:ThrottledCalls++
+                if ($script:ThrottledCalls -eq 1) {
+                    $Headers = [System.Net.WebHeaderCollection]::new()
+                    $Headers.Add('Retry-After', '999999999')
+                    $FakeResponse = [PSCustomObject]@{
+                        StatusCode        = 429
+                        StatusDescription = 'Status 429'
+                        ContentType       = 'application/json'
+                        ContentLength     = 0
+                        Headers           = $Headers
+                    }
+                    $FakeResponse | Add-Member -MemberType ScriptMethod -Name GetResponseStream -Value { return $null }
+                    $Failure = New-Object System.Exception 'Simulated HTTP 429'
+                    $Failure | Add-Member -NotePropertyName Response -NotePropertyValue $FakeResponse -Force
+                    throw $Failure
+                }
+                return [pscustomobject]@{ value = @(); d = [pscustomobject]@{} }
+            }
+            Mock -ModuleName Utility Start-Sleep { }
+
+            $null = & $Function @Params -WarningAction SilentlyContinue
+
+            Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
+            Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly -ParameterFilter { $Seconds -eq $ExpectedWait }
+        }
     }
 }
 
