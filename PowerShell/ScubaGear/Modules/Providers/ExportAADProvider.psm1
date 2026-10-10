@@ -479,6 +479,11 @@ function Get-PrivilegedUser {
         }
     }
 
+    Write-ScubaLog -Message "Resolved $(@($PrivilegedUsers.Keys).Count) privileged object(s) across $(@($AADRoles).Count) role(s)." -Level Debug -Source "Get-PrivilegedUser" -Data @{
+        PrivilegedObjectCount = @($PrivilegedUsers.Keys).Count
+        RoleCount             = @($AADRoles).Count
+    }
+
     $PrivilegedUsers
 }
 
@@ -756,6 +761,13 @@ function GetConfigurationsForPimGroups{
     # Filter out phantom groups from $PIMGroups
     $PIMGroups = @($PIMGroups | Where-Object { $PhantomPIMGroups.Id -notcontains $_.Id })
 
+    Write-ScubaLog -Message "Processing PIM for Groups configurations." -Level Debug -Source "GetConfigurationsForPimGroups" -Data @{
+        DiscoveredPIMGroupCount   = @($AllPIMGroups).Count
+        AssignedPIMGroupCount     = @($PIMGroups).Count + @($PhantomPIMGroups).Count
+        PhantomPIMGroupCount      = @($PhantomPIMGroups).Count
+        ProcessedPIMGroupCount    = @($PIMGroups).Count
+    }
+
     # Add display names to the PIM group objects for easier access later
     foreach ($Group in $PIMGroups) {
         $displayNameResponse = $GroupDisplayNameResults[$Group.Id]
@@ -856,6 +868,11 @@ function GetConfigurationsForRoles{
     # Get all the configuration settings (aka rules) for all the roles in the tenant. API information is contained within the Permissions JSON file, however the filter is being defined here since ScubaGear uses this API in other areas that require a different filter.
     $RolePolicyAssignments = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyAssignment" -M365Environment $M365Environment -queryParams @{'$filter' = "scopeId eq '/' and scopeType eq 'DirectoryRole'"}).Value
 
+    Write-ScubaLog -Message "Retrieving PIM policy rules for $(@($PrivilegedRoleArray).Count) privileged role(s)." -Level Debug -Source "GetConfigurationsForRoles" -Data @{
+        PrivilegedRoleCount   = @($PrivilegedRoleArray).Count
+        PolicyAssignmentCount = @($RolePolicyAssignments).Count
+    }
+
     foreach ($Role in $PrivilegedRoleArray) {
         $RolePolicies = @()
         $RoleTemplateId = $Role.RoleTemplateId
@@ -864,10 +881,27 @@ function GetConfigurationsForRoles{
         $PolicyAssignment = $RolePolicyAssignments | Where-Object -Property RoleDefinitionId -eq -Value $RoleTemplateId
 
         # Get the detailed configuration settings, API information is contained within the Permissions JSON file.
-        $RolePolicies = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyAssignment.PolicyId).Value
+        # Wrapped so a per-role failure (e.g. HTTP 403 missing permission) is logged with role context and does not abort the whole export.
+        try {
+            $RolePolicies = (Invoke-GraphDirectly -Commandlet "Get-MgBetaPolicyRoleManagementPolicyRule" -M365Environment $M365Environment -Id $PolicyAssignment.PolicyId).Value
+        }
+        catch {
+            Write-ScubaLog -Message "Failed to retrieve PIM policy rules for role '$($Role.DisplayName)'." -Level Warning -Source "GetConfigurationsForRoles" -Data @{
+                RoleName       = $Role.DisplayName
+                RoleTemplateId = $RoleTemplateId
+                PolicyId       = $PolicyAssignment.PolicyId
+            } -Exception $_.Exception
+            $RolePolicies = @()
+        }
 
         # Get a list of the users / groups assigned to this role
         $RoleAssignments = @($AllRoleAssignments | Where-Object { $_.RoleDefinitionId -eq $RoleTemplateId })
+
+        Write-ScubaLog -Message "Processed PIM configuration for role '$($Role.DisplayName)'." -Level Debug -Source "GetConfigurationsForRoles" -Data @{
+            RoleName        = $Role.DisplayName
+            RuleCount       = @($RolePolicies).Count
+            AssignmentCount = @($RoleAssignments).Count
+        }
 
         # Store the data that we retrieved in the Role object which is part of the privileged role array
         $Role | Add-Member -Name "Assignments" -Value $RoleAssignments -MemberType NoteProperty
@@ -916,6 +950,11 @@ function Get-PrivilegedRole {
     # The RoleTemplateId value is passed to other cmdlets to retrieve role/group security configuration rules and user/group assignments.
     $PrivilegedRoleArray = (Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryRoleTemplate" -M365Environment $M365Environment).Value | Where-Object { $_.DisplayName -in $PrivilegedRoles } | Select-Object "DisplayName", @{Name='RoleTemplateId'; Expression={$_.Id}}
 
+    Write-ScubaLog -Message "Building privileged role array." -Level Debug -Source "Get-PrivilegedRole" -Data @{
+        PrivilegedRoleCount     = @($PrivilegedRoleArray).Count
+        TenantHasPremiumLicense = $TenantHasPremiumLicense
+    }
+
     # If the tenant has the premium license then you can access the PIM service to get the role configuration policies and the active role assigments
     if ($TenantHasPremiumLicense) {
         # In this block We set LogErrors to false when calling Trace-ScubaFunction because we handle errors locally
@@ -926,6 +965,11 @@ function Get-PrivilegedRole {
         }
         $AllEligibleRoleAssignments = Trace-ScubaFunction -FunctionName "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -LogErrors $false -ScriptBlock {
             (Invoke-GraphDirectly -Commandlet "Get-MgBetaRoleManagementDirectoryRoleEligibilityScheduleInstance" -M365Environment $M365Environment).Value
+        }
+
+        Write-ScubaLog -Message "Retrieved PIM role assignments." -Level Debug -Source "Get-PrivilegedRole" -Data @{
+            ActiveAssignmentCount   = @($AllRoleAssignments).Count
+            EligibleAssignmentCount = @($AllEligibleRoleAssignments).Count
         }
 
         # Each of the helper functions below add configuration settings (aka rules) to the role array.
