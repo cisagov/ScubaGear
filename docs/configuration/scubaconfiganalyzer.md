@@ -69,11 +69,13 @@ The toolbar across the top controls the scan:
   listed, e.g. *Microsoft Entra ID (aad)*, *Exchange Online (exo)*, *Security Suite
   (securitysuite)*).
 - **Environment** - `commercial`, `gcc`, `gcchigh`, or `dod`. This also sets the
-  `M365Environment` value written into the generated YAML.
+  `M365Environment` value written into the generated YAML. When you load a results file, it is
+  set to the environment that run used.
 - **Connect & Scan Tenant** - signs in to Microsoft Graph (and Exchange Online if a selected
   product needs it) and scans the tenant live.
 - **Load Results JSON...** - skips the sign-in and analyzes an existing `ScubaResults_*.json`
-  from a previous ScubaGear run.
+  from a previous ScubaGear run. The configuration that run used is also read from the results
+  file and carried into the generated YAML (see [Step 6](#step-6---take-the-configuration)).
 
 The header shows the tenant, how you are connected, the scan time, and the analyzer version.
 While a scan runs, the window switches to the **Activity Log** tab so you can watch progress.
@@ -128,7 +130,8 @@ and - when expanded - the users, groups, or applications it excludes.
 - The **IN USE** badge marks the policy the generated YAML is currently based on.
 - If the analyzer chose the wrong policy, expand another card and click **Use this policy**. The
   exclusions from that policy are used instead, and both the control YAML and the full
-  configuration are regenerated immediately.
+  configuration are regenerated immediately. Exclusions that were already in the configuration of
+  a loaded results file are kept, and the chosen policy's exclusions are added to them.
 
 ### Step 5 - Review the generated exclusions
 
@@ -155,7 +158,20 @@ explains that instead and points you at the remediation steps.
 ### Step 6 - Take the configuration
 
 The **Configuration YAML** tab assembles every control's exclusions into one ScubaGear
-configuration file. From there you can:
+configuration file.
+
+When the analysis came from a results file, the file also includes the configuration that
+ScubaGear run used, so it is complete enough to run again as-is:
+
+- Settings such as `OrgName`, `ProductNames`, `M365Environment`, and output options are kept.
+  Settings left at their ScubaGear defaults are left out.
+- Exclusions already configured for any product are kept, including products you did not select
+  in the toolbar. The analyzer's detected exclusions are added to the matching controls.
+- `OmitPolicy` and `AnnotatePolicy` entries are kept.
+- `OPAPath` and `OutPath` are written as commented-out lines, because they point to folders on
+  the machine that produced the results. Uncomment and adjust them if you need them.
+
+From there you can:
 
 - **Open ScubaConfig App** - launch the [ScubaConfig App](scubaconfigapp.md) with this
   configuration already loaded, so you can add org details, justifications, and omissions.
