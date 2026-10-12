@@ -62,7 +62,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
@@ -98,7 +98,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
@@ -134,7 +134,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
@@ -174,12 +174,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
-              updates:
-                State: disabled
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
@@ -213,57 +208,11 @@ TestPlan:
                     Value: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - only phishing-resistant MFA is allowed
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
-              updates:
-                State: disabled
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
-              updates:
-                State: enabled
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    IncludeRoles: []
-                    ExcludeRoles: []
-                    ExcludeGuestsOrExternalUsers: null
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-                  SignInRiskLevels: ["high", "medium"]
-                GrantControls:
-                  AuthenticationStrength:
-                    AllowedCombinations:
-                      - "windowsHelloForBusiness"
-                      - "fido2"
-                      - "x509CertificateMultiFactor"
-                  BuiltInControls: []
-                SessionControls:
-                  SignInFrequency:
-                    AuthenticationType: primaryAndSecondaryAuthentication
-                    FrequencyInterval: everyTime
-                    IsEnabled: true
-                    Type: null
-                    Value: null
-        Postconditions: []
-        ExpectedResult: false
       - TestDescription: MS.AAD.2.4v1 Compliant case - all users covered by MS.AAD.2.3v2 with no exclusions
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
-              updates:
-                State: disabled
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
@@ -299,12 +248,7 @@ TestPlan:
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
-              updates:
-                State: disabled
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
+              displayName: Automated Test 1 - DO NOT MODIFY
               updates:
                 State: enabled
                 Conditions:
