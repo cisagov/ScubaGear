@@ -183,6 +183,7 @@ Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA an
 #### MS.AAD.2.4v1
 Sign-ins detected as medium or high risk SHALL require MFA and reauthentication every time for users who authenticate with a password.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
