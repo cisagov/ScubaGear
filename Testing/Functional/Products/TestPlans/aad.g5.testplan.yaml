@@ -55,38 +55,14 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.2.3v1
+  - PolicyId: MS.AAD.2.3v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.3v1 Non-Compliant case - low risk sign ins are blocked
+      - TestDescription: MS.AAD.2.3v2 Non-Compliant case - only high risk sign ins require phishing-resistant MFA
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
-              updates:
-                State: enabled
-                Conditions:
-                  Users:
-                    IncludeUsers: ["All"]
-                    ExcludeUsers: []
-                    IncludeGroups: []
-                    ExcludeGroups: []
-                    IncludeRoles: []
-                    ExcludeRoles: []
-                  Applications:
-                    IncludeApplications: ["All"]
-                    ExcludeApplications: []
-                  SignInRiskLevels: ["low"]
-                GrantControls:
-                  BuiltInControls:
-                    - block
-        Postconditions: []
-        ExpectedResult: false
-      - TestDescription: MS.AAD.2.3v1 Compliant case - high risk sign ins are blocked
-        Preconditions:
-          - Command: UpdateCachedConditionalAccessPolicyByName
-            Splat:
-              displayName: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
               updates:
                 State: enabled
                 Conditions:
@@ -103,8 +79,263 @@ TestPlan:
                     ExcludeApplications: []
                   SignInRiskLevels: ["high"]
                 GrantControls:
-                  BuiltInControls:
-                    - block
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: everyTime
+                    IsEnabled: true
+                    Type: null
+                    Value: null
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.3v2 Non-Compliant case - sign in frequency is not every time
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high", "medium"]
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: timeBased
+                    IsEnabled: true
+                    Type: hours
+                    Value: 4
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.3v2 Compliant case - medium and high risk sign ins require phishing-resistant MFA every time
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high", "medium"]
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: everyTime
+                    IsEnabled: true
+                    Type: null
+                    Value: null
+        Postconditions: []
+        ExpectedResult: true
+
+  - PolicyId: MS.AAD.2.4v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - only high risk sign ins require MFA
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              updates:
+                State: disabled
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high"]
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "password,microsoftAuthenticatorPush"
+                      - "password,softwareOath"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: everyTime
+                    IsEnabled: true
+                    Type: null
+                    Value: null
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - only phishing-resistant MFA is allowed
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              updates:
+                State: disabled
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high", "medium"]
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: everyTime
+                    IsEnabled: true
+                    Type: null
+                    Value: null
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.4v1 Compliant case - all users covered by MS.AAD.2.3v2 with no exclusions
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
+              updates:
+                State: disabled
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high", "medium"]
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: everyTime
+                    IsEnabled: true
+                    Type: null
+                    Value: null
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.AAD.2.4v1 Compliant case - medium and high risk sign ins require MFA every time
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.3v2 Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA
+              updates:
+                State: disabled
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.4v1 Sign-ins detected as medium or high risk SHALL require MFA for password users
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  SignInRiskLevels: ["high", "medium"]
+                GrantControls:
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - "windowsHelloForBusiness"
+                      - "fido2"
+                      - "x509CertificateMultiFactor"
+                      - "password,microsoftAuthenticatorPush"
+                      - "password,softwareOath"
+                  BuiltInControls: []
+                SessionControls:
+                  SignInFrequency:
+                    AuthenticationType: primaryAndSecondaryAuthentication
+                    FrequencyInterval: everyTime
+                    IsEnabled: true
+                    Type: null
+                    Value: null
         Postconditions: []
         ExpectedResult: true
 

@@ -208,8 +208,8 @@
         "notes": "This setting is configured through the Entra admin center, not via Graph API. Manual validation required."
       },
       {
-        "id": "MS.AAD.2.3v1",
-        "name": "Sign-ins detected as high risk SHALL be blocked",
+        "id": "MS.AAD.2.3v2",
+        "name": "Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA and reauthentication every time for passwordless users",
         "exclusionField": "CapExclusions",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
         "validationLogic": {
@@ -225,20 +225,29 @@
               "applications": {
                 "includeApplications": ["All"]
               },
-              "signInRiskLevels": ["high"]
+              "signInRiskLevels": ["high", "medium"]
             },
             "grantControls": {
-              "builtInControls": ["block"],
-              "operator": "OR"
+              "operator": "OR",
+              "authenticationStrength": {
+                "id": "00000000-0000-0000-0000-000000000004",
+                "displayName": "Phishing-resistant MFA"
+              }
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "frequencyInterval": "everyTime"
+              }
             }
           }
         },
         "buildInstructions": {
-          "description": "Create a Conditional Access policy blocking high-risk sign-ins",
+          "description": "Create a Conditional Access policy requiring phishing-resistant MFA and reauthentication every time for medium and high risk sign-ins. Exclude the users and groups that authenticate with a password; they are covered by MS.AAD.2.4v1",
           "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
           "apiMethodCreate": "POST",
           "payloadTemplate": {
-            "displayName": "ScubaGear: Block High Risk Sign-Ins",
+            "displayName": "ScubaGear: Require Phishing-Resistant MFA for Medium and High Risk Sign-Ins",
             "state": "enabled",
             "conditions": {
               "users": {
@@ -249,11 +258,20 @@
               "applications": {
                 "includeApplications": ["All"]
               },
-              "signInRiskLevels": ["high"]
+              "signInRiskLevels": ["high", "medium"]
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["block"]
+              "authenticationStrength": {
+                "@odata.id": "https://graph.microsoft.com/beta/policies/authenticationStrengthPolicies/00000000-0000-0000-0000-000000000004"
+              }
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "authenticationType": "primaryAndSecondaryAuthentication",
+                "frequencyInterval": "everyTime"
+              }
             }
           },
           "exclusionHandling": [
@@ -261,7 +279,78 @@
             "conditions.users.excludeGroups"
           ]
         },
-        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection"
+        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. Users and groups that authenticate with a password MAY be excluded but must be targeted by a policy that meets MS.AAD.2.4v1"
+      },
+      {
+        "id": "MS.AAD.2.4v1",
+        "name": "Sign-ins detected as medium or high risk SHALL require MFA and reauthentication every time for users who authenticate with a password",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": false,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "signInRiskLevels": ["high", "medium"]
+            },
+            "grantControls": {
+              "anyOf": [
+                { "builtInControls": ["mfa"] },
+                { "authenticationStrength": { "id": "00000000-0000-0000-0000-000000000002" } }
+              ]
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "frequencyInterval": "everyTime"
+              }
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring MFA and reauthentication every time for medium and high risk sign-ins. Include every user and group excluded from the MS.AAD.2.3v2 policy",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require MFA for Medium and High Risk Sign-Ins (Password Users)",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": [],
+                "includeGroups": [],
+                "excludeUsers": [],
+                "excludeGroups": []
+              },
+              "applications": {
+                "includeApplications": ["All"]
+              },
+              "signInRiskLevels": ["high", "medium"]
+            },
+            "grantControls": {
+              "operator": "OR",
+              "authenticationStrength": {
+                "@odata.id": "https://graph.microsoft.com/beta/policies/authenticationStrengthPolicies/00000000-0000-0000-0000-000000000002"
+              }
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "authenticationType": "primaryAndSecondaryAuthentication",
+                "frequencyInterval": "everyTime"
+              }
+            }
+          },
+          "exclusionHandling": [
+            "conditions.users.excludeUsers",
+            "conditions.users.excludeGroups"
+          ]
+        },
+        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. A policy is not required when the MS.AAD.2.3v2 policy excludes no users or groups. Otherwise conditions.users.includeUsers and includeGroups must target every user and group excluded from the MS.AAD.2.3v2 policy"
       },
       {
         "id": "MS.AAD.3.1v1",
