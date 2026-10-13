@@ -759,7 +759,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 3. Select **Block password addition**.
 
-4. Set status to **On**. Ensure **Applies to** is set to **All apps**.
+4. Set status to **On**. Ensure **Applies to** is set to **All applications**.
 
 5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
