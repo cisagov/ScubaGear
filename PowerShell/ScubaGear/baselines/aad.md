@@ -1246,6 +1246,7 @@ This section provides policies that help reduce security risks related to the us
 #### MS.AAD.9.1v1
 Risky AI agents SHALL be blocked.
 
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.AAD.9.1v1; Criticality: SHALL -->
