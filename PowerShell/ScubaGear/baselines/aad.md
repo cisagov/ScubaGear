@@ -717,7 +717,7 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 2. Under **Security**, select **Consent and permissions**. Then select **User consent settings**.
 
-3. Under **User consent for apps**, select **Do not allow user consent**.
+3. Under **User consent for applications**, select **Do not allow user consent**.
 
 4. Click **Save**.
 
