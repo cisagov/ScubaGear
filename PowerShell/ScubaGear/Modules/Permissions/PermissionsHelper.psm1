@@ -529,8 +529,9 @@ function Get-ScubaGearEndpointRest {
     )
 
     $AllProducts = 'aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi'
-    $Products = @($AllProducts | Sort-Object -Unique)
-
+    $Products = if ($ProductNames -contains '*') { $AllProducts } else { $ProductNames }
+    $Products = @($Products | Sort-Object -Unique)
+    
     # Teams also reads its tenant settings from the unified settings host, which the catalog lists as its own product.
     $CatalogProducts = @($Products | ForEach-Object { $_; if ($_ -eq 'teams') { 'teamsunified' } })
 
