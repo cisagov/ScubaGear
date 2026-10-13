@@ -475,7 +475,7 @@ Calendar details SHALL NOT be shared with all domains.
 - _Rationale:_ Calendar details may contain information that should not be shared by default with all domains. Disabling sharing with all domains closes an avenue for data exfiltration while still allowing
 legitimate use as needed.
 - _Last modified:_ June 2023
-- _Note:_ Calendar details may be shared with specific domains.
+- _Note:_ Calendar details MAY be shared with specific domains.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3, SC-7(10)(a)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1567: Exfiltration Over Web Service](https://attack.mitre.org/techniques/T1567/)
