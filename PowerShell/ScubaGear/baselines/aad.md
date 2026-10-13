@@ -337,7 +337,7 @@ Phishing-resistant MFA SHALL be required for highly privileged roles.
 <!--ExclusionType: CapExclusions-->
 - _Rationale:_ This is a backup security policy to help protect privileged access to the tenant if the conditional access policy, which requires MFA for all users, is disabled or misconfigured.
 - _Last modified:_ June 2023
-- _Note:_ Refer to the "Highly Privileged Roles" section at the top of these baselines for a reference list of roles considered highly privileged.
+- _Note:_ Refer to the "Highly Privileged Roles" section at the top of this baseline for a reference list of roles considered highly privileged.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-2(1), IA-5c, IA-5g, IA-2(8)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
