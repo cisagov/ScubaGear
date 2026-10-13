@@ -2,9 +2,6 @@ $ProviderPath = '../../../../../Modules/Utility'
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Utility.psm1") -Function 'Invoke-GraphDirectly' -Force
 
 InModuleScope Utility {
-    $ProviderPath = '../../../../../Modules/Permissions'
-    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/PermissionsHelper.psm1") -Function 'Get-ScubaGearPermissions' -Force
-
     $ID = [guid]::NewGuid().Guid
 
     $testCases = @(
@@ -62,10 +59,10 @@ InModuleScope Utility {
                 $Commandlet = ""
                 if(-not $ID){
                     # Mock Invoke-GraphDirectly to retrieve the Graph API URL to verify the configuration file hasn't been modified
-                    return (Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs api -Environment $M365Environment)
+                    return (Get-ScubaGearGraphEndpoint -CmdletName $Cmdlet -Environment $M365Environment)
                 }else{
                     # Mock Invoke-GraphDirectly to retrieve the Graph API URL and insert the ID to verify the configuration file hasn't been modified
-                    return (Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs api -Environment $M365Environment -ID $ID)
+                    return (Get-ScubaGearGraphEndpoint -CmdletName $Cmdlet -Environment $M365Environment -Id $ID)
                 }
             }
         }
@@ -102,13 +99,36 @@ InModuleScope Utility {
         It "should return the expected API header for <Cmdlet>" -TestCases $combinedApiHeaderCases {
             param($Cmdlet, $apiHeaderKey, $apiHeaderValue)
 
-            $expected = Get-ScubaGearPermissions -CmdletName $Cmdlet -OutAs apiheader
+            $expected = Get-ScubaGearApiHeader -CmdletName $Cmdlet
 
             $expectedKey = $expected.psobject.Properties.name
             $expectedValue = $expected.psobject.Properties.value
 
             $expectedKey | Should -Be $apiHeaderKey
             $expectedValue | Should -Be $apiHeaderValue
+        }
+    }
+
+    Describe -Tag 'Utility' -Name "Invoke-GraphDirectly queryParams path (regression)" {
+        BeforeAll {
+            # Stub so Mock can intercept even when the Graph SDK isn't loaded in the test session.
+            # The parameters mirror the real cmdlet so Pester can bind ParameterFilter arguments;
+            # the $null assignment marks them as used for PSScriptAnalyzer (PSReviewUnusedParameter).
+            function Invoke-MgGraphRequest {
+                param($Uri, $Method, $Headers, $Body, $ContentType, $OutputType)
+                $null = $Uri, $Method, $Headers, $Body, $ContentType, $OutputType
+            }
+            Mock Invoke-MgGraphRequest -MockWith { @{ value = @() } }
+        }
+
+        # Guards against the $Uri parameter colliding (case-insensitively) with the internal
+        # $uriBuilder used when building the query string. The prior collision coerced the
+        # UriBuilder to a string and threw "The property 'Query' cannot be found on this object".
+        It "does not throw and appends the query string when -queryParams is supplied" {
+            { Invoke-GraphDirectly -commandlet "Get-MgBetaApplication" -M365Environment "commercial" -queryParams @{ '$top' = '5' } } | Should -Not -Throw
+            Should -Invoke Invoke-MgGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Uri -match 'applications' -and $Uri -match '(\$|%24)top=5'
+            }
         }
     }
 }

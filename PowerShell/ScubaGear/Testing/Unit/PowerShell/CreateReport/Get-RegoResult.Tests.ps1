@@ -164,6 +164,23 @@ InModuleScope CreateReport {
                 $Result.SummaryKey | Should -Be "Errors"
                 $Result.Details | Should -Be $ExampleMissingDetails
             }
+            It 'When the test has missing commands and the Rego supplied ErrorDetails' {
+                $Test = [PSCustomObject]@{
+                    RequirementMet=$false;
+                    Criticality="Should";
+                    ReportDetails=$ExampleReportDetails;
+                    ErrorDetails="Example fix for the failed command";
+                }
+                $MissingCommands = @($ExampleMissingCommand1)
+                $Control = [PSCustomObject]@{
+                    MalformedDescription=$false;
+                    Deleted=$false;
+                }
+                $Result = Get-RegoResult $Test $MissingCommands $Control
+                $Result.DisplayString | Should -Be "Error"
+                $Result.SummaryKey | Should -Be "Errors"
+                $Result.Details | Should -Be "Example fix for the failed command"
+            }
             It 'When the control has been deleted' {
                 $Test = [PSCustomObject]@{
                     RequirementMet=$true;

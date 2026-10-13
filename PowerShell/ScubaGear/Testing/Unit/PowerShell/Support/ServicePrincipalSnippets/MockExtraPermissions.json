@@ -3,7 +3,8 @@
     "servicePrincipal": {
         "id": "sp-extra-1",
         "appId": "00000000-0000-0000-0000-000000000003",
-        "displayName": "ScubaGear Test SP - Extra Perms"
+        "displayName": "ScubaGear Test SP - Extra Perms",
+        "appOwnerOrganizationId": "11111111-1111-1111-1111-111111111111"
     },
     "application": {
         "id": "app-extra-1",
