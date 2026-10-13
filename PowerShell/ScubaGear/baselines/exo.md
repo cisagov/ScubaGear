@@ -137,9 +137,8 @@ An SPF policy SHALL be published for each domain that fails all non-approved sen
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/parameters.md#preferreddnsresolvers)
 
 <!--Policy: MS.EXO.2.2v3; Criticality: SHALL -->
-- _Rationale:_ An adversary may modify the "From" field
-of an email so it appears to be a legitimate email sent by an
-agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates forged "From" fields by providing a means for recipients to detect emails spoofed in this way. SPF is required for FCEB agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security."
+- _Rationale:_ An adversary may modify email headers so the email appears to be a legitimate email sent by an
+agency, facilitating phishing attacks. Publishing an SPF policy for each agency domain mitigates this by providing a means for recipients to detect emails spoofed in this way. SPF is required for FCEB agencies by Binding Operational Directive (BOD) 18-01, "Enhance Email and Web Security."
 - _Last modified:_ October 2025
 - _Note:_ SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Either hardfail or softfail may be used to comply with this baseline policy.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2d
