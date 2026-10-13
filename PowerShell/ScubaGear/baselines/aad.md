@@ -119,9 +119,9 @@ Legacy authentication SHALL be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
-  Conditions > Client applications > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
+  Conditions > Client apps > Configure > <b>Yes</b> > Legacy authentication clients > Select only <b>Exchange ActiveSync clients</b> and <b>Other clients</b>
 
   Access controls > Grant > <b>Block access</b>
 </pre>
@@ -202,7 +202,7 @@ Sign-ins detected as high-risk SHALL be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > User risk > <b>High</b>
 
@@ -220,7 +220,7 @@ Sign-ins detected as high-risk SHALL be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > Sign-in risk > <b>High</b>
 
@@ -429,7 +429,7 @@ Device code authentication SHOULD be blocked.
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
@@ -449,7 +449,7 @@ We recommend using a custom authentication strength to enforce the specific meth
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require authentication strength</b> > <b>YOUR_CUSTOM_AUTHENTICATION_STRENGTH</b>
 </pre>
@@ -459,7 +459,7 @@ We recommend using a custom authentication strength to enforce the specific meth
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require multifactor authentication</b>
 </pre>
@@ -469,7 +469,7 @@ We recommend using a custom authentication strength to enforce the specific meth
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require authentication strength</b> > <b>Multifactor authentication</b>
 </pre>
@@ -500,7 +500,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 <pre>
   Users > Include > Select users and groups > Directory roles > <b>Select each of the roles listed in the "Highly Privileged Roles" section at the top of this document</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > Require authentication strength > <b>Phishing-resistant MFA</b>
 </pre>
@@ -512,7 +512,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Access controls > Grant > Grant Access > <b>Require device to be marked as compliant</b> and <b>Require Microsoft Entra ID hybrid joined device</b> > For multiple controls > <b>Require one of the selected controls</b>
 </pre>
@@ -536,7 +536,7 @@ If Microsoft Authenticator is in use, configure Authenticator to display context
 <pre>
   Users > Include > <b>All users</b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > Authentication Flows > Configure > <b>Yes</b> > Select <b>Device code flow</b>
 
@@ -713,17 +713,17 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 **Option 1**. Do not allow user consent.
 
-1.  In the **Microsoft Entra admin center**, select **Enterprise applications**.
+1.  In the **Microsoft Entra admin center**, select **Enterprise apps**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User consent settings**.
 
-3. Under **User consent for applications**, select **Do not allow user consent**.
+3. Under **User consent for apps**, select **Do not allow user consent**.
 
 4. Click **Save**.
 
 **Option 2**. Allow restricted user consent.
 
-1.  In the **Microsoft Entra admin center**, select **Enterprise applications**.
+1.  In the **Microsoft Entra admin center**, select **Enterprise apps**.
 
 2. Under **Security**, select **Consent and permissions**. Then select **User consent settings**.
 
@@ -741,11 +741,11 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 1.  In the **Microsoft Entra admin center**, create a new Microsoft Entra ID Group that contains administrative users responsible for reviewing and adjudicating application consent requests. Group members will be notified when users request consent for new applications.
 
-2. Then, in **Microsoft Entra admin center** under **Applications**, select **Enterprise applications**.
+2. Then, in **Microsoft Entra admin center** under **Applications**, select **Enterprise apps**.
 
 3. Under **Security**, select **Consent and permissions**. Then select **Admin consent settings**.
 
-4. Under **Admin consent requests**, navigate to **Users can request admin consent to applications they are unable to consent to** and select **Yes**.
+4. Under **Admin consent requests**, navigate to **Users can request admin consent to apps they are unable to consent to** and select **Yes**.
 
 5. Under **Who can review admin consent requests**, select **+ Add groups** and select the group responsible for reviewing and adjudicating applications requests (created in step one, above).
 
@@ -753,43 +753,43 @@ There are a couple of configuration options to restrict user consent. Each optio
 
 #### MS.AAD.5.5v1 Instructions
 
-1. In the **Microsoft Entra admin center**, select **Enterprise applications**.
+1. In the **Microsoft Entra admin center**, select **Enterprise apps**.
 
 2. Under **Security**, select **Application policies**.
 
 3. Select **Block password addition**.
 
-4. Set status to **On**. Ensure **Applies to** is set to **All applications**.
+4. Set status to **On**. Ensure **Applies to** is set to **All apps**.
 
-5. Leave **Only apply to applications created after** blank. Setting a date allows applications created before that date to bypass this restriction.
+5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
 6. Click **Save**.
 
 #### MS.AAD.5.6v1 Instructions
 
-1. In the **Microsoft Entra admin center**, select **Enterprise applications**.
+1. In the **Microsoft Entra admin center**, select **Enterprise apps**.
 
 2. Under **Security**, select **Application policies**.
 
 3. Select **Restrict max password lifetime**.
 
-4. Set status to **On**. Set maximum lifetime to **181 days**. Ensure **Applies to** is set to **All applications**.
+4. Set status to **On**. Set maximum lifetime to **181 days**. Ensure **Applies to** is set to **All apps**.
 
-5. Leave **Only apply to applications created after** blank. Setting a date allows applications created before that date to bypass this restriction.
+5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
 6. Click **Save**.
 
 #### MS.AAD.5.7v1 Instructions
 
-1. In the **Microsoft Entra admin center**, select **Enterprise applications**.
+1. In the **Microsoft Entra admin center**, select **Enterprise apps**.
 
 2. Under **Security**, select **Application policies**.
 
 3. Select **Restrict max certificate lifetime**.
 
-4. Set status to **On**. Set maximum lifetime to **366 days**. Ensure **Applies to** is set to **All applications**.
+4. Set status to **On**. Set maximum lifetime to **366 days**. Ensure **Applies to** is set to **All apps**.
 
-5. Leave **Only apply to applications created after** blank. Setting a date allows applications created before that date to bypass this restriction.
+5. Leave **Only apply to apps created after** blank. Setting a date allows apps created before that date to bypass this restriction.
 
 6. Click **Save**.
 
@@ -1274,7 +1274,7 @@ Risky AI agents SHALL be blocked.
 <pre>
   Assignments > Users, agents (preview) or workload identities > What does this policy apply to? > Agents (preview) > Include > <b>All agent identities (preview) </b>
 
-  Target resources > Include > <b>All resources (formerly 'All cloud applications') </b>
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
   Conditions > Agent risk (preview) > Configure > Yes > Configure agent risk levels needed for policy to be enforced > <b>High </b>
 </pre>
