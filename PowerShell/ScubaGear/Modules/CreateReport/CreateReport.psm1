@@ -271,6 +271,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+                
                 $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
 
                 $Config = $SettingsExport.scuba_config
@@ -314,6 +315,7 @@ function New-Report {
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
                         "Details"= $Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
@@ -345,6 +347,7 @@ function New-Report {
                         "Result"= "Incorrect result"
                         "Criticality"= $Test.Criticality
                         "Details"= $Result.Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
