@@ -75,7 +75,7 @@ external domains prevents this technique when the adversary is
 external to the organization but does not impede legitimate
 internal forwarding.
 - _Last modified:_ March 2025
-- _Note:_ Automatic forwarding may be enabled with specific, agency-approved domains.
+- _Note:_ Automatic forwarding MAY be enabled with specific, agency-approved domains.
 There may be cases where an external domain is operationally needed and has an acceptable
 degree of risk, e.g., a domain controlled by the same agency that hasn't been added
 as an accepted domain in M365.
