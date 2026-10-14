@@ -85,6 +85,39 @@ InModuleScope Connection {
 
         }
     }
+
+    Describe -Tag 'Connection' -Name 'Connect-Tenant exception handling' {
+        BeforeAll {
+            function Connect-GraphHelper {throw 'this will be mocked'}
+            Mock Connect-GraphHelper -MockWith {}
+            function Get-MsalAccessToken {throw 'this will be mocked'}
+            Mock Get-MsalAccessToken -MockWith {
+                $InnerException = [System.InvalidOperationException]::new('Application does not exist in the tenant')
+                throw [System.AggregateException]::new('One or more errors occurred.', $InnerException)
+            }
+            function Get-TeamsScope {throw 'this will be mocked'}
+            Mock Get-TeamsScope -MockWith { 'https://api.interfaces.records.teams.microsoft.com/.default' }
+            function Get-TeamsBaseUrl {throw 'this will be mocked'}
+            Mock Get-TeamsBaseUrl -MockWith { 'https://api.interfaces.records.teams.microsoft.com' }
+            Mock Write-Progress {}
+        }
+
+        It 'Reports the underlying aggregate exception' {
+            $ServicePrincipalParams = @{
+                CertThumbprintParams = @{
+                    AppID = 'app-id'
+                    CertificateThumbprint = 'thumbprint'
+                    Organization = 'example.onmicrosoft.com'
+                }
+            }
+            $Output = Connect-Tenant -ProductNames teams -M365Environment gcchigh -ServicePrincipalParams $ServicePrincipalParams 3>&1
+            $Warnings = @($Output | Where-Object { $_ -is [System.Management.Automation.WarningRecord] })
+            $ConnectionWarningLines = $Warnings[0].Message -split '\r?\n'
+
+            $Warnings.Count | Should -Be 2
+            $ConnectionWarningLines | Should -Contain 'Application does not exist in the tenant'
+        }
+    }
 }
 AfterAll {
     Remove-Module Connection -ErrorAction SilentlyContinue
