@@ -108,6 +108,9 @@ Install-Module -Name ScubaGear
 Install-ScubaDependencies
 ```
 
+> [!NOTE]
+> On ScubaGear 1.8.0 and earlier, this cmdlet is named `Initialize-SCuBA`. See the [dependencies page](docs/prerequisites/dependencies.md) for details.
+
 ### 3. Verify Installation
 
 ```powershell
