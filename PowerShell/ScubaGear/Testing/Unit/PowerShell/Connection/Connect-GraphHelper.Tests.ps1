@@ -6,7 +6,7 @@ BeforeDiscovery {
 InModuleScope ConnectHelpers {
     Describe -Tag 'Connection' -Name 'Connect-GraphHelper' {
         BeforeAll {
-            function Connect-MgGraph {param($ContextScope) throw 'this will be mocked'}
+            function Connect-MgGraph {param($ContextScope) throw "this will be mocked ($ContextScope)"}
             Mock -ModuleName ConnectHelpers Connect-MgGraph {Write-Debug "M365Environment: $M365Environment"}
         }
         context 'Without Service Principal'{
