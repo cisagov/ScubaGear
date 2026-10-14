@@ -62,6 +62,22 @@ test_RScriptVisual_NoLicense_TakesPrecedence_OverMissingTenantSettings if {
     Output := powerbi.tests with input as patched_input
     TestResult("MS.POWERBI.6.1v1", Output, PowerbiLicenseErrorMessage, false) == true
 }
+
+# A 401/403 from the Power BI Admin API returns empty settings, which must produce one Access Denied result
+test_RScriptVisual_AccessDenied if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": []},
+        {"op": "add", "path": "/powerbi_access_denied_reason", "value": "The Power BI Admin API denied access (403 Forbidden)."}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.POWERBI.6.1v1"]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].ActualValue == "Access Denied"
+    RuleOutput[0].ErrorDetails == "Unable to evaluate tenant setting. The Power BI Admin API denied access (403 Forbidden)."
+}
 ###
 
 

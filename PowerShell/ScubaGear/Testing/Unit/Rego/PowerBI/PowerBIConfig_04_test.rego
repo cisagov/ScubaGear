@@ -108,6 +108,22 @@ test_ServicePrincipalAccessPermissionAPIs_NoLicense_TakesPrecedence_OverMissingT
     Output := powerbi.tests with input as patched_input
     TestResult("MS.POWERBI.4.1v1", Output, PowerbiLicenseErrorMessage, false) == true
 }
+
+# A 401/403 from the Power BI Admin API returns empty settings, which must produce one Access Denied result
+test_ServicePrincipalAccessPermissionAPIs_AccessDenied if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": []},
+        {"op": "add", "path": "/powerbi_access_denied_reason", "value": "The Power BI Admin API denied access (403 Forbidden)."}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.POWERBI.4.1v1"]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].ActualValue == "Access Denied"
+    RuleOutput[0].ErrorDetails == "Unable to evaluate tenant setting. The Power BI Admin API denied access (403 Forbidden)."
+}
 ###
 
 
@@ -285,6 +301,22 @@ test_AllowServicePrincipalsCreateAndUseProfiles_NoLicense_TakesPrecedence_OverMi
 
     Output := powerbi.tests with input as patched_input
     TestResult("MS.POWERBI.4.2v1", Output, PowerbiLicenseErrorMessage, false) == true
+}
+
+# A 401/403 from the Power BI Admin API returns empty settings, which must produce one Access Denied result
+test_AllowServicePrincipalsCreateAndUseProfiles_AccessDenied if {
+    patched_input := json.patch(PowerbiTenantSettingsJson, [
+        {"op": "replace", "path": "/powerbi_license_found", "value": true},
+        {"op": "replace", "path": "/powerbi_tenant_settings", "value": []},
+        {"op": "add", "path": "/powerbi_access_denied_reason", "value": "The Power BI Admin API denied access (403 Forbidden)."}
+    ])
+
+    Output := powerbi.tests with input as patched_input
+    RuleOutput := [Result | some Result in Output; Result.PolicyId == "MS.POWERBI.4.2v1"]
+
+    count(RuleOutput) == 1
+    RuleOutput[0].ActualValue == "Access Denied"
+    RuleOutput[0].ErrorDetails == "Unable to evaluate tenant setting. The Power BI Admin API denied access (403 Forbidden)."
 }
 ###
 

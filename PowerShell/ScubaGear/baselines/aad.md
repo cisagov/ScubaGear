@@ -1241,6 +1241,7 @@ Risky AI agents SHALL be blocked.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.AAD.9.1v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
 - _Rationale:_ AI agents may access tenant resources and can perform actions autonomously. Blocking agents that exhibit risky behaviors reduces the risk of unauthorized access and automated misuse of resources.
 - _Last modified:_ March 2026
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC) High, and Department of Defense (DoD) tenants.
@@ -1255,7 +1256,7 @@ Risky AI agents SHALL be blocked.
 
 ### License Requirements
 
-- Requires a Microsoft Entra ID P2 license
+- Requires a Microsoft Entra ID P2 license and either Microsoft Agent 365 or Microsoft 365 E7.
 
 ### Implementation
 

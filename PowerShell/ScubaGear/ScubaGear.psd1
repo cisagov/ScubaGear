@@ -78,6 +78,7 @@ NestedModules = @('Modules\Support\Support.psm1','Modules\Utility\ScubaLogging.p
 FunctionsToExport = @(
     'Invoke-SCuBA',
     'Invoke-SCuBACached',
+    'Invoke-SCuBADiff',
     'Disconnect-SCuBATenant',
     'Copy-SCuBABaselineDocument',
     'Install-OPAforSCuBA',
@@ -93,6 +94,7 @@ FunctionsToExport = @(
     'New-SCuBAConfig',
     'Get-ScubaGearPermissions',
     'Get-ScubaGearEntraMinimumPermissions',
+    'Get-ScubaGearEndpointRest',
     'Test-ScubaGearVersion',
     'Update-ScubaGear',
     'Reset-ScubaGearDependencies',

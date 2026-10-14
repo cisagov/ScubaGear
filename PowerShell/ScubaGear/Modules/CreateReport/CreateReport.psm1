@@ -39,8 +39,14 @@ function Get-RegoResult {
     elseif ($MissingCommands.Count -gt 0) {
         $Result.DisplayString = "Error"
         $Result.SummaryKey = "Errors"
-        $MissingString = $MissingCommands -Join ", "
-        $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        # The Rego can supply ErrorDetails to explain a known failure and how to fix it
+        if (-not [string]::IsNullOrEmpty($Test.ErrorDetails)) {
+            $Result.Details = $Test.ErrorDetails
+        }
+        else {
+            $MissingString = $MissingCommands -Join ", "
+            $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        }
     }
     elseif ($Test.RequirementMet) {
         $Result.DisplayString = "Pass"
@@ -265,6 +271,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+                
                 $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
 
                 $Config = $SettingsExport.scuba_config
@@ -274,6 +281,9 @@ function New-Report {
 
                 # Add annotation if applicable
                 $Result.Details = Add-Annotation -Result $Result -Config $Config -ControlId $Control.Id
+
+                # Point failing controls at the table showing the policies they were evaluated against
+                $Result.Details += Get-PolicyTableLinkHtml -BaselineName $BaselineName -Test $Test -DisplayString $Result.DisplayString
 
                 # Declare annotation fields at the top level. If they exist, these fields need to be included
                 # in the control object regardless if the control is omitted, incorrect, or normal
@@ -305,6 +315,7 @@ function New-Report {
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
                         "Details"= $Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
@@ -336,6 +347,7 @@ function New-Report {
                         "Result"= "Incorrect result"
                         "Criticality"= $Test.Criticality
                         "Details"= $Result.Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
@@ -667,6 +679,10 @@ function New-Report {
         $PartnerDomainsJson = ConvertTo-Json @($PartnerDomains)
         $AntiPhishPoliciesJson = ConvertTo-Json @($SettingsExport.anti_phish_policies) -Depth 5
         $AntiPhishRulesJson = ConvertTo-Json @($SettingsExport.anti_phish_rules) -Depth 5
+        $AntiSpamPoliciesJson = ConvertTo-Json @($SettingsExport.hosted_content_filter_policies) -Depth 5
+        $AntiSpamRulesJson = ConvertTo-Json @($SettingsExport.hosted_content_filter_rules) -Depth 5
+        $AntiMalwarePoliciesJson = ConvertTo-Json @($SettingsExport.anti_malware_policies) -Depth 5
+        $AntiMalwareRulesJson = ConvertTo-Json @($SettingsExport.anti_malware_rules) -Depth 5
         $ProtectionPolicyRulesJson = ConvertTo-Json @($SettingsExport.protection_policy_rules) -Depth 5
         $AcceptedDomainsJson = ConvertTo-Json @($SettingsExport.accepted_domains) -Depth 5
     }
@@ -675,6 +691,10 @@ function New-Report {
         $PartnerDomainsJson = "null"
         $AntiPhishPoliciesJson = "null"
         $AntiPhishRulesJson = "null"
+        $AntiSpamPoliciesJson = "null"
+        $AntiSpamRulesJson = "null"
+        $AntiMalwarePoliciesJson = "null"
+        $AntiMalwareRulesJson = "null"
         $ProtectionPolicyRulesJson = "null"
         $AcceptedDomainsJson = "null"
     }
@@ -739,6 +759,10 @@ function New-Report {
         "<script type='application/json' id='securitysuite-partner-domains-json'> $($PartnerDomainsJson) </script>"
         "<script type='application/json' id='securitysuite-anti-phish-policies-json'> $($AntiPhishPoliciesJson) </script>"
         "<script type='application/json' id='securitysuite-anti-phish-rules-json'> $($AntiPhishRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-spam-policies-json'> $($AntiSpamPoliciesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-spam-rules-json'> $($AntiSpamRulesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-malware-policies-json'> $($AntiMalwarePoliciesJson) </script>"
+        "<script type='application/json' id='securitysuite-anti-malware-rules-json'> $($AntiMalwareRulesJson) </script>"
         "<script type='application/json' id='securitysuite-protection-policy-rules-json'> $($ProtectionPolicyRulesJson) </script>"
         "<script type='application/json' id='securitysuite-accepted-domains-json'> $($AcceptedDomainsJson) </script>"
     ) -join "`n"
@@ -1094,6 +1118,51 @@ function Resolve-HTMLMarkdown{
         throw $InvalidHTMLReplace
         return $OriginalString
     }
+}
+
+function Get-PolicyTableLinkHtml {
+    <#
+    .Description
+    Generates a link from a failing Security Suite control to the report table that
+    shows the policies the control was evaluated against. The table is chosen by the
+    cmdlet the control's test ran, so a control only links to a table built from the
+    same policy objects.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory=$true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $BaselineName,
+
+        [Parameter(Mandatory=$false)]
+        [object]
+        $Test,
+
+        [Parameter(Mandatory=$false)]
+        [string]
+        $DisplayString
+    )
+
+    if ($BaselineName -ne "SecuritySuite") { return "" }
+    if ($DisplayString -notin @("Fail", "Warning")) { return "" }
+
+    # The anchor is the table's CSS class, which SecuritySuiteTableFunctions.js also sets as
+    # the id on the table heading, so the link and its target share one literal.
+    $PolicyTables = [ordered]@{
+        "Get-MalwareFilterPolicy"       = "anti-malware"
+        "Get-AntiPhishPolicy"           = "anti-phish"
+        "Get-HostedContentFilterPolicy" = "anti-spam"
+    }
+    foreach ($Cmdlet in $PolicyTables.Keys) {
+        if ($Test.Commandlet -contains $Cmdlet) {
+            $Table = $PolicyTables[$Cmdlet]
+            return "<br/><a href='#securitysuite-$Table-policies-table'>View all $Table policies</a>"
+        }
+    }
+    return ""
 }
 
 function Get-IndicatorHtml {

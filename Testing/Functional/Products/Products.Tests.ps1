@@ -526,15 +526,21 @@ Describe "Policy Checks for <ProductName>" {
                         }
                     }
                     # Security Suite configuration tables are appended to the Security Suite report.
-                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-phish-policies)-table") {
+                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-malware-policies|anti-phish-policies|anti-spam-policies)-table") {
                         $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
                             "Username", "Email"
                         }
                         elseif ($TableClass -match "securitysuite-partner-domains-table") {
                             "Partner Domain"
                         }
+                        elseif ($TableClass -match "securitysuite-anti-malware-policies-table") {
+                            "", "Policy", "Status", "Priority", "Applicability", "Common Attachments Filter", "Blocked File Types", "Zero-hour Auto Purge"
+                        }
+                        elseif ($TableClass -match "securitysuite-anti-spam-policies-table") {
+                            "", "Policy", "Status", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Domains"
+                        }
                         else {
-                            "", "Policy", "Enabled", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Indicators"
+                            "", "Policy", "Status", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Tips & Indicators"
                         })
 
                         foreach ($Row in $Rows) {
@@ -552,8 +558,8 @@ Describe "Policy Checks for <ProductName>" {
 
                             if ($RowData.Count -gt 0) {
                                 $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
-                                if ($TableClass -match "securitysuite-anti-phish-policies-table") {
-                                    $RowData[2].Text | Should -BeIn @("true", "false") -Because "The anti-phish policy Enabled value must be a Boolean"
+                                if ($TableClass -match "securitysuite-(anti-malware|anti-phish|anti-spam)-policies-table") {
+                                    $RowData[2].Text | Should -BeIn @("On", "Off", "Always on") -Because "The protection policy Status value must match Defender's own On/Off/Always on wording"
                                 }
                             }
                         }

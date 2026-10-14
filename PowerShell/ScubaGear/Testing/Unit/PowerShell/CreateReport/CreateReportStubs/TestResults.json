@@ -3570,11 +3570,12 @@
 
                         ],
         "Commandlet":  [
-
+                           "Get-MalwareFilterPolicy",
+                           "Get-EOPProtectionPolicyRule"
                        ],
-        "Criticality":  "Shall/Not-Implemented",
+        "Criticality":  "Shall",
         "PolicyId":  "MS.SECURITYSUITE.1.1v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite11v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "Requirement not met",
         "RequirementMet":  false
     },
     {
@@ -3630,11 +3631,12 @@
 
                         ],
         "Commandlet":  [
-
+                           "Get-HostedContentFilterPolicy",
+                           "Get-EOPProtectionPolicyRule"
                        ],
-        "Criticality":  "Shall/Not-Implemented",
+        "Criticality":  "Shall",
         "PolicyId":  "MS.SECURITYSUITE.6.1v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite61v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "Requirement not met",
         "RequirementMet":  false
     },
     {
@@ -3666,11 +3668,12 @@
 
                         ],
         "Commandlet":  [
-
+                           "Get-AntiPhishPolicy",
+                           "Get-EOPProtectionPolicyRule"
                        ],
-        "Criticality":  "Should/Not-Implemented",
+        "Criticality":  "Should",
         "PolicyId":  "MS.SECURITYSUITE.2.1v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite21v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "Requirement not met",
         "RequirementMet":  false
     },
     {
@@ -3774,11 +3777,12 @@
 
                         ],
         "Commandlet":  [
-
+                           "Get-SafeLinksPolicy",
+                           "Get-SafeLinksRule"
                        ],
-        "Criticality":  "Should/Not-Implemented",
+        "Criticality":  "Shall",
         "PolicyId":  "MS.SECURITYSUITE.7.1v1",
-        "ReportDetails":  "This product does not currently have the capability to check compliance for this policy. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/v1.7.1/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite71v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for instructions on manual check",
+        "ReportDetails":  "Requirement not met",
         "RequirementMet":  false
     },
     {

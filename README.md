@@ -194,6 +194,7 @@ Reset-ScubaGearDependencies
   - [Required Permissions](docs/prerequisites/permissions.md)
     - [Interactive Permissions](docs/prerequisites/interactive.md)
     - [Non-Interactive Permissions](docs/prerequisites/noninteractive.md)
+  - [Network Access](docs/prerequisites/networkaccess.md)
 
 ## Configuration & Usage
 
@@ -205,6 +206,7 @@ Reset-ScubaGearDependencies
 
 - [Execution Guide](docs/execution/execution.md)
 - [Understanding Reports](docs/execution/reports.md)
+- [Comparing Two Runs (Invoke-SCuBADiff)](docs/execution/diff.md)
 
 ### Troubleshooting & Support
 

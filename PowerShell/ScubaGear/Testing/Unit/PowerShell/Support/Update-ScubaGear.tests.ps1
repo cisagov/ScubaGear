@@ -3,19 +3,6 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Sup
 InModuleScope 'Support' {
     Describe "Update-ScubaGear" {
         BeforeAll {
-            # Load the actual ScubaGear version from the manifest
-            $ManifestPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\ScubaGear.psd1"
-            if (Test-Path -Path $ManifestPath) {
-                $manifestData = Import-PowerShellDataFile -Path $ManifestPath
-                $script:CurrentScubaGearVersion = [version]$manifestData.ModuleVersion
-            } else {
-                throw "Could not find ScubaGear.psd1 at expected path: $ManifestPath"
-            }
-
-            # Create test versions based on actual version
-            $script:MockNewerVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor + 1).0"
-            $script:MockOlderVersion = [version]"$($script:CurrentScubaGearVersion.Major).$($script:CurrentScubaGearVersion.Minor - 1).0"
-
             # For GitHub container
             if (-not (Get-Command -Name 'Update-ScubaGearFromPSGallery' -ErrorAction SilentlyContinue)) {
                 function script:Update-ScubaGearFromPSGallery { }

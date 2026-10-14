@@ -136,7 +136,7 @@ function Import-ScAAnalyzerRules {
 function Import-ScAApiCatalog {
     <#
     .SYNOPSIS
-    Loads ScubaGearApiCatalog.json (moduleCmdlet -> entry) so API resource paths and
+    Loads ScubaGearApiCatalog.json (functionName -> entry) so API resource paths and
     least permissions come from the catalog, never from hardcoded URLs in this module.
     #>
     param([string]$ApiCatalogPath)
@@ -146,11 +146,11 @@ function Import-ScAApiCatalog {
     # If no API catalog path is provided, resolve the default path relative to the module.
     if (-not $ApiCatalogPath) { $ApiCatalogPath = Resolve-ScASchemaPath -FileName 'ScubaGearApiCatalog.json' }
     if (-not (Test-Path $ApiCatalogPath)) { Write-Warning "API catalog not found: $ApiCatalogPath"; return }
-    
+
     try {
         # Read and parse the API catalog JSON file.
         $catalog = Get-Content $ApiCatalogPath -Raw | ConvertFrom-Json
-        foreach ($e in @($catalog)) { if ($e.moduleCmdlet) { $syncHash.ScAApiCatalog[[string]$e.moduleCmdlet] = $e } }
+        foreach ($e in @($catalog)) { if ($e.functionName) { $syncHash.ScAApiCatalog[[string]$e.functionName] = $e } }
     } catch {
         Write-Warning "Failed to read API catalog '$ApiCatalogPath': $($_.Exception.Message)"
     }
@@ -160,7 +160,7 @@ function Resolve-ScAApiResource {
     <#
     .SYNOPSIS
     Builds a Graph request URI for a named analyzer operation by resolving its cmdlet to
-    an apiResource in ScubaGearApiCatalog.json. resultKind: collection (list) | byId
+    an endpointPath in ScubaGearApiCatalog.json. resultKind: collection (list) | byId
     (single item, {id} substituted) | byAppId (service principal by appId). Returns $null
     when the operation or catalog entry is unknown (caller falls back gracefully).
     #>
@@ -174,7 +174,7 @@ function Resolve-ScAApiResource {
 
     # Retrieve the catalog entry for the resolved cmdlet and extract the API resource, filter, and selection parameters.
     $entry    = $syncHash.ScAApiCatalog[$cmd]
-    $resource = [string]$entry.apiResource
+    $resource = [string]$entry.endpointPath
     if (-not $resource) { return $null }
 
     # Determine the filter to apply to the API request based on the catalog entry.

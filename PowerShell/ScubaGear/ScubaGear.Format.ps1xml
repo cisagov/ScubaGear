@@ -196,5 +196,31 @@
         </CustomEntries>
       </CustomControl>
     </View>
+    <View>
+      <Name>SCuBA.Permissions</Name>
+      <ViewSelectedBy>
+        <TypeName>SCuBA.Permissions</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <PropertyName>AppID</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>Status</PropertyName>
+              </ListItem>
+              <ListItem>
+                <PropertyName>FixPermissionIssues</PropertyName>
+                <ItemSelectionCondition>
+                  <ScriptBlock>$null -ne $_.PSObject.Properties['FixPermissionIssues']</ScriptBlock>
+                </ItemSelectionCondition>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
   </ViewDefinitions>
 </Configuration>

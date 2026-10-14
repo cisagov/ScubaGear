@@ -6,10 +6,45 @@ import data.utils.report.ReportDetailsBoolean
 
 # Some global variables
 
-PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluate tenant setting."
+# Connect-Tenant reports why the license check failed, so the report can distinguish a tenant
+# with no Power BI licenses from a running user who simply has none assigned
+PowerbiLicenseReason := object.get(input, "powerbi_license_reason", "")
+
+# The reason is optional: when it is absent or empty the original generic message is used unchanged
+PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluate tenant setting." if {
+    PowerbiLicenseReason == ""
+}
+
+PowerbiLicenseErrorMessage := sprintf("Unable to evaluate tenant setting. %v", [PowerbiLicenseReason]) if {
+    PowerbiLicenseReason != ""
+}
 
 # object.get returns the actual value from the input if the key exists, otherwise it returns the default value specified (false in this case)
 PowerbiLicenseFound := object.get(input, "powerbi_license_found", false)
+
+# The provider sets this when the Power BI Admin API returns 401/403, which is a permissions problem
+# rather than a license problem, so it is only considered once a license was found
+PowerbiAccessDeniedReason := object.get(input, "powerbi_access_denied_reason", "")
+
+PowerbiAccessDenied if {
+    PowerbiLicenseFound
+    PowerbiAccessDeniedReason != ""
+}
+
+# Tenant settings could not be read, either for lack of a license or because access was denied
+PowerbiUnavailable if not PowerbiLicenseFound
+
+PowerbiUnavailable if PowerbiAccessDenied
+
+PowerbiUnavailableActualValue := "No License" if not PowerbiLicenseFound
+
+PowerbiUnavailableActualValue := "Access Denied" if PowerbiAccessDenied
+
+PowerbiUnavailableMessage := PowerbiLicenseErrorMessage if not PowerbiLicenseFound
+
+PowerbiUnavailableMessage := sprintf("Unable to evaluate tenant setting. %v", [PowerbiAccessDeniedReason]) if {
+    PowerbiAccessDenied
+}
 
 # Convert tenant settings array into a map keyed by settingName
 PowerbiTenantSettings[setting.settingName] := setting if {
@@ -28,40 +63,43 @@ PublishToWebSetting := object.get(PowerbiTenantSettings, "PublishToWeb", null)
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": PublishToWebSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     PublishToWebSetting != null
 
     status := PublishToWebSetting.enabled == false
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.1.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or PublishToWeb are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -93,12 +131,13 @@ AllowGuestAccessSecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": AllowGuestAccessSharedContentSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     AllowGuestAccessSharedContentSetting != null
 
@@ -111,28 +150,30 @@ tests contains {
     status := Count(FilterArray(CompliantConditions, true)) > 0
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.2.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or AllowGuestUserToAccessSharedContent are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -165,12 +206,13 @@ ExternalSharingV2SecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": ExternalSharingV2Setting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     ExternalSharingV2Setting != null
 
@@ -182,28 +224,30 @@ tests contains {
     status := Count(FilterArray(conditions, true)) > 0
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.3.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or ExternalSharingV2 are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -236,12 +280,13 @@ ServicePrincipalAccessPermissionApisSecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": ServicePrincipalAccessPermissionApisSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     ServicePrincipalAccessPermissionApisSetting != null
 
@@ -253,28 +298,30 @@ tests contains {
     status := Count(FilterArray(conditions, true)) > 0
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.4.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or ServicePrincipalAccessPermissionAPIs are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -306,12 +353,13 @@ AllowServicePrincipalsCreateAndUseProfilesSecurityGroups if {
 tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": AllowServicePrincipalsCreateAndUseProfilesSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     AllowServicePrincipalsCreateAndUseProfilesSetting != null
 
@@ -323,28 +371,30 @@ tests contains {
     status := Count(FilterArray(conditions, true)) > 0
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.4.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or AllowServicePrincipalsCreateAndUseProfiles are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -367,40 +417,43 @@ BlockResourceKeyAuthenticationSetting := object.get(PowerbiTenantSettings, "Bloc
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": BlockResourceKeyAuthenticationSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     BlockResourceKeyAuthenticationSetting != null
 
     status := BlockResourceKeyAuthenticationSetting.enabled == true
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.5.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or BlockResourceKeyAuthentication are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -422,40 +475,43 @@ RScriptVisualSetting := object.get(PowerbiTenantSettings, "RScriptVisual", null)
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": RScriptVisualSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     RScriptVisualSetting != null
 
     status := RScriptVisualSetting.enabled == false
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.6.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or RScriptVisual are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
@@ -478,40 +534,43 @@ EimInformationProtectionEditSetting := object.get(PowerbiTenantSettings, "EimInf
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": EimInformationProtectionEditSetting.enabled,
     "ReportDetails": ReportDetailsBoolean(status),
     "RequirementMet": status
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     EimInformationProtectionEditSetting != null
 
     status := EimInformationProtectionEditSetting.enabled == true
 }
 
-# Exception case: No PowerBI license found
+# Exception case: No PowerBI license found, or access to the Power BI Admin API was denied
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
-    "ActualValue": "No License",
-    "ReportDetails": PowerbiLicenseErrorMessage,
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
+    "ActualValue": PowerbiUnavailableActualValue,
+    "ReportDetails": PowerbiUnavailableMessage,
+    "ErrorDetails": PowerbiUnavailableMessage,
     "RequirementMet": false
 } if {
-    not PowerbiLicenseFound
+    PowerbiUnavailable
 }
 
 # Exception case: Missing the specific setting that this policy expects
 tests contains {
     "PolicyId": "MS.POWERBI.7.1v1",
     "Criticality": "Should",
-    "Commandlet": ["Invoke-RestMethod"],
+    "Commandlet": ["Get-PowerBITenantSettingsRest"],
     "ActualValue": "Setting Not Found in JSON",
     "ReportDetails": "powerbi_tenant_settings or EimInformationProtectionEdit are missing from input JSON",
     "RequirementMet": false
 } if {
     PowerbiLicenseFound
+    not PowerbiAccessDenied
 
     missing_conditions := [
         count(PowerbiTenantSettings) == 0,
