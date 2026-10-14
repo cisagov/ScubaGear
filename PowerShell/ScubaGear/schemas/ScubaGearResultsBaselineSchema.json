@@ -26,10 +26,14 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
               "clientAppTypes": [
                 "exchangeActiveSync",
@@ -37,17 +41,28 @@
               ]
             },
             "grantControls": {
-              "builtInControls": ["block"],
+              "builtInControls": [
+                "block"
+              ],
               "operator": "OR"
             }
           }
         },
         "requiredSettings": {
           "state": "enabled",
-          "conditions.users.includeUsers": ["All"],
-          "conditions.applications.includeApplications": ["All"],
-          "conditions.clientAppTypes": ["exchangeActiveSync", "other"],
-          "grantControls.builtInControls": ["block"],
+          "conditions.users.includeUsers": [
+            "All"
+          ],
+          "conditions.applications.includeApplications": [
+            "All"
+          ],
+          "conditions.clientAppTypes": [
+            "exchangeActiveSync",
+            "other"
+          ],
+          "grantControls.builtInControls": [
+            "block"
+          ],
           "grantControls.operator": "OR"
         },
         "buildInstructions": {
@@ -59,12 +74,16 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
               "clientAppTypes": [
                 "exchangeActiveSync",
@@ -73,7 +92,9 @@
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["block"]
+              "builtInControls": [
+                "block"
+              ]
             }
           },
           "exclusionHandling": [
@@ -114,25 +135,41 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
-              "userRiskLevels": ["high"]
+              "userRiskLevels": [
+                "high"
+              ]
             },
             "grantControls": {
-              "builtInControls": ["block"],
+              "builtInControls": [
+                "block"
+              ],
               "operator": "OR"
             }
           }
         },
         "requiredSettings": {
           "state": "enabled",
-          "conditions.users.includeUsers": ["All"],
-          "conditions.applications.includeApplications": ["All"],
-          "conditions.userRiskLevels": ["high"],
-          "grantControls.builtInControls": ["block"],
+          "conditions.users.includeUsers": [
+            "All"
+          ],
+          "conditions.applications.includeApplications": [
+            "All"
+          ],
+          "conditions.userRiskLevels": [
+            "high"
+          ],
+          "grantControls.builtInControls": [
+            "block"
+          ],
           "grantControls.operator": "OR"
         },
         "buildInstructions": {
@@ -144,18 +181,26 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
-              "userRiskLevels": ["high"]
+              "userRiskLevels": [
+                "high"
+              ]
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["block"]
+              "builtInControls": [
+                "block"
+              ]
             }
           },
           "exclusionHandling": [
@@ -220,15 +265,23 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
-              "signInRiskLevels": ["high"]
+              "signInRiskLevels": [
+                "high"
+              ]
             },
             "grantControls": {
-              "builtInControls": ["block"],
+              "builtInControls": [
+                "block"
+              ],
               "operator": "OR"
             }
           }
@@ -242,18 +295,26 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
-              "signInRiskLevels": ["high"]
+              "signInRiskLevels": [
+                "high"
+              ]
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["block"]
+              "builtInControls": [
+                "block"
+              ]
             }
           },
           "exclusionHandling": [
@@ -276,10 +337,14 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
@@ -300,12 +365,16 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
@@ -336,16 +405,28 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
               "anyOf": [
-                { "builtInControls": ["mfa"] },
-                { "authenticationStrength": { "id": "00000000-0000-0000-0000-000000000002" } }
+                {
+                  "builtInControls": [
+                    "mfa"
+                  ]
+                },
+                {
+                  "authenticationStrength": {
+                    "id": "00000000-0000-0000-0000-000000000002"
+                  }
+                }
               ]
             }
           }
@@ -359,17 +440,23 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["mfa"]
+              "builtInControls": [
+                "mfa"
+              ]
             }
           },
           "exclusionHandling": [
@@ -479,7 +566,9 @@
                 ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
@@ -513,7 +602,9 @@
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
@@ -543,10 +634,14 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
@@ -567,12 +662,16 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               }
             },
             "grantControls": {
@@ -603,10 +702,14 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeUserActions": ["urn:user:registersecurityinfo"]
+                "includeUserActions": [
+                  "urn:user:registersecurityinfo"
+                ]
               }
             },
             "grantControls": {
@@ -627,12 +730,16 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeUserActions": ["urn:user:registersecurityinfo"]
+                "includeUserActions": [
+                  "urn:user:registersecurityinfo"
+                ]
               }
             },
             "grantControls": {
@@ -663,19 +770,29 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"]
+                "includeUsers": [
+                  "All"
+                ]
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
-              "clientAppTypes": ["all"],
+              "clientAppTypes": [
+                "all"
+              ],
               "authenticationFlows": {
-                "transferMethods": ["deviceCodeFlow"]
+                "transferMethods": [
+                  "deviceCodeFlow"
+                ]
               }
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["block"]
+              "builtInControls": [
+                "block"
+              ]
             }
           }
         },
@@ -688,21 +805,31 @@
             "state": "enabled",
             "conditions": {
               "users": {
-                "includeUsers": ["All"],
+                "includeUsers": [
+                  "All"
+                ],
                 "excludeUsers": [],
                 "excludeGroups": []
               },
               "applications": {
-                "includeApplications": ["All"]
+                "includeApplications": [
+                  "All"
+                ]
               },
-              "clientAppTypes": ["all"],
+              "clientAppTypes": [
+                "all"
+              ],
               "authenticationFlows": {
-                "transferMethods": ["deviceCodeFlow"]
+                "transferMethods": [
+                  "deviceCodeFlow"
+                ]
               }
             },
             "grantControls": {
               "operator": "OR",
-              "builtInControls": ["block"]
+              "builtInControls": [
+                "block"
+              ]
             }
           },
           "exclusionHandling": [
@@ -858,6 +985,45 @@
           "7. Click 'Assign' to provision through PIM"
         ],
         "notes": "Validates that privileged roles are assigned through PIM rather than direct role assignments"
+      },
+      {
+        "id": "MS.AAD.9.1v1",
+        "name": "Risky AI agents SHALL be blocked",
+        "exclusionField": "CapExclusions",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "clientAppTypes": [
+                "all"
+              ],
+              "applications": {
+                "includeApplications": [
+                  "All"
+                ]
+              },
+              "agentIdRiskLevels": [
+                "high"
+              ],
+              "clientApplications": {
+                "includeAgentIdServicePrincipals": [
+                  "All"
+                ]
+              }
+            },
+            "grantControls": {
+              "builtInControls": [
+                "block"
+              ],
+              "operator": "OR"
+            }
+          }
+        },
+        "notes": "This is a SHALL requirement."
       }
     ],
     "exo": [
@@ -1086,12 +1252,19 @@
     "exclusionFieldTypes": {
       "CapExclusions": {
         "description": "Conditional Access Policy exclusions for users and groups",
-        "appliesToProducts": ["aad"],
-        "supportedExclusionTypes": ["users", "groups"]
+        "appliesToProducts": [
+          "aad"
+        ],
+        "supportedExclusionTypes": [
+          "users",
+          "groups"
+        ]
       },
       "none": {
         "description": "No exclusions supported for this baseline",
-        "appliesToProducts": ["all"],
+        "appliesToProducts": [
+          "all"
+        ],
         "supportedExclusionTypes": []
       }
     }
