@@ -244,7 +244,7 @@ The allowable file and folder permissions for links SHALL be set to view only.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.3.2v1; Criticality: SHALL -->
-- _Rationale:_ Unauthorized changes to files can be made if link permissions allow editing by anyone. By restricting permissions on links to "view only," administrators can prevent anonymous file changes.
+- _Rationale:_ Unauthorized changes to files can be made if link permissions allow editing by anyone. By restricting permissions on links to view only, administrators can prevent anonymous file changes.
 - _Last modified:_ March 2025
 - _Note:_ This policy is only applicable if the external sharing slider in the SharePoint admin center is set to **Anyone**.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6
