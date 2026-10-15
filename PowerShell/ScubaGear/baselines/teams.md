@@ -20,7 +20,7 @@ The **License Requirements** sections of this document assume the organization i
 ## Key Terminology
 The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
-**User Types**: Access to MS Teams can be controlled based on user type. In this baseline, the types of users are defined as follows:
+**User Types**: Access to Microsoft Teams can be controlled based on user type. In this baseline, the types of users are defined as follows:
 
 1.  **Internal users**: Members of the agency's M365 tenant
 
@@ -36,7 +36,7 @@ The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "S
 4.  **Unmanaged users**: Users who are not members of any M365 tenant or
     organization (e.g., personal Microsoft accounts)
 
-5.  **Anonymous users**: MS Teams users joining calls who are not
+5.  **Anonymous users**: Microsoft Teams users joining calls who are not
     authenticated through the agency's tenant. These users include unmanaged
     users, external users (except for B2B guests), and true anonymous
     users (i.e., users who are not logged in to any Microsoft or
@@ -58,9 +58,9 @@ The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "S
 
 ## 1. Meeting Policies
 
-This section helps reduce security risks posed by external participants during MS Teams meetings. In this instance, the term "external participants" includes external users, B2B guest users, unmanaged users, and anonymous users.
+This section helps reduce security risks posed by external participants during Microsoft Teams meetings. In this instance, the term "external participants" includes external users, B2B guest users, unmanaged users, and anonymous users.
 
-This section also helps reduce security risks related to user permissions for recording MS Teams meetings. These policies and user permissions apply to meetings hosted by a user, as well as during one-on-one calls and group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
+This section also helps reduce security risks related to user permissions for recording Microsoft Teams meetings. These policies and user permissions apply to meetings hosted by a user, as well as during one-on-one calls and group calls started by a user. Agencies should comply with any other applicable policies or legislation in addition to this guidance.
 
 ### Policies
 
@@ -78,13 +78,13 @@ External meeting participants SHOULD NOT be enabled to request control of shared
   - None
 
 #### MS.TEAMS.1.2v2
-Anonymous users SHALL NOT be enabled to start MS Teams meetings.
+Anonymous users SHALL NOT be enabled to start Microsoft Teams meetings.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.2v2; Criticality: SHALL -->
-- _Rationale:_ This policy protects against anonymous users starting MS Teams meetings and potentially scraping internal contacts. The policy is beneficial for agencies that have implemented custom policies, providing flexibility for some users to automatically admit "everyone" to an MS Teams meeting.
+- _Rationale:_ This policy protects against anonymous users starting Microsoft Teams meetings and potentially scraping internal contacts. The policy is beneficial for agencies that have implemented custom policies, providing flexibility for some users to automatically admit "everyone" to an Microsoft Teams meeting.
 - _Last modified:_ August 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy, and custom meeting policies if they exist.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-15a
@@ -106,7 +106,7 @@ Anonymous users and dial-in callers SHOULD NOT be admitted automatically.
   - None
 
 #### MS.TEAMS.1.4v1
-Internal users SHOULD be admitted to MS Teams meetings automatically.
+Internal users SHOULD be admitted to Microsoft Teams meetings automatically.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
@@ -137,7 +137,7 @@ Meeting recording SHOULD be disabled.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.1.6v1; Criticality: SHOULD -->
-- _Rationale:_ Allowing any user to record an MS Teams meeting may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, the agency limits information exposure.
+- _Rationale:_ Allowing any user to record an Microsoft Teams meeting may lead to unauthorized disclosure of shared information, including audio, video, and shared screens. By disabling the meeting recording setting in the Global (Org-wide default) meeting policy, the agency limits information exposure.
 - _Last modified:_ March 2025
 - _Note:_ This policy applies to the Global (Org-wide default) meeting policy. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
@@ -302,10 +302,10 @@ To configure the settings that control "live events" meeting recordings:
 This section helps reduce security risks related to external and unmanaged user access. In this instance, "external users" refer to members of a different M365 tenant and "unmanaged users" refer to users who are not members of any M365 tenant or organization.
 
 External access allows external users to look up internal users by their
-email address to initiate chats/calls entirely within MS Teams.
-Blocking external access prevents external users from using MS Teams as an
+email address to initiate chats/calls entirely within Microsoft Teams.
+Blocking external access prevents external users from using Microsoft Teams as an
 avenue for reconnaissance or phishing. Even with external access
-disabled, external users will still be able to join MS Teams calls,
+disabled, external users will still be able to join Microsoft Teams calls,
 assuming "anonymous join" is enabled. Depending on agency need, if both
 external access and "anonymous join" are blocked (neither are required
 nor recommended by this baseline), external collaborators would only be
@@ -316,7 +316,7 @@ desirable in some cases (e.g., for agency-to-agency collaboration). See
 the Chief Information Officer Council's [Interagency Collaboration
 Program](https://community.max.gov/display/Egov/Interagency+Collaboration+Program) Office of Management and Budget MA site for a list of .gov domains for sharing.
 
-Similar to external users, blocking contact with unmanaged MS Teams users prevents these users from looking up internal users by their email address and initiating MS Teams calls/chats. Unmanaged users would still be able to join calls, assuming "anonymous join" is enabled. Additionally, unmanaged users may be added to MS Teams chats if an internal user initiates contact.
+Similar to external users, blocking contact with unmanaged Microsoft Teams users prevents these users from looking up internal users by their email address and initiating Microsoft Teams calls/chats. Unmanaged users would still be able to join calls, assuming "anonymous join" is enabled. Additionally, unmanaged users may be added to Microsoft Teams chats if an internal user initiates contact.
 
 ### Policies
 
@@ -455,7 +455,7 @@ This section helps reduce potential security risks related to Teams' email integ
 
 ### Policies
 #### MS.TEAMS.4.1v1
-MS Teams email integration SHALL be disabled.
+Microsoft Teams email integration SHALL be disabled.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -515,7 +515,7 @@ Agencies SHOULD only allow installation of Microsoft applications approved by th
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.1v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing MS Teams integration with all Microsoft applications can expose the agency to potential vulnerabilities present in those applications. By only allowing specific, agency-approved Microsoft applications and blocking all others, the agency can better manage application integration and potential exposure points.
+- _Rationale:_ Allowing Microsoft Teams integration with all Microsoft applications can expose the agency to potential vulnerabilities present in those applications. By only allowing specific, agency-approved Microsoft applications and blocking all others, the agency can better manage application integration and potential exposure points.
 - _Last modified:_ August 2026
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies, and the org-wide app settings. Custom policies MAY be created to allow more flexibility for specific users.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
@@ -528,7 +528,7 @@ Agencies SHOULD only allow installation of third-party applications approved by 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.TEAMS.5.2v2; Criticality: SHOULD -->
-- _Rationale:_ Allowing MS Teams integration with third-party applications can expose the agency to potential vulnerabilities present in an application not managed by the agency. By allowing only specific, agency-approved third-party applications and blocking all others, the agency can limit its exposure to third-party application vulnerabilities.
+- _Rationale:_ Allowing Microsoft Teams integration with third-party applications can expose the agency to potential vulnerabilities present in an application not managed by the agency. By allowing only specific, agency-approved third-party applications and blocking all others, the agency can limit its exposure to third-party application vulnerabilities.
 - _Last modified:_ August 2026
 - _Note:_ This policy applies to the Global (Org-wide default) policy, all custom policies if they exist, and the org-wide settings. Custom policies MAY be created to allow more flexibility for specific users. Third-party apps may not be available in the Government Community Cloud (GCC), GCC High, and Department of Defense (DoD) regions.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-11
