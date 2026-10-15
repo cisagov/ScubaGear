@@ -427,7 +427,7 @@ then add a name and valid email address for each sensitive account. Click **Add*
 2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Select the **Office365 Anti-phish Default (Default)** policy.
+5.  Select the **Office365 AntiPhish Default (Default)** policy.
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, check **Enable domains to protect** and **Include custom domains**.
 8.  Click **Manage [x] custom domain(s)**.
