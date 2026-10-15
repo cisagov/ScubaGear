@@ -1034,7 +1034,7 @@ For users not added to the standard or strict preset policies:
     4. (Optional) Under **Exclude these users, groups, and domains**, add **Users** and **Groups**
        to be exempted from this policy.
     5. Click **Next**.
-    6. On the **Bulk email threshold and spam properties** page, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
+    6. On the **Bulk email threshold & spam properties** page, see [Recommended email and collaboration threat policy settings for cloud organizations](https://learn.microsoft.com/en-us/defender-office-365/recommended-settings-for-eop-and-office365)
     for configuration guidance. We recommend mirroring the values used for either the standard or
     strict preset policies.
     7. For each email classification (**Spam**, **High confidence spam**, **Phishing**, and **High confidence phishing**), select one of the following options:
