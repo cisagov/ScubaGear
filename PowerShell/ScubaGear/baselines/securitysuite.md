@@ -386,7 +386,7 @@ impersonation protection checks.
 2.  Under **Email and collaboration**, select **Policies and rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
-5.  Select the **Office365 Anti-phish Default (Default)** policy.
+5.  Select the **Office365 AntiPhish Default (Default)** policy.
 6.  Click **Edit protection settings**.
 7.  Under **Impersonation**, select **Enable users to protect**.
 8.  Click **Manage [x] sender(s)**.
