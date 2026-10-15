@@ -168,7 +168,7 @@ File and folder default sharing scope SHALL be set to "Specific people (only the
     - [T1565.001: Stored Data Manipulation](https://attack.mitre.org/techniques/T1565/001/)
 
 #### MS.SHAREPOINT.2.2v1
-File and folder default sharing permissions SHALL be set to "view only."
+File and folder default sharing permissions SHALL be set to view only.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
