@@ -177,7 +177,7 @@ test_PasswordAdditionBlocked_Incorrect_V1 if {
 
     Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.5v1", Output, ["Password addition not blocked"], false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["Application policy \"Block password addition\" is not enabled"], false) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V2 if {
@@ -188,7 +188,7 @@ test_PasswordAdditionBlocked_Incorrect_V2 if {
 
     Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.5v1", Output, ["Password addition not blocked"], false) == true
+    TestResultContains("MS.AAD.5.5v1", Output, ["Application policy \"Block password addition\" is not enabled"], false) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V3 if {
