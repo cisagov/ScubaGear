@@ -1046,7 +1046,7 @@ For users not added to the standard or strict preset policies:
       the **Redirect to this email address** field, such as a mailbox set up for monitoring incoming
       spam and phishing messages.
     9. Click **Next**.
-    10. On the **Allow and block list** page, do not click **Allow domains** under **Allowed**. It
+    10. On the **Allow & block list** page, do not click **Allow domains** under **Allowed**. It
     should read **Domains (0)** under **Allowed**. (_MS.SECURITYSUITE.6.2v1_)
     11. Click **Next**, then click **Submit**.
 
