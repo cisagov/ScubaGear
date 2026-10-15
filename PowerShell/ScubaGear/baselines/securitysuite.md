@@ -1251,7 +1251,7 @@ security mechanisms. While blocking all malicious senders is not feasible,
 blocking specific known, malicious IP addresses may reduce the threat from
 specific senders.
 - _Last modified:_ March 2026
-- _Note:_ A connection filter may be implemented to create an IP block list.
+- _Note:_ A connection filter MAY be implemented to create an IP block list.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
 - _MITRE ATT&CK TTP Mapping:_
   - None
