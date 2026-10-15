@@ -812,7 +812,7 @@ For each enabled alert, to add one or more email recipients:
 
 1. Sign in to **Microsoft 365 Defender**.
 
-2. Under **Email and collaboration**, select **Policies and rules**.
+2. Under **Email & collaboration**, select **Policies & rules**.
 
 3. Select **Alert Policy**.
 
