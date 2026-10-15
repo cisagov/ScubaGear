@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearContext
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Initialize-Msal, Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearContext
 
 function Connect-Tenant {
     <#
@@ -54,6 +54,9 @@ function Connect-Tenant {
 
    # Clear prior session so consecutive Invoke-SCuBA calls don't leak tokens across tenants
    Disconnect-ScubaGraph
+
+   # Download/verify the MSAL libraries up front so setup output is separate from any sign-in prompt
+   Initialize-Msal
 
    $DetectedM365Environment = $null
    if (-not $PSBoundParameters.ContainsKey('M365Environment')) {

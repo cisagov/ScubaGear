@@ -56,6 +56,19 @@ InModuleScope ConnectHelpers {
             $script:App.InteractiveCalls | Should -Be 1
         }
 
+        It 'tells the user a browser sign-in is starting only when it is needed' {
+            Mock Write-Information {}
+            $null = Get-MsalAccessToken -ClientId test-client -Tenant organizations -M365Environment commercial `
+                -Scope @('Organization.Read.All') -MultiCloudSupport -PassThru
+            Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter { $MessageData -like '*browser*sign in*' }
+
+            $script:AccountsTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
+            $script:AccountsTask.SetResult(@($script:TokenResult.Account))
+            $null = Get-MsalAccessToken -ClientId test-client -Tenant $script:TokenResult.TenantId `
+                -M365Environment gcchigh -Scope @('Organization.Read.All')
+            Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter { $MessageData -like '*browser*sign in*' }
+        }
+
         It 'pins later browser requests to the discovered tenant and preserves token-only output' {
             $Result = Get-MsalAccessToken -ClientId test-client -Tenant $script:TokenResult.TenantId `
                 -M365Environment gcchigh -Scope @('Organization.Read.All')
@@ -84,6 +97,41 @@ InModuleScope ConnectHelpers {
             { Get-MsalAccessToken -ClientId test-client -Tenant $Tenant -M365Environment $Environment `
                 -Scope @('Organization.Read.All') -MultiCloudSupport } | Should -Throw '*public common or organizations authority*'
             $script:App.InteractiveCalls | Should -Be 0
+        }
+    }
+
+    Describe 'Initialize-Msal setup messages' {
+        BeforeEach {
+            $script:SavedValidated = $Global:ScubaGearState.MsalValidated
+            $script:SavedLibraryPath = $Global:ScubaGearState.MsalLibraryPath
+            $Global:ScubaGearState.MsalValidated = $false
+            $Global:ScubaGearState.MsalLibraryPath = $null
+            $Manifest = Get-ScubaMsalManifest
+            $script:Manifest = @{ Version = $Manifest.Version; Files = @(@{ File = 'Placeholder.dll' }); LoadOrder = @() }
+            Mock Get-ScubaMsalManifest { $script:Manifest }
+            Mock Install-ScubaMsalDependency { $LibraryPath }
+            Mock Write-Information {}
+        }
+
+        AfterEach {
+            $Global:ScubaGearState.MsalValidated = $script:SavedValidated
+            $Global:ScubaGearState.MsalLibraryPath = $script:SavedLibraryPath
+        }
+
+        It 'announces the download and then its completion when the libraries are missing' {
+            $script:ValidationCalls = 0
+            Mock Test-ScubaMsalLibrary { $script:ValidationCalls++; $script:ValidationCalls -gt 1 }
+            Initialize-Msal -LibraryPath 'TestDrive:\msal'
+            Should -Invoke Install-ScubaMsalDependency -Times 1 -Exactly
+            Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter { $MessageData -like '*downloading*No sign-in is required*' }
+            Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter { $MessageData -like 'Setup complete*' }
+        }
+
+        It 'stays quiet when the libraries are already installed' {
+            Mock Test-ScubaMsalLibrary { $true }
+            Initialize-Msal -LibraryPath 'TestDrive:\msal'
+            Should -Invoke Install-ScubaMsalDependency -Times 0 -Exactly
+            Should -Invoke Write-Information -Times 0 -Exactly
         }
     }
 }

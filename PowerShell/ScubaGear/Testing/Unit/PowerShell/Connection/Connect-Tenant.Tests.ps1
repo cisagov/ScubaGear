@@ -45,6 +45,7 @@ InModuleScope Connection {
                 throw 'this will be mocked'
             }
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
+            Mock Initialize-Msal -MockWith {}
             Mock -CommandName Write-Progress {
             }
         }

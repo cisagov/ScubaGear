@@ -586,8 +586,9 @@ function Initialize-Msal {
 
     if (-not $Global:ScubaGearState.MsalValidated) {
         if (-not (Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest)) {
-            Write-Information "MSAL dependencies not found or invalid; downloading to $LibraryPath ..." -InformationAction Continue
+            Write-Information "One-time setup: downloading the Microsoft authentication libraries (MSAL) to $LibraryPath. No sign-in is required for this step..." -InformationAction Continue
             $LibraryPath = Install-ScubaMsalDependency -LibraryPath $LibraryPath
+            Write-Information "Setup complete: the Microsoft authentication libraries (MSAL) were downloaded and verified." -InformationAction Continue
         }
         $null = Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest -ThrowOnFail
         $Global:ScubaGearState.MsalValidated = $true
@@ -774,6 +775,7 @@ function Get-MsalAccessToken {
                 }
 
                 if (-not $TokenResult) {
+                    Write-Information "Opening your default browser so you can sign in to Microsoft 365..." -InformationAction Continue
                     # Embedded web view does not support WebAuthn/FIDO2/passkey ceremonies (no real browser
                     # context), so this must use the system (default OS) browser instead.
                     $InteractiveRequest = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).

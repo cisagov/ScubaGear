@@ -105,6 +105,7 @@ InModuleScope Connection {
     Describe 'Connect-Tenant environment discovery' {
         BeforeEach {
             Mock Disconnect-ScubaGraph {}
+            Mock Initialize-Msal {}
             Mock Get-ScubaInteractiveEnvironment {
                 [pscustomobject]@{
                     M365Environment = 'gcchigh'
