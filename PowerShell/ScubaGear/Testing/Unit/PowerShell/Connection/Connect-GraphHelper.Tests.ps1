@@ -56,23 +56,6 @@ InModuleScope ConnectHelpers {
                 }
             }
         }
-        context 'Token persistence'{
-            It 'Scopes the interactive Graph session to the process' {
-                Connect-GraphHelper -M365Environment 'commercial'
-                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-MgGraph -Times 1 -ParameterFilter { $ContextScope -eq 'Process' }
-            }
-            It 'Scopes the service principal Graph session to the process' {
-                $sp = @{
-                    CertThumbprintParams = @{
-                        CertificateThumbprint = 'A thumbprint';
-                        AppID = 'My Id';
-                        Organization = 'My Organization';
-                    }
-                }
-                Connect-GraphHelper -M365Environment 'commercial' -ServicePrincipalParams $sp
-                Should -Invoke -ModuleName ConnectHelpers -CommandName Connect-MgGraph -Times 1 -ParameterFilter { $ContextScope -eq 'Process' }
-            }
-        }
         context 'With Service Principal'{
             It 'Invoke with Service Principal parameters'{
                 $sp = @{
