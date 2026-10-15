@@ -452,7 +452,7 @@ then add a name and valid email address for each sensitive account. Click **Add*
 4.  Under **Policies**, select **Anti-phishing**.
 5.  Select the **Office365 AntiPhish Default (Default)** policy.
 6.  Click **Edit actions**.
-7.  Under **Safety tips and indicators**, enable each safety tip and indicator.
+7.  Under **Safety tips & indicators**, enable each safety tip and indicator.
 8.  Click **Save**.
 
 ## 3. Data Loss Prevention
