@@ -1323,7 +1323,7 @@ duplicative sections for each applicable control.
 
 To add users to the standard policy:
 1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, click on **Email and collaboration**, then click on **Policies and rules**.
+2. In the left-hand menu, click on **Email & collaboration**, then click on **Policies & rules**.
 3. Select **Threat policies**.
 4. From the **Templated policies** section, select **Preset security policies**.
 5. Under **Standard protection**, enable the toggle so that it reads "Standard protection is on."
