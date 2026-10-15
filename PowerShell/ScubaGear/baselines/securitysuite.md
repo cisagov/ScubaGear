@@ -1339,7 +1339,7 @@ To add users to the standard policy:
 
 To add users to the strict policy:
 1. Sign in to **Microsoft 365 Defender**.
-2. In the left-hand menu, click on **Email and collaboration**, then click on **Policies and rules**.
+2. In the left-hand menu, click on **Email & collaboration**, then click on **Policies & rules**.
 3. Select **Threat policies**.
 4. From the **Templated policies** section, select **Preset security policies**.
 5. Under **Strict protection**, ensure the toggle is enabled so that it reads "Strict protection is on."
