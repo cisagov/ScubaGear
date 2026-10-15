@@ -222,7 +222,7 @@ To configure settings for anonymous users so that they are not admitted automati
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join and lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed or approved.
+4.	Under the **Meeting join & lobby** section, ensure **Who can bypass the lobby** is **not** set to **Everyone**. Bypassing the lobby should be set to **People in my org**, though other options may be used if needed or approved.
 
 5.	In the same section, ensure **People dialing in can bypass the lobby** is set to the **Off** position.
 
