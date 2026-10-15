@@ -209,7 +209,7 @@ DKIM SHOULD be enabled for all domains.
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/parameters.md#preferreddnsresolvers)
 
 <!--Policy: MS.EXO.3.1v1; Criticality: SHOULD -->
-- _Rationale:_ An adversary may modify email headers so the email appears to be a legitimate email sent by an
+- _Rationale:_ An adversary may modify email headers, such as the `MAIL FROM` so the email appears to be a legitimate email sent by an
 agency, facilitating phishing attacks. Enabling DKIM is another means for
 recipients to detect spoofed emails and verify the integrity of email content.
 - _Last modified:_ June 2023
