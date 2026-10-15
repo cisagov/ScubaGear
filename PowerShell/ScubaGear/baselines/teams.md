@@ -258,7 +258,7 @@ To configure settings for anonymous users so that they are not able to bypass th
 
 3.	Select the **Global (Org-wide default)** policy.
 
-4.	Under the **Meeting join and lobby** section, ensure **People dialing in can bypass the lobby** is set to the **Off** position.
+4.	Under the **Meeting join & lobby** section, ensure **People dialing in can bypass the lobby** is set to the **Off** position.
 
 5.  Select **Save** (if applicable).
 
