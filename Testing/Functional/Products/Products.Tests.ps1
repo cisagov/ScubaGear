@@ -79,7 +79,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -96,7 +96,7 @@ param (
     $Variant = [string]::Empty
 )
 
-$script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+$script:ExecutionProductName = $ProductName
 
 BeforeDiscovery {
     $DefaultTestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.testplan.yaml"
@@ -139,8 +139,7 @@ BeforeAll {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
         aad = "Azure Active Directory"
-      defender = "Security Suite"
-      securitysuite = "Security Suite"
+        securitysuite = "Security Suite"
         exo = "Exchange Online"
         powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
@@ -285,7 +284,7 @@ BeforeAll {
     }
 
   function RunScuba() {
-        $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+        $ExecutionProductName = $ProductName
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
             Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
@@ -312,7 +311,7 @@ Describe "Policy Checks for <ProductName>" {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
-                $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductName = $ProductName
                 $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ExecutionProductName/$PolicyId/$ConfigFileName"
 
                 $ScubaConfig = Get-Content -Path $FullPath | ConvertFrom-Yaml
@@ -367,7 +366,7 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductName = $ProductName
                 Invoke-SCuBACached -Productnames $ExecutionProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Save the ModifiedProviderSettingsExport so that it can be referenced during dev testing of functional test scenarios
@@ -431,7 +430,7 @@ Describe "Policy Checks for <ProductName>" {
 
                 # Check final HTML output
                 $FoundPolicy = $false
-                $ExecutionProductNameForLookup = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductNameForLookup = $ProductName
                 $ExecutionProductNameForLookup | Should -Not -BeNullOrEmpty -Because "execution product name must be set for policy [$PolicyId]"
                 $DetailLinkText = $ProductDetails[$ExecutionProductNameForLookup]
                 $DetailLinkText | Should -Not -BeNullOrEmpty -Because "product detail link text must exist for execution product [$ExecutionProductNameForLookup]"

@@ -154,7 +154,7 @@ Invoke-SCuBACached -ProductNames teams, aad -ExportProvider $false -OutPath "C:\
 Run analysis on subset 2
 
 ```powershell
-Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
+Invoke-SCuBACached -ProductNames exo, securitysuite -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24"
 ```
 
 ### Testing Rego on Modified Settings
@@ -281,7 +281,7 @@ If the results are looking incorrect when it generates a html report, this may b
 **Solution**: Rerun the Invoke-SCuBACached in cache mode with a new OPA path:
 
 ```powershell
-Invoke-SCuBACached -ProductNames exo, defender -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -OPAPath "c:\ScubaResults\opadownload"
+Invoke-SCuBACached -ProductNames exo, securitysuite -ExportProvider $false -OutPath "C:\ScubaResults\M365BaselineConformance_2025_09_22_10_19_24" -OPAPath "c:\ScubaResults\opadownload"
 ```
 
 ## Performance Considerations

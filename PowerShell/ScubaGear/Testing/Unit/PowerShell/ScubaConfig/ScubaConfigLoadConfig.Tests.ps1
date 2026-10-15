@@ -200,7 +200,7 @@ M365Environment: invalid-env
                     $cfg = [ScubaConfig]::GetInstance()
                     $cfg.Configuration.ProductNames | Should -Not -BeNullOrEmpty
                     # Since validation was skipped, we can override values
-                    $cfg.Configuration.ProductNames = @('aad', 'defender')
+                    $cfg.Configuration.ProductNames = @('aad', 'securitysuite')
                     $cfg.Configuration.M365Environment = 'commercial'
                     # Ensure OPAPath is still pointing to our temp directory
                     $cfg.Configuration.OPAPath = $tempOpaPath
