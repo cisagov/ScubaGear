@@ -182,7 +182,7 @@ MS.SECURITYSUITE.1.1v1 are followed by the applicable SCuBA policy in parenthese
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email and collaboration**, select **Policies and rules**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-malware**.
 5.  If modifying an existing policy:
