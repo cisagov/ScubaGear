@@ -228,7 +228,7 @@ for instructions on adding users to these policies.
 
 For users not added to the standard or strict preset policies:
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email and collaboration**, select **Policies and rules**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Safe attachments**.
 5.  If modifying an existing policy:
