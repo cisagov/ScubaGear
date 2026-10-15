@@ -447,7 +447,7 @@ then add a name and valid email address for each sensitive account. Click **Add*
 #### MS.SECURITYSUITE.2.4v1 Instructions
 
 1.  Sign in to **Microsoft 365 Defender**.
-2.  Under **Email and collaboration**, select **Policies and rules**.
+2.  Under **Email & collaboration**, select **Policies & rules**.
 3.  Select **Threat policies**.
 4.  Under **Policies**, select **Anti-phishing**.
 5.  Select the **Office365 Anti-phish Default (Default)** policy.
