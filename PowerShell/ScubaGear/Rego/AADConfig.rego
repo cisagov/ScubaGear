@@ -1199,7 +1199,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
     "ActualValue": PasswordAdditionIssues,
-    "ReportDetails": ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString),
+    "ReportDetails": ReportDetailsString(
+        Status,
+        ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString)
+    ),
     "RequirementMet": Status
 } if {
     DescriptionString := "Password addition restriction(s) not meeting requirements"
@@ -1403,7 +1406,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
     "ActualValue": CertificateLifetimeIssues,
-    "ReportDetails": ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString),
+    "ReportDetails": ReportDetailsString(
+        Status,
+        ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString)
+    ),
     "RequirementMet": Status
 } if {
     DescriptionString := "certificate lifetime restriction(s) not meeting requirements"

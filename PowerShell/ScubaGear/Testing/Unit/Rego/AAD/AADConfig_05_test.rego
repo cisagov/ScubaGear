@@ -168,7 +168,7 @@ test_IsEnabled_Incorrect if {
 test_PasswordAdditionBlocked_Correct if {
     Output := aad.tests with input.default_app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.5v1", Output, "0 Password addition restriction(s) not meeting requirements", true) == true
+    TestResult("MS.AAD.5.5v1", Output, "Requirement met", true) == true
 }
 
 test_PasswordAdditionBlocked_Incorrect_V1 if {
@@ -306,7 +306,7 @@ test_PasswordLifetimeRestricted_Incorrect_DateRestriction if {
 test_CertificateLifetimeRestricted_Correct if {
     Output := aad.tests with input.default_app_management_policy as [AppManagementPolicy]
 
-    TestResult("MS.AAD.5.7v1", Output, "0 certificate lifetime restriction(s) not meeting requirements", true) == true
+    TestResult("MS.AAD.5.7v1", Output, "Requirement met", true) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_TooLong if {
