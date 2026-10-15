@@ -274,7 +274,7 @@ To configure the settings that control meeting recordings:
 
 3.  Select the **Global (Org-wide default)** policy.
 
-4.  Under the **Recording and transcription** section, ensure **Meeting recording** is set to the **Off** position.
+4.  Under the **Recording & transcription** section, ensure **Meeting recording** is set to the **Off** position.
 
 5.  Select **Save** (if applicable).
 
