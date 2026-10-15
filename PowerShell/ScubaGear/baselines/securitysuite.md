@@ -966,7 +966,7 @@ combating these false positives. However, allowing an entire domain, especially
 a common domain like office.com, could allow a large number of
 potentially unknown users to bypass spam protections.
 - _Last modified:_ March 2026
-- _Note:_ Allowed senders may be added.
+- _Note:_ Allowed senders MAY be added.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
 - _MITRE ATT&CK TTP Mapping:_
   - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
