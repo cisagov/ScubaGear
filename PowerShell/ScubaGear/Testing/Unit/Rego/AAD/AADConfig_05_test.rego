@@ -201,6 +201,52 @@ test_PasswordAdditionBlocked_Incorrect_V3 if {
 
     TestResultContains("MS.AAD.5.5v1", Output, ["Only applies to apps created after 2023-11-14"], false) == true
 }
+
+test_PasswordAdditionBlocked_EmptyScopes if {
+    Policy := json.patch(AppManagementPolicy, [
+        {"op": "replace", "path": "ApplicationRestrictions/PasswordCredentials", "value": []},
+        {"op": "replace", "path": "ServicePrincipalRestrictions/PasswordCredentials", "value": []}
+    ])
+
+    Output := aad.tests with input.default_app_management_policy as [Policy]
+        with input.app_management_policies as []
+
+    TestResultContains("MS.AAD.5.5v1", Output, ["Application policy \"Block password addition\" is not enabled"], false) == true
+    aad.PasswordAdditionIssues == {"Application policy \"Block password addition\" is not enabled"} with input.default_app_management_policy as [Policy]
+        with input.app_management_policies as []
+    aad.PasswordAdditionFullyBlocked == false with input.default_app_management_policy as [Policy]
+        with input.app_management_policies as []
+}
+
+test_PasswordAdditionBlocked_MissingRestrictionInEachScope if {
+    every ScopeName in ["ApplicationRestrictions", "ServicePrincipalRestrictions"] {
+        CredentialsPath := sprintf("%v/PasswordCredentials", [ScopeName])
+        every Patch in [
+            {"op": "replace", "path": CredentialsPath, "value": []},
+            {"op": "replace", "path": CredentialsPath, "value": [{"RestrictionType": "passwordLifetime"}]},
+            {"op": "remove", "path": CredentialsPath},
+            {"op": "remove", "path": ScopeName}
+        ] {
+            Policy := json.patch(AppManagementPolicy, [Patch])
+            Output := aad.tests with input.default_app_management_policy as [Policy]
+                with input.app_management_policies as []
+
+            TestResultContains("MS.AAD.5.5v1", Output, ["Application policy \"Block password addition\" is not enabled"], false) == true
+            aad.PasswordAdditionFullyBlocked == false with input.default_app_management_policy as [Policy]
+                with input.app_management_policies as []
+        }
+    }
+}
+
+test_PasswordAdditionBlocked_MissingDefaultPolicy if {
+    every Input in [{}, {"default_app_management_policy": []}] {
+        Output := aad.tests with input as Input
+
+        TestResultContains("MS.AAD.5.5v1", Output, ["Application policy \"Block password addition\" is not enabled"], false) == true
+        aad.PasswordAdditionIssues == {"Application policy \"Block password addition\" is not enabled"} with input as Input
+        aad.PasswordAdditionFullyBlocked == false with input as Input
+    }
+}
 #--
 
 #
@@ -278,7 +324,7 @@ test_CertificateLifetimeRestricted_Incorrect_Disabled if {
 
     Output := aad.tests with input.default_app_management_policy as [Policy]
 
-    TestResultContains("MS.AAD.5.7v1", Output, ["Certificate lifetime not restricted"], false) == true
+    TestResultContains("MS.AAD.5.7v1", Output, ["Application policy \"Restrict max certificate lifetime\" is not enabled"], false) == true
 }
 
 test_CertificateLifetimeRestricted_Incorrect_DateRestriction if {
