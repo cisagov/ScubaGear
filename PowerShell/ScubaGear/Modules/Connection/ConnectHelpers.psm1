@@ -22,8 +22,12 @@
         [hashtable]
         $ServicePrincipalParams
     )
+    # Keep the Graph session in memory for this PowerShell process only. The default (CurrentUser)
+    # persists tokens on disk, and Disconnect-MgGraph can only clear them from the process that
+    # created the session, so a disconnect from a new window would leave the tokens reusable.
     $GraphParams = @{
-        'ErrorAction' = 'Stop';
+        'ErrorAction'  = 'Stop';
+        'ContextScope' = 'Process';
     }
 
     if ($ServicePrincipalParams.CertThumbprintParams) {
