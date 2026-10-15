@@ -174,7 +174,7 @@ File and folder default sharing permissions SHALL be set to view only.
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.SHAREPOINT.2.2v1; Criticality: SHALL -->
-- _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes. By restricting default permissions to "view only," administrators prevent unintended or malicious modification.
+- _Rationale:_ Edit access to files and folders could allow a user to make unauthorized changes. By restricting default permissions to view only, administrators prevent unintended or malicious modification.
 - _Last modified:_ June 2023
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-6
 - _MITRE ATT&CK TTP Mapping:_
