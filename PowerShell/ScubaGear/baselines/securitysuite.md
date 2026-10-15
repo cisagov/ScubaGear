@@ -1282,7 +1282,7 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 1. Sign in to **Microsoft 365 Defender portal**.
 
-2. From the left-hand menu, find **Email and collaboration** and select **Policies and rules**.
+2. From the left-hand menu, find **Email & collaboration** and select **Policies & rules**.
 
 3. Select **Threat policies** from the list of policy names.
 
