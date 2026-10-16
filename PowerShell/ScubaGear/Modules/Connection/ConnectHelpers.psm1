@@ -22,8 +22,12 @@
         [hashtable]
         $ServicePrincipalParams
     )
+    # Keep the Graph session in memory for this PowerShell process only. The default (CurrentUser)
+    # persists tokens on disk, and Disconnect-MgGraph can only clear them from the process that
+    # created the session, so a disconnect from a new window would leave the tokens reusable.
     $GraphParams = @{
-        'ErrorAction' = 'Stop';
+        'ErrorAction'  = 'Stop';
+        'ContextScope' = 'Process';
     }
 
     if ($ServicePrincipalParams.CertThumbprintParams) {
@@ -253,6 +257,8 @@ function Get-MsalAccessToken {
                 }
 
                 if (-not $TokenResult) {
+                    # Embedded web view does not support WebAuthn/FIDO2/passkey ceremonies (no real browser
+                    # context), so this must use the system (default OS) browser instead.
                     $TokenResult = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
                         WithPrompt([Microsoft.Identity.Client.Prompt]::SelectAccount).
                         WithUseEmbeddedWebView($true).

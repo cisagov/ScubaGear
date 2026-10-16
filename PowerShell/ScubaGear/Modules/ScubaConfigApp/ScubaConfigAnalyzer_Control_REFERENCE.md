@@ -31,7 +31,7 @@ to point the analyzer at a different file.
 | `EXORestHelperPath` | ScubaGear's `EXORestHelper.psm1` — reused for Exchange Online REST (no `ExchangeOnlineManagement` module). |
 | `ConnectHelpersPath` | ScubaGear's `ConnectHelpers.psm1` — MSAL token acquisition (`Get-MsalAccessToken`, `Initialize-Msal`). |
 | `BaselineSchemaPath` | `ScubaGearResultsBaselineSchema.json` — the validation/results baseline the analyzer checks the tenant against. |
-| `ApiCatalogPath` | `ScubaGearApiCatalog.json` — the Graph/EXO API operation catalog. |
+| `ApiCatalogPath` | `ScubaGearApiCatalog.json` — the Graph/EXO API operation catalog. The file also holds REST call entries keyed by `functionName`; the analyzer reads only entries keyed by `moduleCmdlet` and ignores the rest. |
 | `ConfigSchemaPath` | `ScubaConfigSchema.json` — the canonical config schema (source of truth for which policies are configurable via exclusions, and the `M365Environment` enum). |
 
 > **Not in this file (hardcoded in the launcher):** `AnalyzerControlPath`, `XamlPath`, `ImgPath`,

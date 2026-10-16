@@ -39,8 +39,14 @@ function Get-RegoResult {
     elseif ($MissingCommands.Count -gt 0) {
         $Result.DisplayString = "Error"
         $Result.SummaryKey = "Errors"
-        $MissingString = $MissingCommands -Join ", "
-        $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        # The Rego can supply ErrorDetails to explain a known failure and how to fix it
+        if (-not [string]::IsNullOrEmpty($Test.ErrorDetails)) {
+            $Result.Details = $Test.ErrorDetails
+        }
+        else {
+            $MissingString = $MissingCommands -Join ", "
+            $Result.Details = "This test depends on the following command(s) which did not execute successfully: $($MissingString). See terminal output for more details."
+        }
     }
     elseif ($Test.RequirementMet) {
         $Result.DisplayString = "Pass"
@@ -265,6 +271,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+                
                 $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
 
                 $Config = $SettingsExport.scuba_config
@@ -308,6 +315,7 @@ function New-Report {
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
                         "Details"= $Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
@@ -339,6 +347,7 @@ function New-Report {
                         "Result"= "Incorrect result"
                         "Criticality"= $Test.Criticality
                         "Details"= $Result.Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
@@ -644,18 +653,8 @@ function New-Report {
     # Handle SecuritySuite-specific reporting
     if ($BaselineName -eq "securitysuite") {
         $SecuritySuiteConfig = $SettingsExport.scuba_config.SecuritySuite
-        $DefenderConfig = $SettingsExport.scuba_config.Defender
-
         $SensitiveUserConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.1v1'
-        if ($null -eq $SensitiveUserConfig) {
-            $SensitiveUserConfig = $DefenderConfig.'MS.DEFENDER.2.1v1'
-        }
-
         $PartnerDomainConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.3v1'
-        if ($null -eq $PartnerDomainConfig) {
-            $PartnerDomainConfig = $DefenderConfig.'MS.DEFENDER.2.3v1'
-        }
-
         $SensitiveUsers = @()
         if ($null -ne $SensitiveUserConfig -and $null -ne $SensitiveUserConfig.SensitiveUsers) {
             $SensitiveUsers = @($SensitiveUserConfig.SensitiveUsers)
@@ -895,7 +894,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]

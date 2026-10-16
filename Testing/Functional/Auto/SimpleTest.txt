@@ -1,5 +1,4 @@
 aad
-defender
 exo
 onedrive
 sharepoint
