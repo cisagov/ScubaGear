@@ -56,10 +56,6 @@ Describe -Tag 'PermissionsHelper' -Name 'Get-ScubaGearEndpointRest' {
             @(Get-ScubaGearEndpointRest -M365Environment $Environment -Domain contoso | ForEach-Object { $_.Host } | Sort-Object -Unique) | Should -Be $Expected
         }
 
-        It 'treats defender as securitysuite' {
-            @(& $script:Hosts 'commercial' 'defender') | Should -Be @(& $script:Hosts 'commercial' 'securitysuite')
-        }
-
         It 'treats * as every product Invoke-SCuBA tests' {
             $All = 'aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi'
             @(Get-ScubaGearEndpointRest -ProductNames '*' -M365Environment gcc -Domain contoso -Format Hosts) |

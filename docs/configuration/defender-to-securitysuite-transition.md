@@ -62,7 +62,7 @@ ProductNames:
 ```
 
 > [!NOTE]
-> For backwards compatibility, if you run ScubaGear with `defender` in `ProductNames`, ScubaGear will automatically substitute `securitysuite` and emit a warning. Updating the configuration file removes the warning and reflects the current product name.
+> Beginning in release 2.0.0, Defender is no longer accepted in assessments performed with ScubaGear. Updating a configuration that used Defender to instead use Security Suite is necessary to align configurations with the removal of Defender from the ScubaGear platform.
 
 ### 2. Rename the product exclusion section
 
@@ -127,7 +127,7 @@ When ScubaGear loads a configuration file, the built-in configuration validator 
 
 `Defender migration warning:` for Defender-wide deprecations:
 
-- **Deprecated product name** - `ProductNames` still contains `defender`. ScubaGear runs `securitysuite` in its place and recommends updating the configuration.
+- **Deprecated product name** - `ProductNames` no longer contains `defender`. ScubaGear will instead accept `securitysuite`, and since release 2.0.0 requires that the configuration be updated to remove and replace `defender` with `securitysuite` in order for ScubaGear to run.
 - **Deprecated `Defender` section** - the configuration still contains a top-level `Defender:` section. Move the settings under `SecuritySuite:`.
 
 `Policy migration warning:` for individual policy IDs referenced in the configuration:
@@ -138,8 +138,7 @@ When ScubaGear loads a configuration file, the built-in configuration validator 
 Example console output:
 
 ```text
-WARNING: Configuration validation found 2 warnings:
-  Defender migration warning: The product name 'defender' is deprecated and has been renamed to 'securitysuite'. ScubaGear will run 'securitysuite' in its place. Update ProductNames to use 'securitysuite'. See docs\configuration\defender-to-securitysuite-transition.md and mappings\scuba-baseline-policy-migrations.csv for the full list of migrated policies.
+WARNING: Configuration validation found 1 warning:
   Policy migration warning: Policy ID 'MS.DEFENDER.2.1v1' has been migrated to 'MS.SECURITYSUITE.2.1v1'. Update your configuration to use the new policy ID. See docs\configuration\defender-to-securitysuite-transition.md and mappings\scuba-baseline-policy-migrations.csv for the full list of migrated policies.
 
 --- RECOMMENDED ACTION ---
@@ -147,8 +146,6 @@ WARNING: Configuration validation found 2 warnings:
   - Update your configuration file: replace 'defender' with 'securitysuite' in ProductNames and update migrated policy IDs to their new MS.SECURITYSUITE.* equivalents.
   - Refer to the documentation [docs\configuration\defender-to-securitysuite-transition.md] and the mapping file [mappings\scuba-baseline-policy-migrations.csv] for the complete list of migrated policies.
 ```
-
-These warnings do not stop ScubaGear from running, but resolving them ensures your configuration reflects the current baseline and that your exclusions, annotations, and omissions are applied to the correct policies.
 
 ## Related documentation
 
