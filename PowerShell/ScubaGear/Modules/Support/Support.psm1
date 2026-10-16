@@ -1416,7 +1416,7 @@ function New-SCuBAConfig {
     To assess Azure Active Directory you would enter the value aad.
     To assess Exchange Online you would enter exo and so forth.
     - Azure Active Directory: aad
-    - Microsoft Defender stack: securitysuite
+    - Microsoft Security Suite stack: securitysuite
     - Exchange Online: exo
     - MS Power Platform: powerplatform
     - Power BI: powerbi
@@ -1448,7 +1448,7 @@ function New-SCuBAConfig {
     A connection is established in the current PowerShell terminal session with the first authentication.
     If you want to run another verification in the same PowerShell session simply set
     this variable to be `$false` to bypass the reauthenticating in the same session. Default is $true.
-    Note: defender will ask for authentication even if this variable is set to `$false`
+    Note: securitysuite will ask for authentication even if this variable is set to `$false`
     ;;;.Parameter Version
     ;;;Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -1707,8 +1707,6 @@ function New-SCuBAConfig {
             }
             $Baselines = (Get-Content -Path $BaselinePath -Raw | ConvertFrom-Json).baselines
             foreach ($Product in $Baselines.PSObject.Properties.Name) {
-                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
-                if ($Product -eq 'defender') { continue }
                 foreach ($Policy in $Baselines.$Product) {
                     if ($Policy.id -like "$WordToComplete*") {
                         [System.Management.Automation.CompletionResult]::new($Policy.id, $Policy.id, 'ParameterValue', $Policy.id)
@@ -1735,8 +1733,6 @@ function New-SCuBAConfig {
             $Mappings = (Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json).schemaMetadata.policyExclusionMappings
             foreach ($PolicyId in $Mappings.PSObject.Properties.Name) {
                 if ($PolicyId -eq '_comment') { continue }
-                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
-                if ($PolicyId -like 'MS.DEFENDER.*') { continue }
                 if ($PolicyId -like "$WordToComplete*") {
                     # Return a completion result for the current policy ID.
                     [System.Management.Automation.CompletionResult]::new($PolicyId, $PolicyId, 'ParameterValue', $PolicyId)
@@ -1761,8 +1757,6 @@ function New-SCuBAConfig {
             }
             $Baselines = (Get-Content -Path $BaselinePath -Raw | ConvertFrom-Json).baselines
             foreach ($Product in $Baselines.PSObject.Properties.Name) {
-                # Defender is intentionally excluded: it is not part of the default ScubaGear configuration.
-                if ($Product -eq 'defender') { continue }
                 foreach ($Policy in $Baselines.$Product) {
                     if ($Policy.id -like "$WordToComplete*") {
                         # Return a completion result for the current policy ID.
@@ -1883,7 +1877,7 @@ function New-SCuBAConfig {
             # Note that the regex does not validate the product name
             $Warning = "The policy, $Policy, in the OmitPolicy parameter, is not a valid "
             $Warning += "policy ID. Expected format 'MS.[PRODUCT].[GROUP].[NUMBER]v[VERSION]', "
-            $Warning += "e.g., 'MS.DEFENDER.1.1v1'. Skipping."
+            $Warning += "e.g., 'MS.SECURITYSUITE.1.1v1'. Skipping."
             Write-Warning $Warning
             Continue
         }

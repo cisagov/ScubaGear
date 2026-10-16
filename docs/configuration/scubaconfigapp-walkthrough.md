@@ -71,7 +71,7 @@ Click the **M365 Environment** dropdown and select one:
 Check at least one product under **Select at least one product**:
 
 - Microsoft Entra ID (AAD)
--  Security Suite (Defender)
+-  Security Suite (SecuritySuite)
 - Exchange Online (EXO)
 - Power BI
 - Power Platform
@@ -93,7 +93,7 @@ Exclusions tell ScubaGear evaluation process to validate the specific policy wit
 
 ### 3a. Navigate to the Product Sub-Tab
 
-Click the sub-tab for the product you want to configure (e.g., **AAD**, **DEFENDER**).
+Click the sub-tab for the product you want to configure (e.g., **AAD**, **SECURITYSUITE**).
 
 ### 3b. Find the Policy
 
@@ -427,7 +427,7 @@ The app pre-populates all fields from the file. Make your changes, then follow S
 
 ## Migrating a Legacy Configuration File
 
-If your YAML file was created before the Defender Security Suite baseline was introduced (ScubaGear 1.8.0), it may contain old policy IDs from the `Defender` and `Exo` baselines that have since been moved, renamed, or removed. When you load that file, the app **automatically migrates** any recognized legacy policy settings and shows you a migration report before you proceed.
+If your YAML file was created before the Microsoft Security Suite baseline was introduced (ScubaGear 1.8.0), it may contain old policy IDs from the `Defender` and `Exo` baselines that have since been moved, renamed, or removed. When you load that file, the app **automatically migrates** any recognized legacy policy settings and shows you a migration report before you proceed.
 
 ### What Gets Migrated
 

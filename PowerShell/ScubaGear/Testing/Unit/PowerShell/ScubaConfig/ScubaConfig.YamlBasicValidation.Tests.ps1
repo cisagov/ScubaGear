@@ -73,7 +73,7 @@ Describe "ScubaConfig Basic Root Configuration Tests" {
         $ValidYaml = @"
 ProductNames:
   - aad
-  - defender
+  - securitysuite
 M365Environment: commercial
 Organization: example.onmicrosoft.com
 OrgName: Test Organization
@@ -87,7 +87,7 @@ DisconnectOnExit: false
 
         function global:ConvertFrom-Yaml {
             @{
-                ProductNames=@('aad', 'defender')
+                ProductNames=@('aad', 'securitysuite')
                 M365Environment='commercial'
                 Organization='example.onmicrosoft.com'
                 OrgName='Test Organization'
@@ -141,7 +141,7 @@ DisconnectOnExit: "false"
         $ValidYaml = @"
 ProductNames:
   - aad
-  - defender
+  - securitysuite
   - exo
   - sharepoint
   - teams
@@ -155,7 +155,7 @@ OrgName: Test Organization
 
         function global:ConvertFrom-Yaml {
             @{
-                ProductNames=@('aad', 'defender', 'exo', 'sharepoint', 'teams', 'powerplatform')
+                ProductNames=@('aad', 'securitysuite', 'exo', 'sharepoint', 'teams', 'powerplatform')
                 M365Environment='commercial'
                 OrgName='Test Organization'
             }
@@ -171,7 +171,7 @@ OrgName: Test Organization
         $InvalidYaml = @"
 ProductNames:
   - aad
-  - defender
+  - securitysuite
   - invalid_product
 M365Environment: commercial
 OrgName: Test Organization
@@ -182,7 +182,7 @@ OrgName: Test Organization
 
         function global:ConvertFrom-Yaml {
             @{
-                ProductNames=@('aad', 'defender', 'invalid_product')
+                ProductNames=@('aad', 'securitysuite', 'invalid_product')
                 M365Environment='commercial'
                 OrgName='Test Organization'
             }
