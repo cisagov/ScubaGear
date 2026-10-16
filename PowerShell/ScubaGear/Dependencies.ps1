@@ -15,7 +15,7 @@ param()
 
 try {
     $SupportModulesPath = Join-Path -Path $PSScriptRoot -ChildPath "Modules/Support/Support.psm1"
-    Import-Module -Name $SupportModulesPath
+    Import-Module -Name $SupportModulesPath -Force
 
     # Run version check and display its output
     $null = Test-ScubaGearVersion

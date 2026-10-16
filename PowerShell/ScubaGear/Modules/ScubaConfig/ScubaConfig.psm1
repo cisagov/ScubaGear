@@ -38,6 +38,7 @@ class ScubaConfig {
     hidden static [object]$_ConfigDefaults = $null
     # Cached JSON schema used for validation
     hidden static [object]$_ConfigSchema = $null
+    [Boolean]$M365EnvironmentProvided = $false
 
     # Initializes validator subsystem once per session - loads schemas/defaults from JSON files,
     # caches resources in static properties for performance.
@@ -239,6 +240,8 @@ class ScubaConfig {
         if ($this.Configuration -is [PSCustomObject]) {
             $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
+
+        $this.M365EnvironmentProvided = $this.Configuration.ContainsKey('M365Environment')
 
         # Apply default values and process special configuration properties
         # This ensures all required properties have values for subsequent processing

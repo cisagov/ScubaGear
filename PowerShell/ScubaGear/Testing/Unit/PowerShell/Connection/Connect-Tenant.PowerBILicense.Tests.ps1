@@ -95,6 +95,7 @@ InModuleScope Connection {
             Mock Connect-GraphHelper -MockWith {}
             Mock -CommandName Write-Progress -MockWith {}
             Mock Get-MsalAccessToken -MockWith { return "mock-pbi-access-token" }
+            Mock Initialize-Msal -MockWith {}
             Mock Get-MgContext -MockWith {
                 return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" }
             }
