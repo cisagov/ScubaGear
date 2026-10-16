@@ -533,6 +533,7 @@ TestPlan:
                   Applications:
                     IncludeApplications: ["All"]
                     ExcludeApplications: []
+                    IncludeUserActions: []
         Postconditions: []
         ExpectedResult: true
 

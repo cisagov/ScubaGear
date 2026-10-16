@@ -14,7 +14,7 @@ test_NoExclusionsConditions_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -28,7 +28,7 @@ test_NoExclusionsExemptUsers_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -42,7 +42,7 @@ test_NoExclusionsExemptGroups_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -56,8 +56,15 @@ test_ApplicationExclusions_Incorrect_V1 if {
                         with input.service_plans as ServicePlans
 
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " app exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
@@ -70,8 +77,15 @@ test_UserExclusionNoExempt_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -86,7 +100,7 @@ test_UserExclusionConditions_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -100,8 +114,15 @@ test_UserExclusionsNoExempt_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -115,8 +136,15 @@ test_UserExclusionsSingleExempt_Incorrect_V1 if {
                         with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -135,7 +163,7 @@ test_MultiUserExclusionsConditions_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -149,8 +177,15 @@ test_GroupExclusionNoExempt_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -165,7 +200,7 @@ test_GroupExclusionsConditions_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -179,8 +214,15 @@ test_GroupExclusionsNoExempt_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-    "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -194,8 +236,15 @@ test_GroupExclusionsSingleExempt_Incorrect_V1 if {
                         with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
-    ReportDetailStr :=
-    "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -214,7 +263,7 @@ test_MultiGroupExclusionsConditions_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
@@ -233,7 +282,7 @@ test_UserGroupExclusionConditions_Correct_V1 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
 }
@@ -246,8 +295,15 @@ test_UserGroupExclusionNoExempt_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions, group exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -261,8 +317,15 @@ test_UserGroupExclusionUserExemptOnly_Incorrect_V1 if {
                         with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["49b4dcdf-1f90-41a7c3609b425-9dd7-5e3"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -276,8 +339,15 @@ test_UserGroupExclusionGroupExemptOnly_Incorrect_V1 if {
                         with input.scuba_config.Aad["MS.AAD.2.1v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -293,8 +363,15 @@ test_UserGroupExclusionTooFewUserExempts_Incorrect_V1 if {
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Users as ["65fea286-22d3-42f9-b4ca-93a6f75817d4"]
                         with input.scuba_config.Aad["MS.AAD.2.1v1"].CapExclusions.Groups as ["49b4dcdf-1f90-41a5-9dd7-5e7c3609b423"]
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -306,8 +383,10 @@ test_IncludeApplications_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -318,8 +397,10 @@ test_IncludeUsers_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -330,8 +411,15 @@ test_ExcludeUsers_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " user exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -342,8 +430,15 @@ test_ExcludeGroups_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " group exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -354,8 +449,10 @@ test_ExcludeRoles_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -366,8 +463,10 @@ test_BuiltInControls_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -378,8 +477,10 @@ test_State_Incorrect_V1 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -390,8 +491,10 @@ test_UserRiskLevels_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -402,8 +505,10 @@ test_ServicePlans_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as [ServicePlans[0]]
 
-    ReportDetailStr :=
-        "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+    ReportDetailStr := concat("", [
+        "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**.",
+        " <a href='#caps'>View all CA policies</a>"
+    ])
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
 
@@ -419,7 +524,7 @@ test_AppExclusionConditions_Correct_V2 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -444,7 +549,7 @@ test_GuestUserTypeExclusionConditions_Correct_V2 if {
 
     ReportDetailStr := concat("", [
         "1 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>."
+        "<br/>Test Policy. <a href='#caps'>View all CA policies</a>"
     ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, true) == true
@@ -461,8 +566,15 @@ test_GuestUserTypeExclusionNoExempt_Incorrect_V2 if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr :=
-        "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    ReportDetailStr := concat("", [
+        "0 conditional access policy(s) found that meet(s) all requirements.",
+        " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+        "the config file is updated to include:",
+        " guest exclusions. <a href='#caps'>View all CA policies</a>. ",
+        "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+        "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+        "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+    ])
 
     TestResult("MS.AAD.2.1v1", Output, ReportDetailStr, false) == true
 }
@@ -518,22 +630,24 @@ SignInRiskPassword := json.patch(SignInRiskPasswordless, [
 
 SignInRiskPassedStr(Name) := concat("", [
     "1 conditional access policy(s) found that meet(s) all requirements:",
-    sprintf("<br/>%s. <a href='#caps'>View all CA policies</a>.", [Name])
+    sprintf("<br/>%s. <a href='#caps'>View all CA policies</a>", [Name])
 ])
 
 SignInRiskFailedStr :=
-    "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>."
+    "0 conditional access policy(s) found that meet(s) all requirements. <a href='#caps'>View all CA policies</a>"
 
 SignInRiskNotTargetedStr(Prefix, Ids) := concat("", [
     Prefix,
     ". The following user(s) or group(s) are excluded from the MS.AAD.2.3v2 policy ",
     "but not targeted by a policy that meets this requirement: ",
     Ids,
-    ". <a href='#caps'>View all CA policies</a>."
+    ". <a href='#caps'>View all CA policies</a>"
 ])
 
 SignInRiskNoLicenseStr :=
     "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
+
+SignInRiskNoLicenseCapStr := concat(". ", [SignInRiskNoLicenseStr, "<a href='#caps'>View all CA policies</a>"])
 
 test_PasswordlessSignInRisk_Correct if {
     Output := aad.tests with input.conditional_access_policies as [SignInRiskPasswordless]
@@ -597,12 +711,15 @@ test_PasswordlessSignInRisk_ExemptGuestUserTypes_Correct if {
     TestResult("MS.AAD.2.3v2", Output, SignInRiskPassedStr("Test Policy"), true) == true
 }
 
-SignInRiskUnexemptedStr(Ids) := concat("", [
-    "0 conditional access policy(s) found that meet(s) all requirements. ",
-    "The following user(s) or group(s) are excluded from the policy but do not match ",
-    "the MS.AAD.2.3v2 exclusions in the configuration file: ",
-    Ids,
-    ". <a href='#caps'>View all CA policies</a>."
+SignInRiskNearMissStr(Types) := concat("", [
+    "0 conditional access policy(s) found that meet(s) all requirements.",
+    " <br/><br/><strong>Near miss: </strong> Test Policy would pass if ",
+    "the config file is updated to include: ",
+    Types,
+    ". <a href='#caps'>View all CA policies</a>. ",
+    "<a href=\"https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md\" ",
+    "target=\"_blank\">Run the Start-SCuBAConfigAnalyzer cmdlet</a> ",
+    "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
 ])
 
 test_PasswordlessSignInRisk_UserNoExempt_Incorrect if {
@@ -612,7 +729,7 @@ test_PasswordlessSignInRisk_UserNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskUnexemptedStr(SignInRiskUserA), false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("user exclusions"), false) == true
 }
 
 test_PasswordlessSignInRisk_UserPartialExempt_Incorrect if {
@@ -624,7 +741,7 @@ test_PasswordlessSignInRisk_UserPartialExempt_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.2.3v2"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.3v2"].CapExclusions.Users as [SignInRiskUserA]
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskUnexemptedStr(SignInRiskBreakGlass), false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("user exclusions"), false) == true
 }
 
 test_PasswordlessSignInRisk_GroupNoExempt_Incorrect if {
@@ -634,7 +751,7 @@ test_PasswordlessSignInRisk_GroupNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskUnexemptedStr(SignInRiskGroupA), false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("group exclusions"), false) == true
 }
 
 test_PasswordlessSignInRisk_GroupPartialExempt_Incorrect if {
@@ -646,10 +763,10 @@ test_PasswordlessSignInRisk_GroupPartialExempt_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.2.3v2"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.3v2"].CapExclusions.Groups as [SignInRiskGroupA]
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskUnexemptedStr(SignInRiskGroupB), false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("group exclusions"), false) == true
 }
 
-# Unexempted users and groups are all listed
+# All missing exclusion types are listed
 test_PasswordlessSignInRisk_UserAndGroupNoExempt_Incorrect if {
     CAP := json.patch(SignInRiskPasswordless,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [SignInRiskUserA]},
@@ -658,11 +775,10 @@ test_PasswordlessSignInRisk_UserAndGroupNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    ReportDetailStr := SignInRiskUnexemptedStr(concat(", ", [SignInRiskGroupA, SignInRiskUserA]))
-    TestResult("MS.AAD.2.3v2", Output, ReportDetailStr, false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("user exclusions, group exclusions"), false) == true
 }
 
-# The note only appears when the policy is otherwise correct
+# The near miss only appears when the policy is otherwise correct
 test_PasswordlessSignInRisk_UnexemptedWithOtherFailure_Incorrect if {
     CAP := json.patch(SignInRiskPasswordless,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [SignInRiskUserA]},
@@ -681,7 +797,7 @@ test_PasswordlessSignInRisk_ApplicationNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskFailedStr, false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("app exclusions"), false) == true
 }
 
 test_PasswordlessSignInRisk_GuestUserTypeNoExempt_Incorrect if {
@@ -695,7 +811,7 @@ test_PasswordlessSignInRisk_GuestUserTypeNoExempt_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskFailedStr, false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("guest exclusions"), false) == true
 }
 
 test_PasswordlessSignInRisk_IncludeApplications_Incorrect if {
@@ -812,7 +928,7 @@ test_PasswordlessSignInRisk_NoLicense_Incorrect if {
     Output := aad.tests with input.conditional_access_policies as [SignInRiskPasswordless]
                         with input.service_plans as [ServicePlans[0]]
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskNoLicenseStr, false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNoLicenseCapStr, false) == true
 }
 #--
 
@@ -876,7 +992,7 @@ test_PasswordSignInRisk_MultiplePoliciesTargeted_Correct if {
 
     ReportDetailStr := concat("", [
         "2 conditional access policy(s) found that meet(s) all requirements:",
-        "<br/>Password Policy, Password Policy B. <a href='#caps'>View all CA policies</a>."
+        "<br/>Password Policy, Password Policy B. <a href='#caps'>View all CA policies</a>"
     ])
     TestResult("MS.AAD.2.4v1", Output, ReportDetailStr, true) == true
 }
@@ -970,8 +1086,7 @@ test_PasswordSignInRisk_PasswordlessExclusionNotInConfigNotTargeted_Incorrect if
                         with input.scuba_config.Aad["MS.AAD.2.3v2"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.3v2"].CapExclusions.Users as [SignInRiskUserA]
 
-    Output23 := SignInRiskUnexemptedStr(SignInRiskBreakGlass)
-    TestResult("MS.AAD.2.3v2", Output, Output23, false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("user exclusions"), false) == true
 
     ReportDetailStr := SignInRiskNotTargetedStr(
         "1 conditional access policy(s) found that meet(s) all requirements:<br/>Password Policy",
@@ -991,7 +1106,7 @@ test_PasswordSignInRisk_PasswordlessExclusionNotInConfigTargeted_Correct if {
     Output := aad.tests with input.conditional_access_policies as [PasswordlessCAP, PasswordCAP]
                         with input.service_plans as ServicePlans
 
-    TestResult("MS.AAD.2.3v2", Output, SignInRiskUnexemptedStr(    concat(", ", [SignInRiskUserA, SignInRiskGroupB])), false) == true
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskNearMissStr("user exclusions, group exclusions"), false) == true
     TestResult("MS.AAD.2.4v1", Output, SignInRiskPassedStr("Password Policy"), true) == true
 }
 
@@ -1013,7 +1128,7 @@ test_PasswordSignInRisk_NoPolicy_Incorrect if {
 
 SignInRiskNotRequiredStr := concat("", [
     "No users or groups are excluded from the MS.AAD.2.3v2 policy, ",
-    "so a separate policy for password users is not required. <a href='#caps'>View all CA policies</a>."
+    "so a separate policy for password users is not required. <a href='#caps'>View all CA policies</a>"
 ])
 
 # All users are covered by the MS.AAD.2.3v2 policy with no exclusions, no policy for password users is needed

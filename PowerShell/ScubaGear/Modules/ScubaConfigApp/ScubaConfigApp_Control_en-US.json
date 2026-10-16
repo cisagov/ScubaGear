@@ -306,7 +306,7 @@
     {
       "id": "SecuritySuite",
       "name": "SecuritySuite",
-      "displayName": "Security Suite (defender)",
+      "displayName": "Security Suite (securitysuite)",
       "supportsExclusions": true,
       "showInApp": true
     },
