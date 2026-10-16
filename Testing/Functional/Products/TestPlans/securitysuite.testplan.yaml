@@ -3223,7 +3223,7 @@ TestPlan:
                     RecipientLimitPerDay: 1000
                     ActionWhenThresholdReached: BlockUser
                     BccSuspiciousOutboundMail: true
-                    BccSuspiciousOutboundMailTo:
+                    BccSuspiciousOutboundAdditionalRecipients:
                       - security@example.com
                 outbound_spam_rules: []
         Postconditions: []
@@ -3241,7 +3241,7 @@ TestPlan:
                     RecipientLimitPerDay: 1000
                     ActionWhenThresholdReached: Alert
                     BccSuspiciousOutboundMail: true
-                    BccSuspiciousOutboundMailTo:
+                    BccSuspiciousOutboundAdditionalRecipients:
                       - security@example.com
                 outbound_spam_rules: []
         Postconditions: []
@@ -3259,7 +3259,7 @@ TestPlan:
                     RecipientLimitPerDay: 1000
                     ActionWhenThresholdReached: BlockUser
                     BccSuspiciousOutboundMail: false
-                    BccSuspiciousOutboundMailTo: []
+                    BccSuspiciousOutboundAdditionalRecipients: []
                 outbound_spam_rules: []
         Postconditions: []
         ExpectedResult: false
@@ -3276,7 +3276,7 @@ TestPlan:
                     RecipientLimitPerDay: 1000
                     ActionWhenThresholdReached: BlockUser
                     BccSuspiciousOutboundMail: true
-                    BccSuspiciousOutboundMailTo:
+                    BccSuspiciousOutboundAdditionalRecipients:
                       - security@example.com
                   - Name: FunctionalTest OutboundSpamPolicy
                     Identity: FunctionalTest OutboundSpamPolicy
@@ -3302,7 +3302,7 @@ TestPlan:
                     RecipientLimitPerDay: 1000
                     ActionWhenThresholdReached: BlockUser
                     BccSuspiciousOutboundMail: true
-                    BccSuspiciousOutboundMailTo:
+                    BccSuspiciousOutboundAdditionalRecipients:
                       - security@example.com
                   - Name: FunctionalTest OutboundSpamPolicy
                     Identity: FunctionalTest OutboundSpamPolicy
