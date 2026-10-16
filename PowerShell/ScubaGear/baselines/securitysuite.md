@@ -1316,6 +1316,89 @@ policy](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-secu
 
 8. Ensure **Turn on safe list** is not selected.
 
+## 9. Outbound Anti-Spam Protections
+
+Outbound spam from compromised accounts can disrupt agency communications and damage the agency's reputation.Implementing outbound anti-spam protections helps limit excessive email sending and detect suspicious activity.
+
+### Policies
+
+#### MS.SECURITYSUITE.9.1v1
+Users SHOULD subjected to anti-spam message limits.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+<!--Policy: MS.SECURITYSUITE.9.1v1; Criticality: SHOULD -->
+- _Rationale:_ Compromised accounts can be used to send unusually high volumes of email as part of large-scale attacks. Without outbound message limits, this activity can result in the organization's email being blocked by receiving systems, disrupting legitimate communications and damaging the organization's reputation.
+- _Last modified:_ October 2026
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1586.002: Compromise Accounts: Email Accounts](https://attack.mitre.org/techniques/T1586/002/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+
+#### MS.SECURITYSUITE.9.2v1
+Administrators SHOULD be notified when users have exceeded outbound spam limits.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+<!--Policy: MS.SECURITYSUITE.9.2v1; Criticality: SHOULD -->
+- _Rationale:_ Compromised accounts can be used to send unusually high volumes of email as part of large-scale attacks. Without outbound message limits, this activity can result in the organization's email being blocked by receiving systems, disrupting legitimate communications and damaging the organization's reputation.
+- _Last modified:_ October 2026
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1586.002: Compromise Accounts: Email Accounts](https://attack.mitre.org/techniques/T1586/002/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+
+### Resources
+
+- [Configure outbound spam policies for cloud mailboxes \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/defender-office-365/outbound-spam-policies-configure)
+
+- [Outbound spam protection for cloud mailboxes \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/defender-office-365/outbound-spam-protection-about)
+
+- [Preset security policies \| Microsoft
+  Learn](https://learn.microsoft.com/en-us/defender-office-365/preset-security-policies)
+
+### Implementation
+
+#### MS.SECURITYSUITE.9.1v1 Instructions
+
+Outbound spam is not covered by the preset policies, so these steps need to be taken even if the standard or strict policies are used.
+
+1. Sign in to Microsoft 365 Defender.
+2. Under Email & collaboration, select Policies & rules.
+3. Select Threat policies.
+4. Under Policies, select Anti-spam.
+5. Click **Anti-spam outbound policy (Default)** to open the policy summary. _Note:_ These settings must be applied to **Anti-spam outbound policy (Default)** because although the setting **Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups** is available when creating custom outbound spam policies, Microsoft states that it does not function in custom policies.
+    1. Click Edit protection settings
+    2. Ensure the following settings are set to the recommended level or more restrictive:
+      - Set an external message limit: 500
+      - Set an internal message limit: 1000
+      - Set a daily message limit: 1000
+    3. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**
+    4. Under **Notifications** ensure the following setting **Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups** is checked and at least one email recipient is specified.
+    5. Click **Save**.
+6. **Anti-spam outbound policy (Default)** automatically has the lowest priority among outbound spam policies. Enabled custom outbound spam policies with a higher priority may take precedence over the default policy for users within their scope. Review all enabled custom outbound spam policies to ensure that users covered by this baseline are subject to the required limits. 
+    1. Click Edit protection settings
+    2. Ensure the following settings are set to the recommended level or more restrictive:
+      - Set an external message limit: 500
+      - Set an internal message limit: 1000
+      - Set a daily message limit: 1000
+    4. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**     
+    3. Click **Save**.
+#### MS.SECURITYSUITE.9.2v1 Instructions
+
+1. Sign in to Microsoft 365 Defender.
+2. Under Email & collaboration, select Policies & rules.
+3. Select Alert policies.
+4. Perform the following actions for policies **User restricted from sending email**, **Email sending limit exceeded** and **Suspicious email sending patterns detected**
+    1. Click on the policy to open the policy summary 
+    2. Ensure **Status** is toggled to **On**. 
+    3. Click **Edit policy**.
+      - Under **Decide if you want to notify people when this alert is triggered** ensure **Opt-In for email notifications** is checked.
+      - Under **Email recipients** ensure at least one recipient is specified.
+    4. Click **Next** and **Submit**.
+
 # Appendix A: Adding Users to the Preset Security Policies
 As many controls in this baseline can be satisfied by adding users to the standard
 or strict security policies, this process is described once rather than in

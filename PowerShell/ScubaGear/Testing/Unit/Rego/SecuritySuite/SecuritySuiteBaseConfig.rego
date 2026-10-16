@@ -518,3 +518,44 @@ DlpCompliancePolicies := {
     "Mode": "Enable",
     "Enabled": true
 }
+
+CompliantDefaultOutboundSpamPolicy := {
+    "Name": "Default",
+    "Identity": "Default",
+    "RecipientLimitExternalPerHour": 500,
+    "RecipientLimitInternalPerHour": 1000,
+    "RecipientLimitPerDay": 1000,
+    "ActionWhenThresholdReached": "BlockUser",
+    "BccSuspiciousOutboundMail": true,
+    "BccSuspiciousOutboundAdditionalRecipients": ["security@example.com"]
+}
+
+CompliantCustomOutboundSpamPolicy := {
+    "Name": "Custom Policy",
+    "Identity": "Custom Policy",
+    "RecipientLimitExternalPerHour": 400,
+    "RecipientLimitInternalPerHour": 800,
+    "RecipientLimitPerDay": 900,
+    "ActionWhenThresholdReached": "BlockUser"
+}
+
+UserRestrictedAlert := {
+    "Name": "User restricted from sending email",
+    "Disabled": false,
+    "NotificationEnabled": true,
+    "NotifyUser": ["security@example.com"]
+}
+
+EmailLimitAlert := {
+    "Name": "Email sending limit exceeded",
+    "Disabled": false,
+    "NotificationEnabled": true,
+    "NotifyUser": ["security@example.com"]
+}
+
+SuspiciousPatternsAlert := {
+    "Name": "Suspicious email sending patterns detected",
+    "Disabled": false,
+    "NotificationEnabled": true,
+    "NotifyUser": ["security@example.com"]
+}
