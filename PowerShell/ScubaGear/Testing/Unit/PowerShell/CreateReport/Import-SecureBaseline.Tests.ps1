@@ -26,6 +26,57 @@ InModuleScope CreateReport {
             Import-SecureBaseline -ProductNames $Product -BaselinePath (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve)
             Should -Invoke -CommandName Write-Error -Exactly -Times 0 -Because "do not expect parsing errors on markdown document"
         }
+        It "Policy descriptions exclude following badge markdown for <Product>" {
+            $Output = Import-SecureBaseline -ProductNames $Product -BaselinePath (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve)
+            $WithBadges = foreach ($Group in $Output.$Product) {
+                foreach ($Control in $Group.Controls) {
+                    if ($Control.Value -match '\[!\[') {
+                        $Control.Id
+                    }
+                }
+            }
+            $WithBadges | Should -BeNullOrEmpty -Because "a description ending in a period inside quotes must not continue into the indicator badges"
+        }
+    }
+    Describe -tag "Markdown" -name 'Descriptions that end with a period inside quotes' {
+        BeforeAll {
+            $BaselinePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve
+            $Parsed = Import-SecureBaseline -ProductNames @('aad', 'sharepoint', 'teams') -BaselinePath $BaselinePath
+        }
+        It 'Keeps the baseline text for <Id>' -ForEach @(
+            @{
+                Product = 'sharepoint'
+                Id = 'MS.SHAREPOINT.1.1v1'
+                Expected = 'External sharing for SharePoint SHALL be limited to "Existing guests" or "Only people in your organization."'
+            }
+            @{
+                Product = 'sharepoint'
+                Id = 'MS.SHAREPOINT.1.2v1'
+                Expected = 'External sharing for OneDrive SHALL be limited to "Existing guests" or "Only people in your organization."'
+            }
+            @{
+                Product = 'sharepoint'
+                Id = 'MS.SHAREPOINT.2.1v1'
+                Expected = 'File and folder default sharing scope SHALL be set to "Specific people (only the people the user specifies)."'
+            }
+            @{
+                Product = 'aad'
+                Id = 'MS.AAD.3.4v1'
+                Expected = 'The "Authentication methods manage migration" feature SHALL be set to "Migration complete."'
+            }
+            @{
+                Product = 'teams'
+                Id = 'MS.TEAMS.1.7v2'
+                Expected = '"Record an event" SHOULD NOT be set to "Always record."'
+            }
+        ) {
+            $Control = foreach ($Group in $Parsed.$Product) {
+                foreach ($Item in $Group.Controls) {
+                    if ($Item.Id -eq $Id) { $Item }
+                }
+            }
+            $Control.Value | Should -Be $Expected
+        }
     }
     Describe -tag "Markdown" -name 'Fail import secure baseline (bad path)' {
         It "Fails on bad baseline path" {
