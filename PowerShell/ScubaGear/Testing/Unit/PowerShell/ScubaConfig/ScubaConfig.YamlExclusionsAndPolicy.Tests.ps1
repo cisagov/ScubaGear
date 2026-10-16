@@ -341,7 +341,7 @@ aad:
                         $InvalidYaml = @"
 ProductNames:
     - aad
-    - defender
+    - securitysuite
     - exo
     - powerplatform
     - sharepoint
@@ -358,7 +358,7 @@ OmitPolicy:
 
                         function global:ConvertFrom-Yaml {
                                 @{
-                                        ProductNames=@('aad','defender','exo','powerplatform','sharepoint','teams')
+                                        ProductNames=@('aad','securitysuite','exo','powerplatform','sharepoint','teams')
                                         M365Environment='commercial'
                                         OrgName='Test Organization'
                                         OmitPolicy=@{

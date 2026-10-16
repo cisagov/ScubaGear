@@ -480,7 +480,7 @@ Invoke-SCuBA
 
 >**Note**: Product names are separated by commas.
 
->**Note**: "defender" is also accepted as a product name. It is an alias for the Security Suite baseline.
+>**Note**: "defender" is no longer a product name. It was temporarily an alias for the Security Suite baseline, but is now removed.
 
 ## Quiet
 
