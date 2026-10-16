@@ -9,7 +9,13 @@ Install-ScubaDependencies
 
 > **Note**: ScubaGear utilizes several libraries from Microsoft to read data about their product configurations.  At least one of these libraries is tied to PowerShell 5.  Until Microsoft updates their library, ScubaGear will continue to use PowerShell 5.  As this version is only available on Windows, ScubaGear will only run on Windows.
 
-> **Note**: `Install-ScubaDependencies` was previously named `Initialize-SCuBA`. The old name is retained as a backward-compatible alias, so existing scripts continue to work.
+> **Note**: `Install-ScubaDependencies` was previously named `Initialize-SCuBA`. The old name is retained as a backward-compatible alias, so existing scripts continue to work. ScubaGear 1.8.0 and earlier only have `Initialize-SCuBA`, so run `Initialize-SCuBA` if `Install-ScubaDependencies` is not recognized. Check your installed version with `Invoke-SCuBA -Version`.
+
+> **Note**: On ScubaGear 1.8.0 and earlier, `Initialize-SCuBA` can fail on a computer that still has the PowerShellGet 1.0.0.1 that ships with Windows, with an error saying `PackageManagement` "may override the existing commands" and to use `-AllowClobber`. To work around it, update PowerShellGet first, then open a new PowerShell 5 window and run `Initialize-SCuBA` again:
+>
+> ```powershell
+> Install-Module -Name PowerShellGet -MaximumVersion 2.99.99999 -Scope CurrentUser -AllowClobber -Force
+> ```
 
 `Install-ScubaDependencies` will install the modules in the [PowerShell Module Dependencies](#powershell-module-dependencies) section on your system. It will also install [OPA](https://www.openpolicyagent.org).
 
