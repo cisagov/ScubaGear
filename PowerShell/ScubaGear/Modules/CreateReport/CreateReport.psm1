@@ -951,8 +951,8 @@ function Import-SecureBaseline{
                     $ClosingQuotes = [char[]]@(
                         '"',
                         "'",
-                        [char]0x201D, # ”
-                        [char]0x2019  # ’
+                        [char]0x201D, # right double quote
+                        [char]0x2019  # right single quote
                     )
 
                     try {

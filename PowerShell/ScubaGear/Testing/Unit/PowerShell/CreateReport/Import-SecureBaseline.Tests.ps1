@@ -39,10 +39,6 @@ InModuleScope CreateReport {
         }
     }
     Describe -tag "Markdown" -name 'Descriptions that end with a period inside quotes' {
-        BeforeAll {
-            $BaselinePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve
-            $Parsed = Import-SecureBaseline -ProductNames @('aad', 'sharepoint', 'teams') -BaselinePath $BaselinePath
-        }
         It 'Keeps the baseline text for <Id>' -ForEach @(
             @{
                 Product = 'sharepoint'
@@ -70,6 +66,8 @@ InModuleScope CreateReport {
                 Expected = '"Record an event" SHOULD NOT be set to "Always record."'
             }
         ) {
+            $BaselinePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines" -Resolve
+            $Parsed = Import-SecureBaseline -ProductNames @('aad', 'sharepoint', 'teams') -BaselinePath $BaselinePath
             $Control = foreach ($Group in $Parsed.$Product) {
                 foreach ($Item in $Group.Controls) {
                     if ($Item.Id -eq $Id) { $Item }
