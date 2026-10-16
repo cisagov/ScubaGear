@@ -271,13 +271,16 @@ CapExclusions are supported for the following policies:
 
 - MS.AAD.1.1v1
 - MS.AAD.2.1v1
-- MS.AAD.2.3v1
+- MS.AAD.2.3v2
+- MS.AAD.2.4v1
 - MS.AAD.3.1v1
 - MS.AAD.3.2v2
 - MS.AAD.3.6v1
 - MS.AAD.3.7v1
 - MS.AAD.3.8v1
 - MS.AAD.3.9v1
+
+> **Note:** Users and groups that authenticate with a password are expected to be excluded from the `MS.AAD.2.3v2` Conditional Access policy and listed in the `MS.AAD.2.3v2` `CapExclusions`. `MS.AAD.2.4v1` verifies that every user and group excluded from the `MS.AAD.2.3v2` policy is targeted by a policy that meets `MS.AAD.2.4v1`. Emergency access accounts excluded from both policies must be listed in the `CapExclusions` of both policies. If no users or groups are excluded from the `MS.AAD.2.3v2` policy, `MS.AAD.2.4v1` passes without a separate policy. When the `MS.AAD.2.3v2` policy excludes a user or group that is not listed in its `CapExclusions`, the policy does not meet `MS.AAD.2.3v2` and the report lists the improperly excluded users and groups. The report for `MS.AAD.2.4v1` then lists any user or group excluded from the `MS.AAD.2.3v2` policy that no `MS.AAD.2.4v1` policy targets.
 
 #### Privileged User Policy Exclusions
 

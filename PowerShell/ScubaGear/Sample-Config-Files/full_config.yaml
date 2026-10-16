@@ -99,8 +99,11 @@ Aad:
   # Users detected as high risk SHALL be blocked.
   MS.AAD.2.1v1: *CommonCapExclusions
 
-  # Sign-ins detected as high risk SHALL be blocked.
-  MS.AAD.2.3v1: *CommonCapExclusions
+  # Medium and high risk sign-ins SHALL require phishing-resistant MFA and reauthentication every time for passwordless users.
+  MS.AAD.2.3v2: *CommonCapExclusions
+
+  # Medium and high risk sign-ins SHALL require MFA and reauthentication every time for users who authenticate with a password.
+  MS.AAD.2.4v1: *CommonCapExclusions
 
   # Phishing-resistant MFA SHALL be enforced for all users.
   MS.AAD.3.1v1: &MfaCapExclusions

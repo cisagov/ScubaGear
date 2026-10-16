@@ -132,7 +132,7 @@ This section provides policies that reduce security risks related to potentially
 
 - _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).
 
-- _Note:_ In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.
+- _Note:_ In this section, the terms ["medium risk" and "high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denote the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.
 
 ### Policies
 #### MS.AAD.2.1v1
@@ -165,17 +165,35 @@ A notification SHOULD be sent to the administrator when high-risk users are dete
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
-#### MS.AAD.2.3v1
-Sign-ins detected as high-risk SHALL be blocked.
+#### MS.AAD.2.3v2
+Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA and reauthentication every time for passwordless users. 
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
-<!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.2.3v2; Criticality: SHALL -->
 <!--ExclusionType: CapExclusions-->
-- _Rationale:_ Blocking sign-in attempts detected as high-risk prevents compromised accounts from accessing the tenant.
-- _Last modified:_ June 2023
+- _Rationale:_ Requiring a phishing-resistant authentication every time a sign-in is detected as risky allows legitimate users to remediate the risk while preventing attackers who have compromised an account from accessing the tenant.
+- _Last modified:_ October 2026
+- _Note:_ Users who authenticate with a password MAY be excluded from the Conditional Access policy for this control, provided the users and groups excluded are listed in the [policy's configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions). Every user or group excluded this way MUST be targeted by a policy that meets [MS.AAD.2.4v1](#msaad24v1). If the policy excludes a user or group that is not listed in the configuration exclusions, the policy does not meet this control and the report lists the policy as a near miss.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+
+#### MS.AAD.2.4v1
+Sign-ins detected as medium or high risk SHALL require MFA and reauthentication every time for users who authenticate with a password.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
+<!--Policy: MS.AAD.2.4v1; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
+- _Rationale:_ Users who authenticate with a password cannot use a passwordless method to remediate a risky sign-in. Requiring MFA and reauthentication every time allows these users to prove their identity while preventing attackers who have compromised a password from accessing the tenant.
+- _Last modified:_ October 2026
+- _Note:_ This control checks that every user and group excluded from the policy for [MS.AAD.2.3v2](#msaad23v2) is targeted by a policy that meets this control. If no users or groups are excluded from the policy for MS.AAD.2.3v2, all users are covered by that policy and a separate policy for this control is not required. Users and groups excluded from both policies must be listed in the [configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions). The users and groups excluded from the policy for MS.AAD.2.3v2 are checked even when that policy does not meet its control because of exclusions missing from the configuration. In that case the report for this control lists the excluded users and groups that no policy for this control targets.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
@@ -188,6 +206,8 @@ Sign-ins detected as high-risk SHALL be blocked.
 - [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)
 
 - [Self-remediation experience with Microsoft Entra ID Protection and Conditional Access](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
+
+- [Configure risk policies in Microsoft Entra ID Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies)
 
 ### License Requirements
 
@@ -213,18 +233,44 @@ Sign-ins detected as high-risk SHALL be blocked.
 
 1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high-risk.
 
-#### MS.AAD.2.3v1 Instructions
+#### MS.AAD.2.3v2 Instructions
 
-1.  Create a Conditional Access policy blocking sign-ins determined high-risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy per the values below:
+1.  Create a Conditional Access policy requiring phishing-resistant MFA and reauthentication for sign-ins determined medium or high risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
+  Users > Exclude > <b>Users and groups</b> > <b>Emergency access (break-glass) accounts, and the users and groups that authenticate with a password</b>
+
   Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
-  Conditions > Sign-in risk > <b>High</b>
+  Conditions > Sign-in risk > Configure > <b>Yes</b> > <b>High</b> and <b>Medium</b>
 
-  Access controls > Grant > <b>Block access</b>
+  Access controls > Grant > <b>Grant access</b> > <b>Require authentication strength</b> > <b>Phishing-resistant MFA</b>
+
+  Session > <b>Sign-in frequency</b> > <b>Every time</b>
+</pre>
+
+2.  Add the users and groups excluded from the policy, other than emergency access accounts, to the [configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions) for MS.AAD.2.3v2 and MS.AAD.2.4v1. Create the policy for [MS.AAD.2.4v1](#msaad24v1-instructions) to cover them.
+
+#### MS.AAD.2.4v1 Instructions
+
+If no users or groups are excluded from the policy for [MS.AAD.2.3v2](#msaad23v2-instructions), all users are covered by that policy and this policy is not required.
+
+1.  Create a Conditional Access policy requiring MFA and reauthentication for sign-ins determined medium or high risk by the Identity Protection service for the users who authenticate with a password. Configure the following policy settings in the new Conditional Access policy per the values below:
+
+<pre>
+  Users > Include > <b>Select users and groups</b> > <b>The users and groups excluded from the policy for MS.AAD.2.3v2 that authenticate with a password</b>
+
+  Users > Exclude > <b>Users and groups</b> > <b>Emergency access (break-glass) accounts</b>
+
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
+
+  Conditions > Sign-in risk > Configure > <b>Yes</b> > <b>High</b> and <b>Medium</b>
+
+  Access controls > Grant > <b>Grant access</b> > <b>Require authentication strength</b> > <b>Multifactor authentication</b>
+
+  Session > <b>Sign-in frequency</b> > <b>Every time</b>
 </pre>
 
 ## 3. Strong Authentication and a Secure Registration Process

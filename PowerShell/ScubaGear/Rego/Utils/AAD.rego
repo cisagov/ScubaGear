@@ -235,6 +235,18 @@ IsGeneralMFA(Policy) := true if {
     Count(Strengths - PRMFA) > 0
 } else := false
 
+# Returns true if the policy applies to both medium and high sign-in risk
+IsMediumAndHighSignInRisk(Policy) := true if {
+    "medium" in Policy.Conditions.SignInRiskLevels
+    "high" in Policy.Conditions.SignInRiskLevels
+} else := false
+
+# Returns true if the policy requires reauthentication every time
+IsSignInFrequencyEveryTime(Policy) := true if {
+    Policy.SessionControls.SignInFrequency.IsEnabled == true
+    Policy.SessionControls.SignInFrequency.FrequencyInterval == "everyTime"
+} else := false
+
 # Returns a json object as a list. This is used to future proof against changes microsoft 
 # may make to the input where a field may change from a string to an array of strings. 
 # The function ensures that the output is always an array of strings, whether the input 
