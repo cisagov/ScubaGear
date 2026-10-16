@@ -1357,19 +1357,31 @@ tests contains {
 # MS.SECURITYSUITE.9.1v1
 #--
 
-# Loop through outbound spam policies. If policy has the compliant outbound
-# mesage limits or more restrictive , save the policy name to CompliantOutboundSpamPolicies array.
+DefaultPolicyAdditonalRequirements(Policy) if {
+    Policy.Name != "Default"
+}
+
+DefaultPolicyAdditonalRequirements(Policy) if {
+    Policy.Name == "Default"
+    Policy.BccSuspiciousOutboundMail == true
+    count(Policy.BccSuspiciousOutboundAdditionalRecipients) >= 1
+}
+
+# Identify compliant outbound spam policies
 OutboundSpamPoliciesWithCompliantLimits contains OutboundSpamPolicy.Identity if {
     some OutboundSpamPolicy in input.outbound_spam_policies
+
+    # All policies must meet the recipient limits and blocking action
     OutboundSpamPolicy.RecipientLimitExternalPerHour <= 500
     OutboundSpamPolicy.RecipientLimitInternalPerHour <= 1000
     OutboundSpamPolicy.RecipientLimitPerDay <= 1000
     OutboundSpamPolicy.ActionWhenThresholdReached == "BlockUser"
-    OutboundSpamPolicy.BccSuspiciousOutboundMail == true
-    count(OutboundSpamPolicy.BccSuspiciousOutboundAdditionalRecipients) >= 1
+
+    # Apply additional requirements only to the default policy
+    DefaultPolicyAdditonalRequirements(OutboundSpamPolicy)
 }
 
-# Always audit the default outbound spam policy.
+# Always audit the default outbound spam policy
 AppliedOutboundSpamPolicies contains OutboundSpamPolicy.Identity if {
     some OutboundSpamPolicy in input.outbound_spam_policies
     OutboundSpamPolicy.Name == "Default"
@@ -1433,7 +1445,7 @@ ActualValue9_2 := {
     "NonCompliantAlertPolicies": NonCompliantOutboundSpamPolicies
 }
 
-ReportDetails9_2 := "Requirement met." if {
+ReportDetails9_2 := "Requirement met" if {
     Status9_2
 } else := sprintf(
     "Requirement not met, the following alert policies are not compliant: %s",
@@ -1445,7 +1457,7 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-HostedOutboundSpamFilterPolicy", "Get-HostedOutboundSpamFilterRule"],
     "ActualValue": ActualValue9_2,
-    "ReportDetails": ReportDetailsBoolean(Status9_2),
+    "ReportDetails": ReportDetails9_2,
     "RequirementMet": Status9_2
 }
 #--
