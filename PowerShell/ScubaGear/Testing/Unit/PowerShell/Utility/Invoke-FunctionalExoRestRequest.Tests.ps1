@@ -227,6 +227,124 @@ Describe 'Invoke-FunctionalExoRestRequest' {
         }
     }
 
+    Context 'Real web exception shapes rethrown by Invoke-FunctionalTestRestRequest' {
+        BeforeAll {
+            # Invoke-FunctionalTestRestRequest rethrows the original Invoke-WebRequest error, so the status code
+            # lives on .Response and the message is the stock .NET text, not "status code N".
+            function New-HttpError {
+                param([int] $StatusCode, [hashtable] $Headers = @{})
+                $HttpError = [System.Exception]::new("The remote server returned an error: ($StatusCode).")
+                $HttpError | Add-Member -NotePropertyName Response -NotePropertyValue ([pscustomobject]@{ StatusCode = $StatusCode; Headers = $Headers })
+                $HttpError
+            }
+        }
+
+        It 'retries a timeout and succeeds on the second attempt' {
+            $script:Attempt = 0
+            Mock Invoke-FunctionalTestRestRequest {
+                $script:RestRequestCalls += 1
+                $script:Attempt++
+                if ($script:Attempt -eq 1) {
+                    throw [System.Net.WebException]::new('The operation has timed out', [System.Net.WebExceptionStatus]::Timeout)
+                }
+                return @{ value = @(@{ Name = 'Default' }) }
+            }
+
+            $result = Invoke-FunctionalExoRestRequest `
+                -CmdletName 'Get-SafeAttachmentPolicy' `
+                -ApiEndpoint $script:EXOApiEndpoint `
+                -AccessToken $script:EXOAccessToken `
+                -BaseDelaySeconds 0
+
+            $result | Should -Not -BeNullOrEmpty
+            $script:RestRequestCalls.Count | Should -Be 2
+        }
+
+        It 'retries a PS 7 timeout and throws after exhausting retries' {
+            Mock Invoke-FunctionalTestRestRequest {
+                $script:RestRequestCalls += 1
+                throw [System.Threading.Tasks.TaskCanceledException]::new('The request was canceled due to the configured HttpClient.Timeout of 100 seconds elapsing.')
+            }
+
+            { Invoke-FunctionalExoRestRequest `
+                -CmdletName 'Set-AtpPolicyForO365' `
+                -ApiEndpoint $script:EXOApiEndpoint `
+                -AccessToken $script:EXOAccessToken `
+                -MaxRetries 3 `
+                -BaseDelaySeconds 0 } | Should -Throw '*HttpClient.Timeout*'
+
+            $script:RestRequestCalls.Count | Should -Be 3
+        }
+
+        It 'retries a real 503 response' {
+            $script:Attempt = 0
+            Mock Invoke-FunctionalTestRestRequest {
+                $script:RestRequestCalls += 1
+                $script:Attempt++
+                if ($script:Attempt -eq 1) { throw (New-HttpError -StatusCode 503) }
+                return @{ value = @(@{ Name = 'Default' }) }
+            }
+
+            $result = Invoke-FunctionalExoRestRequest `
+                -CmdletName 'Get-HostedContentFilterPolicy' `
+                -ApiEndpoint $script:EXOApiEndpoint `
+                -AccessToken $script:EXOAccessToken `
+                -BaseDelaySeconds 0
+
+            $result | Should -Not -BeNullOrEmpty
+            $script:RestRequestCalls.Count | Should -Be 2
+        }
+
+        It 'waits for the Retry-After value on a real 429 response' {
+            $script:Attempt = 0
+            Mock Invoke-FunctionalTestRestRequest {
+                $script:RestRequestCalls += 1
+                $script:Attempt++
+                if ($script:Attempt -eq 1) { throw (New-HttpError -StatusCode 429 -Headers @{ 'Retry-After' = '12' }) }
+                return @{ value = @(@{ Name = 'Default' }) }
+            }
+
+            Invoke-FunctionalExoRestRequest `
+                -CmdletName 'Get-AntiPhishPolicy' `
+                -ApiEndpoint $script:EXOApiEndpoint `
+                -AccessToken $script:EXOAccessToken `
+                -BaseDelaySeconds 0 | Out-Null
+
+            $script:SleepCalls | Should -Be @(12)
+        }
+
+        It 'returns null on a real 404 response for Get-* cmdlets' {
+            Mock Invoke-FunctionalTestRestRequest {
+                $script:RestRequestCalls += 1
+                throw (New-HttpError -StatusCode 404)
+            }
+
+            $result = Invoke-FunctionalExoRestRequest `
+                -CmdletName 'Get-SafeLinksRule' `
+                -ApiEndpoint $script:EXOApiEndpoint `
+                -AccessToken $script:EXOAccessToken `
+                -BaseDelaySeconds 0
+
+            $result | Should -BeNullOrEmpty
+            $script:RestRequestCalls.Count | Should -Be 1
+        }
+
+        It 'does not retry a real 403 response' {
+            Mock Invoke-FunctionalTestRestRequest {
+                $script:RestRequestCalls += 1
+                throw (New-HttpError -StatusCode 403)
+            }
+
+            { Invoke-FunctionalExoRestRequest `
+                -CmdletName 'Set-OrganizationConfig' `
+                -ApiEndpoint $script:EXOApiEndpoint `
+                -AccessToken $script:EXOAccessToken `
+                -BaseDelaySeconds 0 } | Should -Throw '*(403)*'
+
+            $script:RestRequestCalls.Count | Should -Be 1
+        }
+    }
+
     Context 'Invoke-FunctionalExoCommand wrapper' {
         It 'passes CmdletName and Parameters to Invoke-FunctionalExoRestRequest' {
             Mock Invoke-FunctionalTestRestRequest {
