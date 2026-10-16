@@ -1384,8 +1384,6 @@ Outbound spam is not covered by the preset policies, so these steps need to be t
     3. Click **Save**.
 #### MS.SECURITYSUITE.9.2v1 Instructions
 
-Outbound spam is not covered by the preset policies, so these steps need to be taken even if the standard or strict policies are used.
-
 1. Sign in to Microsoft 365 Defender.
 2. Under Email & collaboration, select Policies & rules.
 3. Select Alert policies.
