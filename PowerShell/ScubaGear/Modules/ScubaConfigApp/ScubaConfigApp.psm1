@@ -1946,6 +1946,7 @@ Function Start-SCuBAConfigAnalyzer {
     $syncHash.ScAProductMap           = @{}
     $syncHash.ScAApiOperations        = @{}
     $syncHash.ScAExclusionDefinitions = @{}
+    $syncHash.ScAMachineSpecificConfigKeys = @()
     $syncHash.ScACaRules              = $null
     $syncHash.ScAApiCatalog           = @{}
     $syncHash.ScAFriendlyNames        = $null

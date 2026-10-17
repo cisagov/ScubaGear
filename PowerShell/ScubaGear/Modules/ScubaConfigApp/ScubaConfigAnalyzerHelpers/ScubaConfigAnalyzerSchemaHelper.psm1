@@ -131,6 +131,9 @@ function Import-ScAAnalyzerRules {
             $syncHash.ScAExclusionDefinitions[$exclusion.Name] = $exclusion.Value
         }
     }
+
+    # Imported-config keys that are paths on the machine that produced the results.
+    $syncHash.ScAMachineSpecificConfigKeys = if ($AnalyzerSchema.importedConfig.machineSpecificKeys) { @($AnalyzerSchema.importedConfig.machineSpecificKeys) } else { @() }
 }
 
 function Import-ScAApiCatalog {
