@@ -19,6 +19,7 @@ InModuleScope CreateReport {
                 aad           = "AAD";
                 powerplatform = "PowerPlatform";
                 sharepoint    = "SharePoint";
+                powerbi       = "PowerBI";
             }
             # Pulls one JSON data island out of a report. Extracted rather than matched in
             # place so a failure reports the island's contents, not the whole report.
@@ -37,6 +38,7 @@ InModuleScope CreateReport {
                 AAD           = "Azure Active Directory";
                 PowerPlatform = "Microsoft Power Platform";
                 SharePoint    = "SharePoint Online";
+                PowerBI       = "Microsoft Power BI";
             }
         }
         BeforeEach {
@@ -56,7 +58,8 @@ InModuleScope CreateReport {
             @{Product = 'exo'; WarningCount = 0},
             @{Product = 'powerplatform'; WarningCount = 3},
             @{Product = 'sharepoint'; WarningCount = 0},
-            @{Product = 'teams'; WarningCount = 12}
+            @{Product = 'teams'; WarningCount = 12},
+            @{Product = 'powerbi'; WarningCount = 0}
         ){
             $CreateReportParams += @{
                 'BaselineName'    = $ArgToProd[$Product];
