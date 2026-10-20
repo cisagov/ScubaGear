@@ -311,7 +311,7 @@
                                      },
                                      {
                                          "Control ID":  "MS.AAD.3.4v1",
-                                         "Requirement":  "The \"Authentication methods manage migration\" feature SHALL be set to \"Migration complete.\" [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD<i>25--01</i>Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services) [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology) <div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+                                         "Requirement":  "The \"Authentication methods manage migration\" feature SHALL be set to \"Migration complete.\"<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                          "Result":  "Pass",
                                          "Criticality":  "Shall",
                                          "Details":  "Requirement met",
@@ -498,13 +498,13 @@
                                          "Requirement":  "Application password addition SHOULD be blocked.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                          "Result":  "Pass",
                                          "Criticality":  "Should",
-                                         "Details":  "0 Password addition restriction(s) not meeting requirements",
+                                         "Details":  "Requirement met",
                                          "OmittedEvaluationResult":  "N/A",
                                          "OmittedEvaluationDetails":  "N/A",
                                          "IncorrectResult":  "N/A",
                                          "IncorrectResultDetails":  "N/A",
                                          "OriginalResult":  "Pass",
-                                         "OriginalDetails":  "0 Password addition restriction(s) not meeting requirements",
+                                         "OriginalDetails":  "Requirement met",
                                          "Comments":  [
 
                                                       ],
@@ -532,13 +532,13 @@
                                          "Requirement":  "Application certificate lifetime SHOULD be restricted to 365 days or less.<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                          "Result":  "Pass",
                                          "Criticality":  "Should",
-                                         "Details":  "0 certificate lifetime restriction(s) not meeting requirements",
+                                         "Details":  "Requirement met",
                                          "OmittedEvaluationResult":  "N/A",
                                          "OmittedEvaluationDetails":  "N/A",
                                          "IncorrectResult":  "N/A",
                                          "IncorrectResultDetails":  "N/A",
                                          "OriginalResult":  "Pass",
-                                         "OriginalDetails":  "0 certificate lifetime restriction(s) not meeting requirements",
+                                         "OriginalDetails":  "Requirement met",
                                          "Comments":  [
 
                                                       ],
@@ -1933,7 +1933,7 @@
                            "Controls":  [
                                             {
                                                 "Control ID":  "MS.SHAREPOINT.1.1v1",
-                                                "Requirement":  "External sharing for SharePoint SHALL be limited to \"Existing guests\" or \"Only people in your organization.\" [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD<i>25--01</i>Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services) [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology) <div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+                                                "Requirement":  "External sharing for SharePoint SHALL be limited to \"Existing guests\" or \"Only people in your organization.\"<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                                 "Result":  "Fail",
                                                 "Criticality":  "Shall",
                                                 "Details":  "Requirement not met",
@@ -1950,7 +1950,7 @@
                                             },
                                             {
                                                 "Control ID":  "MS.SHAREPOINT.1.2v1",
-                                                "Requirement":  "External sharing for OneDrive SHALL be limited to \"Existing guests\" or \"Only people in your organization.\" [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD<i>25--01</i>Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services) [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology) <div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+                                                "Requirement":  "External sharing for OneDrive SHALL be limited to \"Existing guests\" or \"Only people in your organization.\"<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                                 "Result":  "Pass",
                                                 "Criticality":  "Shall",
                                                 "Details":  "Requirement met",
@@ -1991,7 +1991,7 @@
                            "Controls":  [
                                             {
                                                 "Control ID":  "MS.SHAREPOINT.2.1v1",
-                                                "Requirement":  "File and folder default sharing scope SHALL be set to \"Specific people (only the people the user specifies).\" [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD<i>25--01</i>Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services) [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology) <div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+                                                "Requirement":  "File and folder default sharing scope SHALL be set to \"Specific people (only the people the user specifies).\"<div class='policy-indicators'><a href='https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services' target='_blank' class='indicator indicator-bod' title='BOD 25-01 Requirement'>BOD 25-01 Requirement</a><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/sharepoint.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                                 "Result":  "Pass",
                                                 "Criticality":  "Shall",
                                                 "Details":  "Requirement met",
@@ -2194,7 +2194,7 @@
                                        },
                                        {
                                            "Control ID":  "MS.TEAMS.1.7v2",
-                                           "Requirement":  "\"Record an event\" SHOULD NOT be set to \"Always record.\" [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology) <div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/teams.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
+                                           "Requirement":  "\"Record an event\" SHOULD NOT be set to \"Always record.\"<div class='policy-indicators'><a href='https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/teams.md#key-terminology' target='_blank' class='indicator indicator-automated' title='Automated Check'>Automated Check</a></div>",
                                            "Result":  "Pass",
                                            "Criticality":  "Should",
                                            "Details":  "Requirement met",

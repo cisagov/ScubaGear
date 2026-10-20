@@ -392,7 +392,7 @@
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.5.5v1",
-        "ReportDetails":  "0 Password addition restriction(s) not meeting requirements",
+        "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
     {
@@ -404,7 +404,7 @@
                        ],
         "Criticality":  "Should",
         "PolicyId":  "MS.AAD.5.7v1",
-        "ReportDetails":  "0 certificate lifetime restriction(s) not meeting requirements",
+        "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     },
     {
