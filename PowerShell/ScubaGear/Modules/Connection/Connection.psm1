@@ -13,7 +13,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", IgnoreCase = $false)]
    [string[]]
    $ProductNames,
 
@@ -474,6 +474,10 @@ function Connect-Tenant {
                                 -M365Environment $M365Environment
                         }
                    }
+               }
+               "si" {
+                   # SI-SHELL: the SI provider does not need a connection yet. Add the SI authentication here once
+                   # the SI policies, APIs, and provider are implemented.
                }
                default {
                    throw "Invalid ProductName argument"

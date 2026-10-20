@@ -84,6 +84,8 @@ Function Get-ScubaGearPermissions {
     Begin{
         $ErrorActionPreference = 'Stop'
 
+        # SI-SHELL: add "si" to the Product ValidateSet, this wildcard list, and ScubaGearApiCatalog.json once the SI
+        # policies, APIs, and provider are implemented.
         # If ProductName is * then set Product to all possible values
         if ($Product -contains '*') {
             $Product = @('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform')
@@ -505,6 +507,7 @@ function Get-ScubaGearEndpointRest {
     [CmdletBinding()]
     [OutputType([PSCustomObject], [string])]
     param(
+        # SI-SHELL: add "si" to this ValidateSet once the SI endpoints are added to ScubaGearApiCatalog.json.
         [Parameter(Mandatory = $false)]
         [ValidateSet('teams', 'exo', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
         [string[]]$ProductNames = '*',

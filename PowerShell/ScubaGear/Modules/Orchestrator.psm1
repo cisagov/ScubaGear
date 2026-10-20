@@ -15,6 +15,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerBI
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerPlatformProvider.psm1")
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSecuritySuiteProvider.psm1")
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSharePointProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSIProvider.psm1")
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportTeamsProvider.psm1")
 
 function Invoke-SCuBA {
@@ -155,7 +156,7 @@ function Invoke-SCuBA {
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -770,6 +771,7 @@ $ArgToProd = @{
     powerplatform = "PowerPlatform";
     sharepoint = "SharePoint";
     powerbi = "PowerBI";
+    si = "SI";
 }
 
 $ProdToFullName = @{
@@ -780,6 +782,7 @@ $ProdToFullName = @{
     PowerPlatform = "Microsoft Power Platform";
     SharePoint = "SharePoint Online";
     PowerBI = "Microsoft Power BI";
+    SI = "Super Intelligence";
 }
 
 $IndividualReportFolderName = "IndividualReports"
@@ -946,6 +949,11 @@ function Invoke-ProviderList {
                                 $TeamsProviderParams['CertificateBasedAuth'] = $true
                             }
                             $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
+                        }
+                        "si" {
+                            # SI-SHELL: Export-SIProvider is a shell with no parameters yet. Add its parameters here once identified.
+                            $SIProviderParams = @{}
+                            $RetVal = Export-SIProvider @SIProviderParams | Select-Object -Last 1
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"
@@ -1291,7 +1299,7 @@ function ConvertTo-ResultsCsv {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1648,7 +1656,7 @@ function ConvertTo-RiskyAppsCsv {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -1836,7 +1844,7 @@ function Merge-JsonOutput {
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
@@ -2302,13 +2310,13 @@ function Compare-ProductList {
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductsFailed,
 
@@ -2468,7 +2476,7 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", '*', IgnoreCase = $false)]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
@@ -2592,6 +2600,7 @@ function Invoke-SCuBACached {
             $Script:ScubaLoggingEnabled = $false
 
             if ($ProductNames -eq '*'){
+                # SI-SHELL: add "si" to this wildcard list once the SI policies, APIs, and provider are implemented.
                 $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
             }
 
@@ -3128,6 +3137,7 @@ function ConvertTo-ScubaProductNames {
 
     # Expand the wildcard to all supported products
     if ($ProductNames -contains '*') {
+        # SI-SHELL: add "si" to this wildcard list once the SI policies, APIs, and provider are implemented.
         $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
         Write-Debug "Setting ProductNames to all products because of wildcard"
     }

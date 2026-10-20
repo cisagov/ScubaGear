@@ -155,13 +155,13 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
+        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", "SI", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", IgnoreCase = $false)]
+        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", "Super Intelligence", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -894,7 +894,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', 'si', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]

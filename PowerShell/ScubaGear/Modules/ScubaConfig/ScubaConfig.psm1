@@ -99,6 +99,8 @@ class ScubaConfig {
             return $Path
         }
         elseif ($Name -eq 'AllProductNames') {
+            # SI-SHELL: add "si" to AllProductNames in ScubaConfigDefaults.json once the SI policies, APIs, and provider
+            # are implemented. AllProductNames drives the '*' wildcard and the New-SCuBAConfig product validation.
             return [ScubaConfig]::_ConfigDefaults.defaults.AllProductNames
         }
         elseif ($Name -eq 'DefaultPrivilegedRoles') {

@@ -943,6 +943,7 @@ function Get-ScubaGearAppPermission {
     }
 
     if($ProductNames -contains '*'){
+        # SI-SHELL: add "si" here and to the ProductNames ValidateSets once the SI permissions are identified.
         # If wildcard is specified, include all products
         $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
     }
@@ -2332,6 +2333,7 @@ function New-ScubaGearServicePrincipal {
     Try {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
+            # SI-SHELL: add "si" here and to the ProductNames ValidateSets once the SI permissions are identified.
             # If wildcard is specified, include all products
             $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
         }
