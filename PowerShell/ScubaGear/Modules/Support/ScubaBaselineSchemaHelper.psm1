@@ -218,7 +218,8 @@ function Update-ScubaConfigBaselineWithMarkdown {
     }
 
     # Get baseline policies
-    $baselinePolicies = Get-ScubaBaselinePolicy -BaselineDirectory $BaselineDirectory -GitHubDirectoryUrl $GitHubDirectoryUrl
+    $appendicesByProduct = @{}
+    $baselinePolicies = Get-ScubaBaselinePolicy -BaselineDirectory $BaselineDirectory -GitHubDirectoryUrl $GitHubDirectoryUrl -AppendicesByProduct ([ref]$appendicesByProduct)
 
     # Filter products if specified
     if ($ProductFilter.Count -gt 0) {
@@ -233,6 +234,7 @@ function Update-ScubaConfigBaselineWithMarkdown {
 
     # Create new baselines structure with alphabetical ordering
     $newBaselines = [ordered]@{}
+    $newAppendices = [ordered]@{}
     $mappingStats = @{}
 
     # Sort products alphabetically for consistent output
@@ -271,6 +273,9 @@ function Update-ScubaConfigBaselineWithMarkdown {
             if ($policy.Rationale) {
                 $policyObj['rationale'] = $policy.Rationale
             }
+            if ($policy.Notes.Count -gt 0) {
+                $policyObj['notes'] = @($policy.Notes)
+            }
 
             # Add additional fields if specified and they exist
             foreach ($field in $AdditionalFields) {
@@ -292,12 +297,12 @@ function Update-ScubaConfigBaselineWithMarkdown {
                     }
                     "mitreMapping" {
                         if ($policy.MITRE_Mapping -and $policy.MITRE_Mapping.Count -gt 0) {
-                            $policyObj['mitreMapping'] = $policy.MITRE_Mapping
+                            $policyObj['mitreMapping'] = @($policy.MITRE_Mapping)
                         }
                     }
                     "resources" {
                         if ($policy.SectionResources -and $policy.SectionResources.Count -gt 0) {
-                            $policyObj['resources'] = $policy.SectionResources
+                            $policyObj['resources'] = @($policy.SectionResources)
                         }
                     }
                     "licenseRequirements" {
@@ -320,7 +325,7 @@ function Update-ScubaConfigBaselineWithMarkdown {
                     }
                     "badges" {
                         if ($policy.Badges -and $policy.Badges.Count -gt 0) {
-                            $policyObj['badges'] = $policy.Badges
+                            $policyObj['badges'] = @($policy.Badges)
                         }
                     }
                 }
@@ -331,11 +336,15 @@ function Update-ScubaConfigBaselineWithMarkdown {
 
         if ($productBaseline.Count -gt 0) {
             $newBaselines[$product] = $productBaseline
+            if ($appendicesByProduct.ContainsKey($product)) {
+                $newAppendices[$product] = @($appendicesByProduct[$product])
+            }
         }
     }
 
     # Update the configuration
     $configContent.baselines = $newBaselines
+    $configContent | Add-Member -NotePropertyName "appendices" -NotePropertyValue $newAppendices
 
     # Save the updated configuration with proper character encoding
     $jsonOutput = $configContent | ConvertTo-Json -Depth 10
@@ -377,9 +386,8 @@ function Get-ScubaBaselineHeaderContent {
     Extracts the common header content from the first baseline markdown file.
 
     .DESCRIPTION
-    Extracts content from the introduction section, specifically the last 3 paragraphs
-    that start with "The Secure Cloud Business Applications (SCuBA) project...",
-    "The CISA SCuBA SCBs...", and "For non-Federal users...".
+    Extracts shared introduction content after the document title and product-specific
+    opening paragraph, without depending on the wording of the shared paragraphs.
     Also extracts License Compliance, Assumptions, and Key Terminology sections.
 
     .PARAMETER BaselineDirectory
@@ -450,10 +458,11 @@ function Get-ScubaBaselineHeaderContent {
         keyTerminology = ""
     }
 
-    # Extract introduction content - get only the common SCuBA project description
-    if ($content -match '(?s)The Secure Cloud Business Applications \(SCuBA\) project.*?(?=## License Compliance and Copyright)') {
-        $introSection = $matches[0].Trim()
-        $headerContent.introduction = $introSection
+    # Skip the title and product-specific first paragraph, preserving the shared preamble.
+    if ($content -match '(?ms)^#[ \t]+[^\r\n]+\r?\n[ \t]*\r?\n.*?\r?\n[ \t]*\r?\n(?<Introduction>.*?)(?=^##[ \t]+)') {
+        $headerContent.introduction = $matches['Introduction'].Trim()
+    } else {
+        throw "Unable to extract the shared baseline introduction from '$($firstFile.Name)'. Expected a document title, product opening paragraph, and shared preamble before the first section."
     }
 
     # Extract License Compliance and Copyright section
@@ -486,6 +495,9 @@ function Get-ScubaBaselinePolicy {
     .PARAMETER GitHubDirectoryUrl
     Specifies the GitHub directory URL containing baseline policy files.
 
+    .PARAMETER AppendicesByProduct
+    Optional reference populated with product-specific appendix arrays, separate from policies.
+
     .EXAMPLE
      Get-ScubaBaselinePolicy -BaselineDirectory $BaselineDirectory -GitHubDirectoryUrl $GitHubDirectoryUrl
     #>
@@ -494,10 +506,14 @@ function Get-ScubaBaselinePolicy {
         [string]$BaselineDirectory,
 
         [Parameter(Mandatory=$false)]
-        [string]$GitHubDirectoryUrl
+        [string]$GitHubDirectoryUrl,
+
+        [Parameter(Mandatory=$false)]
+        [ref]$AppendicesByProduct
     )
 
     $policiesByProduct = @{}
+    $productAppendices = @{}
     $files = @()
 
     if ($GitHubDirectoryUrl) {
@@ -551,9 +567,9 @@ function Get-ScubaBaselinePolicy {
             foreach ($policy in $section.Policies) {
                 # Add section context to each policy
                 $policy.PolicySection = $section.Name
-                $policy.SectionDescription = $section.Description
-                $policy.SectionResources = $section.Resources
-                $policy.SectionLicenseRequirements = $section.LicenseRequirements
+                $policy.SectionDescription = $section.Description.Trim()
+                $policy.SectionResources = @($section.Resources)
+                $policy.SectionLicenseRequirements = @($section.LicenseRequirements)
                 $policies += $policy
             }
         }
@@ -561,10 +577,35 @@ function Get-ScubaBaselinePolicy {
         if ($policies.Count -gt 0) {
             $productName = ($file.Name -replace '\.md$', '').ToLower()
             $policiesByProduct[$productName] = $policies
+            $appendices = @(Get-ScubaBaselineAppendix -Content $fullContent)
+            if ($appendices.Count -gt 0) {
+                $productAppendices[$productName] = $appendices
+            }
         }
     }
 
+    if ($AppendicesByProduct) {
+        $AppendicesByProduct.Value = $productAppendices
+    }
     return $policiesByProduct
+}
+
+function Get-ScubaBaselineAppendix {
+    <#
+    .SYNOPSIS
+    Extracts document appendices without treating their headings as policies.
+    #>
+    param([string]$Content)
+
+    $Content = $Content -replace '(?m)^[ \t]*(?:\*\*)?`TLP:[^`]+`(?:\*\*)?[ \t]*\r?$', ''
+    foreach ($appendix in [regex]::Matches($Content, '(?ms)^#[ \t]+(?<Name>Appendix[^\r\n]*)\r?\n(?<Content>.*?)(?=^#[ \t]+|\z)')) {
+        $name = $appendix.Groups['Name'].Value.Trim()
+        [ordered]@{
+            name = $name
+            anchor = '#' + (($name.ToLowerInvariant() -replace '[^\w\- ]', '') -replace ' ', '-')
+            content = $appendix.Groups['Content'].Value.Trim()
+        }
+    }
 }
 
 function Get-ScubaBaselineSections {
@@ -577,6 +618,9 @@ function Get-ScubaBaselineSections {
     #>
     param([string]$Content)
 
+    # Appendices and document markings are not part of the final policy section.
+    $Content = ($Content -split '(?m)^#\s+Appendix\b', 2)[0]
+    $Content = $Content -replace '(?m)^[ \t]*(?:\*\*)?`TLP:[^`]+`(?:\*\*)?[ \t]*\r?$', ''
     $sections = @()
     $lines = $Content -split "`n"
 
@@ -620,6 +664,7 @@ function Get-ScubaBaselineSections {
                 $currentPolicy.Criticality = $policyDetails.Criticality
                 $currentPolicy.LastModified = $policyDetails.LastModified
                 $currentPolicy.Rationale = $policyDetails.Rationale
+                $currentPolicy.Notes = $policyDetails.Notes
                 $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
                 $currentPolicy.Badges = $policyDetails.Badges
                 # Extract implementation instructions for this policy
@@ -631,7 +676,7 @@ function Get-ScubaBaselineSections {
 
             # Process section-level content based on subsection type
             if ($currentSubSection -eq "Resources") {
-                $currentSection.Resources = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources"
+                $currentSection.Resources = @(Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources")
             } elseif ($currentSubSection -eq "License Requirements") {
                 $sectionLicenseReq = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "LicenseRequirements"
                 $currentSection.LicenseRequirements = if ($sectionLicenseReq -and $sectionLicenseReq.Count -gt 0) { $sectionLicenseReq } else { @("N/A") }
@@ -651,6 +696,7 @@ function Get-ScubaBaselineSections {
                 $currentPolicy.Criticality = $policyDetails.Criticality
                 $currentPolicy.LastModified = $policyDetails.LastModified
                 $currentPolicy.Rationale = $policyDetails.Rationale
+                $currentPolicy.Notes = $policyDetails.Notes
                 $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
                 $currentPolicy.Badges = $policyDetails.Badges
                 # Extract implementation instructions for this policy
@@ -663,23 +709,30 @@ function Get-ScubaBaselineSections {
             $currentPolicy = @{
                 PolicyId = $matches[1]
                 Title = ""
+                TitleComplete = $false
                 Content = ""
             }
             continue
         }
 
-        # Policy title (first non-empty line after policy header)
-        if ($currentPolicy -and $currentSubSection -eq "Policies" -and -not $currentPolicy.Title -and $line.Trim() -ne '') {
-            $currentPolicy.Title = $line.Trim()
+        # The statement is the first paragraph, which can wrap across source lines.
+        if ($currentPolicy -and $currentSubSection -eq "Policies" -and -not $currentPolicy.TitleComplete) {
+            if ($line.Trim() -eq '') {
+                if ($currentPolicy.Title) {
+                    $currentPolicy.TitleComplete = $true
+                }
+            } else {
+                $currentPolicy.Title = ("$($currentPolicy.Title) " + $line.Trim()).Trim()
+            }
             continue
         }
 
         # Description content (between ## section header and first ### subsection)
-        if ($currentSection -and -not $currentSubSection -and $line.Trim() -ne '') {
+        if ($currentSection -and -not $currentSubSection) {
             if ($currentSection.Description -eq "") {
                 $currentSection.Description = $line.Trim()
             } else {
-                $currentSection.Description += " " + $line.Trim()
+                $currentSection.Description += "`n" + $line
             }
             continue
         }
@@ -695,6 +748,7 @@ function Get-ScubaBaselineSections {
         $currentPolicy.Criticality = $policyDetails.Criticality
         $currentPolicy.LastModified = $policyDetails.LastModified
         $currentPolicy.Rationale = $policyDetails.Rationale
+        $currentPolicy.Notes = $policyDetails.Notes
         $currentPolicy.MITRE_Mapping = $policyDetails.MITRE_Mapping
         $currentPolicy.Badges = $policyDetails.Badges
         $currentPolicy.Implementation = Get-ScubaPolicyImplementation -Content $Content -PolicyId $currentPolicy.PolicyId
@@ -704,7 +758,7 @@ function Get-ScubaBaselineSections {
     # Process final section content
     if ($currentSection) {
         if ($currentSubSection -eq "Resources") {
-            $currentSection.Resources = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources"
+            $currentSection.Resources = @(Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "Resources")
         } elseif ($currentSubSection -eq "License Requirements") {
             $sectionLicenseReq = Get-ScubaSectionContent -Content ($currentContent -join "`n") -ContentType "LicenseRequirements"
             $currentSection.LicenseRequirements = if ($sectionLicenseReq -and $sectionLicenseReq.Count -gt 0) { $sectionLicenseReq } else { @("N/A") }
@@ -735,7 +789,7 @@ function Get-ScubaSectionContent {
         foreach ($match in $linkMatches) {
             $linkName = $match.Groups[1].Value.Trim()
             $linkUrl = $match.Groups[2].Value.Trim()
-            $result += @{ Name = $linkName; Url = $linkUrl }
+            $result += [ordered]@{ Name = $linkName; Url = $linkUrl }
         }
     }
     elseif ($ContentType -eq "LicenseRequirements") {
@@ -764,9 +818,13 @@ function Get-ScubaSectionContent {
             $result += $currentBullet.Trim()
         }
 
-        # If no bullets found, ensure we still return an array (even if empty)
+        # Some baselines express licensing as prose rather than a bullet list.
         if ($result.Count -eq 0) {
-            $result = @()
+            $result = @(
+                ($Content.Trim() -split '\r?\n\s*\r?\n') |
+                    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+                    ForEach-Object { ($_ -replace '\s+', ' ').Trim() }
+            )
         }
     }
 
@@ -784,7 +842,8 @@ function Get-ScubaPolicyImplementation {
     )
 
     # Look for implementation section for this policy
-    $pattern = "(?ms)^####\s+$PolicyId\s+Instructions\s*\n(.*?)(?=^####|^###|^##|\z)"
+    $escapedPolicyId = [regex]::Escape($PolicyId)
+    $pattern = "(?ms)^####[ \t]+$escapedPolicyId[ \t]+Instructions[ \t]*\r?\n(.*?)(?=^#{1,4}[ \t]+|^``TLP:|\z)"
 
     if ($Content -match $pattern) {
         $implementation = $matches[1].Trim()
@@ -793,18 +852,6 @@ function Get-ScubaPolicyImplementation {
         $implementation = $implementation -replace [char]0x201C, '"'  # Left double quotation mark
         $implementation = $implementation -replace [char]0x201D, '"'  # Right double quotation mark
         $implementation = $implementation -replace [char]0x2019, "'"  # Right single quotation mark
-
-        # Clean up markdown code blocks
-        # First, handle indented code blocks (4+ spaces or 1+ tabs followed by backticks)
-        $implementation = $implementation -replace '(?ms)^[ \t]*```[\w]*\r?\n(.*?)\r?\n[ \t]*```[ \t]*$', '$1'
-
-        # Handle regular code blocks at start of line
-        $implementation = $implementation -replace '(?ms)^```[\w]*\r?\n(.*?)\r?\n```[ \t]*$', '$1'
-
-        # Handle inline code blocks and remaining artifacts
-        $implementation = $implementation -replace '```[\w]*\r?\n?', ''
-        $implementation = $implementation -replace '\r?\n?```', ''
-        $implementation = $implementation -replace '```', ''
 
         # Clean up extra whitespace that might remain
         $implementation = $implementation -replace '^\s+', ''
@@ -829,6 +876,7 @@ function Get-ScubaPolicyContent {
         Criticality = $null
         LastModified = $null
         Rationale = $null
+        Notes = @()
         MITRE_Mapping = @()
         Badges = @()
         LicenseRequirements = @()
@@ -842,6 +890,9 @@ function Get-ScubaPolicyContent {
     if ($Content -match '(?s)- _Rationale:_\s*(.+?)(?=\n\s*-|\n\s*\n|\z)') {
         $rationale = $matches[1].Trim()
         $result.Rationale = $rationale -replace '\s+', ' '
+    }
+    foreach ($note in [regex]::Matches($Content, '(?ms)^- _Note:_[ \t]*(.*?)(?=^- |\z)')) {
+        $result.Notes += $note.Groups[1].Value.Trim()
     }
     if ($Content -match '(_MITRE ATT&CK TTP Mapping:_[\s\S]+?)(\n\s*\n|###|$)') {
         $mitreBlock = $matches[1]
@@ -904,4 +955,10 @@ function Get-ScubaPolicyContent {
 
 
 # Export module members
-Export-ModuleMember -Function Get-ScubaBaselinePolicy, Get-ScubaConfigExclusionMappingsFromMarkdown, Update-ScubaConfigBaselineWithMarkdown, Get-ScubaBaselineSections, Get-ScubaBaselineHeaderContent
+Export-ModuleMember -Function @(
+    'Get-ScubaBaselinePolicy',
+    'Get-ScubaConfigExclusionMappingsFromMarkdown',
+    'Update-ScubaConfigBaselineWithMarkdown',
+    'Get-ScubaBaselineSections',
+    'Get-ScubaBaselineHeaderContent'
+)
