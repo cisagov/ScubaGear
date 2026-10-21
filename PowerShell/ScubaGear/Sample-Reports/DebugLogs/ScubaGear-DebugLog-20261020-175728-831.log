@@ -1,0 +1,113 @@
+﻿[2026-10-20 17:57:28.848] [Info   ] [LoggingSystem       ] ScubaGear Logging Initialized - Level: Debug, Tracing: True, Transcript: False
+[2026-10-20 17:57:28.878] [Debug  ] [AutoTrace           ] Automatic function tracing enabled - intercepting ScubaGear function calls
+[2026-10-20 17:57:28.878] [Info   ] [LoggingSystem       ] Enhanced debug logging enabled - automatic function tracing active
+[2026-10-20 17:57:28.881] [Info   ] [ScubaCached         ] ScubaGear logging initialized (Cached Mode)
+    Data: {"Version":"2.0.0","TranscriptEnabled":{"IsPresent":false},"LogFolder":".\\PowerShell\\ScubaGear\\Sample-Reports\\DebugLogs","OutputFolder":".\\PowerShell\\ScubaGear\\Sample-Reports","UserPassedEnvironment":"commercial","ProductNames":"aad, exo, powerbi, powerplatform, securitysuite, sharepoint, teams","ExportProvider":false}
+[2026-10-20 17:57:28.891] [Debug  ] [ScubaCached         ] Output folder confirmed at .\PowerShell\ScubaGear\Sample-Reports
+    Data: {"OutFolderPath":".\\PowerShell\\ScubaGear\\Sample-Reports"}
+[2026-10-20 17:57:28.911] [Info   ] [ScubaCached         ] Cmdlet invocation captured (Cached Mode)
+    Data: {"InvocationLine":"Invoke-SCuBACached -ProductNames * -ExportProvider $false -OutPath $Samples -OPAPath $Opa","Command":"Invoke-SCuBACached","Parameters":{"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","ProductNames":["*"],"ExportProvider":false,"OutPath":".\\PowerShell\\ScubaGear\\Sample-Reports"},"BoundParameterCount":4}
+[2026-10-20 17:57:28.916] [Info   ] [ScubaCached         ] Capturing environment diagnostics (Cached Mode)
+[2026-10-20 17:57:28.933] [Debug  ] [RunDetails          ] Collecting system OS information...
+[2026-10-20 17:57:29.580] [Info   ] [RunDetails          ] System OS Information captured
+    Data: {"Build":"26200","Version":"10.0.26200","Architecture":"64-bit","InstallDate":"1/31/2025 3:35:29 AM","LastBootUpTime":"10/15/2026 3:37:17 AM","OS":"Microsoft Windows 11 Pro"}
+[2026-10-20 17:57:29.584] [Debug  ] [RunDetails          ] Collecting PowerShell version information...
+[2026-10-20 17:57:29.603] [Info   ] [RunDetails          ] PowerShell Version Information captured
+    Data: {"PSEdition":"Desktop","WSManStackVersion":"3.0","BuildVersion":"10.0.26100.9711","PSVersion":"5.1.26100.9711","CLRVersion":"4.0.30319.42000","PSRemotingProtocolVersion":"2.3"}
+[2026-10-20 17:57:29.620] [Debug  ] [RunDetails          ] Collecting ScubaGear version information...
+[2026-10-20 17:57:29.677] [Info   ] [RunDetails          ] ScubaGear Version Information captured
+    Data: {"InstallSource":"Development / GitHub clone","AllPaths":"N/A","CurrentModulePath":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear","CurrentLoadedVersion":"2.0.0","InstalledCount":0,"InstalledVersions":"Not in PSModulePath"}
+[2026-10-20 17:57:29.681] [Debug  ] [RunDetails          ] Collecting OPA executable information...
+[2026-10-20 17:57:34.166] [Info   ] [RunDetails          ] OPA Executable found: opa_windows_amd64.exe
+    Data: {"Path":"C:\\Users\\redacted\\.scubagear\\Tools\\opa_windows_amd64.exe","FileName":"opa_windows_amd64.exe","Version":"Version: 1.19.1","LastModified":"8/17/2026 12:58:43 PM","SizeMB":58.22,"Attributes":"Archive"}
+[2026-10-20 17:57:34.168] [Debug  ] [RunDetails          ] Checking configured OPAPath...
+[2026-10-20 17:57:34.246] [Info   ] [RunDetails          ] OPA Executable at configured path
+    Data: {"Version":"Version: 1.19.1","ResolvedPath":"C:\\Users\\redacted\\.scubagear\\Tools\\opa_windows_amd64.exe","ConfiguredOPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","FoundAtConfiguredPath":true,"SizeMB":58.22}
+[2026-10-20 17:57:34.251] [Debug  ] [RunDetails          ] Capturing current command invocation...
+[2026-10-20 17:57:34.377] [Info   ] [RunDetails          ] Command invocation details captured
+    Data: {"CommandLine":"Write-ScubaRunDetails -IncludeLoadedModules -IncludeErrors -ConfiguredOPAPath $OPAPath -TestNetworkConnectivity $false -ErrorAction Stop","RecentScubaCommands":"$Opa = \"$env:USERPROFILE\\.scubagear\\Tools\" | $Samples = \".\\PowerShell\\ScubaGear\\Sample-Reports\"\n | import-module -Name .\\\\PowerShell\\\\ScubaGear","BoundParameters":"IncludeLoadedModules=True; IncludeErrors=True; ConfiguredOPAPath=C:\\Users\\redacted\\.scubagear\\Tools; TestNetworkConnectivity=False; ErrorAction=Stop","CalledFrom":"Invoke-SCuBACached","WorkingDirectory":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear","CurrentFunction":"Write-ScubaRunDetails","ScriptName":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Modules\\Orchestrator.psm1","ScriptLineNumber":2664}
+[2026-10-20 17:57:34.380] [Debug  ] [RunDetails          ] Collecting loaded modules from memory...
+[2026-10-20 17:57:34.404] [Info   ] [RunDetails          ] Loaded modules summary
+    Data: {"ModuleNames":"CimCmdlets, Dependencies, Microsoft.PowerShell.Management, Microsoft.PowerShell.Security, Microsoft.PowerShell.Utility, PackageManagement, PowerShellEditorServices.Commands, PowerShellGet, PSReadLine, RaiseFunctionCap, ScubaGear, Support","TotalLoadedModules":12}
+[2026-10-20 17:57:34.409] [Debug  ] [RunDetails          ] Detailed loaded module information:
+[2026-10-20 17:57:34.419] [Debug  ] [RunDetails          ] Loaded module: CimCmdlets
+    Data: {"Path":"C:\\WINDOWS\\Microsoft.Net\\assembly\\GAC_MSIL\\Microsoft.Management.Infrastructure.CimCmdlets\\v4.0_1.0.0.0__31bf3856ad364e35\\Microsoft.Management.Infrastructure.CimCmdlets.dll","ModuleType":"Binary","Name":"CimCmdlets","Version":"1.0.0.0"}
+[2026-10-20 17:57:34.423] [Debug  ] [RunDetails          ] Loaded module: Dependencies
+    Data: {"Path":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Dependencies.ps1","ModuleType":"Script","Name":"Dependencies","Version":"0.0"}
+[2026-10-20 17:57:34.426] [Debug  ] [RunDetails          ] Loaded module: Microsoft.PowerShell.Management
+    Data: {"Path":"C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Management\\Microsoft.PowerShell.Management.psd1","ModuleType":"Manifest","Name":"Microsoft.PowerShell.Management","Version":"3.1.0.0"}
+[2026-10-20 17:57:34.434] [Debug  ] [RunDetails          ] Loaded module: Microsoft.PowerShell.Security
+    Data: {"Path":"C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Security\\Microsoft.PowerShell.Security.psd1","ModuleType":"Manifest","Name":"Microsoft.PowerShell.Security","Version":"3.0.0.0"}
+[2026-10-20 17:57:34.439] [Debug  ] [RunDetails          ] Loaded module: Microsoft.PowerShell.Utility
+    Data: {"Path":"C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules\\Microsoft.PowerShell.Utility\\Microsoft.PowerShell.Utility.psd1","ModuleType":"Manifest","Name":"Microsoft.PowerShell.Utility","Version":"3.1.0.0"}
+[2026-10-20 17:57:34.441] [Debug  ] [RunDetails          ] Loaded module: PackageManagement
+    Data: {"Path":"C:\\Users\\redacted\\Documents\\WindowsPowerShell\\Modules\\PackageManagement\\1.4.8.1\\PackageManagement.psm1","ModuleType":"Script","Name":"PackageManagement","Version":"1.4.8.1"}
+[2026-10-20 17:57:34.445] [Debug  ] [RunDetails          ] Loaded module: PowerShellEditorServices.Commands
+    Data: {"Path":"C:\\Users\\redacted\\.vscode\\extensions\\ms-vscode.powershell-2025.4.0\\modules\\PowerShellEditorServices\\Commands\\PowerShellEditorServices.Commands.psm1","ModuleType":"Script","Name":"PowerShellEditorServices.Commands","Version":"0.2.0"}
+[2026-10-20 17:57:34.448] [Debug  ] [RunDetails          ] Loaded module: PowerShellGet
+    Data: {"Path":"C:\\Users\\redacted\\Documents\\WindowsPowerShell\\Modules\\PowerShellGet\\2.2.5\\PSModule.psm1","ModuleType":"Script","Name":"PowerShellGet","Version":"2.2.5"}
+[2026-10-20 17:57:34.451] [Debug  ] [RunDetails          ] Loaded module: PSReadLine
+    Data: {"Path":"C:\\Users\\redacted\\.vscode\\extensions\\ms-vscode.powershell-2025.4.0\\modules\\PSReadLine\\2.4.4\\PSReadLine.psm1","ModuleType":"Script","Name":"PSReadLine","Version":"2.4.4"}
+[2026-10-20 17:57:34.455] [Debug  ] [RunDetails          ] Loaded module: RaiseFunctionCap
+    Data: {"Path":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\RaiseFunctionCap.ps1","ModuleType":"Script","Name":"RaiseFunctionCap","Version":"0.0"}
+[2026-10-20 17:57:34.456] [Debug  ] [RunDetails          ] Loaded module: ScubaGear
+    Data: {"Path":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\ScubaGear.psm1","ModuleType":"Script","Name":"ScubaGear","Version":"2.0.0"}
+[2026-10-20 17:57:34.465] [Debug  ] [RunDetails          ] Loaded module: Support
+    Data: {"Path":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Modules\\Support\\Support.psm1","ModuleType":"Script","Name":"Support","Version":"0.0"}
+[2026-10-20 17:57:34.592] [Info   ] [RunDetails          ] ScubaGear-related modules currently loaded in memory
+    Data: {"Modules":"ScubaGear (2.0.0)","ModulePaths":"ScubaGear=C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear","Count":1}
+[2026-10-20 17:57:34.596] [Debug  ] [RunDetails          ] Collecting recent PowerShell errors...
+[2026-10-20 17:57:34.599] [Info   ] [RunDetails          ] No recent errors found in $Error variable
+[2026-10-20 17:57:34.604] [Debug  ] [ModuleSnapshot      ] Capturing module snapshot: InitialLoad
+[2026-10-20 17:57:34.620] [Debug  ] [ModuleSnapshot      ] Loaded 2 module names from RequiredVersions.ps1
+[2026-10-20 17:57:34.651] [Info   ] [ModuleSnapshot      ] Module snapshot 'InitialLoad' captured: 1 module(s)
+    Data: {"SnapshotName":"InitialLoad","ModulePathsSummary":"ScubaGear=C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear","ModulePaths":["ScubaGear=C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear"],"ModuleCount":1,"ModuleSummary":"ScubaGear (2.0.0)","Modules":["ScubaGear (2.0.0)"]}
+[2026-10-20 17:57:34.661] [Info   ] [ScubaCached         ] ExportProvider disabled - using cached provider data
+[2026-10-20 17:57:34.958] [Info   ] [ScubaCached         ] Starting Rego verification
+    Data: {"ProductNames":"aad, exo, powerbi, powerplatform, securitysuite, sharepoint, teams"}
+[2026-10-20 17:57:35.034] [Debug  ] [RunRego             ] Starting Rego evaluation: AAD
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\AADConfig.rego","RegoExists":true,"Product":"aad","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:35.680] [Debug  ] [RunRego             ] Rego evaluation succeeded: AAD
+    Data: {"Product":"aad"}
+[2026-10-20 17:57:35.712] [Debug  ] [RunRego             ] Starting Rego evaluation: EXO
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\EXOConfig.rego","RegoExists":true,"Product":"exo","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:36.000] [Debug  ] [RunRego             ] Rego evaluation succeeded: EXO
+    Data: {"Product":"exo"}
+[2026-10-20 17:57:36.031] [Debug  ] [RunRego             ] Starting Rego evaluation: PowerBI
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\PowerBIConfig.rego","RegoExists":true,"Product":"powerbi","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:36.316] [Debug  ] [RunRego             ] Rego evaluation succeeded: PowerBI
+    Data: {"Product":"powerbi"}
+[2026-10-20 17:57:36.344] [Debug  ] [RunRego             ] Starting Rego evaluation: PowerPlatform
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\PowerPlatformConfig.rego","RegoExists":true,"Product":"powerplatform","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:36.641] [Debug  ] [RunRego             ] Rego evaluation succeeded: PowerPlatform
+    Data: {"Product":"powerplatform"}
+[2026-10-20 17:57:36.673] [Debug  ] [RunRego             ] Starting Rego evaluation: SecuritySuite
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\SecuritySuiteConfig.rego","RegoExists":true,"Product":"securitysuite","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:37.116] [Debug  ] [RunRego             ] Rego evaluation succeeded: SecuritySuite
+    Data: {"Product":"securitysuite"}
+[2026-10-20 17:57:37.148] [Debug  ] [RunRego             ] Starting Rego evaluation: SharePoint
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\SharePointConfig.rego","RegoExists":true,"Product":"sharepoint","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:37.433] [Debug  ] [RunRego             ] Rego evaluation succeeded: SharePoint
+    Data: {"Product":"sharepoint"}
+[2026-10-20 17:57:37.462] [Debug  ] [RunRego             ] Starting Rego evaluation: Teams
+    Data: {"RegoFile":"C:\\Users\\redacted\\Documents\\Github\\ScubaGear\\PowerShell\\ScubaGear\\Rego\\TeamsConfig.rego","RegoExists":true,"Product":"teams","InputExists":true,"OPAPath":"C:\\Users\\redacted\\.scubagear\\Tools","InputFile":".\\PowerShell\\ScubaGear\\Sample-Reports\\ProviderSettingsExport.json"}
+[2026-10-20 17:57:37.759] [Debug  ] [RunRego             ] Rego evaluation succeeded: Teams
+    Data: {"Product":"teams"}
+[2026-10-20 17:57:37.800] [Info   ] [ScubaCached         ] Rego verification completed
+[2026-10-20 17:57:37.808] [Info   ] [ScubaCached         ] Starting report creation
+[2026-10-20 17:57:46.651] [Info   ] [ReportCreation      ] Report created: AAD
+    Data: {"Omits":0,"Manual":3,"Passes":14,"Errors":0,"Product":"aad","Failures":12,"Warnings":5}
+[2026-10-20 17:57:49.323] [Info   ] [ReportCreation      ] Report created: EXO
+    Data: {"Omits":0,"Manual":0,"Passes":11,"Errors":0,"Product":"exo","Failures":0,"Warnings":1}
+[2026-10-20 17:57:50.345] [Info   ] [ReportCreation      ] Report created: PowerBI
+    Data: {"Omits":0,"Manual":0,"Passes":5,"Errors":0,"Product":"powerbi","Failures":0,"Warnings":3}
+[2026-10-20 17:57:51.743] [Info   ] [ReportCreation      ] Report created: PowerPlatform
+    Data: {"Omits":0,"Manual":2,"Passes":5,"Errors":0,"Product":"powerplatform","Failures":1,"Warnings":1}
+[2026-10-20 17:57:55.339] [Info   ] [ReportCreation      ] Report created: SecuritySuite
+    Data: {"Omits":0,"Manual":3,"Passes":17,"Errors":0,"Product":"securitysuite","Failures":0,"Warnings":4}
+[2026-10-20 17:57:56.259] [Info   ] [ReportCreation      ] Report created: SharePoint
+    Data: {"Omits":0,"Manual":0,"Passes":6,"Errors":0,"Product":"sharepoint","Failures":2,"Warnings":0}
+[2026-10-20 17:57:57.529] [Info   ] [ReportCreation      ] Report created: Teams
+    Data: {"Omits":0,"Manual":0,"Passes":14,"Errors":0,"Product":"teams","Failures":0,"Warnings":0}
+[2026-10-20 17:58:08.802] [Info   ] [ScubaCached         ] ScubaGear assessment completed! Check report in [.\PowerShell\ScubaGear\Sample-Reports]
+[2026-10-20 17:58:09.099] [Info   ] [LoggingSystem       ] ScubaGear logging session ending
