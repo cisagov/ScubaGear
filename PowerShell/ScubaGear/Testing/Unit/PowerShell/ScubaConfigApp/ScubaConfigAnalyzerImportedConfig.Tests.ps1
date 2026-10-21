@@ -1,3 +1,5 @@
+using module '..\..\..\..\Modules\ScubaConfig\ScubaConfig.psm1'
+
 Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer carries the imported results configuration into the generated YAML' {
     BeforeAll {
         $scubaGearRoot = (Resolve-Path "$PSScriptRoot\..\..\..\..").Path
@@ -28,8 +30,8 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer carries the imported results
             'MS.AAD.1.1v1' = [pscustomobject]@{ CapExclusions = [pscustomobject]@{ Users = @('aaaaaaaa-0000-0000-0000-000000000001'); Groups = @() } }
             'MS.AAD.7.4v1' = [pscustomobject]@{ RoleExclusions = [pscustomobject]@{ Users = @('bbbbbbbb-0000-0000-0000-000000000002') } }
         })
-        $cfg | Add-Member -NotePropertyName Teams -NotePropertyValue ([pscustomobject]@{ 'MS.TEAMS.2.1v1' = [pscustomobject]@{ AllowedDomains = @('partner.com') } })
-        $cfg | Add-Member -NotePropertyName OmitPolicy -NotePropertyValue ([pscustomobject]@{ 'MS.EXO.1.1v2' = [pscustomobject]@{ Rationale = 'Handled by third party: yes'; Expiration = '2027-01-31' } })
+        $cfg | Add-Member -NotePropertyName Exo -NotePropertyValue ([pscustomobject]@{ 'MS.EXO.1.1v2' = [pscustomobject]@{ AllowedForwardingDomains = @('partner.com') } })
+        $cfg | Add-Member -NotePropertyName OmitPolicy -NotePropertyValue ([pscustomobject]@{ 'MS.TEAMS.1.1v1' = [pscustomobject]@{ Rationale = 'Handled by third party: yes'; Expiration = '2027-01-31' } })
         $cfg | Add-Member -NotePropertyName AnnotatePolicy -NotePropertyValue ([pscustomobject]@{ 'MS.AAD.3.1v1' = [pscustomobject]@{ Comment = 'Tracked in ticket #42'; RemediationDate = '2027-03-01T00:00:00'; IncorrectResult = $false } })
         $script:raw = $results.Raw
 
@@ -95,11 +97,20 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer carries the imported results
         It 'keeps imported exclusions, including products that were not analyzed' {
             $yaml | Should -Match 'aaaaaaaa-0000-0000-0000-000000000001'
             $yaml | Should -Match 'bbbbbbbb-0000-0000-0000-000000000002'
-            $yaml | Should -Match '(?m)^Teams:\r?\n  MS\.TEAMS\.2\.1v1:\r?\n    AllowedDomains:\r?\n      - partner\.com'
+            $yaml | Should -Match '(?m)^Exo:\r?\n  MS\.EXO\.1\.1v2:\r?\n    AllowedForwardingDomains:\r?\n      - partner\.com'
+        }
+
+        It 'does not restore imported exclusions that an override cleared' {
+            $cleared = Get-ScubaAnalyzerConfigYaml -Analysis $analysis -ExclusionOverrides @{
+                'MS.AAD.1.1v1' = @{ Users = @() }
+            }
+            $cleared | Should -Not -Match 'aaaaaaaa-0000-0000-0000-000000000001'
+            $cleared | Should -Not -Match 'MS\.AAD\.1\.1v1'
+            $cleared | Should -Match 'bbbbbbbb-0000-0000-0000-000000000002'
         }
 
         It 'keeps OmitPolicy and AnnotatePolicy' {
-            $yaml | Should -Match '(?m)^OmitPolicy:\r?\n  MS\.EXO\.1\.1v2:\r?\n    Rationale: ''Handled by third party: yes''\r?\n    Expiration: ''2027-01-31'''
+            $yaml | Should -Match '(?m)^OmitPolicy:\r?\n  MS\.TEAMS\.1\.1v1:\r?\n    Rationale: ''Handled by third party: yes''\r?\n    Expiration: ''2027-01-31'''
             $yaml | Should -Match '(?m)^AnnotatePolicy:\r?\n  MS\.AAD\.3\.1v1:'
             $yaml | Should -Match '(?m)^    IncorrectResult: false\r?$'
         }
@@ -128,9 +139,16 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer carries the imported results
             Import-Module powershell-yaml
             $parsed = $yaml | ConvertFrom-Yaml
             $parsed.M365Environment | Should -Be 'gcc'
-            $parsed.OmitPolicy.'MS.EXO.1.1v2'.Expiration | Should -Be '2027-01-31'
+            $parsed.OmitPolicy.'MS.TEAMS.1.1v1'.Expiration | Should -Be '2027-01-31'
             $parsed.AnnotatePolicy.'MS.AAD.3.1v1'.IncorrectResult | Should -BeFalse
-            $parsed.Teams.'MS.TEAMS.2.1v1'.AllowedDomains | Should -Be @('partner.com')
+            $parsed.Exo.'MS.EXO.1.1v2'.AllowedForwardingDomains | Should -Be @('partner.com')
+        }
+
+        It 'produces YAML that ScubaGear accepts as a configuration file' -Skip:(-not (Get-Module -ListAvailable powershell-yaml)) {
+            $yamlPath = Join-Path $TestDrive 'AnalyzerMergedConfig.yaml'
+            Set-Content -Path $yamlPath -Value $yaml -Encoding UTF8
+            $result = [ScubaConfig]::ValidateConfigFile($yamlPath)
+            $result.IsValid | Should -BeTrue -Because ($result.ValidationErrors -join '; ')
         }
     }
 

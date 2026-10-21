@@ -10,6 +10,7 @@
 ### Bug Fixes
 - Config Analyzer: the per-control YAML now shows exclusions from the imported configuration for Conditional Access controls (previously only the detected policy exclusions were shown).
 - Config Analyzer: generated YAML values that would be read as another type (dates, numbers, booleans) or that contain YAML syntax characters are quoted.
+- Config Analyzer: emptying a control's exclusions (via `-ExclusionOverrides` or the UI) no longer writes the imported values back into the generated YAML.
 
 ## 2.8.12 (build 1500) [08/13/2026] - App-independent Baseline Policy Viewer, control cleanup, Analyzer online-baseline toggle
 

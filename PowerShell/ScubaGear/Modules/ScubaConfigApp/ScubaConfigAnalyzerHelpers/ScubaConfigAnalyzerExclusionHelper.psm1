@@ -420,6 +420,8 @@ function Get-ScubaAnalyzerConfigYaml {
 
     # Group findings by product config key.
     $byProduct = @{}
+    $clearedFields = @{}
+
     # Iterate through each finding in the analysis to group them by product config key.
     foreach ($f in @($Analysis.Findings)) {
         if (-not $f.ExclusionField -or $f.ExclusionField -eq 'none') { continue }
@@ -438,7 +440,11 @@ function Get-ScubaAnalyzerConfigYaml {
             foreach ($k in @($ov.Keys)) { $vals[$k] = @($ov[$k]) }
         }
         # Skip this finding if there are no exclusion values after applying overrides.
-        if (@($vals.Keys | Where-Object { @($vals[$_]).Count -gt 0 }).Count -eq 0) { continue }
+        # Remember the field so the imported-config merge does not write it back.
+        if (@($vals.Keys | Where-Object { @($vals[$_]).Count -gt 0 }).Count -eq 0) {
+            $clearedFields[$f.ControlId] = $f.ExclusionField
+            continue
+        }
 
         # Determine the selected policy and its display name for the current finding.
         $selId  = [string]$f.SelectedPolicyId
@@ -484,6 +490,14 @@ function Get-ScubaAnalyzerConfigYaml {
         foreach ($controlId in $controlIds) {
             $entry = $entries[$controlId]
             $importedFields = $importedControls[$controlId]
+            $keptFields = if ($importedFields -is [System.Collections.IDictionary]) {
+                @($importedFields.Keys | Where-Object {
+                    -not ($entry -and $_ -eq $entry.ExclusionField) -and
+                    -not ($clearedFields.ContainsKey($controlId) -and $_ -eq $clearedFields[$controlId])
+                })
+            } else { @() }
+            # Nothing left to write for this control, so don't emit an empty "MS.X.1.1v1:" key (schema requires an object)
+            if (-not $entry -and $importedFields -is [System.Collections.IDictionary] -and @($keptFields).Count -eq 0) { continue }
             if ($entry) {
                 [void]$sb.AppendLine("  # $($entry.Requirement)")
                 if ($entry.CAPolicyName) { [void]$sb.AppendLine("  # CA policy: $($entry.CAPolicyName)") }
@@ -495,11 +509,8 @@ function Get-ScubaAnalyzerConfigYaml {
             [void]$sb.AppendLine("  $($controlId):")
             # The analyzer's values for its exclusion field already include what the imported config had.
             if ($entry) { Add-ScAYamlExclusionField -Builder $sb -ExclusionField $entry.ExclusionField -ExclusionValues $entry.ExclusionValues -DisplayNameLookup $DisplayNameLookup }
-            if ($importedFields -is [System.Collections.IDictionary]) {
-                foreach ($field in @($importedFields.Keys)) {
-                    if ($entry -and $field -eq $entry.ExclusionField) { continue }
-                    Add-ScAYamlNode -Builder $sb -Value ([ordered]@{ $field = $importedFields[$field] }) -Indent 4 -DisplayNameLookup $DisplayNameLookup
-                }
+            foreach ($field in $keptFields) {
+                Add-ScAYamlNode -Builder $sb -Value ([ordered]@{ $field = $importedFields[$field] }) -Indent 4 -DisplayNameLookup $DisplayNameLookup
             }
         }
         [void]$sb.AppendLine("")
