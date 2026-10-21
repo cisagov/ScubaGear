@@ -6,6 +6,7 @@ InModuleScope Orchestrator {
         BeforeAll {
             function Connect-Tenant {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                [CmdletBinding()]
                 param($ProductNames, $M365Environment, $ServicePrincipalParams)
                 throw 'this will be mocked'
             }
@@ -39,7 +40,7 @@ InModuleScope Orchestrator {
                 Invoke-Connection -ScubaConfig $ScubaConfig
                 Should -Invoke -CommandName Connect-Tenant -Exactly -Times 1 -Scope It
         }
-        It 'omits the default environment when interactive discovery is requested' {
+        It 'returns the environment discovered by Connect-Tenant' {
             $ScubaConfig = [pscustomobject]@{
                 ProductNames = @('aad')
                 M365Environment = 'commercial'
@@ -48,11 +49,11 @@ InModuleScope Orchestrator {
             Mock Connect-Tenant {
                 [pscustomobject]@{ DetectedM365Environment = 'gcchigh'; ProdAuthFailed = @() }
             }
-            $Result = Invoke-Connection -ScubaConfig $ScubaConfig -AutoDetectEnvironment
+            $Result = Invoke-Connection -ScubaConfig $ScubaConfig
             $Result.DetectedM365Environment | Should -Be 'gcchigh'
-            Should -Invoke Connect-Tenant -Times 1 -Exactly -ParameterFilter { -not $M365Environment }
+            Should -Invoke Connect-Tenant -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'commercial' }
         }
-        It 'passes the supplied environment when discovery is disabled' {
+        It 'passes the configured environment to Connect-Tenant' {
             $ScubaConfig = [pscustomobject]@{
                 ProductNames = @('aad')
                 M365Environment = 'dod'
@@ -60,6 +61,15 @@ InModuleScope Orchestrator {
             }
             Invoke-Connection -ScubaConfig $ScubaConfig
             Should -Invoke Connect-Tenant -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'dod' }
+        }
+        It 'preserves verbose authentication messages across the connection module boundary' {
+            $ScubaConfig = [pscustomobject]@{
+                ProductNames = @('aad'); M365Environment = 'commercial'; LogIn = $true
+            }
+            Mock Connect-Tenant { Write-Verbose 'Authentication boundary reached' }
+            $Messages = @(Invoke-Connection -ScubaConfig $ScubaConfig -Verbose 4>&1)
+            @($Messages | Where-Object { $_ -is [System.Management.Automation.VerboseRecord] }).Message |
+                Should -Contain 'Authentication boundary reached'
         }
     }
 }

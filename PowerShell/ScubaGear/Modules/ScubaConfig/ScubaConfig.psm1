@@ -105,6 +105,13 @@ class ScubaConfig {
         elseif ($Name -eq 'DefaultPrivilegedRoles') {
             return [ScubaConfig]::_ConfigDefaults.privilegedRoles
         }
+        elseif ($Name -eq 'AuthenticationClientIdHashtable') {
+            $ClientIdHash = @{}
+            foreach ($Property in [ScubaConfig]::_ConfigDefaults.AuthenticationClientIdHashtable.PSObject.Properties) {
+                $ClientIdHash[$Property.Name] = [string]$Property.Value
+            }
+            return $ClientIdHash
+        }
         elseif ($Name.StartsWith('Default')) {
             # For standard "Default" prefixed names, auto-resolve from defaults section
             $ConfigKey = $Name.Substring(7) # Remove 'Default' prefix

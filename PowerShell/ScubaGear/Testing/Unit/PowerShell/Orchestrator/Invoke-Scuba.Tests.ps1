@@ -76,14 +76,16 @@ InModuleScope Orchestrator {
             It 'uses the detected environment for tenant details and providers' {
                 Mock Invoke-Connection { @{ DetectedM365Environment = 'gcchigh'; ProdAuthFailed = @() } }
                 Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
-                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { $AutoDetectEnvironment }
+                Should -Invoke Invoke-Connection -Times 1 -Exactly
                 Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'gcchigh' }
                 Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'gcchigh' }
             }
 
-            It 'preserves an explicit environment override' {
+            It 'uses the discovered environment even when an environment was explicitly provided' {
+                Mock Invoke-Connection { @{ DetectedM365Environment = 'gcchigh'; ProdAuthFailed = @() } }
                 Invoke-SCuBA -ProductNames aad -M365Environment dod -Quiet -SilenceBODWarnings
-                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { -not $AutoDetectEnvironment }
+                Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'gcchigh' }
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'gcchigh' }
             }
         }
         Context 'When checking the conformance of commercial tenants' {

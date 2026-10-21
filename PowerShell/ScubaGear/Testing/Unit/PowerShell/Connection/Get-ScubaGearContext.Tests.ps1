@@ -42,10 +42,20 @@ InModuleScope ConnectHelpers {
                 Mock -ModuleName ConnectHelpers Invoke-ScubaGraphRequest {
                     param($Uri)
                     if ($Uri -eq '/v1.0/organization') {
-                        return [pscustomobject]@{ value = @([pscustomobject]@{ id = 'tenant-guid'; displayName = 'Contoso' }) }
+                        return [pscustomobject]@{ value = @([pscustomobject]@{
+                            id = 'tenant-guid'
+                            displayName = 'Contoso'
+                            verifiedDomains = @(
+                                [pscustomobject]@{ name = 'contoso.com'; isInitial = $false; isDefault = $true },
+                                [pscustomobject]@{ name = 'contoso.onmicrosoft.com'; isInitial = $true; isDefault = $false }
+                            )
+                        }) }
                     }
                     if ($Uri -eq '/v1.0/me') {
                         return [pscustomobject]@{ userPrincipalName = 'jane.doe@contoso.com'; mail = 'jane.doe@contoso.com' }
+                    }
+                    if ($Uri -eq "/v1.0/servicePrincipals(appId='14d82eec-204b-4c2f-b7e8-296a70dab67e')") {
+                        return [pscustomobject]@{ displayName = 'Contoso Graph Client' }
                     }
                     throw "Unexpected Uri: $Uri"
                 }
@@ -57,9 +67,63 @@ InModuleScope ConnectHelpers {
                 $Result.AuthType | Should -Be 'Delegated'
                 $Result.TenantId | Should -Be 'tenant-guid'
                 $Result.TenantName | Should -Be 'Contoso'
+                $Result.TenantDomain | Should -Be 'contoso.onmicrosoft.com'
+                $Result.AppDisplayName | Should -Be 'Contoso Graph Client'
                 $Result.ClientId | Should -Be '14d82eec-204b-4c2f-b7e8-296a70dab67e'
                 $Result.Environment | Should -Be 'commercial'
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Invoke-ScubaGraphRequest -Times 1 -ParameterFilter { $Uri -eq '/v1.0/me' }
+                Should -Invoke Invoke-ScubaGraphRequest -Times 1 -Exactly -ParameterFilter {
+                    $Uri -eq "/v1.0/servicePrincipals(appId='14d82eec-204b-4c2f-b7e8-296a70dab67e')"
+                }
+            }
+
+            It 'uses the documented Graph client name when service principal lookup is denied' {
+                Mock Invoke-ScubaGraphRequest { throw 'Insufficient privileges' } -ParameterFilter {
+                    $Uri -like '/v1.0/servicePrincipals*'
+                }
+
+                $Result = Get-ScubaGearContext -WarningVariable ContextWarnings
+
+                $Result.AppDisplayName | Should -Be 'Microsoft Graph Command Line Tools'
+                $Result.Account | Should -Be 'jane.doe@contoso.com'
+                $Result.TenantDomain | Should -Be 'contoso.onmicrosoft.com'
+                $ContextWarnings | Should -BeNullOrEmpty
+                $Global:ScubaGearState.Session.TokenParameters.Scope | Should -Be @('Organization.Read.All')
+            }
+
+            It 'does not substitute the Graph client name for an unknown client' {
+                $SavedClientId = $Global:ScubaGearState.Session.TokenParameters.ClientId
+                try {
+                    $Global:ScubaGearState.Session.TokenParameters.ClientId = 'unknown-client'
+                    Mock Invoke-ScubaGraphRequest { throw 'Insufficient privileges' } -ParameterFilter {
+                        $Uri -like '/v1.0/servicePrincipals*'
+                    }
+
+                    $Result = Get-ScubaGearContext -WarningVariable ContextWarnings -WarningAction SilentlyContinue
+
+                    $Result.AppDisplayName | Should -BeNullOrEmpty
+                    $Result.ClientId | Should -Be 'unknown-client'
+                    $Result.Account | Should -Be 'jane.doe@contoso.com'
+                    @($ContextWarnings).Count | Should -Be 1
+                }
+                finally {
+                    $Global:ScubaGearState.Session.TokenParameters.ClientId = $SavedClientId
+                }
+            }
+
+            It 'leaves the tenant domain empty when the initial domain is unavailable' {
+                Mock Invoke-ScubaGraphRequest {
+                    [pscustomobject]@{ value = @([pscustomobject]@{
+                        id = 'tenant-guid'
+                        displayName = 'Contoso'
+                        verifiedDomains = @([pscustomobject]@{ name = 'contoso.com'; isInitial = $false; isDefault = $true })
+                    }) }
+                } -ParameterFilter { $Uri -eq '/v1.0/organization' }
+
+                $Result = Get-ScubaGearContext
+
+                $Result.TenantDomain | Should -BeNullOrEmpty
+                $Result.TenantName | Should -Be 'Contoso'
             }
         }
 
@@ -78,7 +142,11 @@ InModuleScope ConnectHelpers {
                 Mock -ModuleName ConnectHelpers Invoke-ScubaGraphRequest {
                     param($Uri)
                     if ($Uri -eq '/v1.0/organization') {
-                        return [pscustomobject]@{ value = @([pscustomobject]@{ id = 'tenant-guid'; displayName = 'Contoso' }) }
+                        return [pscustomobject]@{ value = @([pscustomobject]@{
+                            id = 'tenant-guid'
+                            displayName = 'Contoso'
+                            verifiedDomains = @([pscustomobject]@{ name = 'contoso.onmicrosoft.com'; isInitial = $true })
+                        }) }
                     }
                     if ($Uri -like "/v1.0/servicePrincipals(appId='*'*") {
                         return [pscustomobject]@{ displayName = 'ScubaGear Automation' }
@@ -92,6 +160,7 @@ InModuleScope ConnectHelpers {
                 $Result.Account | Should -Be '11111111-2222-3333-4444-555555555555 (service principal)'
                 $Result.AppDisplayName | Should -Be 'ScubaGear Automation'
                 $Result.AuthType | Should -Be 'AppOnly'
+                $Result.TenantDomain | Should -Be 'contoso.onmicrosoft.com'
                 $Result.ClientId | Should -Be '11111111-2222-3333-4444-555555555555'
                 Should -Invoke -ModuleName ConnectHelpers -CommandName Invoke-ScubaGraphRequest -Times 0 -ParameterFilter { $Uri -eq '/v1.0/me' }
             }
@@ -115,6 +184,7 @@ InModuleScope ConnectHelpers {
                 { $Script:Result = Get-ScubaGearContext -WarningAction SilentlyContinue -ErrorAction Stop } | Should -Not -Throw
                 $Script:Result.Account | Should -Be 'Unknown'
                 $Script:Result.TenantId | Should -BeNullOrEmpty
+                $Script:Result.TenantDomain | Should -BeNullOrEmpty
             }
         }
     }

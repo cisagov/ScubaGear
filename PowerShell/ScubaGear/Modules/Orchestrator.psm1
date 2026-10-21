@@ -36,8 +36,8 @@ function Invoke-SCuBA {
     Use '*' to run all baselines.
     .Parameter M365Environment
     This parameter is used to authenticate to the different commercial/government environments.
-    When omitted for interactive scans, the environment is detected during system-browser sign-in.
-    An explicitly supplied command-line or configuration-file value bypasses interactive detection.
+    Interactive scans discover the environment during the first system-browser sign-in,
+    then reuse the established session's environment on subsequent scans.
     Valid values include "commercial", "gcc", "gcchigh", or "dod".
     - For M365 tenants with E3/E5 licenses enter the value **"commercial"**.
     - For M365 Government Community Cloud tenants with G3/G5 licenses enter the value **"gcc"**.
@@ -540,17 +540,13 @@ function Invoke-SCuBA {
             $Script:ScubaLoggingEnabled = $false
         }
 
-        $AutoDetectEnvironment = -not $PSBoundParameters.ContainsKey('M365Environment')
-        if ($PSCmdlet.ParameterSetName -eq 'Configuration' -and [ScubaConfig]::GetInstance().M365EnvironmentProvided) {
-            $AutoDetectEnvironment = $false
-        }
-
         # If user is authenticating with service principal, automatically detect the M365Environment using Microsoft's openid-configuration API
         # This overrides any user provided command line value for M365Environment and the default value of "commercial"
         if ($ScubaConfig.CertificateThumbprint -or $ScubaConfig.AppID) {
             # Get-ServicePrincipalParams will validate that CertificateThumbprint, AppID, and Organization are all provided
             $null = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
             $ScubaConfig.M365Environment = Get-M365EnvironmentByDomain -TenantDomain $ScubaConfig.Organization
+            Write-Information "Automatically discovered M365Environment: $($ScubaConfig.M365Environment)" -InformationAction Continue
         }
 
         # Product Authentication - parameters consolidated into ScubaConfig
@@ -560,7 +556,8 @@ function Invoke-SCuBA {
             UsesServicePrincipal = (-not [string]::IsNullOrEmpty($ScubaConfig.AppID))
         }
 
-        $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig -AutoDetectEnvironment:$AutoDetectEnvironment
+        $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig `
+            -Verbose:($VerbosePreference -eq 'Continue')
         # If Connect-Tenant automatically detected the M365Environment during interactive auth, change the ScubaConfig value to the detected value.
         if ($ConnectionResult.DetectedM365Environment) {
             $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
@@ -2266,22 +2263,21 @@ function Invoke-Connection {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [object]
-        $ScubaConfig,
-
-        [switch]$AutoDetectEnvironment
+        $ScubaConfig
     )
 
     $ConnectTenantParams = @{
         'ProductNames' = $ScubaConfig.ProductNames;
         'M365Environment' = $ScubaConfig.M365Environment
     }
+    # Preference variables do not reliably cross script-module boundaries.
+    if ($VerbosePreference -eq 'Continue') {
+        $ConnectTenantParams.Verbose = $true
+    }
 
     if ($ScubaConfig.AppID) {
         $ServicePrincipalParams = Get-ServicePrincipalParams -ScubaConfig $ScubaConfig
         $ConnectTenantParams += @{ServicePrincipalParams = $ServicePrincipalParams;}
-    }
-    elseif ($AutoDetectEnvironment) {
-        $ConnectTenantParams.Remove('M365Environment')
     }
 
     $ConnectionResult = @{
@@ -2735,7 +2731,7 @@ function Invoke-SCuBACached {
                 }
 
                 $ConnectionResult = Invoke-Connection -ScubaConfig $TempScubaConfig `
-                    -AutoDetectEnvironment:(-not $PSBoundParameters.ContainsKey('M365Environment'))
+                    -Verbose:($VerbosePreference -eq 'Continue')
                 if ($ConnectionResult.DetectedM365Environment) {
                     $TempScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
                     $M365Environment = $ConnectionResult.DetectedM365Environment

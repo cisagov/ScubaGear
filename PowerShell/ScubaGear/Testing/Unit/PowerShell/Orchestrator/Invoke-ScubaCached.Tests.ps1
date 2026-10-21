@@ -6,7 +6,7 @@ InModuleScope Orchestrator {
         BeforeAll {
             function Invoke-Connection {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
-                param($ScubaConfig, $AutoDetectEnvironment)
+                param($ScubaConfig)
             }
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
             function Get-TenantDetail {
@@ -76,14 +76,16 @@ InModuleScope Orchestrator {
             It 'propagates the detected cloud before exporting provider data' {
                 Mock Invoke-Connection { @{ DetectedM365Environment = 'dod'; ProdAuthFailed = @() } }
                 Invoke-SCuBACached -ProductNames aad -ExportProvider $true -Quiet -SilenceBODWarnings
-                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { $AutoDetectEnvironment }
+                Should -Invoke Invoke-Connection -Times 1 -Exactly
                 Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'dod' }
                 Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'dod' }
             }
 
-            It 'bypasses discovery when an environment is explicitly provided' {
+            It 'uses the discovered environment even when an environment was explicitly provided' {
+                Mock Invoke-Connection { @{ DetectedM365Environment = 'dod'; ProdAuthFailed = @() } }
                 Invoke-SCuBACached -ProductNames aad -ExportProvider $true -M365Environment gcc -Quiet -SilenceBODWarnings
-                Should -Invoke Invoke-Connection -Times 1 -Exactly -ParameterFilter { -not $AutoDetectEnvironment }
+                Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'dod' }
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'dod' }
             }
         }
 

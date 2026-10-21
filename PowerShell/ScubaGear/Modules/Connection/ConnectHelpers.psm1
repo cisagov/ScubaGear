@@ -1,20 +1,27 @@
-﻿# Session state stored globally so all module import paths share the same instance
+﻿using module '..\ScubaConfig\ScubaConfig.psm1'
+
+# Authentication flow and state diagram: /docs/MSAL-INTEGRATION.md
+
+# Session state stored globally so all module import paths share the same instance
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
 if (-not $Global:ScubaGearState) {
-    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; MsalResolverRegistered = $false }
+    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; }
 }
 
 function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
+    .PARAMETER Discovery
+    Discovers the user's tenant and cloud, then establishes the tenant-specific Graph
+    session using the same MSAL application and its token cache.
     .Functionality
     Internal
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'ExplicitEnvironment')]
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $true, ParameterSetName = 'ExplicitEnvironment')]
         [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
         [string]
@@ -24,14 +31,19 @@ function Connect-GraphHelper {
         [string[]]
         $Scopes = $null,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(ParameterSetName = 'ExplicitEnvironment')]
         [ValidateNotNullOrEmpty()]
         [hashtable]
         $ServicePrincipalParams,
 
-        [Parameter(Mandatory = $false)]
-        [string]$TenantId
+        [Parameter(ParameterSetName = 'ExplicitEnvironment')]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'Discovery')]
+        [switch]$Discovery
     )
+    $AuthVerbose = @{}
+    if ($VerbosePreference -eq 'Continue') { $AuthVerbose.Verbose = $true }
     if ($ServicePrincipalParams.CertThumbprintParams) {
         $TokenParameters = @{
             CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint
@@ -44,15 +56,44 @@ function Connect-GraphHelper {
         }
     }
     else {
+        $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
         $TokenParameters = @{
             Scope = if ($Scopes) { $Scopes } else { @('Organization.Read.All') }
-            ClientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
+            ClientId = $ClientIdHash.aad
             Tenant = if ($TenantId) { $TenantId } else { 'organizations' }
+        }
+        if ($Discovery) {
+            # Call Get-MsalAccessToken for initial interactive discovery sign-in, which returns the tenant ID and authority host for the user's account.
+            $Result = Get-MsalAccessToken @TokenParameters -M365Environment commercial -ForCloudDiscovery -PassThru @AuthVerbose
+
+            $DiscoveredTenantId = [guid]::Empty
+            if (-not [guid]::TryParse([string]$Result.TenantId, [ref]$DiscoveredTenantId) -or $DiscoveredTenantId -eq [guid]::Empty) {
+                throw 'Interactive cloud discovery did not return a valid tenant ID.'
+            }
+            $AuthorityHost = switch ($Result.Account.Environment) {
+                { $_ -in @('login.microsoftonline.com', 'login.windows.net', 'sts.windows.net') } { 'login.microsoftonline.com' }
+                'login.microsoftonline.us' { 'login.microsoftonline.us' }
+                default { throw "Interactive cloud discovery returned an unsupported authority: '$($Result.Account.Environment)'." }
+            }
+            $M365Environment = Get-M365EnvironmentByDomain -TenantDomain $DiscoveredTenantId.ToString() -AuthorityHost $AuthorityHost
+            if (($AuthorityHost -eq 'login.microsoftonline.us') -ne ($M365Environment -in @('gcchigh', 'dod'))) {
+                throw "Detected environment '$M365Environment' does not match the sign-in authority '$AuthorityHost'."
+            }
+            $TokenParameters.Tenant = $DiscoveredTenantId.ToString()
+        }
+        # Keep using the current tenant when a Graph caller requests additional permission scopes.
+        # For example, Compare-ScubaGearPermission in ServicePrincipal.psm1 requests Application.Read.All
+        # without TenantId. Use the existing session's tenant when the environment matches;
+        # an explicit TenantId is already included in TokenParameters above.
+        elseif (-not $TenantId -and $Global:ScubaGearState.Session -and
+            $Global:ScubaGearState.Session.M365Environment -eq $M365Environment) {
+            $TokenParameters.Tenant = $Global:ScubaGearState.Session.TokenParameters.Tenant
         }
     }
 
     $TokenParameters.M365Environment = $M365Environment
-    $Global:ScubaGearState.Session = @{
+    # Keep the established session until replacement authentication succeeds.
+    $Session = @{
         M365Environment = $M365Environment
         GraphEndpoint = switch ($M365Environment) {
             'gcchigh' { 'https://graph.microsoft.us' }
@@ -61,7 +102,59 @@ function Connect-GraphHelper {
         }
         TokenParameters = $TokenParameters
     }
-    $null = Get-MsalAccessToken @TokenParameters
+    $TokenResult = Get-MsalAccessToken @TokenParameters -PassThru @AuthVerbose
+    $Session.Account = $TokenResult.Account
+    $Global:ScubaGearState.Session = $Session
+}
+
+function Get-M365EnvironmentByDomain {
+    <#
+    .SYNOPSIS
+        Determines the M365 environment based on the tenant domain.
+
+    .DESCRIPTION
+        Determines the M365 environment based on the tenant domain.
+
+    .PARAMETER TenantDomain
+        The domain of the tenant for which to determine the environment.
+
+    .EXAMPLE
+        $M365Environment = Get-M365EnvironmentByDomain -TenantDomain "contoso.onmicrosoft.com"
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding(DefaultParameterSetName = 'Interactive')]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TenantDomain,
+
+        [ValidateSet('login.microsoftonline.com', 'login.microsoftonline.us')]
+        [string]$AuthorityHost = 'login.microsoftonline.com'
+    )
+
+    $MetadataUri = "https://$AuthorityHost/$TenantDomain/.well-known/openid-configuration"
+
+    $Metadata = Invoke-RestMethod -Uri $MetadataUri -Method Get -ErrorAction Stop
+
+    $TenantRegionSubScope = $Metadata.tenant_region_sub_scope
+
+    $M365Environment = switch ($TenantRegionSubScope) {
+        "DODCON" { "gcchigh" }
+        "GCC"    { "gcc" }
+        "DOD"    { "dod" }
+        $null    {
+            if ([string]::IsNullOrWhiteSpace($Metadata.tenant_region_scope) -or $Metadata.tenant_region_scope -eq 'USGov') {
+                throw 'Tenant metadata does not identify a supported M365 environment.'
+            }
+            "commercial"
+        }
+        default  {
+            throw "Unknown tenant_region_sub_scope value: '$TenantRegionSubScope'"
+        }
+    }
+
+    return $M365Environment
 }
 
 function Get-ScubaGraphContext {
@@ -90,10 +183,11 @@ function Get-ScubaGearContext {
         ScubaGear no longer depends on the Microsoft.Graph.Authentication module, so
         Get-MgContext is no longer available to identify the signed-in account. This
         cmdlet is the MSAL-based replacement: it resolves the same information
-        (account/app, tenant, client ID, scopes) by making live Microsoft Graph REST
-        calls with the cached MSAL token (GET /v1.0/me for delegated/user sign-ins,
-        and a service principal lookup for certificate/app-only sign-ins) instead of
-        relying on the removed cmdlet's local SDK state.
+        (account/app, tenant and initial domain, client ID, scopes) by making live
+        Microsoft Graph REST calls with the cached MSAL token. It uses GET /v1.0/me
+        for delegated/user sign-ins and looks up the client service principal for
+        both authentication types. If that lookup fails for the standard Graph
+        client, it uses the client's documented display name.
     .EXAMPLE
         Get-ScubaGearContext
 
@@ -114,39 +208,50 @@ function Get-ScubaGearContext {
     $Session = $Global:ScubaGearState.Session
     $TokenParameters = $Session.TokenParameters
     $IsAppOnly = [bool]$TokenParameters.CertificateThumbprint
+    $ClientId = if ($IsAppOnly) { $TokenParameters.AppID } else { $TokenParameters.ClientId }
+    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
 
     $Account = "Unknown"
-    $AppDisplayName = $null
+    # Organization.Read.All alone does not grant permission to read service principals.
+    $AppDisplayName = if ($ClientId -eq $ClientIdHash.aad) { 'Microsoft Graph Command Line Tools' } else { $null }
     $TenantId = $null
     $TenantName = $null
+    $TenantDomain = $null
 
     try {
-        $OrgInfo = Invoke-ScubaGraphRequest -Uri '/v1.0/organization' -Method GET -ErrorAction Stop
+        $OrgInfo = Invoke-ScubaGraphRequest -Uri '/v1.0/organization' -Method GET
         $Org = @($OrgInfo.value)[0]
         if ($Org) {
             $TenantId = $Org.id
             $TenantName = $Org.displayName
+            $TenantDomain = ($Org.verifiedDomains | Where-Object { $_.isInitial } | Select-Object -First 1).name
         }
     }
     catch {
-        Write-Verbose "Get-ScubaGearContext: unable to resolve tenant details via Microsoft Graph: $($_.Exception.Message)"
+        Write-Warning "Get-ScubaGearContext: unable to resolve tenant details via Microsoft Graph: $($_.Exception.Message)"
+    }
+
+    try {
+        $ServicePrincipal = Invoke-ScubaGraphRequest -Uri "/v1.0/servicePrincipals(appId='$ClientId')" -Method GET
+        if ($ServicePrincipal.displayName) {
+            $AppDisplayName = $ServicePrincipal.displayName
+        }
+    }
+    catch {
+        if ($AppDisplayName) {
+            Write-Verbose "Get-ScubaGearContext: using the documented client display name because the service principal lookup failed: $($_.Exception.Message)"
+        }
+        else {
+            Write-Warning "Get-ScubaGearContext: unable to resolve service principal display name via Microsoft Graph: $($_.Exception.Message)"
+        }
     }
 
     if ($IsAppOnly) {
-        $Account = "$($TokenParameters.AppID) (service principal)"
-        try {
-            $ServicePrincipal = Invoke-ScubaGraphRequest -Uri "/v1.0/servicePrincipals(appId='$($TokenParameters.AppID)')" -Method GET -ErrorAction Stop
-            if ($ServicePrincipal.displayName) {
-                $AppDisplayName = $ServicePrincipal.displayName
-            }
-        }
-        catch {
-            Write-Verbose "Get-ScubaGearContext: unable to resolve service principal display name via Microsoft Graph: $($_.Exception.Message)"
-        }
+        $Account = "$ClientId (service principal)"
     }
     else {
         try {
-            $Me = Invoke-ScubaGraphRequest -Uri '/v1.0/me' -Method GET -ErrorAction Stop
+            $Me = Invoke-ScubaGraphRequest -Uri '/v1.0/me' -Method GET
             if ($Me.userPrincipalName) {
                 $Account = $Me.userPrincipalName
             }
@@ -155,17 +260,18 @@ function Get-ScubaGearContext {
             }
         }
         catch {
-            Write-Verbose "Get-ScubaGearContext: unable to resolve signed-in user via Microsoft Graph /v1.0/me: $($_.Exception.Message)"
+            Write-Warning "Get-ScubaGearContext: unable to resolve signed-in user via Microsoft Graph /v1.0/me: $($_.Exception.Message)"
         }
     }
 
     [pscustomobject]@{
         Account        = $Account
         AppDisplayName = $AppDisplayName
-        ClientId       = if ($IsAppOnly) { $TokenParameters.AppID } else { $TokenParameters.ClientId }
+        ClientId       = $ClientId
         AuthType       = if ($IsAppOnly) { 'AppOnly' } else { 'Delegated' }
         TenantId       = $TenantId
         TenantName     = $TenantName
+        TenantDomain   = $TenantDomain
         Scopes         = @($TokenParameters.Scope)
         Environment    = $Session.M365Environment
         GraphEndpoint  = $Session.GraphEndpoint
@@ -229,7 +335,10 @@ function Invoke-ScubaGraphRequest {
     $RefreshedToken = $false
     while ($Attempt -le $MaxRetries) {
         $Attempt++
-        $TokenParameters = $Global:ScubaGearState.Session.TokenParameters
+        $TokenParameters = $Global:ScubaGearState.Session.TokenParameters.Clone()
+        if ($RefreshedToken) {
+            $TokenParameters.ForceRefresh = $true
+        }
         $AccessToken = Get-MsalAccessToken @TokenParameters
         $RequestHeaders = @{
             Authorization = "Bearer $AccessToken"
@@ -282,7 +391,6 @@ function Invoke-ScubaGraphRequest {
             }
             if ($StatusCode -eq 401 -and -not $RefreshedToken) {
                 $RefreshedToken = $true
-                $Global:ScubaGearState.MsalAppCache = @{}
                 continue
             }
             if ($StatusCode -eq 429 -and $Attempt -le $MaxRetries) {
@@ -565,6 +673,12 @@ function Initialize-Msal {
         [string]$LibraryPath
     )
 
+    if ($Global:ScubaGearState.MsalValidated) {
+        return
+    }
+
+    # Do not mark initialization complete if assembly loading or another setup step fails.
+    $ErrorActionPreference = 'Stop'
     $ExplicitLibraryPath = $PSBoundParameters.ContainsKey('LibraryPath')
     $Manifest = Get-ScubaMsalManifest
     $ExpectedAssemblyVersion = [version]"$($Manifest.Version).0"
@@ -584,20 +698,16 @@ function Initialize-Msal {
         }
     }
 
-    if (-not $Global:ScubaGearState.MsalValidated) {
-        if (-not (Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest)) {
-            Write-Information "One-time setup: downloading the Microsoft authentication libraries (MSAL) to $LibraryPath. No sign-in is required for this step..." -InformationAction Continue
-            $LibraryPath = Install-ScubaMsalDependency -LibraryPath $LibraryPath
-            Write-Information "Setup complete: the Microsoft authentication libraries (MSAL) were downloaded and verified." -InformationAction Continue
-        }
-        $null = Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest -ThrowOnFail
-        $Global:ScubaGearState.MsalValidated = $true
-        $Global:ScubaGearState.MsalLibraryPath = $LibraryPath
+    if (-not (Test-ScubaMsalLibrary -LibraryPath $LibraryPath -Manifest $Manifest)) {
+        Write-Information "One-time setup: downloading the Microsoft authentication libraries (MSAL) to $LibraryPath. No sign-in is required for this step..." -InformationAction Continue
+        # Installation validates the downloaded libraries before returning.
+        $LibraryPath = Install-ScubaMsalDependency -LibraryPath $LibraryPath
+        Write-Information "Setup complete: the Microsoft authentication libraries (MSAL) were downloaded and verified." -InformationAction Continue
+    }
 
-        # Prune superseded cache versions once the pinned version is confirmed usable.
-        if (-not $ExplicitLibraryPath -and -not $env:ScubaGearMsalPath) {
-            Remove-ScubaMsalStaleVersion -KeepVersion $Manifest.Version
-        }
+    # Prune superseded cache versions once the pinned version is confirmed usable.
+    if (-not $ExplicitLibraryPath -and -not $env:ScubaGearMsalPath) {
+        Remove-ScubaMsalStaleVersion -KeepVersion $Manifest.Version
     }
 
     # A compiled AssemblyResolve handler provides runtime binding redirects (MSAL 4.89 requests
@@ -645,6 +755,66 @@ namespace ScubaGear {
             [void][Reflection.Assembly]::LoadFrom((Join-Path $LibraryPath $AssemblyFile))
         }
     }
+    $Global:ScubaGearState.MsalLibraryPath = $LibraryPath
+    $Global:ScubaGearState.MsalValidated = $true
+}
+
+function New-ScubaMsalPublicClient {
+    <#
+    .SYNOPSIS
+        Builds a public MSAL client using the system browser and a loopback redirect.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ClientId,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Authority,
+
+        [switch]$ForCloudDiscovery
+    )
+
+    [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
+        WithAuthority($Authority).
+        WithRedirectUri('http://localhost').
+        WithMultiCloudSupport($ForCloudDiscovery.IsPresent).
+        Build()
+}
+
+function New-ScubaMsalBrowserRequest {
+    <#
+    .SYNOPSIS
+        Creates a system-browser request, reusing the selected account for browser SSO.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$MsalApp,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$Scope,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Tenant,
+
+        [object]$Account
+    )
+
+    # The system browser supports WebAuthn/FIDO2/passkeys. MSAL's default prompt
+    # forces account selection; retain that only until an account has been selected.
+    $Request = $MsalApp.AcquireTokenInteractive($Scope).WithUseEmbeddedWebView($false)
+    if ($Account) {
+        $Request = $Request.WithAccount($Account).WithPrompt([Microsoft.Identity.Client.Prompt]::NoPrompt)
+    }
+    if ($Tenant -notin @('common', 'organizations')) {
+        $Request = $Request.WithTenantId($Tenant)
+    }
+    return $Request
 }
 
 function Get-MsalAccessToken {
@@ -653,12 +823,14 @@ function Get-MsalAccessToken {
         Acquires an OAuth2 access token via MSAL using certificate or interactive auth.
         Reuses cached MSAL app instances and attempts silent token acquisition before
         prompting interactively, minimizing the number of browser popups per session.
-    .PARAMETER MultiCloudSupport
-        Enables instance-aware discovery at the public common/organizations authority.
+    .PARAMETER ForCloudDiscovery
+        Enables instance-aware sign-in to discover the tenant's cloud from the public common/organizations authority.
         Only supported for first-party Microsoft clients registered with the same ID across clouds.
     .PARAMETER PassThru
-        Returns the MSAL authentication result, including the selected tenant and account cloud,
+        Returns the MSAL authentication result object, including the selected tenant and account cloud,
         instead of only the access token.
+    .PARAMETER ForceRefresh
+        Bypasses cached access tokens while retaining refresh credentials for silent acquisition.
     .FUNCTIONALITY
         Internal
     #>
@@ -684,16 +856,18 @@ function Get-MsalAccessToken {
         [string]$M365Environment,
 
         [Parameter(ParameterSetName = 'Interactive')]
-        [switch]$MultiCloudSupport,
+        [switch]$ForCloudDiscovery,
 
-        [Parameter(ParameterSetName = 'Interactive')]
-        [switch]$PassThru
+        [switch]$PassThru,
+
+        [switch]$ForceRefresh
     )
 
+    # We call Initialize-Msal here because this function is called directly from the functional test orchestrator.
     Initialize-Msal
 
-    if ($MultiCloudSupport -and ($Tenant -notin @('common', 'organizations') -or $M365Environment -ne 'commercial')) {
-        throw 'Multi-cloud discovery requires the public common or organizations authority.'
+    if ($ForCloudDiscovery -and ($Tenant -notin @('common', 'organizations') -or $M365Environment -ne 'commercial')) {
+        throw 'Cloud discovery requires the public common or organizations authority.'
     }
 
     $Authority = switch ($M365Environment) {
@@ -711,20 +885,18 @@ function Get-MsalAccessToken {
         }
     }
 
-    # Cache MSAL app instances by key so token cache persists across calls.
-    # This enables AcquireTokenSilent to succeed for subsequent scope requests
-    # after the first interactive sign-in, reducing browser popups to one.
-    if (-not $Global:ScubaGearState.MsalAppCache) {
-        $Global:ScubaGearState.MsalAppCache = @{}
-    }
+    # Reuse MSAL application instances via MsalAppCache so their token caches persist between requests.
+    # Each delegated client ID has one application and token cache, including Graph discovery,
+    # the tenant connection, and later API requests. Disconnect before switching tenants or credentials.
 
     $MaxAttempts = 3
     $Attempt = 0
     while ($Attempt -lt $MaxAttempts) {
         $Attempt++
         try {
+            # Non-interactive authentication.
             if ($PSCmdlet.ParameterSetName -eq 'ServicePrincipal') {
-                $CacheKey = "SP:$AppID|$Authority"
+                $CacheKey = "SP:$AppID"
                 if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
                     $Global:ScubaGearState.MsalAppCache[$CacheKey] = [Microsoft.Identity.Client.ConfidentialClientApplicationBuilder]::Create($AppID).
                         WithCertificate($Certificate).
@@ -732,57 +904,81 @@ function Get-MsalAccessToken {
                         Build()
                 }
                 $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
-                $TokenResult = $MsalApp.AcquireTokenForClient([string[]]@($Scope)).ExecuteAsync().GetAwaiter().GetResult()
-            }
-            else {
-                $CacheKey = "PUB:$ClientId|$Authority"
-                if ($MultiCloudSupport) {
-                    $CacheKey += '|multicloud'
+                $ClientRequest = $MsalApp.AcquireTokenForClient([string[]]@($Scope))
+                if ($ForceRefresh) {
+                    $ClientRequest = $ClientRequest.WithForceRefresh($true)
                 }
+                $TokenResult = $ClientRequest.ExecuteAsync().GetAwaiter().GetResult()
+            }
+            # Interactive authentication.
+            else {
+                # Reuse the same cached MSAL application object for the same client ID (e.g. Microsoft Graph Command Line Tools).
+                $CacheKey = "PUB:$ClientId"
                 if (-not $Global:ScubaGearState.MsalAppCache.ContainsKey($CacheKey)) {
-                    # Loopback redirect + system browser (no WAM broker)
-                    $NewMsalApp = [Microsoft.Identity.Client.PublicClientApplicationBuilder]::Create($ClientId).
-                        WithAuthority($Authority).
-                        WithRedirectUri('http://localhost').
-                        WithMultiCloudSupport($MultiCloudSupport.IsPresent).
-                        Build()
-                    $DiscoveryCacheKey = "PUB:$ClientId|https://login.microsoftonline.com/organizations|multicloud"
-                    if (-not $MultiCloudSupport -and $Global:ScubaGearState.MsalAppCache.ContainsKey($DiscoveryCacheKey)) {
-                        # Keep the bootstrap cache in memory while pinning later requests to the discovered tenant/cloud.
-                        $DiscoveryApp = $Global:ScubaGearState.MsalAppCache[$DiscoveryCacheKey]
-                        $NewMsalApp.UserTokenCache.DeserializeMsalV3(
-                            $DiscoveryApp.UserTokenCache.SerializeMsalV3(), $true)
-                    }
-                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = $NewMsalApp
+                    $Global:ScubaGearState.MsalAppCache[$CacheKey] = New-ScubaMsalPublicClient `
+                        -ClientId $ClientId -Authority $Authority -ForCloudDiscovery:$ForCloudDiscovery
                 }
                 $MsalApp = $Global:ScubaGearState.MsalAppCache[$CacheKey]
-
-                # Try silent acquisition first using cached accounts
+                # An IAccount identifies the user, not a client application. Use the
+                # scan's Graph account even when this new client lists no accounts;
+                # MSAL checks this application's own cache for usable credentials.
                 $TokenResult = $null
+                $SignInAccount = $Global:ScubaGearState.Session.Account
                 try {
-                    $Accounts = $MsalApp.GetAccountsAsync().GetAwaiter().GetResult()
-                    if ($Accounts -and $Accounts.Count -gt 0) {
-                        $SilentRequest = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $Accounts[0])
+                    # If the session has no selected account, look for one in this MSAL app's cache.
+                    # Reusing the session account avoids this lookup and keeps products using the same user.
+                    if (-not $SignInAccount) {
+                        $Accounts = @($MsalApp.GetAccountsAsync().GetAwaiter().GetResult())
+                        if ($Accounts -and $Accounts.Count -gt 0) {
+                            $SignInAccount = $Accounts[0]
+                        }
+                    }
+                    # Use the Account object from the Session or MsalApp cache to acquire a token silently.
+                    # MSAL returns the underlying cached access token if it is not expired.
+                    # If the existing token is expired, MSAL will use the refresh token to get a fresh access token.
+                    if ($SignInAccount) {
+                        $SilentRequest = $MsalApp.AcquireTokenSilent([string[]]@($Scope), $SignInAccount)
+                        if ($ForceRefresh) {
+                            $SilentRequest = $SilentRequest.WithForceRefresh($true)
+                        }
                         if ($Tenant -notin @('common', 'organizations')) {
+                            # The instance-aware discovery client resolves the cloud from
+                            # SignInAccount.Environment while this override selects the tenant.
                             $SilentRequest = $SilentRequest.WithTenantId($Tenant)
                         }
                         $TokenResult = $SilentRequest.ExecuteAsync().GetAwaiter().GetResult()
+                        Write-Verbose "Acquired token silently for client '$ClientId' at '$Authority'."
+                    }
+                    else {
+                        Write-Verbose "No cached MSAL account for client '$ClientId' at '$Authority'; interactive sign-in is required."
                     }
                 }
                 catch {
-                    # Silent failed (no cached token for this scope) — fall through to interactive
+                    # PowerShell wraps SDK exceptions. Include the underlying MSAL code
+                    # so missing credentials can be distinguished from consent/MFA requirements.
+                    $SilentFailure = $_.Exception
+                    while ($SilentFailure.InnerException -and -not $SilentFailure.PSObject.Properties['ErrorCode']) {
+                        $SilentFailure = $SilentFailure.InnerException
+                    }
+                    $FailureCode = if ($SilentFailure.PSObject.Properties['ErrorCode']) { " [$($SilentFailure.ErrorCode)]" } else { '' }
+                    Write-Verbose "Silent token acquisition failed for client '$ClientId' at '$Authority'$($FailureCode): $($SilentFailure.Message)"
+                    # Only UI-required MSAL exceptions justify browser fallback, including no_tokens_found.
+                    # PSTypeNames includes base types, so derived UI-required exceptions are also recognized.
+                    if ($SilentFailure.PSTypeNames -notcontains 'Microsoft.Identity.Client.MsalUiRequiredException') {
+                        throw
+                    }
                     $TokenResult = $null
                 }
 
                 if (-not $TokenResult) {
-                    Write-Information "Opening your default browser so you can sign in to Microsoft 365..." -InformationAction Continue
-                    # Embedded web view does not support WebAuthn/FIDO2/passkey ceremonies (no real browser
-                    # context), so this must use the system (default OS) browser instead.
-                    $InteractiveRequest = $MsalApp.AcquireTokenInteractive([string[]]@($Scope)).
-                        WithUseEmbeddedWebView($false)
-                    if ($Tenant -notin @('common', 'organizations')) {
-                        $InteractiveRequest = $InteractiveRequest.WithTenantId($Tenant)
+                    if ($SignInAccount) {
+                        Write-Information "Opening your default browser to reuse your Microsoft 365 sign-in. Additional interaction may be required by Entra." -InformationAction Continue
                     }
+                    else {
+                        Write-Information "Opening your default browser so you can sign in to Microsoft 365..." -InformationAction Continue
+                    }
+                    $InteractiveRequest = New-ScubaMsalBrowserRequest -MsalApp $MsalApp `
+                        -Scope $Scope -Tenant $Tenant -Account $SignInAccount
                     $TokenResult = $InteractiveRequest.ExecuteAsync().GetAwaiter().GetResult()
                 }
             }
@@ -809,6 +1005,7 @@ Export-ModuleMember -Function @(
     'Disconnect-ScubaGraph',
     'Get-ScubaGraphContext',
     'Get-ScubaGearContext',
+    'Get-M365EnvironmentByDomain',
     'Initialize-Msal',
     'Get-MsalAccessToken',
     'Invoke-ScubaGraphRequest',

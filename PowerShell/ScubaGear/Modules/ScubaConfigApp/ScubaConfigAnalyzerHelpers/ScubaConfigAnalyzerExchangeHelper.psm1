@@ -9,6 +9,8 @@
     Part of the ScubaGear project - https://github.com/cisagov/ScubaGear
 #>
 
+using module '..\..\ScubaConfig\ScubaConfig.psm1'
+
 function Connect-ScubaAnalyzerExchange {
     <#
     .SYNOPSIS
@@ -55,7 +57,8 @@ function Connect-ScubaAnalyzerExchange {
         $token = Get-MsalAccessToken -Scope $scope -CertificateThumbprint $CertificateThumbprint -AppID $AppId -Tenant $Organization -M365Environment $M365Environment
     } else {
         # ScubaGear's public client id for delegated EXO tokens.
-        $token = Get-MsalAccessToken -Scope $scope -ClientId 'fb78d390-0c51-40cd-8e17-fdbfab77341b' -Tenant $tenantDomain -M365Environment $M365Environment
+        $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+        $token = Get-MsalAccessToken -Scope $scope -ClientId $ClientIdHash.exo -Tenant $tenantDomain -M365Environment $M365Environment
     }
 
     # Store the acquired access token and API endpoint in the shared hash for later use.
