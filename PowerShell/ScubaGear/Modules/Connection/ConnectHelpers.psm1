@@ -817,6 +817,183 @@ function New-ScubaMsalBrowserRequest {
     return $Request
 }
 
+function Invoke-ScubaMsalRequest {
+    <#
+    .SYNOPSIS
+        Runs an MSAL request so that Ctrl-C and an optional timeout can cancel it.
+    .DESCRIPTION
+        GetAwaiter().GetResult() blocks the pipeline thread, so Ctrl-C cannot stop a sign-in
+        that is waiting on the browser. This waits in short slices instead, which lets PowerShell
+        process a stop request, and cancels the MSAL operation (releasing its loopback listener)
+        when the wait ends for any reason.
+    .PARAMETER Request
+        An MSAL request builder exposing ExecuteAsync(CancellationToken).
+    .PARAMETER TimeoutSeconds
+        Cancels the request after this many seconds. 0 means no timeout.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [object]$Request,
+
+        [ValidateRange(0, 3600)]
+        [int]$TimeoutSeconds = 0
+    )
+
+    $Cts = [System.Threading.CancellationTokenSource]::new()
+    try {
+        if ($TimeoutSeconds -gt 0) {
+            $Cts.CancelAfter([TimeSpan]::FromSeconds($TimeoutSeconds))
+        }
+        $Task = $Request.ExecuteAsync($Cts.Token)
+        while (-not $Task.IsCompleted) {
+            [void]$Task.AsyncWaitHandle.WaitOne(250)
+        }
+        try {
+            return $Task.GetAwaiter().GetResult()
+        }
+        catch [System.OperationCanceledException] {
+            if ($TimeoutSeconds -gt 0 -and $Cts.IsCancellationRequested) {
+                throw [System.OperationCanceledException]::new(
+                    "Sign-in did not complete within $TimeoutSeconds seconds.", $_.Exception)
+            }
+            throw
+        }
+    }
+    finally {
+        $Cts.Cancel()
+        $Cts.Dispose()
+    }
+}
+
+function Get-ScubaMsalFailureChain {
+    <#
+    .SYNOPSIS
+        Returns an exception and each of its inner exceptions, outermost first.
+    .DESCRIPTION
+        PowerShell wraps SDK exceptions (for example in MethodInvocationException), so the
+        MSAL exception that explains a failure is usually an inner exception.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Exception]$Exception
+    )
+
+    $Current = $Exception
+    while ($Current) {
+        $Current
+        $Current = $Current.InnerException
+    }
+}
+
+function Test-ScubaMsalRetryableError {
+    <#
+    .SYNOPSIS
+        Determines whether a failed token acquisition is worth attempting again.
+    .DESCRIPTION
+        Only transient service and network failures are retried. Anything that needs the user
+        to act (cancelled or timed-out sign-in, wrong credentials, admin consent, Conditional
+        Access, a missing certificate or an invalid app registration) fails immediately, because
+        trying again sends the user straight back to the same prompt.
+    .PARAMETER Exception
+        The exception thrown while acquiring the token.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Exception]$Exception
+    )
+
+    $Chain = @(Get-ScubaMsalFailureChain -Exception $Exception)
+
+    foreach ($Failure in $Chain) {
+        if ($Failure -is [System.OperationCanceledException] -or
+            $Failure -is [System.Management.Automation.PipelineStoppedException] -or
+            $Failure.PSTypeNames -contains 'Microsoft.Identity.Client.MsalUiRequiredException') {
+            return $false
+        }
+        if ($Failure.PSObject.Properties['ErrorCode'] -and $Failure.ErrorCode -in @('authentication_canceled', 'access_denied')) {
+            return $false
+        }
+    }
+
+    $TransientCodes = @('request_timeout', 'temporarily_unavailable', 'service_not_available', 'network_not_available')
+    $TransientHttpStatuses = @(408, 429, 500, 502, 503, 504)
+    $TransientWebStatuses = @(
+        [System.Net.WebExceptionStatus]::Timeout,
+        [System.Net.WebExceptionStatus]::ConnectFailure,
+        [System.Net.WebExceptionStatus]::ConnectionClosed,
+        [System.Net.WebExceptionStatus]::KeepAliveFailure,
+        [System.Net.WebExceptionStatus]::NameResolutionFailure,
+        [System.Net.WebExceptionStatus]::ReceiveFailure,
+        [System.Net.WebExceptionStatus]::SendFailure
+    )
+
+    foreach ($Failure in $Chain) {
+        $IsMsal = $Failure.PSTypeNames -contains 'Microsoft.Identity.Client.MsalException'
+        if ($IsMsal -and $Failure.PSObject.Properties['ErrorCode'] -and $Failure.ErrorCode -in $TransientCodes) {
+            return $true
+        }
+        if ($IsMsal -and $Failure.PSObject.Properties['StatusCode'] -and [int]$Failure.StatusCode -in $TransientHttpStatuses) {
+            return $true
+        }
+        if ($Failure -is [System.Net.WebException] -and $Failure.Status -in $TransientWebStatuses) {
+            return $true
+        }
+        if ($Failure -is [System.Net.Sockets.SocketException] -or
+            $Failure -is [System.IO.IOException] -or
+            $Failure.GetType().FullName -eq 'System.Net.Http.HttpRequestException') {
+            return $true
+        }
+    }
+
+    return $false
+}
+
+function Get-ScubaMsalFailureHint {
+    <#
+    .SYNOPSIS
+        Explains, in plain language, why a sign-in failure will not be retried.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Exception]$Exception
+    )
+
+    $Text = (Get-ScubaMsalFailureChain -Exception $Exception | ForEach-Object {
+            $Code = if ($_.PSObject.Properties['ErrorCode']) { $_.ErrorCode } else { '' }
+            "$Code $($_.Message)"
+        }) -join ' '
+
+    switch -Regex ($Text) {
+        'AADSTS(65001|90094|650056|650057)|consent_required|admin_consent' {
+            return 'Your account is not permitted to grant the required permissions. Ask a Global Administrator to consent, or to run ScubaGear once for this tenant, then try again.'
+        }
+        'authentication_canceled|did not complete within|OperationCanceled|access_denied' {
+            return 'The sign-in was cancelled or timed out. Run ScubaGear again to sign in.'
+        }
+        'AADSTS(50126|50053|50057|50055|50034)' {
+            return 'The sign-in was rejected because of the account credentials or account status. Check the account and try again.'
+        }
+        'AADSTS(53003|53000|53001|50105|530032)' {
+            return 'The sign-in was blocked by a tenant access policy (such as Conditional Access) or because the account is not assigned to the application.'
+        }
+    }
+    return $null
+}
+
 function Get-MsalAccessToken {
     <#
     .SYNOPSIS
@@ -890,6 +1067,8 @@ function Get-MsalAccessToken {
     # the tenant connection, and later API requests. Disconnect before switching tenants or credentials.
 
     $MaxAttempts = 3
+    # A person must complete the browser sign-in; give up if it is abandoned (for example the tab was closed).
+    $InteractiveTimeoutSeconds = 300
     $Attempt = 0
     while ($Attempt -lt $MaxAttempts) {
         $Attempt++
@@ -908,7 +1087,7 @@ function Get-MsalAccessToken {
                 if ($ForceRefresh) {
                     $ClientRequest = $ClientRequest.WithForceRefresh($true)
                 }
-                $TokenResult = $ClientRequest.ExecuteAsync().GetAwaiter().GetResult()
+                $TokenResult = Invoke-ScubaMsalRequest -Request $ClientRequest
             }
             # Interactive authentication.
             else {
@@ -946,7 +1125,7 @@ function Get-MsalAccessToken {
                             # SignInAccount.Environment while this override selects the tenant.
                             $SilentRequest = $SilentRequest.WithTenantId($Tenant)
                         }
-                        $TokenResult = $SilentRequest.ExecuteAsync().GetAwaiter().GetResult()
+                        $TokenResult = Invoke-ScubaMsalRequest -Request $SilentRequest
                         Write-Verbose "Acquired token silently for client '$ClientId' at '$Authority'."
                     }
                     else {
@@ -979,7 +1158,7 @@ function Get-MsalAccessToken {
                     }
                     $InteractiveRequest = New-ScubaMsalBrowserRequest -MsalApp $MsalApp `
                         -Scope $Scope -Tenant $Tenant -Account $SignInAccount
-                    $TokenResult = $InteractiveRequest.ExecuteAsync().GetAwaiter().GetResult()
+                    $TokenResult = Invoke-ScubaMsalRequest -Request $InteractiveRequest -TimeoutSeconds $InteractiveTimeoutSeconds
                 }
             }
 
@@ -989,6 +1168,16 @@ function Get-MsalAccessToken {
             return $TokenResult.AccessToken
         }
         catch {
+            # Retry only transient failures. A cancelled or timed-out sign-in, bad credentials, a
+            # consent the user cannot grant, or Ctrl-C would just show the same prompt again.
+            if (-not (Test-ScubaMsalRetryableError -Exception $_.Exception)) {
+                $Hint = Get-ScubaMsalFailureHint -Exception $_.Exception
+                if ($Hint) {
+                    Write-Warning "Token acquisition failed and will not be retried. $Hint"
+                }
+                throw
+            }
+
             if ($Attempt -ge $MaxAttempts) {
                 Write-Warning "Failed to acquire access token after $MaxAttempts attempts"
                 throw

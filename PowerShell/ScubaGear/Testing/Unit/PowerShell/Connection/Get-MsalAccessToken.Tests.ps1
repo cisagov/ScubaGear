@@ -246,23 +246,9 @@ InModuleScope ConnectHelpers {
             }
         }
 
-        It 'propagates a <FailureKind> during silent acquisition without opening the browser' -TestCases @(
-            @{ FailureKind = 'network failure' },
-            @{ FailureKind = 'programming error' },
-            @{ FailureKind = 'non-UI MSAL error with no_tokens_found' }
-        ) {
-            param($FailureKind)
+        It 'retries a transient network failure during silent acquisition without opening the browser' {
             $Global:ScubaGearState.Session = @{ Account = $script:TokenResult.Account }
-            $Failure = if ($FailureKind -eq 'network failure') {
-                [System.Net.WebException]::new('Silent acquisition failed')
-            }
-            else {
-                [System.InvalidOperationException]::new('Silent acquisition failed')
-            }
-            if ($FailureKind -eq 'non-UI MSAL error with no_tokens_found') {
-                $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalClientException')
-                $Failure | Add-Member NoteProperty ErrorCode 'no_tokens_found'
-            }
+            $Failure = [System.Net.WebException]::new('Silent acquisition failed', [System.Net.WebExceptionStatus]::ConnectFailure)
             # GetAwaiter().GetResult() and PowerShell wrap a faulted SDK task.
             $script:TokenTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
             $script:TokenTask.SetException($Failure)
@@ -276,6 +262,77 @@ InModuleScope ConnectHelpers {
             $script:App.InteractiveCalls | Should -Be 0
             Should -Invoke New-ScubaMsalBrowserRequest -Times 0 -Exactly
             Should -Invoke Start-Sleep -Times 2 -Exactly -ParameterFilter { $Seconds -eq 5 }
+        }
+
+        It 'does not retry a <FailureKind> during silent acquisition and does not open the browser' -TestCases @(
+            @{ FailureKind = 'programming error' },
+            @{ FailureKind = 'non-UI MSAL error with no_tokens_found' }
+        ) {
+            param($FailureKind)
+            $Global:ScubaGearState.Session = @{ Account = $script:TokenResult.Account }
+            $Failure = [System.InvalidOperationException]::new('Silent acquisition failed')
+            if ($FailureKind -eq 'non-UI MSAL error with no_tokens_found') {
+                $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalClientException')
+                $Failure | Add-Member NoteProperty ErrorCode 'no_tokens_found'
+            }
+            $script:TokenTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
+            $script:TokenTask.SetException($Failure)
+
+            {
+                Get-MsalAccessToken -ClientId test-client -Tenant $script:TokenResult.TenantId `
+                    -M365Environment gcchigh -Scope @('Organization.Read.All') -WarningAction SilentlyContinue
+            } | Should -Throw '*Silent acquisition failed*'
+
+            $script:App.SilentCalls | Should -Be 1
+            $script:App.InteractiveCalls | Should -Be 0
+            Should -Invoke New-ScubaMsalBrowserRequest -Times 0 -Exactly
+            Should -Invoke Start-Sleep -Times 0 -Exactly
+        }
+
+        It 'does not retry an interactive sign-in that fails with <Scenario>' -TestCases @(
+            @{ Scenario = 'a cancelled sign-in'; Code = 'authentication_canceled'; Message = 'User canceled authentication'; Hint = '*cancelled or timed out*' },
+            @{ Scenario = 'a consent the user cannot grant'; Code = 'invalid_grant'; Message = 'AADSTS65001: The user or administrator has not consented'; Hint = '*Global Administrator*' },
+            @{ Scenario = 'a wrong password'; Code = 'invalid_grant'; Message = 'AADSTS50126: Error validating credentials'; Hint = '*credentials*' }
+        ) {
+            param($Scenario, $Code, $Message, $Hint)
+            $Failure = [System.InvalidOperationException]::new($Message)
+            $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalException')
+            $Failure | Add-Member NoteProperty ErrorCode $Code
+            $script:TokenTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
+            $script:TokenTask.SetException($Failure)
+
+            Mock Write-Warning {}
+            {
+                Get-MsalAccessToken -ClientId test-client -Tenant organizations -M365Environment commercial `
+                    -Scope @('Organization.Read.All')
+            } | Should -Throw "*$Message*"
+
+            $script:App.InteractiveCalls | Should -Be 1
+            Should -Invoke Start-Sleep -Times 0 -Exactly
+            Should -Invoke Write-Warning -Times 1 -Exactly -ParameterFilter { $Message -like $Hint }
+        }
+
+        It 'retries an interactive sign-in only for a transient service failure' {
+            $Failure = [System.InvalidOperationException]::new('Service unavailable')
+            $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalException')
+            $Failure | Add-Member NoteProperty ErrorCode 'service_not_available'
+            $script:TokenTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
+            $script:TokenTask.SetException($Failure)
+
+            {
+                Get-MsalAccessToken -ClientId test-client -Tenant organizations -M365Environment commercial `
+                    -Scope @('Organization.Read.All') -WarningAction SilentlyContinue
+            } | Should -Throw '*Service unavailable*'
+
+            $script:App.InteractiveCalls | Should -Be 3
+            Should -Invoke Start-Sleep -Times 2 -Exactly -ParameterFilter { $Seconds -eq 5 }
+        }
+
+        It 'passes the interactive sign-in timeout to the request' {
+            Mock Invoke-ScubaMsalRequest { $script:TokenResult }
+            $null = Get-MsalAccessToken -ClientId test-client -Tenant organizations -M365Environment commercial `
+                -Scope @('Organization.Read.All')
+            Should -Invoke Invoke-ScubaMsalRequest -Times 1 -Exactly -ParameterFilter { $TimeoutSeconds -eq 300 }
         }
 
         It 'does not open the browser when account enumeration fails' {
