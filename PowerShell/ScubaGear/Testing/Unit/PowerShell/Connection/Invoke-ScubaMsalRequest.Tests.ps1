@@ -20,7 +20,9 @@ InModuleScope ConnectHelpers {
 
         It 'surfaces the original exception of a faulted request' {
             $Request = New-FakeRequest {
-                [System.Threading.Tasks.Task]::FromException[object]([System.InvalidOperationException]::new('boom'))
+                $Faulted = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
+                $Faulted.SetException([System.InvalidOperationException]::new('boom'))
+                $Faulted.Task
             }
             { Invoke-ScubaMsalRequest -Request $Request } | Should -Throw '*boom*'
         }
