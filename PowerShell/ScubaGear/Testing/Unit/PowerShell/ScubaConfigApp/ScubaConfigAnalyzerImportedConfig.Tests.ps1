@@ -8,7 +8,12 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer carries the imported results
         $controlPath   = Join-Path $configAppRoot 'ScubaConfigAnalyzer_Control_en-US.json'
         $baselinePath  = Join-Path $scubaGearRoot 'schemas\ScubaGearResultsBaselineSchema.json'
         $script:configSchemaPath = Join-Path $scubaGearRoot 'Modules\ScubaConfig\ScubaConfigSchema.json'
-        $sampleResults = Join-Path $scubaGearRoot 'Sample-Reports\ScubaResults_fa5589b7-d528-4f80.json'
+        # Sample reports are replaced when ScubaGear is released; do not pin a UUID filename.
+        $sampleDir = Join-Path $scubaGearRoot 'Sample-Reports'
+        $sampleResults = Get-ChildItem -Path $sampleDir -Filter 'ScubaResults_*.json' -File |
+            Sort-Object Name -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+        if (-not $sampleResults) { throw "No ScubaResults_*.json found in $sampleDir" }
 
         # The helpers share state through $syncHash; give every helper module the same instance.
         $sharedState = [hashtable]::Synchronized(@{
