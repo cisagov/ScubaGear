@@ -409,10 +409,10 @@ NonSpecificMFAPoliciesBaseCheck(policy) if {
 # Only match policies with user and group exclusions per the confile file
 NonSpecificMFAPoliciesEval(policy) := result if {
     checks := [
-        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.2v1")},
-        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.2v1")},
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.2v1")},
-        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.2v1")},
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
     ]
     result := CapEval(NonSpecificMFAPoliciesBaseCheck(policy), checks)
 }
@@ -1152,8 +1152,21 @@ PasswordAdditionFullyBlocked := true if {
     }
 }
 
+# True when the specified scope contains a passwordAddition restriction, not an empty array.
+PasswordAdditionInScope(ScopeName) if {
+    Policy := input.default_app_management_policy[0]
+    some Restriction in Policy[ScopeName].PasswordCredentials
+    Restriction.RestrictionType == "passwordAddition"
+}
+
+# Issue: either scope (Application or Service Principal) has no passwordAddition restriction.
+PasswordAdditionIssues contains "Application policy \"Block password addition\" is not enabled" if {
+    some ScopeName in ["ApplicationRestrictions", "ServicePrincipalRestrictions"]
+    not PasswordAdditionInScope(ScopeName)
+}
+
 # Issue: a passwordAddition restriction is not enabled at all.
-PasswordAdditionIssues contains "Password addition not blocked" if {
+PasswordAdditionIssues contains "Application policy \"Block password addition\" is not enabled" if {
     some Restriction in PasswordAdditionRestrictions
     Restriction.State != "enabled"
 }
@@ -1187,7 +1200,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
     "ActualValue": PasswordAdditionIssues,
-    "ReportDetails": ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString),
+    "ReportDetails": ReportDetailsString(
+        Status,
+        ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString)
+    ),
     "RequirementMet": Status
 } if {
     DescriptionString := "Password addition restriction(s) not meeting requirements"
@@ -1228,7 +1244,7 @@ PasswordLifetimeRestrictions contains Restriction if {
 }
 
 # Issue: a passwordLifetime restriction is not enabled.
-PasswordLifetimeIssues contains "Password lifetime not restricted" if {
+PasswordLifetimeIssues contains "Application policy \"Restrict max password lifetime\" is not enabled" if {
     some Restriction in PasswordLifetimeRestrictions
     Restriction.State != "enabled"
 }
@@ -1244,12 +1260,12 @@ PasswordLifetimeIssues contains Issue if {
 
 # Issue: passwordLifetime restriction is missing entirely from one or both scopes.
 # When the portal toggle is OFF, the entry is omitted rather than present-but-disabled.
-PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
+PasswordLifetimeIssues contains "Application policy \"Restrict max password lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not PasswordLifetimeInScope(Policy.ApplicationRestrictions.PasswordCredentials)
 }
 
-PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
+PasswordLifetimeIssues contains "Application policy \"Restrict max password lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not PasswordLifetimeInScope(Policy.ServicePrincipalRestrictions.PasswordCredentials)
 }
@@ -1334,7 +1350,7 @@ CertificateLifetimeRestrictions contains Restriction if {
 }
 
 # Issue: an asymmetricKeyLifetime restriction is not enabled.
-CertificateLifetimeIssues contains "Certificate lifetime not restricted" if {
+CertificateLifetimeIssues contains "Application policy \"Restrict max certificate lifetime\" is not enabled" if {
     some Restriction in CertificateLifetimeRestrictions
     Restriction.State != "enabled"
 }
@@ -1349,12 +1365,12 @@ CertificateLifetimeIssues contains Issue if {
 }
 
 # Issue: asymmetricKeyLifetime restriction is missing entirely from one or both scopes.
-CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
+CertificateLifetimeIssues contains "Application policy \"Restrict max certificate lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not CertificateLifetimeInScope(Policy.ApplicationRestrictions.KeyCredentials)
 }
 
-CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
+CertificateLifetimeIssues contains "Application policy \"Restrict max certificate lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not CertificateLifetimeInScope(Policy.ServicePrincipalRestrictions.KeyCredentials)
 }
@@ -1391,7 +1407,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
     "ActualValue": CertificateLifetimeIssues,
-    "ReportDetails": ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString),
+    "ReportDetails": ReportDetailsString(
+        Status,
+        ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString)
+    ),
     "RequirementMet": Status
 } if {
     DescriptionString := "certificate lifetime restriction(s) not meeting requirements"
