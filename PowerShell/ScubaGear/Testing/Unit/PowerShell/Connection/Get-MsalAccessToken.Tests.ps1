@@ -294,7 +294,6 @@ InModuleScope ConnectHelpers {
             @{ Scenario = 'a consent the user cannot grant'; Code = 'invalid_grant'; Message = 'AADSTS65001: The user or administrator has not consented'; Hint = '*Global Administrator*' },
             @{ Scenario = 'a wrong password'; Code = 'invalid_grant'; Message = 'AADSTS50126: Error validating credentials'; Hint = '*credentials*' }
         ) {
-            param($Scenario, $Code, $Message, $Hint)
             $Failure = [System.InvalidOperationException]::new($Message)
             $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalException')
             $Failure | Add-Member NoteProperty ErrorCode $Code

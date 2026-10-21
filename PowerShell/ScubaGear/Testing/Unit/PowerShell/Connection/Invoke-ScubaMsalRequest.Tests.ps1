@@ -14,13 +14,12 @@ InModuleScope ConnectHelpers {
         }
 
         It 'returns the result of a completed request' {
-            $Request = New-FakeRequest { param($Token) [System.Threading.Tasks.Task]::FromResult('token') }
+            $Request = New-FakeRequest { [System.Threading.Tasks.Task]::FromResult('token') }
             Invoke-ScubaMsalRequest -Request $Request | Should -Be 'token'
         }
 
         It 'surfaces the original exception of a faulted request' {
             $Request = New-FakeRequest {
-                param($Token)
                 [System.Threading.Tasks.Task]::FromException[object]([System.InvalidOperationException]::new('boom'))
             }
             { Invoke-ScubaMsalRequest -Request $Request } | Should -Throw '*boom*'
@@ -93,7 +92,6 @@ Import-Module $ModulePath -Force
             @{ Scenario = 'a connection failure'; Failure = { [System.Net.WebException]::new('down', [System.Net.WebExceptionStatus]::ConnectFailure) } },
             @{ Scenario = 'a socket error'; Failure = { [System.Net.Sockets.SocketException]::new() } }
         ) {
-            param($Scenario, $Failure)
             Test-ScubaMsalRetryableError -Exception (& $Failure) | Should -BeTrue
         }
 
@@ -112,7 +110,6 @@ Import-Module $ModulePath -Force
             @{ Scenario = 'a programming error'; Failure = { [System.InvalidOperationException]::new('bug') } },
             @{ Scenario = 'a stopped pipeline'; Failure = { [System.Management.Automation.PipelineStoppedException]::new() } }
         ) {
-            param($Scenario, $Failure)
             Test-ScubaMsalRetryableError -Exception (& $Failure) | Should -BeFalse
         }
 

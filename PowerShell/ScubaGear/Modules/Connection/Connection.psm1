@@ -14,6 +14,10 @@ teams                     Teams PowerShell                        12128f48-ec9e-
 
 Access the mapping with [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable').
 #>
+
+# The MSAL session is the cross-module singleton created in ConnectHelpers.psm1
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Initialize-Msal, Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearContext, Get-M365EnvironmentByDomain
 
 function Connect-Tenant {
