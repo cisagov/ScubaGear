@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint, Get-ScubaRestRetryDefaults
 
 function Get-TeamsScope {
     <#
@@ -87,8 +87,9 @@ function Get-TeamsMeetingPolicyRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsMeetingPolicyRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
@@ -111,8 +112,9 @@ function Get-TeamsTenantFederationConfigurationRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsTenantFederationConfigurationRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
@@ -135,8 +137,9 @@ function Get-TeamsClientConfigurationRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsClientConfigurationRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
@@ -159,8 +162,9 @@ function Get-TeamsAppPermissionPolicyRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsAppPermissionPolicyRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
@@ -183,8 +187,9 @@ function Get-TeamsMeetingBroadcastPolicyRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsMeetingBroadcastPolicyRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
@@ -207,8 +212,9 @@ function Get-TeamsM365UnifiedTenantSettingsRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-TeamsM365UnifiedTenantSettingsRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
