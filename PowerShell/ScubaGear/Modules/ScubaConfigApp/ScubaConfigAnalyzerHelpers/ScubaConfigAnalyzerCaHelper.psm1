@@ -55,6 +55,9 @@ function Test-ScAPolicyRequirement {
     # If the expected value is an array, check that all expected items are present in the current value.
     # If the expected value is a hashtable or PSCustomObject, recursively check each property.
     if ($ExpectedValue -is [array]) {
+        if ($SchemaPath -eq 'conditions.agentIdRiskLevels' -and $currentValue -is [string]) {
+            $currentValue = @($currentValue -split '\s*,\s*' | Where-Object { $_ })
+        }
         if ($null -eq $currentValue) {
             return @{ Meets = $false; Issues = @("ERROR: $FriendlyName is null (expected: $($ExpectedValue -join ', '))") }
         }
@@ -279,7 +282,7 @@ function Get-ScAPolicyAnalysis {
     foreach ($policy in $matchingPolicies) {
         $settingIssues   = @()   # requirement failures + disallowed exclusions (need a tenant change)
         $exclusionIssues = @()   # config exclusions (add to config to pass)
-        $detected        = @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
+        $detected        = Get-ScAExclusionValueMap -ExclusionField $exclusionField
         $excludedCount   = 0
 
         # 1. Validate each requirement dynamically from the baseline schema.
@@ -307,6 +310,8 @@ function Get-ScAPolicyAnalysis {
             $raw = Get-ScAValueAtPath -Object $policy -Path $det.policyPath
             $vals = if ([string]$det.valueKind -eq 'csvOrArray') {
                 if ($raw -is [string]) { @($raw -split '\s*,\s*' | Where-Object { $_ }) } else { @($raw | Where-Object { $_ }) }
+            } elseif ([string]$det.valueKind -eq 'whitespaceOrArray') {
+                if ($raw -is [string]) { @($raw -split '\s+' | Where-Object { $_ }) } else { @($raw | Where-Object { $_ }) }
             } else {
                 @($raw | Where-Object { $_ })
             }
@@ -314,8 +319,11 @@ function Get-ScAPolicyAnalysis {
 
             if ($typeSupported) {
                 # Config CAN waive these: record them + emit a WARNING (not a hard failure).
+                if (-not $det.field -or -not $detected.ContainsKey([string]$det.field)) {
+                    throw "Analyzer exclusion detector '$($det.policyPath)' references undefined field '$($det.field)' for '$exclusionField'."
+                }
                 $excludedCount += @($vals).Count
-                if ($det.field -and $detected.ContainsKey([string]$det.field)) { $detected[[string]$det.field] += @($vals) }
+                $detected[[string]$det.field] += @($vals)
                 $lbl  = if ($det.issueLabel)  { [string]$det.issueLabel }  else { 'item' }
                 $dlbl = if ($det.detailLabel) { [string]$det.detailLabel } else { 'IDs' }
                 $sug  = if ($det.suggestion)  { [string]$det.suggestion }  else { 'Review if these exclusions are justified and documented' }
@@ -351,12 +359,7 @@ function Get-ScAPolicyAnalysis {
                 IssueCount    = @($policyIssues).Count
                 SettingIssueCount = @($settingIssues).Count
                 ExcludedPrincipalCount = $excludedCount
-                DetectedExclusions = @{
-                    Users          = @($detected.Users          | Select-Object -Unique)
-                    Groups         = @($detected.Groups         | Select-Object -Unique)
-                    Applications   = @($detected.Applications   | Select-Object -Unique)
-                    GuestUserTypes = @($detected.GuestUserTypes | Select-Object -Unique)
-                }
+                DetectedExclusions = Get-ScAExclusionValueMap -ExclusionField $exclusionField -Values $detected
             }
         }
     }
@@ -393,9 +396,8 @@ function Get-ScAActionClassification {
     }
     # Settings are correct but principals are excluded -> config can waive it (add exclusions).
     if ($best.SettingIssueCount -eq 0 -and $best.ExcludedPrincipalCount -gt 0) {
-        return @{ Result = 'Fail'; Action = 'ADD_EXCLUSIONS'; RootCause = 'The best-matching policy meets this baseline but excludes users/groups/apps/guests. Add them to your config to pass.' }
+        return @{ Result = 'Fail'; Action = 'ADD_EXCLUSIONS'; RootCause = 'The best-matching policy meets this baseline but has exclusions. Review and add justified exclusions to your config to pass.' }
     }
     # Otherwise the closest policy has wrong settings -> the tenant must fix the policy.
     return @{ Result = 'Fail'; Action = 'FIX_POLICY'; RootCause = 'The best-matching policy needs configuration changes to pass this baseline.' }
 }
-

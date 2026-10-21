@@ -1,5 +1,5 @@
 {
-  "Version": "2.8.12 (build 1500)",
+  "Version": "2.10.21 (build 1100)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
@@ -51,7 +51,9 @@
           "heading": "REMOVED - NO REPLACEMENT ({0}):"
         },
         "skipped": {
-          "prefix":  "SKIPPED"
+          "prefix":  "SKIPPED",
+          "heading": "LEGACY POLICY RESOLVED - TARGET ALREADY CONFIGURED ({0}):",
+          "body": "The legacy policy entry was removed. Existing target settings were retained; legacy values were not merged. Review the target settings before saving."
         }
       }
     }
@@ -616,6 +618,21 @@
     ]
   },
   "inputTypes": {
+    "AgentCapExclusions": {
+      "name": "Conditional Access Policy Excluded Risky Agents",
+      "value": "AgentExclusions",
+      "description": "Exclude risky agent identities and/or agent blueprints from agent-only conditional access policies",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Agent Service Principal Object IDs",
+          "value": "Agents",
+          "description": "Object IDs of risky excluded agent identities and/or agent blueprints",
+          "valueType": "guid",
+          "required": false
+        }
+      ]
+    },
     "CapExclusions": {
       "name": "Conditional Access Policy Excluded Groups, Users, Applications, and Guest User Types",
       "value": "CapExclusions",

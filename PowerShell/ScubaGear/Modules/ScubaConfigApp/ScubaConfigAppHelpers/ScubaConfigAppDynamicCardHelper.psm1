@@ -1247,7 +1247,7 @@ Function New-FieldListCard {
     [void]$buttonPanel.Children.Add($saveButton)
     # Per-policy baseline viewer button is gated by EnablePolicyViewer (shown unless explicitly false).
     $showBaselineButton = -not ($syncHash.UIConfigs.PSObject.Properties['EnablePolicyViewer'] -and $syncHash.UIConfigs.EnablePolicyViewer -eq $false)
-    if ($showBaselineButton) {
+    if ($showBaselineButton -and $null -ne $baselinePolicyButton) {
         [void]$buttonPanel.Children.Add($baselinePolicyButton)
     }
     [void]$buttonPanel.Children.Add($removeButton)

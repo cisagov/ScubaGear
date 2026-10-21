@@ -415,11 +415,10 @@ function Select-ScubaAnalyzerPolicy {
         $finding.SelectedPolicyId = $PolicyId
         # Copy the candidate's exclusions onto the finding (fresh arrays so later edits
         # don't mutate the candidate). This is what the YAML builders read.
-        $ex = if ($chosen.DetectedExclusions) { $chosen.DetectedExclusions } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
-        $finding.DetectedExclusions = @{ Users = @($ex.Users); Groups = @($ex.Groups); Applications = @($ex.Applications); GuestUserTypes = @($ex.GuestUserTypes) }
+        $finding.DetectedExclusions = Get-ScAExclusionValueMap -ExclusionField $finding.ExclusionField -Values $chosen.DetectedExclusions
         # Keep the schema-keyed value map in sync so both YAML views follow the choice.
         $dv = [ordered]@{}
-        foreach ($k in 'Users','Groups','Applications','GuestUserTypes') { if (@($finding.DetectedExclusions[$k]).Count -gt 0) { $dv[$k] = @($finding.DetectedExclusions[$k]) } }
+        foreach ($k in @($finding.DetectedExclusions.Keys)) { if (@($finding.DetectedExclusions[$k]).Count -gt 0) { $dv[$k] = @($finding.DetectedExclusions[$k]) } }
         $finding.DetectedExclusionValues = $dv
         Show-ScubaAnalyzerDetail        # re-render cards (updates which one is "in use")
         Update-ScubaAnalyzerFullYaml    # aggregate YAML follows the new choice

@@ -218,6 +218,9 @@ class CapHelper {
         $CapIncludedActions = $Cap.Conditions.Applications.IncludeUserActions
         $CapAppFilterMode = $Cap.Conditions.Applications.ApplicationFilter.Mode
         $CapIncludedApps = $Cap.Conditions.Applications.IncludeApplications
+        if ($CapIncludedApps -Contains "AllAgentIdResources") {
+            return @("Policy applies to: agent resources", "Agent resources included: All")
+        }
         if ($CapIncludedApps.Length -gt 0 -or
             $null -ne $CapAppFilterMode) {
             # For "Select what this policy applies to", "Cloud Apps" was  selected
@@ -300,6 +303,10 @@ class CapHelper {
         $Output = @()
 
         # User risk
+        $CapAgentRiskLevels = $Cap.Conditions.AgentIdRiskLevels
+        if ($CapAgentRiskLevels.Length -gt 0) {
+            $Output += "Agent risk levels: $($CapAgentRiskLevels -Join ', ')"
+        }
         $CapUserRiskLevels = $Cap.Conditions.UserRiskLevels
         if ($CapUserRiskLevels.Length -gt 0) {
             $Output += "User risk levels: $($CapUserRiskLevels -Join ', ')"
@@ -503,6 +510,13 @@ class CapHelper {
                 $UsersIncluded = $($this.GetIncludedUsers($Cap)) -Join ", "
                 $UsersExcluded = $($this.GetExcludedUsers($Cap)) -Join ", "
                 $Users = @("Users included: $($UsersIncluded)", "Users excluded: $($UsersExcluded)")
+                $AgentClients = $Cap.Conditions.ClientApplications
+                if ($AgentClients.IncludeAgentIdServicePrincipals) {
+                    $IncludedAgents = @($AgentClients.IncludeAgentIdServicePrincipals) -join ", "
+                    $ExcludedAgents = @($AgentClients.ExcludeAgentIdServicePrincipals) -join ", "
+                    if (-not $ExcludedAgents) { $ExcludedAgents = "None" }
+                    $Users = @("Agents included: $IncludedAgents", "Agents excluded: $ExcludedAgents")
+                }
                 $Apps = $this.GetApplications($Cap)
                 $Conditions = $this.GetConditions($Cap)
                 $AccessControls = $this.GetAccessControls($Cap)
@@ -535,4 +549,44 @@ class CapHelper {
 
 function Get-CapTracker {
     [CapHelper]::New()
+}
+
+function ConvertTo-AgentCapExclusionArray {
+    <#
+    .SYNOPSIS
+    Normalizes preview agent exclusions without changing other CA policy fields.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory, ValueFromPipeline)]
+        [object]$Policy
+    )
+
+    process {
+        $ClientApplications = $Policy.Conditions.ClientApplications
+        if ($null -ne $ClientApplications -and
+            $ClientApplications.PSObject.Properties.Name -contains 'ExcludeAgentIdServicePrincipals') {
+            $Raw = $ClientApplications.ExcludeAgentIdServicePrincipals
+            if ($null -eq $Raw) {
+                $Values = @()
+            }
+            elseif ($Raw -is [string]) {
+                $Values = @($Raw -split '\s+' | Where-Object { $_ })
+            }
+            elseif ($Raw -is [array]) {
+                $Values = $Raw
+            }
+            else {
+                throw "Unexpected agent exclusion type in conditional access policy '$($Policy.Id)': $($Raw.GetType().FullName)"
+            }
+            foreach ($Value in $Values) {
+                if ($Value -isnot [string] -or
+                    $Value -notmatch '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$') {
+                    throw "Invalid agent service-principal object ID in conditional access policy '$($Policy.Id)': '$Value'"
+                }
+            }
+            $ClientApplications.ExcludeAgentIdServicePrincipals = @($Values)
+        }
+        $Policy
+    }
 }

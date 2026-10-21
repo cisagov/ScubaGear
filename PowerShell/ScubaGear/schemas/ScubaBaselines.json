@@ -2213,7 +2213,7 @@
         "name": "Risky AI agents SHALL be blocked.",
         "policySection": "AI Security",
         "sectionDescription": "This section provides policies that help reduce security risks related to the usage of artificial intelligence (AI) agents and automated services that interact with tenant resources.",
-        "exclusionField": "CapExclusions",
+        "exclusionField": "AgentCapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
         "rationale": "AI agents may access tenant resources and can perform actions autonomously. Blocking agents that exhibit risky behaviors reduces the risk of unauthorized access and automated misuse of resources.",
@@ -2252,6 +2252,11 @@
             "label": "Automated Check",
             "linkUrl": "#key-terminology",
             "color": "5E9732"
+          },
+          {
+            "label": "Configurable",
+            "linkUrl": "../../../docs/configuration/configuration.md#agent-conditional-access-policy-exclusions",
+            "color": "005288"
           }
         ]
       }

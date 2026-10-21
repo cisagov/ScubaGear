@@ -40,7 +40,7 @@
       "MS.AAD.3.8v1": ["CapExclusions"],
       "MS.AAD.3.9v1": ["CapExclusions"],
       "MS.AAD.7.4v1": ["RoleExclusions"],
-      "MS.AAD.9.1v1": ["RoleExclusions"],
+      "MS.AAD.9.1v1": ["AgentExclusions"],
       "MS.SECURITYSUITE.2.1v1": ["SensitiveUsers"],
       "MS.SECURITYSUITE.2.3v1": ["PartnerDomains"],
       "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
@@ -49,7 +49,7 @@
     "productCapabilities": {
       "Aad": {
         "supportsExclusions": true,
-        "supportedExclusionTypes": ["CapExclusions", "RoleExclusions"]
+        "supportedExclusionTypes": ["CapExclusions", "RoleExclusions", "AgentExclusions"]
       },
       "SecuritySuite": {
         "supportsExclusions": true,
@@ -248,6 +248,9 @@
           "properties": {
             "CapExclusions": {
               "$ref": "#/definitions/exclusionTypes/CapExclusions"
+            },
+            "AgentExclusions": {
+              "$ref": "#/definitions/exclusionTypes/AgentExclusions"
             },
             "RoleExclusions": {
               "$ref": "#/definitions/exclusionTypes/RoleExclusions"
@@ -476,6 +479,20 @@
     },
 
     "exclusionTypes": {
+      "AgentExclusions": {
+        "_comment": "Approved agent service-principal object IDs for agent Conditional Access policies",
+        "type": "object",
+        "properties": {
+          "Agents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CapExclusions": {
         "_comment": "Conditional Access Policy exclusions (GUIDs only)",
         "type": "object",
