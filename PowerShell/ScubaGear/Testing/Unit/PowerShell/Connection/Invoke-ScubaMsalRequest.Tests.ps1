@@ -4,7 +4,6 @@ Import-Module $ModulePath -Force
 InModuleScope ConnectHelpers {
     Describe 'Invoke-ScubaMsalRequest' {
         BeforeAll {
-            $script:ModulePath = Join-Path $PSScriptRoot '..\..\..\..\Modules\Connection\ConnectHelpers.psm1'
             function New-FakeRequest {
                 param([scriptblock]$Execute)
                 $Request = [pscustomobject]@{}
@@ -34,26 +33,28 @@ InModuleScope ConnectHelpers {
         }
 
         It 'cancels the underlying request when the caller is stopped, as Ctrl-C does' {
+            # The function is copied into a separate runspace instead of importing the module there.
+            # Loading ConnectHelpers (which uses ScubaConfig classes) a second time in one process
+            # corrupts the shared class state for the tests that run after this one.
+            $FunctionBody = (Get-Command Invoke-ScubaMsalRequest).ScriptBlock.ToString()
             $State = [hashtable]::Synchronized(@{ Token = $null; Started = $false })
             $Runspace = [runspacefactory]::CreateRunspace()
             $Runspace.Open()
             $Runspace.SessionStateProxy.SetVariable('State', $State)
-            $Runspace.SessionStateProxy.SetVariable('ModulePath', (Resolve-Path $script:ModulePath).Path)
+            $Runspace.SessionStateProxy.SetVariable('FunctionBody', $FunctionBody)
             $Shell = [powershell]::Create()
             $Shell.Runspace = $Runspace
             try {
                 [void]$Shell.AddScript(@'
-Import-Module $ModulePath -Force
-& (Get-Module ConnectHelpers) {
-    $Request = [pscustomobject]@{}
-    $Request | Add-Member ScriptMethod ExecuteAsync {
-        param($Token)
-        $State.Token = $Token
-        $State.Started = $true
-        [System.Threading.Tasks.Task]::Delay(-1, $Token)
-    }
-    Invoke-ScubaMsalRequest -Request $Request
+Set-Item -Path function:Invoke-ScubaMsalRequest -Value ([scriptblock]::Create($FunctionBody))
+$Request = [pscustomobject]@{}
+$Request | Add-Member ScriptMethod ExecuteAsync {
+    param($Token)
+    $State.Token = $Token
+    $State.Started = $true
+    [System.Threading.Tasks.Task]::Delay(-1, $Token)
 }
+Invoke-ScubaMsalRequest -Request $Request
 '@)
                 $Pending = $Shell.BeginInvoke()
 
