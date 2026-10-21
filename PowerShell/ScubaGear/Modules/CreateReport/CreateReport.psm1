@@ -941,11 +941,19 @@ function Import-SecureBaseline{
                     }
 
                     # This assumes that the value is on the immediate next line after the ID and ends in a period.
+                    # A closing quote after that period (.") is still the end of the sentence.
                     $LineAdvance = 1;
                     $MaxLineSearch = 20;
                     $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
                     $IsMalformedDescription = $false
                     $IsList = $false
+                    # Straight and curly quotes. Trimmed only to detect the terminator; $Value itself is unchanged.
+                    $ClosingQuotes = [char[]]@(
+                        '"',
+                        "'",
+                        [char]0x201D, # right double quote
+                        [char]0x2019  # right single quote
+                    )
 
                     try {
                         if ([string]::IsNullOrWhiteSpace($Value)){
@@ -956,7 +964,7 @@ function Import-SecureBaseline{
 
                         # Processing multiline description.
                         # TODO: Improve processing GitHub issue #526
-                        while ($Value.Substring($Value.Length-1,1) -ne "."){
+                        while (-not $Value.TrimEnd($ClosingQuotes).EndsWith('.')){
                             $LineAdvance++
 
                             if ($Value -match [regex]::Escape("<!--")){
