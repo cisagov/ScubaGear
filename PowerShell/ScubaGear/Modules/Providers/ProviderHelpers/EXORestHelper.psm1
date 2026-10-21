@@ -254,6 +254,8 @@ function Invoke-EXORestMethod {
         Calls the Exchange Online AdminApi InvokeCommand endpoint with the specified
         cmdlet name. The backend API expects the cmdlet name as a parameter in the
         request body and returns the results as JSON.
+        Each request has a 30-second timeout and up to three attempts, with backoff
+        for timeouts, dropped connections, and transient HTTP errors.
     .PARAMETER CmdletName
         The Exchange Online cmdlet to invoke (e.g., "Get-RemoteDomain", "Get-OrganizationConfig").
     .PARAMETER ApiEndpoint
@@ -300,7 +302,7 @@ function Invoke-EXORestMethod {
     try {
         $Response = Invoke-ScubaRestMethod -BaseUrl $ApiEndpoint -Endpoint "" -AccessToken $AccessToken `
             -Method POST -Body $Body -AdditionalHeaders $AdditionalHeaders -TimeoutSec 30 `
-            -MaxRetries 3 -RetryDelaySeconds 5
+            -MaxRetries 2 -RetryDelaySeconds 5
         return $Response.value
     }
     catch {
