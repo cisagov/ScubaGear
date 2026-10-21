@@ -1965,12 +1965,18 @@ tests contains {
 # MS.AAD.9.1v1
 #--
 
+# Agent policies target "All" or "AllAgentIdResources" resources. The preview Graph API
+# returns this field as a string, so EnsureTrimmedArray normalizes it to an array.
+AIAgentsResourceScope(policy) if {
+    some resource in EnsureTrimmedArray(policy.Conditions.Applications.IncludeApplications)
+    resource in {"All", "AllAgentIdResources"}
+}
+
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
 AIAgentsBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    some resource in EnsureTrimmedArray(policy.Conditions.Applications.IncludeApplications)
-    resource in {"All", "AllAgentIdResources"}
+    AIAgentsResourceScope(policy)
     policy.State == "enabled"
     ###
 

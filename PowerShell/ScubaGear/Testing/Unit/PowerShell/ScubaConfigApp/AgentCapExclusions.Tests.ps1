@@ -1,6 +1,9 @@
+using module '..\..\..\..\Modules\ScubaConfig\ScubaConfigValidator.psm1'
+
 Describe -Tag 'Analyzer' -Name 'Agent-only Conditional Access exclusions' {
     BeforeAll {
         $root = (Resolve-Path "$PSScriptRoot\..\..\..\..").Path
+        [ScubaConfigValidator]::Initialize("$root\Modules\ScubaConfig")
         $app = Join-Path $root 'Modules\ScubaConfigApp'
         $helpers = Join-Path $app 'ScubaConfigAnalyzerHelpers'
         Import-Module "$helpers\ScubaConfigAnalyzerSchemaHelper.psm1" -Force
@@ -39,7 +42,33 @@ Describe -Tag 'Analyzer' -Name 'Agent-only Conditional Access exclusions' {
         $definitions.AgentExclusions.fields[0].value | Should -Be 'Agents'
     }
 
-    It 'validates agent IDs and rejects application fields in AgentExclusions' {
+    It 'defines AgentExclusions as a GUID-only list of agents and nothing else' {
+        $definition = $configSchema.definitions.exclusionTypes.AgentExclusions
+        $definition | Should -Not -BeNullOrEmpty
+        @($definition.properties.PSObject.Properties.Name) | Should -Be @('Agents')
+        $definition.additionalProperties | Should -BeFalse
+        $definition.properties.Agents.type | Should -Be 'array'
+        $definition.properties.Agents.items.'$ref' | Should -Be '#/definitions/patterns/guid'
+        $definition.properties.Agents.uniqueItems | Should -BeTrue
+        $configSchema.definitions.exclusionTypes.PSObject.Properties.Name | Should -Not -Contain 'AgentCapExclusions'
+        $configSchema.definitions.exclusionTypes.PSObject.Properties.Name | Should -Contain 'AgentExclusions'
+        @($configSchema.definitions.patterns.guid.pattern) | Should -Not -BeNullOrEmpty
+    }
+
+    It 'accepts AgentExclusions for MS.AAD.9.1v1 and warns about exclusion types it does not support' {
+        function Get-ConfigWarning($Exclusions) {
+            $file = Join-Path $TestDrive "agent-config-$([guid]::NewGuid()).json"
+            @{ ProductNames = @('aad'); Aad = @{ 'MS.AAD.9.1v1' = $Exclusions } } | ConvertTo-Json -Depth 10 | Set-Content $file -Encoding utf8
+            $result = [ScubaConfigValidator]::ValidateYamlFile($file, $false, $false)
+            @($result.ValidationErrors) + @($result.Warnings) | Where-Object { $_ -match '9\.1v1|AgentExclusions|CapExclusions' }
+        }
+        @(Get-ConfigWarning @{ AgentExclusions = @{ Agents = @($id1, $id2) } }).Count | Should -Be 0
+        (Get-ConfigWarning @{ CapExclusions = @{ Groups = @($id1) } }) -join ' ' | Should -Match "supports exclusion types: AgentExclusions"
+        (Get-ConfigWarning @{ AgentCapExclusions = @{ Agents = @($id1) } }) -join ' ' | Should -Match "supports exclusion types: AgentExclusions"
+    }
+
+    # Test-Json is PowerShell 7+ only; CI's Windows PowerShell 5.1 skips this check.
+    It 'validates agent IDs and rejects application fields in AgentExclusions' -Skip:(-not (Get-Command Test-Json -ErrorAction SilentlyContinue)) {
         $valid = @{ Aad = @{ 'MS.AAD.9.1v1' = @{ AgentExclusions = @{ Agents = @($id1, $id2) } } } } | ConvertTo-Json -Depth 10
         Test-Json -Json $valid -SchemaFile $configSchemaPath | Should -BeTrue
         foreach ($exclusions in @(@{ Agents = @('invalid') }, @{ Agents = @($id1, $id1) }, @{ Applications = @($id1) })) {

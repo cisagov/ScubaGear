@@ -107,17 +107,17 @@ test_NoAgentLicense_P2WarningTakesPrecedence_V1 if {
 
 # GCC High and DoD report the environment message once, not the license message as well
 test_NoAgentLicense_GovernmentReportsEnvironmentOnly_V1 if {
+    ReportDetailString := concat("", [
+        "This policy is not applicable to GCC High or DOD environments because the feature is not yet ",
+        "available. See <a href=\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear",
+        "/baselines/aad.md#msaad91v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
+    ])
     every Environment in ["gcchigh", "dod"] {
         ScubaConf := json.patch(ScubaConfig,
                     [{"op": "add", "path": "M365Environment", "value": Environment},])
         Output := aad.tests with input.service_plans as ServicePlans
                             with input.license_information as LicensesWithoutAgents
                             with input.scuba_config as ScubaConf
-        ReportDetailString := concat("", [
-            "This policy is not applicable to GCC High or DOD environments because the feature is not yet ",
-            "available. See <a href=\"https://github.com/cisagov/ScubaGear/blob/vmain/PowerShell/ScubaGear",
-            "/baselines/aad.md#msaad91v1\" target=\"_blank\">Secure Configuration Baseline policy</a> for more info"
-        ])
         TestResult("MS.AAD.9.1v1", Output, ReportDetailString, false) == true
     }
 }
@@ -240,7 +240,8 @@ test_BlockRiskyAgentsCAPNearMiss_Incorrect_V1 if {
                 {"op": "add", "path": "Conditions/ClientApplications", "value": {} },
                 {"op": "add", "path": "Conditions/ClientApplications/IncludeAgentIdServicePrincipals", "value": ["All"] },
                 {"op": "add", "path": "Conditions/ClientAppTypes", "value": ["all"] },
-                {"op": "add", "path": "Conditions/ClientApplications/ExcludeAgentIdServicePrincipals", "value": ["aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"]}])
+                {"op": "add", "path": "Conditions/ClientApplications/ExcludeAgentIdServicePrincipals",
+                    "value": ["aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"]}])
     Output := aad.tests with input.conditional_access_policies as [CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config as ScubaConf

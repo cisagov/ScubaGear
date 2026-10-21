@@ -83,11 +83,15 @@ AGENT_LICENSE_SKUS := {"AGENT_365", "MICROSOFT_365_E7"}
 
 # The subscribed SKUs as an array. A tenant with a single SKU is exported as one
 # object rather than a one-element array.
+default LicenseSkus := []
+
 LicenseSkus := [input.license_information] if {
     is_object(input.license_information)
-} else := input.license_information if {
+}
+
+LicenseSkus := input.license_information if {
     is_array(input.license_information)
-} else := []
+}
 
 # True only when SKU data was collected. Missing data does not prove a license is absent.
 default LicenseDataAvailable := false
