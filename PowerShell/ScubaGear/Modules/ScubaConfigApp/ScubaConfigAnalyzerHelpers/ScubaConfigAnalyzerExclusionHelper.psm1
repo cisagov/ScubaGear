@@ -100,6 +100,31 @@ function Get-ScAExclusionFieldDefinitions {
     return @()
 }
 
+function Get-ScAExclusionValueMap {
+    <#
+    .SYNOPSIS
+    Copies named exclusion fields declared in the analyzer JSON into fresh arrays.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$ExclusionField,
+        [System.Collections.IDictionary]$Values = @{}
+    )
+
+    $result = @{}
+    foreach ($field in @(Get-ScAExclusionFieldDefinitions -ExclusionField $ExclusionField)) {
+        $name = if ($field.value) { [string]$field.value } else { [string]$field.name }
+        if ([string]::IsNullOrWhiteSpace($name)) {
+            throw "Analyzer exclusion definition '$ExclusionField' has a field with no value or name."
+        }
+        $result[$name] = @(
+            if ($null -ne $Values -and $Values.Contains($name)) {
+                $Values[$name] | Where-Object { $null -ne $_ -and $_ -ne '' } | Select-Object -Unique
+            }
+        )
+    }
+    return $result
+}
+
 function Build-ScAYamlExclusionsBlock {
     <#
     .SYNOPSIS
@@ -436,4 +461,3 @@ function Get-ScubaAnalyzerConfigYaml {
     # Return the formatted exclusion information as a string.
     return $sb.ToString()
 }
-
