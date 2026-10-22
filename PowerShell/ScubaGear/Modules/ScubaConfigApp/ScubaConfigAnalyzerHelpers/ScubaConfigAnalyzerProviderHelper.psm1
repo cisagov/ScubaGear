@@ -89,8 +89,9 @@ function Get-ScAProviderAnalysis {
     if ($Raw -and ($Raw.PSObject.Properties.Name -contains $rawKey)) { $items = @($Raw.$rawKey) }
 
     $exclusionValues = [ordered]@{}
-    $flagged = @()
-    $issues  = @()
+    $flagged  = @()
+    $blocking = @()
+    $issues   = @()
 
     foreach ($det in @($an.detectors)) {
         # A detector may target a different field than the exclusion type (rare); default to it.
@@ -102,6 +103,18 @@ function Get-ScAProviderAnalysis {
             $resolved = Get-ScAValueAtPath -Object $item -Path ([string]$det.valueFrom)
             foreach ($value in @($resolved)) {
                 if ($null -eq $value -or [string]$value -eq '') { continue }
+
+                # A nonExcludable detector finds a problem the config file cannot waive (for
+                # example the default remote domain). It fails the control and needs a tenant
+                # change, but it is never offered as an exclusion value.
+                if ($det.nonExcludable) {
+                    $blocking += [string]$value
+                    $blockLbl = if ($det.issueLabel) { [string]$det.issueLabel } else { 'item' }
+                    $blockSug = if ($det.suggestion) { [string]$det.suggestion } else { 'Change the tenant setting; this cannot be allow-listed in the ScubaGear config.' }
+                    $issues += "ERROR: $blockLbl`: $value|SUGGESTION:$blockSug"
+                    continue
+                }
+
                 if (-not $exclusionValues.Contains($key)) { $exclusionValues[$key] = @() }
                 $exclusionValues[$key] += [string]$value
                 $flagged += [string]$value
@@ -118,9 +131,52 @@ function Get-ScAProviderAnalysis {
     return @{
         ItemCount       = @($items).Count
         Flagged         = @($flagged | Select-Object -Unique)
+        Blocking        = @($blocking | Select-Object -Unique)
         ExclusionValues = $exclusionValues
         Issues          = $issues
     }
+}
+
+function Get-ScAProviderRootCause {
+    <#
+    .SYNOPSIS
+    Derives the root cause, required action and recommendations for a failing provider
+    (non-CA) control from its Get-ScAProviderAnalysis result.
+    .DESCRIPTION
+    Flagged values can be waived with config exclusions. Blocking values (from detectors
+    marked nonExcludable, e.g. the default remote domain) cannot - they need a tenant change.
+    When only blocking values exist the control needs no exclusions at all.
+    #>
+    param([Parameter(Mandatory)]$ProviderAnalysis)
+
+    $flagged  = @($ProviderAnalysis.Flagged)
+    $blocking = @($ProviderAnalysis.Blocking)
+
+    if ($blocking.Count -gt 0 -and $flagged.Count -gt 0) {
+        return @{
+            RootCause       = "$($blocking.Count) item(s) must be fixed in the tenant and cannot be allow-listed: $($blocking -join ', '). $($flagged.Count) other item(s) flagged that can be allow-listed: $($flagged -join ', ')"
+            RequiresAction  = 'EXCLUDE'
+            Recommendations = @(
+                'Fix the tenant setting for the items that cannot be allow-listed (see remediation steps); the control still fails until they are fixed.',
+                'Review the other flagged entries below - add approved ones to the exclusion allow-list; otherwise change the tenant setting.'
+            )
+        }
+    }
+    if ($blocking.Count -gt 0) {
+        return @{
+            RootCause       = "$($blocking.Count) item(s) must be fixed in the tenant and cannot be allow-listed in the ScubaGear config: $($blocking -join ', ')"
+            RequiresAction  = 'FIX_TENANT'
+            Recommendations = @('No exclusions are needed for this control. Fix the tenant setting (see remediation steps), then re-scan.')
+        }
+    }
+    if ($flagged.Count -gt 0) {
+        return @{
+            RootCause       = "$($flagged.Count) item(s) flagged: $($flagged -join ', ')"
+            RequiresAction  = 'EXCLUDE'
+            Recommendations = @('Review the flagged entries below - add approved ones to the exclusion allow-list; otherwise change the tenant setting (see remediation steps).')
+        }
+    }
+    return @{ RootCause = 'The tenant setting does not meet this baseline.'; RequiresAction = 'FIX_TENANT'; Recommendations = @() }
 }
 
 function Get-ScAConfiguredExclusionValues {

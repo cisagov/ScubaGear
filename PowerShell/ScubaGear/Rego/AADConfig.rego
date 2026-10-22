@@ -13,8 +13,11 @@ import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.AppExclusionsFullyExempt
+import data.utils.aad.AgentExclusionsFullyExempt
 import data.utils.aad.GuestUserExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
+import data.utils.aad.AgentLicenses
+import data.utils.aad.LicenseDataAvailable
 import data.utils.aad.IsPhishingResistantMFA
 import data.utils.aad.IsGeneralMFA
 import data.utils.aad.CAPLINK
@@ -1016,7 +1019,7 @@ default DescriptionStr := "authorization policies found that allow non-admin use
 DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
     count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
 } else := concat(" ", [
-    "authorization policies found that allow non-admin users to consent to", 
+    "authorization policies found that allow non-admin users to consent to",
     "third-party applications with risky delegated permission classifications"
  ]) if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
@@ -1447,7 +1450,7 @@ RootDomainFor(Domain) := Root.Id if {
 }
 
 # For tenants created before Oct 2021, passwordValidityPeriodInDays is set to INT_MAX (2147483647), indicating passwords never expire.
-# For tenants created after Oct 2021, passwordValidityPeriodInDays is set to null by default, which also indicates passwords never expire. 
+# For tenants created after Oct 2021, passwordValidityPeriodInDays is set to null by default, which also indicates passwords never expire.
 PasswordNeverExpires(Domain) if Domain.PasswordValidityPeriodInDays == INT_MAX
 PasswordNeverExpires(Domain) if is_null(Domain.PasswordValidityPeriodInDays)
 
@@ -1548,7 +1551,7 @@ NotGlobalAdmins contains User.DisplayName if {
     some User in input.privileged_users
     not "Global Administrator" in User.roles
 }
-# Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error 
+# Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error
 default GetScoreDescription := "All privileged users are Global Admin"
 GetScoreDescription := concat("", [
     "Least Privilege Score = ", Score, " (should be 1 or less)",
@@ -1962,11 +1965,18 @@ tests contains {
 # MS.AAD.9.1v1
 #--
 
+# Agent policies target "All" or "AllAgentIdResources" resources. The preview Graph API
+# returns this field as a string, so EnsureTrimmedArray normalizes it to an array.
+AIAgentsResourceScope(policy) if {
+    some resource in EnsureTrimmedArray(policy.Conditions.Applications.IncludeApplications)
+    resource in {"All", "AllAgentIdResources"}
+}
+
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
 AIAgentsBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    AIAgentsResourceScope(policy)
     policy.State == "enabled"
     ###
 
@@ -1977,14 +1987,14 @@ AIAgentsBaseCheck(policy) if {
     # with leading and trailing spaces removed
     "high" in EnsureTrimmedArray(policy.Conditions.AgentIdRiskLevels)
     "block" in policy.GrantControls.BuiltInControls
-    "All" in policy.Conditions.ClientApplications.IncludeAgentIdServicePrincipals
+    "All" in EnsureTrimmedArray(policy.Conditions.ClientApplications.IncludeAgentIdServicePrincipals)
     ###
 }
 
-# Only match policies with user and group exclusions per the confile file
+# Only match policies whose agent exclusions are approved in the config file.
 AIAgentsEval(policy) := result if {
     checks := [
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.9.1v1")},
+        {"label": "agent exclusions", "ok": AgentExclusionsFullyExempt(policy, "MS.AAD.9.1v1")},
     ]
     result := CapEval(AIAgentsBaseCheck(policy), checks)
 }
@@ -2035,6 +2045,39 @@ tests contains {
     AAD_9_1_Not_Applicable_Due_To_Environment == true
 }
 
+default AAD_9_1_Not_Applicable_Due_To_License := false
+
+# Returns true if the tenant has no license that provides AI agent conditional access
+# (Microsoft Agent 365 or Microsoft 365 E7), so the policy cannot be implemented.
+AAD_9_1_Not_Applicable_Due_To_License := true if {
+    # GCC High and DoD are reported by the environment check above
+    not input.scuba_config.M365Environment in {"gcchigh", "dod"}
+    # Only N/A if no valid policies are found, future proofing in case a policy exists anyway
+    Count(AIAgents) == 0
+    # Only N/A if the license data was collected and shows no agent license
+    LicenseDataAvailable
+    Count(AgentLicenses) == 0
+    # Only N/A if the tenant does have Entra ID P2, otherwise the P2 license error is reported
+    Count(Aad2P2Licenses) > 0
+}
+
+# N/A case for a tenant without the required agent license
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy", "Get-MgBetaSubscribedSku"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.AAD.9.1v1"
+    Reason := concat(" ", [
+    "This policy requires a Microsoft Agent 365 or Microsoft 365 E7 license, which was not found",
+    "in this tenant. See %v for more info"
+    ])
+    AAD_9_1_Not_Applicable_Due_To_License == true
+}
+
 # Pass if at least 1 policy meets all conditions & has correct
 # license.
 tests contains {
@@ -2047,6 +2090,7 @@ tests contains {
     "RequirementMet": Status
 } if {
     AAD_9_1_Not_Applicable_Due_To_Environment == false
+    AAD_9_1_Not_Applicable_Due_To_License == false
     NearMissReportDetails := CapNearMissDetails(
         AIAgents,
         AIAgentsNeedsConfigUpdate,

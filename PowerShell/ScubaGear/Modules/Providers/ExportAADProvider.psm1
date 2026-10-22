@@ -33,6 +33,10 @@ function Export-AADProvider {
     $AllPolicies = $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
 
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
+    # Convert all policies to the agent cap exclusion array format for further processing
+    # currently agent exclusion output as string with spaces per exclusion
+    # This conversion ensures that the policies are in a format compatible with the agent CAP exclusion processing
+    $AllPolicies = @($AllPolicies | ConvertTo-AgentCapExclusionArray)
     $CapHelper = Get-CapTracker
     $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # Used in generating the CAP html in the report
 

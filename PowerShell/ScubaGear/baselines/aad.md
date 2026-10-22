@@ -1248,9 +1248,10 @@ Risky AI agents SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#agent-conditional-access-policy-exclusions)
 
 <!--Policy: MS.AAD.9.1v1; Criticality: SHALL -->
-<!--ExclusionType: CapExclusions-->
+<!--ExclusionType: AgentCapExclusions-->
 - _Rationale:_ AI agents may access tenant resources and can perform actions autonomously. Blocking agents that exhibit risky behaviors reduces the risk of unauthorized access and automated misuse of resources.
 - _Last modified:_ March 2026
 - _Note:_ This policy is not applicable to Government Community Cloud (GCC) High, and Department of Defense (DoD) tenants.
