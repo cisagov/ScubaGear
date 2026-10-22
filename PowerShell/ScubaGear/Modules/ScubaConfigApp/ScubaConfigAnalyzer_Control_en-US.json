@@ -184,6 +184,14 @@
     }
   },
 
+  "importedConfig": {
+    "_comment": "Controls how the configuration a ScubaGear run used (Raw.scuba_config in a results file) is carried into the generated YAML. machineSpecificKeys are paths that only exist on the machine that produced the results; they are written as commented-out lines so the YAML still runs elsewhere.",
+    "machineSpecificKeys": [
+      "OPAPath",
+      "OutPath"
+    ]
+  },
+
   "exclusionDefinitions": {
     "_comment": "Each exclusion type defines its YAML shape AND (for non-CA types) its analysis. The engine picks the analysis by exclusion type via the config-schema policyExclusionMappings, so a new type is added here + a mapping only. Operators read the item value at 'path': equals, notEquals, exists(bool), in[], notIn[], greaterThan, lessThan, matches(regex), contains; combine with allOf[]/anyOf[].",
     "AgentExclusions": {
