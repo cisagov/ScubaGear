@@ -1,26 +1,39 @@
-# Uninstall
+```
+To-do:
+1. Write a note for Reset-ScubaGearGependencies, including syntax if not duplicative.
+2. Cleanup: Remove comment line(s). Remove strikethrough line(s).
+```
+
+# Removing ScubaGear dependencies with `Remove-ScubaModuleVersion`
+To remove some or all installed dependencies for purpose of dependency conflict resolution, or for ensuring current and proper installation, or troubleshooting ScubaGear issues then invoking `Remove-ScubaModuleVersion` is desired. Read the help provided via `Get-Help Remove-ScubaModuleVersion` for usage.
+
+### UninstallModules.ps1 is retired
+
+The script `UninstallModules.ps1` is no longer used, and has been removed from ScubaGear. Previously, this script removed the Powershell modules required by the ScubaGear assessment tool.
+
+
+**Note**: The ScubaGear development team is gradually decrementing the dependencies on PowerShell SDK modules in favor of direct REST API calls. While there are very few PowerShell SDK modules required to run the current release of ScubaGear, a prior release may have had multiple additional PowerShell SDK dependencies, including but not limited to (for example) several Microsoft Graph SDK modules.
+
+# Uninstall 
 
 To uninstall ScubaGear, follow these steps:
 
-* Run the `UninstallModules.ps1` script in the `utils` folder to remove the modules that were installed.
+### Uninstall dependencies
 
-```powershell
-# Uninstall modules
-.\UninstallModules.ps1
-```
+`<example place holder - yaml>`
 
-* Uninstall ScubaGear itself.
-
-```powershell
-# Uninstall ScubaGear
-Uninstall-Module -Name ScubaGear 
-```
-
-* Uninstall OPA by deleting the `.scubagear` folder in the user's home directory.
+### Uninstall OPA by deleting the `.scubagear` folder in the user's home directory.
 
 ```powershell
 # Delete .scubagear folder
 Remove-Item C:\Users\johndoe\.scubagear
+```
+
+### Uninstall ScubaGear itself.
+
+```powershell
+# Uninstall ScubaGear
+Uninstall-Module -Name ScubaGear 
 ```
 
 * If ScubaGear was [downloaded from GitHub](github.md), delete the ScubaGear folder that was extracted from the zip file.
