@@ -194,6 +194,8 @@ function Get-ScubaGearContext {
         Displays the account or app, tenant, and scopes ScubaGear is currently using
         to call Microsoft Graph. Useful for confirming which tenant/user a session is
         connected to before running Invoke-SCuBA against multiple tenants or accounts.
+        ScubaGear clears its session when Invoke-SCuBA finishes unless it was run with
+        -DisconnectOnExit:$false.
     .FUNCTIONALITY
         Public
     #>
@@ -201,7 +203,7 @@ function Get-ScubaGearContext {
     param()
 
     if (-not $Global:ScubaGearState.Session) {
-        Write-Warning "ScubaGear is not currently connected to Microsoft Graph. Run Invoke-SCuBA or Connect-Tenant first."
+        Write-Warning "ScubaGear is not currently connected to Microsoft Graph. ScubaGear disconnects when a run finishes unless Invoke-SCuBA is run with -DisconnectOnExit:`$false."
         return
     }
 

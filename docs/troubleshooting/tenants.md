@@ -1,10 +1,10 @@
 # Multiple Tenants
 
-ScubaGear shares an in-memory MSAL user token cache between the Microsoft client applications used by its products. After the first sign-in, each client attempts silent authentication; MSAL can reuse family refresh tokens where Microsoft permits it. Additional browser windows can still be required for clients outside that family, consent, or tenant authentication policies. Repeated `Invoke-SCuBA` runs in the same PowerShell process retain this cache. Closing PowerShell, calling `Disconnect-SCuBATenant`, or using `-DisconnectOnExit` clears it. Use `-Verbose` to see which clients acquired tokens silently and why others required interaction.
+ScubaGear shares an in-memory MSAL user token cache between the Microsoft client applications used by its products. After the first sign-in, each client attempts silent authentication; MSAL can reuse family refresh tokens where Microsoft permits it. Additional browser windows can still be required for clients outside that family, consent, or tenant authentication policies. By default, ScubaGear clears this cache when each run finishes (the [DisconnectOnExit parameter](../configuration/parameters.md#disconnectonexit) defaults to `$true`), so every run signs in on its own and cannot reuse a previous run's tenant or credentials. If you run `Invoke-SCuBA -DisconnectOnExit:$false`, repeated runs in the same PowerShell process retain this cache; closing PowerShell or calling `Disconnect-SCuBATenant` clears it. Use `-Verbose` to see which clients acquired tokens silently and why others required interaction.
 
 If a later client needs the browser, ScubaGear supplies the account already selected for the scan and omits the forced account selector. Entra can then reuse its browser session without asking you to select the same account again. A browser window or tab opening does not necessarily mean credentials must be entered again; consent, MFA, and other policy requirements are still controlled by Entra.
 
-If testing with multiple tenants, it is a best practice is to use the [DisconnectOnExit parameter](../configuration/parameters.md#disconnectonexit). If you don't use this parameter and are seeing errors about connecting to the wrong tenant, you can resolve this by running the following command:
+If you keep the session between runs with `-DisconnectOnExit:$false` and test with multiple tenants or accounts, run `Disconnect-SCuBATenant` before switching tenants, switching credentials (for example from one user to another), or switching between interactive and service principal authentication. A kept session is reused as it is, so skipping this step can connect to the wrong tenant. You can resolve this by running the following command:
 
 ```powershell
 # Delete all tokens
@@ -20,11 +20,12 @@ to. This is especially useful when working across multiple tenants or accounts, 
 prior session was cleared before connecting to a different tenant.
 
 `Get-ScubaGearContext` reads the session ScubaGear already established; it doesn't sign in on
-its own. Run it after a cmdlet that authenticates (such as `Invoke-SCuBA`), in the same
-PowerShell terminal:
+its own. Because ScubaGear clears its session when `Invoke-SCuBA` finishes by default, keep the session
+with `-DisconnectOnExit:$false` (or run it during a run that is still in progress) before calling it,
+in the same PowerShell terminal:
 
 ```powershell
-Invoke-SCuBA -ProductNames aad -M365Environment commercial   # sign in to Tenant A
+Invoke-SCuBA -ProductNames aad -M365Environment commercial -DisconnectOnExit:$false   # sign in to Tenant A and keep the session
 Get-ScubaGearContext                                          # confirm which tenant/account you're on
 Disconnect-SCuBATenant                                        # clear the session before switching
 Invoke-SCuBA -ProductNames aad -M365Environment commercial   # sign in to Tenant B

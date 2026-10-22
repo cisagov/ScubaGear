@@ -89,6 +89,43 @@ InModuleScope Orchestrator {
             }
         }
 
+        Context 'Disconnect on exit' {
+            BeforeEach {
+                Mock Repair-ScubaGearJson {
+                    @{
+                        JsonObject = @{
+                            report_uuid = '00000000-0000-0000-0000-000000000000'
+                            Raw = @{ report_uuid = '00000000-0000-0000-0000-000000000000' }
+                        }
+                        RepairedJson = $false
+                    }
+                }
+                Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
+            }
+
+            It 'disconnects by default after signing in' {
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly -ParameterFilter { -not $ProductNames }
+            }
+
+            It 'keeps the session when -DisconnectOnExit:$false is supplied' {
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -DisconnectOnExit:$false -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
+            }
+
+            It 'does not disconnect when no sign-in was performed' {
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
+            }
+
+            It 'disconnects when sign-in fails' {
+                Mock Invoke-Connection { throw 'sign-in failed' }
+                { Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -Quiet -SilenceBODWarnings } |
+                    Should -Throw '*sign-in failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+        }
+
         Context "When there are multiple ScubaResults*.json files" {
         # It's possible (but not expected) that there are multiple files matching
         # "ScubaResults*.json". In this case, ScubaGear should choose the file

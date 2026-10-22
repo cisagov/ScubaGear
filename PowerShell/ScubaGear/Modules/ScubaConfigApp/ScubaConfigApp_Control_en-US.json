@@ -293,7 +293,7 @@
     "OutReportsName_TextBox": "ScubaReports",
     "OpaPath_TextBox": ".",
     "LogIn_CheckBox": true,
-    "DisconnectOnExit`_CheckBox": false
+    "DisconnectOnExit`_CheckBox": true
   },
   "products": [
     {

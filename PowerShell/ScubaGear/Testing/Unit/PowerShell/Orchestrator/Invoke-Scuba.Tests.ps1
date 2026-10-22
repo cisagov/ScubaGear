@@ -88,6 +88,57 @@ InModuleScope Orchestrator {
                 Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'gcchigh' }
             }
         }
+        Context 'Disconnect on exit' {
+            BeforeEach {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
+            }
+
+            It 'disconnects by default when the scan completes' {
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly -ParameterFilter { -not $ProductNames }
+            }
+
+            It 'disconnects when -DisconnectOnExit is supplied' {
+                Invoke-SCuBA -ProductNames aad -DisconnectOnExit -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'keeps the session when -DisconnectOnExit:$false is supplied' {
+                Invoke-SCuBA -ProductNames aad -DisconnectOnExit:$false -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
+            }
+
+            It 'disconnects when sign-in fails' {
+                Mock Invoke-Connection { throw 'sign-in failed' }
+                { Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings } | Should -Throw '*sign-in failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'disconnects when the tenant lookup fails' {
+                Mock Get-TenantDetail { throw 'tenant lookup failed' }
+                { Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings } | Should -Throw '*tenant lookup failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'disconnects when every product fails authentication' {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @('aad') } }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-ProviderList -Times 0 -Exactly
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'disconnects when provider collection fails' {
+                Mock Invoke-ProviderList { throw 'provider failed' }
+                { Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings } | Should -Throw '*provider failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'keeps the session after a failure when -DisconnectOnExit:$false is supplied' {
+                Mock Invoke-Connection { throw 'sign-in failed' }
+                { Invoke-SCuBA -ProductNames aad -DisconnectOnExit:$false -Quiet -SilenceBODWarnings } | Should -Throw '*sign-in failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
+            }
+        }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParams')]

@@ -655,7 +655,8 @@ class ScubaConfig {
         foreach ($PropertyName in $Defaults.PSObject.Properties.Name) {
             # Only set default if the property wasn't explicitly provided in the configuration file
             # This respects user's explicit choices while filling in gaps with sensible defaults
-            if (-not $this.Configuration.$PropertyName) {
+            # An explicit boolean (including false) is a user's choice, not a missing value
+            if ($this.Configuration.$PropertyName -isnot [bool] -and -not $this.Configuration.$PropertyName) {
                 Write-Debug "Setting default value for '$PropertyName'"
                 # Copy the default value from the defaults configuration
                 $this.Configuration[$PropertyName] = $Defaults.$PropertyName

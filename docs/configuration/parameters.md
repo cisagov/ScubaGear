@@ -96,19 +96,19 @@ Invoke-SCuBA -ProductNames teams `
 
 ## DisconnectOnExit
 
-**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs; this will require you to re-authenticate the next time you run ScubaGear. The name of this parameter is a misnomer.
+**DisconnectOnExit** deletes the authentication tokens from your local machine that were used to connect to the Microsoft APIs when ScubaGear finishes, including when it stops because of an error. This is the default, so each run signs in again, and a run can never reuse the previous run's tenant or credentials. Set it to `$false` (`-DisconnectOnExit:$false`, or `DisconnectOnExit: false` in a configuration file) to keep the session so another run in the same PowerShell window signs in silently. When you keep the session, run `Disconnect-SCuBATenant` before switching tenants, credentials, or between interactive and service principal authentication. The name of this parameter is a misnomer.
 
 | Parameter   | Value  |
 |-------------|--------|
 | Optional    | Yes    |
 | Datatype    | Switch |
-| Default     | n/a    |
+| Default     | `$true` |
 | Config File | Yes    |
 
 ```powershell
-# Delete the auth tokens
+# Keep the session after the run (the default is to delete the auth tokens)
 Invoke-SCuBA -ProductNames teams `
-  -DisconnectOnExit
+  -DisconnectOnExit:$false
 ```
 
 ## KeepIndividualJSON

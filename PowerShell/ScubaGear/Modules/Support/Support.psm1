@@ -1601,7 +1601,7 @@ function New-SCuBAConfig {
     .Parameter NumberOfUUIDCharactersToTruncate
     The number of UUID characters to truncate in generated output filenames. Valid values are 0, 13, 18, or 36.
     .Parameter DisconnectOnExit
-    Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    Disconnect all active connections and discard the cached sign-in tokens when ScubaGear finishes (default: $true)
     .Parameter ConfigLocation
     The folder path where the generated SampleConfig.yaml will be created. The folder is created if it
     does not already exist. Defaults to the user's Desktop, falling back to the home directory on
@@ -1729,7 +1729,7 @@ function New-SCuBAConfig {
         [ValidateNotNullOrEmpty()]
         [ValidateSet($true, $false)]
         [boolean]
-        $DisconnectOnExit = $false,
+        $DisconnectOnExit = $true,
 
         [Parameter(Mandatory = $false)]
         [ValidateNotNullOrEmpty()]

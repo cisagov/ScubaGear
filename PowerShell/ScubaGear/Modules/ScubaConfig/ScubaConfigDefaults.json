@@ -25,7 +25,7 @@
     "AllProductNames": ["aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"],
     "M365Environment": "commercial",
     "LogIn": true,
-    "DisconnectOnExit": false,
+    "DisconnectOnExit": true,
     "OutPath": ".",
     "OutFolderName": "M365BaselineConformance",
     "OutProviderFileName": "ProviderSettingsExport",

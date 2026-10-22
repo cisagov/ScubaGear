@@ -97,7 +97,11 @@ function Invoke-SCuBA {
     The CSV created in the folder created in OutPath that contains a CSV template prepopulated with the failed
     SHALL controls with fields for documenting failure causes and remediation plans. Defaults to "ActionPlan".
     .Parameter DisconnectOnExit
-    Set switch to disconnect all active connections on exit from ScubaGear (default: $false)
+    Disconnect all active connections and discard the cached sign-in tokens when ScubaGear finishes,
+    including when it stops because of an error (default: $true). Use -DisconnectOnExit:$false, or set
+    DisconnectOnExit to false in a configuration file, to keep the session so the next run in the same
+    PowerShell window signs in silently. Run Disconnect-SCuBATenant before switching tenants or credentials
+    when the session is kept.
     .Parameter ConfigFilePath
     Local file path to a JSON or YAML formatted configuration file.
     Configuration file parameters can be used in place of command-line
@@ -143,9 +147,10 @@ function Invoke-SCuBA {
     This example will run the tool against all available security baselines with the
     'dod' teams endpoint.
     .Example
-    Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit
-    Run the tool against Entra Id and Exchange Online security
-    baselines, disconnecting connections for those products when complete.
+    Invoke-SCuBA -ProductNames aad,exo -M365Environment gcc -OPAPath . -OutPath . -DisconnectOnExit:$false
+    Run the tool against Entra Id and Exchange Online security baselines and keep the session open when
+    complete, so another run in the same PowerShell window can reuse the sign-in. Run
+    Disconnect-SCuBATenant before switching tenants or credentials.
     .Example
     Invoke-SCuBA -ProductNames * -CertificateThumbprint <insert-thumbprint> -AppID <insert-appid> -Organization "tenant.onmicrosoft.com"
     This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
@@ -346,7 +351,13 @@ function Invoke-SCuBA {
                 'M365Environment' = $M365Environment
                 'OPAPath' = $OPAPath
                 'LogIn' = $LogIn
-                'DisconnectOnExit' = $DisconnectOnExit
+                # A switch cannot default to true, so use the configured default unless the switch was supplied.
+                'DisconnectOnExit' = if ($PSBoundParameters.ContainsKey('DisconnectOnExit')) {
+                    $DisconnectOnExit.ToBool()
+                }
+                else {
+                    [ScubaConfig]::ScubaDefault('DefaultDisconnectOnExit')
+                }
                 'OutPath' = $OutPath
                 'OutFolderName' = $OutFolderName
                 'OutProviderFileName' = $OutProviderFileName
@@ -556,59 +567,69 @@ function Invoke-SCuBA {
             UsesServicePrincipal = (-not [string]::IsNullOrEmpty($ScubaConfig.AppID))
         }
 
-        $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig `
-            -Verbose:($VerbosePreference -eq 'Continue')
-        # If Connect-Tenant automatically detected the M365Environment during interactive auth, change the ScubaConfig value to the detected value.
-        if ($ConnectionResult.DetectedM365Environment) {
-            $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
-        }
+        # The scan's own try/finally starts after this phase, so guard it separately. Without this, a failed or
+        # cancelled sign-in, a failed tenant lookup, or the all-products-failed exit would leave the session open.
+        $ConnectionPhaseComplete = $false
+        try {
+            $ConnectionResult = Invoke-Connection -ScubaConfig $ScubaConfig `
+                -Verbose:($VerbosePreference -eq 'Continue')
+            # If Connect-Tenant automatically detected the M365Environment during interactive auth, change the ScubaConfig value to the detected value.
+            if ($ConnectionResult.DetectedM365Environment) {
+                $ScubaConfig.M365Environment = $ConnectionResult.DetectedM365Environment
+            }
 
-        $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
-        if ($ProdAuthFailed.Count -gt 0) {
-            Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
+            $ProdAuthFailed = $ConnectionResult.ProdAuthFailed
+            if ($ProdAuthFailed.Count -gt 0) {
+                Write-ScubaLog -Message "Some products failed authentication" -Level "Warning" -Source "InvokeScuba" -Data @{FailedProducts = ($ProdAuthFailed -join ', ')}
 
-            # Check if ALL products failed authentication
-            $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
-            if (-not $Difference) {
-                # All products failed - log critical error (triggers automatic report generation in Stop-ScubaLogging)
-                Write-ScubaLog -Message "CRITICAL: All products failed authentication - aborting execution" -Level "Error" -Source "InvokeScuba" -Data @{
-                    RequestedProducts = ($ScubaConfig.ProductNames -join ', ')
-                    FailedProducts = ($ProdAuthFailed -join ', ')
+                # Check if ALL products failed authentication
+                $Difference = Compare-Object $ScubaConfig.ProductNames -DifferenceObject $ProdAuthFailed -PassThru
+                if (-not $Difference) {
+                    # All products failed - log critical error (triggers automatic report generation in Stop-ScubaLogging)
+                    Write-ScubaLog -Message "CRITICAL: All products failed authentication - aborting execution" -Level "Error" -Source "InvokeScuba" -Data @{
+                        RequestedProducts = ($ScubaConfig.ProductNames -join ', ')
+                        FailedProducts = ($ProdAuthFailed -join ', ')
+                    }
+                    # Stop logging and generate error report before exiting
+                    Stop-ScubaLogging
+                    return
                 }
-                # Stop logging and generate error report before exiting
-                Stop-ScubaLogging
-                return
+
+                # Some products succeeded - continue with the successful ones
+                $ScubaConfig.ProductNames = $Difference
             }
 
-            # Some products succeeded - continue with the successful ones
-            $ScubaConfig.ProductNames = $Difference
-        }
-
-        # Capture module snapshot after authentication to log what modules were imported
-        if ($Script:ScubaLoggingEnabled) {
-            try {
-                Update-ScubaModuleSnapshot -SnapshotName "PostAuthentication"
-            }
-            catch {
-                Write-ScubaLog -Message "Failed to capture post-authentication module snapshot" -Level "Warning" -Source "InvokeScuba" -Data @{
-                    Error = $_.Exception.Message
+            # Capture module snapshot after authentication to log what modules were imported
+            if ($Script:ScubaLoggingEnabled) {
+                try {
+                    Update-ScubaModuleSnapshot -SnapshotName "PostAuthentication"
+                }
+                catch {
+                    Write-ScubaLog -Message "Failed to capture post-authentication module snapshot" -Level "Warning" -Source "InvokeScuba" -Data @{
+                        Error = $_.Exception.Message
+                    }
                 }
             }
+
+            # Tenant Metadata for the Report
+
+            Write-ScubaLog -Message "Retrieving tenant details..." -Level "Info" -Source "InvokeScuba" -Data @{
+                ProductNames = ($ScubaConfig.ProductNames -join ', ')
+                M365Environment = $ScubaConfig.M365Environment
+            }
+
+            $TenantDetails = Get-TenantDetail -M365Environment $ScubaConfig.M365Environment
+            Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
+
+            # Generate a GUID to uniquely identify the output JSON
+            $Guid = New-Guid -ErrorAction 'Stop'
+            $ConnectionPhaseComplete = $true
         }
-
-        # Tenant Metadata for the Report
-
-        Write-ScubaLog -Message "Retrieving tenant details..." -Level "Info" -Source "InvokeScuba" -Data @{
-            ProductNames = ($ScubaConfig.ProductNames -join ', ')
-            M365Environment = $ScubaConfig.M365Environment
+        finally {
+            if (-not $ConnectionPhaseComplete) {
+                Invoke-ScubaDisconnectOnExit -DisconnectOnExit $ScubaConfig.DisconnectOnExit -Verbose:($VerbosePreference -eq 'Continue')
+            }
         }
-
-        $TenantDetails = Get-TenantDetail -M365Environment $ScubaConfig.M365Environment
-        Write-ScubaLog -Message "Tenant details retrieved successfully" -Level "Debug" -Source "InvokeScuba"
-
-        # Generate a GUID to uniquely identify the output JSON
-        $Guid = New-Guid -ErrorAction 'Stop'
-
         try {
             # Provider Execution
             # Provider parameters consolidated into ScubaConfig; remaining args passed explicitly
@@ -734,14 +755,7 @@ function Invoke-SCuBA {
             ConvertTo-RiskyAppsCsv @RiskyAppsCsvParams
         }
         finally {
-            if ($ScubaConfig.DisconnectOnExit) {
-                if ($VerbosePreference -eq "Continue") {
-                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
-                }
-                else {
-                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
-                }
-            }
+            Invoke-ScubaDisconnectOnExit -DisconnectOnExit $ScubaConfig.DisconnectOnExit -Verbose:($VerbosePreference -eq 'Continue')
             [ScubaConfig]::ResetInstance()
 
             # Clean up debug logging module
@@ -2293,6 +2307,29 @@ function Invoke-Connection {
     $ConnectionResult
 }
 
+function Invoke-ScubaDisconnectOnExit {
+    <#
+    .Description
+    Disconnects from the tenant, discarding the cached sign-in tokens, when the run is configured
+    to disconnect on exit. Callers invoke this from a finally block so that it also runs when a
+    sign-in or scan fails or is cancelled.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [bool]
+        $DisconnectOnExit
+    )
+
+    if (-not $DisconnectOnExit) {
+        return
+    }
+
+    Disconnect-SCuBATenant -ErrorAction SilentlyContinue -Verbose:($VerbosePreference -eq 'Continue')
+}
+
 function Compare-ProductList {
     <#
     .Description
@@ -2394,6 +2431,10 @@ function Invoke-SCuBACached {
     Authentication is skipped by default. If you want to run verification with authentication
     in the current PowerShell session, set this variable to `$true` to establish a connection.
     Default is $false.
+    .Parameter DisconnectOnExit
+    When **LogIn** is `$true`, disconnect all active connections and discard the cached sign-in tokens when
+    this cmdlet finishes, including when it stops because of an error (default: $true). Use
+    -DisconnectOnExit:$false to keep the session. Has no effect when no sign-in was performed.
     .Parameter Version
     Will output the current ScubaGear version to the terminal without running this cmdlet.
     .Parameter AppID
@@ -2492,6 +2533,11 @@ function Invoke-SCuBACached {
         [ValidateSet($true, $false)]
         [boolean]
         $LogIn = $false,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
+        [ValidateNotNullOrEmpty()]
+        [switch]
+        $DisconnectOnExit,
 
         [Parameter(ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
@@ -2691,6 +2737,12 @@ function Invoke-SCuBACached {
                 'OutReportName' = $OutReportName;
                 'OPAPath' = $OPAPath;
                 'LogIn' = $LogIn;
+                'DisconnectOnExit' = if ($PSBoundParameters.ContainsKey('DisconnectOnExit')) {
+                    $DisconnectOnExit.ToBool()
+                }
+                else {
+                    [ScubaConfig]::ScubaDefault('DefaultDisconnectOnExit')
+                };
                 'AppID' = $AppID;
                 'CertificateThumbprint' = $CertificateThumbprint;
                 'Organization' = $Organization;
@@ -2910,6 +2962,11 @@ function Invoke-SCuBACached {
             ConvertTo-RiskyAppsCsv @RiskyAppsCsvParams
         }
         finally {
+            # Only a run that signed in has anything to disconnect.
+            if ($ExportProvider -and $TempScubaConfig.LogIn) {
+                Invoke-ScubaDisconnectOnExit -DisconnectOnExit $TempScubaConfig.DisconnectOnExit -Verbose:($VerbosePreference -eq 'Continue')
+            }
+
             # Clean up debug logging module
             try {
                 Write-ScubaLog -Message "ScubaGear assessment completed! Check report in [$OutFolderPath]" -Level "Info" -Source "ScubaCached"

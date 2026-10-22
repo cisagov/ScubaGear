@@ -294,7 +294,8 @@ BeforeAll {
         }
         else {
             if ($ProductName -eq 'exo') {
-                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                # Keep the interactive session so the run does not sign in again for every policy.
+                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -DisconnectOnExit:$false -Quiet -KeepIndividualJSON -SilenceBODWarnings
             }
             else {
                 Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
@@ -323,6 +324,10 @@ Describe "Policy Checks for <ProductName>" {
                     $ScubaConfig.CertificateThumbprint = $Thumbprint
                     $ScubaConfig.AppID = $AppId
                     $ScubaConfig.Organization = $TenantDomain
+                }
+                else {
+                    # Keep the interactive session so the run does not sign in again for every policy.
+                    $ScubaConfig.DisconnectOnExit = $false
                 }
 
                 $ScubaConfig.M365Environment = $M365Environment
