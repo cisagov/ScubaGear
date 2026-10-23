@@ -118,11 +118,11 @@
         "notes": "Validates that a CA policy exists blocking legacy authentication (Exchange ActiveSync and Other clients) for all users"
       },
       {
-        "id": "MS.AAD.2.1v1",
-        "name": "Users detected as high risk SHALL be blocked",
+        "id": "MS.AAD.2.1v2",
+        "name": "Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in",
         "category": "Risk Based Policies",
-        "description": "Users detected as high risk SHALL be blocked",
-        "rationale": "Blocking high-risk users prevents compromised accounts from accessing the tenant",
+        "description": "Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in",
+        "rationale": "Requiring high-risk users to remediate their risk prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention",
         "exclusionField": "CapExclusions",
         "requiresLicense": "Microsoft Entra ID P2",
         "exceptions": null,
@@ -146,13 +146,21 @@
               },
               "userRiskLevels": [
                 "high"
-              ]
+              ],
+              "signInRiskLevels": []
             },
             "grantControls": {
               "builtInControls": [
-                "block"
+                "riskRemediation"
               ],
-              "operator": "OR"
+              "authenticationStrength": "required",
+              "operator": "AND"
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "frequencyInterval": "everyTime"
+              }
             }
           }
         },
@@ -167,17 +175,21 @@
           "conditions.userRiskLevels": [
             "high"
           ],
+          "conditions.signInRiskLevels": [],
           "grantControls.builtInControls": [
-            "block"
+            "riskRemediation"
           ],
-          "grantControls.operator": "OR"
+          "grantControls.authenticationStrength": "required",
+          "grantControls.operator": "AND",
+          "sessionControls.signInFrequency.isEnabled": true,
+          "sessionControls.signInFrequency.frequencyInterval": "everyTime"
         },
         "buildInstructions": {
-          "description": "Create a Conditional Access policy blocking high-risk users",
+          "description": "Create a Conditional Access policy requiring high-risk users to remediate their risk",
           "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
           "apiMethodCreate": "POST",
           "payloadTemplate": {
-            "displayName": "ScubaGear: Block High Risk Users",
+            "displayName": "ScubaGear: Require Risk Remediation for High Risk Users",
             "state": "enabled",
             "conditions": {
               "users": {
@@ -197,10 +209,20 @@
               ]
             },
             "grantControls": {
-              "operator": "OR",
+              "operator": "AND",
               "builtInControls": [
-                "block"
-              ]
+                "riskRemediation"
+              ],
+              "authenticationStrength": {
+                "id": "<AUTHENTICATION_STRENGTH_POLICY_ID>"
+              }
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "frequencyInterval": "everyTime",
+                "authenticationType": "primaryAndSecondaryAuthentication"
+              }
             }
           },
           "exclusionHandling": [
@@ -210,20 +232,22 @@
         },
         "remediationSteps": [
           "1. Verify Microsoft Entra ID P2 license is assigned to users",
-          "2. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
-          "3. Go to Protection → Conditional Access → Policies",
-          "4. Click 'New policy' to create a new Conditional Access policy",
-          "5. Name: 'MS.AAD.2.1v1 - ScubaGear: Block High Risk Users'",
-          "6. Users: Include → All users",
-          "7. Target resources: Include → All cloud apps",
-          "8. Conditions: User risk → Select 'High'",
-          "9. Access controls: Grant → Select 'Block access'",
-          "10. Enable policy: Select 'Report-only' for testing",
-          "11. Monitor report-only results for 24-48 hours",
-          "12. Change to 'On' after validating no false positives",
-          "13. Configure Identity Protection to remediate risky users"
+          "2. Verify users are registered for Microsoft Entra multifactor authentication and, for hybrid users, that password writeback is enabled",
+          "3. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "4. Go to Protection → Conditional Access → Policies",
+          "5. Click 'New policy' to create a new Conditional Access policy",
+          "6. Name: 'MS.AAD.2.1v2 - ScubaGear: Require Risk Remediation for High Risk Users'",
+          "7. Users: Include → All users; Exclude → emergency access (break-glass) accounts",
+          "8. Target resources: Include → All resources (formerly 'All cloud apps')",
+          "9. Conditions: User risk → Configure 'Yes' → Select 'High'",
+          "10. Do not configure Sign-in risk in this policy",
+          "11. Access controls: Grant → Select 'Grant access' → 'Require risk remediation' (Require authentication strength is selected automatically; choose the strength appropriate for your organization)",
+          "12. Session: Sign-in frequency → 'Every time' (applied automatically and mandatory)",
+          "13. Enable policy: Select 'Report-only' for testing",
+          "14. Monitor report-only results for 24-48 hours",
+          "15. Change to 'On' after validating no false positives"
         ],
-        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features"
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with an authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy"
       },
       {
         "id": "MS.AAD.2.2v1",
