@@ -1,4 +1,5 @@
 Old ID,Old Description,New ID,Shall or Should,Removal Rationale
+MS.AAD.2.1v1,Users detected as high risk SHALL be blocked.,MS.AAD.2.1v2,Shall,N/A
 MS.AAD.3.2v1,"If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.",MS.AAD.3.2v2,Shall,N/A
 MS.AAD.3.5v1,"The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled.",MS.AAD.3.5v2,Shall,N/A
 MS.EXO.2.2v2,An SPF policy SHALL be published for each domain that fails all non-approved senders.,MS.EXO.2.2v3,SHALL,Currently requires SPF policies to include a hard fail -all not a soft fail ~all. Relax that requirement to accept both hard and soft fails. Bumped to v3
