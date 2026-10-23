@@ -1,3 +1,4 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
 function Get-RegoResult {
@@ -155,13 +156,11 @@ function New-Report {
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -200,7 +199,7 @@ function New-Report {
         $SecureBaselines
     )
 
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
@@ -1191,7 +1190,7 @@ function Get-IndicatorHtml {
         return ""
     }
 
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
     $IndicatorHtml = "<div class='policy-indicators'>"
 
     foreach ($Indicator in $Indicators) {
