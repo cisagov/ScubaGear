@@ -6,6 +6,8 @@
  # triggering a pointless consent prompt.
 #>
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Each test starts without an existing Graph session.')]
+param()
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force
 
 InModuleScope Connection {
@@ -92,9 +94,16 @@ InModuleScope Connection {
         }
 
         BeforeEach {
-            Mock Connect-GraphHelper -MockWith {}
+            $Global:ScubaGearState.Session = $null
+            Mock Connect-GraphHelper {
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = 'commercial'
+                    TokenParameters = @{ Scope = @('Organization.Read.All') }
+                }
+            }
             Mock -CommandName Write-Progress -MockWith {}
             Mock Get-MsalAccessToken -MockWith { return "mock-pbi-access-token" }
+            Mock Initialize-Msal -MockWith {}
             Mock Get-MgContext -MockWith {
                 return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" }
             }

@@ -38,6 +38,7 @@ class ScubaConfig {
     hidden static [object]$_ConfigDefaults = $null
     # Cached JSON schema used for validation
     hidden static [object]$_ConfigSchema = $null
+    [Boolean]$M365EnvironmentProvided = $false
 
     # Initializes validator subsystem once per session - loads schemas/defaults from JSON files,
     # caches resources in static properties for performance.
@@ -103,6 +104,13 @@ class ScubaConfig {
         }
         elseif ($Name -eq 'DefaultPrivilegedRoles') {
             return [ScubaConfig]::_ConfigDefaults.privilegedRoles
+        }
+        elseif ($Name -eq 'AuthenticationClientIdHashtable') {
+            $ClientIdHash = @{}
+            foreach ($Property in [ScubaConfig]::_ConfigDefaults.AuthenticationClientIdHashtable.PSObject.Properties) {
+                $ClientIdHash[$Property.Name] = [string]$Property.Value
+            }
+            return $ClientIdHash
         }
         elseif ($Name.StartsWith('Default')) {
             # For standard "Default" prefixed names, auto-resolve from defaults section
@@ -239,6 +247,8 @@ class ScubaConfig {
         if ($this.Configuration -is [PSCustomObject]) {
             $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
+
+        $this.M365EnvironmentProvided = $this.Configuration.ContainsKey('M365Environment')
 
         # Apply default values and process special configuration properties
         # This ensures all required properties have values for subsequent processing
@@ -645,7 +655,8 @@ class ScubaConfig {
         foreach ($PropertyName in $Defaults.PSObject.Properties.Name) {
             # Only set default if the property wasn't explicitly provided in the configuration file
             # This respects user's explicit choices while filling in gaps with sensible defaults
-            if (-not $this.Configuration.$PropertyName) {
+            # An explicit boolean (including false) is a user's choice, not a missing value
+            if ($this.Configuration.$PropertyName -isnot [bool] -and -not $this.Configuration.$PropertyName) {
                 Write-Debug "Setting default value for '$PropertyName'"
                 # Copy the default value from the defaults configuration
                 $this.Configuration[$PropertyName] = $Defaults.$PropertyName

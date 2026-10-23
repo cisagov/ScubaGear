@@ -11,7 +11,7 @@ BeforeDiscovery {
   $Outputs = Initialize-ScubaGearForTesting
   # Whitelist the outputs that we are interested in finding
   $global:PSGallery = $false
-  $global:DownloadedOPAVersion = $false
+  $global:OPAAvailable = $false
   $global:SetupTime = $false
   $global:SetupTimeValue = 0
   $global:SetupTimeThreshold = 1000 # The max time it should take to initialize SG
@@ -24,15 +24,14 @@ BeforeDiscovery {
       if ($Output.StartsWith("PSGallery is trusted")) {
         $global:PSGallery = $true
       }
-      elseif ($Output.StartsWith("Downloaded OPA version")) {
-        $global:DownloadedOPAVersion = $true
-      }
       elseif ($Output.StartsWith("ScubaGear setup time elapsed")) {
         $global:SetupTime = $true
         $global:SetupTimeValue = [int]$Output.split(":")[1].Trim()
       }
     }
   }
+  $OPAPath = Join-Path $env:USERPROFILE '.scubagear/Tools/opa_windows_amd64.exe'
+  $global:OPAAvailable = Test-Path -Path $OPAPath -PathType Leaf
 }
 
 # Use Write-Warning b/c other writes don't actually write
@@ -64,8 +63,8 @@ Describe "Initialize-ScubaGear Output Check" {
   It "PSGallery should be trusted" {
     $global:PSGallery | Should -Be $true
   }
-  It "OPA should be downloaded" {
-    $global:DownloadedOPAVersion | Should -Be $true
+  It "OPA should be available" {
+    $global:OPAAvailable | Should -Be $true
   }
   It "Setup time should be minimal" {
     $global:SetupTime | Should -Be $true

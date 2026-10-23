@@ -5,9 +5,17 @@ InModuleScope Orchestrator {
     Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba' {
         BeforeAll {
             Mock -ModuleName Orchestrator Invoke-Connection { @() }
-            function Get-TenantDetail {throw 'this will be mocked'}
+            function Get-TenantDetail {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($M365Environment)
+                throw 'this will be mocked'
+            }
             Mock -ModuleName Orchestrator Get-TenantDetail { '{"DisplayName": "displayName"}' }
-            function Invoke-ProviderList {throw 'this will be mocked'}
+            function Invoke-ProviderList {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($ScubaConfig, $TenantDetails, $ModuleVersion, $OutFolderPath, $Guid, $ConnectionResult)
+                throw 'this will be mocked'
+            }
             Mock -ModuleName Orchestrator Invoke-ProviderList {}
             function Invoke-RunRego {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Invoke-RunRego {}
@@ -63,6 +71,73 @@ InModuleScope Orchestrator {
 
             function Get-ServicePrincipalParams {throw 'this will be mocked'}
             Mock -ModuleName Orchestrator Get-ServicePrincipalParams { @{CertThumbprintParams = @{AppID="a"; CertificateThumbprint="b"; Organization="c"}} }
+        }
+        Context 'Interactive environment discovery' {
+            It 'uses the detected environment for tenant details and providers' {
+                Mock Invoke-Connection { @{ DetectedM365Environment = 'gcchigh'; ProdAuthFailed = @() } }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-Connection -Times 1 -Exactly
+                Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'gcchigh' }
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'gcchigh' }
+            }
+
+            It 'uses the discovered environment even when an environment was explicitly provided' {
+                Mock Invoke-Connection { @{ DetectedM365Environment = 'gcchigh'; ProdAuthFailed = @() } }
+                Invoke-SCuBA -ProductNames aad -M365Environment dod -Quiet -SilenceBODWarnings
+                Should -Invoke Get-TenantDetail -Times 1 -Exactly -ParameterFilter { $M365Environment -eq 'gcchigh' }
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.M365Environment -eq 'gcchigh' }
+            }
+        }
+        Context 'Disconnect on exit' {
+            BeforeEach {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
+            }
+
+            It 'disconnects by default when the scan completes' {
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly -ParameterFilter { -not $ProductNames }
+            }
+
+            It 'disconnects when -DisconnectOnExit is supplied' {
+                Invoke-SCuBA -ProductNames aad -DisconnectOnExit -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'keeps the session when -DisconnectOnExit:$false is supplied' {
+                Invoke-SCuBA -ProductNames aad -DisconnectOnExit:$false -Quiet -SilenceBODWarnings
+                Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
+            }
+
+            It 'disconnects when sign-in fails' {
+                Mock Invoke-Connection { throw 'sign-in failed' }
+                { Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings } | Should -Throw '*sign-in failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'disconnects when the tenant lookup fails' {
+                Mock Get-TenantDetail { throw 'tenant lookup failed' }
+                { Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings } | Should -Throw '*tenant lookup failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'disconnects when every product fails authentication' {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @('aad') } }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-ProviderList -Times 0 -Exactly
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'disconnects when provider collection fails' {
+                Mock Invoke-ProviderList { throw 'provider failed' }
+                { Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings } | Should -Throw '*provider failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 1 -Exactly
+            }
+
+            It 'keeps the session after a failure when -DisconnectOnExit:$false is supplied' {
+                Mock Invoke-Connection { throw 'sign-in failed' }
+                { Invoke-SCuBA -ProductNames aad -DisconnectOnExit:$false -Quiet -SilenceBODWarnings } | Should -Throw '*sign-in failed*'
+                Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
+            }
         }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {

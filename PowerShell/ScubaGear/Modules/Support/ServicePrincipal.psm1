@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper, Get-MsalAccessToken -force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod, Get-ScubaGearGraphEndpoint -force
@@ -2093,7 +2095,8 @@ function Get-PowerPlatformAdminToken {
     )
 
     # Azure PowerShell well-known public client ID, used for delegated admin auth (same as Connection.psm1).
-    $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+    $PPClientId = $ClientIdHash.powerplatform
     $Scope      = Get-PowerPlatformScope -M365Environment $M365Environment
     $BaseUrl    = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
 

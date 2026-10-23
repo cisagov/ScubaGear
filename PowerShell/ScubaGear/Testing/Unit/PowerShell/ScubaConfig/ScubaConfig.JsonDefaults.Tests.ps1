@@ -50,9 +50,9 @@ Describe "JSON-based Configuration System" {
     }
 
     Context "Default Values from JSON" {
-        It "Should read DisconnectOnExit default as false from JSON" {
+        It "Should read DisconnectOnExit default as true from JSON" {
             $disconnectDefault = [ScubaConfig]::ScubaDefault('DefaultDisconnectOnExit')
-            $disconnectDefault | Should -Be $false
+            $disconnectDefault | Should -Be $true
         }
 
         It "Should read LogIn default as true from JSON" {
