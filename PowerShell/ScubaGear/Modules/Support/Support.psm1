@@ -904,7 +904,7 @@ function Install-ScubaDependencies {
         Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
     }
     else {
-        $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
+        $Policy = Get-PSRepository -Name "PSGallery"
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
             Write-Output "PSGallery is trusted."
