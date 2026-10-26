@@ -43,14 +43,23 @@ function Invoke-Rego {
         throw "Open Policy Agent executable was not found. Please see the README for instructions on how to retry downloading the executable and which directory it should be placed."
     }
 
+    # Resolve the executable to its native filesystem path before launching it. $Cmd
+    # can be relative (ProcessStartInfo.FileName resolves it against the process working
+    # directory, not the PowerShell location) or carry a FileSystem PSDrive qualifier,
+    # and a native process can launch neither. GetUnresolvedProviderPathFromPSPath
+    # translates both without requiring the path to exist and keeps literal characters.
+    $Cmd = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($Cmd)
+
     # Load Utils
     if (-not (Test-Path -LiteralPath $RegoFile -PathType Leaf)) {
         throw "Rego file not found at: $RegoFile"
     }
 
-    # LiteralPath so input/output paths containing wildcard characters (e.g. []) resolve correctly.
-    $ResolvedInputFile = (Resolve-Path -LiteralPath $InputFile -ErrorAction Stop).Path
-    $ResolvedRegoFile = (Resolve-Path -LiteralPath $RegoFile -ErrorAction Stop).Path
+    # LiteralPath so paths containing wildcard characters (e.g. []) resolve correctly,
+    # and ProviderPath so the native filesystem path -- not a PSDrive-qualified one that
+    # OPA cannot resolve -- is what reaches the process.
+    $ResolvedInputFile = (Resolve-Path -LiteralPath $InputFile -ErrorAction Stop).ProviderPath
+    $ResolvedRegoFile = (Resolve-Path -LiteralPath $RegoFile -ErrorAction Stop).ProviderPath
 
     $RegoFileObject = Get-Item -LiteralPath $ResolvedRegoFile -ErrorAction Stop
     if ($null -eq $RegoFileObject) {
@@ -61,7 +70,7 @@ function Invoke-Rego {
     if (-not (Test-Path -LiteralPath $ScubaUtils -PathType Container)) {
         throw "Rego Utils directory not found at: $ScubaUtils"
     }
-    $ResolvedScubaUtils = (Resolve-Path -LiteralPath $ScubaUtils -ErrorAction Stop).Path
+    $ResolvedScubaUtils = (Resolve-Path -LiteralPath $ScubaUtils -ErrorAction Stop).ProviderPath
 
     $CmdArgs = @("eval", "data.$PackageName.tests", "-i", $ResolvedInputFile, "-d", $ResolvedRegoFile, "-d", $ResolvedScubaUtils, "-f", "values")
 

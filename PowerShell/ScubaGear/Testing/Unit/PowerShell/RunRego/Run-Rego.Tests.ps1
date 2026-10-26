@@ -59,6 +59,46 @@ InModuleScope 'RunRego' {
             }
         }
     }
+
+    Describe -Tag 'RunRego' -Name 'Invoke-Rego native path handling' {
+        BeforeAll {
+            Mock -ModuleName RunRego Invoke-ExternalCmd { return 0 }
+        }
+        It 'Resolves a FileSystem PSDrive and relative paths to native paths before invoking OPA' {
+            # A native process cannot launch a PSDrive-qualified or working-directory-relative
+            # path, so Invoke-Rego must hand OPA native filesystem paths. Build a self-contained
+            # tree (note the space in the folder name), map a FileSystem PSDrive onto it, and run
+            # from that drive with relative paths.
+            $Root  = Join-Path $TestDrive 'opa root'
+            $Utils = Join-Path $Root 'Utils'
+            [void][System.IO.Directory]::CreateDirectory($Utils)
+            $OpaName = if ("Windows_NT" -eq $Env:OS) { 'opa_windows_amd64.exe' } else { 'opa' }
+            Set-Content -LiteralPath (Join-Path $Root $OpaName) -Value 'stub'
+            Set-Content -LiteralPath (Join-Path $Root 'input.json') -Value '{}'
+            Set-Content -LiteralPath (Join-Path $Root 'Policy.rego') -Value "package aad.tests`n"
+            Set-Content -LiteralPath (Join-Path $Utils 'util.rego') -Value "package utils`n"
+
+            New-PSDrive -Name ScubaRunRegoTest -PSProvider FileSystem -Root $Root -Scope Global | Out-Null
+            try {
+                Push-Location ScubaRunRegoTest:
+                try {
+                    Invoke-Rego -InputFile './input.json' -RegoFile './Policy.rego' -PackageName 'aad' -OPAPath '.' | Out-Null
+                }
+                finally { Pop-Location }
+            }
+            finally { Remove-PSDrive -Name ScubaRunRegoTest -ErrorAction SilentlyContinue }
+
+            # The executable and every path argument reach OPA as native paths, never carrying
+            # the PSDrive qualifier that OPA cannot resolve.
+            Should -Invoke -ModuleName RunRego -CommandName Invoke-ExternalCmd -Times 1 -Exactly -ParameterFilter {
+                ($LiteralPath -eq (Join-Path $Root $OpaName)) -and
+                ($LiteralPath -notmatch 'ScubaRunRegoTest:') -and
+                (-not (($PassThruArgs -join '|') -match 'ScubaRunRegoTest:')) -and
+                (($PassThruArgs -join '|') -match ([regex]::Escape((Join-Path $Root 'input.json'))))
+            }
+        }
+    }
+
 }
 
 AfterAll {
