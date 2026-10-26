@@ -89,6 +89,38 @@ InModuleScope Orchestrator {
             Should -Invoke -CommandName Format-PlainText -Exactly -Times 0
             Should -Invoke -CommandName Write-Warning -Exactly -Times 1
         }
+
+        It 'Routes CSV values through ConvertFrom-CsvValue to neutralize spreadsheet formula injection' {
+            # Keep the tenant-derived text intact through Format-PlainText so the
+            # CSV-injection sanitizer is what acts on it.
+            Mock -CommandName Format-PlainText { $RawString }
+            Mock -CommandName ConvertFrom-CsvValue { $Value }
+            Mock -CommandName ConvertFrom-Json { @{
+                "Results" = [PSCustomObject]@{
+                    "EXO" = @(
+                        [PSCustomObject]@{
+                            "Controls" = @(
+                                [PSCustomObject]@{
+                                    "Requirement" = "Require MFA";
+                                    "Details"     = '=HYPERLINK("http://evil","x")';
+                                    "Result"      = "Pass";
+                                }
+                            )
+                        }
+                    );
+                }}
+            }
+            $CsvParameters = @{
+                ProductNames          = @("exo");
+                OutFolderPath         = ".";
+                FullScubaResultsName  = "ScubaResults";
+                OutCsvFileName        = "ScubaResults";
+                OutActionPlanFileName = "ActionPlan";
+            }
+            { ConvertTo-ResultsCsv @CsvParameters } | Should -Not -Throw
+            # The tenant-derived Details column must be routed through the sanitizer.
+            Should -Invoke -CommandName ConvertFrom-CsvValue -ParameterFilter { $Value -eq '=HYPERLINK("http://evil","x")' } -Times 1
+        }
     }
 }
 

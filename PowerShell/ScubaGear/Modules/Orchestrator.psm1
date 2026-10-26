@@ -1361,6 +1361,19 @@ function ConvertTo-ResultsCsv {
                     }
                 }
             }
+
+            # Neutralize spreadsheet formula injection before writing the CSVs. A
+            # cell whose text begins with =, +, - or @ is evaluated as a formula by
+            # Excel, and control fields such as Details are tenant-derived, so route
+            # every string column through ConvertFrom-CsvValue, mirroring
+            # ConvertTo-ScubaDiffCsvRecord in the Diff module.
+            foreach ($Row in @($ScubaResultsCsv) + @($ActionPlanCsv)) {
+                foreach ($Property in @($Row.PSObject.Properties)) {
+                    if ($Property.Value -is [string]) {
+                        $Property.Value = ConvertFrom-CsvValue -Value $Property.Value
+                    }
+                }
+            }
             $ResultsCsvFileName = Join-Path -Path $OutFolderPath "$OutCsvFileName.csv"
             $PlanCsvFileName = Join-Path -Path $OutFolderPath "$OutActionPlanFileName.csv"
             $Encoding = Get-FileEncoding
