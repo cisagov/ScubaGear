@@ -739,10 +739,13 @@ function Invoke-SCuBA {
         finally {
             if ($ScubaConfig.DisconnectOnExit) {
                 if ($VerbosePreference -eq "Continue") {
-                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue -Verbose
+                    # Verbose output is enabled, so include verbose flag when disconnecting
+                    # Removed ProductNames parameter as it is no longer needed for disconnecting
+                    Disconnect-SCuBATenant -ErrorAction SilentlyContinue -Verbose
                 }
                 else {
-                    Disconnect-SCuBATenant -ProductNames $ScubaConfig.ProductNames -ErrorAction SilentlyContinue
+                    # Removed ProductNames parameter as it is no longer needed for disconnecting
+                    Disconnect-SCuBATenant -ErrorAction SilentlyContinue
                 }
             }
             [ScubaConfig]::ResetInstance()
