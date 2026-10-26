@@ -14,6 +14,14 @@ ScubaConfigApp module contains these elements:
 - **Connected Support**: Simplify selection screen to pull in Graph users and group IDs
 - **Debug Capabilities**: Comprehensive debugging features
 
+### Legacy policy import notices
+
+When importing YAML, the migration notice lists the old and replacement policy
+IDs, including cases where the replacement is already configured. In that case,
+the existing replacement settings are retained and the legacy entry is removed;
+legacy exclusions are not merged automatically. Review the replacement policy
+before saving, especially when the file contained both versions.
+
 ![ScubaGear Assessment Process Diagram](../images/scubaconfigapp_main.png)
 
 ## Main Function

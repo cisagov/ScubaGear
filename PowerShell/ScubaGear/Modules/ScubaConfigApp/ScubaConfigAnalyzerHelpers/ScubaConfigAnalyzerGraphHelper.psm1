@@ -188,9 +188,9 @@ function Get-ScADisplayNameLookup {
                         if ($val) { $lookup[$id] = $val; break }
                     }
                 }
-            } catch { 
+            } catch {
                 # Handle any errors that occur during the display name lookup.
-                Write-Verbose "Display-name lookup failed for '$id': $($_.Exception.Message)" 
+                Write-Verbose "Display-name lookup failed for '$id': $($_.Exception.Message)"
             }
         }
     }
@@ -233,7 +233,7 @@ function Get-ScAUserPrincipalNameLookup {
     # Filter the extracted IDs to include only valid GUIDs and remove duplicates.
     $ids = @($ids | Where-Object { $_ -match $guidRe } | Select-Object -Unique)
     Write-ScAEngineActivity "User UPN resolution: $(@($ids).Count) distinct user id(s) found via $(@($userPaths).Count) path(s) ($($userPaths -join ', ')) across $(@($Policies).Count) policy/policies."
-    
+
     # If no valid user IDs were found, skip the user UPN resolution.
     if (@($ids).Count -eq 0) { return $lookup }
 
@@ -252,7 +252,7 @@ function Get-ScAUserPrincipalNameLookup {
     }
 
     Write-ScAEngineActivity "User UPN resolution: resolved $(@($lookup.Keys).Count) of $(@($ids).Count) user principal name(s)."
-    
+
     # Return the lookup table containing resolved user principal names (UPNs) keyed by user ID.
     return $lookup
 }
@@ -288,12 +288,12 @@ function Get-ScubaTenantGraphData {
     # Ensure the API catalog is loaded for resolving resource URIs.
     Import-ScAApiCatalog -ApiCatalogPath $ApiCatalogPath
     # Initialize the data structure to hold tenant and organization information.
-    $data = @{ 
-        conditional_access_policies = @(); 
-        OrgDisplayName = $null; 
-        Organization = $null; 
-        TenantId = $null; 
-        DisplayNameLookup = @{}; 
+    $data = @{
+        conditional_access_policies = @();
+        OrgDisplayName = $null;
+        Organization = $null;
+        TenantId = $null;
+        DisplayNameLookup = @{};
         UserUpnLookup = @{} }
 
     # Determine the product-specific controls from the baseline schema.
@@ -437,7 +437,7 @@ function Get-ScubaAnalyzerFetchConnections {
     # Iterate over each selected product and collect all cmdlets referenced in its baseline validations.
     foreach ($p in $Products) {
         $pl = $p.ToLower()
-        
+
         # Check if the baseline schema contains validations for the current product.
         if ($BaselineSchema.baselineValidations.PSObject.Properties.Name -contains $pl) {
             foreach ($c in $BaselineSchema.baselineValidations.$pl) { if ($c.apiPermissionRef) { [void]$cmdlets.Add([string]$c.apiPermissionRef) } }

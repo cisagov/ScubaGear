@@ -408,39 +408,10 @@ Function Invoke-YamlImportWithProgress {
         }
         # Show migration report if legacy policies were remapped (only on success)
         if ($importSucceeded -and $syncHash.MigrationLog -and $syncHash.MigrationLog.Count -gt 0) {
-            $bullet    = [char]0x2022
             $migCfg    = $syncHash.UIConfigs.policyMigration
             $rptCfg    = $migCfg.localeReportWindow
-            $maxLines  = [int]$migCfg.reportMaxLinesPerSection
-
-            $migrated  = @($syncHash.MigrationLog | Where-Object { $_ -match "^$($rptCfg.sections.migrated.prefix)"  })
             $decoupled = @($syncHash.MigrationLog | Where-Object { $_ -match "^$($rptCfg.sections.decoupled.prefix)" })
-            $dropped   = @($syncHash.MigrationLog | Where-Object { $_ -match "^$($rptCfg.sections.dropped.prefix)"   })
-
-            $sections = [System.Collections.ArrayList]::new()
-
-            if ($migrated.Count -gt 0) {
-                $heading = $rptCfg.sections.migrated.heading -f $migrated.Count
-                $lines   = ($migrated | Select-Object -First $maxLines | ForEach-Object { "$bullet $_" }) -join "`n"
-                if ($migrated.Count -gt $maxLines) { $lines += "`n$bullet ... and $($migrated.Count - $maxLines) more" }
-                [void]$sections.Add("$heading`n$lines")
-            }
-            if ($decoupled.Count -gt 0) {
-                $heading = $rptCfg.sections.decoupled.heading -f $decoupled.Count
-                $body    = $rptCfg.sections.decoupled.body
-                $lines   = ($decoupled | ForEach-Object { "$bullet $_" }) -join "`n"
-                [void]$sections.Add("$heading`n$body`n$lines")
-            }
-            if ($dropped.Count -gt 0) {
-                $heading = $rptCfg.sections.dropped.heading -f $dropped.Count
-                $lines   = ($dropped | ForEach-Object { "$bullet $_" }) -join "`n"
-                [void]$sections.Add("$heading`n$lines")
-            }
-
-            $total = $syncHash.MigrationLog.Count
-            $msg   = ($rptCfg.intro -f $total) + "`n`n" +
-                     ($sections -join "`n`n") +
-                     "`n`n" + $rptCfg.outro
+            $msg = Format-PolicyMigrationReport -MigrationLog @($syncHash.MigrationLog) -MigrationConfig $migCfg
 
             $icon = if ($decoupled.Count -gt 0) { [System.Windows.MessageBoxImage]::Warning } else { [System.Windows.MessageBoxImage]::Information }
             $syncHash.ShowMessageBox.Invoke(
@@ -633,6 +604,94 @@ Function Import-YamlToDataStructures {
 # YAML files to their SecuritySuite equivalents using the mapping defined in
 # mappings\scuba-baseline-policy-migrations.csv.
 # =============================================================================
+
+function Format-PolicyMigrationReport {
+    <#
+    .SYNOPSIS
+    Formats every migration outcome using the report sections in the UI JSON.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string[]]$MigrationLog,
+        [Parameter(Mandatory)][object]$MigrationConfig
+    )
+
+    $report = $MigrationConfig.localeReportWindow
+    $maxLines = [int]$MigrationConfig.reportMaxLinesPerSection
+    if ($maxLines -lt 1) { throw 'Migration reportMaxLinesPerSection must be positive.' }
+    $bullet = [char]0x2022
+    $sections = @()
+    $remaining = @($MigrationLog)
+    foreach ($property in $report.sections.PSObject.Properties) {
+        $definition = $property.Value
+        $pattern = '^' + [regex]::Escape([string]$definition.prefix) + '(?:\s|$)'
+        $entries = @($remaining | Where-Object { $_ -match $pattern })
+        if ($entries.Count -eq 0) { continue }
+        $remaining = @($remaining | Where-Object { $_ -notmatch $pattern })
+        $parts = @()
+        if ($definition.heading) { $parts += $definition.heading -f $entries.Count }
+        if ($definition.body) { $parts += $definition.body }
+        $parts += @($entries | Select-Object -First $maxLines | ForEach-Object { "$bullet $_" })
+        if ($entries.Count -gt $maxLines) { $parts += "$bullet ... and $($entries.Count - $maxLines) more" }
+        $sections += $parts -join "`n"
+    }
+    # Preserve unexpected log entries rather than displaying a count with no details.
+    $sections += @($remaining | ForEach-Object { "$bullet $_" })
+    return ($report.intro -f $MigrationLog.Count) + "`n`n" + ($sections -join "`n`n") + "`n`n" + $report.outro
+}
+
+function Merge-MigratedPolicyData {
+    <#
+    .SYNOPSIS
+    Merges legacy policy exclusion data into an already-configured replacement policy.
+    .DESCRIPTION
+    Dictionaries are merged recursively and lists are unioned. A scalar that differs
+    from the target's is a conflict: the target value is kept and the conflict is counted.
+    .OUTPUTS
+    Hashtable with Merged (both sides were mergeable dictionaries), Added (values added
+    to the target) and Conflicts (differing scalars where the target was kept).
+    #>
+    [CmdletBinding()]
+    param(
+        [AllowNull()]$Target,
+        [AllowNull()]$Legacy
+    )
+
+    $result = @{ Merged = $false; Added = 0; Conflicts = 0 }
+    if (-not ($Target -is [System.Collections.IDictionary]) -or -not ($Legacy -is [System.Collections.IDictionary])) {
+        return $result
+    }
+    $result.Merged = $true
+
+    foreach ($key in @($Legacy.Keys)) {
+        $legacyValue = $Legacy[$key]
+        if (-not $Target.Contains($key)) {
+            $Target[$key] = $legacyValue
+            $result.Added += if ($legacyValue -is [System.Collections.IList]) { $legacyValue.Count } else { 1 }
+            continue
+        }
+        $targetValue = $Target[$key]
+        if ($targetValue -is [System.Collections.IDictionary] -and $legacyValue -is [System.Collections.IDictionary]) {
+            $child = Merge-MigratedPolicyData -Target $targetValue -Legacy $legacyValue
+            $result.Added += $child.Added
+            $result.Conflicts += $child.Conflicts
+        }
+        elseif ($targetValue -is [System.Collections.IList] -and $legacyValue -is [System.Collections.IList]) {
+            $merged = [System.Collections.Generic.List[object]]::new()
+            foreach ($item in $targetValue) { $merged.Add($item) }
+            foreach ($item in $legacyValue) {
+                $present = $false
+                foreach ($existing in $merged) { if ([string]$existing -ieq [string]$item) { $present = $true; break } }
+                if (-not $present) { $merged.Add($item); $result.Added++ }
+            }
+            $Target[$key] = $merged
+        }
+        elseif ([string]$targetValue -ne [string]$legacyValue) {
+            $result.Conflicts++
+        }
+    }
+    return $result
+}
 
 Function Get-PolicyMigrationMap {
     <#
@@ -887,9 +946,23 @@ Function Invoke-PolicyMigration {
                     Write-DebugOutput -Message "Skipping MigrationPendingReview for [$newPolicyId]: no renderable Exclusion card" -Source $MyInvocation.MyCommand -Level "Info"
                 }
             } else {
-                [void]$syncHash.MigrationLog.Add(
-                    "$pfxSkipped exclusion [$productKey][$oldPolicyId] → [$newProductKey][$newPolicyId] (target already configured)")
-                Write-DebugOutput -Message "Migration skipped - target already configured: [$newProductKey][$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
+                # The replacement policy is already configured: fold the legacy values into it
+                # rather than discarding them.
+                $merge = Merge-MigratedPolicyData -Target $targetData[$newPolicyId] -Legacy $productData[$oldPolicyId]
+                if ($merge.Merged -and ($merge.Added -gt 0 -or $merge.Conflicts -eq 0)) {
+                    $mergeNote = if ($merge.Added -gt 0) { "merged into existing target: $($merge.Added) value(s) added" } else { "existing target already contained all values" }
+                    $prefix = if ($entry.migrationType -eq $typeDecoupled) { $pfxDecoupled } else { $pfxMigrated }
+                    [void]$syncHash.MigrationLog.Add(
+                        "$prefix exclusion [$productKey][$oldPolicyId] → [$newProductKey][$newPolicyId] ($mergeNote)")
+                    Write-DebugOutput -Message "Migrated exclusion by merging: [$productKey][$oldPolicyId] → [$newProductKey][$newPolicyId] ($mergeNote)" -Source $MyInvocation.MyCommand -Level "Info"
+                    if ($merge.Added -gt 0 -and (& $HasRenderableCard 'Exclusions' $newProductKey $newPolicyId)) {
+                        [void]$syncHash.MigrationPendingReview.Add("Exclusions|$newPolicyId")
+                    }
+                } else {
+                    [void]$syncHash.MigrationLog.Add(
+                        "$pfxSkipped exclusion [$productKey][$oldPolicyId] → [$newProductKey][$newPolicyId] (target already configured)")
+                    Write-DebugOutput -Message "Migration skipped - target already configured with conflicting values: [$newProductKey][$newPolicyId]" -Source $MyInvocation.MyCommand -Level "Warning"
+                }
             }
             $productData.Remove($oldPolicyId)
             }
@@ -1037,4 +1110,3 @@ Function Invoke-PolicyMigration {
     Write-DebugOutput -Message "Policy migration complete: $($syncHash.MigrationLog.Count) change(s)" -Source $MyInvocation.MyCommand -Level "Info"
     return $Config
 }
-
