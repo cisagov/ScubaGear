@@ -140,7 +140,7 @@ function Invoke-ScubaConfigAnalysis {
                 $providerAnalysis = if ($vtype -ne 'conditionalAccessPolicy' -and $candidateExclusionField) {
                     Get-ScAProviderAnalysis -ExclusionField $candidateExclusionField -Raw $results.Raw
                 } else { $null }
-                
+
                 # Retrieve the policy analysis for CA controls based on the validation schema.
                 $policyAnalysis = if ($validationSchema -and $vtype -eq 'conditionalAccessPolicy') {
                     Get-ScAPolicyAnalysis -ControlId $controlId -Results $results -ValidationSchema $validationSchema
@@ -151,14 +151,14 @@ function Invoke-ScubaConfigAnalysis {
                 # Best-match policy = closest to compliant (fewest policy-setting changes, then fewest waivers).
                 $sortedPolicies = @($policyAnalysis.AllPolicies | Sort-Object { $_.SettingIssueCount }, { $_.ExcludedPrincipalCount }, { $_.IssueCount })
                 $bestMatch      = if (@($sortedPolicies).Count -gt 0) { $sortedPolicies[0] } else { $null }
-                
+
                 # Determine the detected exclusions based on the best-match policy.
                 $detectedExclusions = if ($bestMatch) {
                     $bestMatch.DetectedExclusions
                 } else {
-                    @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() }
+                    @{}
                 }
-                
+
                 # Collect all missing settings from the policy analysis for reporting purposes.
                 $missingSettings = @()
                 foreach ($p in @($policyAnalysis.AllPolicies)) { $missingSettings += $p.Issues }
@@ -167,7 +167,7 @@ function Invoke-ScubaConfigAnalysis {
                 $baselineExclusionField = if ($validationSchema -and $validationSchema.exclusionField) { $validationSchema.exclusionField } else { 'none' }
                 $remediation    = if ($validationSchema -and $validationSchema.remediationSteps) { @($validationSchema.remediationSteps) } elseif ($validationSchema -and $validationSchema.buildInstructions.configurationSteps) { @($validationSchema.buildInstructions.configurationSteps) } else { @() }
                 $requirementTxt = if ($control.Requirement) { $control.Requirement } elseif ($validationSchema) { $validationSchema.name } else { $controlId }
-                
+
                 # Remove any HTML tags from the requirement text for cleaner display.
                 $requirementTxt = Remove-ScAHtml $requirementTxt
 
@@ -179,14 +179,8 @@ function Invoke-ScubaConfigAnalysis {
                     # Otherwise, mark the root cause as non-compliant.
                     if ($result -eq 'Pass') {
                         $rootCause = @{ RootCause = 'Compliant'; RequiresAction = 'NONE'; Recommendations = @() }
-                    } elseif (@($providerAnalysis.Flagged).Count -gt 0) {
-                        $rootCause = @{
-                            RootCause      = "$(@($providerAnalysis.Flagged).Count) item(s) flagged: $(@($providerAnalysis.Flagged) -join ', ')"
-                            RequiresAction = 'EXCLUDE'
-                            Recommendations = @('Review the flagged entries below - add approved ones to the exclusion allow-list; otherwise change the tenant setting (see remediation steps).')
-                        }
                     } else {
-                        $rootCause = @{ RootCause = 'The tenant setting does not meet this baseline.'; RequiresAction = 'FIX_TENANT'; Recommendations = @() }
+                        $rootCause = Get-ScAProviderRootCause -ProviderAnalysis $providerAnalysis
                     }
                 } else {
                     #Get the root cause and recommendations for this control result, based on the policy analysis.
@@ -202,6 +196,11 @@ function Invoke-ScubaConfigAnalysis {
                     $configInfo.Configurable = $true
                     $configInfo.ConfigAction = 'EXCLUDE'
                     if (@($configInfo.ConfigExclusionTypes).Count -eq 0) { $configInfo.ConfigExclusionTypes = @($candidateExclusionField) }
+                }
+                # Only problems that config cannot waive (nonExcludable detectors) and nothing to
+                # allow-list: the tenant must change and no exclusions apply.
+                if ($providerAnalysis -and $result -ne 'Pass' -and @($providerAnalysis.Blocking).Count -gt 0 -and @($providerAnalysis.Flagged).Count -eq 0) {
+                    $configInfo.ConfigAction = 'FIX_TENANT'
                 }
 
                 # The config-schema exclusion type is authoritative for the YAML key (the
@@ -427,6 +426,7 @@ function Invoke-ScubaTenantScan {
 
             # The exclusion type selects the analysis (exclusionDefinitions.<field>.analysis).
             $candidateExclusionField = $null
+            $providerRecommendations = @()
 
             # Determine the candidate exclusion field for the current control.
             if ($syncHash.ScAConfigurableMap -and $syncHash.ScAConfigurableMap.ContainsKey($controlId) -and @($syncHash.ScAConfigurableMap[$controlId]).Count -gt 0) {
@@ -453,10 +453,12 @@ function Invoke-ScubaTenantScan {
                     # returned nothing) - do NOT claim Pass; flag it as needing verification.
                     $result = 'Manual'; $requiresAction = 'REVIEW'
                     $rootCause = "Could not collect the data needed to check this baseline (no '$candidateExclusionField' source data). Verify the required module/connection (e.g. Connect-ExchangeOnline) and re-scan."
-                } elseif (@($providerAnalysis.Flagged).Count -gt 0) {
-                    # One or more items were flagged in the provider analysis, indicating a failure.
-                    $result = 'Fail'; $requiresAction = 'EXCLUDE'
-                    $rootCause = "$(@($providerAnalysis.Flagged).Count) item(s) flagged: $(@($providerAnalysis.Flagged) -join ', ')"
+                } elseif (@($providerAnalysis.Flagged).Count -gt 0 -or @($providerAnalysis.Blocking).Count -gt 0) {
+                    # Items were flagged: some may be waivable by config exclusions, others (Blocking) need a tenant fix.
+                    $providerCause = Get-ScAProviderRootCause -ProviderAnalysis $providerAnalysis
+                    $result = 'Fail'; $requiresAction = $providerCause.RequiresAction
+                    $rootCause = $providerCause.RootCause
+                    $providerRecommendations = @($providerCause.Recommendations)
                 } else {
                     # No items were flagged in the provider analysis, indicating a pass.
                     $result = 'Pass'; $requiresAction = 'NONE'
@@ -478,6 +480,11 @@ function Invoke-ScubaTenantScan {
                 $configInfo.ConfigAction = 'EXCLUDE'
                 if (@($configInfo.ConfigExclusionTypes).Count -eq 0) { $configInfo.ConfigExclusionTypes = @($candidateExclusionField) }
             }
+            # Only problems that config cannot waive (nonExcludable detectors) and nothing to
+            # allow-list: the tenant must change and no exclusions apply.
+            if ($providerAnalysis -and $result -ne 'Pass' -and @($providerAnalysis.Blocking).Count -gt 0 -and @($providerAnalysis.Flagged).Count -eq 0) {
+                $configInfo.ConfigAction = 'FIX_TENANT'
+            }
 
             # Update the summary counts based on the analysis result.
             switch ($result) {
@@ -491,7 +498,7 @@ function Invoke-ScubaTenantScan {
             $sortedPolicies = @($policyAnalysis.AllPolicies | Sort-Object { $_.SettingIssueCount }, { $_.ExcludedPrincipalCount }, { $_.IssueCount })
             $bestMatch      = if (@($sortedPolicies).Count -gt 0) { $sortedPolicies[0] } else { $null }
             # Determine the detected exclusions and missing settings for the best match policy.
-            $detectedExclusions = if ($bestMatch) { $bestMatch.DetectedExclusions } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
+            $detectedExclusions = if ($bestMatch) { $bestMatch.DetectedExclusions } else { @{} }
             $missingSettings = @()
             # Collect all missing settings from the policy analysis.
             foreach ($p in @($policyAnalysis.AllPolicies)) { $missingSettings += $p.Issues }
@@ -534,11 +541,16 @@ function Invoke-ScubaTenantScan {
 
             # Initialize the recommendations array and populate it based on the required action.
             $recommendations = @()
-            switch ($requiresAction) {
-                'ADD_EXCLUSIONS' { $recommendations += "Add the excluded users/groups below to your ScubaGear config so this baseline passes." }
-                'EXCLUDE'        { $recommendations += "Review the flagged entries below - add approved ones to the exclusion allow-list; otherwise change the tenant setting." }
-                'FIX_POLICY'     { $recommendations += "Update the best-match policy so its settings match the baseline requirement, then re-scan." }
-                'CREATE_POLICY'  { $recommendations += "Create a new Conditional Access policy as described below, then re-scan." }
+            if (@($providerRecommendations).Count -gt 0) {
+                # Provider controls supply their own guidance (exclusions vs. tenant fix).
+                $recommendations += @($providerRecommendations)
+            } else {
+                switch ($requiresAction) {
+                    'ADD_EXCLUSIONS' { $recommendations += "Add the excluded users/groups below to your ScubaGear config so this baseline passes." }
+                    'EXCLUDE'        { $recommendations += "Review the flagged entries below - add approved ones to the exclusion allow-list; otherwise change the tenant setting." }
+                    'FIX_POLICY'     { $recommendations += "Update the best-match policy so its settings match the baseline requirement, then re-scan." }
+                    'CREATE_POLICY'  { $recommendations += "Create a new Conditional Access policy as described below, then re-scan." }
+                }
             }
             # Add additional recommendations if the configuration action requires fixing the tenant setting.
             if ($configInfo.ConfigAction -eq 'FIX_TENANT') {

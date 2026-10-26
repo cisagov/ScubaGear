@@ -989,7 +989,7 @@
       {
         "id": "MS.AAD.9.1v1",
         "name": "Risky AI agents SHALL be blocked",
-        "exclusionField": "CapExclusions",
+        "exclusionField": "AgentExclusions",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
         "validationLogic": {
           "type": "conditionalAccessPolicy",
@@ -1002,8 +1002,9 @@
                 "all"
               ],
               "applications": {
-                "includeApplications": [
-                  "All"
+                "anyOf": [
+                  { "includeApplications": ["All"] },
+                  { "includeApplications": ["AllAgentIdResources"] }
                 ]
               },
               "agentIdRiskLevels": [

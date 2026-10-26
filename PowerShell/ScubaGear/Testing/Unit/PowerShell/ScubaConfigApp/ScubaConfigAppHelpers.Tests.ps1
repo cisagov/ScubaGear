@@ -508,6 +508,58 @@
                 }
             }
 
+            It 'Should merge a legacy entry into an existing same-product target and log MIGRATED' {
+                Mock -ModuleName ScubaConfigAppImportHelper Get-PolicyMigrationMap {
+                    return @{
+                        'MS.AAD.3.2v1' = [PSCustomObject]@{
+                            oldPolicyId = 'MS.AAD.3.2v1'; oldProduct = 'Aad'
+                            newPolicyId = 'MS.AAD.3.2v2'; newProduct = 'Aad'
+                            allNewPolicyIds = @('MS.AAD.3.2v2'); migrationNote = 'Version bump'
+                        }
+                    }
+                }
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.3.2v1' = [ordered]@{ CapExclusions = [ordered]@{ Groups = @('g1', 'g2', 'G3'); Users = @('u1') } }
+                        'MS.AAD.3.2v2' = [ordered]@{ CapExclusions = [ordered]@{ Groups = @('g2', 'g3') } }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                $result['Aad'].Keys -contains 'MS.AAD.3.2v1' | Should -BeFalse
+                $target = $result['Aad']['MS.AAD.3.2v2']['CapExclusions']
+                ($target.Groups | Sort-Object) -join ',' | Should -Be 'g1,g2,g3'
+                $target.Users -join ',' | Should -Be 'u1'
+                InModuleScope ScubaConfigAppImportHelper {
+                    $script:syncHash.MigrationLog.Count | Should -Be 1
+                    $script:syncHash.MigrationLog[0]    | Should -Match '^MIGRATED exclusion \[Aad\]\[MS\.AAD\.3\.2v1\] .* \[Aad\]\[MS\.AAD\.3\.2v2\]'
+                    $script:syncHash.MigrationLog[0]    | Should -Not -Match 'SKIPPED'
+                }
+            }
+
+            It 'Should log MIGRATED without review when the target already contains every legacy value' {
+                Mock -ModuleName ScubaConfigAppImportHelper Get-PolicyMigrationMap {
+                    return @{
+                        'MS.AAD.3.2v1' = [PSCustomObject]@{
+                            oldPolicyId = 'MS.AAD.3.2v1'; oldProduct = 'Aad'
+                            newPolicyId = 'MS.AAD.3.2v2'; newProduct = 'Aad'
+                            allNewPolicyIds = @('MS.AAD.3.2v2'); migrationNote = 'Version bump'
+                        }
+                    }
+                }
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.3.2v1' = [ordered]@{ CapExclusions = [ordered]@{ Groups = @('g1') } }
+                        'MS.AAD.3.2v2' = [ordered]@{ CapExclusions = [ordered]@{ Groups = @('g1', 'g2') } }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                ($result['Aad']['MS.AAD.3.2v2']['CapExclusions'].Groups | Sort-Object) -join ',' | Should -Be 'g1,g2'
+                InModuleScope ScubaConfigAppImportHelper {
+                    $script:syncHash.MigrationLog[0] | Should -Match '^MIGRATED'
+                    $script:syncHash.MigrationPendingReview.Count | Should -Be 0
+                }
+            }
+
             It 'Should leave non-legacy product keys untouched' {
                 $config = [ordered]@{
                     'Aad' = [ordered]@{ 'MS.AAD.3.1v1' = @{ CapExclusions = @{} } }
