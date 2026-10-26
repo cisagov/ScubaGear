@@ -149,19 +149,21 @@ function Invoke-SCuBA {
     This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
+    .Notes
+    ProductName and M365Environment default values are pulled from the ScubaConfig schema
     #>
     [CmdletBinding(DefaultParameterSetName='Report')]
     param (
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Configuration')]
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment'),
@@ -330,10 +332,10 @@ function Invoke-SCuBA {
         # Initialize logging flag - actual initialization happens after output folder is created
         $Script:ScubaLoggingEnabled = $false
 
-        # ProductNames normalization (wildcard expansion) is centralized in 
-        # ConvertTo-ScubaProductNames and applied once to the resolved $ScubaConfig.ProductNames 
-        # below, after the command-line parameters and any configuration file have been merged. 
-        # Handling it at that single # convergence point ensures products from either source are 
+        # ProductNames normalization (wildcard expansion) is centralized in
+        # ConvertTo-ScubaProductNames and applied once to the resolved $ScubaConfig.ProductNames
+        # below, after the command-line parameters and any configuration file have been merged.
+        # Handling it at that single # convergence point ensures products from either source are
         # normalized identically.
 
         # Default execution ParameterSet
@@ -762,27 +764,9 @@ function Invoke-SCuBA {
     }
 }
 
-$ArgToProd = @{
-    teams = "Teams";
-    exo = "EXO";
-    securitysuite = "SecuritySuite";
-    aad = "AAD";
-    powerplatform = "PowerPlatform";
-    sharepoint = "SharePoint";
-    powerbi = "PowerBI";
-}
-
-$ProdToFullName = @{
-    Teams = "Microsoft Teams";
-    EXO = "Exchange Online";
-    SecuritySuite = "Security Suite";
-    AAD = "Azure Active Directory";
-    PowerPlatform = "Microsoft Power Platform";
-    SharePoint = "SharePoint Online";
-    PowerBI = "Microsoft Power BI";
-}
-
-$IndividualReportFolderName = "IndividualReports"
+# This variable stores the default folder name for individual reports
+# This now comes from the ScubaConfig default settings and schema
+$IndividualReportFolderName = [ScubaConfig]::ScubaDefault('DefaultIndividualReportFolderName')
 
 function Get-FileEncoding{
     <#
@@ -866,7 +850,8 @@ function Invoke-ProviderList {
             }
 
             foreach ($Product in $ScubaConfig.ProductNames) {
-                $BaselineName = $ArgToProd[$Product]
+                # Get the default individual report folder name from the ScubaConfig
+                $BaselineName = [ScubaConfig]::GetProductBaselineName($Product)
                 $N += 1
                 $Percent = $N * 100 / $Len
                 $Status = "Running the $($BaselineName) Provider; $($N) of $($Len) Product settings extracted"
@@ -1078,7 +1063,8 @@ function Invoke-RunRego {
             $N = 0
             $Len = $ScubaConfig.ProductNames.Length
             foreach ($Product in $ScubaConfig.ProductNames) {
-                $BaselineName = $ArgToProd[$Product]
+                # Get the default individual report folder name from the ScubaConfig
+                $BaselineName = [ScubaConfig]::GetProductBaselineName($Product)
                 $N += 1
                 $Percent = $N * 100 / $Len
 
@@ -1286,12 +1272,14 @@ function ConvertTo-ResultsCsv {
     This function converts the controls inside the Results section of the json output to a csv.
     .Functionality
     Internal
+    .Notes
+    Product Names and M365 Environment parameters support argument completion.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductNames,
 
@@ -1329,7 +1317,8 @@ function ConvertTo-ResultsCsv {
                 $ScubaResults = @{"Results" = [PSCustomObject]@{}}
                 $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
                 foreach ($Product in $ProductNames) {
-                    $BaselineName = $ArgToProd[$Product]
+                    # Get the default individual report folder name from the ScubaConfig
+                    $BaselineName = [ScubaConfig]::GetProductBaselineName($Product)
                     $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
                     $IndividualResults = Get-Content -Encoding UTF8 -LiteralPath $FileName | ConvertFrom-Json
                     $ScubaResults.Results | Add-Member -NotePropertyName $BaselineName `
@@ -1643,12 +1632,14 @@ function ConvertTo-RiskyAppsCsv {
     highest risk level to lowest.
     .Functionality
     Internal
+    .Notes
+    ProductName default values are pulled from the ScubaConfig schema
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductNames,
 
@@ -1831,12 +1822,17 @@ function Merge-JsonOutput {
     This function packages all the json output created into a single json file.
     .Functionality
     Internal
+    .Description
+    This function is intended for internal use within the Scuba orchestrator module.
+    It merges individual JSON outputs into a consolidated JSON file for easier analysis.
+    .Notes
+    ProductNames are pulled from the ScubaConfig schema
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductNames,
 
@@ -1890,9 +1886,13 @@ function Merge-JsonOutput {
             $FullNames = @()
             $ProductAbbreviationMapping = @{}
             foreach ($ProductName in $ProductNames) {
-                $BaselineName = $ArgToProd[$ProductName]
-                $FullNames += $ProdToFullName[$BaselineName]
-                $ProductAbbreviationMapping[$ProdToFullName[$BaselineName]] = $BaselineName
+                # Pull the baseline name and display name for the product from the schema
+                $BaselineName = [ScubaConfig]::GetProductBaselineName($ProductName)
+                # Pull the display name for the product based on the baseline name from the schema
+                $DisplayName = [ScubaConfig]::GetDisplayNameFromBaselineName($BaselineName)
+                # Add the display name to the full names list and map it to the baseline name
+                $FullNames += $DisplayName
+                $ProductAbbreviationMapping[$DisplayName] = $BaselineName
             }
 
             $Results = [pscustomobject]@{}
@@ -1917,7 +1917,8 @@ function Merge-JsonOutput {
             $IndividualReportPath = Join-Path -Path $OutFolderPath $IndividualReportFolderName -ErrorAction 'Stop'
             $FailsNotAnnotated = @()
             foreach ($Product in $ProductNames) {
-                $BaselineName = $ArgToProd[$Product]
+                # Pull the display name for the product based on the baseline name from the schema
+                $BaselineName = [ScubaConfig]::GetProductBaselineName($Product)
                 $FileName = Join-Path $IndividualReportPath "$($BaselineName)Report.json"
                 $DeletionList += $FileName
                 $IndividualResults = Get-Content -Encoding UTF8 -LiteralPath $FileName | ConvertFrom-Json
@@ -2074,7 +2075,8 @@ function Invoke-ReportCreation {
             $SecureBaselines =  Import-SecureBaseline -ProductNames $ScubaConfig.ProductNames
 
             foreach ($Product in $ScubaConfig.ProductNames) {
-                $BaselineName = $ArgToProd[$Product]
+                # Pull the baseline name and display name for the product from the schema
+                $BaselineName = [ScubaConfig]::GetProductBaselineName($Product)
                 $N += 1
                 $Percent = $N*100/$Len
                 $Status = "Running the $($BaselineName) Report creation; $($N) of $($Len) Baselines Reports created";
@@ -2087,7 +2089,8 @@ function Invoke-ReportCreation {
                 }
                 Write-Progress @ProgressParams
 
-                $FullName = $ProdToFullName[$BaselineName]
+                # Pull the display name for the product based on the baseline name from the schema
+                $FullName = [ScubaConfig]::GetDisplayNameFromBaselineName($BaselineName)
 
                 $CreateReportParams = @{
                     'BaselineName' = $BaselineName;
@@ -2236,11 +2239,13 @@ function Get-TenantDetail {
     the various M365 PowerShell modules
     .Functionality
     Internal
+    .Notes
+    The M365Environment default values are pulled from the ScubaConfig schema
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+    [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment
@@ -2297,18 +2302,20 @@ function Compare-ProductList {
     Used to compare a failed execution list with the original list
     .Functionality
     Internal
+    .Notes
+    ProductName and ProductsFailed are pulled from the ScubaConfig schema
     #>
     param(
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductNames,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductsFailed,
 
@@ -2458,6 +2465,8 @@ function Invoke-SCuBACached {
     This example will run the tool against all available security baselines while authenticating using a Service Principal with the CertificateThumprint bundle of parameters.
     .Functionality
     Public
+    .Notes
+    ProductName and M365Environment default values are pulled from the ScubaConfig schema
     #>
     [CmdletBinding()]
     param (
@@ -2468,12 +2477,12 @@ function Invoke-SCuBACached {
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", '*', IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]
         $ProductNames = [ScubaConfig]::ScubaDefault('DefaultProductNames'),
 
         [Parameter(Mandatory = $false, ParameterSetName = 'Report')]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment = [ScubaConfig]::ScubaDefault('DefaultM365Environment'),
@@ -2592,7 +2601,8 @@ function Invoke-SCuBACached {
             $Script:ScubaLoggingEnabled = $false
 
             if ($ProductNames -eq '*'){
-                $ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
+                # If ProductNames is set to '*', retrieve all supported products from the ScubaConfig schema
+                $ProductNames = [ScubaConfig]::GetSupportedProducts()
             }
 
             if ($OutCsvFileName -eq $OutActionPlanFileName) {
