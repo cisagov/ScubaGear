@@ -1,3 +1,5 @@
+Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
+
 function Invoke-Rego {
     <#
     .Description
@@ -74,6 +76,21 @@ function Invoke-Rego {
 
     $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
     $RegoOutput
+
+    # # Test code Below (Delete after beta testing)
+    # ########################
+    # $ShellPath = (Get-Process -Id $PID).Path
+    # # $Script = '[Console]::Out.WriteLine("Some message on stdout"); exit 2'
+    # $Script = '[Console]::Error.WriteLine("Some message on stderr"); exit 2'
+
+    # $Encoded = [Convert]::ToBase64String(
+    #     [Text.Encoding]::Unicode.GetBytes($Script)
+    # )
+
+    # Invoke-ExternalCmd -LiteralPath $ShellPath -PassThruArgs @(
+    #     '-NoProfile', '-NonInteractive', '-EncodedCommand', $Encoded
+    # )
+    # ####################### End Test code
 }
 
 function Invoke-ExternalCmd{
@@ -103,55 +120,84 @@ function Invoke-ExternalCmd{
     }
     $ProcessStartInfo.Arguments = ($EscapedArgs -join ' ')
 
+    $ExecutablePath = (Resolve-Path -LiteralPath $LiteralPath -ErrorAction Stop).Path
+    $ProcessStartInfo.FileName = $ExecutablePath
+    Write-ScubaLog -Message "$ExecutablePath $($ProcessStartInfo.Arguments)" -Level "Info" -Source "Invoke-ExternalCmd"
+
     $Process = [System.Diagnostics.Process]::new()
-    $Process.StartInfo = $ProcessStartInfo
     try {
-        $ProcessStarted = $Process.Start()
-        if (-not $ProcessStarted) {
-            throw "Failed to start process '$LiteralPath'. The process returned false on Start()."
+        $Process.StartInfo = $ProcessStartInfo
+        try {
+            if (-not $Process.Start()) {
+                throw 'The process returned false on Start().'
+            }
         }
-    }
-    catch {
-        throw "Failed to start process '$LiteralPath': $($_.Exception.Message)"
-    }
-
-    # Read streams asynchronously to avoid deadlocks
-    $stdOutTask = $Process.StandardOutput.ReadToEndAsync()
-    $stdErrTask = $Process.StandardError.ReadToEndAsync()
-
-    $Process.WaitForExit()
-
-    $StdOut = ""
-    $StdErr = ""
-
-    try {
-        $StdOut = $stdOutTask.Result
-    }
-    catch {
-        Write-Verbose "Failed to read StandardOutput: $($_.Exception.Message)"
-    }
-
-    try {
-        $StdErr = $stdErrTask.Result
-    }
-    catch {
-        Write-Verbose "Failed to read StandardError: $($_.Exception.Message)"
-    }
-
-    if ($Process.ExitCode -ne 0) {
-        if ([string]::IsNullOrWhiteSpace($StdErr)) {
-            $StdErr = "Unknown error from external command."
+        catch {
+            $Message = "Failed to start process '$ExecutablePath': $($_.Exception.Message)"
+            throw $Message
         }
-        throw "Program '$LiteralPath' failed with exit code $($Process.ExitCode): $StdErr"
-    }
 
-    if (-not [string]::IsNullOrWhiteSpace($StdErr)) {
-        Write-Verbose "External command stderr: $StdErr"
-    }
+        # Start both reads before waiting to avoid deadlocks on full output buffers.
+        # Attempt both streams even if starting or completing one read fails.
+        $StreamErrors = @()
+        $ReadTasks = @{}
+        $Output = @{ StandardOutput = ''; StandardError = '' }
+        foreach ($Stream in @('StandardOutput', 'StandardError')) {
+            try {
+                $ReadTasks[$Stream] = $Process.$Stream.ReadToEndAsync()
+            }
+            catch {
+                $StreamErrors += "Failed to read ${Stream}: $($_.Exception.Message)"
+            }
+        }
 
-    return $StdOut
+        foreach ($Stream in @('StandardOutput', 'StandardError')) {
+            if ($ReadTasks.ContainsKey($Stream)) {
+                try {
+                    $Output[$Stream] = $ReadTasks[$Stream].GetAwaiter().GetResult()
+                }
+                catch {
+                    $StreamErrors += "Failed to read ${Stream}: $($_.Exception.Message)"
+                }
+            }
+        }
+
+        $Process.WaitForExit()
+        $StdOut = $Output.StandardOutput
+        $StdErr = $Output.StandardError
+
+        # If the process exited with a non-zero exit code or if there were any errors reading the streams, log the error and throw an exception.
+        if ($Process.ExitCode -ne 0 -or $StreamErrors.Count -gt 0) {
+            $Message = if ($Process.ExitCode -ne 0) {
+                "Program '$ExecutablePath' failed with exit code $($Process.ExitCode)."
+            }
+            else {
+                "Failed to capture output from program '$ExecutablePath' (exit code 0)."
+            }
+            if ($StreamErrors.Count -gt 0) {
+                $Message += "`n" + ($StreamErrors -join "`n")
+            }
+            if (-not [string]::IsNullOrWhiteSpace($StdErr)) {
+                $Message += "`nStandard error:`n$StdErr"
+            }
+            if (-not [string]::IsNullOrWhiteSpace($StdOut)) {
+                $Message += "`nStandard output:`n$StdOut"
+            }
+            if ($StreamErrors.Count -eq 0 -and [string]::IsNullOrWhiteSpace($StdErr) -and
+                [string]::IsNullOrWhiteSpace($StdOut)) {
+                $Message += "`nNo output was captured from either stream."
+            }
+            throw $Message
+        }
+
+        return $StdOut
+    }
+    finally {
+        $Process.Dispose()
+    }
 }
 
 Export-ModuleMember -Function @(
-    'Invoke-Rego'
+    'Invoke-Rego',
+    'Invoke-ExternalCmd'
 )
