@@ -28,6 +28,7 @@ on:
           - powerbi
           - sharepoint
           - teams
+          - si
       EmailOnFailure:
         description: Check to send an email on failure
         type: boolean
@@ -46,6 +47,7 @@ on:
   #     - ".github/workflows/function_test_powerbi.yaml"
   #     - ".github/workflows/function_test_sharepoint.yaml"
   #     - ".github/workflows/function_test_teams.yaml"
+  #     - ".github/workflows/function_test_si.yaml"
   #     - ".github/actions/extract-email/action.yaml"
   #     - ".github/actions/get-thumbprint/action.yaml"
   #     - ".github/actions/import-pfx/action.yaml"
@@ -217,6 +219,33 @@ jobs:
     name: Test Teams
     if: ${{ inputs.product == '' || inputs.product == 'all' || inputs.product == 'teams' }}
     uses: ./.github/workflows/function_test_teams.yaml
+    permissions:
+      contents: write
+      id-token: write
+    with:
+      # Default to true when running on a schedule and the input is missing
+      EmailOnFailure: ${{ !contains(inputs.EmailOnFailure, 'false') }}
+      GitHubEventSchedule: ${{ github.event.schedule }}
+      GitHubEventName: ${{ github.event_name }}
+      SelectedProduct: ${{ inputs.product || 'all' }}
+      RefName: ${{ github.ref_name }}
+    secrets:
+      PfxBase64: ${{ secrets.NIGHTLY_TEST_BUILD_PFX }}
+      PfxPassword: ${{ secrets.NIGHTLY_TEST_BUILD_PW }}
+      TestParams: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS }}
+      TestParamsDev: ${{ secrets.NIGHTLY_TEST_BUILD_PARAMS_DEV }}
+      NotifierUsername: ${{ secrets.NOTIFIER_EMAIL_USERNAME }}
+      NotifierPassword: ${{ secrets.NOTIFIER_EMAIL_PASSWORD }}
+    needs:
+      - publish
+
+  test_si:
+    name: Test SI
+    # SI-SHELL: SI only runs when selected manually until the SI_Tenant1 alias is added to the
+    # NIGHTLY_TEST_BUILD_PARAMS secret. Then change this to match the other products:
+    # inputs.product == '' || inputs.product == 'all' || inputs.product == 'si'
+    if: ${{ inputs.product == 'si' }}
+    uses: ./.github/workflows/function_test_si.yaml
     permissions:
       contents: write
       id-token: write

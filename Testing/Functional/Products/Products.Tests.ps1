@@ -79,7 +79,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -145,6 +145,7 @@ BeforeAll {
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"
         teams = "Microsoft Teams"
+        si = "Super Intelligence"
     }
 
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.

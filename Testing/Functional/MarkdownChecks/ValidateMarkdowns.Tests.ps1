@@ -11,6 +11,7 @@ InModuleScope CreateReport {
         @{Product = "powerplatform"; MarkdownFilePath = "baselines/powerplatform.md"}
         @{Product = "sharepoint"; MarkdownFilePath = "baselines/sharepoint.md"}
         @{Product = "teams"; MarkdownFilePath = "baselines/teams.md"}
+        @{Product = "si"; MarkdownFilePath = "baselines/si.md"}
     ){
         It "Markdown file exists for <Product>" {
             Test-Path -Path $MarkdownFilePath | Should -BeTrue -Because "Current Location: $(Get-Location) File: $MarkdownFilePath "
@@ -28,6 +29,7 @@ InModuleScope CreateReport {
         @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
         @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 11}
         @{Product = "teams"; GroupCount = 5; PolicyCount = 14}
+        @{Product = "si"; GroupCount = 13; PolicyCount = 52}
     ){
         BeforeEach{
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Baseline', Justification = 'Variable is used in another scope')]
