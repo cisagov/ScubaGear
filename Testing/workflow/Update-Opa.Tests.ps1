@@ -32,9 +32,9 @@ Describe "Update OPA" {
     It "Update OPA version in ScubaConfigDefaults.json" {
         # Setup important paths
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $SourceDefaultsPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json' -Resolve
+        $SourceDefaultsPath = Join-Path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/schemas/ScubaConfigDefaults.json' -Resolve
         $RepoRootPath = $TestDrive
-        $ConfigDefaultsPath = Join-Path $RepoRootPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json'
+        $ConfigDefaultsPath = Join-Path $RepoRootPath 'PowerShell/ScubaGear/schemas/ScubaConfigDefaults.json'
         New-Item -Path (Split-Path $ConfigDefaultsPath) -ItemType Directory -Force | Out-Null
         Copy-Item -Path $SourceDefaultsPath -Destination $ConfigDefaultsPath
 

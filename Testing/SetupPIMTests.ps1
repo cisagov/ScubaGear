@@ -42,7 +42,7 @@ $NewFailGlobalAdmin = "Printer Administrator"
 ###########################
 ###### Part 1 - Update the privilegedRoles array in ScubaConfigDefaults.json
 $ScriptDirectory = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
-$ConfigJsonPath = Join-Path -Path $ScriptDirectory -ChildPath "..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfigDefaults.json" -Resolve
+$ConfigJsonPath = Join-Path -Path $ScriptDirectory -ChildPath "..\PowerShell\ScubaGear\schemas\ScubaConfigDefaults.json" -Resolve
 
 # Read the JSON file
 $ConfigJson = Get-Content -Path $ConfigJsonPath | ConvertFrom-Json

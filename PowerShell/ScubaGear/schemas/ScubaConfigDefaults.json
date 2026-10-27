@@ -16,6 +16,8 @@
   },
   "defaults": {
     "OPAPath": "~/.scubagear/Tools",
+    "ScubaGitHubUrl": "https://github.com/cisagov/ScubaGear",
+    "IndividualReportFolderName": "IndividualReports",
     "OPAExecutable": {
       "Windows": "opa_windows_amd64.exe",
       "MacOS": "opa_darwin_amd64",

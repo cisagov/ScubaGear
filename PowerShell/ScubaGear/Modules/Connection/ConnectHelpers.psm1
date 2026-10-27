@@ -18,11 +18,13 @@ function Connect-GraphHelper {
     session using the same MSAL application and its token cache.
     .Functionality
     Internal
+    .Notes
+    The M365Environment default values are pulled from the ScubaConfig schema.
     #>
     [CmdletBinding(DefaultParameterSetName = 'ExplicitEnvironment')]
     param(
         [Parameter(Mandatory = $true, ParameterSetName = 'ExplicitEnvironment')]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
@@ -1012,6 +1014,8 @@ function Get-MsalAccessToken {
         Bypasses cached access tokens while retaining refresh credentials for silent acquisition.
     .FUNCTIONALITY
         Internal
+    .Notes
+        The M365Environment default values are pulled from the ScubaConfig schema.
     #>
     [CmdletBinding(DefaultParameterSetName = 'Interactive')]
     param(
@@ -1031,7 +1035,7 @@ function Get-MsalAccessToken {
         [string]$Tenant,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(ParameterSetName = 'Interactive')]

@@ -67,7 +67,7 @@ Files modified before this integration began:
 - `PowerShell/ScubaGear/Modules/Connection/ConnectHelpers.psm1`
 - `PowerShell/ScubaGear/Modules/Connection/Connection.psm1`
 - `PowerShell/ScubaGear/Modules/Orchestrator.psm1`
-- `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json`
+- `PowerShell/ScubaGear/schemas/ScubaConfigDefaults.json`
 - `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json`
 - `PowerShell/ScubaGear/Modules/Support/Support.psm1`
 - `PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml`

@@ -84,6 +84,55 @@ Describe "ScubaConfig Module Unit Tests" {
         [ScubaConfig]::ResetInstance()
     }
 
+    Context "Schema-driven product metadata" {
+        It "reads accepted product values from the schema" {
+            [ScubaConfig]::GetAllValidProductNames() | Should -Be ([ScubaConfig]::GetConfigSchema().properties.ProductNames.items.enum)
+        }
+
+        It "resolves baseline and display names" {
+            [ScubaConfig]::GetProductBaselineName('aad') | Should -Be 'AAD'
+            [ScubaConfig]::GetDisplayNameFromBaselineName('AAD') | Should -Be 'Microsoft Entra ID'
+            [ScubaConfig]::GetProductBaselineNames() | Should -Contain 'SecuritySuite'
+            { [ScubaConfig]::GetProductBaselineName('invalid') } | Should -Throw
+            { [ScubaConfig]::GetDisplayNameFromBaselineName('invalid') } | Should -Throw
+        }
+
+        It "resolves deprecated aliases and tenant provider priority" {
+            [ScubaConfig]::GetDeprecatedProductAliases()['defender'] | Should -Be 'securitysuite'
+            [ScubaConfig]::GetTenantDetailProvider(@('exo', 'teams')) | Should -Be 'teams'
+            [ScubaConfig]::GetTenantDetailProvider(@('exo', 'sharepoint')) | Should -Be 'aad'
+            [ScubaConfig]::GetTenantDetailProvider(@('invalid')) | Should -Be 'unknown'
+        }
+
+        It "reads report defaults from configuration" {
+            [ScubaConfig]::GetScubaGitHubUrl() | Should -Be 'https://github.com/cisagov/ScubaGear'
+            [ScubaConfig]::ScubaDefault('DefaultIndividualReportFolderName') | Should -Be 'IndividualReports'
+        }
+
+        It "reflects product metadata changes without a hardcoded product list" {
+            $schema = [ScubaConfig]::GetConfigSchema()
+            $originalProducts = $schema.properties.ProductNames.items.enum
+            $schema.properties.ProductNames.items.enum = @($originalProducts) + 'testproduct'
+            $schema.schemaMetadata.reportProductNames | Add-Member -NotePropertyName testproduct -NotePropertyValue ([pscustomobject]@{
+                baselineName = 'TestProduct'
+                displayName = 'Test Product'
+                tenantDetailProvider = 'testprovider'
+                tenantDetailPriority = 0
+            })
+            try {
+                [ScubaConfig]::GetAllValidProductNames() | Should -Contain 'testproduct'
+                [ScubaConfig]::GetProductBaselineNames() | Should -Contain 'TestProduct'
+                [ScubaConfig]::GetProductBaselineName('testproduct') | Should -Be 'TestProduct'
+                [ScubaConfig]::GetDisplayNameFromBaselineName('TestProduct') | Should -Be 'Test Product'
+                [ScubaConfig]::GetTenantDetailProvider(@('aad', 'testproduct')) | Should -Be 'testprovider'
+            }
+            finally {
+                $schema.properties.ProductNames.items.enum = $originalProducts
+                $schema.schemaMetadata.reportProductNames.PSObject.Properties.Remove('testproduct')
+            }
+        }
+    }
+
     Context "Class Structure and Properties" {
         It "Should be a valid PowerShell class" {
             [ScubaConfig] | Should -Not -BeNullOrEmpty

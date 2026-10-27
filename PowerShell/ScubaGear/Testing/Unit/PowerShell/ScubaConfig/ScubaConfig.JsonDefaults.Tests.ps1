@@ -62,7 +62,7 @@ Describe "JSON-based Configuration System" {
 
         It "Should read OPAVersion default from JSON" {
             # Read the expected value directly from the JSON file
-            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" -Raw | ConvertFrom-Json
+            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\schemas\ScubaConfigDefaults.json" -Raw | ConvertFrom-Json
             $expectedVersion = $jsonDefaults.defaults.OPAVersion
 
             # Verify ScubaConfig returns the same value
@@ -137,14 +137,14 @@ Describe "JSON-based Configuration System" {
     Context "No Hardcoded Values" {
         It "Should not use hardcoded DisconnectOnExit value" {
             # This test ensures the value comes from JSON, not hardcoded
-            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" | ConvertFrom-Json
+            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\schemas\ScubaConfigDefaults.json" | ConvertFrom-Json
             $jsonValue = $jsonDefaults.defaults.DisconnectOnExit
             $configValue = [ScubaConfig]::ScubaDefault('DefaultDisconnectOnExit')
             $configValue | Should -Be $jsonValue
         }
 
         It "Should read all default values from JSON file" {
-            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigDefaults.json" | ConvertFrom-Json
+            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\schemas\ScubaConfigDefaults.json" | ConvertFrom-Json
 
             # Test key values match between JSON and ScubaConfig
             [ScubaConfig]::ScubaDefault('DefaultLogIn') | Should -Be $jsonDefaults.defaults.LogIn
