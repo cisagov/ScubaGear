@@ -43,6 +43,7 @@ SCuBA controls have been [mapped](docs/misc/mappings.md) to both NIST SP 800-53 
     - [Power Platform](PowerShell/ScubaGear/baselines/powerplatform.md): Low-code application security settings
     - [SharePoint](PowerShell/ScubaGear/baselines/sharepoint.md): Document collaboration and access controls
     - [Teams](PowerShell/ScubaGear/baselines/teams.md): Communication and meeting security policies
+    - [Super Intelligence (SI)](PowerShell/ScubaGear/baselines/si.md): SI and SI Agents security and governance settings (in development)
 
   - [Removed Policies](PowerShell/ScubaGear/baselines/removedpolicies.md)
 

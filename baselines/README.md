@@ -6,5 +6,6 @@ The baselines have been moved into the ScubaGear PowerShell module for easier di
 - [Power Platform](../PowerShell/ScubaGear/baselines/powerplatform.md)
 - [Security Suite](../PowerShell/ScubaGear/baselines/securitysuite.md)
 - [SharePoint & OneDrive](../PowerShell/ScubaGear/baselines/sharepoint.md)
+- [Super Intelligence (SI)](../PowerShell/ScubaGear/baselines/si.md)
 - [Teams](../PowerShell/ScubaGear/baselines/teams.md)
 - [Removed Policies](../PowerShell/ScubaGear/baselines/removedpolicies.md)
