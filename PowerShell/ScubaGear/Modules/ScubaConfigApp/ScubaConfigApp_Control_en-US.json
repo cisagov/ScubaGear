@@ -12,7 +12,7 @@
   "EnablePolicyViewer": true,
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json",
   "LocalBaselineSchemaPath": "..\\..\\schemas\\ScubaBaselines.json",
-  "DefaultConfigsSchemaPath": "..\\ScubaConfig\\ScubaConfigDefaults.json",
+  "DefaultConfigsSchemaPath": "..\\..\\schemas\\ScubaConfigDefaults.json",
   "PolicyMigrationsCSVPath": "..\\..\\mappings\\scuba-baseline-policy-migrations.csv",
   "WalkthroughMarkdownPath": "..\\..\\..\\..\\docs\\configuration\\scubaconfigapp-walkthrough.md",
   "WalkthroughGitHubUrl": "https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfigapp-walkthrough.md",

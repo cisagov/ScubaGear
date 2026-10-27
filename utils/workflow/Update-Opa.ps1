@@ -104,7 +104,7 @@ function Update-OpaVersion {
 
     Write-Warning "Updating OPA versions and compatible OPA versions in ScubaConfigDefaults.json..."
 
-    $ScubaConfigDefaultsPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json'
+    $ScubaConfigDefaultsPath = Join-Path -Path $RepoPath -ChildPath 'PowerShell/ScubaGear/schemas/ScubaConfigDefaults.json'
 
     if (-not (Test-Path -PathType Leaf -Path $ScubaConfigDefaultsPath)) {
         throw "Fatal Error: Couldn't find ScubaConfigDefaults.json at path $ScubaConfigDefaultsPath"
