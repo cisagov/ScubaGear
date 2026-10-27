@@ -1,5 +1,10 @@
 
 :  # SCUBACONFIGAPPUI CHANGELOG
+## Unreleased - Config Analyzer MS.AAD.7.4v1 role assignment guidance
+
+### Bug Fixes
+- Config Analyzer: MS.AAD.7.4v1 is a privileged role assignment control. Imported results and live scans no longer recommend creating a Conditional Access policy. Both describe PIM or an alternative PAM system, the emergency-access and service-account exceptions, and that a PIM-for-Groups group may keep a permanent active role assignment only after enrollment is confirmed. Detected permanent principals are offered as RoleExclusions.
+
 ## Unreleased - Config Analyzer carries the imported results configuration into the generated YAML
 
 ### Enhancements
