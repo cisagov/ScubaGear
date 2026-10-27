@@ -233,7 +233,7 @@ function New-ScubaAnalyzerControlYamlText {
 
     # Controls that don't support config exclusions get a comment, not a config block.
     if (-not $Finding.ExclusionField -or $Finding.ExclusionField -eq 'none') {
-        return "# $($Finding.ControlId) does not support exclusions.`n# Remediate by creating or fixing the policy (see remediation steps)."
+        return "# $($Finding.ControlId) does not support exclusions.`n# Follow the remediation steps for this control."
     }
 
     # Resolve the name of the CA policy the exclusions are based on (the user's selected

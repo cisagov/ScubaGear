@@ -210,6 +210,7 @@
       ]
     },
     "RoleExclusions": {
+      "_comment": "Permanent active assignments are read from Raw.privileged_roles by Get-ScAPrivilegedRoleAssignmentAnalysis. A generic detector cannot tell users from groups, or which groups are enrolled in PIM for Groups.",
       "valueShape": "principal",
       "fields": [
         { "name": "Users", "value": "Users" },
