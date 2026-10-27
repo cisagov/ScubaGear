@@ -20,7 +20,10 @@ function Export-SharePointProvider {
     $HelperFolderPath = Join-Path -Path $PSScriptRoot -ChildPath "ProviderHelpers"
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "CommandTracker.psm1")
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "SPORestHelper.psm1")
+    Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/ScubaLogging.psm1") -Function Write-ScubaLog
     $Tracker = Get-CommandTracker
+
+    Write-ScubaLog -Message "Starting SharePoint provider export." -Level Info -Source "Export-SharePointProvider"
 
     $SPOTenantJson = ConvertTo-Json @()
 
@@ -33,6 +36,12 @@ function Export-SharePointProvider {
 
     $SuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $UnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
+
+    Write-ScubaLog -Message "Completed SharePoint provider export." -Level Debug -Source "Export-SharePointProvider" -Data @{
+        SuccessfulCommandCount   = @($Tracker.GetSuccessfulCommands()).Count
+        UnsuccessfulCommandCount = @($Tracker.GetUnSuccessfulCommands()).Count
+        UnsuccessfulCommands     = @($Tracker.GetUnSuccessfulCommands())
+    }
 
     # Note the spacing and the last comma in the json is important
     $json = @"
