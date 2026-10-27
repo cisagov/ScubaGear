@@ -230,6 +230,28 @@ InModuleScope -ModuleName ExportAADProvider {
             $ValidJson | Should -Be $true
         }
 
+        It "runs both risky permission checks by default" {
+            $MockCommandTracker.SuccessfulCommands = @()
+
+            $null = Export-AADProvider
+
+            $MockCommandTracker.SuccessfulCommands | Should -Contain 'Get-ApplicationsWithRiskyPermissions'
+            $MockCommandTracker.SuccessfulCommands | Should -Contain 'Get-ServicePrincipalsWithRiskyPermissions'
+        }
+
+        It "skips both risky permission checks while keeping other Entra ID checks" {
+            $MockCommandTracker.SuccessfulCommands = @()
+
+            $Json = Export-AADProvider -SkipLongFunctions
+            $ParsedJson = ConvertFrom-Json -InputObject "{$($Json.TrimEnd(','))}"
+
+            $MockCommandTracker.SuccessfulCommands | Should -Not -Contain 'Get-ApplicationsWithRiskyPermissions'
+            $MockCommandTracker.SuccessfulCommands | Should -Not -Contain 'Get-ServicePrincipalsWithRiskyPermissions'
+            $MockCommandTracker.SuccessfulCommands | Should -Contain 'Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications'
+            $ParsedJson.risky_applications.Count | Should -Be 0
+            $ParsedJson.risky_third_party_service_principals.Count | Should -Be 0
+        }
+
         It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals return $null" {
             # Override defaults
             $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return $null })
