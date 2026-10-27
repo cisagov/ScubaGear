@@ -76,7 +76,6 @@ No Agent Service Principal SHALL hold the Privileged Role Administrator role.
 Conditional Access policies SHOULD be applied at the agent identity blueprint level.
 
 <!--Policy: MS.SI.1.3v1; Criticality: SHOULD -->
-<!--Source: Copilot Studio & Security Copilot deck, Slide 6-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -137,7 +136,6 @@ Workload Identity Conditional Access SHOULD be enabled for agent service princip
 Copilot Studio agents SHALL NOT be configured to run on the maker's stored connections (delegated maker credentials).
 
 <!--Policy: MS.SI.2.3v1; Criticality: SHALL -->
-<!--Source: Copilot Studio & Security Copilot deck, Slide 7-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -341,7 +339,6 @@ TBD - Section description.
 Sensitivity label policy scope SHALL include Groups and sites.
 
 <!--Policy: MS.SI.6.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 6-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -353,7 +350,6 @@ Sensitivity label policy scope SHALL include Groups and sites.
 Unified audit log ingestion SHALL be enabled.
 
 <!--Policy: MS.SI.6.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 6-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -365,7 +361,6 @@ Unified audit log ingestion SHALL be enabled.
 Sensitivity label display names SHALL be unique within the tenant.
 
 <!--Policy: MS.SI.6.3v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 6-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -377,7 +372,6 @@ Sensitivity label display names SHALL be unique within the tenant.
 AI data-security admin roles SHALL be assigned by least privilege.
 
 <!--Policy: MS.SI.6.4v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 6-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -420,7 +414,6 @@ TBD - Section description.
 A sensitivity label taxonomy SHALL be published to all users.
 
 <!--Policy: MS.SI.7.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 7-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -432,7 +425,6 @@ A sensitivity label taxonomy SHALL be published to all users.
 A default label SHALL be configured for new content.
 
 <!--Policy: MS.SI.7.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 7-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -444,7 +436,6 @@ A default label SHALL be configured for new content.
 Justification SHALL be required to lower or remove a label.
 
 <!--Policy: MS.SI.7.3v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 7-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -456,7 +447,6 @@ Justification SHALL be required to lower or remove a label.
 Container labeling SHALL be applied to sites and Teams in AI scope.
 
 <!--Policy: MS.SI.7.4v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 7-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -499,7 +489,6 @@ TBD - Section description.
 Service-side auto-labeling SHALL be configured for SharePoint, OneDrive, and Exchange.
 
 <!--Policy: MS.SI.8.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 8-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -511,7 +500,6 @@ Service-side auto-labeling SHALL be configured for SharePoint, OneDrive, and Exc
 Auto-labeling policies SHALL be validated in simulation before enforcement.
 
 <!--Policy: MS.SI.8.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 8-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -523,7 +511,6 @@ Auto-labeling policies SHALL be validated in simulation before enforcement.
 Disposition toward existing labels SHALL be explicitly configured for auto-labeling policies.
 
 <!--Policy: MS.SI.8.3v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 8-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -535,7 +522,6 @@ Disposition toward existing labels SHALL be explicitly configured for auto-label
 Custom sensitive information types SHALL be defined for organization-specific identifiers.
 
 <!--Policy: MS.SI.8.4v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 8-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -547,7 +533,6 @@ Custom sensitive information types SHALL be defined for organization-specific id
 Classifiers SHOULD be validated before use in enforcing policies.
 
 <!--Policy: MS.SI.8.5v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 8-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -594,7 +579,6 @@ TBD - Section description.
 Sites not approved for AI grounding SHALL be excluded from AI discovery.
 
 <!--Policy: MS.SI.9.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 9-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -606,7 +590,6 @@ Sites not approved for AI grounding SHALL be excluded from AI discovery.
 An oversharing assessment SHALL be completed before AI enablement.
 
 <!--Policy: MS.SI.9.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 9-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -618,7 +601,6 @@ An oversharing assessment SHALL be completed before AI enablement.
 A defined process SHALL evaluate newly created sites for AI-discovery exclusion.
 
 <!--Policy: MS.SI.9.3v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 9-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -657,7 +639,6 @@ TBD - Section description.
 A DLP policy SHALL be scoped to the Copilot and Copilot Chat location.
 
 <!--Policy: MS.SI.10.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -669,7 +650,6 @@ A DLP policy SHALL be scoped to the Copilot and Copilot Chat location.
 That DLP policy SHALL be in enforcement mode, not simulation.
 
 <!--Policy: MS.SI.10.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -681,7 +661,6 @@ That DLP policy SHALL be in enforcement mode, not simulation.
 A defined AI disposition SHALL exist for every label applying encryption.
 
 <!--Policy: MS.SI.10.3v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -693,7 +672,6 @@ A defined AI disposition SHALL exist for every label applying encryption.
 Prompts containing sensitive information types SHOULD be restricted from AI processing.
 
 <!--Policy: MS.SI.10.4v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -705,7 +683,6 @@ Prompts containing sensitive information types SHOULD be restricted from AI proc
 External web grounding SHOULD be restricted for sensitive prompts.
 
 <!--Policy: MS.SI.10.5v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -717,7 +694,6 @@ External web grounding SHOULD be restricted for sensitive prompts.
 Endpoint DLP SHOULD monitor third-party generative AI sites.
 
 <!--Policy: MS.SI.10.6v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -768,7 +744,6 @@ TBD - Section description.
 Data Security Posture Management for AI SHALL be activated.
 
 <!--Policy: MS.SI.11.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 11-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -780,7 +755,6 @@ Data Security Posture Management for AI SHALL be activated.
 Recommended AI protection policies SHOULD be evaluated, applied, or declined on record.
 
 <!--Policy: MS.SI.11.2v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 11-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -792,7 +766,6 @@ Recommended AI protection policies SHOULD be evaluated, applied, or declined on 
 DSPM findings SHOULD be reviewed on a defined recurring cadence.
 
 <!--Policy: MS.SI.11.3v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 11-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -804,7 +777,6 @@ DSPM findings SHOULD be reviewed on a defined recurring cadence.
 Audit retention for AI interactions SHALL meet records requirements.
 
 <!--Policy: MS.SI.11.4v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 11-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -816,7 +788,6 @@ Audit retention for AI interactions SHALL meet records requirements.
 Retention policies SHALL cover AI interactions.
 
 <!--Policy: MS.SI.11.5v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 11-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -828,7 +799,6 @@ Retention policies SHALL cover AI interactions.
 AI interactions SHALL be discoverable through eDiscovery.
 
 <!--Policy: MS.SI.11.6v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 11-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -879,7 +849,6 @@ TBD - Section description.
 A Communication Compliance policy SHOULD be scoped to AI interactions.
 
 <!--Policy: MS.SI.12.1v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 12-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -891,7 +860,6 @@ A Communication Compliance policy SHOULD be scoped to AI interactions.
 Reviewers SHALL be assigned and triage SHALL occur on a defined cadence.
 
 <!--Policy: MS.SI.12.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 12-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -903,7 +871,6 @@ Reviewers SHALL be assigned and triage SHALL occur on a defined cadence.
 Insider Risk Management policies SHOULD include AI usage indicators.
 
 <!--Policy: MS.SI.12.3v1; Criticality: SHOULD -->
-<!--Source: Purview/DSPM deck, Slide 12-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -915,7 +882,6 @@ Insider Risk Management policies SHOULD include AI usage indicators.
 Compensating detective controls SHALL exist where preventive AI controls are unavailable.
 
 <!--Policy: MS.SI.12.4v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 12-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -958,7 +924,6 @@ TBD - Section description.
 Pay-as-you-go metering for agents SHALL NOT be enabled.
 
 <!--Policy: MS.SI.13.1v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 13-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -970,7 +935,6 @@ Pay-as-you-go metering for agents SHALL NOT be enabled.
 Agent knowledge sources SHALL be limited to those carrying required protection.
 
 <!--Policy: MS.SI.13.2v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 13-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -982,7 +946,6 @@ Agent knowledge sources SHALL be limited to those carrying required protection.
 Agents published on non-Microsoft channels SHALL be inventoried and approved.
 
 <!--Policy: MS.SI.13.3v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 13-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -994,7 +957,6 @@ Agents published on non-Microsoft channels SHALL be inventoried and approved.
 DLP SHALL be scoped to cover agents where the knowledge source supports it.
 
 <!--Policy: MS.SI.13.4v1; Criticality: SHALL -->
-<!--Source: Purview/DSPM deck, Slide 13-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -1006,7 +968,6 @@ DLP SHALL be scoped to cover agents where the knowledge source supports it.
 Power Platform data loss prevention policies SHALL restrict connector combinations available to agent environments.
 
 <!--Policy: MS.SI.13.5v1; Criticality: SHALL -->
-<!--Source: Copilot Studio & Security Copilot deck, Slide 10-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -1018,7 +979,6 @@ Power Platform data loss prevention policies SHALL restrict connector combinatio
 External threat detection for Copilot Studio agents SHOULD be configured to block on error rather than allow.
 
 <!--Policy: MS.SI.13.6v1; Criticality: SHOULD -->
-<!--Source: Copilot Studio & Security Copilot deck, Slide 8-->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
