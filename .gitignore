@@ -28,6 +28,7 @@
 **/.DS_Store
 
 # Reports
+ScubaReports*
 **/M365BaselineConformance*
 /Testing/Functional/Reports*
 /Testing/Functional/Archive*

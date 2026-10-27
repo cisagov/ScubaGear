@@ -1,14 +1,18 @@
-﻿function Connect-GraphHelper {
+﻿using module '..\ScubaConfig\ScubaConfig.psm1'
+
+function Connect-GraphHelper {
     <#
     .Description
     This function is used for assisting in connecting to different M365 Environments via the Graph API.
     .Functionality
     Internal
+    .Notes
+    The M365Environment default values are pulled from the ScubaConfig schema.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
@@ -168,6 +172,8 @@ function Get-MsalAccessToken {
         prompting interactively, minimizing the number of browser popups per session.
     .FUNCTIONALITY
         Internal
+    .Notes
+        The M365Environment default values are pulled from the ScubaConfig schema.
     #>
     [CmdletBinding(DefaultParameterSetName = 'Interactive')]
     param(
@@ -187,7 +193,7 @@ function Get-MsalAccessToken {
         [string]$Tenant,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 

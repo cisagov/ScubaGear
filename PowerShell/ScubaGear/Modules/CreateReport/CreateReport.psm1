@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
 function Get-RegoResult {
@@ -150,18 +152,19 @@ function New-Report {
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
     Internal
+    .Notes
+    The BaselineName default values are pulled from the ScubaConfig schema.
     #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", "SI", IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetProductBaselineNames() })]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", "Super Intelligence", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -199,8 +202,8 @@ function New-Report {
         [object]
         $SecureBaselines
     )
-
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    # Retrieve the Scuba GitHub URL from the configuration schema
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
@@ -271,7 +274,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
-                
+
                 $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
 
                 $Config = $SettingsExport.scuba_config
@@ -1191,7 +1194,7 @@ function Get-IndicatorHtml {
         return ""
     }
 
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
     $IndicatorHtml = "<div class='policy-indicators'>"
 
     foreach ($Indicator in $Indicators) {

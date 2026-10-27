@@ -3,8 +3,6 @@
 name: Functional Tests SI
 
 # This is a reusable workflow called by the pipeline.
-# SI-SHELL: the SI_Tenant1 alias must be added to the NIGHTLY_TEST_BUILD_PARAMS secret
-# (with ProductName=si) before this workflow can run.
 on:
   workflow_call:
     inputs:

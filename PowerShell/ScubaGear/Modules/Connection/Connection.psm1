@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Connect-Tenant {
     <#
    .Description
@@ -6,6 +8,8 @@ function Connect-Tenant {
    credentials
    .Functionality
    Internal
+   .Notes
+    The M365Environment default values are pulled from the ScubaConfig schema.
    #>
    [CmdletBinding(DefaultParameterSetName='Manual')]
    param (
@@ -13,7 +17,9 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", IgnoreCase = $false)]
+    # Validated against the ProductNames schema enum (minus '*') rather than GetSupportedProducts(), so that
+    # products not yet in AllProductNames (such as si) can still be requested by name.
+    [ValidateScript({ $_ -cin @([ScubaConfig]::GetAllValidProductNames() | Where-Object { $_ -ne '*' }) })]
    [string[]]
    $ProductNames,
 
@@ -21,7 +27,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+    [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
    [string]
    $M365Environment,
 
@@ -476,8 +482,7 @@ function Connect-Tenant {
                    }
                }
                "si" {
-                   # SI-SHELL: the SI provider does not need a connection yet. Add the SI authentication here once
-                   # the SI policies, APIs, and provider are implemented.
+                   # The SI provider does not need a connection yet.
                }
                default {
                    throw "Invalid ProductName argument"

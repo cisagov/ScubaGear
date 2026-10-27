@@ -1,5 +1,5 @@
 {
-  "version": "1.8.12",
+  "version": "1.10.21",
   "PullOnlineBaselines": false,
   "GenerateTenantGovernanceConfig": false,
   "ScubaConfigAppModulePath": "ScubaConfigApp.psm1",
@@ -7,7 +7,7 @@
   "ConnectHelpersPath": "..\\Connection\\ConnectHelpers.psm1",
   "BaselineSchemaPath": "..\\..\\schemas\\ScubaGearResultsBaselineSchema.json",
   "ApiCatalogPath": "..\\..\\schemas\\ScubaGearApiCatalog.json",
-  "ConfigSchemaPath": "..\\ScubaConfig\\ScubaConfigSchema.json",
+  "ConfigSchemaPath": "..\\..\\schemas\\ScubaConfigSchema.json",
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json",
   "OnlineApiCatalogURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearApiCatalog.json",
   "tenantGovernanceSchemaURL": "https://www.schemastore.org/utcm-monitor.json",
@@ -184,8 +184,22 @@
     }
   },
 
+  "importedConfig": {
+    "_comment": "Controls how the configuration a ScubaGear run used (Raw.scuba_config in a results file) is carried into the generated YAML. machineSpecificKeys are paths that only exist on the machine that produced the results; they are written as commented-out lines so the YAML still runs elsewhere.",
+    "machineSpecificKeys": [
+      "OPAPath",
+      "OutPath"
+    ]
+  },
+
   "exclusionDefinitions": {
     "_comment": "Each exclusion type defines its YAML shape AND (for non-CA types) its analysis. The engine picks the analysis by exclusion type via the config-schema policyExclusionMappings, so a new type is added here + a mapping only. Operators read the item value at 'path': equals, notEquals, exists(bool), in[], notIn[], greaterThan, lessThan, matches(regex), contains; combine with allOf[]/anyOf[].",
+    "AgentExclusions": {
+      "valueShape": "principal",
+      "fields": [
+        { "name": "Agents", "value": "Agents" }
+      ]
+    },
     "CapExclusions": {
       "valueShape": "principal",
       "fields": [
@@ -248,10 +262,27 @@
         },
         "detectors": [
           {
-            "flagWhen": { "path": "AutoForwardEnabled", "equals": true },
+            "flagWhen": {
+              "allOf": [
+                { "path": "AutoForwardEnabled", "equals": true },
+                { "path": "DomainName", "notEquals": "*" }
+              ]
+            },
             "valueFrom": "DomainName",
             "issueLabel": "remote domain allows automatic forwarding",
             "suggestion": "If forwarding to this domain is approved, add it to AllowedForwardingDomains; otherwise set AutoForwardEnabled to false on the remote domain."
+          },
+          {
+            "flagWhen": {
+              "allOf": [
+                { "path": "AutoForwardEnabled", "equals": true },
+                { "path": "DomainName", "equals": "*" }
+              ]
+            },
+            "valueFrom": "DomainName",
+            "nonExcludable": true,
+            "issueLabel": "default remote domain allows automatic forwarding",
+            "suggestion": "The default remote domain (*) cannot be allow-listed. Disable automatic forwarding on it: Set-RemoteDomain -Identity Default -AutoForwardEnabled $false."
           }
         ]
       }
@@ -341,6 +372,15 @@
     "exclusionDetectors": {
       "_comment": "Detect waivable CA exclusions and convert them into config warnings/errors.",
       "rules": [
+        {
+          "field": "Agents",
+          "issueLabel": "agent",
+          "detailLabel": "Agent service-principal object IDs",
+          "policyPath": "conditions.clientApplications.excludeAgentIdServicePrincipals",
+          "valueKind": "whitespaceOrArray",
+          "requiresExclusionType": "AgentExclusions",
+          "suggestion": "If justified: Add the agent service-principal object IDs to AgentExclusions Agents in ScubaConfig"
+        },
         {
           "field": "Users",
           "issueLabel": "user",

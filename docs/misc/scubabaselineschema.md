@@ -30,6 +30,9 @@ Current Schema Version: **1.0.0**
   "KeyTerminology": "string",
   "baselines": {
     "product": [ /* array of policy objects */ ]
+  },
+  "appendices": {
+    "product": [ /* array of appendix objects, in source order */ ]
   }
 }
 ```
@@ -45,6 +48,13 @@ Current Schema Version: **1.0.0**
 | `Assumptions` | string | No | Common assumptions for all baselines |
 | `KeyTerminology` | string | No | Key terminology definitions |
 | `baselines` | object | Yes | Object containing product-specific baseline arrays |
+| `appendices` | object | No | Product-specific appendix arrays, separate from policy controls |
+
+`Introduction` contains the shared preamble from the first baseline, excluding
+the document title and product-specific opening paragraph. It includes the common
+SCuBA project guidance, disclaimer, and TLP notice. The generator uses paragraph
+boundaries rather than a specific opening sentence so wording changes do not
+silently remove the viewer's landing-page introduction.
 
 ## Baseline Product Structure
 
@@ -60,6 +70,30 @@ The `baselines` object contains properties for each Microsoft 365 product:
 
 Each product property contains an array of policy objects.
 
+## Product Appendices
+
+The generator extracts each top-level `# Appendix ...` section into `appendices`,
+using the same product keys as `baselines`. Only products with appendices are
+included. Each product's value is always an array, including a single appendix:
+
+```json
+{
+  "name": "Appendix A: Adding Users to the Preset Security Policies",
+  "anchor": "#appendix-a-adding-users-to-the-preset-security-policies",
+  "content": "As many controls in this baseline..."
+}
+```
+
+`name` preserves the source heading without its `#` prefix. `anchor` is the
+markdown heading fragment used by internal links. `content` preserves the body
+markdown, including nested headings and lists, but excludes document-level TLP
+footer markings. Product filtering applies to appendices as well as policies.
+Appendices do not create policy IDs or increase policy counts.
+
+The Baseline Viewer lists appendices after the policies under each product in
+the left navigation. Appendix text is searchable; SHALL/SHOULD filters apply
+only to policies. Older JSON without `appendices` remains supported.
+
 ## Policy Object Schema
 
 Each policy object represents a single security baseline control:
@@ -74,6 +108,7 @@ Each policy object represents a single security baseline control:
   "omissionField": "Omissions",
   "annotationField": "Annotations",
   "rationale": "Legacy authentication protocols...",
+  "notes": ["Additional policy guidance, when present..."],
   "criticality": "SHALL",
   "lastModified": "January 2024",
   "implementation": "Instructions for implementing...",
@@ -120,6 +155,7 @@ Each policy object represents a single security baseline control:
 | Property | Type | Description |
 |----------|------|-------------|
 | `rationale` | string | Rationale explaining why this policy is important |
+| `notes` | array | Policy-level `_Note:_` guidance as markdown strings, including nested bullets |
 | `criticality` | string | Criticality level: "SHALL", "SHOULD", "MAY", "3RD PARTY", "NOT-IMPLEMENTED" |
 | `lastModified` | string | Last modification date (format varies) |
 | `implementation` | string | Implementation instructions |
@@ -128,6 +164,13 @@ Each policy object represents a single security baseline control:
 | `licenseRequirements` | array | Array of license requirement strings |
 | `link` | string | Direct link to policy documentation |
 | `badges` | array | Array of badge objects for visual indicators |
+
+Collection properties remain JSON arrays even when they contain only one item.
+License requirements can originate from either bullet lists or prose paragraphs.
+Policy statements include all lines of their opening paragraph. Implementation
+markdown retains nested headings, blockquotes, and fenced code, but excludes
+appendices and document-level TLP markings. Notes within implementation instructions
+remain in `implementation`; policy metadata notes are exposed separately in `notes`.
 
 ### Resource Object
 

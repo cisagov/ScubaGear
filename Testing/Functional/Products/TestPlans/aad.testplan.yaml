@@ -793,6 +793,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials:
@@ -819,6 +820,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials:
@@ -849,6 +851,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials:
@@ -881,6 +884,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials:
@@ -919,6 +923,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials:
@@ -961,6 +966,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials: []
@@ -981,6 +987,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials: []
@@ -1001,6 +1008,7 @@ TestPlan:
           - Command: UpdateProviderExport
             Splat:
               updates:
+                app_management_policies: []
                 default_app_management_policy:
                   - ApplicationRestrictions:
                       PasswordCredentials: []

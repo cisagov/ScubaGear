@@ -296,18 +296,17 @@ function Update-ScubaAnalyzerControlYaml {
     param([Parameter(Mandatory)]$Finding)
     try {
         # Build one schema-keyed value map covering both principal and list exclusion shapes.
+        # DetectedExclusionValues wins: it also carries the exclusions from the imported config.
         $vals = [ordered]@{}
+        if ($Finding.DetectedExclusionValues) {
+            foreach ($k in @($Finding.DetectedExclusionValues.Keys)) {
+                if (@($Finding.DetectedExclusionValues[$k]).Count -gt 0) { $vals[$k] = @($Finding.DetectedExclusionValues[$k]) }
+            }
+        }
         if ($Finding.DetectedExclusions) {
             foreach ($k in @($Finding.DetectedExclusions.Keys)) {
                 $v = $Finding.DetectedExclusions[$k]
-                if ($null -ne $v -and @($v).Count -gt 0) { $vals[$k] = @($v) }
-            }
-        }
-        if ($Finding.DetectedExclusionValues) {
-            foreach ($k in @($Finding.DetectedExclusionValues.Keys)) {
-                if (-not $vals.Contains($k) -and @($Finding.DetectedExclusionValues[$k]).Count -gt 0) {
-                    $vals[$k] = @($Finding.DetectedExclusionValues[$k])
-                }
+                if (-not $vals.Contains($k) -and $null -ne $v -and @($v).Count -gt 0) { $vals[$k] = @($v) }
             }
         }
         # DisplayNameLookup lets the snippet annotate each id with '# Friendly Name'.
@@ -415,11 +414,16 @@ function Select-ScubaAnalyzerPolicy {
         $finding.SelectedPolicyId = $PolicyId
         # Copy the candidate's exclusions onto the finding (fresh arrays so later edits
         # don't mutate the candidate). This is what the YAML builders read.
-        $ex = if ($chosen.DetectedExclusions) { $chosen.DetectedExclusions } else { @{ Users = @(); Groups = @(); Applications = @(); GuestUserTypes = @() } }
-        $finding.DetectedExclusions = @{ Users = @($ex.Users); Groups = @($ex.Groups); Applications = @($ex.Applications); GuestUserTypes = @($ex.GuestUserTypes) }
+        $finding.DetectedExclusions = Get-ScAExclusionValueMap -ExclusionField $finding.ExclusionField -Values $chosen.DetectedExclusions
         # Keep the schema-keyed value map in sync so both YAML views follow the choice.
         $dv = [ordered]@{}
-        foreach ($k in 'Users','Groups','Applications','GuestUserTypes') { if (@($finding.DetectedExclusions[$k]).Count -gt 0) { $dv[$k] = @($finding.DetectedExclusions[$k]) } }
+        foreach ($k in @($finding.DetectedExclusions.Keys)) { if (@($finding.DetectedExclusions[$k]).Count -gt 0) { $dv[$k] = @($finding.DetectedExclusions[$k]) } }
+        # Exclusions already in the imported config stay; the chosen policy's are appended.
+        if ($finding.ConfiguredExclusionValues) {
+            foreach ($k in @($finding.ConfiguredExclusionValues.Keys)) {
+                $dv[$k] = @(@($dv[$k]) + @($finding.ConfiguredExclusionValues[$k]) | Where-Object { $_ } | Select-Object -Unique)
+            }
+        }
         $finding.DetectedExclusionValues = $dv
         Show-ScubaAnalyzerDetail        # re-render cards (updates which one is "in use")
         Update-ScubaAnalyzerFullYaml    # aggregate YAML follows the new choice
@@ -646,6 +650,16 @@ function Start-ScubaAnalyzerAnalysis {
 
         # Success: publish the result and repaint the findings list + aggregate YAML.
         $syncHash.Analysis = $syncHash.AnalysisSync.Result
+        # The results file's own config (scuba_config) seeds the environment selector and
+        # is merged into the generated YAML by Get-ScubaAnalyzerConfigYaml.
+        $importedConfig = $syncHash.Analysis.ImportedConfig
+        if ($importedConfig -and $importedConfig.Count -gt 0) {
+            if ($importedConfig.Contains('M365Environment')) {
+                $envItem = @($syncHash.Environment_ComboBox.Items | Where-Object { [string]$_ -eq [string]$importedConfig['M365Environment'] }) | Select-Object -First 1
+                if ($envItem) { $syncHash.Environment_ComboBox.SelectedItem = $envItem }
+            }
+            Write-ScubaAnalyzerLog "Imported configuration from results: $(@($importedConfig.Keys) -join ', ')"
+        }
         Update-ScubaAnalyzerFindings
         Update-ScubaAnalyzerFullYaml
         Update-ScubaAnalyzerTenantGovernanceJson

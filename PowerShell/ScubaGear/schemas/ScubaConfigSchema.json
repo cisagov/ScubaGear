@@ -25,7 +25,9 @@
       "SilenceBODWarnings",
       "DarkMode",
       "Verbose",
-      "Debug"
+      "Debug",
+      "ScubaGitHubUrl",
+      "IndividualReportFolderName"
       ],
 
     "policyExclusionMappings": {
@@ -40,16 +42,29 @@
       "MS.AAD.3.8v1": ["CapExclusions"],
       "MS.AAD.3.9v1": ["CapExclusions"],
       "MS.AAD.7.4v1": ["RoleExclusions"],
-      "MS.AAD.9.1v1": ["RoleExclusions"],
+      "MS.AAD.9.1v1": ["AgentExclusions"],
       "MS.SECURITYSUITE.2.1v1": ["SensitiveUsers"],
       "MS.SECURITYSUITE.2.3v1": ["PartnerDomains"],
       "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
     },
 
+    "deprecatedProductAliases": {
+      "defender": "securitysuite"
+    },
+    "reportProductNames": {
+      "aad":           { "baselineName": "AAD",           "displayName": "Microsoft Entra ID",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 1 },
+      "sharepoint":    { "baselineName": "SharePoint",    "displayName": "SharePoint Online",        "tenantDetailProvider": "aad",           "tenantDetailPriority": 2 },
+      "powerbi":       { "baselineName": "PowerBI",       "displayName": "Microsoft Power BI",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 3 },
+      "teams":         { "baselineName": "Teams",         "displayName": "Microsoft Teams",          "tenantDetailProvider": "teams",         "tenantDetailPriority": 4 },
+      "powerplatform": { "baselineName": "PowerPlatform", "displayName": "Microsoft Power Platform", "tenantDetailProvider": "powerplatform", "tenantDetailPriority": 5 },
+      "exo":           { "baselineName": "EXO",           "displayName": "Exchange Online",          "tenantDetailProvider": "exo",           "tenantDetailPriority": 6 },
+      "securitysuite": { "baselineName": "SecuritySuite", "displayName": "Security Suite",           "tenantDetailProvider": "exo",           "tenantDetailPriority": 7 },
+      "si":            { "baselineName": "SI",            "displayName": "Super Intelligence",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 8 }
+    },
     "productCapabilities": {
       "Aad": {
         "supportsExclusions": true,
-        "supportedExclusionTypes": ["CapExclusions", "RoleExclusions"]
+        "supportedExclusionTypes": ["CapExclusions", "RoleExclusions", "AgentExclusions"]
       },
       "SecuritySuite": {
         "supportsExclusions": true,
@@ -248,6 +263,9 @@
           "properties": {
             "CapExclusions": {
               "$ref": "#/definitions/exclusionTypes/CapExclusions"
+            },
+            "AgentExclusions": {
+              "$ref": "#/definitions/exclusionTypes/AgentExclusions"
             },
             "RoleExclusions": {
               "$ref": "#/definitions/exclusionTypes/RoleExclusions"
@@ -476,6 +494,20 @@
     },
 
     "exclusionTypes": {
+      "AgentExclusions": {
+        "_comment": "Approved agent service-principal object IDs for agent Conditional Access policies",
+        "type": "object",
+        "properties": {
+          "Agents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      },
       "CapExclusions": {
         "_comment": "Conditional Access Policy exclusions (GUIDs only)",
         "type": "object",

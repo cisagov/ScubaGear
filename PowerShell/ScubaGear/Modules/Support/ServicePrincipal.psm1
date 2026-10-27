@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper, Get-MsalAccessToken -force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod, Get-ScubaGearGraphEndpoint -force
@@ -943,7 +945,6 @@ function Get-ScubaGearAppPermission {
     }
 
     if($ProductNames -contains '*'){
-        # SI-SHELL: add "si" here and to the ProductNames ValidateSets once the SI permissions are identified.
         # If wildcard is specified, include all products
         $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
     }
@@ -2333,7 +2334,6 @@ function New-ScubaGearServicePrincipal {
     Try {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
-            # SI-SHELL: add "si" here and to the ProductNames ValidateSets once the SI permissions are identified.
             # If wildcard is specified, include all products
             $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
         }

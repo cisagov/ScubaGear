@@ -241,9 +241,7 @@ jobs:
 
   test_si:
     name: Test SI
-    # SI-SHELL: SI only runs when selected manually until the SI_Tenant1 alias is added to the
-    # NIGHTLY_TEST_BUILD_PARAMS secret. Then change this to match the other products:
-    # inputs.product == '' || inputs.product == 'all' || inputs.product == 'si'
+    # SI only runs when selected manually until the SI_Tenant1 alias is added to the NIGHTLY_TEST_BUILD_PARAMS secret.
     if: ${{ inputs.product == 'si' }}
     uses: ./.github/workflows/function_test_si.yaml
     permissions:
