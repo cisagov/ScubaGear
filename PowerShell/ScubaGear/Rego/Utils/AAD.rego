@@ -73,6 +73,41 @@ Aad2P2Licenses contains ServicePlan.ServicePlanId if {
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
 }
 
+#################################################################################
+# Microsoft Agent 365 / Microsoft 365 E7 license detection (MS.AAD.9.1v1)       #
+#################################################################################
+
+# SKU part numbers that provide AI agent conditional access. These match the
+# String_Id values in Modules/CreateReport/MicrosoftLicenseToProductNameMappings.csv.
+AGENT_LICENSE_SKUS := {"AGENT_365", "MICROSOFT_365_E7"}
+
+# The subscribed SKUs as an array. A tenant with a single SKU is exported as one
+# object rather than a one-element array.
+default LicenseSkus := []
+
+LicenseSkus := [input.license_information] if {
+    is_object(input.license_information)
+}
+
+LicenseSkus := input.license_information if {
+    is_array(input.license_information)
+}
+
+# True only when SKU data was collected. Missing data does not prove a license is absent.
+default LicenseDataAvailable := false
+
+LicenseDataAvailable if {
+    count(LicenseSkus) > 0
+}
+
+# SKUs that provide agent conditional access and have enabled units. A lapsed
+# subscription remains listed but reports zero enabled units.
+AgentLicenses contains Sku.SkuId if {
+    some Sku in LicenseSkus
+    Sku.SkuPartNumber in AGENT_LICENSE_SKUS
+    object.get(Sku, ["PrepaidUnits", "Enabled"], 0) > 0
+}
+
 # Returns license warning if license not present as results may be wrong,
 # Othewise returns report string with link to table at bottom of report
 ReportDetailsArrayLicenseWarningCap(Array, String) := Description if {
@@ -156,6 +191,28 @@ AppExclusionsFullyExempt(Policy, PolicyID) := true if {
 AppExclusionsFullyExempt(Policy, PolicyID) := true if {
     count({x | some x in Policy.Conditions.Applications.ExcludeApplications}) == 0
     count({y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Applications}) == 0
+}
+
+# Preview exports may contain whitespace-separated IDs; cached exports still need
+# to work after the provider starts normalizing this field to an array.
+AgentExclusionArray(value) := value if {
+    is_array(value)
+} else := [id |
+    some id in regex.split(`\s+`, trim_space(value))
+    id != ""
+] if {
+    is_string(value)
+} else := [] if {
+    value == null
+}
+
+default AgentExclusionsFullyExempt(_, _) := false
+
+AgentExclusionsFullyExempt(Policy, PolicyID) := true if {
+    raw := object.get(Policy, ["Conditions", "ClientApplications", "ExcludeAgentIdServicePrincipals"], null)
+    excluded := ConvertToSet(AgentExclusionArray(raw))
+    allowed := ConvertToSet(object.get(input, ["scuba_config", "Aad", PolicyID, "AgentExclusions", "Agents"], []))
+    count(excluded - allowed) == 0
 }
 
 default GuestUserExclusionsFullyExempt(_, _) := false

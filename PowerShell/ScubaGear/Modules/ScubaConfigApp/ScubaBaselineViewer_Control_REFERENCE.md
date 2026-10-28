@@ -69,3 +69,20 @@ Everything the viewer needs to render headers and map baseline JSON fields into 
 > The baseline **content** (policy text, links, MITRE data) is not in this file — it comes from the
 > baseline source (`ScubaBaselines.json` locally by default, or the online copy from
 > `configurationBaselineJsonRawOnlinePath` when the viewer is launched with `-Online`).
+
+The `notes` policy mapping displays the generated policy-level note strings in a
+separate Notes section. Implementation blockquotes remain with the instructions.
+The viewer accepts both array-valued resources and legacy single resource objects.
+Markdown rendering supports nested emphasis in links, inline and fenced code,
+soft-wrapped paragraphs, and HTML images with alternative text. Repository-root
+image paths are resolved against `configurationBaselineJsonRawOnlinePath`; image
+loading failures emit a warning and leave the alternative text visible.
+
+Product appendices come from the top-level `appendices` object in the generated
+baseline JSON, not from policy section mappings. Each appendix appears after the
+last policy in its product's left-navigation list. Selecting it displays its own
+title and markdown body, without policy metadata, badges, or configuration
+examples. Appendix text is searchable, but appendices are excluded from
+SHALL/SHOULD filters and policy counts. Internal `#appendix-...` links navigate
+to the matching appendix for the selected product. Older JSON without appendices
+continues to show the policy-only navigation.

@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Connect-Tenant {
     <#
    .Description
@@ -6,6 +8,8 @@ function Connect-Tenant {
    credentials
    .Functionality
    Internal
+   .Notes
+    The M365Environment default values are pulled from the ScubaConfig schema.
    #>
    [CmdletBinding(DefaultParameterSetName='Manual')]
    param (
@@ -13,7 +17,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedProducts() })]
    [string[]]
    $ProductNames,
 
@@ -21,7 +25,7 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-   [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
+    [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
    [string]
    $M365Environment,
 

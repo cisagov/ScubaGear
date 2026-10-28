@@ -64,6 +64,10 @@ Aad:
         - ""
       Users:
         - ""
+  MS.AAD.9.1v1:
+    AgentExclusions:
+      Agents:
+        - ""
 SecuritySuite:
   MS.SECURITYSUITE.2.1v1:
     SensitiveUsers:

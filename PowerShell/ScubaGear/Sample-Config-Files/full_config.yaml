@@ -141,6 +141,13 @@ Aad:
       Groups:
         - 4a471183-d934-4fb4-b1b3-d9525e0e1b45 # Example Group 2
 
+  # Risky AI agents SHALL be blocked
+  MS.AAD.9.1v1:
+    AgentExclusions:
+      Agents:
+        - 73575e48-4466-4a02-bce7-bd973eca5992 # Example Agent Object 1
+        - de840f91-aa4a-4ea4-b433-bede07e41e97 # Example Agent Blueprint Object 1
+
 # ========================
 # EXCLUSIONS : EXO SAMPLE
 # ========================

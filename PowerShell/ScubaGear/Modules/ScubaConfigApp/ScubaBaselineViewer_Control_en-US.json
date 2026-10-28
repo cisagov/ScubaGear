@@ -68,6 +68,15 @@
         "contentBackground": "#FEF2F2",
         "isExpanded": false
       },
+      "notes": {
+        "displayName": "Notes",
+        "containerIndex": 7,
+        "jsonProperty": ["notes"],
+        "headerBackground": "#DBEAFE",
+        "borderColor": "#3B82F6",
+        "contentBackground": "#EFF6FF",
+        "isExpanded": true
+      },
       "implementation": {
         "displayName": "Implementation Instructions",
         "containerIndex": 5,
