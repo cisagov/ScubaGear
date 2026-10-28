@@ -25,7 +25,9 @@
       "SilenceBODWarnings",
       "DarkMode",
       "Verbose",
-      "Debug"
+      "Debug",
+      "ScubaGitHubUrl",
+      "IndividualReportFolderName"
       ],
 
     "policyExclusionMappings": {
@@ -46,6 +48,18 @@
       "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
     },
 
+    "deprecatedProductAliases": {
+      "defender": "securitysuite"
+    },
+    "reportProductNames": {
+      "aad":           { "baselineName": "AAD",           "displayName": "Microsoft Entra ID",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 1 },
+      "sharepoint":    { "baselineName": "SharePoint",    "displayName": "SharePoint Online",        "tenantDetailProvider": "aad",           "tenantDetailPriority": 2 },
+      "powerbi":       { "baselineName": "PowerBI",       "displayName": "Microsoft Power BI",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 3 },
+      "teams":         { "baselineName": "Teams",         "displayName": "Microsoft Teams",          "tenantDetailProvider": "teams",         "tenantDetailPriority": 4 },
+      "powerplatform": { "baselineName": "PowerPlatform", "displayName": "Microsoft Power Platform", "tenantDetailProvider": "powerplatform", "tenantDetailPriority": 5 },
+      "exo":           { "baselineName": "EXO",           "displayName": "Exchange Online",          "tenantDetailProvider": "exo",           "tenantDetailPriority": 6 },
+      "securitysuite": { "baselineName": "SecuritySuite", "displayName": "Security Suite",           "tenantDetailProvider": "exo",           "tenantDetailPriority": 7 }
+    },
     "productCapabilities": {
       "Aad": {
         "supportsExclusions": true,
