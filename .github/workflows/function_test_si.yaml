@@ -114,7 +114,7 @@ jobs:
           Alias: SI_Tenant1
           TestParams: ${{ secrets.TestParams }}
       - name: Notify on Failure
-        uses: dawidd6/action-send-mail@v18
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59 # v18
         with:
           server_address: smtp.gmail.com
           server_port: 465
