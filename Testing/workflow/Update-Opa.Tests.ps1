@@ -33,7 +33,7 @@ Describe "Update OPA" {
         # Setup important paths
         $RepoRootPath = Join-Path -Path $PSScriptRoot -ChildPath '../..' -Resolve
         $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '../../utils/workflow/Update-Opa.ps1' -Resolve
-        $ConfigDefaultsPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigDefaults.json' -Resolve
+        $ConfigDefaultsPath = Join-path -Path $PSScriptRoot -ChildPath '../../PowerShell/ScubaGear/schemas/ScubaConfigDefaults.json' -Resolve
 
         # Setup mock values
         $MockCurrentVersion = "1.1.1"  # The old default (expect this to be added to compatibleOpaVersions)

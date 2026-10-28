@@ -12,7 +12,7 @@ Describe -Tag 'Analyzer' -Name 'Agent-only Conditional Access exclusions' {
         $control = Get-Content "$app\ScubaConfigAnalyzer_Control_en-US.json" -Raw | ConvertFrom-Json
         $schema = Get-Content "$root\schemas\ScubaGearResultsBaselineSchema.json" -Raw | ConvertFrom-Json
         $script:validation = $schema.baselineValidations.aad | Where-Object id -EQ 'MS.AAD.9.1v1'
-        $configSchemaPath = "$root\Modules\ScubaConfig\ScubaConfigSchema.json"
+        $configSchemaPath = "$root\schemas\ScubaConfigSchema.json"
         $script:configSchema = Get-Content $configSchemaPath -Raw | ConvertFrom-Json
         $definitions = @{ AgentExclusions = $control.exclusionDefinitions.AgentExclusions }
         $state = @{
