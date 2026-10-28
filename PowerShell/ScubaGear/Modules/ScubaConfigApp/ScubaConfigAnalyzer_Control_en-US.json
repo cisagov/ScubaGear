@@ -1,5 +1,5 @@
 {
-  "version": "1.10.21",
+  "version": "1.10.28 (build 1728)",
   "PullOnlineBaselines": false,
   "GenerateTenantGovernanceConfig": false,
   "ScubaConfigAppModulePath": "ScubaConfigApp.psm1",
