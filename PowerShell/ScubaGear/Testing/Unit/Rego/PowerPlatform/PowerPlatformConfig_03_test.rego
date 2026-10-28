@@ -31,6 +31,15 @@ test_isDisabled_NullIsolationPolicy if {
 
     TestResult("MS.POWERPLATFORM.3.1v1", Output, NeverConfiguredError, false) == true
 }
+
+# PowerShell 7 parses the literal body null as a real null, where Windows PowerShell 5.1 keeps the text "null".
+test_isDisabled_JsonNullIsolationPolicy if {
+    Output := powerplatform.tests with input.tenant_isolation as [null]
+
+    NeverConfiguredError := "Tenant isolation policy has never been configured in this tenant"
+
+    TestResult("MS.POWERPLATFORM.3.1v1", Output, NeverConfiguredError, false) == true
+}
 #--
 
 #
