@@ -230,9 +230,8 @@ InModuleScope ConnectHelpers {
             }
         }
 
-        It 'supplies a cached account to browser SSO when MSAL requires consent or MFA' {
-            $script:AccountsTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
-            $script:AccountsTask.SetResult(@($script:TokenResult.Account))
+        It 'supplies the account chosen earlier in the session to browser SSO when MSAL requires consent or MFA' {
+            $Global:ScubaGearState.Session = @{ Account = $script:TokenResult.Account }
             $script:App | Add-Member ScriptMethod AcquireTokenSilent {
                 $Failure = [System.InvalidOperationException]::new('Interaction required')
                 $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalUiRequiredException')
@@ -243,6 +242,32 @@ InModuleScope ConnectHelpers {
                 -M365Environment gcchigh -Scope @('Organization.Read.All')
             Should -Invoke New-ScubaMsalBrowserRequest -Times 1 -Exactly -ParameterFilter {
                 [object]::ReferenceEquals($Account, $script:TokenResult.Account)
+            }
+        }
+
+        It 'lets the user choose an account when the only account known is one found in the cache' {
+            $script:AccountsTask = [System.Threading.Tasks.TaskCompletionSource[object]]::new()
+            $script:AccountsTask.SetResult(@($script:TokenResult.Account))
+            $script:SilentAttempts = 0
+            $script:App | Add-Member ScriptMethod AcquireTokenSilent {
+                $script:SilentAttempts++
+                $Failure = [System.InvalidOperationException]::new('Interaction required')
+                $Failure.PSTypeNames.Insert(0, 'Microsoft.Identity.Client.MsalUiRequiredException')
+                $Failure | Add-Member NoteProperty ErrorCode 'invalid_grant'
+                throw $Failure
+            } -Force
+            $null = Get-MsalAccessToken -ClientId test-client -Tenant $script:TokenResult.TenantId `
+                -M365Environment gcchigh -Scope @('Organization.Read.All')
+            $script:SilentAttempts | Should -Be 1 -Because 'the cached account is still tried silently first'
+            Should -Invoke New-ScubaMsalBrowserRequest -Times 1 -Exactly -ParameterFilter { $null -eq $Account }
+        }
+
+        It 'tells the user what the browser sign-in is waiting for and how to stop it' {
+            Mock Write-Information {}
+            $null = Get-MsalAccessToken -ClientId test-client -Tenant organizations -M365Environment commercial `
+                -Scope @('Organization.Read.All')
+            Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter {
+                $MessageData -like '*Need admin approval*Global Administrator*Ctrl+C*5 minutes*'
             }
         }
 

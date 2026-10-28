@@ -1109,6 +1109,9 @@ function Get-MsalAccessToken {
                 # MSAL checks this application's own cache for usable credentials.
                 $TokenResult = $null
                 $SignInAccount = $Global:ScubaGearState.Session.Account
+                # Only an account chosen earlier in this scan may steer the browser. An account that
+                # was merely found in the cache has not been confirmed by the user for this sign-in.
+                $AccountChosenInSession = [bool]$SignInAccount
                 try {
                     # If the session has no selected account, look for one in this MSAL app's cache.
                     # Reusing the session account avoids this lookup and keeps products using the same user.
@@ -1156,14 +1159,18 @@ function Get-MsalAccessToken {
                 }
 
                 if (-not $TokenResult) {
-                    if ($SignInAccount) {
-                        Write-Information "Opening your default browser to reuse your Microsoft 365 sign-in. Additional interaction may be required by Entra." -InformationAction Continue
+                    $WaitingNote = "ScubaGear is now waiting for you to finish signing in. If Entra says 'Need admin approval', " +
+                        "ask a Global Administrator to approve the permissions, then run ScubaGear again. " +
+                        "Press Ctrl+C to cancel; ScubaGear stops waiting after $([math]::Ceiling($InteractiveTimeoutSeconds / 60)) minutes."
+                    if ($AccountChosenInSession) {
+                        Write-Information "Opening your default browser to reuse your Microsoft 365 sign-in. Additional interaction may be required by Entra. $WaitingNote" -InformationAction Continue
                     }
                     else {
-                        Write-Information "Opening your default browser so you can sign in to Microsoft 365..." -InformationAction Continue
+                        Write-Information "Opening your default browser so you can sign in to Microsoft 365. $WaitingNote" -InformationAction Continue
                     }
+                    $BrowserAccount = if ($AccountChosenInSession) { $SignInAccount } else { $null }
                     $InteractiveRequest = New-ScubaMsalBrowserRequest -MsalApp $MsalApp `
-                        -Scope $Scope -Tenant $Tenant -Account $SignInAccount
+                        -Scope $Scope -Tenant $Tenant -Account $BrowserAccount
                     $TokenResult = Invoke-ScubaMsalRequest -Request $InteractiveRequest -TimeoutSeconds $InteractiveTimeoutSeconds
                 }
             }
