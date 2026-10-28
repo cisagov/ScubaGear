@@ -324,6 +324,15 @@ TestPlan:
         IsNotChecked: true
         ExpectedResult: false
 
+  - PolicyId: MS.SI.10.7v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SI.10.7v1 Not Checked
+        Preconditions: []
+        Postconditions: []
+        IsNotChecked: true
+        ExpectedResult: false
+
   - PolicyId: MS.SI.11.1v1
     TestDriver: ScubaCached
     Tests:

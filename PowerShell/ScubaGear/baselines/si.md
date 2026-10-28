@@ -51,7 +51,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.1.1v1
-No Agent Service Principal SHALL hold the Global Administrator role.
+No agent identity SHALL hold the Global Administrator role.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi11v1-instructions)
 
 <!--Policy: MS.SI.1.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -62,7 +64,9 @@ No Agent Service Principal SHALL hold the Global Administrator role.
 - _Note:_ TBD
 
 #### MS.SI.1.2v1
-No Agent Service Principal SHALL hold the Privileged Role Administrator role.
+No agent identity SHALL hold the Privileged Role Administrator role.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi12v1-instructions)
 
 <!--Policy: MS.SI.1.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -74,6 +78,8 @@ No Agent Service Principal SHALL hold the Privileged Role Administrator role.
 
 #### MS.SI.1.3v1
 Conditional Access policies SHOULD be applied at the agent identity blueprint level.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi13v1-instructions)
 
 <!--Policy: MS.SI.1.3v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -111,7 +117,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.2.1v1
-Agent service principals SHALL authenticate via Managed Identity or certificate credentials, not client secrets.
+Agent identity blueprints SHALL use federated identity credentials (such as managed identities) or certificates, not client secrets.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi21v1-instructions)
 
 <!--Policy: MS.SI.2.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -122,7 +130,9 @@ Agent service principals SHALL authenticate via Managed Identity or certificate 
 - _Note:_ TBD
 
 #### MS.SI.2.2v1
-Workload Identity Conditional Access SHOULD be enabled for agent service principals.
+Conditional Access for Agent ID SHOULD be configured for agent identities.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi22v1-instructions)
 
 <!--Policy: MS.SI.2.2v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -133,7 +143,9 @@ Workload Identity Conditional Access SHOULD be enabled for agent service princip
 - _Note:_ TBD
 
 #### MS.SI.2.3v1
-Copilot Studio agents SHALL NOT be configured to run on the maker's stored connections (delegated maker credentials).
+Copilot Studio agents SHALL NOT use maker-provided credentials.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi23v1-instructions)
 
 <!--Policy: MS.SI.2.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -171,7 +183,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.3.1v1
-Every agent SHALL be registered with a business owner and technical owner before deployment.
+Every agent SHALL be assigned a sponsor and an owner before deployment.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi31v1-instructions)
 
 <!--Policy: MS.SI.3.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -182,7 +196,9 @@ Every agent SHALL be registered with a business owner and technical owner before
 - _Note:_ TBD
 
 #### MS.SI.3.2v1
-Every agent SHALL be registered with purpose statement before deployment.
+Every agent SHALL be registered with a description of its purpose before deployment.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi32v1-instructions)
 
 <!--Policy: MS.SI.3.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -195,6 +211,8 @@ Every agent SHALL be registered with purpose statement before deployment.
 #### MS.SI.3.3v1
 Unused agents SHOULD be disabled after X days of inactivity.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi33v1-instructions)
+
 <!--Policy: MS.SI.3.3v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -204,7 +222,9 @@ Unused agents SHOULD be disabled after X days of inactivity.
 - _Note:_ The inactivity threshold (X days) is TBD. This policy may require an additional license.
 
 #### MS.SI.3.4v1
-Orphaned agents SHOULD be disabled after X days of inactivity.
+Ownerless agents SHOULD be disabled after X days of inactivity.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi34v1-instructions)
 
 <!--Policy: MS.SI.3.4v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -246,7 +266,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.4.1v1
-Anonymous access to published agents SHALL be disabled.
+Agents SHALL NOT be published with the No authentication option.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi41v1-instructions)
 
 <!--Policy: MS.SI.4.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -259,6 +281,8 @@ Anonymous access to published agents SHALL be disabled.
 #### MS.SI.4.2v1
 Public publishing of agents SHALL be disabled.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi42v1-instructions)
+
 <!--Policy: MS.SI.4.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -269,6 +293,8 @@ Public publishing of agents SHALL be disabled.
 
 #### MS.SI.4.3v1
 External user access SHALL be restricted to approved domains.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi43v1-instructions)
 
 <!--Policy: MS.SI.4.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -308,6 +334,8 @@ TBD - Section description.
 #### MS.SI.5.1v1
 Agent conversations and actions SHALL be logged and retained according to M-26-14.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi51v1-instructions)
+
 <!--Policy: MS.SI.5.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -336,7 +364,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.6.1v1
-Sensitivity label policy scope SHALL include Groups and sites.
+The sensitivity label scope SHALL include Groups & sites.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi61v1-instructions)
 
 <!--Policy: MS.SI.6.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -347,7 +377,9 @@ Sensitivity label policy scope SHALL include Groups and sites.
 - _Note:_ TBD
 
 #### MS.SI.6.2v1
-Unified audit log ingestion SHALL be enabled.
+Unified audit logging SHALL be enabled.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi62v1-instructions)
 
 <!--Policy: MS.SI.6.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -360,6 +392,8 @@ Unified audit log ingestion SHALL be enabled.
 #### MS.SI.6.3v1
 Sensitivity label display names SHALL be unique within the tenant.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi63v1-instructions)
+
 <!--Policy: MS.SI.6.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -369,7 +403,9 @@ Sensitivity label display names SHALL be unique within the tenant.
 - _Note:_ TBD
 
 #### MS.SI.6.4v1
-AI data-security admin roles SHALL be assigned by least privilege.
+Data Security AI Admin roles SHALL be assigned by least privilege.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi64v1-instructions)
 
 <!--Policy: MS.SI.6.4v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -413,6 +449,8 @@ TBD - Section description.
 #### MS.SI.7.1v1
 A sensitivity label taxonomy SHALL be published to all users.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi71v1-instructions)
+
 <!--Policy: MS.SI.7.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -424,6 +462,8 @@ A sensitivity label taxonomy SHALL be published to all users.
 #### MS.SI.7.2v1
 A default label SHALL be configured for new content.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi72v1-instructions)
+
 <!--Policy: MS.SI.7.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -433,7 +473,9 @@ A default label SHALL be configured for new content.
 - _Note:_ TBD
 
 #### MS.SI.7.3v1
-Justification SHALL be required to lower or remove a label.
+Users SHALL be required to provide a justification to remove a label or lower its classification.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi73v1-instructions)
 
 <!--Policy: MS.SI.7.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -444,7 +486,9 @@ Justification SHALL be required to lower or remove a label.
 - _Note:_ TBD
 
 #### MS.SI.7.4v1
-Container labeling SHALL be applied to sites and Teams in AI scope.
+Sensitivity labels SHALL be applied to SharePoint sites and Teams in AI scope.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi74v1-instructions)
 
 <!--Policy: MS.SI.7.4v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -486,7 +530,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.8.1v1
-Service-side auto-labeling SHALL be configured for SharePoint, OneDrive, and Exchange.
+Auto-labeling policies SHALL be configured for SharePoint, OneDrive, and Exchange.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi81v1-instructions)
 
 <!--Policy: MS.SI.8.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -497,7 +543,9 @@ Service-side auto-labeling SHALL be configured for SharePoint, OneDrive, and Exc
 - _Note:_ TBD
 
 #### MS.SI.8.2v1
-Auto-labeling policies SHALL be validated in simulation before enforcement.
+Auto-labeling policies SHALL be run in simulation mode before they are turned on.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi82v1-instructions)
 
 <!--Policy: MS.SI.8.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -508,7 +556,9 @@ Auto-labeling policies SHALL be validated in simulation before enforcement.
 - _Note:_ TBD
 
 #### MS.SI.8.3v1
-Disposition toward existing labels SHALL be explicitly configured for auto-labeling policies.
+The option to replace existing labels SHALL be explicitly configured for auto-labeling policies.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi83v1-instructions)
 
 <!--Policy: MS.SI.8.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -521,6 +571,8 @@ Disposition toward existing labels SHALL be explicitly configured for auto-label
 #### MS.SI.8.4v1
 Custom sensitive information types SHALL be defined for organization-specific identifiers.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi84v1-instructions)
+
 <!--Policy: MS.SI.8.4v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -530,7 +582,9 @@ Custom sensitive information types SHALL be defined for organization-specific id
 - _Note:_ TBD
 
 #### MS.SI.8.5v1
-Classifiers SHOULD be validated before use in enforcing policies.
+Trainable classifiers SHOULD be validated before use in enforcing policies.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi85v1-instructions)
 
 <!--Policy: MS.SI.8.5v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -576,7 +630,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.9.1v1
-Sites not approved for AI grounding SHALL be excluded from AI discovery.
+Restricted Content Discovery SHALL be applied to SharePoint sites not approved for Microsoft 365 Copilot.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi91v1-instructions)
 
 <!--Policy: MS.SI.9.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -587,7 +643,9 @@ Sites not approved for AI grounding SHALL be excluded from AI discovery.
 - _Note:_ TBD
 
 #### MS.SI.9.2v1
-An oversharing assessment SHALL be completed before AI enablement.
+A data risk assessment SHALL be completed before AI enablement.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi92v1-instructions)
 
 <!--Policy: MS.SI.9.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -598,7 +656,9 @@ An oversharing assessment SHALL be completed before AI enablement.
 - _Note:_ TBD
 
 #### MS.SI.9.3v1
-A defined process SHALL evaluate newly created sites for AI-discovery exclusion.
+A defined process SHALL evaluate newly created SharePoint sites for Restricted Content Discovery.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi93v1-instructions)
 
 <!--Policy: MS.SI.9.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -636,7 +696,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.10.1v1
-A DLP policy SHALL be scoped to the Copilot and Copilot Chat location.
+A defined SI disposition SHALL exist for every sensitivity label that applies encryption.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi101v1-instructions)
 
 <!--Policy: MS.SI.10.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -647,9 +709,11 @@ A DLP policy SHALL be scoped to the Copilot and Copilot Chat location.
 - _Note:_ TBD
 
 #### MS.SI.10.2v1
-That DLP policy SHALL be in enforcement mode, not simulation.
+Microsoft 365 Copilot and Copilot Chat SHOULD be blocked from processing prompts containing sensitive information types.
 
-<!--Policy: MS.SI.10.2v1; Criticality: SHALL -->
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi102v1-instructions)
+
+<!--Policy: MS.SI.10.2v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -658,9 +722,11 @@ That DLP policy SHALL be in enforcement mode, not simulation.
 - _Note:_ TBD
 
 #### MS.SI.10.3v1
-A defined AI disposition SHALL exist for every label applying encryption.
+Microsoft 365 Copilot and Copilot Chat SHOULD be blocked from using external web search as a grounding source for prompts containing sensitive information types.
 
-<!--Policy: MS.SI.10.3v1; Criticality: SHALL -->
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi103v1-instructions)
+
+<!--Policy: MS.SI.10.3v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
@@ -669,7 +735,9 @@ A defined AI disposition SHALL exist for every label applying encryption.
 - _Note:_ TBD
 
 #### MS.SI.10.4v1
-Prompts containing sensitive information types SHOULD be restricted from AI processing.
+Endpoint DLP SHOULD monitor third-party generative AI sites.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi104v1-instructions)
 
 <!--Policy: MS.SI.10.4v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -680,7 +748,9 @@ Prompts containing sensitive information types SHOULD be restricted from AI proc
 - _Note:_ TBD
 
 #### MS.SI.10.5v1
-External web grounding SHOULD be restricted for sensitive prompts.
+Microsoft 365 Copilot and Copilot Chat SHOULD be blocked from using external email as grounding data.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi105v1-instructions)
 
 <!--Policy: MS.SI.10.5v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -691,7 +761,9 @@ External web grounding SHOULD be restricted for sensitive prompts.
 - _Note:_ TBD
 
 #### MS.SI.10.6v1
-Endpoint DLP SHOULD monitor third-party generative AI sites.
+Microsoft 365 Copilot and Copilot Chat SHOULD be blocked from processing files, emails, or chats with designated sensitivity labels.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi106v1-instructions)
 
 <!--Policy: MS.SI.10.6v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -701,9 +773,24 @@ Endpoint DLP SHOULD monitor third-party generative AI sites.
   - TBD
 - _Note:_ TBD
 
+#### MS.SI.10.7v1
+Restricted Content Discovery SHOULD be used to block Microsoft 365 Copilot from accessing restricted SharePoint sites.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi107v1-instructions)
+
+<!--Policy: MS.SI.10.7v1; Criticality: SHOULD -->
+- _Rationale:_ TBD
+- _Last modified:_ TBD
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ TBD
+- _MITRE ATT&CK TTP Mapping:_
+  - TBD
+- _Note:_ TBD
+
 ### Resources
 
-- TBD
+- [Microsoft Purview DLP for Microsoft 365 Copilot and Cowork \| Microsoft Learn](https://learn.microsoft.com/en-us/purview/dlp-microsoft365-copilot-location-learn-about)
+
+- [Restrict discovery of SharePoint sites and content \| Microsoft Learn](https://learn.microsoft.com/en-us/sharepoint/restricted-content-discovery)
 
 ### License Requirements
 
@@ -735,13 +822,19 @@ Endpoint DLP SHOULD monitor third-party generative AI sites.
 
 1. TBD
 
+#### MS.SI.10.7v1 Instructions
+
+1. TBD
+
 ## 11. DSPM, Audit & Records for AI
 
 TBD - Section description.
 
 ### Policies
 #### MS.SI.11.1v1
-Data Security Posture Management for AI SHALL be activated.
+Data Security Posture Management SHALL be activated for AI apps and agents.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi111v1-instructions)
 
 <!--Policy: MS.SI.11.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -752,7 +845,9 @@ Data Security Posture Management for AI SHALL be activated.
 - _Note:_ TBD
 
 #### MS.SI.11.2v1
-Recommended AI protection policies SHOULD be evaluated, applied, or declined on record.
+Data Security Posture Management recommendations for AI SHOULD be evaluated and either completed or dismissed on record.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi112v1-instructions)
 
 <!--Policy: MS.SI.11.2v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -763,7 +858,9 @@ Recommended AI protection policies SHOULD be evaluated, applied, or declined on 
 - _Note:_ TBD
 
 #### MS.SI.11.3v1
-DSPM findings SHOULD be reviewed on a defined recurring cadence.
+Data Security Posture Management reports SHOULD be reviewed on a defined recurring cadence.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi113v1-instructions)
 
 <!--Policy: MS.SI.11.3v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -774,7 +871,9 @@ DSPM findings SHOULD be reviewed on a defined recurring cadence.
 - _Note:_ TBD
 
 #### MS.SI.11.4v1
-Audit retention for AI interactions SHALL meet records requirements.
+Audit log retention for AI interactions SHALL meet records requirements.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi114v1-instructions)
 
 <!--Policy: MS.SI.11.4v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -787,6 +886,8 @@ Audit retention for AI interactions SHALL meet records requirements.
 #### MS.SI.11.5v1
 Retention policies SHALL cover AI interactions.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi115v1-instructions)
+
 <!--Policy: MS.SI.11.5v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -797,6 +898,8 @@ Retention policies SHALL cover AI interactions.
 
 #### MS.SI.11.6v1
 AI interactions SHALL be discoverable through eDiscovery.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi116v1-instructions)
 
 <!--Policy: MS.SI.11.6v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -848,6 +951,8 @@ TBD - Section description.
 #### MS.SI.12.1v1
 A Communication Compliance policy SHOULD be scoped to AI interactions.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi121v1-instructions)
+
 <!--Policy: MS.SI.12.1v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -859,6 +964,8 @@ A Communication Compliance policy SHOULD be scoped to AI interactions.
 #### MS.SI.12.2v1
 Reviewers SHALL be assigned and triage SHALL occur on a defined cadence.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi122v1-instructions)
+
 <!--Policy: MS.SI.12.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -868,7 +975,9 @@ Reviewers SHALL be assigned and triage SHALL occur on a defined cadence.
 - _Note:_ TBD
 
 #### MS.SI.12.3v1
-Insider Risk Management policies SHOULD include AI usage indicators.
+Insider Risk Management policies SHOULD include risky AI usage indicators.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi123v1-instructions)
 
 <!--Policy: MS.SI.12.3v1; Criticality: SHOULD -->
 - _Rationale:_ TBD
@@ -880,6 +989,8 @@ Insider Risk Management policies SHOULD include AI usage indicators.
 
 #### MS.SI.12.4v1
 Compensating detective controls SHALL exist where preventive AI controls are unavailable.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi124v1-instructions)
 
 <!--Policy: MS.SI.12.4v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -921,7 +1032,9 @@ TBD - Section description.
 
 ### Policies
 #### MS.SI.13.1v1
-Pay-as-you-go metering for agents SHALL NOT be enabled.
+Pay-as-you-go billing for agents SHALL NOT be enabled.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi131v1-instructions)
 
 <!--Policy: MS.SI.13.1v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -934,6 +1047,8 @@ Pay-as-you-go metering for agents SHALL NOT be enabled.
 #### MS.SI.13.2v1
 Agent knowledge sources SHALL be limited to those carrying required protection.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi132v1-instructions)
+
 <!--Policy: MS.SI.13.2v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -944,6 +1059,8 @@ Agent knowledge sources SHALL be limited to those carrying required protection.
 
 #### MS.SI.13.3v1
 Agents published on non-Microsoft channels SHALL be inventoried and approved.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi133v1-instructions)
 
 <!--Policy: MS.SI.13.3v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -956,6 +1073,8 @@ Agents published on non-Microsoft channels SHALL be inventoried and approved.
 #### MS.SI.13.4v1
 DLP SHALL be scoped to cover agents where the knowledge source supports it.
 
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi134v1-instructions)
+
 <!--Policy: MS.SI.13.4v1; Criticality: SHALL -->
 - _Rationale:_ TBD
 - _Last modified:_ TBD
@@ -965,7 +1084,9 @@ DLP SHALL be scoped to cover agents where the knowledge source supports it.
 - _Note:_ TBD
 
 #### MS.SI.13.5v1
-Power Platform data loss prevention policies SHALL restrict connector combinations available to agent environments.
+Power Platform data policies SHALL restrict connector combinations available to agent environments.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi135v1-instructions)
 
 <!--Policy: MS.SI.13.5v1; Criticality: SHALL -->
 - _Rationale:_ TBD
@@ -976,7 +1097,9 @@ Power Platform data loss prevention policies SHALL restrict connector combinatio
 - _Note:_ TBD
 
 #### MS.SI.13.6v1
-External threat detection for Copilot Studio agents SHOULD be configured to block on error rather than allow.
+The external threat detection error behavior for Copilot Studio custom agents SHOULD be set to Block the query.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#mssi136v1-instructions)
 
 <!--Policy: MS.SI.13.6v1; Criticality: SHOULD -->
 - _Rationale:_ TBD

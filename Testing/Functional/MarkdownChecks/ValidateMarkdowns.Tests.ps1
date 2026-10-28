@@ -29,7 +29,7 @@ InModuleScope CreateReport {
         @{Product = "powerplatform"; GroupCount = 5; PolicyCount = 8}
         @{Product = "sharepoint"; GroupCount = 4; PolicyCount = 11}
         @{Product = "teams"; GroupCount = 5; PolicyCount = 14}
-        @{Product = "si"; GroupCount = 13; PolicyCount = 52}
+        @{Product = "si"; GroupCount = 13; PolicyCount = 53}
     ){
         BeforeEach{
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'Baseline', Justification = 'Variable is used in another scope')]

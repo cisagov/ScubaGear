@@ -482,7 +482,21 @@ function Connect-Tenant {
                    }
                }
                "si" {
-                   # The SI provider does not need a connection yet.
+                   #### Authenticate to MS Graph with min permissions so the tenant details can be retrieved when SI is run on its own
+                   # The SI provider does not export any settings yet. The Microsoft Graph and Microsoft Purview connections it
+                   # needs will be added here once the SI policies and their APIs are identified.
+                   Connect-GraphIfNecessary -MsGraphAuthRequired $MsGraphAuthRequired -M365Environment $M365Environment -ServicePrincipalParams $ServicePrincipalParams
+                   $MsGraphAuthRequired = $false
+
+                   # Dynamically determine the M365Environment for interactive auth
+                    if (-not $ServicePrincipalParams -and -not $AutodetectEnvironmentCompleted) {
+                        $UserAuthInfo = Get-MgContext
+                        $TenantId = $UserAuthInfo.TenantId
+                        $DetectedM365Environment = Get-M365EnvironmentByDomain -TenantDomain $TenantId
+                        $M365Environment = $DetectedM365Environment
+                        $AutodetectEnvironmentCompleted = $true
+                        Write-Information "Automatically determined M365Environment: $DetectedM365Environment" -InformationAction Continue
+                    }
                }
                default {
                    throw "Invalid ProductName argument"

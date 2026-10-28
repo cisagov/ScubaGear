@@ -76,3 +76,15 @@ test_NotImplemented_Correct_V6 if {
     TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
 }
 #--
+
+#
+# Policy MS.SI.10.7v1
+#--
+test_NotImplemented_Correct_V7 if {
+    PolicyId := "MS.SI.10.7v1"
+
+    Output := si.tests with input as { }
+
+    TestResult(PolicyId, Output, NotCheckedDetails(PolicyId), false) == true
+}
+#--

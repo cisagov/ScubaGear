@@ -524,7 +524,7 @@ tests contains {
 # At this time we are unable to test for this policy because the automated check has not been implemented yet
 tests contains {
     "PolicyId": "MS.SI.10.2v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails("MS.SI.10.2v1"),
@@ -539,7 +539,7 @@ tests contains {
 # At this time we are unable to test for this policy because the automated check has not been implemented yet
 tests contains {
     "PolicyId": "MS.SI.10.3v1",
-    "Criticality": "Shall/Not-Implemented",
+    "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails("MS.SI.10.3v1"),
@@ -588,6 +588,21 @@ tests contains {
     "Commandlet": [],
     "ActualValue": [],
     "ReportDetails": NotCheckedDetails("MS.SI.10.6v1"),
+    "RequirementMet": false
+}
+#--
+
+#
+# MS.SI.10.7v1
+#--
+
+# At this time we are unable to test for this policy because the automated check has not been implemented yet
+tests contains {
+    "PolicyId": "MS.SI.10.7v1",
+    "Criticality": "Should/Not-Implemented",
+    "Commandlet": [],
+    "ActualValue": [],
+    "ReportDetails": NotCheckedDetails("MS.SI.10.7v1"),
     "RequirementMet": false
 }
 #--

@@ -53,7 +53,7 @@ License text.
             [regex]::Matches((Get-Content $_.FullName -Raw), '(?m)^#### (MS\.[A-Z]+\.\d+\.\d+v\d+)\s*$') |
                 ForEach-Object { $_.Groups[1].Value }
         })
-        $policies.Count | Should -Be 161
+        $policies.Count | Should -Be 162
         Compare-Object ($sourceIds | Sort-Object) ($policies.id | Sort-Object) | Should -BeNullOrEmpty
         @($policies | Where-Object { [string]::IsNullOrWhiteSpace($_.name) }).Count | Should -Be 0
     }
@@ -127,8 +127,8 @@ License text.
             Should -Be 'The DLP policy SHOULD include an action to block access to sensitive information by restricted applications and unwanted Bluetooth applications.'
     }
 
-    It 'preserves all 91 policy notes and their nested text' {
-        @($policies | ForEach-Object { $_.notes } | Where-Object { $_ }).Count | Should -Be 91
+    It 'preserves all 92 policy notes and their nested text' {
+        @($policies | ForEach-Object { $_.notes } | Where-Object { $_ }).Count | Should -Be 92
         ($policies | Where-Object id -eq 'MS.SECURITYSUITE.3.5v1').notes[0] |
             Should -Match 'This action can only be included if at least one device is onboarded'
     }
