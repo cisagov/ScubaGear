@@ -68,7 +68,7 @@ Files modified before this integration began:
 - `PowerShell/ScubaGear/Modules/Connection/Connection.psm1`
 - `PowerShell/ScubaGear/Modules/Orchestrator.psm1`
 - `PowerShell/ScubaGear/schemas/ScubaConfigDefaults.json`
-- `PowerShell/ScubaGear/Modules/ScubaConfig/ScubaConfigSchema.json`
+- `PowerShell/ScubaGear/schemas/ScubaConfigSchema.json`
 - `PowerShell/ScubaGear/Modules/Support/Support.psm1`
 - `PowerShell/ScubaGear/Sample-Config-Files/full_config.yaml`
 - `PowerShell/ScubaGear/Testing/Unit/PowerShell/Connection/Connect-GraphHelper.Tests.ps1`
