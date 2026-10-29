@@ -1,4 +1,6 @@
-﻿Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../Connection/ConnectHelpers.psm1') -Function Disconnect-ScubaGraph, Invoke-ScubaGraphRequest -Force
+﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../Connection/ConnectHelpers.psm1') -Function Disconnect-ScubaGraph, Invoke-ScubaGraphRequest -Force
 
 Function Update-GraphStatusIndicator {
     <#
@@ -121,6 +123,9 @@ Function Invoke-GraphQueryWithFilter {
     # Create runspace
     $runspace = [runspacefactory]::CreateRunspace()
     $runspace.Open()
+    # This runspace starts empty: give it the caller's Graph session and the module that provides the request command.
+    $runspace.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
+    $runspace.SessionStateProxy.SetVariable('ConnectHelpersPath', (Join-Path $PSScriptRoot '../../Connection/ConnectHelpers.psm1'))
 
     Write-DebugOutput "Created new runspace for Graph query" -Source "Invoke-GraphQueryWithFilter" -Level "Verbose"
 
@@ -133,6 +138,8 @@ Function Invoke-GraphQueryWithFilter {
         param($QueryType, $GraphConfig, $FilterString, $SearchString, $Top)
 
         try {
+            Import-Module $ConnectHelpersPath -Function Invoke-ScubaGraphRequest -ErrorAction Stop
+
             # Get query configuration
             $queryConfig = $GraphConfig.$QueryType
             if (-not $queryConfig) {

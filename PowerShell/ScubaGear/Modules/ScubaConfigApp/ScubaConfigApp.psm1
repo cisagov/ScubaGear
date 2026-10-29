@@ -1,4 +1,6 @@
-﻿Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-ScubaGraphContext, Invoke-ScubaGraphRequest -Force
+﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-ScubaGraphContext, Invoke-ScubaGraphRequest -Force
 
 function Resolve-ScubaConfigAppWalkthroughPath {
     param(
@@ -382,6 +384,8 @@ Function Start-SCuBAConfigApp {
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
     $Runspace.Open() | Out-Null
+    # The UI runs in its own runspace, which would otherwise start with an empty Graph session.
+    $Runspace.SessionStateProxy.SetVariable("ScubaGearState",$Global:ScubaGearState)
     $Runspace.SessionStateProxy.SetVariable("syncHash",$syncHash)
     $PowerShellCommand = [PowerShell]::Create().AddScript({
 
@@ -1956,6 +1960,8 @@ Function Start-SCuBAConfigAnalyzer {
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
     $Runspace.Open()
+    # Share the caller's Graph session so Connect & Scan and the background threads see the same sign-in.
+    $Runspace.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
     $syncHash.Runspace = $Runspace
     $syncHash.InitialResultsPath = $ResultsPath
     $syncHash.M365Environment = $M365Environment

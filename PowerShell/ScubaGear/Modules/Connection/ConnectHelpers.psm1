@@ -5,8 +5,11 @@
 # Session state stored globally so all module import paths share the same instance
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
+# A runspace that was handed this object before importing the module (the config app and analyzer do this
+# so their background threads share one sign-in) keeps it, because the guard below skips re-creation.
+# It is synchronized because the UI thread and those background threads read and write it together.
 if (-not $Global:ScubaGearState) {
-    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; LastRun = $null; }
+    $Global:ScubaGearState = [hashtable]::Synchronized(@{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; LastRun = $null; })
 }
 
 function Connect-GraphHelper {
