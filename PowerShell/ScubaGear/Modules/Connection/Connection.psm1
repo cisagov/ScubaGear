@@ -18,7 +18,7 @@ function Connect-Tenant {
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
     # Validated against the ProductNames schema enum (minus '*') rather than GetSupportedProducts(), so that
-    # products not yet in AllProductNames (such as si) can still be requested by name.
+    # products not yet in AllProductNames (such as si, see #2550) can still be requested by name.
     [ValidateScript({ $_ -cin @([ScubaConfig]::GetAllValidProductNames() | Where-Object { $_ -ne '*' }) })]
    [string[]]
    $ProductNames,
