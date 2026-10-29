@@ -1319,7 +1319,7 @@ Outbound spam from compromised accounts can disrupt agency communications and da
 ### Policies
 
 #### MS.SECURITYSUITE.9.1v1
-Users SHOULD subjected to anti-spam message limits.
+Users SHOULD be subjected to anti-spam message limits.
 
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
