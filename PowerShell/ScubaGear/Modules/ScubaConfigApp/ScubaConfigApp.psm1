@@ -1408,7 +1408,9 @@ Function Start-SCuBAConfigApp {
     $PowerShellCommand.Runspace = $Runspace
     $AsyncHandle = $PowerShellCommand.BeginInvoke()
 
-    # Wait for the runspace to complete (non-blocking if needed)
+    # Wait for the runspace to complete. Wait in short script slices rather than one blocking call, so this runspace can
+    # still service calls made into it from the UI runspace (for example ScubaConfig class methods).
+    while (-not $AsyncHandle.IsCompleted) { Start-Sleep -Milliseconds 100 }
     $null = $PowerShellCommand.EndInvoke($AsyncHandle)
 
     # Now safe to clean up
