@@ -2827,8 +2827,8 @@ function Remove-ScubaGearAppCert {
                                 keyId = $existingKey.KeyId
                                 type = $existingKey.Type
                                 usage = $existingKey.Usage
-                                startDateTime = $existingKey.StartDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-                                endDateTime = $existingKey.EndDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                startDateTime = ([datetime]$existingKey.StartDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                endDateTime = ([datetime]$existingKey.EndDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                             }
                             $updatedKeyCredentials += $formattedKey
                         }
@@ -2979,9 +2979,9 @@ function New-ScubaGearAppCert {
                     $formattedExistingKey = @{
                         customKeyIdentifier = $existingKey.CustomKeyIdentifier
                         displayName = $existingKey.DisplayName
-                        endDateTime = $existingKey.EndDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                        endDateTime = ([datetime]$existingKey.EndDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                         keyId = $existingKey.KeyId
-                        startDateTime = $existingKey.StartDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                        startDateTime = ([datetime]$existingKey.StartDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                         type = $existingKey.Type
                         usage = $existingKey.Usage
                     }
