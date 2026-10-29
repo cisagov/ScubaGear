@@ -528,6 +528,14 @@ Launching with `-Online` connects the app to Microsoft Graph and unlocks several
 Start-SCuBAConfigApp -Online
 ```
 
+### Signing In
+
+- **Browser sign-in.** Your default browser opens so you can sign in to Microsoft 365. The PowerShell window prints a message and waits for you to finish; it stops waiting after five minutes. Press `Ctrl+C` in the PowerShell window to cancel.
+- **"Need admin approval".** If Entra shows this page, the permissions listed under [Before You Begin](#before-you-begin) have not been consented for your account. A Global Administrator must approve them; then run `Start-SCuBAConfigApp -Online` again.
+- **The window opens after you sign in.** Once the app opens, the Graph indicator shows **Connected** and the **Organization** box is filled in with your tenant's default domain and greyed out. Click the indicator to disconnect at any time.
+- **Signing out.** Closing the app disconnects from Microsoft Graph, and the PowerShell window prints "Disconnected from Microsoft Graph". The next `-Online` launch asks you to sign in again.
+- **No browser prompt?** You can sign in without a browser by passing `-TenantName`, `-AppId` and `-CertificateThumbprint` (app-only). See the [module reference](scubaconfigapp.md).
+
 ### Browsing and Selecting Groups
 
 On any exclusion list field that accepts group object IDs, a **Get Groups** button appears next to the entry area. Click it to open a searchable browser showing all groups in your tenant.
