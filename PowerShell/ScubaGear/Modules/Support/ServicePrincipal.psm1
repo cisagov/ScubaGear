@@ -2027,8 +2027,18 @@ function Set-ScubaGearAppPermission {
                 try {
                     Write-Verbose "Attempting to remove Power Platform registration"
 
-                    Set-PowerPlatformAppRegistration -AppID $AppID -TenantId (Get-MgContext).TenantId -M365Environment $M365Environment -Remove
-                    Write-Output "Successfully removed Power Platform registration"
+                    # This session only has application and role permissions, which cannot read the organization,
+                    # so take the tenant from the service principal, the same way the registration step below does.
+                    $sp = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                        '$filter' = "id eq '$ServicePrincipalID'"
+                    }).Value
+
+                    if ($sp) {
+                        Set-PowerPlatformAppRegistration -AppID $AppID -TenantId $sp.AppOwnerOrganizationId -M365Environment $M365Environment -Remove
+                        Write-Output "Successfully removed Power Platform registration"
+                    } else {
+                        Write-Warning "Could not retrieve tenant ID for Power Platform registration removal"
+                    }
                 } catch {
                     Write-Warning "Failed to remove Power Platform registration: $($_.Exception.Message)"
                 }

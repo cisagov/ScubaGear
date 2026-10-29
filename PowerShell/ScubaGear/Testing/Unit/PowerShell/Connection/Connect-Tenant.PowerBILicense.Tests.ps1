@@ -89,7 +89,6 @@ InModuleScope Connection {
                 throw 'this will be mocked'
             }
 
-            function Get-MgContext { throw 'this will be mocked' }
             function Get-M365EnvironmentByDomain { throw 'this will be mocked' }
         }
 
@@ -104,9 +103,6 @@ InModuleScope Connection {
             Mock -CommandName Write-Progress -MockWith {}
             Mock Get-MsalAccessToken -MockWith { return "mock-pbi-access-token" }
             Mock Initialize-Msal -MockWith {}
-            Mock Get-MgContext -MockWith {
-                return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" }
-            }
             Mock Get-M365EnvironmentByDomain -MockWith { return 'commercial' }
 
             # Tenant has a Power BI plan, and the running user has one too. Individual tests
