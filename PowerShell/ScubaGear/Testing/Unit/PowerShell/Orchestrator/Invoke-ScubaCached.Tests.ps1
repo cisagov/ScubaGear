@@ -151,6 +151,17 @@ InModuleScope Orchestrator {
                 Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { "$MessageData" -match 'jane\.doe|tenant-guid|11111111-2222' }
                 Should -Invoke Write-Host -Times 0 -Exactly -ParameterFilter { "$Object" -match 'jane\.doe|tenant-guid|11111111-2222' }
             }
+
+            It 'points the user to Get-ScubaGearContext when it signs in' {
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter { "$MessageData" -like '*Get-ScubaGearContext*' }
+            }
+
+            It 'says nothing about Get-ScubaGearContext when no sign-in was performed' {
+                Mock Get-ScubaGearRunIdentity { }
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { "$MessageData" -like '*Get-ScubaGearContext*' }
+            }
         }
 
         Context "When there are multiple ScubaResults*.json files" {

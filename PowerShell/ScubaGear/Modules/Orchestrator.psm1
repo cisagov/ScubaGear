@@ -601,6 +601,8 @@ function Invoke-SCuBA {
                 $ScubaConfig.ProductNames = $Difference
             }
 
+            Write-ScubaContextHint
+
             # Capture module snapshot after authentication to log what modules were imported
             if ($Script:ScubaLoggingEnabled) {
                 try {
@@ -2312,6 +2314,25 @@ function Invoke-Connection {
     $ConnectionResult
 }
 
+function Write-ScubaContextHint {
+    <#
+    .Description
+    Points the user to Get-ScubaGearContext once a sign-in exists, so they know how to confirm which credentials
+    and tenant the run is using. The hint deliberately names no account, app or tenant: console output is often
+    screenshotted into public bug reports. Does nothing when there is no session.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param()
+
+    if (-not (Get-ScubaGearRunIdentity)) {
+        return
+    }
+
+    Write-Information "To see which account and tenant this run is using, run Get-ScubaGearContext." -InformationAction Continue
+}
+
 function Invoke-ScubaDisconnectOnExit {
     <#
     .Description
@@ -2821,6 +2842,8 @@ function Invoke-SCuBACached {
                 else {
                     Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "ScubaCached"
                 }
+
+                Write-ScubaContextHint
 
                 # Capture module snapshot after authentication to see what modules were imported
                 if ($Script:ScubaLoggingEnabled) {
