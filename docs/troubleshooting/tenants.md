@@ -19,22 +19,37 @@ account (or app/service principal) and tenant the current PowerShell session is 
 to. This is especially useful when working across multiple tenants or accounts, to confirm a
 prior session was cleared before connecting to a different tenant.
 
-`Get-ScubaGearContext` reads the session ScubaGear already established; it doesn't sign in on
-its own. Because ScubaGear clears its session when `Invoke-SCuBA` finishes by default, keep the session
-with `-DisconnectOnExit:$false` (or run it during a run that is still in progress) before calling it,
-in the same PowerShell terminal:
+`Get-ScubaGearContext` doesn't sign in on its own. While a session is connected, it reads that session and
+asks Microsoft Graph for the details. ScubaGear disconnects when `Invoke-SCuBA` finishes by default, which
+discards its tokens, so afterwards there is nothing live to query. In that case `Get-ScubaGearContext` shows the
+credentials the most recent run used, from a short record saved just before the disconnect. The record holds the
+account or app, the authentication type, the tenant, and the environment, never tokens. It is labeled
+`Disconnected (last run)`. It lives only in the current PowerShell process, so it is gone when you close the
+window, and it is not written to the report or the debug log.
+
+Every run also prints a line near the start such as
+`Scanning as admin@contoso.onmicrosoft.com (user), tenant ee6afab0-3d70-4380-aa11-243aa9dedef2, environment commercial.`
+so you can confirm the credentials before the results are collected.
 
 ```powershell
-Invoke-SCuBA -ProductNames aad -M365Environment commercial -DisconnectOnExit:$false   # sign in to Tenant A and keep the session
-Get-ScubaGearContext                                          # confirm which tenant/account you're on
-Disconnect-SCuBATenant                                        # clear the session before switching
+Invoke-SCuBA -ProductNames aad -M365Environment commercial   # sign in to Tenant A, scan, then disconnect
+Get-ScubaGearContext                                          # shows the credentials the last run used (disconnected)
 Invoke-SCuBA -ProductNames aad -M365Environment commercial   # sign in to Tenant B
-Get-ScubaGearContext                                          # confirm it's now Tenant B
+Get-ScubaGearContext                                          # shows Tenant B's credentials
 ```
 
-Example output:
+To query the live session instead (tenant name, domain, and scopes), keep it with `-DisconnectOnExit:$false`:
 
 ```powershell
+Invoke-SCuBA -ProductNames aad -M365Environment commercial -DisconnectOnExit:$false   # keep the session
+Get-ScubaGearContext                                          # live details; Status is Connected
+Disconnect-SCuBATenant                                        # clear the session before switching
+```
+
+Example output of a live session:
+
+```powershell
+Status         : Connected
 Account        : admin@contoso.onmicrosoft.com
 AppDisplayName : Microsoft Graph Command Line Tools
 ClientId       : 14d82eec-204b-4c2f-b7e8-296a70dab67e
@@ -47,11 +62,25 @@ Environment    : commercial
 GraphEndpoint  : https://graph.microsoft.com
 ```
 
+Example output after the run has disconnected:
+
+```powershell
+Status             : Disconnected (last run)
+Account            : admin@contoso.onmicrosoft.com
+ClientId           : 14d82eec-204b-4c2f-b7e8-296a70dab67e
+AuthType           : Delegated
+Tenant             : ee6afab0-3d70-4380-aa11-243aa9dedef2
+Environment        : commercial
+DisconnectedAtZulu : 2026-10-29T12:00:00.000Z
+```
+
 `TenantDomain` is the tenant's initial verified domain. `AppDisplayName` comes from the
 client application's service principal. If that lookup fails for the standard interactive
-Graph client, ScubaGear uses its documented name, Microsoft Graph Command Line Tools.
+Graph client, ScubaGear uses its documented name, Microsoft Graph Command Line Tools. Tenant
+name, domain, and scopes are only available from a live session.
 
-If no session is currently active, `Get-ScubaGearContext` prints a warning and returns nothing
-rather than throwing an error. Because the session lives in memory for the current PowerShell
-process, `Get-ScubaGearContext` only reflects the connection made in that same terminal/process
+If no session is currently active and no run has finished in this PowerShell process,
+`Get-ScubaGearContext` prints a warning and returns nothing rather than throwing an error. Because
+both the session and the last-run record live in memory for the current PowerShell process,
+`Get-ScubaGearContext` only reflects runs made in that same terminal/process
 — it will not show a connection made in a different PowerShell window.

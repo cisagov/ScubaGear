@@ -139,6 +139,47 @@ InModuleScope Orchestrator {
                 Should -Invoke Disconnect-SCuBATenant -Times 0 -Exactly
             }
         }
+        Context 'Run identity' {
+            BeforeEach {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
+                Mock Write-Information {}
+            }
+
+            It 'tells the user which user, tenant and environment the run is signed in as' {
+                Mock Get-ScubaGearRunIdentity {
+                    [pscustomobject]@{ AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = 'app'; Tenant = 'tenant-guid'; Environment = 'commercial' }
+                }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter {
+                    $MessageData -eq 'Scanning as jane.doe@contoso.com (user), tenant tenant-guid, environment commercial.'
+                }
+            }
+
+            It 'names the app for a service principal run' {
+                Mock Get-ScubaGearRunIdentity {
+                    [pscustomobject]@{ AuthType = 'AppOnly'; Account = $null; AppId = '11111111-2222-3333-4444-555555555555'; Tenant = 'contoso.onmicrosoft.com'; Environment = 'gcchigh' }
+                }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter {
+                    $MessageData -eq 'Scanning as app 11111111-2222-3333-4444-555555555555 (service principal), tenant contoso.onmicrosoft.com, environment gcchigh.'
+                }
+            }
+
+            It 'says nothing when there is no sign-in' {
+                Mock Get-ScubaGearRunIdentity { }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { $MessageData -like 'Scanning as*' }
+            }
+
+            It 'is not shown when every product fails authentication' {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @('aad') } }
+                Mock Get-ScubaGearRunIdentity {
+                    [pscustomobject]@{ AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = 'app'; Tenant = 'tenant-guid'; Environment = 'commercial' }
+                }
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { $MessageData -like 'Scanning as*' }
+            }
+        }
         Context 'When checking the conformance of commercial tenants' {
             BeforeAll {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'SplatParams')]

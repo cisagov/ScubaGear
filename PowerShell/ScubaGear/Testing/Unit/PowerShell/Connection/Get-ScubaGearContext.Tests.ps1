@@ -18,6 +18,7 @@ InModuleScope ConnectHelpers {
         Context 'When ScubaGear is not connected to Microsoft Graph' {
             BeforeAll {
                 $Global:ScubaGearState.Session = $null
+                $Global:ScubaGearState.LastRun = $null
             }
 
             It 'Warns and returns nothing' {
@@ -25,6 +26,166 @@ InModuleScope ConnectHelpers {
                 $Result = Get-ScubaGearContext -WarningVariable Warnings -WarningAction SilentlyContinue
                 $Result | Should -BeNullOrEmpty
                 $Warnings | Should -Not -BeNullOrEmpty
+            }
+        }
+
+        Context 'When the last run has disconnected' {
+            BeforeEach {
+                $Global:ScubaGearState.Session = $null
+                Mock -ModuleName ConnectHelpers Invoke-ScubaGraphRequest { throw 'No Graph call is possible after a disconnect.' }
+            }
+
+            AfterAll {
+                $Global:ScubaGearState.LastRun = $null
+            }
+
+            It 'Shows the user and tenant the last run used, labeled as disconnected' {
+                $Global:ScubaGearState.LastRun = [pscustomobject]@{
+                    AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'
+                    Tenant = 'tenant-guid'; Environment = 'commercial'; DisconnectedAtZulu = '2026-10-29T12:00:00.000Z'
+                }
+                $Result = Get-ScubaGearContext -InformationAction SilentlyContinue
+                $Result.Status | Should -Be 'Disconnected (last run)'
+                $Result.Account | Should -Be 'jane.doe@contoso.com'
+                $Result.AuthType | Should -Be 'Delegated'
+                $Result.ClientId | Should -Be '14d82eec-204b-4c2f-b7e8-296a70dab67e'
+                $Result.Tenant | Should -Be 'tenant-guid'
+                $Result.Environment | Should -Be 'commercial'
+                $Result.DisconnectedAtZulu | Should -Be '2026-10-29T12:00:00.000Z'
+            }
+
+            It 'Shows the app the last run used for a service principal' {
+                $Global:ScubaGearState.LastRun = [pscustomobject]@{
+                    AuthType = 'AppOnly'; Account = $null; AppId = '11111111-2222-3333-4444-555555555555'
+                    Tenant = 'contoso.onmicrosoft.com'; Environment = 'gcchigh'; DisconnectedAtZulu = '2026-10-29T12:00:00.000Z'
+                }
+                $Result = Get-ScubaGearContext -InformationAction SilentlyContinue
+                $Result.Status | Should -Be 'Disconnected (last run)'
+                $Result.Account | Should -Be '11111111-2222-3333-4444-555555555555 (service principal)'
+                $Result.AuthType | Should -Be 'AppOnly'
+            }
+
+            It 'Makes no Microsoft Graph calls and does not warn' {
+                $Global:ScubaGearState.LastRun = [pscustomobject]@{
+                    AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = 'app'
+                    Tenant = 'tenant-guid'; Environment = 'commercial'; DisconnectedAtZulu = '2026-10-29T12:00:00.000Z'
+                }
+                $Result = Get-ScubaGearContext -WarningVariable ContextWarnings -InformationAction SilentlyContinue
+                $Result | Should -Not -BeNullOrEmpty
+                $ContextWarnings | Should -BeNullOrEmpty
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Invoke-ScubaGraphRequest -Times 0 -Exactly
+            }
+
+            It 'Says it is showing the last run, not a live connection' {
+                $Global:ScubaGearState.LastRun = [pscustomobject]@{
+                    AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = 'app'
+                    Tenant = 'tenant-guid'; Environment = 'commercial'; DisconnectedAtZulu = '2026-10-29T12:00:00.000Z'
+                }
+                $Output = Get-ScubaGearContext 6>&1
+                @($Output | Where-Object { $_ -is [System.Management.Automation.InformationRecord] -and $_.MessageData -like '*disconnected*most recent run*' }).Count | Should -Be 1
+            }
+        }
+
+        Context 'Get-ScubaGearRunIdentity' {
+            AfterAll {
+                $Global:ScubaGearState.Session = $null
+            }
+
+            It 'Returns nothing when there is no session' {
+                $Global:ScubaGearState.Session = $null
+                Get-ScubaGearRunIdentity | Should -BeNullOrEmpty
+            }
+
+            It 'Returns the user, app, tenant and environment of a delegated session' {
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = 'commercial'
+                    Account = [pscustomobject]@{ Username = 'jane.doe@contoso.com' }
+                    TokenParameters = @{ Scope = @('Organization.Read.All'); ClientId = '14d82eec-204b-4c2f-b7e8-296a70dab67e'; Tenant = 'tenant-guid' }
+                }
+                $Result = Get-ScubaGearRunIdentity
+                $Result.AuthType | Should -Be 'Delegated'
+                $Result.Account | Should -Be 'jane.doe@contoso.com'
+                $Result.AppId | Should -Be '14d82eec-204b-4c2f-b7e8-296a70dab67e'
+                $Result.Tenant | Should -Be 'tenant-guid'
+                $Result.Environment | Should -Be 'commercial'
+            }
+
+            It 'Returns the app and no account for a service principal session' {
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = 'gcchigh'
+                    Account = $null
+                    TokenParameters = @{ CertificateThumbprint = 'A thumbprint'; AppID = '11111111-2222-3333-4444-555555555555'; Tenant = 'contoso.onmicrosoft.com' }
+                }
+                $Result = Get-ScubaGearRunIdentity
+                $Result.AuthType | Should -Be 'AppOnly'
+                $Result.Account | Should -BeNullOrEmpty
+                $Result.AppId | Should -Be '11111111-2222-3333-4444-555555555555'
+                $Result.Tenant | Should -Be 'contoso.onmicrosoft.com'
+            }
+
+            It 'Contains no tokens or certificate thumbprint' {
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = 'commercial'
+                    Account = [pscustomobject]@{ Username = 'jane.doe@contoso.com' }
+                    TokenParameters = @{ Scope = @('Organization.Read.All'); ClientId = 'client'; Tenant = 'tenant-guid'; CertificateThumbprint = $null }
+                }
+                (Get-ScubaGearRunIdentity).PSObject.Properties.Name | Sort-Object |
+                    Should -Be @('Account', 'AppId', 'AuthType', 'Environment', 'Tenant')
+            }
+        }
+
+        Context 'Disconnect-ScubaGraph records the last run' {
+            BeforeEach {
+                $Global:ScubaGearState.LastRun = $null
+                $Global:ScubaGearState.MsalAppCache = @{ 'PUB:client' = [pscustomobject]@{ Name = 'cached app' } }
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = 'commercial'
+                    Account = [pscustomobject]@{ Username = 'jane.doe@contoso.com' }
+                    TokenParameters = @{ Scope = @('Organization.Read.All'); ClientId = 'client'; Tenant = 'tenant-guid' }
+                }
+            }
+
+            AfterAll {
+                $Global:ScubaGearState.LastRun = $null
+            }
+
+            It 'Saves who the session was signed in as' {
+                Disconnect-ScubaGraph
+                $Global:ScubaGearState.LastRun.Account | Should -Be 'jane.doe@contoso.com'
+                $Global:ScubaGearState.LastRun.AuthType | Should -Be 'Delegated'
+                $Global:ScubaGearState.LastRun.Tenant | Should -Be 'tenant-guid'
+                $Global:ScubaGearState.LastRun.DisconnectedAtZulu | Should -Match '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$'
+            }
+
+            It 'Still clears the session and the token cache' {
+                Disconnect-ScubaGraph
+                $Global:ScubaGearState.Session | Should -BeNullOrEmpty
+                $Global:ScubaGearState.MsalAppCache.Count | Should -Be 0
+            }
+
+            It 'Keeps no token or other credential material in the saved record' {
+                Disconnect-ScubaGraph
+                $Global:ScubaGearState.LastRun.PSObject.Properties.Name | Sort-Object |
+                    Should -Be @('Account', 'AppId', 'AuthType', 'DisconnectedAtZulu', 'Environment', 'Tenant')
+            }
+
+            It 'Does not erase the saved record when disconnecting again with no session' {
+                Disconnect-ScubaGraph
+                Disconnect-ScubaGraph
+                $Global:ScubaGearState.LastRun.Account | Should -Be 'jane.doe@contoso.com'
+            }
+
+            It 'Replaces the saved record with the newest run' {
+                Disconnect-ScubaGraph
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = 'gcchigh'
+                    Account = $null
+                    TokenParameters = @{ CertificateThumbprint = 'A thumbprint'; AppID = 'app-2'; Tenant = 'other.onmicrosoft.us' }
+                }
+                Disconnect-ScubaGraph
+                $Global:ScubaGearState.LastRun.AuthType | Should -Be 'AppOnly'
+                $Global:ScubaGearState.LastRun.AppId | Should -Be 'app-2'
+                $Global:ScubaGearState.LastRun.Account | Should -BeNullOrEmpty
             }
         }
 
@@ -63,6 +224,7 @@ InModuleScope ConnectHelpers {
 
             It 'Resolves the signed-in user via GET /v1.0/me' {
                 $Result = Get-ScubaGearContext
+                $Result.Status | Should -Be 'Connected'
                 $Result.Account | Should -Be 'jane.doe@contoso.com'
                 $Result.AuthType | Should -Be 'Delegated'
                 $Result.TenantId | Should -Be 'tenant-guid'

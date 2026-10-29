@@ -6,7 +6,7 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
 if (-not $Global:ScubaGearState) {
-    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; }
+    $Global:ScubaGearState = @{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; LastRun = $null; }
 }
 
 function Connect-GraphHelper {
@@ -177,6 +177,42 @@ function Get-ScubaGraphContext {
     }
 }
 
+function Get-ScubaGearRunIdentity {
+    <#
+    .SYNOPSIS
+        Returns who (or what app) the current ScubaGear session is signed in as, without calling Microsoft Graph.
+    .DESCRIPTION
+        Reads the identity from the session ScubaGear already established. It makes no network calls and
+        never prompts for a sign-in, so it is safe to call at the end of a run or while handling an error.
+        It holds no tokens. Returns nothing when there is no session.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param()
+
+    $Session = $Global:ScubaGearState.Session
+    if (-not $Session) {
+        return
+    }
+
+    $TokenParameters = $Session.TokenParameters
+    $IsAppOnly = [bool]$TokenParameters.CertificateThumbprint
+    $Account = $null
+    if (-not $IsAppOnly -and $Session.Account -and $Session.Account.Username) {
+        $Account = [string]$Session.Account.Username
+    }
+
+    [pscustomobject]@{
+        AuthType    = if ($IsAppOnly) { 'AppOnly' } else { 'Delegated' }
+        Account     = $Account
+        AppId       = if ($IsAppOnly) { $TokenParameters.AppID } else { $TokenParameters.ClientId }
+        Tenant      = $TokenParameters.Tenant
+        Environment = $Session.M365Environment
+    }
+}
+
 function Get-ScubaGearContext {
     <#
     .SYNOPSIS
@@ -190,14 +226,19 @@ function Get-ScubaGearContext {
         for delegated/user sign-ins and looks up the client service principal for
         both authentication types. If that lookup fails for the standard Graph
         client, it uses the client's documented display name.
+
+        ScubaGear disconnects when a run finishes, which discards its tokens, so there is no live
+        connection to query afterwards. In that case this cmdlet shows the credentials the most
+        recent run used, taken from a record that was saved just before disconnecting (the account or
+        app, authentication type, tenant and environment, but no tokens). That output has a Status of
+        'Disconnected (last run)'. Tenant name, domain and scopes are only available while connected.
     .EXAMPLE
         Get-ScubaGearContext
 
         Displays the account or app, tenant, and scopes ScubaGear is currently using
         to call Microsoft Graph. Useful for confirming which tenant/user a session is
         connected to before running Invoke-SCuBA against multiple tenants or accounts.
-        ScubaGear clears its session when Invoke-SCuBA finishes unless it was run with
-        -DisconnectOnExit:$false.
+        After a run has finished and disconnected, it shows the credentials that run used.
     .FUNCTIONALITY
         Public
     #>
@@ -205,7 +246,20 @@ function Get-ScubaGearContext {
     param()
 
     if (-not $Global:ScubaGearState.Session) {
-        Write-Warning "ScubaGear is not currently connected to Microsoft Graph. ScubaGear disconnects when a run finishes unless Invoke-SCuBA is run with -DisconnectOnExit:`$false."
+        $LastRun = $Global:ScubaGearState.LastRun
+        if ($LastRun) {
+            Write-Information "ScubaGear is disconnected. Showing the credentials used by the most recent run (disconnected $($LastRun.DisconnectedAtZulu))." -InformationAction Continue
+            return [pscustomobject]@{
+                Status             = 'Disconnected (last run)'
+                Account            = if ($LastRun.Account) { $LastRun.Account } else { "$($LastRun.AppId) (service principal)" }
+                ClientId           = $LastRun.AppId
+                AuthType           = $LastRun.AuthType
+                Tenant             = $LastRun.Tenant
+                Environment        = $LastRun.Environment
+                DisconnectedAtZulu = $LastRun.DisconnectedAtZulu
+            }
+        }
+        Write-Warning "ScubaGear is not currently connected to Microsoft Graph, and no earlier run has been recorded in this PowerShell session. Run Invoke-SCuBA first."
         return
     }
 
@@ -269,6 +323,7 @@ function Get-ScubaGearContext {
     }
 
     [pscustomobject]@{
+        Status         = 'Connected'
         Account        = $Account
         AppDisplayName = $AppDisplayName
         ClientId       = $ClientId
@@ -286,11 +341,22 @@ function Disconnect-ScubaGraph {
     <#
     .SYNOPSIS
         Clears the Graph session and MSAL token cache.
+    .DESCRIPTION
+        Before clearing, it keeps a record of who the session was signed in as so Get-ScubaGearContext can
+        still show the credentials the most recent run used. The record holds the account or app, authentication
+        type, tenant and environment only, never tokens. The session and token cache are always cleared.
     .FUNCTIONALITY
         Internal
     #>
     [CmdletBinding()]
     param()
+
+    $Identity = Get-ScubaGearRunIdentity
+    if ($Identity) {
+        $Identity | Add-Member -NotePropertyName DisconnectedAtZulu `
+            -NotePropertyValue ([DateTime]::UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", [cultureinfo]::InvariantCulture))
+        $Global:ScubaGearState.LastRun = $Identity
+    }
 
     $Global:ScubaGearState.Session = $null
     $Global:ScubaGearState.MsalAppCache = @{}
@@ -1207,6 +1273,7 @@ Export-ModuleMember -Function @(
     'Disconnect-ScubaGraph',
     'Get-ScubaGraphContext',
     'Get-ScubaGearContext',
+    'Get-ScubaGearRunIdentity',
     'Get-M365EnvironmentByDomain',
     'Initialize-Msal',
     'Get-MsalAccessToken',

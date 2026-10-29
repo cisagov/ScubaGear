@@ -126,6 +126,38 @@ InModuleScope Orchestrator {
             }
         }
 
+        Context 'Run identity' {
+            BeforeEach {
+                Mock Repair-ScubaGearJson {
+                    @{
+                        JsonObject = @{
+                            report_uuid = '00000000-0000-0000-0000-000000000000'
+                            Raw = @{ report_uuid = '00000000-0000-0000-0000-000000000000' }
+                        }
+                        RepairedJson = $false
+                    }
+                }
+                Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
+                Mock Write-Information {}
+            }
+
+            It 'tells the user who the run is signed in as when it signs in' {
+                Mock Get-ScubaGearRunIdentity {
+                    [pscustomobject]@{ AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = 'app'; Tenant = 'tenant-guid'; Environment = 'commercial' }
+                }
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter {
+                    $MessageData -eq 'Scanning as jane.doe@contoso.com (user), tenant tenant-guid, environment commercial.'
+                }
+            }
+
+            It 'says nothing when no sign-in was performed' {
+                Mock Get-ScubaGearRunIdentity { }
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { $MessageData -like 'Scanning as*' }
+            }
+        }
+
         Context "When there are multiple ScubaResults*.json files" {
         # It's possible (but not expected) that there are multiple files matching
         # "ScubaResults*.json". In this case, ScubaGear should choose the file
