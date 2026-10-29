@@ -90,42 +90,6 @@ function Show-ScubaMessageBox {
     }
 }
 
-function Select-ActionableError {
-    <#
-    .SYNOPSIS
-    Filters out the benign native MSAL load failures that Microsoft.Graph.Authentication
-    records in Windows PowerShell 5.1, returning the remaining error records.
-    .DESCRIPTION
-    Recent Microsoft.Graph.Authentication releases pre-load every DLL in their
-    Dependencies folder with Assembly.LoadFrom on Windows PowerShell 5.1. The native
-    msalruntime*.dll files throw BadImageFormatException; the module catches and skips
-    them, but PowerShell still records them in $Error. Only a BadImageFormatException
-    that names an msalruntime file is removed. Every other error is kept.
-    #>
-    [CmdletBinding()]
-    param(
-        [AllowNull()][object[]]$ErrorRecord
-    )
-
-    # Iterate through each error record and remove benign MSAL loader noise
-    foreach ($item in @($ErrorRecord)) {
-        if ($null -eq $item) { continue }
-        # Extract the exception from the error record, if applicable
-        $exception = if ($item -is [System.Management.Automation.ErrorRecord]) { $item.Exception } else { $item }
-        $isLoaderNoise = $false
-        # Traverse the exception chain to check for MSAL loader noise
-        for ($current = $exception; $null -ne $current; $current = $current.InnerException) {
-            # Check if the current exception is a BadImageFormatException for an msalruntime DLL
-            if ($current -is [System.BadImageFormatException] -and "$($current.Message) $($current.FileName)" -match 'msalruntime[\w\-]*\.dll') {
-                $isLoaderNoise = $true
-                break
-            }
-        }
-        # If the error is identified as MSAL loader noise, it will be skipped; otherwise, it will be output
-        if (-not $isLoaderNoise) { $item }
-    }
-}
-
 Function Start-SCuBAConfigApp {
     <#
     .SYNOPSIS
@@ -1422,9 +1386,7 @@ Function Start-SCuBAConfigApp {
         Write-Output "================================="
         Write-Output "Disconnected from Microsoft Graph"
     }
-    # The window's runspace may auto-load Microsoft.Graph.Authentication, which records
-    # harmless native-DLL load failures in Windows PowerShell 5.1; do not count those.
-    $Data.Error = @(Select-ActionableError -ErrorRecord @($Data.Error))
+    $Data.Error = @($Data.Error)
     if ($Data.Error.Count -eq 0) {
         Write-Output "ScubaConfigApp closed successfully with no errors"
     } else {
