@@ -53,6 +53,7 @@ function Connect-GraphHelper {
             Tenant = $ServicePrincipalParams.CertThumbprintParams.Organization
             Scope = switch ($M365Environment) {
                 { $_ -in @('commercial', 'gcc') } { 'https://graph.microsoft.com/.default' }
+                'dod' { 'https://dod-graph.microsoft.us/.default' }
                 default { 'https://graph.microsoft.us/.default' }
             }
         }

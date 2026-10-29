@@ -164,6 +164,32 @@ InModuleScope ConnectHelpers {
                     $M365Environment -eq 'commercial'
                 }
             }
+
+            # The Graph audience differs by cloud, and DoD has its own root, so its token scope must name it
+            # (https://dod-graph.microsoft.us) instead of the GCC High root.
+            It 'requests the <ExpectedScope> scope and publishes <ExpectedEndpoint> for <Environment>' -TestCases @(
+                @{ Environment = 'commercial'; ExpectedScope = 'https://graph.microsoft.com/.default'; ExpectedEndpoint = 'https://graph.microsoft.com' },
+                @{ Environment = 'gcc'; ExpectedScope = 'https://graph.microsoft.com/.default'; ExpectedEndpoint = 'https://graph.microsoft.com' },
+                @{ Environment = 'gcchigh'; ExpectedScope = 'https://graph.microsoft.us/.default'; ExpectedEndpoint = 'https://graph.microsoft.us' },
+                @{ Environment = 'dod'; ExpectedScope = 'https://dod-graph.microsoft.us/.default'; ExpectedEndpoint = 'https://dod-graph.microsoft.us' }
+            ) {
+                param($Environment, $ExpectedScope, $ExpectedEndpoint)
+                $sp = @{
+                    CertThumbprintParams = @{
+                        CertificateThumbprint = 'A thumbprint';
+                        AppID = 'My Id';
+                        Organization = 'My Organization';
+                    }
+                }
+                Connect-GraphHelper -M365Environment $Environment -ServicePrincipalParams $sp
+                Should -Invoke -ModuleName ConnectHelpers -CommandName Get-MsalAccessToken -Times 1 -Exactly -ParameterFilter {
+                    $Scope -eq $ExpectedScope -and $M365Environment -eq $Environment
+                }
+                $Global:ScubaGearState.Session.TokenParameters.Scope | Should -Be $ExpectedScope
+                $Global:ScubaGearState.Session.GraphEndpoint | Should -Be $ExpectedEndpoint
+                # The scope's host must be the same Graph root the requests are sent to.
+                $ExpectedScope | Should -Be "$($Global:ScubaGearState.Session.GraphEndpoint)/.default"
+            }
         }
     }
 
