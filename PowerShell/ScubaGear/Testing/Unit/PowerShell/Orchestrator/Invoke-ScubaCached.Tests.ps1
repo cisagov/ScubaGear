@@ -139,22 +139,17 @@ InModuleScope Orchestrator {
                 }
                 Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
                 Mock Write-Information {}
-            }
-
-            It 'tells the user who the run is signed in as when it signs in' {
+                Mock Write-Host {}
                 Mock Get-ScubaGearRunIdentity {
-                    [pscustomobject]@{ AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = 'app'; Tenant = 'tenant-guid'; Environment = 'commercial' }
-                }
-                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -Quiet -SilenceBODWarnings
-                Should -Invoke Write-Information -Times 1 -Exactly -ParameterFilter {
-                    $MessageData -eq 'Scanning as jane.doe@contoso.com (user), tenant tenant-guid, environment commercial.'
+                    [pscustomobject]@{ AuthType = 'Delegated'; Account = 'jane.doe@contoso.com'; AppId = '11111111-2222-3333-4444-555555555555'; Tenant = 'tenant-guid'; Environment = 'commercial' }
                 }
             }
 
-            It 'says nothing when no sign-in was performed' {
-                Mock Get-ScubaGearRunIdentity { }
-                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -Quiet -SilenceBODWarnings
-                Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { $MessageData -like 'Scanning as*' }
+            # Screenshots of the console end up in public bug reports; Get-ScubaGearContext is how a user asks for this.
+            It 'does not print the account, app or tenant the run signed in with' {
+                Invoke-SCuBACached -ProductNames aad -ExportProvider $true -LogIn $true -Quiet -SilenceBODWarnings
+                Should -Invoke Write-Information -Times 0 -Exactly -ParameterFilter { "$MessageData" -match 'jane\.doe|tenant-guid|11111111-2222' }
+                Should -Invoke Write-Host -Times 0 -Exactly -ParameterFilter { "$Object" -match 'jane\.doe|tenant-guid|11111111-2222' }
             }
         }
 

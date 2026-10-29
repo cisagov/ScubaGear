@@ -601,8 +601,6 @@ function Invoke-SCuBA {
                 $ScubaConfig.ProductNames = $Difference
             }
 
-            Write-ScubaRunIdentity
-
             # Capture module snapshot after authentication to log what modules were imported
             if ($Script:ScubaLoggingEnabled) {
                 try {
@@ -2314,27 +2312,6 @@ function Invoke-Connection {
     $ConnectionResult
 }
 
-function Write-ScubaRunIdentity {
-    <#
-    .Description
-    Tells the user who or what this run is signed in as, so the person running ScubaGear can confirm the right
-    credentials and tenant before the results are collected. Console only: it is not written to the debug log or
-    the results. Does nothing when there is no session.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param()
-
-    $Identity = Get-ScubaGearRunIdentity
-    if (-not $Identity) {
-        return
-    }
-
-    $Who = if ($Identity.Account) { "$($Identity.Account) (user)" } else { "app $($Identity.AppId) (service principal)" }
-    Write-Information "Scanning as $Who, tenant $($Identity.Tenant), environment $($Identity.Environment)." -InformationAction Continue
-}
-
 function Invoke-ScubaDisconnectOnExit {
     <#
     .Description
@@ -2844,8 +2821,6 @@ function Invoke-SCuBACached {
                 else {
                     Write-ScubaLog -Message "All products authenticated successfully" -Level "Info" -Source "ScubaCached"
                 }
-
-                Write-ScubaRunIdentity
 
                 # Capture module snapshot after authentication to see what modules were imported
                 if ($Script:ScubaLoggingEnabled) {

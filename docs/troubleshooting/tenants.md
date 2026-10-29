@@ -27,9 +27,9 @@ account or app, the authentication type, the tenant, and the environment, never 
 `Disconnected (last run)`. It lives only in the current PowerShell process, so it is gone when you close the
 window, and it is not written to the report or the debug log.
 
-Every run also prints a line near the start such as
-`Scanning as admin@contoso.onmicrosoft.com (user), tenant ee6afab0-3d70-4380-aa11-243aa9dedef2, environment commercial.`
-so you can confirm the credentials before the results are collected.
+The run's console output deliberately does not print the account or tenant, because screenshots of the console
+are often pasted into public bug reports. Run `Get-ScubaGearContext` whenever you want to confirm which
+credentials a run used, as described above.
 
 ```powershell
 Invoke-SCuBA -ProductNames aad -M365Environment commercial   # sign in to Tenant A, scan, then disconnect
