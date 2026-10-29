@@ -12,6 +12,47 @@ if (-not $Global:ScubaGearState) {
     $Global:ScubaGearState = [hashtable]::Synchronized(@{ Session = $null; MsalAppCache = @{}; MsalValidated = $false; MsalLibraryPath = $null; LastRun = $null; })
 }
 
+# PowerShell class methods are served by the runspace that defined the class, and that runspace must be running script
+# to answer. The config app and analyzer make Graph calls from worker runspaces while the runspace that launched them
+# sits idle at the console prompt, so a worker that calls [ScubaConfig] waits forever. The sign-in path needs only two
+# values from the class, so they are resolved here, on the runspace that imports this module, and kept in the shared state.
+function Get-ScubaGearSupportedEnvironment {
+    <#
+    .Description
+    Returns the supported M365 environment names. Read from the shared session state so a worker runspace never has to
+    call the ScubaConfig class.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param()
+
+    if (-not $Global:ScubaGearState.SupportedEnvironments) {
+        $Global:ScubaGearState.SupportedEnvironments = @([ScubaConfig]::GetSupportedEnvironments())
+    }
+    $Global:ScubaGearState.SupportedEnvironments
+}
+
+function Get-ScubaGearClientIdTable {
+    <#
+    .Description
+    Returns the product-to-client-ID table used for delegated sign-in. Read from the shared session state so a worker
+    runspace never has to call the ScubaConfig class.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param()
+
+    if (-not $Global:ScubaGearState.ClientIds) {
+        $Global:ScubaGearState.ClientIds = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+    }
+    $Global:ScubaGearState.ClientIds
+}
+
+$null = Get-ScubaGearSupportedEnvironment
+$null = Get-ScubaGearClientIdTable
+
 function Connect-GraphHelper {
     <#
     .Description
@@ -27,7 +68,12 @@ function Connect-GraphHelper {
     [CmdletBinding(DefaultParameterSetName = 'ExplicitEnvironment')]
     param(
         [Parameter(Mandatory = $true, ParameterSetName = 'ExplicitEnvironment')]
-        [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
+        [ValidateScript({
+            # Read the shared state directly: validation scripts resolve commands in the caller's scope, not this module's.
+            $Environments = $Global:ScubaGearState.SupportedEnvironments
+            if (-not $Environments) { $Environments = [ScubaConfig]::GetSupportedEnvironments() }
+            $_ -cin $Environments
+        })]
         [ValidateNotNullOrEmpty()]
         [string]
         $M365Environment,
@@ -62,7 +108,7 @@ function Connect-GraphHelper {
         }
     }
     else {
-        $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+        $ClientIdHash = Get-ScubaGearClientIdTable
         $TokenParameters = @{
             Scope = if ($Scopes) { $Scopes } else { @('Organization.Read.All') }
             ClientId = $ClientIdHash.aad
@@ -271,7 +317,7 @@ function Get-ScubaGearContext {
     $TokenParameters = $Session.TokenParameters
     $IsAppOnly = [bool]$TokenParameters.CertificateThumbprint
     $ClientId = if ($IsAppOnly) { $TokenParameters.AppID } else { $TokenParameters.ClientId }
-    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+    $ClientIdHash = Get-ScubaGearClientIdTable
 
     $Account = "Unknown"
     # Organization.Read.All alone does not grant permission to read service principals.
@@ -1105,7 +1151,12 @@ function Get-MsalAccessToken {
         [string]$Tenant,
 
         [Parameter(Mandatory = $true)]
-        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
+        [ValidateScript({
+            # Read the shared state directly: validation scripts resolve commands in the caller's scope, not this module's.
+            $Environments = $Global:ScubaGearState.SupportedEnvironments
+            if (-not $Environments) { $Environments = [ScubaConfig]::GetSupportedEnvironments() }
+            $_ -in $Environments
+        })]
         [string]$M365Environment,
 
         [Parameter(ParameterSetName = 'Interactive')]
@@ -1278,6 +1329,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaGraphContext',
     'Get-ScubaGearContext',
     'Get-ScubaGearRunIdentity',
+    'Get-ScubaGearClientIdTable',
     'Get-M365EnvironmentByDomain',
     'Initialize-Msal',
     'Get-MsalAccessToken',

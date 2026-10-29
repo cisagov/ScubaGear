@@ -26,6 +26,9 @@ function Invoke-ScubaGraphRequest {
     $Global:FakeExchangeLog.Add([pscustomobject]@{ Function = "Invoke-ScubaGraphRequest"; Uri = $Uri }) | Out-Null
     & $Global:FakeExchangeConfig.GraphRequestHandler $Uri
 }
+function Get-ScubaGearClientIdTable {
+    return @{ exo = 'fb78d390-0c51-40cd-8e17-fdbfab77341b' }
+}
 '@ | Set-Content -Path $script:FakeConnectHelpersPath -Encoding UTF8
 
         $script:FakeEXORestHelperPath = Join-Path $TestDrive 'FakeEXORestHelper.psm1'

@@ -30,7 +30,7 @@ function Connect-ScubaAnalyzerExchange {
 
     # Reuse ScubaGear's own REST + MSAL helpers so the auth/endpoint logic stays identical.
     Import-Module $syncHash.EXORestHelperPath  -Force -ErrorAction Stop
-    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Get-MsalAccessToken, Invoke-ScubaGraphRequest
+    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearClientIdTable
 
     # Tenant id + initial (onmicrosoft.com) domain for the endpoint / anchor mailbox, resolved
     # fresh below via Graph REST from the live session established in Phase A.
@@ -57,7 +57,7 @@ function Connect-ScubaAnalyzerExchange {
         $token = Get-MsalAccessToken -Scope $scope -CertificateThumbprint $CertificateThumbprint -AppID $AppId -Tenant $Organization -M365Environment $M365Environment
     } else {
         # ScubaGear's public client id for delegated EXO tokens.
-        $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+        $ClientIdHash = Get-ScubaGearClientIdTable
         $token = Get-MsalAccessToken -Scope $scope -ClientId $ClientIdHash.exo -Tenant $tenantDomain -M365Environment $M365Environment
     }
 

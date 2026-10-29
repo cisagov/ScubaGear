@@ -24,6 +24,8 @@ InModuleScope ConnectHelpers {
                 $SavedClientId = $ClientIds.aad
                 try {
                     $ClientIds.aad = '11111111-2222-3333-4444-555555555555'
+                    # The client ID table is cached in the shared state; clear it so this call reads the changed defaults.
+                    $Global:ScubaGearState.ClientIds = $null
 
                     Connect-GraphHelper -M365Environment 'commercial'
 
@@ -34,6 +36,7 @@ InModuleScope ConnectHelpers {
                 }
                 finally {
                     $ClientIds.aad = $SavedClientId
+                    $Global:ScubaGearState.ClientIds = $null
                 }
             }
 
