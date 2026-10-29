@@ -1316,12 +1316,8 @@ Function Start-SCuBAConfigApp {
             # If user clicked "Yes", proceed with normal closing operations
             $syncHash.isClosing = $true
 
-            # Disconnect safely
-            if (Get-ScubaGraphContext) {
-                try { Disconnect-ScubaGraph -ErrorAction SilentlyContinue } catch {
-                    Write-Error "Error disconnecting from Microsoft Graph: $($_.Exception.Message)"
-                }
-            }
+            # The Graph session is disconnected by Start-SCuBAConfigApp once this window has closed. The commands to do it
+            # are not available in this runspace, and doing it there also means a cancelled close never signs the user out.
 
             # Don't call .Close() here - it’s already in the closing state
             #$syncHash.Window.Close()
@@ -1372,19 +1368,26 @@ Function Start-SCuBAConfigApp {
     $PowerShellCommand.Runspace = $Runspace
     $AsyncHandle = $PowerShellCommand.BeginInvoke()
 
-    # Wait for the runspace to complete. Wait in short script slices rather than one blocking call, so this runspace can
-    # still service calls made into it from the UI runspace (for example ScubaConfig class methods).
-    while (-not $AsyncHandle.IsCompleted) { Start-Sleep -Milliseconds 100 }
+    # Wait for the runspace to complete. Keep this one blocking call: the window calls scriptblocks bound to this runspace
+    # (ShowMessageBox, ShowBaselinePolicyViewer), and while this runspace is running script those calls are run on its
+    # thread instead of the window's, which breaks reading the window handle and creating windows.
     $null = $PowerShellCommand.EndInvoke($AsyncHandle)
 
     # Now safe to clean up
     $Runspace.Close()
     $Runspace.Dispose()
 
-    #show graph was disconnected if it was online
+    # Disconnect for real before saying so. The window's close handler cannot do it: that runspace does not have these
+    # commands. If the user already disconnected from the status indicator, GraphConnected is false and nothing is left to do.
     if ($Data.GraphConnected -eq $true) {
-        Write-Output "================================="
-        Write-Output "Disconnected from Microsoft Graph"
+        try {
+            Disconnect-ScubaGraph -ErrorAction Stop
+            Write-Output "================================="
+            Write-Output "Disconnected from Microsoft Graph"
+        }
+        catch {
+            Write-Warning "Could not disconnect from Microsoft Graph: $($_.Exception.Message)"
+        }
     }
     $Data.Error = @($Data.Error)
     if ($Data.Error.Count -eq 0) {
