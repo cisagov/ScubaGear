@@ -14,8 +14,8 @@ InModuleScope AADRiskyPermissionsHelper {
                 $MockResourcePermissionCache[$prop.Name] = $prop.Value
             }
 
-            function Invoke-MgGraphRequest { }
-            Mock Invoke-MgGraphRequest { $MockApplications }
+            function Invoke-ScubaGraphRequest { }
+            Mock Invoke-ScubaGraphRequest { $MockApplications }
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
             }

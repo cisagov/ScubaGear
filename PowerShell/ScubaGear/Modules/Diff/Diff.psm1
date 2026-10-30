@@ -806,6 +806,14 @@ function Import-ScubaResultsFile {
             throw "ScubaResults file '$LiteralPath' is missing the required top-level key '$key'. Is this a ScubaResults.json file produced by ScubaGear?"
         }
     }
+    # PowerShell 7 converts ISO date strings to DateTime values, and a DateTime later becomes a
+    # culture-specific string that is neither comparable nor the value in the file. Restore the
+    # ISO-8601 text so the run-order check, DiffResults and report match on every PowerShell version.
+    $RunTimestamp = $obj.MetaData.PSObject.Properties['TimestampZulu']
+    if ($RunTimestamp -and $RunTimestamp.Value -is [DateTime]) {
+        $RunTimestamp.Value = $RunTimestamp.Value.ToUniversalTime().ToString(
+            "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", [cultureinfo]::InvariantCulture)
+    }
     return $obj
 }
 

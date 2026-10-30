@@ -7,7 +7,7 @@ Describe -Tag 'Analyzer' -Name 'ScubaConfigAnalyzer carries the imported results
         $helpersPath   = Join-Path $configAppRoot 'ScubaConfigAnalyzerHelpers'
         $controlPath   = Join-Path $configAppRoot 'ScubaConfigAnalyzer_Control_en-US.json'
         $baselinePath  = Join-Path $scubaGearRoot 'schemas\ScubaGearResultsBaselineSchema.json'
-        $script:configSchemaPath = Join-Path $scubaGearRoot 'Modules\ScubaConfig\ScubaConfigSchema.json'
+        $script:configSchemaPath = Join-Path $scubaGearRoot 'schemas\ScubaConfigSchema.json'
         # Sample reports are replaced when ScubaGear is released; do not pin a UUID filename.
         $sampleDir = Join-Path $scubaGearRoot 'Sample-Reports'
         $sampleResults = Get-ChildItem -Path $sampleDir -Filter 'ScubaResults_*.json' -File |

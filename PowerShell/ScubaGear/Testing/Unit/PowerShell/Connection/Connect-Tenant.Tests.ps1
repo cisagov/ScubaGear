@@ -1,3 +1,5 @@
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Each test starts without an existing Graph session.')]
+param()
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../../../Modules/Connection/Connection.psm1") -Function 'Connect-Tenant' -Force
 
 InModuleScope Connection {
@@ -10,8 +12,25 @@ InModuleScope Connection {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
-            function Connect-GraphHelper {throw 'this will be mocked'}
-            Mock Connect-GraphHelper -MockWith {}
+            function Connect-GraphHelper {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($ServicePrincipalParams, $M365Environment, $Scopes, $TenantId, [switch]$Discovery)
+                throw 'this will be mocked'
+            }
+            Mock Connect-GraphHelper -MockWith {
+                if ($Discovery) {
+                    $M365Environment = $script:ConnectionEnvironment
+                    $TenantId = '305102d0-7ccc-4007-83bb-ac1f44f8d620'
+                }
+                $Global:ScubaGearState.Session = @{
+                    M365Environment = $M365Environment
+                    TokenParameters = @{
+                        Scope = if ($Scopes) { $Scopes } else { @('Organization.Read.All') }
+                        Tenant = $TenantId
+                        CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint
+                    }
+                }
+            }
             # SharePoint now uses REST API - no PnP/SPO connection needed
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
             Mock Get-ExchangeOnlineApiEndpoint -MockWith { return "https://mock.outlook.office365.com/adminapi/beta/TenantId/InvokeCommand" }
@@ -35,16 +54,19 @@ InModuleScope Connection {
                     }
                 }
             }
-            function Get-MsalAccessToken {throw 'this will be mocked'}
+            function Get-MsalAccessToken {
+                [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
+                param($Scope, $ClientId, $Tenant, $M365Environment, $CertificateThumbprint, $AppID)
+                throw 'this will be mocked'
+            }
             Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
+            Mock Initialize-Msal -MockWith {}
             Mock -CommandName Write-Progress {
             }
-            function Get-MgContext {throw 'this will be mocked'}
-            Mock Get-MgContext -MockWith { return [pscustomobject]@{ TenantId = "305102d0-7ccc-4007-83bb-ac1f44f8d620" } }
-            function Get-M365EnvironmentByDomain {throw 'this will be mocked'}
-            Mock Get-M365EnvironmentByDomain -MockWith {
-                return (Get-Random -InputObject @('commercial', 'gcc', 'gcchigh', 'dod'))
-            }
+        }
+        BeforeEach {
+            $Global:ScubaGearState.Session = $null
+            $script:ConnectionEnvironment = $Endpoint
         }
         Context 'With Endpoint:  <Endpoint>; ProductNames: <ProductNames>' -ForEach @(
             @{ProductNames = "aad"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
