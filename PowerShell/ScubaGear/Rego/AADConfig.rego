@@ -1570,7 +1570,7 @@ LeastPrivilegeScore := "Policy MS.AAD.7.1 failed so score not computed" if {
     IsGlobalAdminCountGood == false
 } else := GetScoreDescription
 
-# Pass if 7.1 passed and Least Privilege Score < 1, fail if 7.1 failed or Least Privilege score is >= 1
+# Pass if 7.1 passed and Global Admin count <= non-Global Admin privileged user count; otherwise fail.
 tests contains {
     "PolicyId": "MS.AAD.7.2v1",
     "Criticality" : "Shall",
