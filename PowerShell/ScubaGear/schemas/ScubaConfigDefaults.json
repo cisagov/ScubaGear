@@ -5,6 +5,15 @@
     "lastUpdated": "2026-01-12",
     "compatibleOpaVersions": ["1.1.0","1.2.0","1.3.0","1.4.0","1.5.0","1.6.0","1.7.1","1.8.0","1.9.0","1.10.1","1.11.1","1.12.2","1.13.2","1.14.1","1.15.2","1.16.2","1.17.1","1.18.2","1.19.1"]
   },
+  "AuthenticationClientIdHashtable": {
+    "aad": "14d82eec-204b-4c2f-b7e8-296a70dab67e",
+    "exo": "fb78d390-0c51-40cd-8e17-fdbfab77341b",
+    "securitysuite": "fb78d390-0c51-40cd-8e17-fdbfab77341b",
+    "powerplatform": "1950a258-227b-4e31-a9cf-717495945fc2",
+    "powerbi": "1950a258-227b-4e31-a9cf-717495945fc2",
+    "sharepoint": "9bc3ab49-b65d-410a-85ad-de819febfddc",
+    "teams": "12128f48-ec9e-42f0-b203-ea49fb6af367"
+  },
   "defaults": {
     "OPAPath": "~/.scubagear/Tools",
     "ScubaGitHubUrl": "https://github.com/cisagov/ScubaGear",
@@ -18,7 +27,7 @@
     "AllProductNames": ["aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"],
     "M365Environment": "commercial",
     "LogIn": true,
-    "DisconnectOnExit": false,
+    "DisconnectOnExit": true,
     "OutPath": ".",
     "OutFolderName": "M365BaselineConformance",
     "OutProviderFileName": "ProviderSettingsExport",

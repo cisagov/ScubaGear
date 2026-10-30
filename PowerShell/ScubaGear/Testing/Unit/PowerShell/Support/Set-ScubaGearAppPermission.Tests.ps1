@@ -136,6 +136,42 @@ InModuleScope ServicePrincipal {
                 $Result = $PowerPlatformNeededObject | Set-ScubaGearAppPermission -WhatIf
                 $Result[0] | Should -Be "WhatIf: Would register application with Power Platform"
             }
+
+            # Get-MgContext no longer exists, and this session cannot read the organization, so the tenant has to come
+            # from the service principal. The -WhatIf tests above never reach this code.
+            It "Removes the Power Platform registration using the service principal's tenant" {
+                $PowerPlatformUnneededObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockPowerPlatformUnneeded.json") | ConvertFrom-Json
+                Mock Invoke-GraphDirectly {
+                    [pscustomobject]@{ Value = [pscustomobject]@{ AppOwnerOrganizationId = '11111111-1111-1111-1111-111111111111' } }
+                } -ParameterFilter { $Commandlet -eq 'Get-MgServicePrincipal' }
+                Mock Set-PowerPlatformAppRegistration {}
+
+                $Result = $PowerPlatformUnneededObject | Set-ScubaGearAppPermission -Confirm:$false -WarningVariable RemovalWarnings -WarningAction SilentlyContinue
+
+                Should -Invoke Set-PowerPlatformAppRegistration -Times 1 -Exactly -ParameterFilter {
+                    $AppID -eq '00000000-0000-0000-0000-000000000001' -and
+                    $TenantId -eq '11111111-1111-1111-1111-111111111111' -and
+                    $M365Environment -eq 'commercial' -and
+                    $Remove
+                }
+                Should -Invoke Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                    $Commandlet -eq 'Get-MgServicePrincipal' -and $queryParams['$filter'] -eq "id eq '00000000-0000-0000-0000-000000000002'"
+                }
+                $Result | Should -Contain 'Successfully removed Power Platform registration'
+                $RemovalWarnings | Should -BeNullOrEmpty
+            }
+
+            It "Warns and does not remove the registration when the tenant cannot be found" {
+                $PowerPlatformUnneededObject = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockPowerPlatformUnneeded.json") | ConvertFrom-Json
+                Mock Invoke-GraphDirectly { [pscustomobject]@{ Value = $null } } -ParameterFilter { $Commandlet -eq 'Get-MgServicePrincipal' }
+                Mock Set-PowerPlatformAppRegistration {}
+
+                $Result = $PowerPlatformUnneededObject | Set-ScubaGearAppPermission -Confirm:$false -WarningVariable RemovalWarnings -WarningAction SilentlyContinue
+
+                Should -Invoke Set-PowerPlatformAppRegistration -Times 0 -Exactly
+                $Result | Should -Not -Contain 'Successfully removed Power Platform registration'
+                @($RemovalWarnings) -join ' ' | Should -BeLike '*Could not retrieve tenant ID*'
+            }
         }
 
         Context "Multiple Issues Tests" {

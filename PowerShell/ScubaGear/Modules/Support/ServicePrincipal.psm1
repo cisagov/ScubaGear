@@ -2027,8 +2027,18 @@ function Set-ScubaGearAppPermission {
                 try {
                     Write-Verbose "Attempting to remove Power Platform registration"
 
-                    Set-PowerPlatformAppRegistration -AppID $AppID -TenantId (Get-MgContext).TenantId -M365Environment $M365Environment -Remove
-                    Write-Output "Successfully removed Power Platform registration"
+                    # This session only has application and role permissions, which cannot read the organization,
+                    # so take the tenant from the service principal, the same way the registration step below does.
+                    $sp = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                        '$filter' = "id eq '$ServicePrincipalID'"
+                    }).Value
+
+                    if ($sp) {
+                        Set-PowerPlatformAppRegistration -AppID $AppID -TenantId $sp.AppOwnerOrganizationId -M365Environment $M365Environment -Remove
+                        Write-Output "Successfully removed Power Platform registration"
+                    } else {
+                        Write-Warning "Could not retrieve tenant ID for Power Platform registration removal"
+                    }
                 } catch {
                     Write-Warning "Failed to remove Power Platform registration: $($_.Exception.Message)"
                 }
@@ -2095,7 +2105,8 @@ function Get-PowerPlatformAdminToken {
     )
 
     # Azure PowerShell well-known public client ID, used for delegated admin auth (same as Connection.psm1).
-    $PPClientId = "1950a258-227b-4e31-a9cf-717495945fc2"
+    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+    $PPClientId = $ClientIdHash.powerplatform
     $Scope      = Get-PowerPlatformScope -M365Environment $M365Environment
     $BaseUrl    = Get-PowerPlatformBaseUrl -M365Environment $M365Environment
 
@@ -2816,8 +2827,8 @@ function Remove-ScubaGearAppCert {
                                 keyId = $existingKey.KeyId
                                 type = $existingKey.Type
                                 usage = $existingKey.Usage
-                                startDateTime = $existingKey.StartDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-                                endDateTime = $existingKey.EndDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                startDateTime = ([datetime]$existingKey.StartDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                                endDateTime = ([datetime]$existingKey.EndDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                             }
                             $updatedKeyCredentials += $formattedKey
                         }
@@ -2968,9 +2979,9 @@ function New-ScubaGearAppCert {
                     $formattedExistingKey = @{
                         customKeyIdentifier = $existingKey.CustomKeyIdentifier
                         displayName = $existingKey.DisplayName
-                        endDateTime = $existingKey.EndDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                        endDateTime = ([datetime]$existingKey.EndDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                         keyId = $existingKey.KeyId
-                        startDateTime = $existingKey.StartDateTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+                        startDateTime = ([datetime]$existingKey.StartDateTime).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
                         type = $existingKey.Type
                         usage = $existingKey.Usage
                     }
