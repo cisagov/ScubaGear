@@ -846,31 +846,35 @@ function Test-ScubaTransientConnectionError {
     )
 
     $Exception = $ErrorRecord.Exception
+    while ($null -ne $Exception) {
+        if ($Exception -is [System.Net.WebException]) {
+            $TransientStatuses = @(
+                [System.Net.WebExceptionStatus]::Timeout,
+                [System.Net.WebExceptionStatus]::ConnectFailure,
+                [System.Net.WebExceptionStatus]::ConnectionClosed,
+                [System.Net.WebExceptionStatus]::KeepAliveFailure,
+                [System.Net.WebExceptionStatus]::NameResolutionFailure,
+                [System.Net.WebExceptionStatus]::ReceiveFailure,
+                [System.Net.WebExceptionStatus]::SendFailure
+            )
+            return $Exception.Status -in $TransientStatuses
+        }
 
-    if ($Exception -is [System.Net.WebException]) {
-        $TransientStatuses = @(
-            [System.Net.WebExceptionStatus]::Timeout,
-            [System.Net.WebExceptionStatus]::ConnectFailure,
-            [System.Net.WebExceptionStatus]::ConnectionClosed,
-            [System.Net.WebExceptionStatus]::KeepAliveFailure,
-            [System.Net.WebExceptionStatus]::NameResolutionFailure,
-            [System.Net.WebExceptionStatus]::ReceiveFailure,
-            [System.Net.WebExceptionStatus]::SendFailure
-        )
-        return $Exception.Status -in $TransientStatuses
+        if ($Exception -is [System.TimeoutException] -or $Exception.GetType().FullName -in @(
+                'System.Threading.Tasks.TaskCanceledException',
+                'System.Net.Http.HttpRequestException',
+                'System.IO.IOException',
+                'System.Net.Sockets.SocketException'
+            )) {
+            return $true
+        }
+
+        if ($Exception.Message -match 'timed out|timeout|connection.*(closed|reset|refused)|name.*resolution') {
+            return $true
+        }
+        $Exception = $Exception.InnerException
     }
-
-    $TypeName = $Exception.GetType().FullName
-    if ($TypeName -in @(
-            'System.Threading.Tasks.TaskCanceledException',
-            'System.Net.Http.HttpRequestException',
-            'System.IO.IOException',
-            'System.Net.Sockets.SocketException'
-        )) {
-        return $true
-    }
-
-    return $Exception.Message -match 'timed out|timeout|connection.*(closed|reset|refused)|name.*resolution'
+    return $false
 }
 
 function Invoke-ScubaRestMethod {
@@ -911,19 +915,18 @@ function Invoke-ScubaRestMethod {
         Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
 
     .PARAMETER MaxRetries
-        Number of retry attempts on HTTP 408/429/500/502/503/504 responses and transient connection errors
-        (default: 0, i.e. no retries; max: 100).
+        Number of retries on HTTP 408/429/500/502/503/504 responses and transient connection errors,
+        including timeouts (default: 0, i.e. no retries; max: 100).
 
     .PARAMETER RetryDelaySeconds
-        Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
-        header, and doubled after each successive 408/5xx retry (default: 5). Any single sleep,
+        Initial retry delay in seconds, used as a fallback when a 429/5xx response has no Retry-After
+        header, and doubled after each successive retry (default: 5). Any single sleep,
         including a server-supplied Retry-After, is capped at MaxDelaySeconds.
 
     .PARAMETER MaxDelaySeconds
         Upper bound in seconds on any single sleep between retries (default: 3600; range 1-3600).
         Keeps a large or hostile Retry-After value from stalling a scan. The Teams, SharePoint,
-        Power Platform and Power BI helpers use a lower cap, see Get-ScubaRestRetryDefaults.
-
+        Power Platform and Power BI helpers use a lower cap, see         Get-ScubaRestRetryDefaults.
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
             -AccessToken $Token -Endpoint "/providers/PowerPlatform.Governance/v1/tenants/settings"
@@ -1053,11 +1056,13 @@ function Invoke-ScubaRestMethod {
                 $RetryAfter = [Math]::Min($RetryAfter, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' throttled (HTTP 429). Retrying in ${RetryAfter}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $RetryAfter
+                $RetryDelaySeconds *= 2
                 continue
             }
 
             if (-not $IsLastAttempt -and $StatusCode -in @(408, 500, 502, 503, 504)) {
-                $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
+                $Delay = Get-RetryAfterSeconds -HttpResponseObject $WebResponse -DefaultSeconds $RetryDelaySeconds
+                $Delay = [Math]::Min($Delay, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $Delay
                 $RetryDelaySeconds *= 2
@@ -1263,6 +1268,56 @@ function Get-HttpResponseDetails {
     return $StringBuffer.ToString()
 }
 
+function Get-HttpRetryInfo {
+    <#
+    .SYNOPSIS
+        Pulls out what a REST caller needs to decide whether a failed request is worth retrying.
+
+    .DESCRIPTION
+        Returns the HTTP status code (0 when the request never got a response), the Retry-After
+        delay in seconds (0 when the header is missing), and whether the failure was a network-level
+        error such as a timeout, dropped connection or DNS failure.
+
+        Works with the exception shapes Invoke-WebRequest and Invoke-RestMethod throw on both
+        PS 5.1 (WebException with an HttpWebResponse) and PS 7+ (HttpResponseException with an
+        HttpResponseMessage, or TaskCanceledException on timeout).
+
+    .PARAMETER Exception
+        The exception caught from Invoke-WebRequest or Invoke-RestMethod.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Exception]
+        $Exception
+    )
+
+    $StatusCode = 0
+    $RetryAfterSeconds = 0
+    $IsNetworkError = $false
+
+    $ResponseProperty = $Exception.PSObject.Properties['Response']
+    $Response = if ($null -ne $ResponseProperty) { $ResponseProperty.Value } else { $null }
+
+    if ($null -ne $Response) {
+        $StatusCode = [int]$Response.StatusCode
+        $RetryAfterSeconds = Get-RetryAfterSeconds -HttpResponseObject $Response -DefaultSeconds 0
+    }
+    else {
+        $IsNetworkError = Test-ScubaTransientConnectionError -ErrorRecord ([pscustomobject]@{ Exception = $Exception })
+    }
+
+    [pscustomobject]@{
+        StatusCode        = $StatusCode
+        RetryAfterSeconds = [Math]::Max(0, $RetryAfterSeconds)
+        IsNetworkError    = $IsNetworkError
+    }
+}
+
 function Get-ScubaGearCatalog {
     <#
     .Description
@@ -1448,6 +1503,7 @@ Export-ModuleMember -Function @(
     'Invoke-ScubaRestMethod',
     'Get-ScubaRestRetryDefaults',
     'Get-HttpResponseDetails',
+    'Get-HttpRetryInfo',
     'Get-ScubaGearCatalog',
     'Get-ScubaGearServiceEndpoint',
     'Get-ScubaGearOAuthScope',
