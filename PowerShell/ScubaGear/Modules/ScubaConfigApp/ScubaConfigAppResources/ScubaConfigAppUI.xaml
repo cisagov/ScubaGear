@@ -1479,7 +1479,7 @@
                                                     <CheckBox x:Name="LogIn_CheckBox" Content="Login Required" IsChecked="True"/>
                                                 </StackPanel>
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                                    <CheckBox x:Name="DisconnectOnExit_CheckBox" Content="Disconnect on Exit"/>
+                                                    <CheckBox x:Name="DisconnectOnExit_CheckBox" Content="Disconnect on Exit" IsChecked="True"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </StackPanel>

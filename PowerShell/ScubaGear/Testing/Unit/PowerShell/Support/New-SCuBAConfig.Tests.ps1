@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Support')
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Support') -Force
 
 InModuleScope Support {
     Describe -Tag Support -Name 'New-SCuBAConfig' {
@@ -71,7 +71,7 @@ InModuleScope Support {
 
             It 'Builds the exclusion templates from the ScubaGear configuration schema' {
                 # Capture the config object handed to ConvertTo-Yaml so we can inspect the generated
-                # structure. The exclusion sections are derived from Modules/ScubaConfig/ScubaConfigSchema.json.
+                # structure. The exclusion sections are derived from schemas/ScubaConfigSchema.json.
                 $Script:CapturedConfig = $null
                 Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
 

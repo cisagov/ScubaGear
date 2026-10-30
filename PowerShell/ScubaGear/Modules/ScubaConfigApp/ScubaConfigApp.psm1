@@ -1,4 +1,8 @@
-﻿function Resolve-ScubaConfigAppWalkthroughPath {
+﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Get-ScubaGraphContext, Invoke-ScubaGraphRequest -Force
+
+function Resolve-ScubaConfigAppWalkthroughPath {
     param(
         [Parameter(Mandatory = $true)]
         [string]$UIConfigPath,
@@ -86,42 +90,6 @@ function Show-ScubaMessageBox {
     }
 }
 
-function Select-ActionableError {
-    <#
-    .SYNOPSIS
-    Filters out the benign native MSAL load failures that Microsoft.Graph.Authentication
-    records in Windows PowerShell 5.1, returning the remaining error records.
-    .DESCRIPTION
-    Recent Microsoft.Graph.Authentication releases pre-load every DLL in their
-    Dependencies folder with Assembly.LoadFrom on Windows PowerShell 5.1. The native
-    msalruntime*.dll files throw BadImageFormatException; the module catches and skips
-    them, but PowerShell still records them in $Error. Only a BadImageFormatException
-    that names an msalruntime file is removed. Every other error is kept.
-    #>
-    [CmdletBinding()]
-    param(
-        [AllowNull()][object[]]$ErrorRecord
-    )
-
-    # Iterate through each error record and remove benign MSAL loader noise
-    foreach ($item in @($ErrorRecord)) {
-        if ($null -eq $item) { continue }
-        # Extract the exception from the error record, if applicable
-        $exception = if ($item -is [System.Management.Automation.ErrorRecord]) { $item.Exception } else { $item }
-        $isLoaderNoise = $false
-        # Traverse the exception chain to check for MSAL loader noise
-        for ($current = $exception; $null -ne $current; $current = $current.InnerException) {
-            # Check if the current exception is a BadImageFormatException for an msalruntime DLL
-            if ($current -is [System.BadImageFormatException] -and "$($current.Message) $($current.FileName)" -match 'msalruntime[\w\-]*\.dll') {
-                $isLoaderNoise = $true
-                break
-            }
-        }
-        # If the error is identified as MSAL loader noise, it will be skipped; otherwise, it will be output
-        if (-not $isLoaderNoise) { $item }
-    }
-}
-
 Function Start-SCuBAConfigApp {
     <#
     .SYNOPSIS
@@ -177,7 +145,6 @@ Function Start-SCuBAConfigApp {
     https://github.com/cisagov/ScubaGear
 
     .LINK
-    Connect-MgGraph
     ConvertFrom-Yaml
     #>
 
@@ -264,15 +231,22 @@ Function Start-SCuBAConfigApp {
     # Connect to Microsoft Graph if Online parameter is used
     if ($Online) {
         try {
-            #Allow PRMFA: Set-MgGraphOption -EnableLoginByWAM:$true
             Write-Output ""
             Write-Output $(if ($AppOnlyAuth) { "Connecting to Microsoft Graph (app-only certificate)..." } else { "Connecting to Microsoft Graph..." })
-            Connect-MgGraph @GraphParameters -NoWelcome -ErrorAction Stop | Out-Null
+            if ($AppOnlyAuth) {
+                Connect-GraphHelper -M365Environment $M365Environment -ServicePrincipalParams @{
+                    CertThumbprintParams = @{
+                        CertificateThumbprint = $CertificateThumbprint
+                        AppID                 = $AppId
+                        Organization          = $TenantName
+                    }
+                }
+            } else {
+                Connect-GraphHelper -M365Environment $M365Environment -Scopes $GraphParameters.Scopes
 
-            # Interactive auth resolves a signed-in user; confirm it. App-only has no user
-            # context (/me returns 400), so a successful Connect-MgGraph is sufficient there.
-            if (-not $AppOnlyAuth) {
-                Invoke-MgGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
+                # Interactive auth resolves a signed-in user; confirm it. App-only has no user
+                # context (/me returns 400), so a successful connection is sufficient there.
+                Invoke-ScubaGraphRequest -Method GET -Uri "$GraphEndpoint/v1.0/me" -ErrorAction Stop | Out-Null
             }
             Write-Output " - Successfully connected to Microsoft Graph"
             $GraphConnected = $true
@@ -345,7 +319,7 @@ Function Start-SCuBAConfigApp {
         (Get-Module ScubaGear -ErrorAction SilentlyContinue).Version.ToString()
     }
 
-    # Store the ScubaGear module root so Build-ScubaGearCommand can import from the correct source.
+    # Store the ScubaGear module root so New-ScubaGearCommand can import from the correct source.
     # $PSScriptRoot is the ScubaConfigApp folder; the module root is two levels up.
     $resolvedScubaRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..") -ErrorAction SilentlyContinue).Path
     $syncHash.ScubaGearModulePath = if ($resolvedScubaRoot -and (Test-Path (Join-Path $resolvedScubaRoot 'ScubaGear.psd1'))) {
@@ -374,6 +348,8 @@ Function Start-SCuBAConfigApp {
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
     $Runspace.Open() | Out-Null
+    # The UI runs in its own runspace, which would otherwise start with an empty Graph session.
+    $Runspace.SessionStateProxy.SetVariable("ScubaGearState",$Global:ScubaGearState)
     $Runspace.SessionStateProxy.SetVariable("syncHash",$syncHash)
     $PowerShellCommand = [PowerShell]::Create().AddScript({
 
@@ -760,7 +736,7 @@ Function Start-SCuBAConfigApp {
         # Handle Organization TextBox with special Graph Connected logic
         if ($syncHash.GraphConnected) {
             try {
-                $tenantDetails = (Invoke-MgGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
+                $tenantDetails = (Invoke-ScubaGraphRequest -Method GET -Uri "$($syncHash.GraphEndpoint)/v1.0/organization" -OutputType PSObject).Value
                 $tenantName = ($tenantDetails.VerifiedDomains | Where-Object { $_.IsDefault -eq $true }).Name
                 $syncHash.Organization_TextBox.Text = $tenantName
                 $syncHash.Organization_TextBox.Foreground = [System.Windows.Media.Brushes]::Gray
@@ -1340,12 +1316,8 @@ Function Start-SCuBAConfigApp {
             # If user clicked "Yes", proceed with normal closing operations
             $syncHash.isClosing = $true
 
-            # Disconnect safely
-            if (Get-MgContext) {
-                try { Disconnect-MgGraph -ErrorAction SilentlyContinue } catch {
-                    Write-Error "Error disconnecting from Microsoft Graph: $($_.Exception.Message)"
-                }
-            }
+            # The Graph session is disconnected by Start-SCuBAConfigApp once this window has closed. The commands to do it
+            # are not available in this runspace, and doing it there also means a cancelled close never signs the user out.
 
             # Don't call .Close() here - it’s already in the closing state
             #$syncHash.Window.Close()
@@ -1396,21 +1368,28 @@ Function Start-SCuBAConfigApp {
     $PowerShellCommand.Runspace = $Runspace
     $AsyncHandle = $PowerShellCommand.BeginInvoke()
 
-    # Wait for the runspace to complete (non-blocking if needed)
+    # Wait for the runspace to complete. Keep this one blocking call: the window calls scriptblocks bound to this runspace
+    # (ShowMessageBox, ShowBaselinePolicyViewer), and while this runspace is running script those calls are run on its
+    # thread instead of the window's, which breaks reading the window handle and creating windows.
     $null = $PowerShellCommand.EndInvoke($AsyncHandle)
 
     # Now safe to clean up
     $Runspace.Close()
     $Runspace.Dispose()
 
-    #show graph was disconnected if it was online
+    # Disconnect for real before saying so. The window's close handler cannot do it: that runspace does not have these
+    # commands. If the user already disconnected from the status indicator, GraphConnected is false and nothing is left to do.
     if ($Data.GraphConnected -eq $true) {
-        Write-Output "================================="
-        Write-Output "Disconnected from Microsoft Graph"
+        try {
+            Disconnect-ScubaGraph -ErrorAction Stop
+            Write-Output "================================="
+            Write-Output "Disconnected from Microsoft Graph"
+        }
+        catch {
+            Write-Warning "Could not disconnect from Microsoft Graph: $($_.Exception.Message)"
+        }
     }
-    # The window's runspace may auto-load Microsoft.Graph.Authentication, which records
-    # harmless native-DLL load failures in Windows PowerShell 5.1; do not count those.
-    $Data.Error = @(Select-ActionableError -ErrorRecord @($Data.Error))
+    $Data.Error = @($Data.Error)
     if ($Data.Error.Count -eq 0) {
         Write-Output "ScubaConfigApp closed successfully with no errors"
     } else {
@@ -1948,6 +1927,8 @@ Function Start-SCuBAConfigAnalyzer {
     $Runspace.ApartmentState = "STA"
     $Runspace.ThreadOptions = "ReuseThread"
     $Runspace.Open()
+    # Share the caller's Graph session so Connect & Scan and the background threads see the same sign-in.
+    $Runspace.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
     $syncHash.Runspace = $Runspace
     $syncHash.InitialResultsPath = $ResultsPath
     $syncHash.M365Environment = $M365Environment
@@ -1985,6 +1966,7 @@ Function Start-SCuBAConfigAnalyzer {
     $syncHash.ScAProductMap           = @{}
     $syncHash.ScAApiOperations        = @{}
     $syncHash.ScAExclusionDefinitions = @{}
+    $syncHash.ScAMachineSpecificConfigKeys = @()
     $syncHash.ScACaRules              = $null
     $syncHash.ScAApiCatalog           = @{}
     $syncHash.ScAFriendlyNames        = $null
@@ -2263,6 +2245,20 @@ Function Start-SCuBAConfigAnalyzer {
                         Start-ScubaAnalyzerAnalysis -ResultsPath $syncHash.InitialResultsPath
                     }
                 })
+            })
+
+            # Disconnect the MSAL Graph session (if any) when the Analyzer window closes, so a
+            # closed window doesn't leave a stale session behind for the next launch/tenant -
+            # mirrors the same cleanup Start-SCuBAConfigApp performs on its own window close.
+            $syncHash.Window.Add_Closing({
+                try {
+                    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Get-ScubaGraphContext, Disconnect-ScubaGraph
+                    if (Get-ScubaGraphContext) {
+                        Disconnect-ScubaGraph -ErrorAction SilentlyContinue
+                    }
+                } catch {
+                    Write-Verbose "Analyzer Graph disconnect on close failed: $($_.Exception.Message)"
+                }
             })
 
             $syncHash.Window.ShowDialog() | Out-Null
