@@ -8,6 +8,7 @@ $MarkdownCases = @(
     @{Product = "powerplatform"; MarkdownFileName = "powerplatform.md"; BaselinePath = $BaselinePath}
     @{Product = "sharepoint"; MarkdownFileName = "sharepoint.md"; BaselinePath = $BaselinePath}
     @{Product = "teams"; MarkdownFileName = "teams.md"; BaselinePath = $BaselinePath}
+    @{Product = "si"; MarkdownFileName = "si.md"; BaselinePath = $BaselinePath}
 )
 $ImportCases = @(
     @{Product = "aad"; GroupCount = 9; PolicyCount = 34; BaselinePath = $BaselinePath}
@@ -17,6 +18,7 @@ $ImportCases = @(
     @{Product = "powerplatform"; GroupCount = 6; PolicyCount = 9; BaselinePath = $BaselinePath}
     @{Product = "sharepoint"; GroupCount = 3; PolicyCount = 8; BaselinePath = $BaselinePath}
     @{Product = "teams"; GroupCount = 4; PolicyCount = 14; BaselinePath = $BaselinePath}
+    @{Product = "si"; GroupCount = 13; PolicyCount = 53; BaselinePath = $BaselinePath}
 )
 Import-Module $CreateReportModulePath -Force
 

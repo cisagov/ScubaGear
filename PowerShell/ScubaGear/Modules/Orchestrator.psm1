@@ -15,6 +15,7 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerBI
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportPowerPlatformProvider.psm1")
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSecuritySuiteProvider.psm1")
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSharePointProvider.psm1")
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportSIProvider.psm1")
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "Providers\ExportTeamsProvider.psm1")
 
 function Invoke-SCuBA {
@@ -946,6 +947,10 @@ function Invoke-ProviderList {
                                 $TeamsProviderParams['CertificateBasedAuth'] = $true
                             }
                             $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
+                        }
+                        "si" {
+                            $SIProviderParams = @{}
+                            $RetVal = Export-SIProvider @SIProviderParams | Select-Object -Last 1
                         }
                         default {
                             Write-Error -Message "Invalid ProductName argument"

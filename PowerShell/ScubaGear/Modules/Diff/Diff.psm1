@@ -18,6 +18,7 @@ $script:ProductDisplayNameMap = @{
     'PowerPlatform'  = 'Microsoft Power Platform'
     'PowerBI'        = 'Microsoft Power BI'
     'SharePoint'     = 'SharePoint Online'
+    'SI'             = 'Super Intelligence'
     'Teams'          = 'Microsoft Teams'
     'SecuritySuite'  = 'Security Suite'
 }
@@ -32,6 +33,7 @@ $script:ProductOrder = @(
     'PowerPlatform'
     'SharePoint'
     'SecuritySuite'
+    'SI'
     'Teams'
 )
 
