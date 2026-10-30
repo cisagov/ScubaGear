@@ -33,7 +33,7 @@ Opens the ScubaGear Configuration UI for creating and managing configuration fil
 #### Syntax
 
 ```powershell
-Start-SCuBAConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Online] [[-M365Environment] <String>] [-Passthru]
+Start-SCuBAConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Online] [[-M365Environment] <String>] [-TenantName <String>] [-AppId <String>] [-CertificateThumbprint <String>] [-Passthru]
 ```
 
 #### Parameters
@@ -44,6 +44,9 @@ Start-SCuBAConfigApp [[-ConfigFilePath] <String>] [[-Language] <String>] [-Onlin
 | Language | String | UI language (localization) | "en-US" |
 | Online | Switch | Enable Microsoft Graph connectivity | False |
 | M365Environment | String | Target M365 environment (commercial, gcc, gcchigh, dod) | "commercial" |
+| TenantName | String | Tenant domain (for example `contoso.onmicrosoft.com`) or tenant ID to connect to. Used with `-Online` | None |
+| AppId | String | Application (client) ID for non-interactive, app-only Graph sign-in. Used with `-Online`; requires `-CertificateThumbprint` and `-TenantName` | None |
+| CertificateThumbprint | String | Thumbprint of the certificate for `-AppId`. The certificate must be in the CurrentUser or LocalMachine personal store | None |
 | Passthru | Switch | Return the configuration objects | False |
 
 #### Examples:
@@ -63,6 +66,10 @@ Start-SCuBAConfigApp -ConfigFilePath "C:\configs\myconfig.yaml"
 ```powershell
 # Launch and connect to graph for GCC High environment
 Start-SCuBAConfigApp -Online -M365Environment gcchigh
+```
+```powershell
+# Connect without an interactive sign-in, using an app registration and its certificate (app-only)
+Start-SCuBAConfigApp -Online -TenantName contoso.onmicrosoft.com -AppId 00000000-0000-0000-0000-000000000000 -CertificateThumbprint 0123456789ABCDEF0123456789ABCDEF01234567
 ```
 ```powershell
 #Use Passthru with a variable to retrieve all configurations in hashtables
@@ -338,7 +345,7 @@ Instead, it is recommended to:
   $SCuBAUI.error
   ```
 
-- **Graph connectivity fails**: Verify the `Microsoft.Graph.Authentication` module is installed and your authentication credentials have Graph permissions. You must have the following Graph permissions:
+- **Graph connectivity fails**: Verify that the bundled MSAL files pass the integrity check and your authentication credentials have Graph permissions. You must have the following Graph permissions:
 
   ```
   User.Read.All
@@ -356,7 +363,7 @@ Instead, it is recommended to:
 - Clicking between `New Session` and `Import` multiple times may cause UI issues. Close UI and relaunch is the recommended
 - The UI does not support YAML anchors or aliases at this time. Use `-Online` parameter to help build exclusions
 - The UI does not support JSON export at this time.
-- The `-Online` parameter does not support using a service principal at this time when running the UI; it must be interactive. A service principal can be configured within the UI (see Advanced Section) and will be used to ScubaGear within UI.
+- `-Online` signs in interactively in your browser by default. To connect without a sign-in, pass `-TenantName`, `-AppId` and `-CertificateThumbprint`; the app then uses the application's permissions instead of a user's, so the user and group lookups only return what that application has been granted permission to read. Separately, a service principal can be configured within the UI (see Advanced Section) and will be used to run ScubaGear within the UI.
 - If no baselines are showing after selecting product names, it could be a communication issue with the GitHub repository. Change `PullOnlineBaselines` to `false` within the `ScubaConfigApp_Control_en-US.json` app configuration file
 
 ### Run ScubaGear and Report Summary Notes
