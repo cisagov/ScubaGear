@@ -1,3 +1,5 @@
+using module '..\..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+
 <#
     .SYNOPSIS
     Test script for MS365 Teams product.
@@ -131,6 +133,7 @@ BeforeAll {
     Import-Module $ScubaModule
     Import-Module $ConnectionModule
     Import-Module $ConnectHelpersPath
+    $script:ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
     Import-Module Selenium
 
     # Dot source utility functions
@@ -171,7 +174,7 @@ BeforeAll {
             $script:SPOAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "9bc3ab49-b65d-410a-85ad-de819febfddc" `
+                -ClientId $script:ClientIdHash.sharepoint `
                 -Scope "$($script:SPOAdminUrl)/.default"
         }
     }
@@ -196,7 +199,7 @@ BeforeAll {
             $script:PPAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -ClientId $script:ClientIdHash.powerplatform `
                 -Scope $PPScope
         }
     }
@@ -221,7 +224,7 @@ BeforeAll {
             $script:TeamsAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "12128f48-ec9e-42f0-b203-ea49fb6af367" `
+                -ClientId $script:ClientIdHash.teams `
                 -Scope $TeamsScope
         }
     }
@@ -246,7 +249,7 @@ BeforeAll {
             $script:PBIAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -ClientId $script:ClientIdHash.powerbi `
                 -Scope $PBIScope
         }
     }
@@ -292,7 +295,8 @@ BeforeAll {
         }
         else {
             if ($ProductName -eq 'exo') {
-                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                # Keep the interactive session so the run does not sign in again for every policy.
+                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -DisconnectOnExit:$false -Quiet -KeepIndividualJSON -SilenceBODWarnings
             }
             else {
                 Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
@@ -321,6 +325,10 @@ Describe "Policy Checks for <ProductName>" {
                     $ScubaConfig.CertificateThumbprint = $Thumbprint
                     $ScubaConfig.AppID = $AppId
                     $ScubaConfig.Organization = $TenantDomain
+                }
+                else {
+                    # Keep the interactive session so the run does not sign in again for every policy.
+                    $ScubaConfig.DisconnectOnExit = $false
                 }
 
                 $ScubaConfig.M365Environment = $M365Environment

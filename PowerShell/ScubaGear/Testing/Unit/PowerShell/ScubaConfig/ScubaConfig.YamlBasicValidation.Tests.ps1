@@ -69,6 +69,23 @@ Describe "ScubaConfig Basic Root Configuration Tests" {
         $Defaults.validation.PSObject.Properties.Name | Should -Contain "supportedFileExtensions"
     }
 
+    It "Should apply the true default when DisconnectOnExit is omitted" {
+        $Instance = [ScubaConfig]::GetInstance()
+        $Instance.Configuration = @{ ProductNames = @('aad') }
+        $Instance.SetParameterDefaults()
+
+        $Instance.Configuration.DisconnectOnExit | Should -BeTrue
+    }
+
+    It "Should keep an explicit false for booleans whose default is true" {
+        $Instance = [ScubaConfig]::GetInstance()
+        $Instance.Configuration = @{ ProductNames = @('aad'); LogIn = $false; DisconnectOnExit = $false }
+        $Instance.SetParameterDefaults()
+
+        $Instance.Configuration.LogIn | Should -BeFalse
+        $Instance.Configuration.DisconnectOnExit | Should -BeFalse
+    }
+
     It "Should validate basic YAML configuration with proper boolean types" {
         $ValidYaml = @"
 ProductNames:
