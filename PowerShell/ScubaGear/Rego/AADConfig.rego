@@ -1519,8 +1519,8 @@ tests contains {
 # MS.AAD.7.1v1
 #--
 
-# Save all users that have the Global Admin role
-GlobalAdmins contains User.DisplayName if {
+# Save all users that have the Global Admin role (Updated to include User.Id to prevent duplicate name collision)
+GlobalAdmins contains sprintf("%v (%v)", [User.DisplayName, User.Id]) if {
     some User in input.privileged_users
     "Global Administrator" in User.roles
 }
@@ -1547,8 +1547,8 @@ tests contains {
 # MS.AAD.7.2v1
 #--
 
-# Save all users that don't have Global Admin role
-NotGlobalAdmins contains User.DisplayName if {
+# Save all users that don't have Global Admin role (Updated to include User.Id)
+NotGlobalAdmins contains sprintf("%v (%v)", [User.DisplayName, User.Id]) if {
     some User in input.privileged_users
     not "Global Administrator" in User.roles
 }
@@ -1591,9 +1591,8 @@ tests contains {
 # MS.AAD.7.3v1
 #--
 
-# Save privileged users that do not have cloud
-# only accounts
-FederatedAdmins contains User.DisplayName if {
+# Save privileged users that do not have cloud only accounts (Updated to include User.Id)
+FederatedAdmins contains sprintf("%v (%v)", [User.DisplayName, User.Id]) if {
     some User in input.privileged_users
     not is_null(User.OnPremisesImmutableId)
 }
