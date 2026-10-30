@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 - Config Analyzer: MS.AAD.7.4v1 is a privileged role assignment control. Imported results and live scans no longer recommend creating a Conditional Access policy. Both describe PIM or an alternative PAM system, the emergency-access and service-account exceptions, and that a PIM-for-Groups group may keep a permanent active role assignment only after enrollment is confirmed. Detected permanent principals are offered as RoleExclusions.
+- Config Analyzer: an imported non-Conditional-Access control with no provider data keeps command-error handling (`Error` is `CHECK_PERMISSIONS`, configuration action `REVIEW`) and keeps `N/A` and `Omitted` as manual review. Only a `Fail` is a tenant fix. Permanent role assignments are offered as `RoleExclusions` only when `EndDateTime` is JSON null, matching the Rego policy. A missing or blank `EndDateTime` is not a match.
 
 ## Unreleased - Config Analyzer carries the imported results configuration into the generated YAML
 

@@ -202,20 +202,43 @@ function Get-ScANonCaRootCause {
         return @{ RootCause = 'Compliant'; RequiresAction = 'NONE'; Recommendations = @() }
     }
 
+    # A failed data-collection command is not evidence the tenant is noncompliant.
+    # This matches the non-Conditional-Access branch of Get-ScARootCause.
+    if ($Result -eq 'Error') {
+        return @{
+            RootCause       = 'Command execution error'
+            RequiresAction  = 'CHECK_PERMISSIONS'
+            Recommendations = @('Verify Microsoft Graph permissions and connection.')
+        }
+    }
+
+    # ScubaGear exports N/A for unimplemented checks and Omitted when a policy is omitted.
+    # Neither is a failure, so they keep the previous manual-review classification.
+    if ($Result -eq 'N/A' -or $Result -eq 'Omitted') {
+        return @{
+            RootCause       = 'Manual review required'
+            RequiresAction  = 'REVIEW'
+            Recommendations = @()
+        }
+    }
+
     $recs = @()
     if ($ValidationSchema -and $ValidationSchema.remediationContent.recommendations) {
         $recs = @($ValidationSchema.remediationContent.recommendations)
     }
 
+    # Only a recorded Fail is a tenant fix. Warning, Manual, and any other status stay a review.
+    $action = if ($Result -eq 'Fail') { 'FIX_TENANT' } else { 'REVIEW' }
+
     if ($ValidationType -eq 'roleAssignmentAnalysis') {
         return @{
             RootCause       = 'This baseline covers privileged role assignments, not Conditional Access. Follow the remediation steps; creating a Conditional Access policy will not satisfy it.'
-            RequiresAction  = $(if ($Result -eq 'Warning' -or $Result -eq 'Manual') { 'REVIEW' } else { 'FIX_TENANT' })
+            RequiresAction  = $action
             Recommendations = $recs
         }
     }
 
-    if ($Result -eq 'Warning' -or $Result -eq 'Manual') {
+    if ($action -eq 'REVIEW') {
         return @{
             RootCause       = 'This baseline is configured outside Conditional Access and needs manual review (see steps).'
             RequiresAction  = 'REVIEW'
@@ -259,8 +282,10 @@ function Get-ScAPrivilegedRoleAssignmentAnalysis {
     .SYNOPSIS
     Finds permanent active assignments on highly privileged roles for MS.AAD.7.4v1.
     .DESCRIPTION
-    ScubaGear stores these on Raw.privileged_roles. A permanent assignment has no
-    EndDateTime, which is the same test the Rego policy uses. Principals found in
+    ScubaGear stores these on Raw.privileged_roles. A permanent assignment is one
+    whose EndDateTime is JSON null, the same test as Rego (x.EndDateTime == null).
+    A missing property is undefined in Rego and is not a match. A blank string is
+    not null either. Principals found in
     privileged_users are RoleExclusions users. Privileged service principals are listed
     there too, because RoleExclusions has no separate service-principal list. Every other
     principal is reported as a group.
@@ -324,9 +349,9 @@ function Get-ScAPrivilegedRoleAssignmentAnalysis {
         $roleHasPermanent = $false
         foreach ($assignment in @($role.Assignments)) {
             if (-not $assignment) { continue }
-            $hasEnd = Test-ScAMember $assignment 'EndDateTime'
-            $end = if ($hasEnd) { $assignment.EndDateTime } else { $null }
-            if ($null -ne $end -and -not [string]::IsNullOrWhiteSpace([string]$end)) { continue }
+            # Rego: x.EndDateTime == null. Missing is undefined, and "" == null is false.
+            if (-not (Test-ScAMember $assignment 'EndDateTime')) { continue }
+            if ($null -ne $assignment.EndDateTime) { continue }
             $id = if ($assignment.PrincipalId) { [string]$assignment.PrincipalId } else { '' }
             if ([string]::IsNullOrWhiteSpace($id)) { continue }
             $roleHasPermanent = $true
