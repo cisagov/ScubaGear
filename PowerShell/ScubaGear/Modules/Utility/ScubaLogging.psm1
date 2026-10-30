@@ -91,6 +91,8 @@ function Initialize-ScubaLogging {
 
         # Setup log directory and file path with timestamp
         if ($LogPath) {
+            $LogPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($LogPath)
+
             # Create the log directory if it doesn't exist
             if (!(Test-Path -LiteralPath $LogPath)) {
                 # .NET file APIs resolve relative paths against the process cwd, not $PWD; absolutize first.
@@ -311,8 +313,8 @@ function Trace-ScubaFunction {
     The caller will use $false when they want to handle the error themselves.
 
     .EXAMPLE
-    $result = Trace-ScubaFunction -FunctionName "Get-MgUser" -Parameters @{UserId="test@domain.com"} -ScriptBlock {
-        Get-MgUser -UserId $UserId
+    $result = Trace-ScubaFunction -FunctionName "Get-MgBetaOrganization" -ScriptBlock {
+        Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment
     }
     #>
     [CmdletBinding()]

@@ -131,6 +131,25 @@ InModuleScope Utility {
             }
         }
 
+        Context '408 retry behavior' {
+            It 'Retries on HTTP 408 and succeeds once the error clears' {
+                $script:CallCount = 0
+                Mock -ModuleName Utility Start-Sleep { }
+                Mock -ModuleName Utility Invoke-RestMethod {
+                    $script:CallCount++
+                    if ($script:CallCount -eq 1) {
+                        throw (New-FakeRestException -StatusCode 408)
+                    }
+                    return [pscustomobject]@{ result = 'ok' }
+                }
+                $Result = Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' `
+                    -MaxRetries 2 -RetryDelaySeconds 1 -WarningAction SilentlyContinue
+                $Result.result | Should -Be 'ok'
+                Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
+                Should -Invoke -ModuleName Utility Start-Sleep -Times 1 -Exactly
+            }
+        }
+
         Context 'Standard provider retry settings' {
             It 'Get-ScubaRestRetryDefaults returns 3 retries, a 5 second delay and a 120 second cap' {
                 $Defaults = Get-ScubaRestRetryDefaults
@@ -188,6 +207,41 @@ InModuleScope Utility {
                     -MaxRetries 2 -RetryDelaySeconds 5 -WarningAction SilentlyContinue
                 $Result.result | Should -Be 'ok'
                 Should -Invoke -ModuleName Utility Invoke-RestMethod -Times 2 -Exactly
+            }
+        }
+
+        Context 'Undecoded gzip response fallback' {
+            BeforeAll {
+                function New-GzipBytes {
+                    param([string]$Text)
+                    $Output = [System.IO.MemoryStream]::new()
+                    $Gzip = [System.IO.Compression.GZipStream]::new($Output, [System.IO.Compression.CompressionMode]::Compress)
+                    $Payload = [System.Text.Encoding]::UTF8.GetBytes($Text)
+                    $Gzip.Write($Payload, 0, $Payload.Length)
+                    $Gzip.Dispose()
+                    return , $Output.ToArray()
+                }
+            }
+
+            It 'Re-reads and decompresses a gzip body that Invoke-RestMethod returned as a string' {
+                $script:GzipBytes = New-GzipBytes -Text '[{"Identity":"Global","AutoAdmittedUsers":"EveryoneInCompany"}]'
+                Mock -ModuleName Utility Invoke-RestMethod { return ([string][char]0x1F + [char]0xFFFD + 'garbled') }
+                Mock -ModuleName Utility Invoke-WebRequest {
+                    [pscustomobject]@{ RawContentStream = [System.IO.MemoryStream]::new($script:GzipBytes) }
+                }
+                $Result = @(Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x')
+                $Result[0].Identity | Should -Be 'Global'
+                $Result[0].AutoAdmittedUsers | Should -Be 'EveryoneInCompany'
+                Should -Invoke -ModuleName Utility Invoke-WebRequest -Times 1 -Exactly -ParameterFilter {
+                    $Uri -eq 'https://example.com/x' -and $Headers['Authorization'] -match 'tok'
+                }
+            }
+
+            It 'Does not re-issue the request for ordinary string responses' {
+                Mock -ModuleName Utility Invoke-RestMethod { return 'plain text' }
+                Mock -ModuleName Utility Invoke-WebRequest { throw 'should not be called' }
+                Invoke-ScubaRestMethod -BaseUrl 'https://example.com' -AccessToken 'tok' -Endpoint '/x' | Should -Be 'plain text'
+                Should -Invoke -ModuleName Utility Invoke-WebRequest -Times 0 -Exactly
             }
         }
 

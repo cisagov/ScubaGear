@@ -94,6 +94,10 @@
     Part of the ScubaGear project - https://github.com/cisagov/ScubaGear
 #>
 
+# The Graph session is the cross-module singleton created in ConnectHelpers.psm1; this file hands it to the runspaces it creates.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+
 # ------------------------------------------------------------------------------------
 # Small helpers
 # ------------------------------------------------------------------------------------
@@ -717,6 +721,7 @@ function Start-ScubaAnalyzerTenantScan {
         # Background runspace. It shares the real (synchronized) $syncHash for the ScA caches, paths
         # and launch params, imports the analyzer helpers (not the UI helper), and runs A -> C.
         $bg = [runspacefactory]::CreateRunspace(); $bg.ApartmentState = 'MTA'; $bg.ThreadOptions = 'ReuseThread'; $bg.Open()
+        $bg.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
         $bg.SessionStateProxy.SetVariable('syncHash', $syncHash)
         $bg.SessionStateProxy.SetVariable('connectSync', $connectSync)
         $bg.SessionStateProxy.SetVariable('helpersPath', $syncHash.HelperModulesPath)
@@ -928,6 +933,7 @@ function Open-ScubaConfigAppFromAnalyzer {
 
         $rs = [runspacefactory]::CreateRunspace()
         $rs.ApartmentState = 'STA'; $rs.ThreadOptions = 'ReuseThread'; $rs.Open()   # STA: it hosts a WPF window
+        $rs.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
         $rs.SessionStateProxy.SetVariable('modulePath', $syncHash.ScubaConfigAppModulePath)
         $rs.SessionStateProxy.SetVariable('configFile', $configFile)
         $rs.SessionStateProxy.SetVariable('online', $online)
