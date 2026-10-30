@@ -98,8 +98,8 @@ Aad:
         - otherExternalUser
         - serviceProvider
 
-  # Users detected as high risk SHALL be blocked.
-  MS.AAD.2.1v1: *CommonCapExclusions
+  # Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in.
+  MS.AAD.2.1v2: *CommonCapExclusions
 
   # Sign-ins detected as high risk SHALL be blocked.
   MS.AAD.2.3v1: *CommonCapExclusions
@@ -203,9 +203,9 @@ AnnotatePolicy:
   # -------------------------------------
   # ANNOTATE POLICY : AAD SAMPLE
   # -------------------------------------
-  # Users detected as high risk SHALL be blocked.
-  MS.AAD.2.1v1:
-    Comment: "This policy is used to block users detected as high risk. The organization has a process in place to review and unblock users if necessary."
+  # Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in.
+  MS.AAD.2.1v2:
+    Comment: "This policy requires users detected as high risk to remediate their risk. The organization has a process in place to assist users that cannot self-remediate."
     RemediationDate: 2026-01-01  # Optional. The date a failing control is anticipated to be implemented.
   # Phishing-resistant MFA SHALL be enforced for all users.
   MS.AAD.3.1v1:

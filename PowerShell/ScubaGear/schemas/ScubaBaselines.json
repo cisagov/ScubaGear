@@ -1,5 +1,5 @@
 {
-  "Version": "2.10.20 [updated 10/20/2026]",
+  "Version": "2.10.23 [updated 10/23/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -73,20 +73,20 @@
         ]
       },
       {
-        "id": "MS.AAD.2.1v1",
-        "name": "Users detected as high risk SHALL be blocked.",
+        "id": "MS.AAD.2.1v2",
+        "name": "Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in.",
         "policySection": "Risk-based Policies",
         "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the term [\"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "rationale": "Blocking high-risk users may prevent compromised accounts from accessing the tenant.",
+        "rationale": "Requiring high-risk users to remediate their risk before regaining access prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention. Requiring reauthentication on every sign-in ensures that existing sessions held by an attacker cannot persist.",
         "notes": [
-          "Users identified as high-risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account."
+          "Users identified as high-risk by Microsoft Entra ID Protection can be required to remediate their risk via a Microsoft Entra ID Conditional Access policy using the \"Require risk remediation\" grant control. Users with passwords are prompted to complete a secure password change after successful multifactor authentication, while passwordless users have their sessions revoked and must reauthenticate. The grant control automatically requires an authentication strength (combined using AND) and applies a sign-in frequency session control of \"Every time\". User risk and sign-in risk conditions must not be combined in the same policy. This policy replaces the block-based policy from MS.AAD.2.1v1."
         ],
         "criticality": "SHALL",
-        "lastModified": "June 2023",
-        "implementation": "1.  Create a conditional access policy blocking users categorized as high-risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > <b>High</b>\n\n  Access controls > Grant > <b>Block access</b>\n</pre>",
+        "lastModified": "October 2026",
+        "implementation": "Before enabling this policy, [investigate and remediate any active user risks](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-remediate-unblock). Users must be registered for Microsoft Entra multifactor authentication to self-remediate, and hybrid users synced from on-premises require password writeback to be enabled. Users who are not registered are blocked until an administrator remediates their risk.\n\n1.  Create a conditional access policy that requires users categorized as high-risk by the Identity Protection service to remediate their risk. Configure the following policy settings in the new conditional access policy per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > Configure > <b>Yes</b> > Configure user risk levels needed for policy to be enforced > <b>High</b>\n\n  Access controls > Grant > <b>Grant access</b> > <b>Require risk remediation</b>\n  (<b>Require authentication strength</b> is selected automatically; choose the strength appropriate for your organization)\n\n  Session > <b>Sign-in frequency</b> > <b>Every time</b>\n  (applied automatically when Require risk remediation is selected and is mandatory)\n</pre>\n\n2.  Do not configure sign-in risk in this policy. Create a separate policy for sign-in risk (see MS.AAD.2.3v1).\n\n3.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).\n\n4.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.",
         "mitreMapping": [
           {
             "Name": "T1078: Valid Accounts",
@@ -101,6 +101,10 @@
           {
             "Name": "What are risk detections?",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
+          },
+          {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           },
           {
             "Name": "Simulating risk detections in Identity Protection",
@@ -160,6 +164,10 @@
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
           },
           {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
+          },
+          {
             "Name": "Simulating risk detections in Identity Protection",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk"
           },
@@ -205,6 +213,10 @@
           {
             "Name": "What are risk detections?",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
+          },
+          {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           },
           {
             "Name": "Simulating risk detections in Identity Protection",
