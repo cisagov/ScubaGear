@@ -38,6 +38,12 @@ Describe "JSON-based Configuration System" {
             { [ScubaConfig]::InitializeValidator() } | Should -Not -Throw
         }
 
+        It "Should reload defaults after the validator is reset" {
+            [ScubaConfig]::ResetInstance()
+            $skipDefault = [ScubaConfig]::ScubaDefault('DefaultSkipLongFunctions')
+            $skipDefault | Should -BeFalse
+        }
+
         It "Should load configuration defaults from JSON" {
             $defaults = [ScubaConfig]::GetConfigDefaults()
             $defaults | Should -Not -BeNullOrEmpty
@@ -53,6 +59,13 @@ Describe "JSON-based Configuration System" {
         It "Should read DisconnectOnExit default as true from JSON" {
             $disconnectDefault = [ScubaConfig]::ScubaDefault('DefaultDisconnectOnExit')
             $disconnectDefault | Should -Be $true
+        }
+
+        It "Should read SkipLongFunctions default as false from JSON" {
+            $skipDefault = [ScubaConfig]::ScubaDefault('DefaultSkipLongFunctions')
+            $skipDefault | Should -BeFalse
+            $jsonDefaults = Get-Content "$PSScriptRoot\..\..\..\..\schemas\ScubaConfigDefaults.json" -Raw | ConvertFrom-Json
+            $skipDefault | Should -Be $jsonDefaults.defaults.SkipLongFunctions
         }
 
         It "Should read LogIn default as true from JSON" {

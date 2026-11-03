@@ -34,6 +34,10 @@ class ScubaConfig {
     hidden static [Boolean]$_IsLoaded = $false
     # Track whether the validator subsystem has been initialized
     hidden static [Boolean]$_ValidatorInitialized = $false
+    # Directory of this module file, captured at import. Class methods cannot
+    # rely on $PSCommandPath: it is empty once Invoke-SCuBA resets the validator
+    # and a later call re-enters InitializeValidator from parameter validation.
+    hidden static [string]$_ModuleRoot = ''
     # Cached configuration defaults loaded from JSON file
     hidden static [object]$_ConfigDefaults = $null
     # Cached JSON schema used for validation
@@ -46,8 +50,19 @@ class ScubaConfig {
     static [void] InitializeValidator() {
         # Only initialize if not already done (singleton initialization)
         if (-not [ScubaConfig]::_ValidatorInitialized) {
-            # Get the directory containing this module file
-            $ModulePath = Split-Path -Parent $PSCommandPath
+            # Prefer the path captured when the module loaded. $PSCommandPath is
+            # null inside this class method after the first scan resets the validator.
+            $ModulePath = [ScubaConfig]::_ModuleRoot
+            if ([string]::IsNullOrWhiteSpace($ModulePath)) {
+                $LoadedModule = Get-Module -Name ScubaConfig -ErrorAction SilentlyContinue |
+                    Select-Object -First 1
+                if ($null -ne $LoadedModule) {
+                    $ModulePath = $LoadedModule.ModuleBase
+                }
+            }
+            if ([string]::IsNullOrWhiteSpace($ModulePath)) {
+                $ModulePath = Split-Path -Parent $PSCommandPath
+            }
             # Initialize the validator with the module path
             [ScubaConfigValidator]::Initialize($ModulePath)
             # Cache the loaded defaults and schema for fast access
@@ -863,3 +878,7 @@ class ScubaConfig {
         return [ScubaConfig]::_ConfigDefaults.privilegedRoles
     }
 }
+
+# Capture the module directory while $PSScriptRoot is still valid. Later calls
+# into the class, including ProductNames validation, do not have $PSCommandPath.
+[ScubaConfig]::_ModuleRoot = $PSScriptRoot
