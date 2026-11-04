@@ -978,8 +978,7 @@ function Get-ScubaGearAppPermission {
     }
 
     if($ProductNames -contains '*'){
-        # If wildcard is specified, include all products
-        $ProductNames = @([ScubaConfig]::GetAllValidProductNames() | Where-Object { $_ -ne '*' })
+        $ProductNames = @([ScubaConfig]::GetSupportedProducts())
     }
 
     # Get permissions and roles (these are local operations)
@@ -3219,8 +3218,7 @@ function New-ScubaGearServicePrincipal {
     Try {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
-            # If wildcard is specified, include all products
-            $ProductNames = @([ScubaConfig]::GetAllValidProductNames() | Where-Object { $_ -ne '*' })
+            $ProductNames = @([ScubaConfig]::GetSupportedProducts())
         }
 
         # Get permissions using the same approach as Get-ScubaGearAppPermission
