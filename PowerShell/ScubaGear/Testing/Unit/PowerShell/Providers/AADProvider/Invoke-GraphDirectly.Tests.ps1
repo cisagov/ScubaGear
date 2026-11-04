@@ -85,6 +85,7 @@ InModuleScope Utility {
         # Tests to ensure that the correct API header is returned for each cmdlet that requires it. The API header is stored in the permissions configuration file (ScubaGearApiCatalog.json).
         $ApiHeaderCases = @(
             @{ Cmdlet = "Get-MgBetaUserCount"; Path = "users/`$count"; NeedsID = $false; IdValue = $null; apiHeader = @{ConsistencyLevel = "eventual"} }
+            @{ Cmdlet = "Get-MgBetaIdentityConditionalAccessPolicy"; Path = "identity/conditionalAccess/policies"; NeedsID = $false; IdValue = $null; apiHeader = @{Prefer = "include-unknown-enum-members"} }
         )
 
         $combinedApiHeaderCases = @()

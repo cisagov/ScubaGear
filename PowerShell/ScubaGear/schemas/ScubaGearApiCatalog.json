@@ -475,7 +475,7 @@
         "endpointPath": "/beta/identity/conditionalAccess/policies",
         "parameters": [],
         "apiFilter": "",
-        "apiHeader": [],
+        "apiHeader": [{"Prefer": "include-unknown-enum-members"}],
         "leastPermissions": ["Policy.Read.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
@@ -483,7 +483,7 @@
         "oauthScope": "",
         "poshModule": ["Microsoft.Graph.Beta.Identity.SignIns"],
         "supportLinks": ["https://learn.microsoft.com/en-us/powershell/module/Microsoft.Graph.Beta.Identity.SignIns/Get-MgBetaIdentityConditionalAccessPolicy?view=graph-powershell-beta","https://learn.microsoft.com/graph/api/conditionalaccessroot-list-policies?view=graph-rest-beta"],
-        "notes": ""
+        "notes": "riskRemediation is an evolvable grant-control enum. Without Prefer: include-unknown-enum-members, Graph returns unknownFutureValue and the CAP table cannot name the control."
     },
     {
         "functionName": "Get-MgBetaIdentityConditionalAccessNamedLocation",
