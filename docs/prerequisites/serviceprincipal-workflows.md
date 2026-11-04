@@ -26,7 +26,7 @@ The benefits of using the ScubaGear Service Principal module include:
 > [!IMPORTANT]
 > **This module is designed exclusively for ScubaGear.**
  - ✅ Creates a service principal for ScubaGear assessments
- - ✅ Manages ScubaGear product permissions (Entra, Exchange, SharePoint, Teams, SecuritySuite, Power Platform)
+ - ✅ Manages ScubaGear product permissions and registrations (Entra, Exchange, SharePoint, Teams, SecuritySuite, Power Platform, and Power BI read-only Admin API access)
  - ✅ Handles certificate management
  - ✅ Audits and fixes ScubaGear Service Principal permission issues
  - ❌ NOT for general service principal management
@@ -45,13 +45,17 @@ Before using the Service Principal module, ensure you have:
 
    | Function | Entra ID Role (any one of)  | Microsoft Graph API Scopes |
    |----------|-------------------------------|---------------------------|
-   | `New-ScubaGearServicePrincipal` | **Application Administrator**<br><sup>Global Admin, Security Admin, or Cloud App Admin also work</sup> | `Application.ReadWrite.All`<br>`RoleManagement.ReadWrite.Directory`<br>`User.Read` |
-   | `Get-ScubaGearAppPermission` | **Global Reader**<br><sup>Global Admin, Directory Writers, Hybrid Identity Admin, Security Admin, Cloud App Admin, or App Admin also work</sup> | `Application.Read.All`<br>`RoleManagement.Read.Directory` |
-   | `Set-ScubaGearAppPermission` | **Privileged Role Administrator**<br><sup>Global Admin, Directory Writers, Hybrid Identity Admin, Identity Governance Admin, User Admin, Cloud App Admin, or App Admin also work</sup> | `Application.ReadWrite.All`<br>`AppRoleAssignment.ReadWrite.All`<br>`RoleManagement.ReadWrite.Directory` |
+   | `New-ScubaGearServicePrincipal` | **Application Administrator**<br><sup>Global Admin, Security Admin, or Cloud App Admin also work</sup> | `Application.ReadWrite.All`<br>`RoleManagement.ReadWrite.Directory`<br>`User.Read`<br>`Group.ReadWrite.All` |
+   | `Get-ScubaGearAppPermission` | **Global Reader**<br><sup>Global Admin, Directory Writers, Hybrid Identity Admin, Security Admin, Cloud App Admin, or App Admin also work</sup> | `Application.Read.All`<br>`RoleManagement.Read.Directory`<br>`Group.Read.All` |
+   | `Set-ScubaGearAppPermission` | **Privileged Role Administrator**<br><sup>Global Admin, Directory Writers, Hybrid Identity Admin, Identity Governance Admin, User Admin, Cloud App Admin, or App Admin also work</sup> | `Application.ReadWrite.All`<br>`AppRoleAssignment.ReadWrite.All`<br>`RoleManagement.ReadWrite.Directory`<br>`Group.ReadWrite.All` |
    | `Get-ScubaGearAppCert` | **Global Reader**<br><sup>Global Admin, Cloud App Admin, or App Admin also work</sup> | `Application.Read.All` |
    | `New-ScubaGearAppCert`<br>`Remove-ScubaGearAppCert` | **Application Administrator**<br><sup>Global Admin, Cloud App Admin, or App Developer* also work</sup> | `Application.ReadWrite.All` |
 
    <sup>*Application Developer can only manage applications they own</sup>
+
+   > [!NOTE]
+   > When setting up Power BI access, the command also obtains a delegated
+   > Power BI Admin API token. Sign in with an account assigned the Fabric Administrator role. This is separate from the Microsoft Graph scopes in the table above.
 
 ## Initial Setup Workflow
 
@@ -60,7 +64,7 @@ Before using the Service Principal module, ensure you have:
 ### Step 1: Plan Your Configuration
 
 Before creating the service principal, determine:
-- **Products to assess:** Choose from aad, exo, sharepoint, teams, securitysuite, powerplatform, or use `*` for all products
+- **Products to assess:** Choose from aad, exo, sharepoint, teams, securitysuite, powerplatform, powerbi, or use `*` for all products
 - **Environment:** commercial, gcc, gcchigh, or dod
 - **Certificate validity:** Default 6 months, customizable up to 12 months maximum
 
@@ -71,7 +75,7 @@ Test the creation without making changes:
 ```powershell
 New-ScubaGearServicePrincipal `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform' `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform', 'powerbi' `
     -WhatIf
 ```
 
@@ -79,6 +83,7 @@ New-ScubaGearServicePrincipal `
 - App registration will be created
 - Permissions to be granted
 - Roles to be assigned
+- Power BI read-only Admin API access setup, when `powerbi` is selected
 - Certificate details
 
 ### Step 3: Create the Service Principal
@@ -88,7 +93,7 @@ Create the Service Principal:
 ```powershell
 $NewSP = New-ScubaGearServicePrincipal `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform' `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform', 'powerbi' `
     -ServicePrincipalName "ScubaGear-Production"
 ```
 
@@ -108,7 +113,28 @@ Get-ScubaGearAppPermission `
 ```
 
 > [!NOTE]
-> After setup, if assessing Power BI, also complete the [Power BI Tenant Setting](noninteractive.md#power-bi-tenant-setting) configuration step in the Power BI Admin portal.
+> When `powerbi` is selected, the setup command enables the service principal access to Power BI
+> **read-only admin APIs** tenant settings and
+> associates the service principal with an allowed Entra security group. If
+> existing allowed groups are configured, you can select one or create/use
+> ScubaGear's dedicated group. The [manual Power BI setup steps](noninteractive.md#power-bi-tenant-setting)
+> remain available when configuring a service principal without the ScubaGear
+> helper commands.
+
+> [!TIP]
+> If the Power BI read-only Admin API tenant setting is already enabled for
+> specific groups, but your service principal is not a member of any of them,
+> `Get-ScubaGearAppPermission` shows that the service principal needs Power BI
+> access. When you create the service principal or apply the suggested fix
+> interactively, you can add it to an existing allowed group or create or use
+> ScubaGear's dedicated group.
+>
+> ScubaGear's dedicated group is named `ScubaGear PowerBI Service Principals`;
+> it is not a built-in Entra group. ScubaGear reuses an existing group with
+> that name or creates one if needed, adds the service principal to it, and
+> includes it in the tenant setting while preserving existing allowed groups.
+> The group-selection prompt appears while applying changes, not during
+> `-WhatIf`.
 
 **Expected result:** Status should show "No action needed - service principal is correctly configured."
 
@@ -141,7 +167,7 @@ Invoke-Scuba `
 $Audit = Get-ScubaGearAppPermission `
     -AppID "your-app-id-here" `
     -M365Environment commercial `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform'
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform', 'powerbi'
 ```
 
 ### Step 2: Review Audit Results
@@ -158,6 +184,8 @@ $Audit
 - `MissingRoles` - Directory roles that need assignment
 - `DelegatedPermissions` - Delegated permissions to remove (ScubaGear requires application permissions only for non-interactive execution)
 - `PowerPlatformRegistered` - Whether Power Platform is properly registered
+- `PowerBIRegistered` - Whether Power BI read-only Admin API access is configured
+- `PowerBIGroupMembership` - Whether the service principal belongs to a Power BI allowed security group
 - `FixPermissionIssues` - Command to fix issues
 - `Status` - Summary of issues found
 
@@ -192,6 +220,7 @@ Set-ScubaGearAppPermission -AppID $Audit.AppID -M365Environment $Audit.M365Envir
 - Permissions to be removed
 - Roles to be assigned
 - Power Platform registration changes
+- Power BI allowed-group membership changes
 
 ### Step 2: Apply Remediation
 
@@ -209,7 +238,7 @@ Confirm all issues were resolved:
 Get-ScubaGearAppPermission `
     -AppID $Audit.AppID `
     -M365Environment $Audit.M365Environment `
-    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform'
+    -ProductNames $Audit.ProductNames
 ```
 
 **Expected result:** Status should now show "No action needed."
@@ -310,6 +339,38 @@ $Audit = Get-ScubaGearAppPermission `
 ```powershell
 $Audit | Set-ScubaGearAppPermission
 ```
+
+### Scenario 3: Add Power BI
+
+**Example:** You need the service principal to assess Power BI in addition to
+its currently configured products.
+
+#### Step 1: Audit with Power BI selected
+
+```powershell
+$Audit = Get-ScubaGearAppPermission `
+    -AppID "your-app-id-here" `
+    -M365Environment commercial `
+    -ProductNames 'aad', 'exo', 'sharepoint', 'teams', 'securitysuite', 'powerplatform', 'powerbi'
+```
+
+#### Step 2: Configure Power BI access
+
+Review the proposed changes before applying them:
+
+```powershell
+$Audit | Set-ScubaGearAppPermission -WhatIf
+```
+
+If Power BI access is missing, apply the remediation:
+
+```powershell
+$Audit | Set-ScubaGearAppPermission
+```
+
+The setup adds the service principal to a selected or dedicated Entra security
+group and configures the Power BI read-only Admin API tenant setting. Verify
+with a new `Get-ScubaGearAppPermission` audit using the same product selection.
 
 ### Scenario 2: Remove Unused Products
 
