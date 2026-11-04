@@ -57,9 +57,25 @@ InModuleScope ServicePrincipal {
             $script:PowerBITestAppId = '11111111-1111-1111-1111-111111111111'
             $script:PowerBITestSpId = '22222222-2222-2222-2222-222222222222'
             $script:PowerBITestGroupId = '33333333-3333-3333-3333-333333333333'
+            $script:PowerBITestMissingGroupId = '44444444-4444-4444-4444-444444444444'
+            $script:PowerBITestNewGroupId = '55555555-5555-5555-5555-555555555555'
+            $script:PowerBITestOtherMissingGroupId = '66666666-6666-6666-6666-666666666666'
+            $script:PowerBITestExcludedGroupId = '77777777-7777-7777-7777-777777777777'
+
+            function New-PowerBITestHttpError {
+                param([int]$StatusCode)
+                $failure = [System.Exception]::new("Simulated HTTP $StatusCode")
+                $failure | Add-Member -NotePropertyName Response -NotePropertyValue ([PSCustomObject]@{ StatusCode = $StatusCode })
+                return $failure
+            }
         }
 
         BeforeEach {
+            $script:PowerBITestSettingEnabled = $true
+            $script:PowerBITestGroups = @([PSCustomObject]@{
+                graphId = $script:PowerBITestGroupId
+                name = 'Test group'
+            })
             Mock -CommandName Get-PowerBIAdminToken -MockWith {
                 return [PSCustomObject]@{ BaseUrl = 'https://example.test'; AccessToken = 'token' }
             }
@@ -67,11 +83,13 @@ InModuleScope ServicePrincipal {
                 return [PSCustomObject]@{
                     tenantSettings = @([PSCustomObject]@{
                         settingName = 'AllowServicePrincipalsUseReadAdminAPIs'
-                        enabled = $true
-                        enabledSecurityGroups = @([PSCustomObject]@{
-                            graphId = $script:PowerBITestGroupId
-                            name = 'Test group'
-                        })
+                        enabled = $script:PowerBITestSettingEnabled
+                        enabledSecurityGroups = @($script:PowerBITestGroups)
+                        excludedSecurityGroups = @([PSCustomObject]@{ graphId = $script:PowerBITestExcludedGroupId; name = 'Excluded group' })
+                        properties = @([PSCustomObject]@{ name = 'ExistingProperty'; value = 'true'; type = 'Boolean' })
+                        delegateToCapacity = $false
+                        delegateToDomain = $true
+                        delegateToWorkspace = $false
                     })
                 }
             }
@@ -132,6 +150,361 @@ InModuleScope ServicePrincipal {
             ($Output -join "`n") | Should -Not -Match "currently enabled for the following security group|  \[1\] Test group \(ID:"
             ($Output -join "`n") | Should -Not -Match "Create a new dedicated security group and append it"
             Should -Invoke -CommandName Read-Host -Times 1 -Exactly
+        }
+
+        It "omits a missing dedicated group when selecting <Selection>" -ForEach @(
+            @{ Selection = 'an existing group'; Choice = '1'; MissingFirst = $true; ExpectedAction = "existing allowed group 'Test group'" }
+            @{ Selection = 'the default replacement'; Choice = ''; MissingFirst = $false; ExpectedAction = "Create/use group 'ScubaGear PowerBI Service Principals'" }
+        ) {
+            $missingGroup = [PSCustomObject]@{
+                graphId = $script:PowerBITestMissingGroupId
+                name = 'ScubaGear PowerBI Service Principals'
+            }
+            if ($MissingFirst) {
+                $script:PowerBITestGroups = @($missingGroup) + @($script:PowerBITestGroups)
+            } else {
+                $script:PowerBITestGroups += $missingGroup
+            }
+            $script:PowerBITestSelection = $Choice
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { @() }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                if ($ID -eq $script:PowerBITestMissingGroupId) {
+                    throw (New-PowerBITestHttpError -StatusCode 404)
+                }
+                return [PSCustomObject]@{ Value = @() }
+            }
+            Mock -CommandName Read-Host -MockWith { $script:PowerBITestSelection }
+
+            $Output = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -WhatIf -WarningVariable GroupWarnings `
+                -WarningAction SilentlyContinue -InformationVariable MenuInformation
+
+            $MenuText = @($MenuInformation | ForEach-Object { $_.MessageData }) -join "`n"
+            $GroupWarnings | Should -Match $script:PowerBITestMissingGroupId
+            $GroupWarnings | Should -Match 'was not found'
+            $MenuText | Should -Match 'Test group \(ID: 33333333-3333-3333-3333-333333333333\)'
+            $MenuText | Should -Not -Match $script:PowerBITestMissingGroupId
+            $MenuText | Should -Match '\[2\] Create a new dedicated security group'
+            ($Output -join "`n") | Should -Match $ExpectedAction
+            ($Output -join "`n") | Should -Match 'remove stale Power BI allowed-group reference'
+            Should -Invoke -CommandName Read-Host -Times 1 -Exactly -ParameterFilter {
+                $Prompt -eq 'Select an option [1-2] (Default: 2)'
+            }
+            Should -Invoke -CommandName Read-Host -Times 0 -ParameterFilter { $Prompt -like 'Remove stale*' }
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'POST' }
+        }
+
+        It "confirms stale-reference cleanup and creates a replacement with <Scenario>" -ForEach @(
+            @{ Scenario = 'another allowed group'; IncludeValidGroup = $true; MultipleMissing = $false }
+            @{ Scenario = 'only the missing group'; IncludeValidGroup = $false; MultipleMissing = $false }
+            @{ Scenario = 'multiple missing groups'; IncludeValidGroup = $true; MultipleMissing = $true }
+        ) {
+            if (-not $IncludeValidGroup) { $script:PowerBITestGroups = @() }
+            $script:PowerBITestGroups += [PSCustomObject]@{
+                graphId = $script:PowerBITestMissingGroupId
+                name = 'ScubaGear PowerBI Service Principals'
+            }
+            if ($MultipleMissing) {
+                $script:PowerBITestGroups += [PSCustomObject]@{
+                    id = $script:PowerBITestOtherMissingGroupId
+                    name = 'Other deleted group'
+                }
+            }
+            $script:PowerBIUpdatedSetting = $null
+
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { @() }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                param($Commandlet, $ID, $Uri, $Method)
+                if ($Commandlet -eq 'Get-MgBetaGroupMember') {
+                    if ($ID -in @($script:PowerBITestMissingGroupId, $script:PowerBITestOtherMissingGroupId)) {
+                        throw (New-PowerBITestHttpError -StatusCode 404)
+                    }
+                    return [PSCustomObject]@{ Value = @() }
+                }
+                if ($Commandlet -eq 'Get-MgBetaGroup') {
+                    return [PSCustomObject]@{ Value = @() }
+                }
+                if ($Method -eq 'POST' -and $Uri -eq 'https://graph.microsoft.com/v1.0/groups') {
+                    return [PSCustomObject]@{ id = $script:PowerBITestNewGroupId }
+                }
+                if ($Method -eq 'POST' -and $Uri -eq "https://graph.microsoft.com/v1.0/groups/$($script:PowerBITestNewGroupId)/members/`$ref") {
+                    return
+                }
+                throw 'Unexpected Graph request.'
+            }
+            Mock -CommandName Invoke-ScubaRestMethod -MockWith {
+                $script:PowerBIUpdatedSetting = $Body | ConvertFrom-Json
+            }
+            Mock -CommandName Read-Host -MockWith {
+                if ($Prompt -like 'Remove stale*') { return 'y' }
+                return ''
+            }
+
+            $null = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -Confirm:$false -WarningAction SilentlyContinue
+
+            $updatedGroupIds = @($script:PowerBIUpdatedSetting.enabledSecurityGroups | ForEach-Object { $_.graphId })
+            $updatedGroupIds.Count | Should -Be (1 + [int]$IncludeValidGroup)
+            $updatedGroupIds | Should -Not -Contain $script:PowerBITestMissingGroupId
+            $updatedGroupIds | Should -Not -Contain $script:PowerBITestOtherMissingGroupId
+            $updatedGroupIds | Should -Contain $script:PowerBITestNewGroupId
+            if ($IncludeValidGroup) { $updatedGroupIds | Should -Contain $script:PowerBITestGroupId }
+            $script:PowerBIUpdatedSetting.excludedSecurityGroups[0].graphId | Should -Be $script:PowerBITestExcludedGroupId
+            $script:PowerBIUpdatedSetting.properties[0].name | Should -Be 'ExistingProperty'
+            $script:PowerBIUpdatedSetting.properties[0].value | Should -Be 'true'
+            $script:PowerBIUpdatedSetting.delegateToCapacity | Should -BeFalse
+            $script:PowerBIUpdatedSetting.delegateToDomain | Should -BeTrue
+            $script:PowerBIUpdatedSetting.delegateToWorkspace | Should -BeFalse
+            Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly
+            Should -Invoke -CommandName Read-Host -Times 1 -Exactly -ParameterFilter { $Prompt -like 'Remove stale*' }
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'DELETE' }
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'POST' -and
+                $Uri -eq "https://graph.microsoft.com/v1.0/groups/$($script:PowerBITestNewGroupId)/members/`$ref"
+            }
+        }
+
+        It "uses a valid dedicated group when another allowed group is missing" {
+            $script:PowerBITestGroups = @(
+                [PSCustomObject]@{ graphId = $script:PowerBITestGroupId; name = 'ScubaGear PowerBI Service Principals' }
+                [PSCustomObject]@{ graphId = $script:PowerBITestMissingGroupId; name = 'Deleted group' }
+            )
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { @() }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                param($Commandlet, $ID, $Uri, $Method)
+                if ($Commandlet -eq 'Get-MgBetaGroupMember') {
+                    if ($ID -eq $script:PowerBITestMissingGroupId) {
+                        throw (New-PowerBITestHttpError -StatusCode 404)
+                    }
+                    return [PSCustomObject]@{ Value = @() }
+                }
+                if ($Method -eq 'POST' -and $Uri -eq "https://graph.microsoft.com/v1.0/groups/$($script:PowerBITestGroupId)/members/`$ref") {
+                    return
+                }
+                throw 'Unexpected Graph request.'
+            }
+            $script:PowerBIUpdatedSetting = $null
+            Mock -CommandName Invoke-ScubaRestMethod -MockWith {
+                $script:PowerBIUpdatedSetting = $Body | ConvertFrom-Json
+            }
+            Mock -CommandName Read-Host -MockWith {
+                if ($Prompt -like 'Remove stale*') { return 'yes' }
+                return ''
+            }
+
+            $null = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -Confirm:$false -WarningAction SilentlyContinue
+
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'POST' -and
+                $Uri -eq "https://graph.microsoft.com/v1.0/groups/$($script:PowerBITestGroupId)/members/`$ref"
+            }
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Commandlet -eq 'Get-MgBetaGroup' }
+            Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly
+            @($script:PowerBIUpdatedSetting.enabledSecurityGroups).Count | Should -Be 1
+            $script:PowerBIUpdatedSetting.enabledSecurityGroups[0].graphId | Should -Be $script:PowerBITestGroupId
+            Should -Invoke -CommandName Read-Host -Times 1 -Exactly -ParameterFilter { $Prompt -like 'Remove stale*' }
+        }
+
+        Context "Stale-reference confirmation" {
+            BeforeEach {
+                $script:PowerBITestGroups += [PSCustomObject]@{
+                    graphId = $script:PowerBITestMissingGroupId
+                    name = 'ScubaGear PowerBI Service Principals'
+                }
+                $script:PowerBIUpdatedSetting = $null
+                Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { @() }
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    param($Commandlet, $ID, $Uri, $Method)
+                    if ($Commandlet -eq 'Get-MgBetaGroupMember') {
+                        if ($ID -eq $script:PowerBITestMissingGroupId) {
+                            throw (New-PowerBITestHttpError -StatusCode 404)
+                        }
+                        return [PSCustomObject]@{ Value = @() }
+                    }
+                    if ($Method -eq 'POST' -and $Uri -eq "https://graph.microsoft.com/v1.0/groups/$($script:PowerBITestGroupId)/members/`$ref") {
+                        return
+                    }
+                    throw 'Unexpected Graph request.'
+                }
+                Mock -CommandName Invoke-ScubaRestMethod -MockWith {
+                    $script:PowerBIUpdatedSetting = $Body | ConvertFrom-Json
+                }
+            }
+
+            It "stops without writes when cleanup is declined with '<Response>'" -ForEach @(
+                @{ Response = 'n' }
+                @{ Response = '' }
+            ) {
+                $script:PowerBITestCleanupResponse = $Response
+                Mock -CommandName Read-Host -MockWith { $script:PowerBITestCleanupResponse }
+
+                {
+                    Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                        -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                        -M365Environment commercial -Confirm:$false -WarningAction SilentlyContinue
+                } | Should -Throw '*cleanup was not confirmed*'
+
+                Should -Invoke -CommandName Read-Host -Times 1 -Exactly
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'POST' }
+                Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 0
+            }
+
+            It "does not let Force approve stale-reference removal" {
+                Mock -CommandName Read-Host -MockWith { throw 'Unexpected prompt.' }
+
+                {
+                    Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                        -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                        -M365Environment commercial -Force -Confirm:$false -WarningAction SilentlyContinue
+                } | Should -Throw '*requires interactive confirmation*'
+
+                Should -Invoke -CommandName Read-Host -Times 0
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'POST' }
+                Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 0
+            }
+
+            It "previews cleanup without confirmation or writes under Force and WhatIf" {
+                Mock -CommandName Read-Host -MockWith { throw 'Unexpected prompt.' }
+
+                $Output = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                    -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                    -M365Environment commercial -Force -WhatIf -WarningAction SilentlyContinue
+
+                ($Output -join "`n") | Should -Match 'remove stale Power BI allowed-group reference'
+                ($Output -join "`n") | Should -Match $script:PowerBITestMissingGroupId
+                Should -Invoke -CommandName Read-Host -Times 0
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'POST' }
+                Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 0
+            }
+
+            It "reprompts for invalid cleanup input then updates an existing allowed group once" {
+                $script:PowerBITestCleanupPromptCount = 0
+                Mock -CommandName Read-Host -MockWith {
+                    if ($Prompt -like 'Remove stale*') {
+                        $script:PowerBITestCleanupPromptCount++
+                        if ($script:PowerBITestCleanupPromptCount -eq 1) { return 'invalid' }
+                        return 'Y'
+                    }
+                    return '1'
+                }
+
+                $null = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                    -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                    -M365Environment commercial -Confirm:$false -WarningVariable CleanupWarnings -WarningAction SilentlyContinue
+
+                ($CleanupWarnings -join "`n") | Should -Match 'Enter Y or N'
+                Should -Invoke -CommandName Read-Host -Times 2 -Exactly -ParameterFilter { $Prompt -like 'Remove stale*' }
+                Should -Invoke -CommandName Read-Host -Times 1 -Exactly -ParameterFilter { $Prompt -like 'Select an option*' }
+                Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly
+                @($script:PowerBIUpdatedSetting.enabledSecurityGroups).Count | Should -Be 1
+                $script:PowerBIUpdatedSetting.enabledSecurityGroups[0].graphId | Should -Be $script:PowerBITestGroupId
+                $script:PowerBIUpdatedSetting.excludedSecurityGroups[0].graphId | Should -Be $script:PowerBITestExcludedGroupId
+            }
+
+            It "does not skip confirmed cleanup after finding existing direct membership" {
+                $script:PowerBITestGroups = @($script:PowerBITestGroups[1], $script:PowerBITestGroups[0])
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    [PSCustomObject]@{ Value = @([PSCustomObject]@{ Id = $script:PowerBITestSpId }) }
+                } -ParameterFilter { $Commandlet -eq 'Get-MgBetaGroupMember' -and $ID -eq $script:PowerBITestGroupId }
+                Mock -CommandName Read-Host -MockWith {
+                    if ($Prompt -like 'Remove stale*') { return 'y' }
+                    return '1'
+                }
+
+                $null = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                    -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                    -M365Environment commercial -Confirm:$false -WarningAction SilentlyContinue
+
+                Should -Invoke -CommandName Read-Host -Times 1 -Exactly -ParameterFilter { $Prompt -like 'Remove stale*' }
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'POST' }
+                Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly
+                @($script:PowerBIUpdatedSetting.enabledSecurityGroups).Count | Should -Be 1
+                $script:PowerBIUpdatedSetting.enabledSecurityGroups[0].graphId | Should -Be $script:PowerBITestGroupId
+            }
+        }
+
+        It "validates group choices when the setting is disabled and membership already matches" {
+            $script:PowerBITestSettingEnabled = $false
+            $script:PowerBITestGroups = @(
+                [PSCustomObject]@{ graphId = $script:PowerBITestGroupId; name = 'ScubaGear PowerBI Service Principals' }
+                [PSCustomObject]@{ graphId = $script:PowerBITestMissingGroupId; name = 'Deleted group' }
+            )
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { $script:PowerBITestGroupId }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                if ($ID -eq $script:PowerBITestMissingGroupId) {
+                    throw (New-PowerBITestHttpError -StatusCode 404)
+                }
+                return [PSCustomObject]@{ Value = @() }
+            }
+            Mock -CommandName Read-Host -MockWith { '' }
+
+            $Output = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -WhatIf -WarningAction SilentlyContinue `
+                -InformationVariable MenuInformation
+
+            $MenuText = @($MenuInformation | ForEach-Object { $_.MessageData }) -join "`n"
+            $MenuText | Should -Match $script:PowerBITestGroupId
+            $MenuText | Should -Not -Match $script:PowerBITestMissingGroupId
+            $MenuText | Should -Not -Match 'Create a new dedicated security group'
+            ($Output -join "`n") | Should -Match "existing allowed group 'ScubaGear PowerBI Service Principals'"
+        }
+
+        It "fails without changes when group inspection encounters <Failure>" -ForEach @(
+            @{ Failure = 'HTTP 403'; StatusCode = 403; Message = 'Simulated HTTP 403' }
+            @{ Failure = 'a network error'; StatusCode = 0; Message = 'Network unreachable' }
+        ) {
+            $script:PowerBITestFailureStatus = $StatusCode
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { @() }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                if ($script:PowerBITestFailureStatus) {
+                    throw (New-PowerBITestHttpError -StatusCode $script:PowerBITestFailureStatus)
+                }
+                throw [System.Net.WebException]::new('Network unreachable')
+            }
+            Mock -CommandName Invoke-ScubaRestMethod -MockWith {}
+            Mock -CommandName Read-Host -MockWith {}
+
+            {
+                Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId -ServicePrincipalID $script:PowerBITestSpId `
+                    -TenantId 'tenant-id' -M365Environment commercial -Force -Confirm:$false -WarningAction SilentlyContinue
+            } | Should -Throw "*Unable to inspect members of Power BI allowed group*$Message*"
+
+            Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 0
+            Should -Invoke -CommandName Read-Host -Times 0
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0 -ParameterFilter { $Method -eq 'POST' }
+        }
+
+        It "warns and omits an allowed group without an object ID" {
+            $script:PowerBITestGroups = @([PSCustomObject]@{ name = 'Group without ID' })
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith {}
+            Mock -CommandName Invoke-GraphDirectly -MockWith {}
+            Mock -CommandName Read-Host -MockWith {}
+
+            $Output = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -WhatIf -WarningVariable GroupWarnings -WarningAction SilentlyContinue
+
+            $GroupWarnings | Should -Match 'has no object ID'
+            ($Output -join "`n") | Should -Match "Create/use group 'ScubaGear PowerBI Service Principals'"
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+            Should -Invoke -CommandName Read-Host -Times 0
+        }
+
+        It "does not inspect groups when access is already configured" {
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { $script:PowerBITestGroupId }
+            Mock -CommandName Invoke-GraphDirectly -MockWith { throw 'Unexpected Graph request.' }
+
+            $Output = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -Force -Confirm:$false
+
+            $Output | Should -Match 'already an authorized member'
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
         }
     }
 

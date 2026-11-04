@@ -143,8 +143,30 @@ Get-ScubaGearAppPermission `
 > it is not a built-in Entra group. ScubaGear reuses an existing group with
 > that name or creates one if needed, adds the service principal to it, and
 > includes it in the tenant setting while preserving existing allowed groups.
-> The group-selection prompt appears while applying changes, not during
+> The group-selection prompt appears only when applying changes with
+> `New-ScubaGearServicePrincipal` or `Set-ScubaGearAppPermission`, not when using
+> `-WhatIf`. `Get-ScubaGearAppPermission` is read-only and does not support
 > `-WhatIf`.
+>
+> Power BI can still list a group in the **Service principals can access
+> read-only admin APIs** tenant setting after the group has been deleted from
+> Entra ID. When ScubaGear encounters a group it cannot find in Entra ID during
+> setup, it warns you and excludes that group from selection. Before configuring
+> access, interactive setup asks whether to remove the stale entry from the
+> Power BI tenant setting. This removes only the Power BI reference, not an
+> Entra group. Declining or pressing Enter stops Power BI configuration without
+> changing group membership or the tenant setting.
+>
+> If valid allowed groups remain, interactive setup lets you select one and,
+> when the dedicated group is not already listed, offers to create or reuse
+> `ScubaGear PowerBI Service Principals` instead. If no valid allowed groups
+> remain, setup proceeds with that dedicated-group workflow without a
+> group-selection prompt.
+>
+> Confirmed cleanup and the selected or new group's access are saved in one
+> tenant-setting update; other allowed groups are preserved.
+> Unattended setup does not approve stale-entry removal automatically. Remove
+> stale entries from the Power BI tenant setting manually first.
 
 **Expected result:** Status should show "No action needed - service principal is correctly configured."
 
