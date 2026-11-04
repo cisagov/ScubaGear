@@ -2701,7 +2701,9 @@ function Set-PowerBIAppRegistration {
         read-only Power BI admin APIs and that the 'AllowServicePrincipalsUseReadAdminAPIs' tenant
         setting is enabled. If security groups are already configured in the tenant setting, the user
         is prompted interactively whether to add the service principal to an existing group or to
-        create and append a dedicated new group. Existing groups are preserved. With -Remove, the
+        create and append a dedicated new group. Existing groups are preserved unless the user
+        confirms removal of stale references to groups that cannot be found in Entra ID. Cleanup
+        and the chosen group are saved in one tenant-setting update. With -Remove, the
         service principal is removed from each allowed group it directly belongs to; the groups and
         tenant setting are left unchanged.
 
@@ -2723,6 +2725,7 @@ function Set-PowerBIAppRegistration {
 
     .PARAMETER Force
         If specified, suppresses interactive prompts and defaults to creating/appending the dedicated group.
+        Does not authorize stale-reference cleanup; remove stale entries manually before using -Force.
 
     .PARAMETER Remove
         Removes the service principal from Power BI allowed security groups without deleting the groups
@@ -2901,26 +2904,63 @@ function Set-PowerBIAppRegistration {
             }
         }
 
-        if (-not $alreadyMemberGroup) {
+        $settingEnabled = [bool]($ReadAdminAPISetting -and $ReadAdminAPISetting.enabled -eq $true)
+        $staleGroups = @()
+        $selectableGroups = @($ExistingGroups)
+        if (-not $alreadyMemberGroup -or -not $settingEnabled) {
+            $selectableGroups = @()
             foreach ($grp in $ExistingGroups) {
                 $grpId = if ($grp.graphId) { $grp.graphId } else { $grp.id }
-                if ([string]::IsNullOrEmpty($grpId)) { continue }
+                if ([string]::IsNullOrEmpty($grpId)) {
+                    Write-Warning "A Power BI allowed group has no object ID and cannot be selected. Check the Power BI tenant setting."
+                    continue
+                }
                 try {
                     $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $grpId
+                    $selectableGroups += $grp
                     $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
-                    if ($members | Where-Object { ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID) }) {
+                    if (-not $alreadyMemberGroup -and ($members | Where-Object { ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID) })) {
                         $alreadyMemberGroup = $grp
-                        break
+                        if ($settingEnabled -and $staleGroups.Count -eq 0) { break }
                     }
                 } catch {
-                    Write-Verbose "Could not inspect members of group '$grpId': $($_.Exception.Message)"
+                    if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) {
+                        $missingGroupName = if ($grp.name) { $grp.name } elseif ($grp.displayName) { $grp.displayName } else { $grpId }
+                        $staleGroups += [PSCustomObject]@{ Id = [string]$grpId; Name = $missingGroupName }
+                        Write-Warning "Power BI allowed group '$missingGroupName' ($grpId) was not found in Microsoft Entra ID. Its Power BI tenant-setting entry may be stale."
+                    } else {
+                        throw "Unable to inspect members of Power BI allowed group '$grpId': $($_.Exception.Message)"
+                    }
                 }
             }
         }
 
-        if ($alreadyMemberGroup -and $ReadAdminAPISetting -and $ReadAdminAPISetting.enabled -eq $true) {
+        if ($alreadyMemberGroup -and $settingEnabled -and $staleGroups.Count -eq 0) {
             Write-Output "Service principal $AppID is already an authorized member of allowed group '$($alreadyMemberGroup.name)' ($($alreadyMemberGroup.graphId))."
             return
+        }
+
+        if ($staleGroups.Count -gt 0) {
+            $staleGroupDescriptions = ($staleGroups | ForEach-Object { "'$($_.Name)' ($($_.Id))" } | Select-Object -Unique) -join ', '
+            if (-not $WhatIfPreference) {
+                if ($Force -or -not [Environment]::UserInteractive) {
+                    throw "Removing stale Power BI group references requires interactive confirmation. Remove $staleGroupDescriptions from the Power BI tenant setting manually, or rerun setup interactively."
+                }
+                do {
+                    $cleanupChoice = Read-Host "Remove stale Power BI allowed-group reference(s) $staleGroupDescriptions? No Entra groups will be deleted [y/N]"
+                    if ([string]::IsNullOrWhiteSpace($cleanupChoice) -or $cleanupChoice -match '^(n|no)$') {
+                        throw "Power BI setup stopped because stale-reference cleanup was not confirmed. No group membership or tenant-setting changes were made."
+                    }
+                    if ($cleanupChoice -notmatch '^(y|yes)$') {
+                        Write-Warning "Enter Y or N."
+                    }
+                } until ($cleanupChoice -match '^(y|yes)$')
+            }
+            $staleGroupIds = @($staleGroups | Select-Object -ExpandProperty Id -Unique)
+            $ExistingGroups = @($ExistingGroups | Where-Object {
+                $groupId = if ($_.graphId) { $_.graphId } else { $_.id }
+                [string]$groupId -notin $staleGroupIds
+            })
         }
 
         # Determine target group
@@ -2928,10 +2968,10 @@ function Set-PowerBIAppRegistration {
         $targetGroupId = $null
         $targetGroupName = $null
 
-        # Check if the dedicated $GroupName already exists in $ExistingGroups
+        # Check if the dedicated $GroupName already exists in the selectable groups
         $existingDedicatedGroupIndex = -1
-        for ($i = 0; $i -lt $ExistingGroups.Count; $i++) {
-            $g = $ExistingGroups[$i]
+        for ($i = 0; $i -lt $selectableGroups.Count; $i++) {
+            $g = $selectableGroups[$i]
             $gName = if ($g.name) { $g.name } else { $g.displayName }
             if ($gName -eq $GroupName) {
                 $existingDedicatedGroupIndex = $i
@@ -2939,11 +2979,11 @@ function Set-PowerBIAppRegistration {
             }
         }
 
-        if ($ExistingGroups.Count -gt 0 -and -not $Force -and [Environment]::UserInteractive) {
+        if ($selectableGroups.Count -gt 0 -and -not $Force -and [Environment]::UserInteractive) {
             Write-Information "" -InformationAction Continue
             Write-Information "Power BI tenant setting 'Service principals can access read-only admin APIs' is currently enabled for the following security group(s):" -InformationAction Continue
-            for ($i = 0; $i -lt $ExistingGroups.Count; $i++) {
-                $g = $ExistingGroups[$i]
+            for ($i = 0; $i -lt $selectableGroups.Count; $i++) {
+                $g = $selectableGroups[$i]
                 $gName = if ($g.name) { $g.name } else { "Unnamed group" }
                 $gId = if ($g.graphId) { $g.graphId } else { $g.id }
                 Write-Information "  [$($i + 1)] $gName (ID: $gId)" -InformationAction Continue
@@ -2953,20 +2993,20 @@ function Set-PowerBIAppRegistration {
                 # Dedicated group already in the allowed list: only choose among existing groups, default to the dedicated group
                 $defaultIndex = $existingDedicatedGroupIndex + 1
                 Write-Information "" -InformationAction Continue
-                $choice = Read-Host "Select an option [1-$($ExistingGroups.Count)] (Default: $defaultIndex)"
+                $choice = Read-Host "Select an option [1-$($selectableGroups.Count)] (Default: $defaultIndex)"
                 if ([string]::IsNullOrWhiteSpace($choice)) {
                     $choice = "$defaultIndex"
                 }
 
-                if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $ExistingGroups.Count) {
-                    $chosenGroup = $ExistingGroups[[int]$choice - 1]
+                if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $selectableGroups.Count) {
+                    $chosenGroup = $selectableGroups[[int]$choice - 1]
                     $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
                     $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { "Selected Group" }
                     $isExistingGroupSelected = $true
                 }
             } else {
                 # Dedicated group not in allowed list: offer existing groups or create & append new
-                $createOptionIndex = $ExistingGroups.Count + 1
+                $createOptionIndex = $selectableGroups.Count + 1
                 Write-Information "  [$createOptionIndex] Create a new dedicated security group and append it ('$GroupName')" -InformationAction Continue
                 Write-Information "" -InformationAction Continue
 
@@ -2975,8 +3015,8 @@ function Set-PowerBIAppRegistration {
                     $choice = "$createOptionIndex"
                 }
 
-                if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $ExistingGroups.Count) {
-                    $chosenGroup = $ExistingGroups[[int]$choice - 1]
+                if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $selectableGroups.Count) {
+                    $chosenGroup = $selectableGroups[[int]$choice - 1]
                     $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
                     $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { "Selected Group" }
                     $isExistingGroupSelected = $true
@@ -2987,7 +3027,7 @@ function Set-PowerBIAppRegistration {
         # If not selected via prompt (or in non-interactive/force mode)
         if (-not $isExistingGroupSelected) {
             if ($existingDedicatedGroupIndex -ge 0) {
-                $chosenGroup = $ExistingGroups[$existingDedicatedGroupIndex]
+                $chosenGroup = $selectableGroups[$existingDedicatedGroupIndex]
                 $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
                 $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { $GroupName }
                 $isExistingGroupSelected = $true
@@ -3002,6 +3042,9 @@ function Set-PowerBIAppRegistration {
         } else {
             "Create/use group '$targetGroupName', add service principal, and append to Power BI tenant setting"
         }
+        if ($staleGroups.Count -gt 0) {
+            $actionDesc += "; remove stale Power BI allowed-group reference(s): $staleGroupDescriptions"
+        }
 
         if ($PSCmdlet.ShouldProcess($target, $actionDesc)) {
             $catalog = Get-ScubaGearCatalog
@@ -3009,6 +3052,8 @@ function Set-PowerBIAppRegistration {
             if (-not $GraphBase) {
                 throw "Unable to resolve the Microsoft Graph base URL for environment '$M365Environment'."
             }
+            $groupsToConfigure = @($ExistingGroups)
+            $updateSetting = (-not $settingEnabled -or $staleGroups.Count -gt 0)
 
             if ($isExistingGroupSelected) {
                 # Add SP to the selected existing group
@@ -3027,18 +3072,6 @@ function Set-PowerBIAppRegistration {
                     Write-Output "Successfully added service principal $AppID to group '$targetGroupName'."
                 } else {
                     Write-Verbose "Service principal $AppID is already a member of group '$targetGroupName'."
-                }
-
-                # Ensure setting is enabled
-                if (-not $ReadAdminAPISetting -or $ReadAdminAPISetting.enabled -ne $true) {
-                    $Endpoint = "/v1/admin/tenantsettings/AllowServicePrincipalsUseReadAdminAPIs/update"
-                    $Body = @{
-                        enabled               = $true
-                        enabledSecurityGroups = @($ExistingGroups)
-                    }
-                    $jsonBody = $Body | ConvertTo-Json -Depth 10
-                    $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method "POST" -Endpoint $Endpoint -Body $jsonBody
-                    Write-Output "Enabled Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs'."
                 }
             }
             else {
@@ -3094,26 +3127,30 @@ function Set-PowerBIAppRegistration {
                     $gid -eq $targetGroupId
                 }
 
-                if (-not $groupAlreadyInSetting -or -not $ReadAdminAPISetting -or $ReadAdminAPISetting.enabled -ne $true) {
+                if (-not $groupAlreadyInSetting) {
                     $NewGroupEntry = [PSCustomObject]@{
                         graphId = $targetGroupId
                         name    = $GroupName
                     }
-                    $CombinedGroups = if ($groupAlreadyInSetting) {
-                        @($ExistingGroups)
-                    } else {
-                        @($ExistingGroups) + @($NewGroupEntry)
-                    }
-
-                    $Endpoint = "/v1/admin/tenantsettings/AllowServicePrincipalsUseReadAdminAPIs/update"
-                    $Body = @{
-                        enabled               = $true
-                        enabledSecurityGroups = @($CombinedGroups)
-                    }
-                    $jsonBody = $Body | ConvertTo-Json -Depth 10
-                    $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method "POST" -Endpoint $Endpoint -Body $jsonBody
-                    Write-Output "Successfully updated Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs' with group '$GroupName'."
+                    $groupsToConfigure += $NewGroupEntry
+                    $updateSetting = $true
                 }
+            }
+
+            if ($updateSetting) {
+                $Endpoint = "/v1/admin/tenantsettings/AllowServicePrincipalsUseReadAdminAPIs/update"
+                $Body = @{
+                    enabled               = $true
+                    enabledSecurityGroups = @($groupsToConfigure)
+                }
+                foreach ($propertyName in @('excludedSecurityGroups', 'properties', 'delegateToCapacity', 'delegateToDomain', 'delegateToWorkspace')) {
+                    if ($ReadAdminAPISetting -and $ReadAdminAPISetting.PSObject.Properties[$propertyName] -and $null -ne $ReadAdminAPISetting.$propertyName) {
+                        $Body[$propertyName] = $ReadAdminAPISetting.$propertyName
+                    }
+                }
+                $jsonBody = $Body | ConvertTo-Json -Depth 10
+                $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method "POST" -Endpoint $Endpoint -Body $jsonBody
+                Write-Output "Successfully updated Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs' with group '$targetGroupName'."
             }
         }
         else {
