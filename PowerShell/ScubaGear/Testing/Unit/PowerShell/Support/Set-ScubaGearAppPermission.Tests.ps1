@@ -3,6 +3,176 @@ $ServicePrincipalModule = "$($ModulesPath)/Support/ServicePrincipal.psm1"
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath $ServicePrincipalModule)
 
 InModuleScope ServicePrincipal {
+    Describe "Get-ServicePrincipalMemberGroupIds" {
+        It "batches membership checks into requests of at most 20 group IDs" {
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                param($Uri, $Method, $Body)
+                $RequestBody = $Body | ConvertFrom-Json
+                if ($Method -ne 'POST' -or
+                    $Uri -ne 'https://graph.microsoft.us/v1.0/servicePrincipals/service-principal-id/checkMemberGroups' -or
+                    @($RequestBody.groupIds).Count -gt 20) {
+                    throw "Unexpected checkMemberGroups request."
+                }
+                return @{ value = @($RequestBody.groupIds) }
+            }
+
+            $GroupIds = @(1..21 | ForEach-Object { "group-$_" })
+            $MatchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID 'service-principal-id' `
+                -GroupIds $GroupIds -M365Environment gcchigh)
+
+            $MatchedGroupIds.Count | Should -Be 21
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 2 -Exactly
+        }
+
+        It "throws when the Graph response does not contain membership results" {
+            Mock -CommandName Invoke-GraphDirectly -MockWith { return @{ unexpected = @() } }
+
+            {
+                Get-ServicePrincipalMemberGroupIds -ServicePrincipalID 'service-principal-id' `
+                    -GroupIds @('group-id') -M365Environment commercial
+            } | Should -Throw '*checkMemberGroups response did not contain a valid value*'
+        }
+
+        It "accepts an empty membership result" {
+            Mock -CommandName Invoke-GraphDirectly -MockWith { return [PSCustomObject]@{ value = @() } }
+
+            $MatchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID 'service-principal-id' `
+                -GroupIds @('group-id') -M365Environment commercial)
+
+            $MatchedGroupIds.Count | Should -Be 0
+        }
+
+        It "propagates a Graph request failure" {
+            Mock -CommandName Invoke-GraphDirectly -MockWith { throw 'Network unreachable' }
+
+            {
+                Get-ServicePrincipalMemberGroupIds -ServicePrincipalID 'service-principal-id' `
+                    -GroupIds @('group-id') -M365Environment commercial
+            } | Should -Throw '*Network unreachable*'
+        }
+    }
+
+    Describe "Set-PowerBIAppRegistration catalog endpoints" {
+        BeforeAll {
+            $script:PowerBITestAppId = '11111111-1111-1111-1111-111111111111'
+            $script:PowerBITestSpId = '22222222-2222-2222-2222-222222222222'
+            $script:PowerBITestGroupId = '33333333-3333-3333-3333-333333333333'
+        }
+
+        BeforeEach {
+            Mock -CommandName Get-PowerBIAdminToken -MockWith {
+                return [PSCustomObject]@{ BaseUrl = 'https://example.test'; AccessToken = 'token' }
+            }
+            Mock -CommandName Get-PowerBITenantSettingsRest -MockWith {
+                return [PSCustomObject]@{
+                    tenantSettings = @([PSCustomObject]@{
+                        settingName = 'AllowServicePrincipalsUseReadAdminAPIs'
+                        enabled = $true
+                        enabledSecurityGroups = @([PSCustomObject]@{
+                            graphId = $script:PowerBITestGroupId
+                            name = 'Test group'
+                        })
+                    })
+                }
+            }
+        }
+
+        It "uses the catalog path with both IDs and the reference suffix when removing membership" {
+            $script:PowerBITestCheckCount = 0
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith {
+                $script:PowerBITestCheckCount++
+                if ($script:PowerBITestCheckCount -eq 1) { return $script:PowerBITestGroupId }
+            }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                param($Commandlet, $Method)
+                if ($Commandlet -eq 'Get-MgBetaGroupMember') {
+                    return [PSCustomObject]@{
+                        Value = @([PSCustomObject]@{ Id = $script:PowerBITestSpId })
+                    }
+                }
+                if ($Method -ne 'DELETE') { throw 'Unexpected Graph request.' }
+            }
+
+            Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId -ServicePrincipalID $script:PowerBITestSpId `
+                -TenantId 'tenant-id' -M365Environment commercial -Remove -Confirm:$false
+
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'DELETE' -and
+                $Uri -eq "https://graph.microsoft.com/v1.0/groups/$($script:PowerBITestGroupId)/members/$($script:PowerBITestSpId)/`$ref"
+            }
+        }
+
+        It "does not make changes when allowed-group membership cannot be checked" {
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { throw 'Network unreachable' }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {}
+
+            {
+                Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId -ServicePrincipalID $script:PowerBITestSpId `
+                    -TenantId 'tenant-id' -M365Environment commercial -Force -Confirm:$false
+            } | Should -Throw '*Unable to verify Power BI allowed-group membership*'
+
+            Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+        }
+
+        It "displays interactive group choices on the information stream, not the success stream" {
+            Mock -CommandName Get-ServicePrincipalMemberGroupIds -MockWith { @() }
+            Mock -CommandName Invoke-GraphDirectly -MockWith {
+                [PSCustomObject]@{ Value = @() }
+            } -ParameterFilter { $Commandlet -eq 'Get-MgBetaGroupMember' }
+            Mock -CommandName Read-Host -MockWith { '1' }
+
+            $Output = Set-PowerBIAppRegistration -AppID $script:PowerBITestAppId `
+                -ServicePrincipalID $script:PowerBITestSpId -TenantId 'tenant-id' `
+                -M365Environment commercial -WhatIf -InformationVariable MenuInformation
+
+            $MenuText = @($MenuInformation | ForEach-Object { $_.MessageData }) -join "`n"
+            $MenuText | Should -Match "Power BI tenant setting 'Service principals can access read-only admin APIs'"
+            $MenuText | Should -Match 'Test group \(ID: 33333333-3333-3333-3333-333333333333\)'
+            $MenuText | Should -Match 'Create a new dedicated security group'
+            ($Output -join "`n") | Should -Not -Match "currently enabled for the following security group|  \[1\] Test group \(ID:"
+            ($Output -join "`n") | Should -Not -Match "Create a new dedicated security group and append it"
+            Should -Invoke -CommandName Read-Host -Times 1 -Exactly
+        }
+    }
+
+    Describe "Power Platform registration catalog endpoints" {
+        BeforeEach {
+            Mock -CommandName Get-PowerPlatformAdminToken -MockWith {
+                return [PSCustomObject]@{ BaseUrl = 'https://example.test'; AccessToken = 'token' }
+            }
+        }
+
+        It "uses the catalog path for registration and removal" {
+            Mock -CommandName Invoke-ScubaRestMethod -MockWith {}
+            $AppId = '11111111-1111-1111-1111-111111111111'
+
+            Set-PowerPlatformAppRegistration -AppID $AppId -TenantId 'tenant-id' -M365Environment commercial
+            Set-PowerPlatformAppRegistration -AppID $AppId -TenantId 'tenant-id' -M365Environment commercial -Remove
+
+            Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'PUT' -and $Endpoint -eq '/providers/Microsoft.BusinessAppPlatform/adminApplications/11111111-1111-1111-1111-111111111111?api-version=2020-10-01'
+            }
+            Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'DELETE' -and $Endpoint -eq '/providers/Microsoft.BusinessAppPlatform/adminApplications/11111111-1111-1111-1111-111111111111?api-version=2020-10-01'
+            }
+        }
+
+        It "uses the catalog path when checking registrations" {
+            Mock -CommandName Invoke-ScubaRestMethod -MockWith {
+                return [PSCustomObject]@{ value = @([PSCustomObject]@{
+                    applicationId = '11111111-1111-1111-1111-111111111111'
+                }) }
+            }
+
+            Test-PowerPlatformAppRegistration -AppID '11111111-1111-1111-1111-111111111111' `
+                -TenantId 'tenant-id' -M365Environment commercial | Should -BeTrue
+
+            Should -Invoke -CommandName Invoke-ScubaRestMethod -Times 1 -Exactly -ParameterFilter {
+                $Endpoint -eq '/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-10-01'
+            }
+        }
+    }
+
     Describe "Set-ScubaGearAppPermission" {
         BeforeAll {
             Mock -CommandName Connect-GraphHelper -MockWith {
@@ -113,6 +283,186 @@ InModuleScope ServicePrincipal {
             }
         }
 
+        Context "Unneeded directory role assignment tests" {
+            BeforeEach {
+                $script:UnneededRoleInput = Get-Content (Join-Path -Path $PSScriptRoot -ChildPath "SetScubaGearAppPermissionData\MockPowerPlatformUnneeded.json") | ConvertFrom-Json
+                $script:UnneededRoleInput.ProductNames = @('aad')
+                $script:UnneededRoleInput.MissingRoles = $false
+                $script:UnneededRoleInput.PowerPlatformRegistered = $false
+                $script:UnneededRoleInput | Add-Member -MemberType NoteProperty -Name PowerBIRegistered -Value $false -Force
+                $script:UnneededRoleInput | Add-Member -MemberType NoteProperty -Name PowerBIGroupMembership -Value $false -Force
+                $script:UnneededRoleInput | Add-Member -MemberType NoteProperty -Name ExtraRoles -Value @([PSCustomObject]@{
+                    RoleName = 'Global Reader'
+                    RoleDefinitionId = 'global-reader-role-id'
+                    AssignmentId = 'global-reader-assignment-id'
+                }) -Force
+            }
+
+            It "previews <RoleName> removal without issuing a Graph delete under WhatIf" -ForEach @(
+                @{ RoleName = 'Global Reader' }
+                @{ RoleName = 'Global Administrator' }
+                @{ RoleName = 'Custom Audit Role' }
+            ) {
+                param($RoleName)
+                $script:UnneededRoleInput.ExtraRoles[0].RoleName = $RoleName
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    throw "WhatIf must not issue a Graph request."
+                }
+
+                $result = $script:UnneededRoleInput | Set-ScubaGearAppPermission -WhatIf
+
+                $result | Should -Contain "WhatIf: Would remove unneeded directory role '$RoleName' from 00000000-0000-0000-0000-000000000001"
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+            }
+
+            It "deletes the <RoleName> assignment through the catalog-backed Graph command" -ForEach @(
+                @{ RoleName = 'Global Reader' }
+                @{ RoleName = 'Global Administrator' }
+                @{ RoleName = 'Custom Audit Role' }
+            ) {
+                param($RoleName)
+                $script:UnneededRoleInput.ExtraRoles[0].RoleName = $RoleName
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    param($Commandlet, $id, $M365Environment)
+                    if ($Commandlet -ne 'Remove-MgRoleManagementDirectoryRoleAssignment' -or
+                        $id -ne 'global-reader-assignment-id' -or
+                        $M365Environment -ne 'commercial') {
+                        throw "Unexpected Graph request."
+                    }
+                }
+
+                $result = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false
+
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                    $Commandlet -eq 'Remove-MgRoleManagementDirectoryRoleAssignment' -and
+                    $id -eq 'global-reader-assignment-id' -and
+                    $M365Environment -eq 'commercial'
+                }
+                $result | Should -Contain "Removed unneeded directory role assignment: $RoleName"
+            }
+
+            It "preserves Global Reader when a selected product still requires it" {
+                $script:UnneededRoleInput.ProductNames = @('aad', 'exo')
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    throw "Global Reader is still required and must not be deleted."
+                }
+
+                $result = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false
+
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+                $result | Should -Not -Contain 'Removed unneeded directory role assignment: Global Reader'
+            }
+
+            It "deletes each unneeded Global Reader assignment by its own assignment ID" {
+                $script:UnneededRoleInput.ExtraRoles = @(
+                    [PSCustomObject]@{
+                        RoleName = 'Global Reader'
+                        RoleDefinitionId = 'global-reader-role-id'
+                        AssignmentId = 'first-assignment-id'
+                    }
+                    [PSCustomObject]@{
+                        RoleName = 'Global Reader'
+                        RoleDefinitionId = 'global-reader-role-id'
+                        AssignmentId = 'second-assignment-id'
+                    }
+                )
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    param($Commandlet, $id)
+                    if ($Commandlet -ne 'Remove-MgRoleManagementDirectoryRoleAssignment' -or
+                        $id -notin @('first-assignment-id', 'second-assignment-id')) {
+                        throw 'Unexpected Graph request.'
+                    }
+                }
+
+                $null = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false
+
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                    $Commandlet -eq 'Remove-MgRoleManagementDirectoryRoleAssignment' -and $id -eq 'first-assignment-id'
+                }
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                    $Commandlet -eq 'Remove-MgRoleManagementDirectoryRoleAssignment' -and $id -eq 'second-assignment-id'
+                }
+            }
+
+            It "removes unneeded roles while preserving a required role in the same input" {
+                $script:UnneededRoleInput.ProductNames = @('aad', 'exo')
+                $script:UnneededRoleInput.ExtraRoles = @(
+                    [PSCustomObject]@{
+                        RoleName = 'Global Reader'
+                        AssignmentId = 'reader-assignment-id'
+                    }
+                    [PSCustomObject]@{
+                        RoleName = 'Global Administrator'
+                        AssignmentId = 'admin-assignment-id'
+                    }
+                    [PSCustomObject]@{
+                        RoleName = 'Custom Audit Role'
+                        AssignmentId = 'custom-assignment-id'
+                    }
+                )
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    param($Commandlet, $id)
+                    if ($Commandlet -ne 'Remove-MgRoleManagementDirectoryRoleAssignment' -or
+                        $id -notin @('admin-assignment-id', 'custom-assignment-id')) {
+                        throw 'Unexpected Graph request.'
+                    }
+                }
+
+                $result = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false
+
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 2 -Exactly
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                    $Commandlet -eq 'Remove-MgRoleManagementDirectoryRoleAssignment' -and $id -eq 'admin-assignment-id'
+                }
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+                    $Commandlet -eq 'Remove-MgRoleManagementDirectoryRoleAssignment' -and $id -eq 'custom-assignment-id'
+                }
+                $result | Should -Not -Contain 'Removed unneeded directory role assignment: Global Reader'
+            }
+
+            It "preserves a required role other than Global Reader in stale pipeline data" {
+                $script:UnneededRoleInput.ExtraRoles[0].RoleName = 'Custom Audit Role'
+                Mock -CommandName Get-ScubaGearServicePrincipalRole -MockWith { 'Custom Audit Role' }
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    throw 'A required role must not be deleted.'
+                }
+
+                $null = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false
+
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+            }
+
+            It "warns and skips role removal when <PropertyName> is missing" -ForEach @(
+                @{ PropertyName = 'RoleName' }
+                @{ PropertyName = 'AssignmentId' }
+            ) {
+                param($PropertyName)
+                $script:UnneededRoleInput.ExtraRoles[0].$PropertyName = $null
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    throw 'An incomplete role assignment must not be deleted.'
+                }
+
+                $null = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false `
+                    -WarningVariable RemovalWarnings -WarningAction SilentlyContinue
+
+                $RemovalWarnings | Should -Match 'role name or role-assignment ID is missing'
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+            }
+
+            It "warns and skips role removal when product selection is missing" {
+                $script:UnneededRoleInput.ProductNames = $null
+                Mock -CommandName Invoke-GraphDirectly -MockWith {
+                    throw 'A role must not be deleted without determining product requirements.'
+                }
+
+                $null = $script:UnneededRoleInput | Set-ScubaGearAppPermission -Confirm:$false `
+                    -WarningVariable RemovalWarnings -WarningAction SilentlyContinue
+
+                $RemovalWarnings | Should -Match 'Cannot determine required directory roles without ProductNames'
+                Should -Invoke -CommandName Invoke-GraphDirectly -Times 0
+            }
+        }
+
         Context "Extra Permissions Tests" {
 
             It "Verify changes would be made if extra permissions are detected" {
@@ -168,7 +518,7 @@ InModuleScope ServicePrincipal {
 
                 $Result = $PowerPlatformUnneededObject | Set-ScubaGearAppPermission -Confirm:$false -WarningVariable RemovalWarnings -WarningAction SilentlyContinue
 
-                Should -Invoke Set-PowerPlatformAppRegistration -Times 0 -Exactly
+                Should -Invoke Set-PowerPlatformAppRegistration -Times 0
                 $Result | Should -Not -Contain 'Successfully removed Power Platform registration'
                 @($RemovalWarnings) -join ' ' | Should -BeLike '*Could not retrieve tenant ID*'
             }

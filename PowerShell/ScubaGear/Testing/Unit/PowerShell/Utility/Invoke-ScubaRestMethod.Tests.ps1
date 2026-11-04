@@ -424,6 +424,18 @@ foreach ($testCase in $restApiCases) {
 }
 
 $coverageCase = @{ Covered = @($combinedRestCases | ForEach-Object { "$($_.Function)|$($_.EnvName)" }) }
+$servicePrincipalRestCases = @(
+    @{
+        Function = 'Set-PowerPlatformAppRegistration'
+        PathParameters = @{ AppID = '11111111-1111-1111-1111-111111111111' }
+        ExpectedEndpoint = '/providers/Microsoft.BusinessAppPlatform/adminApplications/11111111-1111-1111-1111-111111111111?api-version=2020-10-01'
+    },
+    @{
+        Function = 'Test-PowerPlatformAppRegistration'
+        PathParameters = @{}
+        ExpectedEndpoint = '/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-10-01'
+    }
+)
 
 Describe -Tag 'Utility' -Name 'Invoke-ScubaRestMethod API endpoints' {
     BeforeAll {
@@ -431,7 +443,7 @@ Describe -Tag 'Utility' -Name 'Invoke-ScubaRestMethod API endpoints' {
         # discovery, and other test files remove that copy in AfterAll. The REST helpers then load a new copy, so a mock
         # applied to the old one never reaches them and the tests send real requests. Load Utility here so the helpers
         # and the mock below share the same loaded copy.
-        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Utility/Utility.psm1') -Function Get-ScubaGearServiceEndpoint, Get-ScubaGearCatalog -Force
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Utility/Utility.psm1') -Function Get-ScubaGearServiceEndpoint, Get-ScubaGearCatalog, Get-ScubaGearRestEndpoint -Force
         $HelperPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Providers/ProviderHelpers'
         foreach ($Helper in 'SPORestHelper', 'PowerPlatformRestHelper', 'TeamsRestHelper', 'PowerBIRestHelper', 'EXORestHelper') {
             Import-Module (Join-Path -Path $HelperPath -ChildPath "$Helper.psm1") -Force
@@ -469,15 +481,26 @@ Describe -Tag 'Utility' -Name 'Invoke-ScubaRestMethod API endpoints' {
         }
     }
 
-    It 'covers every REST helper in the catalog for each supported environment' -TestCases @($coverageCase) {
+    It 'resolves the catalog endpoint for <Function>' -TestCases $servicePrincipalRestCases {
+        param($Function, $PathParameters, $ExpectedEndpoint)
+
+        Get-ScubaGearRestEndpoint -FunctionName $Function -PathParameters $PathParameters |
+            Should -Be $ExpectedEndpoint
+    }
+
+    It 'covers every provider REST helper in the catalog for each supported environment' -TestCases @($coverageCase) {
         param($Covered)
 
-        $Missing = Get-ScubaGearCatalog | Where-Object { $_.entryType -eq 'restHelper' } | ForEach-Object {
+        # ServicePrincipal's registration calls have dedicated endpoint contract tests above and in its support tests.
+        $Missing = Get-ScubaGearCatalog | Where-Object {
+            $_.entryType -eq 'restHelper' -and
+            $_.functionName -notin @('Set-PowerPlatformAppRegistration', 'Test-PowerPlatformAppRegistration')
+        } | ForEach-Object {
             $Entry = $_
             $Entry.supportedEnv | ForEach-Object { "$($Entry.functionName)|$_" }
         } | Where-Object { $_ -notin $Covered }
 
-        $Missing | Should -BeNullOrEmpty -Because 'each REST helper and environment in the catalog should have an expected URL above'
+        $Missing | Should -BeNullOrEmpty -Because 'each provider REST helper and environment should have an expected URL above'
     }
 
     Context 'Retry when throttled' {
