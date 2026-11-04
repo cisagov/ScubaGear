@@ -897,7 +897,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', 'si', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
