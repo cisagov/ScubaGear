@@ -33,6 +33,7 @@ class CapHelper {
         "domainJoinedDevice" = "Hybrid Azure AD joined device";
         "approvedApplication" = "approved client app";
         "compliantApplication" = "app protection policy";
+        "riskRemediation" = "risk remediation";
         "passwordChange" = "password change"}
 
     [System.Collections.Hashtable] $CondAccessAppControlStrings = @{"monitorOnly" = "Monitor only";
