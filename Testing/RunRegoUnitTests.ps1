@@ -31,7 +31,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
-    [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI', '*')]
+    [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI', 'SI', '*')]
     [Alias('p')]
     [string[]]$Products = '*',
 
@@ -135,7 +135,7 @@ function Invoke-Products {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI')]
+        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI', 'SI')]
         [string[]]$Products
     )
 
@@ -183,7 +183,7 @@ function Invoke-ControlGroups {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI')]
+        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI', 'SI')]
         [string]$Product,
 
         [Parameter(Mandatory = $true)]
@@ -235,7 +235,7 @@ function Invoke-SpecificTests {
         [string]$Flag,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI')]
+        [ValidateSet('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI', 'SI')]
         [string]$Product,
 
         [Parameter(Mandatory = $true)]
@@ -292,7 +292,7 @@ if ($Verbosity.IsPresent) {
     $Flag = "-v"
 }
 if ($pEmpty) {
-    Invoke-Products -Flag $Flag -Products @('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI')
+    Invoke-Products -Flag $Flag -Products @('AAD', 'SecuritySuite', 'EXO', 'PowerPlatform', 'Sharepoint', 'Teams', 'PowerBI', 'SI')
 }
 elseif ((-not $pEmpty) -and (-not $cEmpty) -and (-not $tEmpty)) {
     if (($Products.Count -gt 1) -or ($ControlGroups.Count -gt 1)) {
