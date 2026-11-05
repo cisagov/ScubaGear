@@ -40,6 +40,10 @@ ScubaReports*
 **/DiffResults.json
 **/DiffResults.csv
 **/DiffReport.html
+# ...except the sample diff output that ships in Sample-Reports.
+!PowerShell/ScubaGear/Sample-Reports/DiffReports/DiffResults.json
+!PowerShell/ScubaGear/Sample-Reports/DiffReports/DiffResults.csv
+!PowerShell/ScubaGear/Sample-Reports/DiffReports/DiffReport.html
 
 # Debug Logs
 /testing/M365Baseline*

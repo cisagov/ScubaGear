@@ -10,6 +10,13 @@ InModuleScope Support {
         $SampleFolders = @(
             "individualReports"
             "individualReports/images"
+            "DiffReports"
+        )
+        $SampleDiffFiles = @(
+            "DiffReports/DiffResults.json",
+            "DiffReports/DiffResults.csv",
+            "DiffReports/DiffReport.html",
+            "DiffReports/README.md"
         )
         BeforeAll{
             $SampleReportsCopyFolder = Join-Path -Path $env:Temp -ChildPath 'samples/reports'
@@ -27,6 +34,10 @@ InModuleScope Support {
                 Should -Not -Throw
         }
         It "Top level sample file, <_>, is copied" -ForEach $SampleFiles {
+            $ItemPath = Join-Path -Path $SampleReportsCopyFolder -ChildPath $_
+            Test-Path -Path $ItemPath -PathType Leaf | Should -BeTrue
+        }
+        It "Sample diff file, <_>, is copied" -ForEach $SampleDiffFiles {
             $ItemPath = Join-Path -Path $SampleReportsCopyFolder -ChildPath $_
             Test-Path -Path $ItemPath -PathType Leaf | Should -BeTrue
         }
