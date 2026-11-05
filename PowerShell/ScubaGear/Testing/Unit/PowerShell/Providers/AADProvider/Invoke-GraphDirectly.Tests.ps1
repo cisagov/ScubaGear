@@ -12,6 +12,7 @@ InModuleScope Utility {
         @{ Cmdlet = "Get-MgBetaIdentityConditionalAccessPolicy"; Path = "identity/conditionalAccess/policies"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaUserCount"; Path = "users/`$count"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaPolicyAuthorizationPolicy"; Path = "policies/authorizationPolicy"; NeedsID = $false; IdValue = $null },
+        @{ Cmdlet = "Get-MgBetaPolicyB2BManagementPolicy"; Path = "policies/b2bManagementPolicies"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaPolicyAuthenticationMethodPolicy"; Path = "policies/authenticationMethodsPolicy"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaUser"; Path = "users/"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaGroupMember"; Path = "groups/$ID/members"; NeedsID = $true; IdValue = $ID },

@@ -1947,14 +1947,79 @@ tests contains {
 # MS.AAD.8.3v1
 #--
 
-# At this time we are unable to test for X because of Y
+# Guest invites meet the policy only when they are limited to an allow list of domains.
+# A block list still permits invitations to every other domain, and an empty policy allows any domain.
+default AAD_8_3_Not_Applicable_Due_To_Environment := false
+
+AAD_8_3_Not_Applicable_Due_To_Environment := true if {
+    input.scuba_config.M365Environment in {"gcchigh", "dod"}
+}
+
+B2BAllowedDomains := Domains if {
+    is_array(input.b2b_management_policy.AllowedDomains)
+    Domains := input.b2b_management_policy.AllowedDomains
+} else := []
+
+B2BBlockedDomains := Domains if {
+    is_array(input.b2b_management_policy.BlockedDomains)
+    Domains := input.b2b_management_policy.BlockedDomains
+} else := []
+
+B2BPolicyReadFailed if {
+    some Command in input.aad_unsuccessful_commands
+    Command == "Get-MgBetaPolicyB2BManagementPolicy"
+}
+
+B2BDomainList(Domains) := concat(", ", Domains)
+
+B2BInviteReport := Report if {
+    Count(B2BAllowedDomains) > 0
+    Report := sprintf("Guest invitations are limited to the specified domains: %v", [B2BDomainList(B2BAllowedDomains)])
+} else := Report if {
+    Count(B2BBlockedDomains) > 0
+    Report := sprintf("Guest invitations are blocked only for: %v. Invitations to other domains are still allowed", [B2BDomainList(B2BBlockedDomains)])
+} else := "Guest invitations are allowed to any external domain"
+
 tests contains {
     "PolicyId": "MS.AAD.8.3v1",
     "Criticality": "Should/Not-Implemented",
-    "Commandlet": [],
+    "Commandlet": ["Get-MgBetaPolicyB2BManagementPolicy"],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.8.3v1"),
+    "ReportDetails": CheckedSkippedDetails("MS.AAD.8.3v1", Reason),
     "RequirementMet": false
+} if {
+    Reason := concat(" ", [
+        "This policy is not applicable to GCC High or DOD environments because the B2B management",
+        "policy API is not available. See %v for more info"
+    ])
+    AAD_8_3_Not_Applicable_Due_To_Environment == true
+}
+
+tests contains {
+    "PolicyId": "MS.AAD.8.3v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgBetaPolicyB2BManagementPolicy"],
+    "ActualValue": {"allowed_domains": B2BAllowedDomains, "blocked_domains": B2BBlockedDomains},
+    "ReportDetails": ReportDetail,
+    "RequirementMet": Status
+} if {
+    not AAD_8_3_Not_Applicable_Due_To_Environment
+    B2BPolicyReadFailed
+    Status := false
+    ReportDetail := "Could not read the B2B management policy. The call requires Policy.Read.B2BManagementPolicy, and a delegated sign-in must be a Global Administrator"
+}
+
+tests contains {
+    "PolicyId": "MS.AAD.8.3v1",
+    "Criticality": "Should",
+    "Commandlet": ["Get-MgBetaPolicyB2BManagementPolicy"],
+    "ActualValue": {"allowed_domains": B2BAllowedDomains, "blocked_domains": B2BBlockedDomains},
+    "ReportDetails": B2BInviteReport,
+    "RequirementMet": Status
+} if {
+    not AAD_8_3_Not_Applicable_Due_To_Environment
+    not B2BPolicyReadFailed
+    Status := Count(B2BAllowedDomains) > 0
 }
 #--
 

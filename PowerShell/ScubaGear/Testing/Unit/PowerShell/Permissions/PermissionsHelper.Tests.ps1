@@ -15,6 +15,7 @@ InModuleScope PermissionsHelper {
                     "GroupMember.Read.All"
                     "Organization.Read.All"
                     "Policy.Read.All"
+                    "Policy.Read.B2BManagementPolicy"
                     "PrivilegedAccess.Read.AzureADGroup"
                     "PrivilegedEligibilitySchedule.Read.AzureADGroup"
                     "RoleAssignmentSchedule.Read.Directory"
@@ -93,6 +94,7 @@ InModuleScope PermissionsHelper {
                 $expected = @(
                     "Directory.Read.All"
                     "Policy.Read.All"
+                    "Policy.Read.B2BManagementPolicy"
                     "PrivilegedAccess.Read.AzureADGroup"
                     "PrivilegedEligibilitySchedule.Read.AzureADGroup"
                     "RoleManagement.Read.Directory"

@@ -84,6 +84,13 @@ function Export-AADProvider {
     # Provides data for policies such as user consent and guest user access.
     $AuthZPolicies = ConvertTo-Json @($Tracker.TryCommand("Get-MgBetaPolicyAuthorizationPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
+    # MS.AAD.8.3v1. The B2B management policy API is not available in GCC High or DoD.
+    $B2BManagementPolicy = "null"
+    if ($M365Environment -notin @('gcchigh', 'dod')) {
+        $B2BPolicies = $Tracker.TryCommand("Get-MgBetaPolicyB2BManagementPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+        $B2BManagementPolicy = ConvertTo-AADB2BManagementPolicyJson -Policies $B2BPolicies
+    }
+
     # Provides data for admin consent workflow
     $DirectorySettings = ConvertTo-Json -Depth 10 @($Tracker.TryCommand("Get-MgBetaDirectorySetting", @{"M365Environment"=$M365Environment; "GraphDirect"=$true}))
 
@@ -324,6 +331,7 @@ function Export-AADProvider {
     "conditional_access_policies": $AllPolicies,
     "cap_table_data": $CapTableData,
     "authorization_policies": $AuthZPolicies,
+    "b2b_management_policy": $B2BManagementPolicy,
     "privileged_users": $PrivilegedUsers,
     "privileged_service_principals": $PrivilegedServicePrincipalsJson,
     "privileged_roles": $PrivilegedRoles,
@@ -956,4 +964,88 @@ function Get-PrivilegedRole {
 
     # Return the array
     $PrivilegedRoleArray
+}
+
+function ConvertTo-AADB2BManagementPolicyJson {
+    <#
+    .DESCRIPTION
+    Selects the organization-default B2B management policy and returns JSON with the
+    guest-invite allow and block domain lists. A missing policy becomes the JSON literal null.
+    Domain lists stay JSON arrays, including when only one domain is present.
+    #>
+    param(
+        $Policies
+    )
+
+    $Candidates = @($Policies) | Where-Object { $null -ne $_ -and $_.PSObject.Properties.Name -contains 'Id' }
+    $Selected = $Candidates | Where-Object { $_.IsOrganizationDefault -eq $true -or $_.IsOrganizationDefault -eq 'true' } | Select-Object -First 1
+    if ($null -eq $Selected) {
+        $Selected = $Candidates | Select-Object -First 1
+    }
+    if ($null -eq $Selected) {
+        return "null"
+    }
+
+    $AllowedDomains = @()
+    $BlockedDomains = @()
+    foreach ($Definition in @($Selected.Definition)) {
+        $Parsed = $Definition
+        if ($Definition -is [string]) {
+            try {
+                $Parsed = $Definition | ConvertFrom-Json
+            }
+            catch {
+                # The Graph documentation sample uses single-quoted JSON. Convert that
+                # shape before giving up. A failed parse leaves the domain lists empty.
+                try {
+                    $Parsed = ($Definition -replace "'", '"') | ConvertFrom-Json
+                }
+                catch {
+                    continue
+                }
+            }
+        }
+        $DomainPolicy = $Parsed.B2BManagementPolicy.InvitationsAllowedAndBlockedDomainsPolicy
+        if ($null -eq $DomainPolicy) {
+            $DomainPolicy = $Parsed.B2BManagementPolicy.InvitationsAllowedAndBlocked
+        }
+        if ($null -eq $DomainPolicy) {
+            continue
+        }
+        $AllowedDomains = @($DomainPolicy.AllowedDomains | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+        $BlockedDomains = @($DomainPolicy.BlockedDomains | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    }
+
+    $AllowedJson = ConvertTo-JsonStringArray -Items $AllowedDomains
+    $BlockedJson = ConvertTo-JsonStringArray -Items $BlockedDomains
+    $IsDefault = if ($Selected.IsOrganizationDefault -eq $true -or $Selected.IsOrganizationDefault -eq 'true') { "true" } else { "false" }
+
+    @"
+{
+    "Id": $(ConvertTo-Json -InputObject ([string]$Selected.Id) -Compress),
+    "DisplayName": $(ConvertTo-Json -InputObject ([string]$Selected.DisplayName) -Compress),
+    "IsOrganizationDefault": $IsDefault,
+    "AllowedDomains": $AllowedJson,
+    "BlockedDomains": $BlockedJson
+}
+"@
+}
+
+function ConvertTo-JsonStringArray {
+    param(
+        [string[]]$Items
+    )
+
+    $Encoded = @(
+        foreach ($Item in @($Items)) {
+            if (-not [string]::IsNullOrWhiteSpace($Item)) {
+                ConvertTo-Json -InputObject ([string]$Item) -Compress
+            }
+        }
+    ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+
+    if (@($Encoded).Count -eq 0) {
+        return "[]"
+    }
+    return "[$($Encoded -join ',')]"
 }

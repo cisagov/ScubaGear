@@ -1,7 +1,7 @@
 package aad_test
 import rego.v1
 import data.aad
-import data.utils.report.NotCheckedDetails
+import data.utils.report.CheckedSkippedDetails
 import data.utils.key.TestResult
 
 
@@ -79,12 +79,53 @@ test_AllowInvitesFrom_Incorrect if {
 #
 # Policy MS.AAD.8.3v1
 #--
-test_NotImplemented_Correct if {
+test_AllowedDomains_Correct if {
+    Output := aad.tests with input.b2b_management_policy as {
+        "AllowedDomains": ["contoso.com", "fabrikam.com"],
+        "BlockedDomains": []
+    }
+
+    ReportDetailString := "Guest invitations are limited to the specified domains: contoso.com, fabrikam.com"
+    TestResult("MS.AAD.8.3v1", Output, ReportDetailString, true) == true
+}
+
+test_BlockedDomainsOnly_Incorrect if {
+    Output := aad.tests with input.b2b_management_policy as {
+        "AllowedDomains": [],
+        "BlockedDomains": ["evil.example"]
+    }
+
+    ReportDetailString := "Guest invitations are blocked only for: evil.example. Invitations to other domains are still allowed"
+    TestResult("MS.AAD.8.3v1", Output, ReportDetailString, false) == true
+}
+
+test_AnyDomain_Incorrect if {
+    Output := aad.tests with input.b2b_management_policy as {
+        "AllowedDomains": [],
+        "BlockedDomains": []
+    }
+
+    ReportDetailString := "Guest invitations are allowed to any external domain"
+    TestResult("MS.AAD.8.3v1", Output, ReportDetailString, false) == true
+}
+
+test_PolicyReadFailed_Incorrect if {
+    Output := aad.tests with input.b2b_management_policy as null
+        with input.aad_unsuccessful_commands as ["Get-MgBetaPolicyB2BManagementPolicy"]
+
+    ReportDetailString := "Could not read the B2B management policy. The call requires Policy.Read.B2BManagementPolicy, and a delegated sign-in must be a Global Administrator"
+    TestResult("MS.AAD.8.3v1", Output, ReportDetailString, false) == true
+}
+
+test_GovernmentEnvironment_NotApplicable if {
     PolicyId := "MS.AAD.8.3v1"
-
-    Output := aad.tests with input as { }
-
-    ReportDetailString := NotCheckedDetails(PolicyId)
-    TestResult(PolicyId, Output, ReportDetailString, false) == true
+    ReportDetailString := concat(" ", [
+        "This policy is not applicable to GCC High or DOD environments because the B2B management",
+        "policy API is not available. See %v for more info"
+    ])
+    every Environment in ["gcchigh", "dod"] {
+        Output := aad.tests with input.scuba_config as {"M365Environment": Environment}
+        TestResult(PolicyId, Output, CheckedSkippedDetails(PolicyId, ReportDetailString), false) == true
+    }
 }
 #--

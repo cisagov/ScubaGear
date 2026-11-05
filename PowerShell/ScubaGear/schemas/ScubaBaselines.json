@@ -2174,8 +2174,11 @@
         "omissionField": "Omissions",
         "annotationField": "Annotations",
         "rationale": "Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations gaining access.",
+        "notes": [
+          "This policy is not applicable to Government Community Cloud (GCC) High and Department of Defense (DoD) tenants. The Microsoft Graph B2B management policy API is not available in those environments. A delegated sign-in that reads the policy must be a Global Administrator, and the app must be granted Policy.Read.B2BManagementPolicy."
+        ],
         "criticality": "SHOULD",
-        "lastModified": "June 2023",
+        "lastModified": "November 2026",
         "implementation": "1. Open the **Microsoft Entra admin center**.\n\n2. Select **External Identities > External collaboration settings**.\n\n3. Under **Collaboration restrictions**, select **Allow invitations\n    only to the specified domains (most restrictive)**.\n\n4. Select **Target domains** and enter the names of the external domains authorized by the agency for guest user access.\n\n5. Click **Save**.",
         "mitreMapping": [
           {
@@ -2202,9 +2205,9 @@
         ],
         "badges": [
           {
-            "label": "Manual",
-            "linkUrl": "#msaad83v1-instructions",
-            "color": "046B9A"
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
           }
         ]
       },

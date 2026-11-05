@@ -107,6 +107,15 @@ InModuleScope -ModuleName ExportAADProvider {
                         return [pscustomobject]@{}
                     })
 
+                    $this.AddMockCommand("Get-MgBetaPolicyB2BManagementPolicy", {
+                        return [pscustomobject]@{
+                            Id = "b2b-policy"
+                            DisplayName = "B2BManagementPolicy"
+                            IsOrganizationDefault = $true
+                            Definition = @('{"B2BManagementPolicy":{"InvitationsAllowedAndBlockedDomainsPolicy":{"AllowedDomains":["contoso.com"],"BlockedDomains":[]}}}')
+                        }
+                    })
+
                     $this.AddMockCommand("Get-MgPolicyDefaultAppManagementPolicy", {
                         return [pscustomobject]@{
                             ApplicationRestrictions = @{
@@ -272,6 +281,50 @@ InModuleScope -ModuleName ExportAADProvider {
             $Json = Export-AADProvider
             $Json | Should -Match '"default_app_management_policy":'
             $Json | Should -Match '"app_management_policies":'
+        }
+
+        It "exports the B2B allow list and omits the call for GCC High" {
+            $Json = Export-AADProvider -M365Environment commercial
+            $Json | Should -Match '"b2b_management_policy":'
+            $Json | Should -Match '"AllowedDomains": \["contoso.com"\]'
+
+            $GovJson = Export-AADProvider -M365Environment gcchigh
+            $GovJson | Should -Match '"b2b_management_policy": null'
+        }
+
+        It "uses the organization-default B2B policy domain lists" {
+            $Policies = @(
+                [pscustomobject]@{
+                    Id = "other"
+                    DisplayName = "Other"
+                    IsOrganizationDefault = $false
+                    Definition = @('{"B2BManagementPolicy":{"InvitationsAllowedAndBlockedDomainsPolicy":{"AllowedDomains":["other.example"],"BlockedDomains":[]}}}')
+                }
+                [pscustomobject]@{
+                    Id = "default-policy"
+                    DisplayName = "B2BManagementPolicy"
+                    IsOrganizationDefault = $true
+                    Definition = @('{"B2BManagementPolicy":{"InvitationsAllowedAndBlockedDomainsPolicy":{"AllowedDomains":[],"BlockedDomains":["blocked.example"]}}}')
+                }
+            )
+            $Json = ConvertTo-AADB2BManagementPolicyJson -Policies $Policies
+            $Json | Should -Match '"Id": "default-policy"'
+            $Json | Should -Match '"AllowedDomains": \[\]'
+            $Json | Should -Match '"BlockedDomains": \["blocked.example"\]'
+        }
+
+        It "parses a single-quoted B2B definition and a string organization-default flag" {
+            $Policies = @(
+                [pscustomobject]@{
+                    Id = "quoted"
+                    DisplayName = "B2BManagementPolicy"
+                    IsOrganizationDefault = "true"
+                    Definition = @("{'B2BManagementPolicy':{'InvitationsAllowedAndBlockedDomainsPolicy':{'AllowedDomains':['contoso.com'],'BlockedDomains':[]}}}")
+                }
+            )
+            $Json = ConvertTo-AADB2BManagementPolicyJson -Policies $Policies
+            $Json | Should -Match '"IsOrganizationDefault": true'
+            $Json | Should -Match '"AllowedDomains": \["contoso.com"\]'
         }
     }
 }

@@ -1183,11 +1183,12 @@ Only users with the "Guest Inviter" role SHOULD be able to invite guest users.
 #### MS.AAD.8.3v1
 Guest invites SHOULD only be allowed to be sent to specific external domains that have been authorized by the agency for legitimate business purposes.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msaad83v1-instructions)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 
 <!--Policy: MS.AAD.8.3v1; Criticality: SHOULD -->
 - _Rationale:_ Limiting which domains can be invited to create guest accounts in the tenant helps reduce the risk of users from unauthorized external organizations gaining access.
-- _Last modified:_ June 2023
+- _Last modified:_ November 2026
+- _Note:_ This policy is not applicable to Government Community Cloud (GCC) High and Department of Defense (DoD) tenants. The Microsoft Graph B2B management policy API is not available in those environments. A delegated sign-in that reads the policy must be a Global Administrator, and the app must be granted Policy.Read.B2BManagementPolicy.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-3
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)

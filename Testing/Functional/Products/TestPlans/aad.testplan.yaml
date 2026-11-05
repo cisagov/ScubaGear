@@ -1647,8 +1647,37 @@ TestPlan:
   - PolicyId: MS.AAD.8.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.8.3v1 Not Checked
-        Preconditions: []
+      - TestDescription: MS.AAD.8.3v1 Non-Compliant - Guest invitations are allowed to any domain
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                b2b_management_policy:
+                  AllowedDomains: []
+                  BlockedDomains: []
         Postconditions: []
-        IsNotChecked: true
         ExpectedResult: false
+      - TestDescription: MS.AAD.8.3v1 Non-Compliant - Guest invitations are blocked only for specified domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                b2b_management_policy:
+                  AllowedDomains: []
+                  BlockedDomains:
+                    - evil.example
+                    - other.example
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.8.3v1 Compliant - Guest invitations are limited to specified domains
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              updates:
+                b2b_management_policy:
+                  AllowedDomains:
+                    - contoso.com
+                    - fabrikam.com
+                  BlockedDomains: []
+        Postconditions: []
+        ExpectedResult: true
