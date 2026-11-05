@@ -1,15 +1,13 @@
 ProductName: aad
 TestPlan:
-  - PolicyId: MS.AAD.2.1v1
+  - PolicyId: MS.AAD.2.1v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.1v1 Non-Compliant case - low risk users are blocked
+      - TestDescription: MS.AAD.2.1v2 Non-Compliant case - low risk users are required to remediate risk
         Preconditions:
-          - Command: UpdateCachedHighRiskBlockPoliciesToLowRisk
-            Splat: {}
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
+              displayName: MS.AAD.2.1v2 Users detected as high risk SHALL be required to remediate risk
               updates:
                 State: enabled
                 Conditions:
@@ -26,14 +24,49 @@ TestPlan:
                   UserRiskLevels: ["low"]
                 GrantControls:
                   BuiltInControls:
-                    - block
+                    - riskRemediation
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - windowsHelloForBusiness
+                      - fido2
+                      - x509CertificateMultiFactor
+                  Operator: AND
+                SessionControls:
+                  SignInFrequency:
+                    IsEnabled: true
+                    FrequencyInterval: everyTime
+                    AuthenticationType: primaryAndSecondaryAuthentication
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.1v1 Compliant case - high risk users are blocked
+      - TestDescription: MS.AAD.2.1v2 Non-Compliant case - high risk users are blocked instead of required to remediate risk
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
-              displayName: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked
+              displayName: MS.AAD.2.1v2 Users detected as high risk SHALL be required to remediate risk
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  UserRiskLevels: ["high"]
+                GrantControls:
+                  BuiltInControls:
+                    - block
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.1v2 Non-Compliant case - sign-in frequency is not every time
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.1v2 Users detected as high risk SHALL be required to remediate risk
               updates:
                 State: enabled
                 Conditions:
@@ -51,9 +84,131 @@ TestPlan:
                   UserRiskLevels: ["high"]
                 GrantControls:
                   BuiltInControls:
-                    - block
+                    - riskRemediation
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - windowsHelloForBusiness
+                      - fido2
+                      - x509CertificateMultiFactor
+                  Operator: AND
+                SessionControls:
+                  SignInFrequency:
+                    IsEnabled: true
+                    FrequencyInterval: timeBased
+                    Type: hours
+                    Value: 4
+                    AuthenticationType: primaryAndSecondaryAuthentication
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.1v2 Compliant case - high risk users are required to remediate risk
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.1v2 Users detected as high risk SHALL be required to remediate risk
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  UserRiskLevels: ["high"]
+                GrantControls:
+                  BuiltInControls:
+                    - riskRemediation
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - windowsHelloForBusiness
+                      - fido2
+                      - x509CertificateMultiFactor
+                  Operator: AND
+                SessionControls:
+                  SignInFrequency:
+                    IsEnabled: true
+                    FrequencyInterval: everyTime
+                    AuthenticationType: primaryAndSecondaryAuthentication
         Postconditions: []
         ExpectedResult: true
+      - TestDescription: MS.AAD.2.1v2 Non-Compliant case - authentication strength is combined with OR
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.1v2 Users detected as high risk SHALL be required to remediate risk
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  UserRiskLevels: ["high"]
+                GrantControls:
+                  BuiltInControls:
+                    - riskRemediation
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - windowsHelloForBusiness
+                      - fido2
+                      - x509CertificateMultiFactor
+                  Operator: OR
+                SessionControls:
+                  SignInFrequency:
+                    IsEnabled: true
+                    FrequencyInterval: everyTime
+                    AuthenticationType: primaryAndSecondaryAuthentication
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.AAD.2.1v2 Non-Compliant case - sign-in risk is combined in the same policy
+        Preconditions:
+          - Command: UpdateCachedConditionalAccessPolicyByName
+            Splat:
+              displayName: MS.AAD.2.1v2 Users detected as high risk SHALL be required to remediate risk
+              updates:
+                State: enabled
+                Conditions:
+                  Users:
+                    IncludeUsers: ["All"]
+                    ExcludeUsers: []
+                    IncludeGroups: []
+                    ExcludeGroups: []
+                    IncludeRoles: []
+                    ExcludeRoles: []
+                    ExcludeGuestsOrExternalUsers: null
+                  Applications:
+                    IncludeApplications: ["All"]
+                    ExcludeApplications: []
+                  UserRiskLevels: ["high"]
+                  SignInRiskLevels: ["high"]
+                GrantControls:
+                  BuiltInControls:
+                    - riskRemediation
+                  AuthenticationStrength:
+                    AllowedCombinations:
+                      - windowsHelloForBusiness
+                      - fido2
+                      - x509CertificateMultiFactor
+                  Operator: AND
+                SessionControls:
+                  SignInFrequency:
+                    IsEnabled: true
+                    FrequencyInterval: everyTime
+                    AuthenticationType: primaryAndSecondaryAuthentication
+        Postconditions: []
+        ExpectedResult: false
 
   - PolicyId: MS.AAD.2.3v1
     TestDriver: ScubaCached

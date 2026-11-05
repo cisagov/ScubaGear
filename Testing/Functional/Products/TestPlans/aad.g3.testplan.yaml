@@ -1,9 +1,9 @@
 ProductName: aad
 TestPlan:
-  - PolicyId: MS.AAD.2.1v1
+  - PolicyId: MS.AAD.2.1v2
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.1v1 No P2 license case
+      - TestDescription: MS.AAD.2.1v2 No P2 license case
         Preconditions: []
         Postconditions: []
         ExpectedResult: false

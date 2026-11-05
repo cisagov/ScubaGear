@@ -135,18 +135,18 @@ This section provides policies that reduce security risks related to potentially
 - _Note:_ In this section, the term ["high risk"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.
 
 ### Policies
-#### MS.AAD.2.1v1
-Users detected as high risk SHALL be blocked.
+#### MS.AAD.2.1v2
+Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
-<!--Policy: MS.AAD.2.1v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.2.1v2; Criticality: SHALL -->
 <!--ExclusionType: CapExclusions-->
-- _Rationale:_ Blocking high-risk users may prevent compromised accounts from accessing the tenant.
-- _Last modified:_ June 2023
-- _Note:_ Users identified as high-risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account.
+- _Rationale:_ Requiring high-risk users to remediate their risk before regaining access prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention. Requiring reauthentication on every sign-in ensures that existing sessions held by an attacker cannot persist.
+- _Last modified:_ October 2026
+- _Note:_ Users identified as high-risk by Microsoft Entra ID Protection can be required to remediate their risk via a Microsoft Entra ID Conditional Access policy using the "Require risk remediation" grant control. Users with passwords are prompted to complete a secure password change after successful multifactor authentication, while passwordless users have their sessions revoked and must reauthenticate. The grant control automatically requires an authentication strength (combined using AND) and applies a sign-in frequency session control of "Every time". User risk and sign-in risk conditions must not be combined in the same policy. This policy replaces the block-based policy from MS.AAD.2.1v1.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
@@ -185,6 +185,8 @@ Sign-ins detected as high-risk SHALL be blocked.
 
 - [What are risk detections?](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks)
 
+- [Configure Microsoft Entra ID Protection risk policies](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies)
+
 - [Simulating risk detections in Identity Protection](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk)
 
 - [Self-remediation experience with Microsoft Entra ID Protection and Conditional Access](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience)
@@ -195,19 +197,31 @@ Sign-ins detected as high-risk SHALL be blocked.
 
 ### Implementation
 
-####  MS.AAD.2.1v1 Instructions
+####  MS.AAD.2.1v2 Instructions
 
-1.  Create a conditional access policy blocking users categorized as high-risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy per the values below:
+Before enabling this policy, [investigate and remediate any active user risks](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-remediate-unblock). Users must be registered for Microsoft Entra multifactor authentication to self-remediate, and hybrid users synced from on-premises require password writeback to be enabled. Users who are not registered are blocked until an administrator remediates their risk.
+
+1.  Create a conditional access policy that requires users categorized as high-risk by the Identity Protection service to remediate their risk. Configure the following policy settings in the new conditional access policy per the values below:
 
 <pre>
   Users > Include > <b>All users</b>
 
   Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
 
-  Conditions > User risk > <b>High</b>
+  Conditions > User risk > Configure > <b>Yes</b> > Configure user risk levels needed for policy to be enforced > <b>High</b>
 
-  Access controls > Grant > <b>Block access</b>
+  Access controls > Grant > <b>Grant access</b> > <b>Require risk remediation</b>
+  (<b>Require authentication strength</b> is selected automatically; choose the strength appropriate for your organization)
+
+  Session > <b>Sign-in frequency</b> > <b>Every time</b>
+  (applied automatically when Require risk remediation is selected and is mandatory)
 </pre>
+
+2.  Do not configure sign-in risk in this policy. Create a separate policy for sign-in risk (see MS.AAD.2.3v1).
+
+3.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).
+
+4.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.
 
 #### MS.AAD.2.2v1 Instructions
 

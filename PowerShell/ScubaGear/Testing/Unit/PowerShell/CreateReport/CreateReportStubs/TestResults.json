@@ -255,7 +255,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.2.1v1",
+        "PolicyId":  "MS.AAD.2.1v2",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -4005,5 +4005,4 @@
         "RequirementMet":  true
     }
 ]
-
 

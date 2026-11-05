@@ -128,12 +128,12 @@ tests contains {
 ############
 
 #
-# MS.AAD.2.1v1
+# MS.AAD.2.1v2
 #--
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-BlockHighRiskBaseCheck(policy) if {
+RemediateHighRiskBaseCheck(policy) if {
     ### Common checks for conditional access policies
     ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
     ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
@@ -143,59 +143,78 @@ BlockHighRiskBaseCheck(policy) if {
 
     ### Conditional access checks specific to this policy
     "high" in policy.Conditions.UserRiskLevels
-    "block" in policy.GrantControls.BuiltInControls
+    "riskRemediation" in policy.GrantControls.BuiltInControls
+    # riskRemediation must be paired with an authentication strength using AND
+    policy.GrantControls.AuthenticationStrength != null
+    policy.GrantControls.Operator == "AND"
+    # Microsoft recommends separate policies for user risk and sign-in risk
+    NoSignInRiskLevels(policy)
+    policy.SessionControls.SignInFrequency.IsEnabled == true
+    policy.SessionControls.SignInFrequency.FrequencyInterval == "everyTime"
     ###
 }
 
+NoSignInRiskLevels(policy) if {
+    policy.Conditions.SignInRiskLevels == null
+}
+
+NoSignInRiskLevels(policy) if {
+    count(policy.Conditions.SignInRiskLevels) == 0
+}
+
+NoSignInRiskLevels(policy) if {
+    not "SignInRiskLevels" in object.keys(policy.Conditions)
+}
+
 # Only match policies with user and group exclusions per the confile file
-BlockHighRiskEval(policy) := result if {
+RemediateHighRiskEval(policy) := result if {
     checks := [
-        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
-        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
-        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.1v2")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.1v2")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.1v2")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.1v2")},
     ]
-    result := CapEval(BlockHighRiskBaseCheck(policy), checks)
+    result := CapEval(RemediateHighRiskBaseCheck(policy), checks)
 }
 
 # Evaluate each conditional access policy to see if any meet the conditions
-BlockHighRisk contains CAPolicy.DisplayName if {
+RemediateHighRisk contains CAPolicy.DisplayName if {
     some CAPolicy in input.conditional_access_policies
-    eval := BlockHighRiskEval(CAPolicy)
+    eval := RemediateHighRiskEval(CAPolicy)
     eval.status == "pass"
 }
 
 # Check if any conditional access policies meet the conditions but have missing exclusions
-BlockHighRiskNeedsConfigUpdate contains {
+RemediateHighRiskNeedsConfigUpdate contains {
     "PolicyName": CAPolicy.DisplayName,
     "MissingExclusionTypes": eval.MissingExclusionTypes,
 } if {
     some CAPolicy in input.conditional_access_policies
-    eval := BlockHighRiskEval(CAPolicy)
+    eval := RemediateHighRiskEval(CAPolicy)
     eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.1v1",
+    "PolicyId": "MS.AAD.2.1v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
-    "ActualValue": BlockHighRisk,
+    "ActualValue": RemediateHighRisk,
     "ReportDetails": ReportDetails,
-    "NearMisses": BlockHighRiskNeedsConfigUpdate,
+    "NearMisses": RemediateHighRiskNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     NearMissReportDetails := CapNearMissDetails(
-        BlockHighRisk,
-        BlockHighRiskNeedsConfigUpdate,
+        RemediateHighRisk,
+        RemediateHighRiskNeedsConfigUpdate,
     )
     # Concatenate the report details into one string and remove any empty strings
     ReportDetails := concat(". ", [
         ReportDetail |
         some ReportDetail in [
-            ReportDetailsArrayLicenseWarning(BlockHighRisk, DescriptionString),
+            ReportDetailsArrayLicenseWarning(RemediateHighRisk, DescriptionString),
             NearMissReportDetails,
             CAPLINK,
             NearMissAnalyzerDetails(NearMissReportDetails)
@@ -204,7 +223,7 @@ tests contains {
     ])
     Conditions := [
         Count(Aad2P2Licenses) > 0,
-        Count(BlockHighRisk) > 0
+        Count(RemediateHighRisk) > 0
     ]
     Status := Count(FilterArray(Conditions, false)) == 0
 }

@@ -144,7 +144,7 @@ Example policy annotations configuration:
 
 ```yaml
 AnnotatePolicy:
-  MS.AAD.2.1v1:
+  MS.AAD.2.1v2:
     IncorrectResult: false
     Comment: "Remediation scheduled for Q2 2024"
     RemediationDate: 2025-06-30
@@ -212,7 +212,7 @@ Aad:
       GuestUserTypes:
         - b2bCollaborationGuest
         - b2bCollaborationMember
-  MS.AAD.2.1v1:
+  MS.AAD.2.1v2:
     CapExclusions:
       Users:
         - "12345678-1234-1234-1234-123456789012"  # Emergency access account 1
@@ -270,7 +270,7 @@ The `Aad` top level key allows the user to specify configurations specific to th
 CapExclusions are supported for the following policies:
 
 - MS.AAD.1.1v1
-- MS.AAD.2.1v1
+- MS.AAD.2.1v2
 - MS.AAD.2.3v1
 - MS.AAD.3.1v1
 - MS.AAD.3.2v2

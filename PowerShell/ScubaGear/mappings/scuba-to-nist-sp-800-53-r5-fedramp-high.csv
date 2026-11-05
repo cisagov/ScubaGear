@@ -1,6 +1,6 @@
 scuba-control-id,nist-800-53-control-id
 MS.AAD.1.1v1,CM-7
-MS.AAD.2.1v1,"AC-2(12), AC-2(13)"
+MS.AAD.2.1v2,"AC-2(12), AC-2(13)"
 MS.AAD.2.2v1,AC-2(12)
 MS.AAD.2.3v1,"AC-2(12), AC-2(13)"
 MS.AAD.3.1v1,"IA-2(1), IA-2(2), IA-5c, IA-5g, IA-2(8)"
