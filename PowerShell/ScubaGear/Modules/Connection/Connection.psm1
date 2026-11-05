@@ -37,7 +37,9 @@ function Connect-Tenant {
    [Parameter(ParameterSetName = 'Manual')]
    [Parameter(Mandatory = $true)]
    [ValidateNotNullOrEmpty()]
-    [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedProducts() })]
+    # Validated against the ProductNames schema enum (minus '*') rather than GetSupportedProducts(), so that
+    # products not yet in AllProductNames (such as si, see #2550) can still be requested by name.
+    [ValidateScript({ $_ -cin @([ScubaConfig]::GetAllValidProductNames() | Where-Object { $_ -ne '*' }) })]
    [string[]]
    $ProductNames,
 
@@ -525,6 +527,21 @@ function Connect-Tenant {
                                 -Tenant $TenantName `
                                 -M365Environment $M365Environment
                         }
+                   }
+               }
+               "si" {
+                   # Sign in to Microsoft Graph with minimum permissions so the tenant details can be retrieved when SI is run on its own.
+                   # The SI provider does not export any settings yet. The Microsoft Graph and Microsoft Purview connections it
+                   # needs will be added here once the SI policies and their APIs are identified.
+                   if ($AADAuthRequired) {
+                       $LimitedGraphParams = @{
+                           'M365Environment' = $M365Environment;
+                       }
+                       if ($ServicePrincipalParams) {
+                           $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
+                       }
+                       Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                       $AADAuthRequired = $false
                    }
                }
                default {
