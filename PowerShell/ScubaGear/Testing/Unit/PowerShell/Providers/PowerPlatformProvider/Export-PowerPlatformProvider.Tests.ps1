@@ -36,25 +36,6 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
                                     TenantId    = "TenantId";
                                 }
                             }
-                            "Get-MgBetaOrganization" {
-                                $this.SuccessfulCommands += $Command
-                                return [pscustomobject]@{
-                                    DisplayName = "Test tenant name";
-                                    Id          = "00000000-0000-0000-0000-000000000000";
-                                    VerifiedDomains = @(
-                                        @{
-                                            IsInitial = $true;
-                                            IsDefault = $true;
-                                            Name      = "root.onmicrosoft.com";
-                                        },
-                                        @{
-                                            IsInitial = $false;
-                                            IsDefault = $false;
-                                            Name      = "managed.onmicrosoft.com";
-                                        }
-                                    );
-                                }
-                            }
                             "Get-PowerPlatformTenantSettingsRest" {
                                 $this.SuccessfulCommands += $Command
                                 return [pscustomobject]@{}
@@ -110,6 +91,24 @@ InModuleScope -ModuleName ExportPowerPlatformProvider {
             function Get-CommandTracker {}
             Mock -ModuleName ExportPowerPlatformProvider Get-CommandTracker {
                 return [MockCommandTracker]::New()
+            }
+            Mock -ModuleName ExportPowerPlatformProvider Resolve-ScubaOrganization {
+                return ,@([pscustomobject]@{
+                    DisplayName = "Test tenant name";
+                    Id          = "00000000-0000-0000-0000-000000000000";
+                    VerifiedDomains = @(
+                        @{
+                            IsInitial = $true;
+                            IsDefault = $true;
+                            Name      = "root.onmicrosoft.com";
+                        },
+                        @{
+                            IsInitial = $false;
+                            IsDefault = $false;
+                            Name      = "managed.onmicrosoft.com";
+                        }
+                    );
+                })
             }
             function Test-SCuBAValidProviderJson {
                 param (

@@ -6,7 +6,7 @@
 
 ```mermaid
 flowchart TD
-    Session["$Global:ScubaGearState.Session<br/>Current Microsoft Graph connection<br/>M365Environment, GraphEndpoint<br/>TokenParameters, Account"]
+    Session["$Global:ScubaGearState.Session<br/>Current Microsoft Graph connection<br/>M365Environment, GraphEndpoint<br/>TokenParameters, Account<br/>Organization"]
     GraphRequest["Invoke-ScubaGraphRequest<br/>Obtains a token before each Graph API request"]
     Token["Get-MsalAccessToken<br/>Selects an MSAL application and asks it for a token"]
     Cache["$Global:ScubaGearState.MsalAppCache<br/>Hashtable: cache key to MSAL application object<br/>Retains applications between requests and scans"]
@@ -36,7 +36,7 @@ flowchart TD
 
 The cache entries illustrate delegated and certificate authentication alternatives. A scan uses its selected authentication mode; the two certificate application IDs are fictional examples, not built-in ScubaGear client IDs.
 
-- **`Session` describes the current Graph connection.** `TokenParameters` holds the Graph scopes, tenant, environment, and either a delegated `ClientId` or certificate `AppID` and thumbprint. `Account` identifies the selected user for delegated authentication and is null for certificate authentication. `Get-ScubaGearContext` uses this session to query Graph for the tenant, username, application name, and other context. Access and refresh tokens are held in MSAL's caches rather than in `Session`.
+- **`Session` describes the current Graph connection.** `TokenParameters` holds the Graph scopes, tenant, environment, and either a delegated `ClientId` or certificate `AppID` and thumbprint. `Account` identifies the selected user for delegated authentication and is null for certificate authentication. `Organization` caches the tenant's `/beta/organization` record the first time `Resolve-ScubaOrganization` reads it, so `Connect-Tenant`, `Get-AADTenantDetail`, the Power Platform provider, and the risky permissions helpers share one Graph call per session; it is discarded with the session. `Get-ScubaGearContext` uses this session to query Graph for the tenant, username, application name, and other context. Access and refresh tokens are held in MSAL's caches rather than in `Session`.
 - **`MsalAppCache` retains the MSAL application objects that own the token caches.** `Get-MsalAccessToken` chooses `PUB:<ClientId>` for delegated authentication or `SP:<AppID>` for certificate authentication. The dictionary values are application objects, not access tokens. Each object retains its own token cache, allowing later requests to acquire tokens without starting a new browser authorization when cached credentials suffice. Cache contents are not copied between application objects.
 
 Some example keys and their uses are:

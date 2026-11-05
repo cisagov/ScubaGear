@@ -88,16 +88,17 @@ Describe 'MSAL session reuse across scans' {
             Mock Get-ExchangeOnlineApiEndpoint { 'https://outlook.office365.com/adminapi' }
             Mock Get-ComplianceApiEndpoint { 'https://ps.compliance.protection.outlook.com/adminapi' }
             Mock Invoke-GraphDirectly {
-                if ($Commandlet -eq 'Get-MgBetaOrganization') {
-                    return [pscustomobject]@{ Value = [pscustomobject]@{
-                        Id = '305102d0-7ccc-4007-83bb-ac1f44f8d620'
-                        VerifiedDomains = @([pscustomobject]@{ isInitial = $true; Name = 'contoso.onmicrosoft.com' })
-                    } }
-                }
                 return [pscustomobject]@{ Value = @([pscustomobject]@{
                     ServicePlans = @([pscustomobject]@{ ProvisioningStatus = 'Success'; ServicePlanName = 'POWER_BI_STANDARD' })
                 }) }
             }
+            # Connect-Tenant reads the organization through Resolve-ScubaOrganization, which lives in Utility.
+            Mock Invoke-GraphDirectly {
+                return [pscustomobject]@{ Value = @([pscustomobject]@{
+                    Id = '305102d0-7ccc-4007-83bb-ac1f44f8d620'
+                    VerifiedDomains = @([pscustomobject]@{ isInitial = $true; Name = 'contoso.onmicrosoft.com' })
+                }) }
+            } -ModuleName Utility -ParameterFilter { $Commandlet -eq 'Get-MgBetaOrganization' }
 
             Disconnect-ScubaGraph
             $script:Apps = @{}
@@ -357,7 +358,7 @@ Describe 'MSAL session reuse across scans' {
             $Result = Connect-Tenant -ProductNames $Products
 
             $Result.ProdAuthFailed | Should -BeNullOrEmpty
-            Should -Invoke Invoke-GraphDirectly -Times 1 -Exactly -ParameterFilter {
+            Should -Invoke Invoke-GraphDirectly -ModuleName Utility -Times 1 -Exactly -ParameterFilter {
                 $Commandlet -eq 'Get-MgBetaOrganization'
             }
             Should -Invoke Get-ExchangeOnlineApiEndpoint -Times 1 -Exactly -ParameterFilter {
@@ -366,6 +367,22 @@ Describe 'MSAL session reuse across scans' {
             Should -Invoke Get-ComplianceApiEndpoint -Times 1 -Exactly -ParameterFilter {
                 $TenantId -eq '305102d0-7ccc-4007-83bb-ac1f44f8d620' -and $TenantDomain -eq 'contoso.onmicrosoft.com'
             }
+        }
+    }
+
+    It 'reuses the cached organization on a later scan and drops it on disconnect' {
+        InModuleScope Connection {
+            $null = Connect-Tenant -ProductNames exo,sharepoint -M365Environment commercial
+            $Global:ScubaGearState.Session.Organization.Id | Should -Be '305102d0-7ccc-4007-83bb-ac1f44f8d620'
+
+            $Second = Connect-Tenant -ProductNames exo,sharepoint -M365Environment commercial
+            $Second.ProdAuthFailed | Should -BeNullOrEmpty
+            Should -Invoke Invoke-GraphDirectly -ModuleName Utility -Times 1 -Exactly -ParameterFilter {
+                $Commandlet -eq 'Get-MgBetaOrganization'
+            }
+
+            Disconnect-SCuBATenant
+            $Global:ScubaGearState.Session | Should -BeNullOrEmpty
         }
     }
 
