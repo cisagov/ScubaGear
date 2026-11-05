@@ -76,21 +76,6 @@ function Invoke-Rego {
 
     $RegoOutput = Invoke-ExternalCmd -LiteralPath $Cmd -PassThruArgs $CmdArgs | Out-String -ErrorAction 'Stop' | ConvertFrom-Json -ErrorAction 'Stop'
     $RegoOutput
-
-    # # Test code Below (Delete after beta testing)
-    # ########################
-    # $ShellPath = (Get-Process -Id $PID).Path
-    # # $Script = '[Console]::Out.WriteLine("Some message on stdout"); exit 2'
-    # $Script = '[Console]::Error.WriteLine("Some message on stderr"); exit 2'
-
-    # $Encoded = [Convert]::ToBase64String(
-    #     [Text.Encoding]::Unicode.GetBytes($Script)
-    # )
-
-    # Invoke-ExternalCmd -LiteralPath $ShellPath -PassThruArgs @(
-    #     '-NoProfile', '-NonInteractive', '-EncodedCommand', $Encoded
-    # )
-    # ####################### End Test code
 }
 
 function Invoke-ExternalCmd{
