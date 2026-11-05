@@ -926,7 +926,7 @@ function Invoke-ScubaRestMethod {
     .PARAMETER MaxDelaySeconds
         Upper bound in seconds on any single sleep between retries (default: 3600; range 1-3600).
         Keeps a large or hostile Retry-After value from stalling a scan. The Teams, SharePoint,
-        Power Platform and Power BI helpers use a lower cap, see         Get-ScubaRestRetryDefaults.
+        Power Platform and Power BI helpers use a lower cap, see Get-ScubaRestRetryDefaults.
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
             -AccessToken $Token -Endpoint "/providers/PowerPlatform.Governance/v1/tenants/settings"
