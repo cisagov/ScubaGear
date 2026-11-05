@@ -1,0 +1,1984 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>ScubaGear Diff Report</title>
+<style>
+/*
+ * Styling for the ScubaGear diff report (Invoke-SCuBADiff).
+ * The color palette mirrors the CISA CreateReport palette (Main.css) so that
+ * the diff report reads as part of the same family of reports and honors the
+ * viewer's light/dark theme selection.
+ */
+:root {
+    --background-primary: white;
+    --background-secondary: #f2f4f6;
+    --text-color: #1a1a1a;
+    --header-color: #005288;
+    --border-color: #c2c8cc;
+    --uuid-color: #424242;
+    --link-color: #006086;
+    /* Row state colors, matching Main.css --test-* variables. Rows are colored by
+       their Result (After) value; grey (matching manual checks / --test-other) is
+       used for manual, omitted, and removed policies. */
+    --diff-red: #E5C7C7;
+    --diff-green: #d5ebd5;
+    --diff-yellow: #fff7d6;
+    --diff-grey: #ebebf2;
+    /* Table grid lines, matching the ScubaResults report (Main.css --border-color)
+       so the two reports read with the same weight. Kept separate from
+       --border-color, which styles the lighter report chrome (cards, buttons). */
+    --table-border-color: black;
+    /* Result (Before) / Result (After) text colors. The row background carries the
+       after state only, so coloring both result cells is what makes a Pass -> Fail
+       flip catch the eye. Each one clears 4.5:1 against every row background it can
+       land on; Fail and Warning reuse Main.css palette entries. */
+    --result-pass-color: #14532d;
+    --result-fail-color: #981d20;
+    --result-warning-color: #713f12;
+}
+
+html[data-theme='dark'] {
+    --background-primary: #10171D;
+    --background-secondary: #1b242c;
+    --text-color: #e6e6e6;
+    --header-color: #b7c8d2;
+    --border-color: #3a444c;
+    --uuid-color: #b0b0b0;
+    --link-color: #6fb7e6;
+    --diff-red: #381919;
+    --diff-green: #1C361C;
+    --diff-yellow: #524100;
+    --diff-grey: #414141;
+    --table-border-color: #7b7b7b;
+    /* Lightened for dark mode so each still clears 4.5:1 on the dark row
+       backgrounds; Fail and Warning reuse the Main.css dark palette. */
+    --result-pass-color: #8fd17a;
+    --result-fail-color: #fca5a5;
+    --result-warning-color: #fde68a;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--background-primary);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0 2em 4em 2em;
+}
+
+h1, h2, h3 {
+    color: var(--header-color);
+}
+
+/* Section titles (Summary and each product heading) are centered. */
+h2 { text-align: center; }
+
+a { color: var(--link-color); }
+
+.report-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border-color);
+    padding: 1em 0;
+}
+
+.report-title h1 { margin: 0; }
+
+.report-subtitle {
+    margin: 0.25em 0 0;
+    color: var(--uuid-color);
+    font-size: 0.95em;
+}
+
+.source-summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2em;
+    margin: 1em 0;
+}
+
+.source-card {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75em 1.25em;
+}
+
+.source-card h3 { text-align: center; }
+
+.source-card .uuid { color: var(--uuid-color); font-size: 0.85em; }
+
+.controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5em;
+    align-items: center;
+    margin: 1em 0;
+}
+
+.controls-bar label { cursor: pointer; user-select: none; }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0 2em 0;
+    overflow-x: auto;
+    display: block;
+}
+
+th, td {
+    border: 1px solid var(--table-border-color);
+    padding: 0.5em 0.75em;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.9em;
+}
+
+th {
+    background-color: var(--background-secondary);
+    position: sticky;
+    top: 0;
+}
+
+/* Row state coloring (driven by the Result (After) value). */
+tr.diff-red    { background-color: var(--diff-red); }
+tr.diff-green  { background-color: var(--diff-green); }
+tr.diff-yellow { background-color: var(--diff-yellow); }
+tr.diff-grey   { background-color: var(--diff-grey); }
+
+/* Result (Before) and Result (After) cells. The row background shows the after
+   state; these colors let a reader see at a glance which way a policy moved. */
+td.result-cell { font-weight: 600; }
+td.result-pass    { color: var(--result-pass-color); }
+td.result-fail    { color: var(--result-fail-color); }
+td.result-warning { color: var(--result-warning-color); }
+
+/* Unchanged rows are hidden by default; the "Show unchanged" toggle reveals them. */
+tr.diff-unchanged-row { display: none; }
+body.show-unchanged tr.diff-unchanged-row { display: table-row; }
+
+/* The summary table is centered on the page and all of its cells are
+   center-aligned (both the header row and the count cells). */
+.summary-table {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.summary-table th, .summary-table td { text-align: center; }
+
+.summary-table td.count-zero { color: var(--uuid-color); }
+
+/* Classification filters live in the summary header. Each non-Unchanged column header
+   carries a checkbox; toggling it off dims that column here (.col-off) and hides
+   the matching rows in the product tables. */
+.summary-table th.classification-filter label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.summary-table th.classification-filter input { cursor: pointer; }
+
+.summary-table .col-off { opacity: 0.3; }
+
+.filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75em;
+    margin: 0.25em 0 0.75em;
+}
+
+.filter-hint {
+    text-align: center;
+    color: var(--uuid-color);
+    font-size: 0.85em;
+}
+
+.filter-btn {
+    font-family: inherit;
+    font-size: 0.85em;
+    color: var(--text-color);
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.35em 0.75em;
+    cursor: pointer;
+}
+
+.filter-btn:hover { border-color: var(--link-color); }
+
+/* Product diff tables: only the header row is centered; body cells keep
+   the default left alignment. */
+.policy-diff th { text-align: center; }
+
+.classification-label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.underlying {
+    font-weight: normal;
+    color: var(--uuid-color);
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+/* Marks a row whose before and after sides are different policies, aligned
+   across the legacy -> Security Suite migration. Deliberately colorless: the
+   row keeps its Result (After) color and this only annotates the ID pair. */
+.migrated-badge {
+    display: inline-block;
+    margin-left: 0.4em;
+    padding: 0 0.4em;
+    border: 1px solid var(--border-color);
+    border-radius: 0.8em;
+    background-color: var(--background-secondary);
+    color: var(--uuid-color);
+    font-size: 0.75em;
+    font-style: italic;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.legend .migrated-badge { margin-left: 0; margin-right: 0.35em; }
+
+.diff-generated { text-align: center; }
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1em;
+    margin: 1em 0;
+    font-size: 0.85em;
+}
+.legend .swatch {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 1px solid var(--border-color);
+    margin-right: 0.35em;
+    vertical-align: middle;
+}
+.legend .swatch.diff-red    { background-color: var(--diff-red); }
+.legend .swatch.diff-green  { background-color: var(--diff-green); }
+.legend .swatch.diff-yellow { background-color: var(--diff-yellow); }
+.legend .swatch.diff-grey   { background-color: var(--diff-grey); }
+
+</style>
+</head>
+<body>
+<div class="report-header">
+  <div class="report-title">
+    <h1>ScubaGear Diff Report</h1>
+    <p class="report-subtitle">Comparison between two ScubaResults.json files</p>
+  </div>
+  <div class="controls-bar">
+    <label><input type="checkbox" id="toggle-unchanged"> Show unchanged rows</label>
+    <label><input type="checkbox" id="toggle-dark"> Dark Mode</label>
+  </div>
+</div>
+<div class="source-summary">
+  <div class="source-card">
+    <h3>Before</h3>
+    <div>Tool version: 1.6.0</div>
+    <div>Timestamp: 2025-07-08T20:16:55.876Z</div>
+    <div class="uuid">Report UUID: 0d275954-350e-4a22-b534-0d44291d5a7f</div>
+  </div>
+  <div class="source-card">
+    <h3>After</h3>
+    <div>Tool version: 2.0.0</div>
+    <div>Timestamp: 2026-10-15T21:46:53.179Z</div>
+    <div class="uuid">Report UUID: df678ddd-66c2-4097-b78a-58e71f3e5117</div>
+  </div>
+</div>
+<p class="diff-generated">Diff generated 2026-11-05T16:24:25.088Z by ScubaGear 2.0.0.</p>
+<p><strong>Products only in Before (controls reported as Removed Policy unless migrated):</strong> Defender</p>
+<p><strong>Products only in After (all controls New Policy):</strong> PowerBI, SecuritySuite</p>
+<div class="legend">
+  <span><span class="swatch diff-red"></span>Fail (Result After)</span>
+  <span><span class="swatch diff-yellow"></span>Warning (Result After)</span>
+  <span><span class="swatch diff-green"></span>Pass (Result After)</span>
+  <span><span class="swatch diff-grey"></span>Manual (N/A) / Omitted / Removed Policy / Migrated</span>
+  <span><span class="migrated-badge">migrated</span>Before result comes from the retired policy shown in the Control ID column.</span>
+  <span><strong>Migrated</strong> rows are the retired policy in its own product section; its result is compared under Security Suite.</span>
+  <span>Unchanged rows are hidden by default (use the toggle above).</span>
+</div>
+<h2>Summary</h2>
+<div class="filter-controls">
+  <span class="filter-hint">Use the checkboxes in the column headers to filter classifications. Filters apply to this table and the product tables below.</span>
+  <button type="button" id="toggle-all-filters" class="filter-btn">Uncheck all filters</button>
+</div>
+<table class="summary-table">
+<tr><th>Product</th><th class="classification-col classification-filter" data-classification="Errored"><label><input type="checkbox" class="classification-toggle" data-classification="Errored" checked> Errored</label></th><th class="classification-col classification-filter" data-classification="NewFail"><label><input type="checkbox" class="classification-toggle" data-classification="NewFail" checked> NewFail</label></th><th class="classification-col classification-filter" data-classification="NewWarning"><label><input type="checkbox" class="classification-toggle" data-classification="NewWarning" checked> NewWarning</label></th><th class="classification-col classification-filter" data-classification="NewIncorrectResult"><label><input type="checkbox" class="classification-toggle" data-classification="NewIncorrectResult" checked> NewIncorrectResult</label></th><th class="classification-col classification-filter" data-classification="PolicyVersionUpdate"><label><input type="checkbox" class="classification-toggle" data-classification="PolicyVersionUpdate" checked> PolicyVersionUpdate</label></th><th class="classification-col classification-filter" data-classification="NewOmission"><label><input type="checkbox" class="classification-toggle" data-classification="NewOmission" checked> NewOmission</label></th><th class="classification-col classification-filter" data-classification="Other"><label><input type="checkbox" class="classification-toggle" data-classification="Other" checked> Other</label></th><th class="classification-col classification-filter" data-classification="NewAutomatedCheck"><label><input type="checkbox" class="classification-toggle" data-classification="NewAutomatedCheck" checked> NewAutomatedCheck</label></th><th class="classification-col classification-filter" data-classification="NewManualCheck"><label><input type="checkbox" class="classification-toggle" data-classification="NewManualCheck" checked> NewManualCheck</label></th><th class="classification-col classification-filter" data-classification="NewPass"><label><input type="checkbox" class="classification-toggle" data-classification="NewPass" checked> NewPass</label></th><th class="classification-col classification-filter" data-classification="NewPolicy"><label><input type="checkbox" class="classification-toggle" data-classification="NewPolicy" checked> NewPolicy</label></th><th class="classification-col classification-filter" data-classification="RemovedPolicy"><label><input type="checkbox" class="classification-toggle" data-classification="RemovedPolicy" checked> RemovedPolicy</label></th><th class="classification-col classification-filter" data-classification="Migrated"><label><input type="checkbox" class="classification-toggle" data-classification="Migrated" checked> Migrated</label></th><th class="classification-col" data-classification="Unchanged">Unchanged</th><th>Total</th></tr>
+<tr><td>Microsoft Entra ID / Azure Active Directory</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count" data-classification="NewFail" data-count="2">2</td><td class="count" data-classification="NewWarning" data-count="1">1</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count" data-classification="PolicyVersionUpdate" data-count="2">2</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count count-zero" data-classification="NewAutomatedCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count" data-classification="NewPass" data-count="2">2</td><td class="count" data-classification="NewPolicy" data-count="4">4</td><td class="count count-zero" data-classification="RemovedPolicy" data-count="0">0</td><td class="count count-zero" data-classification="Migrated" data-count="0">0</td><td class="count" data-classification="Unchanged" data-count="23">23</td><td class="summary-total">34</td></tr>
+<tr><td>Microsoft 365 Defender</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count count-zero" data-classification="NewFail" data-count="0">0</td><td class="count count-zero" data-classification="NewWarning" data-count="0">0</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count count-zero" data-classification="PolicyVersionUpdate" data-count="0">0</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count count-zero" data-classification="NewAutomatedCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewPass" data-count="0">0</td><td class="count count-zero" data-classification="NewPolicy" data-count="0">0</td><td class="count" data-classification="RemovedPolicy" data-count="6">6</td><td class="count" data-classification="Migrated" data-count="13">13</td><td class="count count-zero" data-classification="Unchanged" data-count="0">0</td><td class="summary-total">19</td></tr>
+<tr><td>Exchange Online</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count count-zero" data-classification="NewFail" data-count="0">0</td><td class="count count-zero" data-classification="NewWarning" data-count="0">0</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count" data-classification="PolicyVersionUpdate" data-count="1">1</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count count-zero" data-classification="NewAutomatedCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewPass" data-count="0">0</td><td class="count count-zero" data-classification="NewPolicy" data-count="0">0</td><td class="count" data-classification="RemovedPolicy" data-count="25">25</td><td class="count" data-classification="Migrated" data-count="3">3</td><td class="count" data-classification="Unchanged" data-count="11">11</td><td class="summary-total">40</td></tr>
+<tr><td>Microsoft Power BI</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count count-zero" data-classification="NewFail" data-count="0">0</td><td class="count count-zero" data-classification="NewWarning" data-count="0">0</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count count-zero" data-classification="PolicyVersionUpdate" data-count="0">0</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count count-zero" data-classification="NewAutomatedCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewPass" data-count="0">0</td><td class="count" data-classification="NewPolicy" data-count="8">8</td><td class="count count-zero" data-classification="RemovedPolicy" data-count="0">0</td><td class="count count-zero" data-classification="Migrated" data-count="0">0</td><td class="count count-zero" data-classification="Unchanged" data-count="0">0</td><td class="summary-total">8</td></tr>
+<tr><td>Microsoft Power Platform</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count" data-classification="NewFail" data-count="1">1</td><td class="count" data-classification="NewWarning" data-count="1">1</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count count-zero" data-classification="PolicyVersionUpdate" data-count="0">0</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count count-zero" data-classification="NewAutomatedCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewPass" data-count="0">0</td><td class="count" data-classification="NewPolicy" data-count="1">1</td><td class="count count-zero" data-classification="RemovedPolicy" data-count="0">0</td><td class="count count-zero" data-classification="Migrated" data-count="0">0</td><td class="count" data-classification="Unchanged" data-count="6">6</td><td class="summary-total">9</td></tr>
+<tr><td>SharePoint Online</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count" data-classification="NewFail" data-count="1">1</td><td class="count count-zero" data-classification="NewWarning" data-count="0">0</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count" data-classification="PolicyVersionUpdate" data-count="1">1</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count" data-classification="NewAutomatedCheck" data-count="4">4</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewPass" data-count="0">0</td><td class="count count-zero" data-classification="NewPolicy" data-count="0">0</td><td class="count count-zero" data-classification="RemovedPolicy" data-count="0">0</td><td class="count count-zero" data-classification="Migrated" data-count="0">0</td><td class="count" data-classification="Unchanged" data-count="2">2</td><td class="summary-total">8</td></tr>
+<tr><td>Security Suite</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count count-zero" data-classification="NewFail" data-count="0">0</td><td class="count" data-classification="NewWarning" data-count="2">2</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count count-zero" data-classification="PolicyVersionUpdate" data-count="0">0</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count" data-classification="NewAutomatedCheck" data-count="1">1</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count" data-classification="NewPass" data-count="1">1</td><td class="count" data-classification="NewPolicy" data-count="8">8</td><td class="count count-zero" data-classification="RemovedPolicy" data-count="0">0</td><td class="count count-zero" data-classification="Migrated" data-count="0">0</td><td class="count" data-classification="Unchanged" data-count="12">12</td><td class="summary-total">24</td></tr>
+<tr><td>Microsoft Teams</td><td class="count count-zero" data-classification="Errored" data-count="0">0</td><td class="count count-zero" data-classification="NewFail" data-count="0">0</td><td class="count count-zero" data-classification="NewWarning" data-count="0">0</td><td class="count count-zero" data-classification="NewIncorrectResult" data-count="0">0</td><td class="count" data-classification="PolicyVersionUpdate" data-count="7">7</td><td class="count count-zero" data-classification="NewOmission" data-count="0">0</td><td class="count count-zero" data-classification="Other" data-count="0">0</td><td class="count count-zero" data-classification="NewAutomatedCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewManualCheck" data-count="0">0</td><td class="count count-zero" data-classification="NewPass" data-count="0">0</td><td class="count count-zero" data-classification="NewPolicy" data-count="0">0</td><td class="count" data-classification="RemovedPolicy" data-count="7">7</td><td class="count count-zero" data-classification="Migrated" data-count="0">0</td><td class="count" data-classification="Unchanged" data-count="7">7</td><td class="summary-total">21</td></tr>
+</table>
+<h2>Microsoft Entra ID / Azure Active Directory</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-red" data-classification="NewFail">
+  <td>MS.AAD.1.1v1</td>
+  <td>1 Legacy Authentication</td>
+  <td class="classification-label">New Fail</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Legacy authentication SHALL be blocked.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements. Near miss: MS.AAD.1.1v1 Legacy authentication SHALL be blocked would pass if the config file is updated to include: user exclusions. Run the Start-SCuBAConfigAnalyzer cmdlet, https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.2.1v1</td>
+  <td>2 Risk-based Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Users detected as high risk SHALL be blocked.</td>
+  <td>1 conditional access policy(s) found that meet(s) all requirements: MS.AAD.2.1v1 Users detected as high risk SHALL be blocked.</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.2.2v1</td>
+  <td>2 Risk-based Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>A notification SHOULD be sent to the administrator when high-risk users are detected.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#msaad22v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.2.3v1</td>
+  <td>2 Risk-based Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Sign-ins detected as high-risk SHALL be blocked.</td>
+  <td>1 conditional access policy(s) found that meet(s) all requirements: MS.AAD.2.3v1 Sign-ins detected as high risk SHALL be blocked.</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.3.1v1</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Phishing-resistant MFA SHALL be enforced for all users.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.AAD.3.2v1 &rarr; MS.AAD.3.2v2</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>MFA SHALL be enforced for all users.</td>
+  <td>1 conditional access policy(s) found that meet(s) all requirements: MS.AAD.3.2v1 If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.3.3v2</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>If Microsoft Authenticator is enabled, it SHALL be configured to show login context information.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPass">
+  <td>MS.AAD.3.4v1</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">New Pass</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The &quot;Authentication methods manage migration&quot; feature SHALL be set to &quot;Migration complete.&quot;</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.AAD.3.5v1 &rarr; MS.AAD.3.5v2</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The authentication methods of short message service (SMS), voice call, and email one-time passcode (OTP) SHALL be disabled.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.3.6v1</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Phishing-resistant MFA SHALL be required for highly privileged roles.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements.</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.3.7v1</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Managed devices SHOULD be required for authentication.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements.</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.3.8v1</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Managed devices SHOULD be required to register MFA.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements.</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.3.9v1</td>
+  <td>3 Strong Authentication and a Secure Registration Process</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Device code authentication SHOULD be blocked.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements. Near miss: MS.AAD.3.9v1 Device code authentication SHOULD be blocked would pass if the config file is updated to include: user exclusions, group exclusions. Run the Start-SCuBAConfigAnalyzer cmdlet, https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file.</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.4.1v1</td>
+  <td>4 Centralized Log Collection</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>Security logs SHALL be sent to the agency&#39;s security operations center for monitoring.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#msaad41v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-red" data-classification="NewFail">
+  <td>MS.AAD.5.1v1</td>
+  <td>5 Application Registration and Consent</td>
+  <td class="classification-label">New Fail</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Only administrators SHALL be allowed to register applications.</td>
+  <td>1 authorization policies found that allow non-admin users to register third-party applications: authorizationPolicy</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.5.2v1</td>
+  <td>5 Application Registration and Consent</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>User consent to applications SHALL be restricted.</td>
+  <td>1 authorization policies found that allow non-admin users to consent to third-party applications with risky delegated permission classifications: authorizationPolicy</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPass">
+  <td>MS.AAD.5.3v1</td>
+  <td>5 Application Registration and Consent</td>
+  <td class="classification-label">New Pass</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>An administrative consent workflow SHALL be configured for applications.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.AAD.5.5v1</td>
+  <td>5 Application Registration and Consent</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Application password addition SHOULD be blocked.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.AAD.5.6v1</td>
+  <td>5 Application Registration and Consent</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Application password lifetime SHOULD be restricted to 180 days or less.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.AAD.5.7v1</td>
+  <td>5 Application Registration and Consent</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Application certificate lifetime SHOULD be restricted to 365 days or less.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.6.1v1</td>
+  <td>6 Passwords</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>User passwords SHALL NOT expire.</td>
+  <td>Requirement not met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.1v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role.</td>
+  <td>2 global admin(s) found: Jane Doe, John Public</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.2v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Privileged users SHALL be provisioned with finer-grained roles instead of the Global Administrator role.</td>
+  <td>Requirement not met: Least Privilege Score = 2 (should be 1 or less) Calculated by 2 global admins / 1 privileged users without global admin role</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.3v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers.</td>
+  <td>0 admin(s) that are not cloud-only found</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.4v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Permanent active role assignments SHALL NOT be allowed for highly privileged roles.</td>
+  <td>6 role(s) that contain users with permanent active assignment: Application Administrator, Cloud Application Administrator, Exchange Administrator, Global Administrator, SharePoint Administrator, User Administrator</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.5v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system.</td>
+  <td>4 role(s) assigned to users outside of PIM: Exchange Administrator, Global Administrator, SharePoint Administrator, User Administrator</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.6v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Activation of the Global Administrator role SHALL require approval.</td>
+  <td>1 role(s) or group(s) allowing activation without approval found: Global Administrator(Directory Role)</td>
+</tr>
+<tr class="diff-row diff-red diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.7v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Eligible and active highly privileged role assignments SHALL trigger an alert.</td>
+  <td>6 role(s) or group(s) without notification e-mail configured for role assignments found: Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Global Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.8v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>User activation of the Global Administrator role SHALL trigger an alert.</td>
+  <td>0 role(s) or group(s) without notification e-mail configured for Global Administrator activations found</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.7.9v1</td>
+  <td>7 Highly Privileged User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>User activation of other highly privileged roles SHOULD trigger an alert.</td>
+  <td>5 role(s) or group(s) without notification e-mail configured for role activations found: Cloud Application Administrator(Directory Role), Exchange Administrator(Directory Role), Hybrid Identity Administrator(Directory Role), Privileged Role Administrator(Directory Role), SharePoint Administrator(Directory Role)</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.8.1v1</td>
+  <td>8 Guest User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects.</td>
+  <td>Permission level set to &quot;Limited access&quot; (authorizationPolicy)</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewWarning">
+  <td>MS.AAD.8.2v1</td>
+  <td>8 Guest User Access</td>
+  <td class="classification-label">New Warning</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Only users with the &quot;Guest Inviter&quot; role SHOULD be able to invite guest users.</td>
+  <td>Permission level set to &quot;adminsGuestInvitersAndAllMembers&quot; (authorizationPolicy)</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.AAD.8.3v1</td>
+  <td>8 Guest User Access</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>Guest invites SHOULD only be allowed to be sent to specific external domains that have been authorized by the agency for legitimate business purposes.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/aad.md#msaad83v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-red" data-classification="NewPolicy">
+  <td>MS.AAD.9.1v1</td>
+  <td>9 AI Security</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>Risky AI agents SHALL be blocked.</td>
+  <td>0 conditional access policy(s) found that meet(s) all requirements.</td>
+</tr>
+</table>
+<h2>Microsoft 365 Defender</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.DEFENDER.1.1v1</td>
+  <td>1 Preset Security Profiles</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>The standard and strict preset security policies SHALL be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.DEFENDER.1.2v1</td>
+  <td>1 Preset Security Profiles</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.DEFENDER.1.3v1</td>
+  <td>1 Preset Security Profiles</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.DEFENDER.1.4v1</td>
+  <td>1 Preset Security Profiles</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell"></td>
+  <td>Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.DEFENDER.1.5v1</td>
+  <td>1 Preset Security Profiles</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td class="result-cell"></td>
+  <td>Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.2.1v1</td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.2.1v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.2.2v1</td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.2.2v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell"></td>
+  <td>Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.2.3v1</td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.2.3v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell"></td>
+  <td>Domain impersonation protection SHOULD be added for important partners in both the standard and strict preset policies.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.3.1v1</td>
+  <td>3 Safe Attachments</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.1.4v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.4.1v2</td>
+  <td>4 Data Loss Prevention</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.3.1v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.4.2v1</td>
+  <td>4 Data Loss Prevention</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.3.2v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell"></td>
+  <td>The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.4.3v1</td>
+  <td>4 Data Loss Prevention</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.3.3v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>The action for the custom policy SHOULD be set to block sharing sensitive information with everyone.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.4.4v1</td>
+  <td>4 Data Loss Prevention</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.3.4v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.DEFENDER.4.5v1</td>
+  <td>4 Data Loss Prevention</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.4.6v1</td>
+  <td>4 Data Loss Prevention</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.3.5v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The custom policy SHOULD include an action to block access to sensitive information by restricted apps and unwanted Bluetooth applications.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.5.1v1</td>
+  <td>5 Alerts</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.4.1v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.5.2v1</td>
+  <td>5 Alerts</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.4.2v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.6.1v1</td>
+  <td>6 Audit Logging</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.5.1v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>Unified Audit logging SHALL be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.DEFENDER.6.3v1</td>
+  <td>6 Audit Logging</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.5.2v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31.</td>
+  <td></td>
+</tr>
+</table>
+<h2>Exchange Online</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.1.1v2</td>
+  <td>1 Automatic Forwarding to External Domains</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Automatic forwarding to external domains SHALL be disabled.</td>
+  <td>No domains allow automatic forwarding.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.EXO.2.2v2 &rarr; MS.EXO.2.2v3</td>
+  <td>2 Sender Policy Framework</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>An SPF policy SHALL be published for each domain that fails all non-approved senders.</td>
+  <td>Requirement met. View DNS logs, #dns-logs for more details.</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.3.1v1</td>
+  <td>3 DomainKeys Identified Mail</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>DKIM SHOULD be enabled for all domains.</td>
+  <td>1 agency domain(s) found in violation: tqhjy.onmicrosoft.com. View DNS logs, #dns-logs for more details.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.4.1v1</td>
+  <td>4 Domain-Based Message Authentication, Reporting, and Conformance (DMARC)</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>A DMARC policy SHALL be published for every second-level domain.</td>
+  <td>Requirement met. View DNS logs, #dns-logs for more details.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.4.2v1</td>
+  <td>4 Domain-Based Message Authentication, Reporting, and Conformance (DMARC)</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The DMARC message rejection option SHALL be p=reject.</td>
+  <td>Requirement met. View DNS logs, #dns-logs for more details.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.4.3v1</td>
+  <td>4 Domain-Based Message Authentication, Reporting, and Conformance (DMARC)</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.</td>
+  <td>Requirement met. View DNS logs, #dns-logs for more details.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.4.4v1</td>
+  <td>4 Domain-Based Message Authentication, Reporting, and Conformance (DMARC)</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>An agency point of contact SHOULD be included for aggregate and failure reports.</td>
+  <td>Requirement met. View DNS logs, #dns-logs for more details.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.5.1v1</td>
+  <td>5 Simple Mail Transfer Protocol Authentication</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>SMTP AUTH SHALL be disabled.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.6.1v1</td>
+  <td>6 Calendar and Contact Sharing</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Contact folders SHALL NOT be shared with all domains.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.6.2v1</td>
+  <td>6 Calendar and Contact Sharing</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Calendar details SHALL NOT be shared with all domains.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.7.1v1</td>
+  <td>7 External Sender Warnings</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>External sender warnings SHALL be implemented.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.8.1v2</td>
+  <td>8 Data Loss Prevention Solutions</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>A DLP solution SHALL be used.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.8.2v2</td>
+  <td>8 Data Loss Prevention Solutions</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.8.3v1</td>
+  <td>8 Data Loss Prevention Solutions</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.8.4v1</td>
+  <td>8 Data Loss Prevention Solutions</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>At a minimum, the DLP solution SHALL restrict sharing credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN) via email.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.9.1v2</td>
+  <td>9 Attachment File Type</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Emails SHALL be filtered by attachment file types.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.9.2v1</td>
+  <td>9 Attachment File Type</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The attachment filter SHOULD attempt to determine the true file type and assess the file extension.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.9.3v2</td>
+  <td>9 Attachment File Type</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Disallowed file types SHALL be determined and enforced.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.9.4v1</td>
+  <td>9 Attachment File Type</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Alternatively chosen filtering solutions SHOULD offer services comparable to Microsoft Defender&#39;s Common Attachment Filter.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.9.5v1</td>
+  <td>9 Attachment File Type</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>At a minimum, click-to-run files SHOULD be blocked (e.g., .exe, .cmd, and .vbe).</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.10.1v1</td>
+  <td>10 Malware Scanning</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Emails SHALL be scanned for malware.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.10.2v1</td>
+  <td>10 Malware Scanning</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Emails identified as containing malware SHALL be quarantined or dropped.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.10.3v1</td>
+  <td>10 Malware Scanning</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Email scanning SHALL be capable of reviewing emails after delivery.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.11.1v1</td>
+  <td>11 Phishing Protections</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Impersonation protection checks SHOULD be used.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.EXO.11.2v1</td>
+  <td>11 Phishing Protections</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.2.4v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.11.3v1</td>
+  <td>11 Phishing Protections</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The phishing protection solution SHOULD include an AI-based phishing detection tool comparable to EOP Mailbox Intelligence.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.EXO.12.1v1</td>
+  <td>12 IP Allow Lists</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.8.1v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>IP allow lists SHOULD NOT be created.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="Migrated">
+  <td>MS.EXO.12.2v1</td>
+  <td>12 IP Allow Lists</td>
+  <td class="classification-label" title="Replaced by MS.SECURITYSUITE.8.2v1; compared in the Security Suite section">Migrated</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>Safe lists SHOULD NOT be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.EXO.13.1v1</td>
+  <td>13 Mailbox Auditing</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Mailbox auditing SHALL be enabled.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.14.1v2</td>
+  <td>14 Inbound Anti-Spam Protections</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>A spam filter SHALL be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.14.2v1</td>
+  <td>14 Inbound Anti-Spam Protections</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Spam and high confidence spam SHALL be moved to either the junk email folder or the quarantine folder.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.14.3v1</td>
+  <td>14 Inbound Anti-Spam Protections</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Allowed domains SHALL NOT be added to inbound anti-spam protection policies.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.14.4v1</td>
+  <td>14 Inbound Anti-Spam Protections</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>If a third-party party filtering solution is used, the solution SHOULD offer services comparable to the native spam filtering offered by Microsoft.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.15.1v1</td>
+  <td>15 Link Protection</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>URL comparison with a block-list SHOULD be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.15.2v1</td>
+  <td>15 Link Protection</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Direct download links SHOULD be scanned for malware.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.15.3v1</td>
+  <td>15 Link Protection</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>User click tracking SHOULD be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.16.1v1</td>
+  <td>16 Alerts</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>At a minimum, the following alerts SHALL be enabled: a. Suspicious email sending patterns detected. b. Suspicious Connector Activity. c. Suspicious Email Forwarding Activity. d. Messages have been delayed. e. Tenant restricted from sending unprovisioned email. f. Tenant restricted from sending email. g. A potentially malicious URL click was detected.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.16.2v1</td>
+  <td>16 Alerts</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The alerts SHOULD be sent to a monitored address or incorporated into a security information and event management (SIEM) system.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.17.1v1</td>
+  <td>17 Audit Logging</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Unified Audit logging SHALL be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.EXO.17.3v1</td>
+  <td>17 Audit Logging</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31 (Appendix C).</td>
+  <td></td>
+</tr>
+</table>
+<h2>Microsoft Power BI</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.POWERBI.1.1v1</td>
+  <td>1 Publish to Web</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The &quot;Publish to Web&quot; feature SHOULD be disabled unless the agency mission requires the capability.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.POWERBI.2.1v1</td>
+  <td>2 Power BI Guest Access</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewPolicy">
+  <td>MS.POWERBI.3.1v1</td>
+  <td>3 Power BI External Invitations</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>The &quot;Invite external users to your organization&quot; feature SHOULD be disabled unless agency mission requires the capability.</td>
+  <td>Requirement not met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.POWERBI.4.1v1</td>
+  <td>4 Power BI Service Principals</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Service principals with access to APIs SHOULD be restricted to specific security groups.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.POWERBI.4.2v1</td>
+  <td>4 Power BI Service Principals</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Service principals&#39; ability to create and use profiles SHOULD be restricted to specific security groups.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewPolicy">
+  <td>MS.POWERBI.5.1v1</td>
+  <td>5 Power BI Resource Key Authentication</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>ResourceKey-based authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or &quot;push&quot; datasets) merits its use.</td>
+  <td>Requirement not met</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewPolicy">
+  <td>MS.POWERBI.6.1v1</td>
+  <td>6 Python and R Visual Sharing</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Python and R interactions SHOULD be disabled.</td>
+  <td>Requirement not met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.POWERBI.7.1v1</td>
+  <td>7 Power BI Sensitive Data</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies.</td>
+  <td>Requirement met</td>
+</tr>
+</table>
+<h2>Microsoft Power Platform</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.POWERPLATFORM.1.1v1</td>
+  <td>1 Creation of Power Platform Environments</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The ability to create production and sandbox environments SHALL be restricted to administrators.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.POWERPLATFORM.1.2v1</td>
+  <td>1 Creation of Power Platform Environments</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The ability to create trial environments SHALL be restricted to administrators.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-red" data-classification="NewFail">
+  <td>MS.POWERPLATFORM.2.1v1</td>
+  <td>2 Power Platform Data Loss Prevention Policies</td>
+  <td class="classification-label">New Fail</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>A DLP policy SHALL be created to restrict connector access in the default Power Platform environment.</td>
+  <td>No policy found that applies to default environment</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewWarning">
+  <td>MS.POWERPLATFORM.2.2v1</td>
+  <td>2 Power Platform Data Loss Prevention Policies</td>
+  <td class="classification-label">New Warning</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Non-default environments SHOULD have at least one DLP policy.</td>
+  <td>No DLP policies found</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.POWERPLATFORM.3.1v1</td>
+  <td>3 Power Platform Tenant Isolation</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Power Platform tenant isolation SHALL be enabled.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.POWERPLATFORM.3.2v1</td>
+  <td>3 Power Platform Tenant Isolation</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>An inbound/outbound connection allowlist SHOULD be configured.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform32v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.POWERPLATFORM.4.1v1</td>
+  <td>4 Power Apps Content Security Policy</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/powerplatform.md#mspowerplatform41v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.POWERPLATFORM.5.1v1</td>
+  <td>5 Power Pages Creation</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The ability to create Power Pages sites SHOULD be restricted to administrators.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.POWERPLATFORM.6.1v1</td>
+  <td>6 Power Apps Sharing Controls</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The &quot;Share with everyone&quot; feature SHOULD be disabled.</td>
+  <td>Requirement met</td>
+</tr>
+</table>
+<h2>SharePoint Online</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-red" data-classification="NewFail">
+  <td>MS.SHAREPOINT.1.1v1</td>
+  <td>1 External Sharing</td>
+  <td class="classification-label">New Fail</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>External sharing for SharePoint SHALL be limited to &quot;Existing guests&quot; or &quot;Only people in your organization.&quot;</td>
+  <td>Requirement not met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewAutomatedCheck">
+  <td>MS.SHAREPOINT.1.2v1</td>
+  <td>1 External Sharing</td>
+  <td class="classification-label">New Automated Check</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>External sharing for OneDrive SHALL be limited to &quot;Existing guests&quot; or &quot;Only people in your organization.&quot;</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewAutomatedCheck">
+  <td>MS.SHAREPOINT.1.3v1</td>
+  <td>1 External Sharing</td>
+  <td class="classification-label">New Automated Check</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs.</td>
+  <td>Requirement met: Note that we currently only check for approved external domains. Approved security groups are currently not being checked, see the baseline policy for instructions on a manual check.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.SHAREPOINT.2.1v1</td>
+  <td>2 File and Folder Default Sharing Settings</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>File and folder default sharing scope SHALL be set to &quot;Specific people (only the people the user specifies).&quot;</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.SHAREPOINT.2.2v1</td>
+  <td>2 File and Folder Default Sharing Settings</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>File and folder default sharing permissions SHALL be set to view only.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewAutomatedCheck">
+  <td>MS.SHAREPOINT.3.1v1</td>
+  <td>3 Securing &quot;Anyone&quot; Links and Verification Code Users</td>
+  <td class="classification-label">New Automated Check</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Expiration days for &quot;Anyone&quot; links SHALL be set to 30 days or less.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-red" data-classification="NewAutomatedCheck">
+  <td>MS.SHAREPOINT.3.2v1</td>
+  <td>3 Securing &quot;Anyone&quot; Links and Verification Code Users</td>
+  <td class="classification-label">New Automated Check</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-fail">Fail</td>
+  <td>The allowable file and folder permissions for links SHALL be set to view only.</td>
+  <td>Requirement not met: folders are not limited to view for Anyone</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.SHAREPOINT.3.3v1 &rarr; MS.SHAREPOINT.3.3v2</td>
+  <td>3 Securing &quot;Anyone&quot; Links and Verification Code Users</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Reauthentication days for people who use a verification code SHALL be set to 30 days or less.</td>
+  <td>Requirement met</td>
+</tr>
+</table>
+<h2>Security Suite</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.1.1v1</td>
+  <td>1 Malware Protection</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Emails with click-to-run file attachments SHALL be blocked including, at a minimum, .exe, .cmd, and .vbe files.</td>
+  <td>Requirement met. The highest priority anti-malware policy that applies to all users is: Standard Preset.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.1.2v1</td>
+  <td>1 Malware Protection</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Email scanning SHALL be capable of reviewing emails after delivery.</td>
+  <td>Requirement met. The highest priority anti-malware policy that applies to all users is: Standard Preset.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.1.3v1</td>
+  <td>1 Malware Protection</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Emails identified as containing malware SHALL be quarantined or dropped.</td>
+  <td>Requirement met. The highest priority safe attachments policy that applies to all users is: Standard Preset.</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewWarning" data-migrated="true">
+  <td>MS.DEFENDER.3.1v1 &rarr; MS.SECURITYSUITE.1.4v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>1 Malware Protection</td>
+  <td class="classification-label">New Warning</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malware.</td>
+  <td>Requirement not met</td>
+</tr>
+<tr class="diff-row diff-yellow" data-classification="NewWarning" data-migrated="true">
+  <td>MS.DEFENDER.2.1v1 &rarr; MS.SECURITYSUITE.2.1v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label">New Warning</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>User impersonation protection SHOULD be enabled for sensitive accounts.</td>
+  <td>No users defined as sensitive users in the ScubaGear config file.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPass" data-migrated="true">
+  <td>MS.DEFENDER.2.2v1 &rarr; MS.SECURITYSUITE.2.2v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label">New Pass</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Domain impersonation protection SHOULD be enabled for domains owned by the agency.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.2.3v1 &rarr; MS.SECURITYSUITE.2.3v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>Domain impersonation protection SHOULD be added for key suppliers and partners.</td>
+  <td>No partner domains defined in the ScubaGear config file.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewAutomatedCheck" data-migrated="true">
+  <td>MS.EXO.11.2v1 &rarr; MS.SECURITYSUITE.2.4v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>2 Impersonation Protection</td>
+  <td class="classification-label">New Automated Check</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.4.1v2 &rarr; MS.SECURITYSUITE.3.1v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>3 Data Loss Prevention</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>A DLP policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN).</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-yellow diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.4.2v1 &rarr; MS.SECURITYSUITE.3.2v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>3 Data Loss Prevention</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td class="result-cell result-warning">Warning</td>
+  <td>The DLP policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices.</td>
+  <td>DLP custom policy applied to the following locations: Devices. Custom policy protecting sensitive info types NOT applied to: Exchange, OneDrive, SharePoint, Teams. Teams location requires DLP for Teams included in E5/G5 licenses. For full policy details, see the ActualValue field in the results file: ./RegoOutput.json</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.4.3v1 &rarr; MS.SECURITYSUITE.3.3v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>3 Data Loss Prevention</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.4.4v1 &rarr; MS.SECURITYSUITE.3.4v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>3 Data Loss Prevention</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the DLP policy.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.4.6v1 &rarr; MS.SECURITYSUITE.3.5v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>3 Data Loss Prevention</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>The DLP policy SHOULD include an action to block access to sensitive information by restricted applications and unwanted Bluetooth applications.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite35v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.5.1v1 &rarr; MS.SECURITYSUITE.4.1v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>4 Alerts</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>At a minimum, the following alerts SHALL be enabled: a. Suspicious email sending patterns detected. b. Suspicious Connector Activity. c. Suspicious Email Forwarding Activity. d. Messages have been delayed. e. Tenant restricted from sending unprovisioned email. f. Tenant restricted from sending email. g. A potentially malicious URL click was detected.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.5.2v1 &rarr; MS.SECURITYSUITE.4.2v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>4 Alerts</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM).</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite42v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.6.1v1 &rarr; MS.SECURITYSUITE.5.1v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>5 Audit Logging</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Unified audit logging SHALL be enabled.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.DEFENDER.6.3v1 &rarr; MS.SECURITYSUITE.5.2v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>5 Audit Logging</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell">N/A</td>
+  <td>Audit logs SHALL be retained and searchable for a minimum of 3 months and retrievable for a minimum of 12 months.</td>
+  <td>This product does not currently have the capability to check compliance for this policy. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/securitysuite.md#mssecuritysuite52v1 for instructions on manual check</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.6.1v1</td>
+  <td>6 Inbound Anti-Spam Protections</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Emails detected as spam and phishing SHALL NOT be delivered to the user&#39;s inbox.</td>
+  <td>Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.6.2v1</td>
+  <td>6 Inbound Anti-Spam Protections</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Allowed domains SHALL NOT be added to inbound anti-spam protection policies.</td>
+  <td>Requirement met. Standard preset is active and compliant (Strict not active or non-compliant). Custom and Default policies not evaluated</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.7.1v1</td>
+  <td>7 Link Protection</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams messages, and Office documents.</td>
+  <td>URL comparison with a block-list is enabled via the standard or strict preset security policies.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.7.2v1</td>
+  <td>7 Link Protection</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Direct download links SHOULD be scanned for malware.</td>
+  <td>Direct download links are scanned for malware via the standard or strict preset security policies.</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="NewPolicy">
+  <td>MS.SECURITYSUITE.7.3v1</td>
+  <td>7 Link Protection</td>
+  <td class="classification-label">New Policy</td>
+  <td class="result-cell"></td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>User click tracking SHOULD be enabled.</td>
+  <td>User click tracking is enabled via the standard or strict preset security policies.</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.EXO.12.1v1 &rarr; MS.SECURITYSUITE.8.1v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>8 IP Allow Lists</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>IP allow lists SHOULD NOT be created.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged" data-migrated="true">
+  <td>MS.EXO.12.2v1 &rarr; MS.SECURITYSUITE.8.2v1 <span class="migrated-badge" title="Aligned across the legacy to Security Suite policy migration">migrated</span></td>
+  <td>8 IP Allow Lists</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Safe lists SHOULD NOT be enabled.</td>
+  <td>Requirement met</td>
+</tr>
+</table>
+<h2>Microsoft Teams</h2>
+<table class="policy-diff">
+<tr><th>Control ID</th><th>Group</th><th>Diff</th><th>Result (Before)</th><th>Result (After)</th><th>Requirement</th><th>Details (After)</th></tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.1.1v1</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.1.2v1 &rarr; MS.TEAMS.1.2v2</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Anonymous users SHALL NOT be enabled to start Microsoft Teams meetings.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.1.3v1</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Anonymous users and dial-in callers SHOULD NOT be admitted automatically.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.1.4v1</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Internal users SHOULD be admitted to Microsoft Teams meetings automatically.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.1.5v1</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Dial-in users SHOULD NOT be enabled to bypass the lobby.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.1.6v1</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Meeting recording SHOULD be disabled.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.1.7v2</td>
+  <td>1 Meeting Policies</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>&quot;Record an event&quot; SHOULD NOT be set to &quot;Always record.&quot;</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.2.1v1 &rarr; MS.TEAMS.2.1v2</td>
+  <td>2 External User Access</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>External access for users SHALL only be enabled on a per-domain basis.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.2.2v1 &rarr; MS.TEAMS.2.2v2</td>
+  <td>2 External User Access</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Unmanaged users SHALL NOT be enabled to initiate contact with internal users.</td>
+  <td>This policy is not applicable to GCC, GCC High, or DOD environments. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/teams.md#msteams22v2 for more info</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.2.3v1 &rarr; MS.TEAMS.2.3v2</td>
+  <td>2 External User Access</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Internal users SHOULD NOT be enabled to initiate contact with unmanaged users.</td>
+  <td>This policy is not applicable to GCC, GCC High, or DOD environments. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/teams.md#msteams23v2 for more info</td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.3.1v1</td>
+  <td>3 Skype Users</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell"></td>
+  <td>Contact with Skype users SHALL be blocked.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-green diff-unchanged-row" data-classification="Unchanged">
+  <td>MS.TEAMS.4.1v1</td>
+  <td>4 Teams Email Integration</td>
+  <td class="classification-label">Unchanged</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Microsoft Teams email integration SHALL be disabled.</td>
+  <td>This policy is not applicable to GCC, GCC High, or DOD environments. See Secure Configuration Baseline policy, https://github.com/cisagov/ScubaGear/blob/v2.0.0/PowerShell/ScubaGear/baselines/teams.md#msteams41v1 for more info</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.5.1v1 &rarr; MS.TEAMS.5.1v2</td>
+  <td>5 App Management</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Agencies SHOULD only allow installation of Microsoft applications approved by the agency.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.5.2v1 &rarr; MS.TEAMS.5.2v2</td>
+  <td>5 App Management</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Agencies SHOULD only allow installation of third-party applications approved by the agency.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-green" data-classification="PolicyVersionUpdate">
+  <td>MS.TEAMS.5.3v1 &rarr; MS.TEAMS.5.3v2</td>
+  <td>5 App Management</td>
+  <td class="classification-label">Policy Version Update</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td class="result-cell result-pass">Pass</td>
+  <td>Agencies SHOULD only allow installation of custom applications approved by the agency.</td>
+  <td>Requirement met</td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.6.1v1</td>
+  <td>6 Data Loss Prevention</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>A DLP solution SHALL be enabled. The selected DLP solution SHOULD offer services comparable to the native DLP solution offered by Microsoft.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.6.2v1</td>
+  <td>6 Data Loss Prevention</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>The DLP solution SHALL protect personally identifiable information (PII) and sensitive information, as defined by the agency. At a minimum, sharing of credit card numbers, taxpayer identification numbers (TINs), and Social Security numbers (SSNs) via email SHALL be restricted.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.7.1v1</td>
+  <td>7 Malware Scanning</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Attachments included with Teams messages SHOULD be scanned for malware.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.7.2v1</td>
+  <td>7 Malware Scanning</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>Users SHOULD be prevented from opening or downloading files detected as malware.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.8.1v1</td>
+  <td>8 Link Protection</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>URL comparison with a blocklist SHOULD be enabled.</td>
+  <td></td>
+</tr>
+<tr class="diff-row diff-grey" data-classification="RemovedPolicy">
+  <td>MS.TEAMS.8.2v1</td>
+  <td>8 Link Protection</td>
+  <td class="classification-label">Removed Policy</td>
+  <td class="result-cell">N/A</td>
+  <td class="result-cell"></td>
+  <td>User click tracking SHOULD be enabled.</td>
+  <td></td>
+</tr>
+</table>
+
+<script id="dark-mode-flag" type="application/json">false</script>
+<script>
+/*
+ * Client-side behavior for the ScubaGear diff report (Invoke-SCuBADiff).
+ * Three controls:
+ *   1. "Show unchanged rows" toggles the visibility of Unchanged rows, which
+ *      are hidden by default. This follows the same
+ *      per-report script pattern used by the CreateReport module.
+ *   2. Per-classification filter checkboxes in the summary-table column headers. Each one
+ *      (every classification except Unchanged, which the toggle above owns) hides the
+ *      matching rows in the product tables, dims its own summary column, and
+ *      recomputes each product's Total. Unchanged is always counted in the Total.
+ *   3. "Dark Mode" toggles the light/dark theme by setting data-theme on <html>,
+ *      matching the mechanism in CreateReport/scripts/Utils.js.
+ */
+(function () {
+    "use strict";
+
+    function readFlag(id) {
+        var el = document.getElementById(id);
+        return el ? (el.textContent || "").trim() === "true" : false;
+    }
+
+    function setDarkMode(enabled) {
+        document.documentElement.dataset.theme = enabled ? "dark" : "light";
+    }
+
+    // The classifications whose filter checkbox is currently unchecked (hidden).
+    var hiddenClassifications = Object.create(null);
+    // The "Uncheck all filters" / "Check all filters" button (assigned on load).
+    var allFiltersBtn = null;
+
+    function anyChecked(toggles) {
+        for (var i = 0; i < toggles.length; i++) {
+            if (toggles[i].checked) { return true; }
+        }
+        return false;
+    }
+
+    function updateAllFiltersButton(toggles) {
+        if (!allFiltersBtn) { return; }
+        // When at least one classification is shown, the button clears them; once every
+        // classification is hidden it flips to restore them, so users are never stranded.
+        var someChecked = anyChecked(toggles);
+        allFiltersBtn.textContent = someChecked ? "Uncheck all filters" : "Check all filters";
+        allFiltersBtn.setAttribute("aria-pressed", someChecked ? "false" : "true");
+    }
+
+    function applyRowFilter() {
+        // Product diff rows carry data-classification; summary rows do not. Unchanged
+        // rows are governed by the "Show unchanged rows" toggle, so skip them here.
+        var rows = document.querySelectorAll("tr[data-classification]");
+        for (var i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (row.classList.contains("diff-unchanged-row")) { continue; }
+            var classification = row.getAttribute("data-classification");
+            row.style.display = hiddenClassifications[classification] ? "none" : "";
+        }
+    }
+
+    function applyColumnDim() {
+        var cells = document.querySelectorAll(".summary-table [data-classification]");
+        for (var i = 0; i < cells.length; i++) {
+            var classification = cells[i].getAttribute("data-classification");
+            if (hiddenClassifications[classification]) { cells[i].classList.add("col-off"); }
+            else { cells[i].classList.remove("col-off"); }
+        }
+    }
+
+    function recomputeTotals() {
+        var rows = document.querySelectorAll(".summary-table tr");
+        for (var i = 0; i < rows.length; i++) {
+            var totalCell = rows[i].querySelector(".summary-total");
+            if (!totalCell) { continue; }
+            var counts = rows[i].querySelectorAll("td[data-classification]");
+            var sum = 0;
+            for (var j = 0; j < counts.length; j++) {
+                var classification = counts[j].getAttribute("data-classification");
+                // Unchanged is always counted; other classifications only when active.
+                if (classification === "Unchanged" || !hiddenClassifications[classification]) {
+                    sum += parseInt(counts[j].getAttribute("data-count"), 10) || 0;
+                }
+            }
+            totalCell.textContent = String(sum);
+        }
+    }
+
+    function refreshClassificationFilters(toggles) {
+        hiddenClassifications = Object.create(null);
+        for (var i = 0; i < toggles.length; i++) {
+            if (!toggles[i].checked) {
+                hiddenClassifications[toggles[i].getAttribute("data-classification")] = true;
+            }
+        }
+        applyRowFilter();
+        applyColumnDim();
+        recomputeTotals();
+        updateAllFiltersButton(toggles);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Unchanged-rows toggle. Default: unchanged rows hidden.
+        var unchangedToggle = document.getElementById("toggle-unchanged");
+        if (unchangedToggle) {
+            unchangedToggle.addEventListener("change", function () {
+                document.body.classList.toggle("show-unchanged", unchangedToggle.checked);
+            });
+        }
+
+        // Per-classification filter checkboxes in the summary header.
+        var classificationToggles = document.querySelectorAll(".classification-toggle");
+        if (classificationToggles.length) {
+            for (var i = 0; i < classificationToggles.length; i++) {
+                classificationToggles[i].addEventListener("change", function () {
+                    refreshClassificationFilters(classificationToggles);
+                });
+            }
+
+            // "Uncheck all filters" button: clears every classification filter (and thus
+            // hides every classified row); once all are off it restores them.
+            allFiltersBtn = document.getElementById("toggle-all-filters");
+            if (allFiltersBtn) {
+                allFiltersBtn.addEventListener("click", function () {
+                    var target = !anyChecked(classificationToggles);
+                    for (var j = 0; j < classificationToggles.length; j++) {
+                        classificationToggles[j].checked = target;
+                    }
+                    refreshClassificationFilters(classificationToggles);
+                });
+            }
+
+            // Establish the initial state (all checked -> nothing hidden).
+            refreshClassificationFilters(classificationToggles);
+        }
+
+        // Dark mode toggle. Default comes from the PowerShell -DarkMode switch.
+        var darkDefault = readFlag("dark-mode-flag");
+        var darkToggle = document.getElementById("toggle-dark");
+        setDarkMode(darkDefault);
+        if (darkToggle) {
+            darkToggle.checked = darkDefault;
+            darkToggle.addEventListener("change", function () {
+                setDarkMode(darkToggle.checked);
+            });
+        }
+    });
+})();
+
+</script>
+</body>
+</html>
