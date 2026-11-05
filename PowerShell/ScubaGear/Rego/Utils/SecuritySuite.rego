@@ -248,6 +248,16 @@ AntiPhishRuleForPolicy(Rule, Policy) if {
     Rule.AntiPhishPolicy == Policy.Identity
 }
 
+CustomRuleCoversAllSenders(Rule) if {
+    RuleFieldEmpty(Rule.From)
+    RuleFieldEmpty(Rule.FromMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfFrom)
+    RuleFieldEmpty(Rule.ExceptIfFromMemberOf)
+    RuleFieldEmpty(Rule.ExceptIfSenderDomainIs)
+    RuleDomains := ConvertToSet(Rule.SenderDomainIs)
+    count(TenantDomainNames - RuleDomains) == 0
+}
+
 CustomRuleCoversAllRecipients(Rule) if {
     RuleFieldEmpty(Rule.SentTo)
     RuleFieldEmpty(Rule.SentToMemberOf)

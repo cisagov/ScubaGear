@@ -177,7 +177,8 @@ function Export-SecuritySuiteProvider {
     $SafeAttachmentPolicy = ConvertTo-Json @(Format-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentPolicy"))
     $SafeAttachmentRule = ConvertTo-Json @(Format-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-SafeAttachmentRule"))
     $BuiltInProtectionRule = ConvertTo-Json @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPBuiltInProtectionRule")
-
+    $OutboundSpamFilterPolicy = ConvertTo-Json @(Format-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedOutboundSpamFilterPolicy"))
+    $OutboundSpamFilterRule = ConvertTo-Json @(Format-SecuritySuitePolicyTable @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-HostedOutboundSpamFilterRule"))
     $ATPPolicyResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-AtpPolicyForO365" -SuppressWarning $true)
     $ATPProtectionPolicyRuleResult = @(Invoke-SecuritySuiteTrackedCommand -CmdletName "Get-ATPProtectionPolicyRule" -SuppressWarning $true)
 
@@ -254,6 +255,8 @@ function Export-SecuritySuiteProvider {
     "anti_malware_rules": $AntiMalwareRule,
     "securitysuite_successful_commands": $SuccessfulCommands,
     "securitysuite_unsuccessful_commands": $UnSuccessfulCommands,
+    "outbound_spam_policies": $OutboundSpamFilterPolicy, 
+    "outbound_spam_rules": $OutboundSpamFilterRule,
 "@
 
     $json
