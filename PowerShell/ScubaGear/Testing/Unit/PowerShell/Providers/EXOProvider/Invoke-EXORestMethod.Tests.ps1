@@ -87,17 +87,17 @@ Describe -Tag 'EXOProvider' -Name 'Invoke-EXORestMethod' {
             Invoke-EXORestMethod @script:InvokeParams | Out-Null
 
             Should -Invoke -ModuleName Utility Write-Warning -Times 1 -Exactly -ParameterFilter {
-                $Message -match 'transient connection error' -and $Message -match 'attempt 1 of 2'
+                $Message -match 'transient connection error' -and $Message -match 'attempt 1 of 3'
             }
         }
 
-        It 'Backs off 5s then 10s and throws the original error after 3 timeouts' {
+        It 'Backs off 5s, 10s then 20s and throws the original error after 4 timeouts' {
             Mock -ModuleName Utility Invoke-RestMethod { $script:Calls++; throw (New-TimeoutError) }
 
             { Invoke-EXORestMethod @script:InvokeParams } |
                 Should -Throw "Exchange Online API call 'Get-SafeAttachmentPolicy' failed: The operation has timed out"
-            $script:Calls | Should -Be 3
-            $script:Sleeps | Should -Be @(5, 10)
+            $script:Calls | Should -Be 4
+            $script:Sleeps | Should -Be @(5, 10, 20)
         }
 
         It 'Waits for the Retry-After value sent with HTTP <StatusCode>' -ForEach @(
@@ -118,7 +118,7 @@ Describe -Tag 'EXOProvider' -Name 'Invoke-EXORestMethod' {
             $script:Sleeps | Should -Be @(17)
         }
 
-        It 'Backs off and stops after three attempts on persistent HTTP <StatusCode>' -ForEach @(
+        It 'Backs off and stops after four attempts on persistent HTTP <StatusCode>' -ForEach @(
             @{ StatusCode = 429 }
             @{ StatusCode = 500 }
             @{ StatusCode = 502 }
@@ -131,8 +131,8 @@ Describe -Tag 'EXOProvider' -Name 'Invoke-EXORestMethod' {
             }
 
             { Invoke-EXORestMethod @script:InvokeParams } | Should -Throw "*($StatusCode)*"
-            $script:Calls | Should -Be 3
-            $script:Sleeps | Should -Be @(5, 10)
+            $script:Calls | Should -Be 4
+            $script:Sleeps | Should -Be @(5, 10, 20)
         }
     }
 
@@ -177,7 +177,7 @@ InModuleScope EXORestHelper {
                     $AccessToken -eq 'tok' -and
                     $Method -eq 'POST' -and
                     $TimeoutSec -eq 30 -and
-                    $MaxRetries -eq 2 -and
+                    $MaxRetries -eq 3 -and
                     $RetryDelaySeconds -eq 5 -and
                     $AdditionalHeaders['Prefer'] -eq 'odata.maxpagesize=1000' -and
                     $AdditionalHeaders['X-ResponseFormat'] -eq 'json' -and
