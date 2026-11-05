@@ -140,6 +140,10 @@ function Invoke-ScubaConfigAnalysis {
                 $providerAnalysis = if ($vtype -ne 'conditionalAccessPolicy' -and $candidateExclusionField) {
                     Get-ScAProviderAnalysis -ExclusionField $candidateExclusionField -Raw $results.Raw
                 } else { $null }
+                # RoleExclusions has no generic detector: permanent assignments live on privileged_roles.
+                if (-not $providerAnalysis -and $candidateExclusionField -eq 'RoleExclusions') {
+                    $providerAnalysis = Get-ScAPrivilegedRoleAssignmentAnalysis -Raw $results.Raw
+                }
 
                 # Retrieve the policy analysis for CA controls based on the validation schema.
                 $policyAnalysis = if ($validationSchema -and $vtype -eq 'conditionalAccessPolicy') {
@@ -173,7 +177,7 @@ function Invoke-ScubaConfigAnalysis {
 
                 # Root cause: provider (non-CA) controls get a data-driven, non-CA message;
                 # CA controls use the Conditional Access classifier.
-                if ($providerAnalysis) {
+                if ($providerAnalysis -and $providerAnalysis.ItemCount -gt 0) {
                     # If the result is 'Pass', mark the root cause as compliant.
                     # If there are flagged items, mark the root cause accordingly.
                     # Otherwise, mark the root cause as non-compliant.
@@ -182,6 +186,9 @@ function Invoke-ScubaConfigAnalysis {
                     } else {
                         $rootCause = Get-ScAProviderRootCause -ProviderAnalysis $providerAnalysis
                     }
+                } elseif ($vtype -and $vtype -ne 'conditionalAccessPolicy') {
+                    # A failed non-CA control must not be classified as a missing Conditional Access policy.
+                    $rootCause = Get-ScANonCaRootCause -Result $result -ValidationType $vtype -ValidationSchema $validationSchema
                 } else {
                     #Get the root cause and recommendations for this control result, based on the policy analysis.
                     $rootCause = Get-ScARootCause -Control $control -PolicyAnalysis $policyAnalysis
@@ -443,6 +450,9 @@ function Invoke-ScubaTenantScan {
             $providerAnalysis = if ($vtype -ne 'conditionalAccessPolicy' -and $candidateExclusionField) {
                 Get-ScAProviderAnalysis -ExclusionField $candidateExclusionField -Raw $resultsLike.Raw
             } else { $null }
+            if (-not $providerAnalysis -and $candidateExclusionField -eq 'RoleExclusions') {
+                $providerAnalysis = Get-ScAPrivilegedRoleAssignmentAnalysis -Raw $resultsLike.Raw
+            }
 
             # If no provider analysis was retrieved and the control is not a conditional access policy, flag it for manual review.
             # Handle the analysis based on the type of control (conditional access policy or provider analysis).
@@ -453,10 +463,15 @@ function Invoke-ScubaTenantScan {
             } elseif ($providerAnalysis) {
                 $policyAnalysis = @{ AllPolicies = @(); TotalPoliciesFound = 0 }
                 if ($providerAnalysis.ItemCount -eq 0) {
-                    # No source data was collected (e.g. the Exchange Online fetch failed or
-                    # returned nothing) - do NOT claim Pass; flag it as needing verification.
-                    $result = 'Manual'; $requiresAction = 'REVIEW'
-                    $rootCause = "Could not collect the data needed to check this baseline (no '$candidateExclusionField' source data). Verify the required module/connection (e.g. Connect-ExchangeOnline) and re-scan."
+                    # No source data was collected - do NOT claim Pass; flag it as needing verification.
+                    if ($candidateExclusionField -eq 'RoleExclusions' -or $vtype -eq 'roleAssignmentAnalysis') {
+                        $nonCa = Get-ScANonCaRootCause -Result 'Manual' -ValidationType 'roleAssignmentAnalysis' -ValidationSchema $control
+                        $result = 'Manual'; $requiresAction = $nonCa.RequiresAction; $rootCause = $nonCa.RootCause
+                        $providerRecommendations = @($nonCa.Recommendations)
+                    } else {
+                        $result = 'Manual'; $requiresAction = 'REVIEW'
+                        $rootCause = "Could not collect the data needed to check this baseline (no '$candidateExclusionField' source data). Verify the required module/connection (e.g. Connect-ExchangeOnline) and re-scan."
+                    }
                 } elseif (@($providerAnalysis.Flagged).Count -gt 0 -or @($providerAnalysis.Blocking).Count -gt 0) {
                     # Items were flagged: some may be waivable by config exclusions, others (Blocking) need a tenant fix.
                     $providerCause = Get-ScAProviderRootCause -ProviderAnalysis $providerAnalysis
@@ -469,10 +484,13 @@ function Invoke-ScubaTenantScan {
                     $rootCause = 'The tenant configuration meets this baseline.'
                 }
             } else {
-                # The control is not a conditional access policy and no provider analysis is available, so flag it for manual review.
+                # The control is not a conditional access policy and no provider analysis is available.
                 $policyAnalysis = @{ AllPolicies = @(); TotalPoliciesFound = 0 }
-                $result = 'Manual'; $requiresAction = 'REVIEW'
-                $rootCause = 'This baseline is configured outside Conditional Access and needs manual review (see steps).'
+                $nonCa = Get-ScANonCaRootCause -Result 'Manual' -ValidationType $vtype -ValidationSchema $control
+                $result = 'Manual'
+                $requiresAction = $nonCa.RequiresAction
+                $rootCause = $nonCa.RootCause
+                $providerRecommendations = @($nonCa.Recommendations)
             }
 
             # Retrieve the configuration action information for the current control based on the analysis result.

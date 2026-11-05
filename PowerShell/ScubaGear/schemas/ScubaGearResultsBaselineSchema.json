@@ -910,7 +910,7 @@
         "name": "Permanent active role assignments SHALL be limited",
         "category": "Privileged Identity Management",
         "description": "Permanent active role assignments SHALL be limited to emergency access accounts",
-        "exclusionField": "none",
+        "exclusionField": "RoleExclusions",
         "apiPermissionRef": "Get-MgRoleManagementDirectoryRoleAssignment",
         "validationLogic": {
           "type": "roleAssignmentAnalysis",
@@ -926,8 +926,9 @@
             "Roles with permanent active assignments found"
           ],
           "recommendations": [
-            "Convert permanent assignments to time-limited or eligible assignments in PIM",
-            "Exceptions: Emergency access accounts and service accounts"
+            "Replace unjustified permanent active assignments with eligible or time-limited assignments in Privileged Identity Management (PIM) or an alternative privileged access management (PAM) system.",
+            "Emergency access accounts, and service accounts that cannot perform role activation, may keep a permanent active assignment. Add only those object ids under RoleExclusions.",
+            "A group enrolled in PIM for Groups may keep a permanent active role assignment, because activation is managed through PIM for Groups. Confirm enrollment before treating a group as an exception; do not assume every group qualifies."
           ]
         },
         "remediationSteps": [
@@ -935,13 +936,17 @@
           "2. Go to Identity → Privileged Identity Management → Azure AD roles",
           "3. Click on the role with permanent assignments",
           "4. Review active role assignments",
-          "5. For each permanent assignment (except emergency access accounts):",
+          "5. For each unjustified permanent assignment:",
           "   - Remove the permanent assignment",
           "   - Add as eligible assignment with activation requirements",
           "   - OR add as active assignment with time-limited duration",
-          "6. Document emergency access account exclusions and justification"
+          "6. Exceptions that may keep a permanent active assignment:",
+          "   - Emergency access accounts",
+          "   - Service accounts that cannot perform role activation",
+          "   - A group enrolled in PIM for Groups, because activation is managed there. Confirm enrollment; do not assume every group qualifies.",
+          "7. Document each exception under RoleExclusions and keep the justification"
         ],
-        "notes": "Validates that roles do not have permanent active assignments except for emergency access accounts"
+        "notes": "Privileged role assignment control, not Conditional Access. Permanent active assignments fail unless they are justified emergency access accounts, service accounts that cannot activate roles, or groups enrolled in PIM for Groups. Confirm PIM for Groups enrollment; do not assume every group qualifies."
       },
       {
         "id": "MS.AAD.7.5v1",
