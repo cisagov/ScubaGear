@@ -90,6 +90,8 @@ InModuleScope Connection {
             }
 
             function Get-M365EnvironmentByDomain { throw 'this will be mocked' }
+
+            function Resolve-ScubaOrganization { throw 'this will be mocked' }
         }
 
         BeforeEach {
@@ -104,6 +106,7 @@ InModuleScope Connection {
             Mock Get-MsalAccessToken -MockWith { return "mock-pbi-access-token" }
             Mock Initialize-Msal -MockWith {}
             Mock Get-M365EnvironmentByDomain -MockWith { return 'commercial' }
+            Mock Resolve-ScubaOrganization -MockWith { return ,@((New-OrgDetails).Value) }
 
             # Tenant has a Power BI plan, and the running user has one too. Individual tests
             # override whichever half of this they are exercising.

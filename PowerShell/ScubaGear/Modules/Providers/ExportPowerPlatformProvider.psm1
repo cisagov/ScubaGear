@@ -1,4 +1,4 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
 
 function Export-PowerPlatformProvider {
     <#
@@ -30,7 +30,16 @@ function Export-PowerPlatformProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "PowerPlatformRestHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    $TenantDetails = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    # Recorded under the Get-MgBetaOrganization name so the report's command lists are unchanged.
+    try {
+        $TenantDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
+        $Tracker.AddSuccessfulCommand("Get-MgBetaOrganization")
+    }
+    catch {
+        Write-Warning "Error running Get-MgBetaOrganization: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
+        $Tracker.AddUnSuccessfulCommand("Get-MgBetaOrganization")
+        $TenantDetails = @()
+    }
     $TenantId = if ($TenantDetails.Id) { $TenantDetails.Id } else { "" }
 
     $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
