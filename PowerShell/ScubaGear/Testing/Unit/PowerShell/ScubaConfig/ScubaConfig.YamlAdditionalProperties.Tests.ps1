@@ -116,6 +116,7 @@ OutRegoFileName: RegoOutput
 OutReportName: BaselineReports
 DisconnectOnExit: false
 SkipDoH: false
+SkipLongFunctions: true
 "@
 
             $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.yaml')
@@ -353,6 +354,7 @@ PreferredDnsResolvers:
   - 8.8.8.8
   - 1.1.1.1
 SkipDoH: false
+SkipLongFunctions: false
 OmitPolicy:
   MS.AAD.1.1v1:
     Rationale: Test omission

@@ -230,6 +230,69 @@ InModuleScope -ModuleName ExportAADProvider {
             $ValidJson | Should -Be $true
         }
 
+        It "runs both risky permission checks unless SkipLongFunctions is set" {
+            $skippedCommands = @(
+                'Format-RiskyApplications'
+                'Format-RiskyThirdPartyServicePrincipals'
+                'Get-ApplicationsWithRiskyPermissions'
+                'Get-ServicePrincipalsWithRiskyPermissions'
+            )
+            $stillRun = @(
+                'Get-DedicatedExchangeHybridApplications'
+                'Get-LegacyExchangeServicePrincipal'
+                'Get-MgBetaDomain'
+                'Get-MgBetaIdentityConditionalAccessPolicy'
+                'Get-MgBetaPolicyDefaultAppManagementPolicy'
+                'Get-PrivilegedRole'
+                'Get-PrivilegedUser'
+                'Get-ServicePrincipalsWithRiskyDelegatedPermissionClassifications'
+            )
+
+            foreach ($label in @('default', 'explicit false')) {
+                $MockCommandTracker.SuccessfulCommands = @()
+                $MockCommandTracker.UnSuccessfulCommands = @()
+                if ($label -eq 'default') {
+                    $null = Export-AADProvider -M365Environment 'commercial'
+                }
+                else {
+                    $null = Export-AADProvider -M365Environment 'commercial' -SkipLongFunctions:$false
+                }
+                foreach ($command in $skippedCommands) {
+                    $MockCommandTracker.SuccessfulCommands | Should -Contain $command -Because "$command runs for $label"
+                }
+            }
+
+            $MockCommandTracker.SuccessfulCommands = @()
+            $MockCommandTracker.UnSuccessfulCommands = @()
+            $null = Export-AADProvider -M365Environment 'commercial'
+            $defaultCommands = @($MockCommandTracker.SuccessfulCommands)
+
+            $MockCommandTracker.SuccessfulCommands = @()
+            $MockCommandTracker.UnSuccessfulCommands = @()
+            $Json = Export-AADProvider -M365Environment 'commercial' -SkipLongFunctions
+            $skippedRun = @($MockCommandTracker.SuccessfulCommands)
+
+            foreach ($command in $skippedCommands) {
+                $skippedRun | Should -Not -Contain $command
+                $MockCommandTracker.UnSuccessfulCommands | Should -Not -Contain $command
+            }
+            foreach ($command in $stillRun) {
+                $skippedRun | Should -Contain $command
+            }
+            $onlyInDefault = @($defaultCommands | Where-Object { $skippedRun -notcontains $_ } | Sort-Object -Unique)
+            $onlyWhenSkipped = @($skippedRun | Where-Object { $defaultCommands -notcontains $_ })
+            $onlyInDefault | Should -Be $skippedCommands
+            $onlyWhenSkipped | Should -BeNullOrEmpty
+
+            (Test-SCuBAValidProviderJson -Json $Json | Select-Object -Last 1) | Should -BeTrue
+            $Json | Should -Match '"risky_applications":\s*\[\s*\]'
+            $Json | Should -Match '"risky_third_party_service_principals":\s*\[\s*\]'
+            $Json | Should -Match '"conditional_access_policies":'
+            $Json | Should -Match '"privileged_roles":'
+            $Json | Should -Match '"risky_delegated_permission_classifications":'
+            $Json | Should -Match '"legacy_exchange_service_principal":'
+        }
+
         It "returns valid JSON if Format-RiskyApplications and Format-ThirdPartyServicePrincipals return $null" {
             # Override defaults
             $MockCommandTracker.AddMockCommand("Format-RiskyApplications", { return $null })
