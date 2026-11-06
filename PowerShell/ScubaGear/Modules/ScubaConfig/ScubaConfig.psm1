@@ -38,6 +38,7 @@ class ScubaConfig {
     hidden static [object]$_ConfigDefaults = $null
     # Cached JSON schema used for validation
     hidden static [object]$_ConfigSchema = $null
+    [Boolean]$M365EnvironmentProvided = $false
 
     # Initializes validator subsystem once per session - loads schemas/defaults from JSON files,
     # caches resources in static properties for performance.
@@ -103,6 +104,13 @@ class ScubaConfig {
         }
         elseif ($Name -eq 'DefaultPrivilegedRoles') {
             return [ScubaConfig]::_ConfigDefaults.privilegedRoles
+        }
+        elseif ($Name -eq 'AuthenticationClientIdHashtable') {
+            $ClientIdHash = @{}
+            foreach ($Property in [ScubaConfig]::_ConfigDefaults.AuthenticationClientIdHashtable.PSObject.Properties) {
+                $ClientIdHash[$Property.Name] = [string]$Property.Value
+            }
+            return $ClientIdHash
         }
         elseif ($Name.StartsWith('Default')) {
             # For standard "Default" prefixed names, auto-resolve from defaults section
@@ -239,6 +247,8 @@ class ScubaConfig {
         if ($this.Configuration -is [PSCustomObject]) {
             $this.Configuration = [ScubaConfig]::ConvertPSObjectToHashtable($this.Configuration)
         }
+
+        $this.M365EnvironmentProvided = $this.Configuration.ContainsKey('M365Environment')
 
         # Apply default values and process special configuration properties
         # This ensures all required properties have values for subsequent processing
@@ -645,7 +655,8 @@ class ScubaConfig {
         foreach ($PropertyName in $Defaults.PSObject.Properties.Name) {
             # Only set default if the property wasn't explicitly provided in the configuration file
             # This respects user's explicit choices while filling in gaps with sensible defaults
-            if (-not $this.Configuration.$PropertyName) {
+            # An explicit boolean (including false) is a user's choice, not a missing value
+            if ($this.Configuration.$PropertyName -isnot [bool] -and -not $this.Configuration.$PropertyName) {
                 Write-Debug "Setting default value for '$PropertyName'"
                 # Copy the default value from the defaults configuration
                 $this.Configuration[$PropertyName] = $Defaults.$PropertyName
@@ -767,6 +778,75 @@ class ScubaConfig {
     static [array] GetSupportedEnvironments() {
         [ScubaConfig]::InitializeValidator()
         return [ScubaConfig]::_ConfigSchema.properties.M365Environment.enum
+    }
+
+    # Returns the default Scuba GitHub URL from the configuration schema.
+    static [string] GetScubaGitHubUrl() {
+        return [ScubaConfig]::ScubaDefault('DefaultScubaGitHubUrl')
+    }
+
+    # Returns array of all valid product names from the configuration schema.
+    static [array] GetAllValidProductNames() {
+        [ScubaConfig]::InitializeValidator()
+        return [ScubaConfig]::_ConfigSchema.properties.ProductNames.items.enum
+    }
+
+    # Returns the baseline name for a given product from the configuration schema.
+    static [string] GetProductBaselineName([string]$ProductName) {
+        [ScubaConfig]::InitializeValidator()
+        # Retrieve the product information from the report product names in the configuration schema.
+        $info = [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.$ProductName
+        # Throw an error if the product information is not found.
+        if ($null -eq $info) { throw "Unknown product name: '$ProductName'" }
+        return $info.baselineName
+    }
+
+    # Returns an array of all baseline names from the configuration schema.
+    static [array] GetProductBaselineNames() {
+        [ScubaConfig]::InitializeValidator()
+        # Retrieve all baseline names from the report product names in the configuration schema.
+        return [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties |
+            Where-Object { $_.Name -notlike '_*' } |
+            ForEach-Object { $_.Value.baselineName }
+    }
+
+    # Returns the display name for a given baseline name from the configuration schema.
+    static [string] GetDisplayNameFromBaselineName([string]$BaselineName) {
+        [ScubaConfig]::InitializeValidator()
+        # Iterate through the report product names to find the matching baseline name
+        foreach ($property in [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties) {
+            if ($property.Name -notlike '_*' -and $property.Value.baselineName -eq $BaselineName) {
+                return $property.Value.displayName
+            }
+        }
+        # Throw an error if no matching baseline name is found.
+        throw "Unknown baseline name: '$BaselineName'"
+    }
+
+    # Returns a hashtable of deprecated product aliases from the configuration schema.
+    static [hashtable] GetDeprecatedProductAliases() {
+        [ScubaConfig]::InitializeValidator()
+        $aliases = @{}
+        # Iterate through the deprecated product aliases and populate the hashtable
+        foreach ($property in [ScubaConfig]::_ConfigSchema.schemaMetadata.deprecatedProductAliases.PSObject.Properties) {
+            if ($property.Name -notlike '_*') { $aliases[$property.Name] = $property.Value }
+        }
+        # Return the populated hashtable of deprecated product aliases.
+        return $aliases
+    }
+
+    # Returns the tenant detail provider for the given product names based on priority.
+    static [string] GetTenantDetailProvider([string[]]$ProductNames) {
+        [ScubaConfig]::InitializeValidator()
+        # Find the first matching product name based on tenant detail priority.
+        $match = [ScubaConfig]::_ConfigSchema.schemaMetadata.reportProductNames.PSObject.Properties |
+            Where-Object { $_.Name -notlike '_*' -and $ProductNames -contains $_.Name } |
+            Sort-Object { $_.Value.tenantDetailPriority } |
+            Select-Object -First 1
+
+        # Return 'unknown' if no match is found, otherwise return the tenant detail provider.
+        if ($null -eq $match) { return 'unknown' }
+        return $match.Value.tenantDetailProvider
     }
 
     # Returns configuration information for specified product (baseline file, capabilities, etc.).

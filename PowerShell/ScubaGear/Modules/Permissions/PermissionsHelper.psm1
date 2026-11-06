@@ -48,10 +48,6 @@ Function Get-ScubaGearPermissions {
         NAME: Get-ScubaGearPermissions
         VERSION: 3.0
 
-        USE TO FIND PERMS:
-            (Find-MgGraphCommand -Command Get-MgBetaPolicyRoleManagementPolicyAssignment).Permissions | Select Name, IsLeastPrivilege
-            Find-MgGraphPermission -All
-
         CHANGELOG:
         2024-10-03 - Initial version
         2024-12-20 - Added pipeline and multi-product support

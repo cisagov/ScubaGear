@@ -11,9 +11,9 @@ Install-ScubaDependencies
 
 > **Note**: `Install-ScubaDependencies` was previously named `Initialize-SCuBA`. The old name is retained as a backward-compatible alias, so existing scripts continue to work.
 
-`Install-ScubaDependencies` will install the modules in the [PowerShell Module Dependencies](#powershell-module-dependencies) section on your system. It will also install [OPA](https://www.openpolicyagent.org).
+`Install-ScubaDependencies` will install the modules in the [PowerShell Module Dependencies](#powershell-module-dependencies) section on your system. It will also install [OPA](https://www.openpolicyagent.org) and the Microsoft Authentication Library (MSAL) assemblies used for Microsoft Graph authentication.
 
-> **Note**: The `Install-ScubaDependencies` cmdlet creates a `.scubagear` folder in the users home directory.  This is where it stores OPA and any other related files.
+> **Note**: The `Install-ScubaDependencies` cmdlet creates a `.scubagear` folder in the users home directory.  This is where it stores OPA, the MSAL assemblies, and any other related files.
 
 ## PowerShell Module Dependencies
 
@@ -21,12 +21,34 @@ The following PowerShell modules are required for ScubaGear to function properly
 
 | Module Name                                   | Minimum Version | Maximum Version  | Purpose                                      |
 |:---------------------------------------------:|:---------------:|:----------------:|:---------------------------------------------|
-| Microsoft.Graph.Authentication |           2.0.0 |           2.25.0 | Microsoft Graph API authentication |
 | powershell-yaml |           0.4.2 |           0.4.12 | YAML file processing and configuration management |
 
 > **Note**: SharePoint and PowerPlatform data are now retrieved via REST API and no longer require Microsoft.Online.SharePoint.PowerShell or PnP.PowerShell modules.
 
 > **Note**: The maximum versions are updated to the latest available versions on a scheduled basis.
+
+ScubaGear does not bundle the Microsoft Authentication Library (MSAL). The pinned version, package hashes, expected assembly hashes, and required Authenticode signer are declared in [RequiredVersions.ps1](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/RequiredVersions.ps1) (`$MsalDependency`). The signed assemblies are downloaded from NuGet on first use and cached under `~/.scubagear/MSAL/<version>/net462`. Every assembly is verified by SHA-256 and Microsoft Authenticode signature before it is loaded, both at install time and at runtime.
+
+## MSAL Installation
+
+Normally, the `Install-ScubaDependencies` cmdlet downloads the MSAL assemblies. This can be verified by looking for the DLLs in `C:\Users\johndoe\.scubagear\MSAL\<version>\net462`. If it failed to do so, or you skipped it with `-NoMSAL`, you can install them separately:
+
+```powershell
+# Download and verify the pinned MSAL assemblies
+Install-MsalForScuBA
+```
+
+To force a re-download over an existing cache, use `Install-MsalForScuBA -Force`.
+
+### Offline / air-gapped installation
+
+For hosts without internet access, pre-stage the assemblies and point ScubaGear at them with the `ScubaGearMsalPath` environment variable. Copy the DLLs listed in `$MsalDependency.Files` into a folder and set:
+
+```powershell
+$env:ScubaGearMsalPath = "D:\offline\msal\net462"
+```
+
+ScubaGear validates the pre-staged files against the pinned hashes and signer before loading them; it will not download when a valid set is already present.
 
 ## OPA Installation
 

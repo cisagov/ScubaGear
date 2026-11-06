@@ -13,7 +13,7 @@ Describe -Tag 'Analyzer' -Name 'MS.EXO.1.1v2 default remote domain handling' {
         $script:paths = @{
             BaselineSchemaPath  = Join-Path $root 'schemas\ScubaGearResultsBaselineSchema.json'
             AnalyzerControlPath = Join-Path $root 'Modules\ScubaConfigApp\ScubaConfigAnalyzer_Control_en-US.json'
-            ConfigSchemaPath    = Join-Path $root 'Modules\ScubaConfig\ScubaConfigSchema.json'
+            ConfigSchemaPath    = Join-Path $root 'schemas\ScubaConfigSchema.json'
         }
 
         function Get-ExoFinding {

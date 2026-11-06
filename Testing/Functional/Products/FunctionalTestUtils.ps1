@@ -1,5 +1,5 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
-Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom, Get-HttpResponseDetails
+Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom, Get-HttpResponseDetails, Get-HttpRetryInfo
 
 function Get-FunctionalTestHeaderValue {
   param(
@@ -262,10 +262,12 @@ function Invoke-FunctionalExoRestRequest {
 
     } catch {
       $Message = $_.Exception.Message
+      $RetryInfo = Get-HttpRetryInfo -Exception $_.Exception
 
-      # Detect HTTP status codes from Invoke-FunctionalTestRestRequest exception messages
-      $StatusCode = 0
-      if ($Message -match 'status code (\d+)') {
+      # Invoke-FunctionalTestRestRequest rethrows the original web exception, so the real status code is on
+      # the response. The message match only covers the errors it throws itself ("unexpected HTTP status code 500").
+      $StatusCode = $RetryInfo.StatusCode
+      if ($StatusCode -eq 0 -and $Message -match 'status code (\d+)') {
         $StatusCode = [int]$Matches[1]
       }
 
@@ -277,17 +279,18 @@ function Invoke-FunctionalExoRestRequest {
         return $null
       }
 
-      # Retry on transient HTTP errors
-      $IsTransient = $StatusCode -in @(429, 500, 502, 503, 504)
+      # Retry on transient HTTP errors and on requests that never got a response (timeouts, dropped connections).
+      # A retried New-* that actually went through the first time fails with "already exists", which is no worse
+      # than failing on the timeout.
+      $IsTransient = $RetryInfo.IsNetworkError -or ($StatusCode -in @(429, 500, 502, 503, 504))
       if ($IsTransient -and $Attempt -lt $MaxRetries) {
         $Delay = $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1)
-
-        # Honor Retry-After for 429
-        if ($StatusCode -eq 429 -and $Message -match 'Retry-After:\s*(\d+)') {
-          $Delay = [math]::Max($Delay, [int]$Matches[1])
+        if ($RetryInfo.RetryAfterSeconds -gt 0) {
+          $Delay = [math]::Max($Delay, $RetryInfo.RetryAfterSeconds)
         }
 
-        Write-Information "[EXO] $CmdletName failed with HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
+        $Reason = if ($RetryInfo.IsNetworkError) { "got no response ($Message)" } else { "failed with HTTP $StatusCode" }
+        Write-Information "[EXO] $CmdletName $Reason (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
         Start-Sleep -Seconds $Delay
         continue
       }
@@ -1726,6 +1729,91 @@ function Set-PowerBITenantSetting {
 }
 
 # -----------------------------------------------------------------------
+# SharePoint tenant sharing changes are eventually-consistent: dependent fields
+# (ODBSharingCapability, *AnonymousLinkType, EmailAttestation*) are rejected with a
+# 400/500 until a just-changed SharingCapability finishes propagating. These helpers give
+# Set-SPOTenant the same poll/retry resilience the EXO and Power Platform wrappers have.
+function Invoke-SPOTenantPost {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)] [hashtable]$Headers,
+        [Parameter(Mandatory = $true)] [string]$Body,
+        [int]$MaxRetries = 5,
+        [int]$BaseDelaySeconds = 5
+    )
+    for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+        try {
+            return Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" `
+                -Method POST -Headers $Headers -Body $Body
+        }
+        catch {
+            $Message = $_.Exception.Message
+            $StatusCode = 0
+            if ($Message -match '\((\d{3})\)') { $StatusCode = [int]$Matches[1] }
+            elseif ($Message -match 'status code (\d+)') { $StatusCode = [int]$Matches[1] }
+            # 400/500 here are the tenant rejecting a dependent field before the SharingCapability
+            # change has propagated; retry them alongside transient throttling/5xx.
+            $Retryable = $StatusCode -in @(400, 429, 500, 502, 503, 504)
+            if ($Retryable -and $Attempt -lt $MaxRetries) {
+                $Delay = [math]::Min(60, $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1))
+                Write-Information "[SPO] SPO.Tenant POST failed with HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
+                Start-Sleep -Seconds $Delay
+                continue
+            }
+            throw
+        }
+    }
+}
+
+function Wait-SPOTenantSettings {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)] [hashtable]$Expected,
+        [int]$MaxAttempts = 12,
+        [int]$DelaySeconds = 5
+    )
+    # Fields excluded from read-your-writes verification:
+    #  - __metadata / free-form domain lists can't be reliably string-compared.
+    #  - DefaultSharingLinkType/DefaultLinkPermission (esp. =None) are transient: SharePoint
+    #    normalizes them shortly after the write, so polling never converges and would push the
+    #    assessment read past the applied value. The assessment must read those immediately.
+    # Everything else is polled until read-your-writes consistent.
+    $SkipFields = @(
+        'SharingBlockedDomainList', 'SharingAllowedDomainList', '__metadata',
+        'DefaultSharingLinkType', 'DefaultLinkPermission'
+    )
+    $Targets = @{}
+    foreach ($Key in $Expected.Keys) {
+        if ($Key -in $SkipFields) { continue }
+        $Targets[$Key] = $Expected[$Key]
+    }
+    if ($Targets.Count -eq 0) { return }
+
+    $GetHeaders = @{
+        Authorization  = "Bearer $script:SPOAccessToken"
+        Accept         = "application/json;odata=verbose"
+        "Content-Type" = "application/json;odata=verbose"
+    }
+    for ($Attempt = 1; $Attempt -le $MaxAttempts; $Attempt++) {
+        try {
+            $Tenant = (Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" `
+                -Method GET -Headers $GetHeaders).d
+            $AllMatch = $true
+            foreach ($Key in $Targets.Keys) {
+                # String compare normalizes int/bool JSON values (e.g. 1, False) uniformly.
+                if ("$($Tenant.$Key)" -ne "$($Targets[$Key])") { $AllMatch = $false; break }
+            }
+            if ($AllMatch) { return }
+        }
+        catch {
+            Write-Information "[SPO] Polling tenant settings failed (attempt $Attempt/$MaxAttempts): $($_.Exception.Message)" -InformationAction Continue
+        }
+        if ($Attempt -lt $MaxAttempts) { Start-Sleep -Seconds $DelaySeconds }
+    }
+    Write-Information "[SPO] Tenant settings did not reach expected values after $MaxAttempts attempt(s); proceeding anyway." -InformationAction Continue
+}
+
+# -----------------------------------------------------------------------
 # SharePoint Online REST wrapper for functional test preconditions.
 # Replaces the removed Microsoft.Online.SharePoint.PowerShell Set-SPOTenant
 # cmdlet. $script:SPOAdminUrl and $script:SPOAccessToken must be set by
@@ -1784,8 +1872,11 @@ function Set-SPOTenant {
             SharingCapability = $SharingCapabilityMap[$SharingCapability]
         }
 
-        Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-            -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5)
+        Invoke-SPOTenantPost -Headers $Headers -Body ($FirstBody | ConvertTo-Json -Depth 5)
+
+        # Wait for the SharingCapability change to propagate before sending dependent fields;
+        # SPO rejects ODB/anonymous-link/attestation fields until it is live.
+        Wait-SPOTenantSettings -Expected @{ SharingCapability = $SharingCapabilityMap[$SharingCapability] }
 
         # Second call: remaining fields (skip SharingCapability)
         $RestBody = @{ "__metadata" = @{ "type" = "Microsoft.Online.SharePoint.TenantAdministration.Tenant" } }
@@ -1804,8 +1895,10 @@ function Set-SPOTenant {
         }
 
         if ($RestBody.Count -gt 1) {
-            Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-                -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5)
+            Invoke-SPOTenantPost -Headers $Headers -Body ($RestBody | ConvertTo-Json -Depth 5)
+            # Read-your-writes: block until the dependent settings are visible so the
+            # subsequent ScubaGear assessment doesn't read stale (pre-change) values.
+            Wait-SPOTenantSettings -Expected $RestBody
         }
         return
     }
@@ -1827,8 +1920,10 @@ function Set-SPOTenant {
         $Body[$Param] = $Mapped
     }
 
-    Invoke-FunctionalTestRestRequest -Uri "$script:SPOAdminUrl/_api/SPO.Tenant" -Method POST `
-        -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5)
+    Invoke-SPOTenantPost -Headers $Headers -Body ($Body | ConvertTo-Json -Depth 5)
+    # Read-your-writes: block until the settings are visible so the subsequent
+    # ScubaGear assessment doesn't read stale (pre-change) values.
+    Wait-SPOTenantSettings -Expected $Body
 }
 
 # Helper functions for functional test

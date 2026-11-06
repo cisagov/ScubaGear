@@ -7,7 +7,7 @@
   "ConnectHelpersPath": "..\\Connection\\ConnectHelpers.psm1",
   "BaselineSchemaPath": "..\\..\\schemas\\ScubaGearResultsBaselineSchema.json",
   "ApiCatalogPath": "..\\..\\schemas\\ScubaGearApiCatalog.json",
-  "ConfigSchemaPath": "..\\ScubaConfig\\ScubaConfigSchema.json",
+  "ConfigSchemaPath": "..\\..\\schemas\\ScubaConfigSchema.json",
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearResultsBaselineSchema.json",
   "OnlineApiCatalogURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaGearApiCatalog.json",
   "tenantGovernanceSchemaURL": "https://www.schemastore.org/utcm-monitor.json",
@@ -182,6 +182,14 @@
         "displayName"
       ]
     }
+  },
+
+  "importedConfig": {
+    "_comment": "Controls how the configuration a ScubaGear run used (Raw.scuba_config in a results file) is carried into the generated YAML. machineSpecificKeys are paths that only exist on the machine that produced the results; they are written as commented-out lines so the YAML still runs elsewhere.",
+    "machineSpecificKeys": [
+      "OPAPath",
+      "OutPath"
+    ]
   },
 
   "exclusionDefinitions": {

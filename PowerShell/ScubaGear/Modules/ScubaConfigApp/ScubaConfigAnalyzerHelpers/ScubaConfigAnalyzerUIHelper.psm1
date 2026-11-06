@@ -94,6 +94,10 @@
     Part of the ScubaGear project - https://github.com/cisagov/ScubaGear
 #>
 
+# The Graph session is the cross-module singleton created in ConnectHelpers.psm1; this file hands it to the runspaces it creates.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+
 # ------------------------------------------------------------------------------------
 # Small helpers
 # ------------------------------------------------------------------------------------
@@ -296,18 +300,17 @@ function Update-ScubaAnalyzerControlYaml {
     param([Parameter(Mandatory)]$Finding)
     try {
         # Build one schema-keyed value map covering both principal and list exclusion shapes.
+        # DetectedExclusionValues wins: it also carries the exclusions from the imported config.
         $vals = [ordered]@{}
+        if ($Finding.DetectedExclusionValues) {
+            foreach ($k in @($Finding.DetectedExclusionValues.Keys)) {
+                if (@($Finding.DetectedExclusionValues[$k]).Count -gt 0) { $vals[$k] = @($Finding.DetectedExclusionValues[$k]) }
+            }
+        }
         if ($Finding.DetectedExclusions) {
             foreach ($k in @($Finding.DetectedExclusions.Keys)) {
                 $v = $Finding.DetectedExclusions[$k]
-                if ($null -ne $v -and @($v).Count -gt 0) { $vals[$k] = @($v) }
-            }
-        }
-        if ($Finding.DetectedExclusionValues) {
-            foreach ($k in @($Finding.DetectedExclusionValues.Keys)) {
-                if (-not $vals.Contains($k) -and @($Finding.DetectedExclusionValues[$k]).Count -gt 0) {
-                    $vals[$k] = @($Finding.DetectedExclusionValues[$k])
-                }
+                if (-not $vals.Contains($k) -and $null -ne $v -and @($v).Count -gt 0) { $vals[$k] = @($v) }
             }
         }
         # DisplayNameLookup lets the snippet annotate each id with '# Friendly Name'.
@@ -419,6 +422,12 @@ function Select-ScubaAnalyzerPolicy {
         # Keep the schema-keyed value map in sync so both YAML views follow the choice.
         $dv = [ordered]@{}
         foreach ($k in @($finding.DetectedExclusions.Keys)) { if (@($finding.DetectedExclusions[$k]).Count -gt 0) { $dv[$k] = @($finding.DetectedExclusions[$k]) } }
+        # Exclusions already in the imported config stay; the chosen policy's are appended.
+        if ($finding.ConfiguredExclusionValues) {
+            foreach ($k in @($finding.ConfiguredExclusionValues.Keys)) {
+                $dv[$k] = @(@($dv[$k]) + @($finding.ConfiguredExclusionValues[$k]) | Where-Object { $_ } | Select-Object -Unique)
+            }
+        }
         $finding.DetectedExclusionValues = $dv
         Show-ScubaAnalyzerDetail        # re-render cards (updates which one is "in use")
         Update-ScubaAnalyzerFullYaml    # aggregate YAML follows the new choice
@@ -645,6 +654,16 @@ function Start-ScubaAnalyzerAnalysis {
 
         # Success: publish the result and repaint the findings list + aggregate YAML.
         $syncHash.Analysis = $syncHash.AnalysisSync.Result
+        # The results file's own config (scuba_config) seeds the environment selector and
+        # is merged into the generated YAML by Get-ScubaAnalyzerConfigYaml.
+        $importedConfig = $syncHash.Analysis.ImportedConfig
+        if ($importedConfig -and $importedConfig.Count -gt 0) {
+            if ($importedConfig.Contains('M365Environment')) {
+                $envItem = @($syncHash.Environment_ComboBox.Items | Where-Object { [string]$_ -eq [string]$importedConfig['M365Environment'] }) | Select-Object -First 1
+                if ($envItem) { $syncHash.Environment_ComboBox.SelectedItem = $envItem }
+            }
+            Write-ScubaAnalyzerLog "Imported configuration from results: $(@($importedConfig.Keys) -join ', ')"
+        }
         Update-ScubaAnalyzerFindings
         Update-ScubaAnalyzerFullYaml
         Update-ScubaAnalyzerTenantGovernanceJson
@@ -702,6 +721,7 @@ function Start-ScubaAnalyzerTenantScan {
         # Background runspace. It shares the real (synchronized) $syncHash for the ScA caches, paths
         # and launch params, imports the analyzer helpers (not the UI helper), and runs A -> C.
         $bg = [runspacefactory]::CreateRunspace(); $bg.ApartmentState = 'MTA'; $bg.ThreadOptions = 'ReuseThread'; $bg.Open()
+        $bg.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
         $bg.SessionStateProxy.SetVariable('syncHash', $syncHash)
         $bg.SessionStateProxy.SetVariable('connectSync', $connectSync)
         $bg.SessionStateProxy.SetVariable('helpersPath', $syncHash.HelperModulesPath)
@@ -913,6 +933,7 @@ function Open-ScubaConfigAppFromAnalyzer {
 
         $rs = [runspacefactory]::CreateRunspace()
         $rs.ApartmentState = 'STA'; $rs.ThreadOptions = 'ReuseThread'; $rs.Open()   # STA: it hosts a WPF window
+        $rs.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
         $rs.SessionStateProxy.SetVariable('modulePath', $syncHash.ScubaConfigAppModulePath)
         $rs.SessionStateProxy.SetVariable('configFile', $configFile)
         $rs.SessionStateProxy.SetVariable('online', $online)

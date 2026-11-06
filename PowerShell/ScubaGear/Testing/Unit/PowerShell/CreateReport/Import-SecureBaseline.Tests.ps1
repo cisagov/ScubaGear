@@ -11,6 +11,7 @@ InModuleScope CreateReport {
         @{Product = "powerplatform"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\powerplatform.md" -Resolve}
         @{Product = "sharepoint"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\sharepoint.md" -Resolve}
         @{Product = "teams"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\teams.md" -Resolve}
+        @{Product = "si"; MarkdownFilePath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\..\..\baselines\si.md" -Resolve}
     ){
         BeforeAll{
             Mock -ModuleName CreateReport -CommandName Write-Error {}

@@ -620,7 +620,7 @@ including the optional `-Online` path and the YAML import / policy migration pat
 flowchart TD
     START([Start-SCuBAConfigApp]) --> ONLINE{-Online\nswitch?}
 
-    ONLINE -- Yes --> GRAPH[Connect-MgGraph\nGraph queries available\nfor user, group, cert lookups]
+    ONLINE -- Yes --> GRAPH[Connect-GraphHelper\nMSAL-based Graph queries available\nfor user, group, cert lookups]
     ONLINE -- No  --> INIT
     GRAPH --> INIT
 

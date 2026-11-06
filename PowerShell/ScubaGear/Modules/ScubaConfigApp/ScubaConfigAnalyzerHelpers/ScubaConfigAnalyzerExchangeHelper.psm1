@@ -9,6 +9,8 @@
     Part of the ScubaGear project - https://github.com/cisagov/ScubaGear
 #>
 
+using module '..\..\ScubaConfig\ScubaConfig.psm1'
+
 function Connect-ScubaAnalyzerExchange {
     <#
     .SYNOPSIS
@@ -28,17 +30,16 @@ function Connect-ScubaAnalyzerExchange {
 
     # Reuse ScubaGear's own REST + MSAL helpers so the auth/endpoint logic stays identical.
     Import-Module $syncHash.EXORestHelperPath  -Force -ErrorAction Stop
-    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop
+    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearClientIdTable
 
-    # Tenant id + initial (onmicrosoft.com) domain for the endpoint / anchor mailbox, from the live
-    # Graph session established in Phase A.
-    $ctx = Get-MgContext
-    $tenantId     = if ($ctx) { [string]$ctx.TenantId } else { $null }
+    # Tenant id + initial (onmicrosoft.com) domain for the endpoint / anchor mailbox, resolved
+    # fresh below via Graph REST from the live session established in Phase A.
+    $tenantId     = $null
     $tenantDomain = $Organization
     # If the organization parameter is not provided, fall back to the tenant domain from the Graph context.
     # This ensures that the Exchange Online connection uses the correct tenant context.
     try {
-        $org = @((Invoke-MgGraphRequest -Method GET -Uri 'v1.0/organization' -OutputType PSObject).value)
+        $org = @((Invoke-ScubaGraphRequest -Method GET -Uri 'v1.0/organization' -ErrorAction Stop).value)
         if (@($org).Count -gt 0) {
             if (-not $tenantId) { $tenantId = [string]$org[0].id }
             $initial = @($org[0].verifiedDomains | Where-Object { $_.isInitial })
@@ -56,7 +57,8 @@ function Connect-ScubaAnalyzerExchange {
         $token = Get-MsalAccessToken -Scope $scope -CertificateThumbprint $CertificateThumbprint -AppID $AppId -Tenant $Organization -M365Environment $M365Environment
     } else {
         # ScubaGear's public client id for delegated EXO tokens.
-        $token = Get-MsalAccessToken -Scope $scope -ClientId 'fb78d390-0c51-40cd-8e17-fdbfab77341b' -Tenant $tenantDomain -M365Environment $M365Environment
+        $ClientIdHash = Get-ScubaGearClientIdTable
+        $token = Get-MsalAccessToken -Scope $scope -ClientId $ClientIdHash.exo -Tenant $tenantDomain -M365Environment $M365Environment
     }
 
     # Store the acquired access token and API endpoint in the shared hash for later use.

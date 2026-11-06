@@ -1,5 +1,17 @@
 
 :  # SCUBACONFIGAPPUI CHANGELOG
+## Unreleased - Config Analyzer carries the imported results configuration into the generated YAML
+
+### Enhancements
+- Config Analyzer: when a results file is loaded, the configuration that ScubaGear run used (`Raw.scuba_config`) is read by the new `ScubaConfigAnalyzerImportedConfigHelper.psm1` and merged into the generated YAML: settings, `ProductNames`, `OmitPolicy`, `AnnotatePolicy`, and product exclusions (including products not selected for analysis) are kept, and the analyzer's detected exclusions are appended to the matching controls. Only ScubaGear config schema keys are kept, values equal to the ScubaGear defaults are dropped, and machine-specific paths (`OPAPath`, `OutPath`, set by `importedConfig.machineSpecificKeys` in the control file) are written as commented-out lines.
+- Config Analyzer: the Environment selector is set to the loaded results' `M365Environment`.
+- Config Analyzer: **Use this policy** appends the chosen Conditional Access policy's exclusions to the ones already configured in the imported results instead of replacing them.
+
+### Bug Fixes
+- Config Analyzer: the per-control YAML now shows exclusions from the imported configuration for Conditional Access controls (previously only the detected policy exclusions were shown).
+- Config Analyzer: generated YAML values that would be read as another type (dates, numbers, booleans) or that contain YAML syntax characters are quoted.
+- Config Analyzer: emptying a control's exclusions (via `-ExclusionOverrides` or the UI) no longer writes the imported values back into the generated YAML.
+
 ## 2.8.12 (build 1500) [08/13/2026] - App-independent Baseline Policy Viewer, control cleanup, Analyzer online-baseline toggle
 
 ### Enhancements

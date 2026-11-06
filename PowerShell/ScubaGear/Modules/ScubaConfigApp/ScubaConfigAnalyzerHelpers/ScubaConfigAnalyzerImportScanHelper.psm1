@@ -222,6 +222,7 @@ function Invoke-ScubaConfigAnalysis {
 
                 # Merge in exclusions already present in the imported config (Raw.scuba_config)
                 # so an already-configured control still shows its values (even when it passes).
+                $configured = [ordered]@{}
                 if ($effExclusionField) {
                     $configured = Get-ScAConfiguredExclusionValues -Raw $results.Raw -ProductConfigKey $configKey -ControlId $controlId -ExclusionField $effExclusionField
                     foreach ($k in @($configured.Keys)) {
@@ -278,6 +279,7 @@ function Invoke-ScubaConfigAnalysis {
                     SelectedPolicyId   = if ($bestMatch) { $bestMatch.Id } else { $null }
                     DetectedExclusions = $detectedExclusions
                     DetectedExclusionValues = $exclusionValues
+                    ConfiguredExclusionValues = $configured
                     YamlBlock          = $yamlBlock
                     HasValidation      = [bool]$validationSchema
                     BuildInstructions  = if ($validationSchema) { $validationSchema.buildInstructions } else { $null }
@@ -317,6 +319,8 @@ function Invoke-ScubaConfigAnalysis {
         ConditionalAccessPolicies = @($results.Raw.conditional_access_policies)
         DisplayNameLookup = @{}
         UserUpnLookup = @{}
+        # The configuration the results were produced with, carried into the generated YAML.
+        ImportedConfig = Get-ScAImportedConfig -Raw $results.Raw -ConfigSchemaPath $ConfigSchemaPath
     }
 }
 
@@ -583,6 +587,7 @@ function Invoke-ScubaTenantScan {
                 SelectedPolicyId   = if ($bestMatch) { $bestMatch.Id } else { $null }
                 DetectedExclusions = $detectedExclusions
                 DetectedExclusionValues = $exclusionValues
+                ConfiguredExclusionValues = [ordered]@{}
                 YamlBlock          = $yamlBlock
                 HasValidation      = $true
                 BuildInstructions  = $control.buildInstructions
@@ -615,6 +620,7 @@ function Invoke-ScubaTenantScan {
         ConditionalAccessPolicies = @($conditionalAccessPolicies)
         DisplayNameLookup = $displayNameLookup
         UserUpnLookup = $userUpnLookup
+        ImportedConfig = $null
     }
 }
 

@@ -56,7 +56,9 @@ class ScubaConfigValidator {
     # Loads and caches JSON schema file for configuration validation
     hidden static [void] LoadSchema() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
-        $SchemaPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigSchema.json"
+        # Module path is ...\Modules\ScubaConfig; the schema lives in ...\schemas
+        # Construct the full path to the schema file.
+        $SchemaPath = Join-Path -Path $ModulePath -ChildPath "..\..\schemas\ScubaConfigSchema.json"
 
         if (-not (Test-Path $SchemaPath)) {
             throw "Schema file not found: $SchemaPath"
@@ -74,7 +76,9 @@ class ScubaConfigValidator {
     # Loads and caches default configuration values from JSON file
     hidden static [void] LoadDefaults() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
-        $DefaultsPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigDefaults.json"
+        # Module path is ...\Modules\ScubaConfig; the defaults live in ...\schemas
+        # Construct the full path to the defaults file.
+        $DefaultsPath = Join-Path -Path $ModulePath -ChildPath "..\..\schemas\ScubaConfigDefaults.json"
 
         if (-not (Test-Path $DefaultsPath)) {
             throw "Defaults file not found: $DefaultsPath"

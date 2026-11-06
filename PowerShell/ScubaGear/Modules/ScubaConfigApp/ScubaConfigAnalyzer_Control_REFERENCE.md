@@ -79,6 +79,7 @@ baselines and API surface; nothing here is hard-coded in PowerShell.
 | --- | --- |
 | `productMap` | Per-product metadata (friendly `displayName`, etc.) keyed by product id. Drives the product list and friendly names. |
 | `apiOperations` | Definitions of the Graph/EXO operations the analyzer invokes to read tenant configuration. |
+| `importedConfig` | How the configuration a ScubaGear run used (`Raw.scuba_config` in a results file) is carried into the generated YAML. `machineSpecificKeys` lists keys (`OPAPath`, `OutPath`) that are paths on the machine that produced the results; they are written as commented-out lines. |
 | `exclusionDefinitions` | Per-control definitions of what to collect and how a config exclusion/allow-list makes the control pass. |
 | `conditionalAccessAnalysis` | Rules for matching non-compliant AAD controls to the best-fit Conditional Access policy. |
 | `RequirementFriendlyNames` | Human-readable names for baseline requirements, used in findings and generated YAML comments. |

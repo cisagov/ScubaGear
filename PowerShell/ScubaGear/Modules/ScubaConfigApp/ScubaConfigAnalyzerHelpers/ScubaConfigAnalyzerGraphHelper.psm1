@@ -89,7 +89,7 @@ function Connect-ScubaAnalyzerGraph {
     Connects to Microsoft Graph for the given environment. Interactive (delegated scopes)
     by default; if -AppId + -CertificateThumbprint are supplied it uses non-interactive
     app-only certificate auth (application permissions, so -Scopes is ignored). Should be
-    called on the UI thread for the interactive path. Returns Get-MgContext.
+    called on the UI thread for the interactive path. Returns Get-ScubaGearContext.
     #>
     param(
         [string[]]$Scopes = @(),
@@ -99,31 +99,29 @@ function Connect-ScubaAnalyzerGraph {
         [string]$Organization
     )
 
-    # Import the Microsoft Graph Authentication module to enable connecting to Graph.
-    Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
+    # Use ScubaGear's own MSAL-based Graph connection - no Microsoft.Graph.Authentication needed.
+    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Connect-GraphHelper, Get-ScubaGearContext
 
-    # Determine the appropriate Graph environment based on the specified M365 environment.
-    $graphEnv = switch ($M365Environment) {
-        'gcchigh' { 'USGov' }
-        'dod'     { 'USGovDoD' }
-        default   { 'Global' }
-    }
-
-    # Prepare the connection parameters for Connect-MgGraph.
-    $connectParams = @{ Environment = $graphEnv; NoWelcome = $true; ErrorAction = 'Stop' }
     if ($AppId -and $CertificateThumbprint) {
         # App-only (non-interactive) certificate auth uses application permissions, not
         # delegated scopes, so -Scopes is intentionally not passed.
-        $connectParams.ClientId = $AppId
-        $connectParams.CertificateThumbprint = $CertificateThumbprint
-        if ($Organization) { $connectParams.TenantId = $Organization }
+        $connectParams = @{
+            M365Environment = $M365Environment
+            ServicePrincipalParams = @{
+                CertThumbprintParams = @{
+                    CertificateThumbprint = $CertificateThumbprint
+                    AppID                 = $AppId
+                    Organization          = $Organization
+                }
+            }
+        }
     } else {
-        $connectParams.Scopes = $Scopes
+        $connectParams = @{ M365Environment = $M365Environment; Scopes = $Scopes }
     }
 
-    # Connect to Microsoft Graph using the prepared parameters.
-    Connect-MgGraph @connectParams | Out-Null
-    return (Get-MgContext)
+    # Connect to Microsoft Graph using ScubaGear's MSAL helper.
+    Connect-GraphHelper @connectParams
+    return (Get-ScubaGearContext)
 }
 
 function Invoke-ScubaGraphGet {
@@ -131,31 +129,21 @@ function Invoke-ScubaGraphGet {
     .DESCRIPTION
     This function handles GET requests to Microsoft Graph, automatically following pagination links and aggregating results.
     .SYNOPSIS
-    GETs a Graph resource with Invoke-MgGraphRequest (raw REST, only needs
-    Microsoft.Graph.Authentication) and follows @odata.nextLink paging. Returns the
+    GETs a Graph resource with ScubaGear's own MSAL-backed Invoke-ScubaGraphRequest (raw REST,
+    no Microsoft.Graph.Authentication needed) and follows @odata.nextLink paging. Returns the
     collected .value items (or the single object for non-collection resources).
     #>
     param([Parameter(Mandatory)][string]$Uri)
 
-    $items = @()
-    $next = $Uri
-    # Loop through the paginated results until there are no more pages.
-    while ($next) {
-        $resp = Invoke-MgGraphRequest -Method GET -Uri $next -OutputType PSObject -ErrorAction Stop
-        if ($null -eq $resp) { break }
-        # Break the loop if the response is null, indicating no more data.
-        if ($resp.PSObject.Properties.Name -contains 'value') {
-            $items += @($resp.value)
-            $next = if ($resp.PSObject.Properties.Name -contains '@odata.nextLink') { $resp.'@odata.nextLink' } else { $null }
-        }
-        else {
-            $items += $resp
-            $next = $null
-        }
-    }
+    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Invoke-ScubaGraphRequest
 
-    # Return the aggregated collection of items from all pages.
-    return $items
+    # Invoke-ScubaGraphRequest already follows @odata.nextLink internally and aggregates .value.
+    $resp = Invoke-ScubaGraphRequest -Method GET -Uri $Uri -ErrorAction Stop
+    if ($null -eq $resp) { return @() }
+    if ($resp.PSObject.Properties.Name -contains 'value') {
+        return @($resp.value)
+    }
+    return @($resp)
 }
 
 function Get-ScADisplayNameLookup {
@@ -193,7 +181,7 @@ function Get-ScADisplayNameLookup {
             if (-not $uri) { continue }
             # Skip this ID if the URI could not be resolved.
             try {
-                $o = Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject -ErrorAction Stop
+                $o = Invoke-ScubaGraphRequest -Method GET -Uri $uri -ErrorAction Stop
                 if ($o) {
                     foreach ($np in $nameProps) {
                         $val = ($o.PSObject.Properties | Where-Object { $_.Name -ieq [string]$np } | Select-Object -First 1).Value
@@ -256,7 +244,7 @@ function Get-ScAUserPrincipalNameLookup {
         if (-not $uri) { Write-ScAEngineActivity "User UPN resolution: could not resolve a Graph URI for user '$id'." -Level Warning; continue }
         # Attempt to resolve the user principal name (UPN) for the current user ID.
         try {
-            $o = Invoke-MgGraphRequest -Method GET -Uri $uri -OutputType PSObject -ErrorAction Stop
+            $o = Invoke-ScubaGraphRequest -Method GET -Uri $uri -ErrorAction Stop
             $upn = if ($o) { ($o.PSObject.Properties | Where-Object { $_.Name -ieq 'userPrincipalName' } | Select-Object -First 1).Value } else { $null }
             if ($upn) { $lookup[$id] = $upn }
             else { Write-ScAEngineActivity "User UPN resolution: user '$id' returned no userPrincipalName." -Level Warning }
@@ -272,10 +260,10 @@ function Get-ScAUserPrincipalNameLookup {
 function Get-ScubaTenantGraphData {
     <#
     .SYNOPSIS
-    Reads the live tenant configuration a product's controls need using ONLY Microsoft
-    Graph authentication + raw Graph API calls (Invoke-MgGraphRequest). The resource
-    path is resolved from the JSON (API catalog 'apiResource' for the cmdlet named in
-    the baseline schema's apiPermissionRef, falling back to buildInstructions
+    Reads the live tenant configuration a product's controls need using ONLY ScubaGear's own
+    MSAL-backed Graph REST transport (Invoke-ScubaGraphRequest), no Microsoft.Graph.Authentication
+    needed. The resource path is resolved from the JSON (API catalog 'apiResource' for the cmdlet
+    named in the baseline schema's apiPermissionRef, falling back to buildInstructions
     .apiResourceCreate) so the schema stays the single source of truth and can change
     without code edits. Requires an existing Graph connection (Connect-ScubaAnalyzerGraph).
 
@@ -289,8 +277,8 @@ function Get-ScubaTenantGraphData {
         [string]$AnalyzerControlPath
     )
 
-    # Ensure the Microsoft Graph Authentication module is imported for subsequent Graph API calls.
-    Import-Module Microsoft.Graph.Authentication -ErrorAction Stop
+    # Ensure ScubaGear's own MSAL/Graph REST helpers are available for subsequent Graph API calls.
+    Import-Module $syncHash.ConnectHelpersPath -Force -ErrorAction Stop -Function Invoke-ScubaGraphRequest, Get-ScubaGearContext
 
     # Load the analyzer rules (named operations) + API catalog so every URL below is
     # resolved from ScubaGearApiCatalog.json rather than hardcoded here.
@@ -318,7 +306,7 @@ function Get-ScubaTenantGraphData {
     }
 
     # Tenant identity + organization (resource resolved from the catalog).
-    try { $ctx = Get-MgContext; if ($ctx) { $data.TenantId = $ctx.TenantId } } catch { Write-Verbose "Get-MgContext unavailable: $($_.Exception.Message)" }
+    try { $ctx = Get-ScubaGearContext; if ($ctx) { $data.TenantId = $ctx.TenantId } } catch { Write-Verbose "Get-ScubaGearContext unavailable: $($_.Exception.Message)" }
     # Retrieve the current Microsoft Graph context to obtain the tenant ID.
     try {
         $orgUri = Resolve-ScAApiResource -Operation 'organization'

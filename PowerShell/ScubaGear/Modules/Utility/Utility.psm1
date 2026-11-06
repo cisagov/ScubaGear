@@ -1,3 +1,4 @@
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Connection/ConnectHelpers.psm1') -Function Invoke-ScubaGraphRequest
 
 function Set-Utf8NoBom {
     <#
@@ -177,8 +178,9 @@ function Invoke-GraphDirectly {
 
     .Parameter Uri
     An explicit Graph API URI (relative, e.g. "/v1.0/me/licenseDetails") to call when the target has
-    no registered cmdlet mapping. When supplied, the request is sent as-is without endpoint resolution,
-    response key normalization, or automatic pagination, so callers receive the raw Graph response.
+    no registered cmdlet mapping. When supplied, the request is sent as-is without endpoint resolution
+    or response key normalization, so callers receive the raw Graph response (GET requests are still
+    paginated automatically, since Invoke-ScubaGraphRequest handles pagination internally).
 
     .Parameter Method
     The HTTP method to use with -Uri (default: GET). Ignored in cmdlet mode, where the method is
@@ -188,7 +190,7 @@ function Invoke-GraphDirectly {
     Additional request headers to send with -Uri (e.g. @{ ConsistencyLevel = 'eventual' }).
 
     .Parameter OutputType
-    The Invoke-MgGraphRequest -OutputType to use with -Uri (e.g. "PSObject").
+    The Invoke-ScubaGraphRequest -OutputType to use with -Uri (e.g. "PSObject").
 
     .Example
     Invoke-GraphDirectly -Uri "/v1.0/me/licenseDetails" -Method GET
@@ -232,8 +234,8 @@ function Invoke-GraphDirectly {
     )
 
     # Uri mode: call an arbitrary Graph endpoint directly for targets with no registered cmdlet
-    # mapping. The raw response is returned without key normalization or pagination so the caller
-    # gets exactly what the Graph API sent, matching a direct Invoke-MgGraphRequest call.
+    # mapping. The raw response is returned without key normalization so the caller gets what the
+    # Graph API sent, matching a direct Invoke-ScubaGraphRequest call.
     if ($PSCmdlet.ParameterSetName -eq 'Uri') {
         Write-Debug "Graph Api direct (explicit Uri): $Uri"
         $graphParams = @{
@@ -247,7 +249,7 @@ function Invoke-GraphDirectly {
             $graphParams['Body'] = if ($Body -is [string]) { $Body } else { $Body | ConvertTo-Json -Depth 10 }
             $graphParams['ContentType'] = 'application/json'
         }
-        return Invoke-MgGraphRequest @graphParams
+        return Invoke-ScubaGraphRequest @graphParams
     }
 
     Write-Debug "Using Graph REST API instead of cmdlet: $commandlet"
@@ -286,7 +288,7 @@ function Invoke-GraphDirectly {
     Write-Debug "Graph Api direct: $endpoint"
 
     If ($null -eq $endpoint) {
-        Write-Error "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
+        throw "The commandlet $commandlet can't be used with the Invoke-GraphDirectly function yet."
     }
 
     $apiHeader = Get-ScubaGearApiHeader -CmdletName $commandlet -Environment $M365Environment
@@ -312,46 +314,10 @@ function Invoke-GraphDirectly {
         $graphParams['ContentType'] = 'application/json'
     }
 
-    # Execute the initial request
-    $resp = Invoke-MgGraphRequest @graphParams
+    # Execute the initial request (Invoke-ScubaGraphRequest handles pagination internally)
+    $resp = Invoke-ScubaGraphRequest @graphParams
 
     if ($Method -notmatch "DELETE|PATCH") {
-        # If the response is a collection (has a 'value' key)
-        if ($resp -is [hashtable] -and $resp.ContainsKey('value')) {
-            $allItems = [System.Collections.Generic.List[object]]::new()
-            foreach ($item in $resp['value']) {
-                $allItems.Add($item)
-            }
-
-            # Build paging params from the shared set (keep Headers if present, drop Body/ContentType)
-            $pageParams = @{ ErrorAction = 'Stop'; Method = 'GET' }
-            if ($graphParams.ContainsKey('Headers')) {
-                $pageParams['Headers'] = $graphParams['Headers']
-            }
-
-            # Get the next page link from the initial response
-            $nextLink = $resp['@odata.nextLink']
-
-            # Follow pagination until no more pages remain
-            while ($null -ne $nextLink -and $nextLink -ne '') {
-                Write-Debug "Following @odata.nextLink: $nextLink"
-
-                # Update the URI to the next page; all other params (Headers, Method) carry over
-                $pageParams['Uri'] = $nextLink
-                $pageResp = Invoke-MgGraphRequest @pageParams
-
-                # Accumulate results from this page
-                foreach ($item in $pageResp['value']) {
-                    $allItems.Add($item)
-                }
-
-                # Advance to the next page (null when no more pages exist)
-                $nextLink = $pageResp['@odata.nextLink']
-            }
-
-            $resp['value'] = $allItems.ToArray()
-        }
-
         return $resp | ConvertFrom-GraphHashtable
     }
 }
@@ -397,24 +363,33 @@ Function ConvertFrom-GraphHashtable {
 
     Process {
         foreach ($Item in $GraphData) {
-            if ($Item -is [hashtable]) {
+            if ($Item -is [System.Collections.IDictionary] -or $Item.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject') {
                 # Create a new object
                 $Object = New-Object -TypeName PSObject
 
-                # Process each property in the hashtable
-                foreach ($property in $Item.GetEnumerator()) {
-                    $UpperCamelCase = ($property.key).Substring(0,1).ToUpper() + ($property.key).Substring(1)
-                    if ($property.Value -is [hashtable]) {
-                        # Recursive call to process nested hashtables
+                $Properties = if ($Item -is [System.Collections.IDictionary]) {
+                    $Item.GetEnumerator() | ForEach-Object {
+                        [pscustomobject]@{ Name = $_.Key; Value = $_.Value }
+                    }
+                }
+                else {
+                    $Item.PSObject.Properties
+                }
+
+                # Process each property in the Graph response
+                foreach ($property in $Properties) {
+                    $UpperCamelCase = ($property.Name).Substring(0,1).ToUpper() + ($property.Name).Substring(1)
+                    if ($null -ne $property.Value -and ($property.Value -is [System.Collections.IDictionary] -or $property.Value.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject')) {
+                        # Recursive call to process nested Graph objects
                         $NestedObject = ConvertFrom-GraphHashtable -GraphData @($property.Value)
 
                         $Object | Add-Member -MemberType NoteProperty -Name $UpperCamelCase -Value $NestedObject
                     }
                     elseif ($property.Value -is [array]) {
-                        # Handle arrays (check if elements are hashtables)
+                        # Handle arrays (check if elements are Graph objects)
                         $ProcessedArray = @()
                         foreach ($element in $property.Value) {
-                            if ($element -is [hashtable]) {
+                            if ($null -ne $element -and ($element -is [System.Collections.IDictionary] -or $element.PSTypeNames[0] -eq 'System.Management.Automation.PSCustomObject')) {
                                 $ProcessedArray += ConvertFrom-GraphHashtable -GraphData @($element)
                             } else {
                                 $ProcessedArray += $element
@@ -644,10 +619,10 @@ function Invoke-GraphBatchRequest {
             }
 
             try {
-                # Execute batch request using Invoke-MgGraphRequest
+                # Execute batch request using the internal Graph transport
                 Write-Verbose "Executing batch request with $($pendingRequests.Count) requests (attempt $($attempt + 1))"
                 $endpoint = Get-ScubaGearServiceEndpoint -Product aad -Environment $M365Environment
-                $batchResponse = Invoke-MgGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
+                $batchResponse = Invoke-ScubaGraphRequest -Method POST -Uri "$endpoint/$ApiVersion/`$batch" -Body ($batchBody | ConvertTo-Json -Depth 10)
             }
             catch {
                 # Entire batch request failed (e.g., network error, auth error, or even a 429 if the batch envelope itself is too large).
@@ -871,31 +846,35 @@ function Test-ScubaTransientConnectionError {
     )
 
     $Exception = $ErrorRecord.Exception
+    while ($null -ne $Exception) {
+        if ($Exception -is [System.Net.WebException]) {
+            $TransientStatuses = @(
+                [System.Net.WebExceptionStatus]::Timeout,
+                [System.Net.WebExceptionStatus]::ConnectFailure,
+                [System.Net.WebExceptionStatus]::ConnectionClosed,
+                [System.Net.WebExceptionStatus]::KeepAliveFailure,
+                [System.Net.WebExceptionStatus]::NameResolutionFailure,
+                [System.Net.WebExceptionStatus]::ReceiveFailure,
+                [System.Net.WebExceptionStatus]::SendFailure
+            )
+            return $Exception.Status -in $TransientStatuses
+        }
 
-    if ($Exception -is [System.Net.WebException]) {
-        $TransientStatuses = @(
-            [System.Net.WebExceptionStatus]::Timeout,
-            [System.Net.WebExceptionStatus]::ConnectFailure,
-            [System.Net.WebExceptionStatus]::ConnectionClosed,
-            [System.Net.WebExceptionStatus]::KeepAliveFailure,
-            [System.Net.WebExceptionStatus]::NameResolutionFailure,
-            [System.Net.WebExceptionStatus]::ReceiveFailure,
-            [System.Net.WebExceptionStatus]::SendFailure
-        )
-        return $Exception.Status -in $TransientStatuses
+        if ($Exception -is [System.TimeoutException] -or $Exception.GetType().FullName -in @(
+                'System.Threading.Tasks.TaskCanceledException',
+                'System.Net.Http.HttpRequestException',
+                'System.IO.IOException',
+                'System.Net.Sockets.SocketException'
+            )) {
+            return $true
+        }
+
+        if ($Exception.Message -match 'timed out|timeout|connection.*(closed|reset|refused)|name.*resolution') {
+            return $true
+        }
+        $Exception = $Exception.InnerException
     }
-
-    $TypeName = $Exception.GetType().FullName
-    if ($TypeName -in @(
-            'System.Threading.Tasks.TaskCanceledException',
-            'System.Net.Http.HttpRequestException',
-            'System.IO.IOException',
-            'System.Net.Sockets.SocketException'
-        )) {
-        return $true
-    }
-
-    return $Exception.Message -match 'timed out|timeout|connection.*(closed|reset|refused)|name.*resolution'
+    return $false
 }
 
 function Invoke-ScubaRestMethod {
@@ -936,19 +915,18 @@ function Invoke-ScubaRestMethod {
         Request timeout in seconds (optional). If not specified, uses Invoke-RestMethod's default.
 
     .PARAMETER MaxRetries
-        Number of retry attempts on HTTP 429/500/502/503/504 responses and transient connection errors
-        (default: 0, i.e. no retries; max: 100).
+        Number of retries on HTTP 408/429/500/502/503/504 responses and transient connection errors,
+        including timeouts (default: 0, i.e. no retries; max: 100).
 
     .PARAMETER RetryDelaySeconds
-        Initial retry delay in seconds, used as a fallback when a 429 response has no Retry-After
-        header, and doubled after each successive 500/502/503/504 retry (default: 5). Any single sleep,
+        Initial retry delay in seconds, used as a fallback when a 429/5xx response has no Retry-After
+        header, and doubled after each successive retry (default: 5). Any single sleep,
         including a server-supplied Retry-After, is capped at MaxDelaySeconds.
 
     .PARAMETER MaxDelaySeconds
         Upper bound in seconds on any single sleep between retries (default: 3600; range 1-3600).
         Keeps a large or hostile Retry-After value from stalling a scan. The Teams, SharePoint,
         Power Platform and Power BI helpers use a lower cap, see Get-ScubaRestRetryDefaults.
-
     .EXAMPLE
         Invoke-ScubaRestMethod -BaseUrl "https://api.bap.microsoft.com" `
             -AccessToken $Token -Endpoint "/providers/PowerPlatform.Governance/v1/tenants/settings"
@@ -1057,7 +1035,14 @@ function Invoke-ScubaRestMethod {
 
     for ($Attempt = 1; $Attempt -le ($MaxRetries + 1); $Attempt++) {
         try {
-            return Invoke-RestMethod @Params
+            $Response = Invoke-RestMethod @Params
+            # Some services (e.g. the Teams admin API) send gzip bodies that Invoke-RestMethod does not
+            # decompress, yielding the compressed bytes as a string that starts with the 0x1F magic byte.
+            if ($Response -is [string] -and $Response.Length -gt 0 -and $Response[0] -eq [char]0x1F) {
+                Write-Verbose "Response from '$Uri' was not decompressed; re-reading it as gzip."
+                $Response = Read-ScubaCompressedRestResponse -RequestParams $Params
+            }
+            return $Response
         }
         # If an error occurs we want to capture the HTTP body because that commonly contains important troubleshooting details.
         catch {
@@ -1071,11 +1056,13 @@ function Invoke-ScubaRestMethod {
                 $RetryAfter = [Math]::Min($RetryAfter, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' throttled (HTTP 429). Retrying in ${RetryAfter}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $RetryAfter
+                $RetryDelaySeconds *= 2
                 continue
             }
 
-            if (-not $IsLastAttempt -and $StatusCode -in @(500, 502, 503, 504)) {
-                $Delay = [Math]::Min($RetryDelaySeconds, $MaxDelaySeconds)
+            if (-not $IsLastAttempt -and $StatusCode -in @(408, 500, 502, 503, 504)) {
+                $Delay = Get-RetryAfterSeconds -HttpResponseObject $WebResponse -DefaultSeconds $RetryDelaySeconds
+                $Delay = [Math]::Min($Delay, $MaxDelaySeconds)
                 Write-Warning "Request to '$Uri' returned HTTP $StatusCode. Retrying in ${Delay}s (attempt $Attempt of $MaxRetries)..."
                 Start-Sleep -Seconds $Delay
                 $RetryDelaySeconds *= 2
@@ -1099,6 +1086,60 @@ function Invoke-ScubaRestMethod {
             Write-Information $DetailedHttpMessage -InformationAction Continue
             throw
         }
+    }
+}
+
+function Read-ScubaCompressedRestResponse {
+    <#
+    .SYNOPSIS
+        Re-issues a REST request with Invoke-WebRequest and returns the gzip-decompressed body,
+        parsed as JSON when possible.
+
+    .DESCRIPTION
+        Used by Invoke-ScubaRestMethod when Invoke-RestMethod returns a gzip body as an undecoded
+        string. The string form cannot be decompressed because text decoding has already corrupted
+        the bytes, so the request is repeated and the raw bytes are read from RawContentStream.
+
+    .PARAMETER RequestParams
+        The Invoke-RestMethod parameter hashtable (Uri, Method, Headers, Body, TimeoutSec, ...).
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$RequestParams
+    )
+
+    $WebParams = $RequestParams.Clone()
+    $WebParams.UseBasicParsing = $true
+    $WebResponse = Invoke-WebRequest @WebParams
+    $Bytes = $WebResponse.RawContentStream.ToArray()
+
+    if ($Bytes.Length -ge 2 -and $Bytes[0] -eq 0x1F -and $Bytes[1] -eq 0x8B) {
+        $GzipStream = [System.IO.Compression.GZipStream]::new(
+            [System.IO.MemoryStream]::new($Bytes), [System.IO.Compression.CompressionMode]::Decompress)
+        $Reader = [System.IO.StreamReader]::new($GzipStream, [System.Text.Encoding]::UTF8)
+        try {
+            $Text = $Reader.ReadToEnd()
+        }
+        finally {
+            $Reader.Dispose()
+        }
+    }
+    else {
+        $Text = [System.Text.Encoding]::UTF8.GetString($Bytes)
+    }
+
+    if ([string]::IsNullOrWhiteSpace($Text)) {
+        return $Text
+    }
+    try {
+        return ($Text | ConvertFrom-Json -ErrorAction Stop)
+    }
+    catch {
+        return $Text
     }
 }
 
@@ -1225,6 +1266,56 @@ function Get-HttpResponseDetails {
     }
 
     return $StringBuffer.ToString()
+}
+
+function Get-HttpRetryInfo {
+    <#
+    .SYNOPSIS
+        Pulls out what a REST caller needs to decide whether a failed request is worth retrying.
+
+    .DESCRIPTION
+        Returns the HTTP status code (0 when the request never got a response), the Retry-After
+        delay in seconds (0 when the header is missing), and whether the failure was a network-level
+        error such as a timeout, dropped connection or DNS failure.
+
+        Works with the exception shapes Invoke-WebRequest and Invoke-RestMethod throw on both
+        PS 5.1 (WebException with an HttpWebResponse) and PS 7+ (HttpResponseException with an
+        HttpResponseMessage, or TaskCanceledException on timeout).
+
+    .PARAMETER Exception
+        The exception caught from Invoke-WebRequest or Invoke-RestMethod.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory = $true)]
+        [System.Exception]
+        $Exception
+    )
+
+    $StatusCode = 0
+    $RetryAfterSeconds = 0
+    $IsNetworkError = $false
+
+    $ResponseProperty = $Exception.PSObject.Properties['Response']
+    $Response = if ($null -ne $ResponseProperty) { $ResponseProperty.Value } else { $null }
+
+    if ($null -ne $Response) {
+        $StatusCode = [int]$Response.StatusCode
+        $RetryAfterSeconds = Get-RetryAfterSeconds -HttpResponseObject $Response -DefaultSeconds 0
+    }
+    else {
+        $IsNetworkError = Test-ScubaTransientConnectionError -ErrorRecord ([pscustomobject]@{ Exception = $Exception })
+    }
+
+    [pscustomobject]@{
+        StatusCode        = $StatusCode
+        RetryAfterSeconds = [Math]::Max(0, $RetryAfterSeconds)
+        IsNetworkError    = $IsNetworkError
+    }
 }
 
 function Get-ScubaGearCatalog {
@@ -1412,6 +1503,7 @@ Export-ModuleMember -Function @(
     'Invoke-ScubaRestMethod',
     'Get-ScubaRestRetryDefaults',
     'Get-HttpResponseDetails',
+    'Get-HttpRetryInfo',
     'Get-ScubaGearCatalog',
     'Get-ScubaGearServiceEndpoint',
     'Get-ScubaGearOAuthScope',

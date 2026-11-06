@@ -1,7 +1,7 @@
 Describe "ScubaConfig JSON Schema Validation Tests" {
     BeforeAll {
         # Read the schema file for testing
-        $SchemaPath = "$PSScriptRoot\..\..\..\..\Modules\ScubaConfig\ScubaConfigSchema.json"
+        $SchemaPath = "$PSScriptRoot\..\..\..\..\schemas\ScubaConfigSchema.json"
         $script:SchemaContent = Get-Content -Path $SchemaPath -Raw | ConvertFrom-Json
     }
 
