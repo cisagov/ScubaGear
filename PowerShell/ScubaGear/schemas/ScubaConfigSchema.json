@@ -34,7 +34,8 @@
       "_comment": "Maps policy IDs to their supported exclusion types for automated validation",
       "MS.AAD.1.1v1": ["CapExclusions"],
       "MS.AAD.2.1v2": ["CapExclusions"],
-      "MS.AAD.2.3v1": ["CapExclusions"],
+      "MS.AAD.2.2v2": ["CapExclusions"],
+      "MS.AAD.2.4v1": ["CapExclusions"],
       "MS.AAD.3.1v1": ["CapExclusions"],
       "MS.AAD.3.2v2": ["CapExclusions"],
       "MS.AAD.3.6v1": ["CapExclusions"],
@@ -46,6 +47,14 @@
       "MS.SECURITYSUITE.2.1v1": ["SensitiveUsers"],
       "MS.SECURITYSUITE.2.3v1": ["PartnerDomains"],
       "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
+    },
+
+    "policyExclusionRelationships": {
+      "_comment": "Maps a policy ID to the dependent policy IDs whose assessment reads that policy's configured exemptions. Config tooling uses this to add the dependent template, warn when a dependent is omitted, and explain the relationship.",
+      "MS.AAD.2.1v2": {
+        "dependents": ["MS.AAD.2.2v2"],
+        "note": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 must be targeted by a conditional access policy that meets MS.AAD.2.2v2 (MFA). MS.AAD.2.2v2 reads the MS.AAD.2.1v2 exemptions, so do not repeat them under MS.AAD.2.2v2; exclusions under MS.AAD.2.2v2 apply only to the MFA policy itself."
+      }
     },
 
     "deprecatedProductAliases": {

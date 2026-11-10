@@ -144,8 +144,8 @@ RemediateHighRiskBaseCheck(policy) if {
     ### Conditional access checks specific to this policy
     "high" in policy.Conditions.UserRiskLevels
     "riskRemediation" in policy.GrantControls.BuiltInControls
-    # riskRemediation must be paired with an authentication strength using AND
-    policy.GrantControls.AuthenticationStrength != null
+    # riskRemediation must be paired with a phishing-resistant authentication strength using AND
+    IsPhishingResistantMFA(policy) == true
     policy.GrantControls.Operator == "AND"
     # Microsoft recommends separate policies for user risk and sign-in risk
     NoSignInRiskLevels(policy)
@@ -230,22 +230,22 @@ tests contains {
 #--
 
 #
-# MS.AAD.2.2v1
+# MS.AAD.2.3v2
 #--
 
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.AAD.2.2v1",
+    "PolicyId": "MS.AAD.2.3v2",
     "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.2.2v1"),
+    "ReportDetails": NotCheckedDetails("MS.AAD.2.3v2"),
     "RequirementMet": false
 }
 #--
 
 #
-# MS.AAD.2.3v1
+# MS.AAD.2.4v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -267,10 +267,10 @@ SignInBlockedBaseCheck(policy) if {
 # Only match policies with user and group exclusions per the confile file
 SignInBlockedEval(policy) := result if {
     checks := [
-        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
-        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
-        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
     ]
     result := CapEval(SignInBlockedBaseCheck(policy), checks)
 }
@@ -295,7 +295,7 @@ SignInBlockedNeedsConfigUpdate contains {
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.3v1",
+    "PolicyId": "MS.AAD.2.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": SignInBlocked,
@@ -322,6 +322,163 @@ tests contains {
     Conditions := [
         Count(Aad2P2Licenses) > 0,
         Count(SignInBlocked) > 0
+    ]
+    Status := Count(FilterArray(Conditions, false)) == 0
+}
+#--
+
+#
+# MS.AAD.2.2v2
+#--
+
+# Users, groups, and guest user types exempted from MS.AAD.2.1v2 in the config file.
+# They are not covered by the phishing-resistant policy, so they must be
+# targeted by a risk remediation policy that requires MFA.
+PrimaryExemptUsers := ConvertToSet(object.get(
+    input, ["scuba_config", "Aad", "MS.AAD.2.1v2", "CapExclusions", "Users"], []))
+
+PrimaryExemptGroups := ConvertToSet(object.get(
+    input, ["scuba_config", "Aad", "MS.AAD.2.1v2", "CapExclusions", "Groups"], []))
+
+PrimaryExemptGuestTypes := ConvertToSet(object.get(
+    input, ["scuba_config", "Aad", "MS.AAD.2.1v2", "CapExclusions", "GuestUserTypes"], []))
+
+default PrimaryHasExemptions := false
+
+PrimaryHasExemptions if {
+    count(PrimaryExemptUsers) + count(PrimaryExemptGroups) + count(PrimaryExemptGuestTypes) > 0
+}
+
+# The policy targets everyone
+TargetsPrimaryExemptions(policy) if {
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+}
+
+# The policy explicitly includes every exempted user, group, and guest user type
+TargetsPrimaryExemptions(policy) if {
+    IncludedUsers := ConvertToSet(object.get(policy.Conditions.Users, "IncludeUsers", []))
+    IncludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "IncludeGroups", []))
+    count(PrimaryExemptUsers - IncludedUsers) == 0
+    count(PrimaryExemptGroups - IncludedGroups) == 0
+    IncludesAllPrimaryExemptGuestTypes(policy)
+}
+
+IncludesAllPrimaryExemptGuestTypes(policy) if {
+    count(PrimaryExemptGuestTypes) == 0
+}
+
+IncludesAllPrimaryExemptGuestTypes(policy) if {
+    Guests := object.get(policy.Conditions.Users, "IncludeGuestsOrExternalUsers", null)
+    Guests != null
+    IncludedTypes := ConvertToSet(split(Guests.GuestOrExternalUserTypes, ","))
+    count(PrimaryExemptGuestTypes - IncludedTypes) == 0
+}
+
+# The policy must not exclude any of the users or groups that are exempted from MS.AAD.2.1v2
+ExcludesNoPrimaryExemptions(policy) if {
+    ExcludedUsers := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeUsers", []))
+    ExcludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeGroups", []))
+    count(PrimaryExemptUsers & ExcludedUsers) == 0
+    count(PrimaryExemptGroups & ExcludedGroups) == 0
+}
+
+# If policy matches basic conditions, special conditions,
+# & all exclusions are intentional, save the policy name
+RemediateHighRiskMFABaseCheck(policy) if {
+    ### Common checks for conditional access policies
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
+    ###
+
+    ### Conditional access checks specific to this policy
+    TargetsPrimaryExemptions(policy)
+    ExcludesNoPrimaryExemptions(policy)
+    "high" in policy.Conditions.UserRiskLevels
+    "riskRemediation" in policy.GrantControls.BuiltInControls
+    # riskRemediation must be paired with an MFA authentication strength using AND
+    policy.GrantControls.AuthenticationStrength != null
+    IsGeneralMFA(policy) == true
+    policy.GrantControls.Operator == "AND"
+    NoSignInRiskLevels(policy)
+    policy.SessionControls.SignInFrequency.IsEnabled == true
+    policy.SessionControls.SignInFrequency.FrequencyInterval == "everyTime"
+    ###
+}
+
+# Only match policies with user and group exclusions per the confile file
+RemediateHighRiskMFAEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
+    ]
+    result := CapEval(RemediateHighRiskMFABaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+RemediateHighRiskMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := RemediateHighRiskMFAEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+RemediateHighRiskMFANeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := RemediateHighRiskMFAEval(CAPolicy)
+    eval.status == "near_miss"
+}
+
+# First test is for the N/A case: nothing is exempted from MS.AAD.2.1v2
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": true
+} if {
+    PolicyId := "MS.AAD.2.2v2"
+    # regal ignore:line-length
+    Reason := "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file. See %v for more info"
+    PrimaryHasExemptions == false
+}
+
+# Pass if at least 1 policy meets all conditions & has correct licence.
+tests contains {
+    "PolicyId": "MS.AAD.2.2v2",
+    "Criticality": "Shall",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
+    "ActualValue": RemediateHighRiskMFA,
+    "ReportDetails": ReportDetails,
+    "NearMisses": RemediateHighRiskMFANeedsConfigUpdate,
+    "RequirementMet": Status
+} if {
+    PrimaryHasExemptions == true
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        RemediateHighRiskMFA,
+        RemediateHighRiskMFANeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportDetailsArrayLicenseWarning(RemediateHighRiskMFA, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
+    Conditions := [
+        Count(Aad2P2Licenses) > 0,
+        Count(RemediateHighRiskMFA) > 0
     ]
     Status := Count(FilterArray(Conditions, false)) == 0
 }

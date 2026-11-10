@@ -13,6 +13,11 @@
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json",
   "LocalBaselineSchemaPath": "..\\..\\schemas\\ScubaBaselines.json",
   "DefaultConfigsSchemaPath": "..\\..\\schemas\\ScubaConfigDefaults.json",
+  "ConfigSchemaPath": "..\\..\\schemas\\ScubaConfigSchema.json",
+  "policyExemptionRelationships": {
+    "_comment": "Relationship metadata (parent policy -> dependent policies, note) is read from schemaMetadata.policyExclusionRelationships in ConfigSchemaPath. exemptionFields lists the exclusion fields that count as exemptions of a parent policy.",
+    "exemptionFields": ["Users", "Groups", "GuestUserTypes"]
+  },
   "PolicyMigrationsCSVPath": "..\\..\\mappings\\scuba-baseline-policy-migrations.csv",
   "WalkthroughMarkdownPath": "..\\..\\..\\..\\docs\\configuration\\scubaconfigapp-walkthrough.md",
   "WalkthroughGitHubUrl": "https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfigapp-walkthrough.md",
@@ -134,7 +139,11 @@
     "FilterApplied": "Filter applied: {0} policies visible",
     "SearchCleared": "Search criteria cleared",
     "ScubaRunReady": "Ready to run ScubaGear {0}",
-    "PowerShellVersionRequired": "PowerShell {0} required"
+    "PowerShellVersionRequired": "PowerShell {0} required",
+    "PolicyExemptionParentNote": "Note: {0}",
+    "PolicyExemptionDependentNote": "Note: {0} reads the exemptions configured for {1}. Do not repeat them here; exclusions added here apply only to the {0} policy itself (for example, break-glass accounts).",
+    "PolicyExemptionOmittedWarning": "{0} has exemptions configured but {1} is listed in Omit Policies. The exempted users, groups, or guest user types would have no compensating control assessed. {2}",
+    "PolicyExemptionWarningsPrefix": "The configuration preview was generated, but please review the following:{0}"
   },
   "localeErrorMessages": {
     "CertificateNotFound": "No suitable certificates found in the current user's personal certificate store.",
@@ -498,6 +507,7 @@
       "cardName": "Exclusion",
       "showFieldType": true,
       "showDescription": false,
+      "showExemptionRelationshipNote": true,
       "supportsAllProducts": false,
       "filterAllLabel": "All Exclusion Policies",
       "filterConfiguredLabel": "Configured Exclusions",

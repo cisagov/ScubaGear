@@ -136,7 +136,7 @@ This section provides policies that reduce security risks related to potentially
 
 ### Policies
 #### MS.AAD.2.1v2
-Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in.
+Users detected as high risk SHALL be required to remediate risk using phishing-resistant MFA, and reauthenticate on every sign-in.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
@@ -144,38 +144,57 @@ Users detected as high risk SHALL be required to remediate risk, and reauthentic
 
 <!--Policy: MS.AAD.2.1v2; Criticality: SHALL -->
 <!--ExclusionType: CapExclusions-->
-- _Rationale:_ Requiring high-risk users to remediate their risk before regaining access prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention. Requiring reauthentication on every sign-in ensures that existing sessions held by an attacker cannot persist.
-- _Last modified:_ October 2026
-- _Note:_ Users identified as high-risk by Microsoft Entra ID Protection can be required to remediate their risk via a Microsoft Entra ID Conditional Access policy using the "Require risk remediation" grant control. Users with passwords are prompted to complete a secure password change after successful multifactor authentication, while passwordless users have their sessions revoked and must reauthenticate. The grant control automatically requires an authentication strength (combined using AND) and applies a sign-in frequency session control of "Every time". User risk and sign-in risk conditions must not be combined in the same policy. This policy replaces the block-based policy from MS.AAD.2.1v1.
+- _Rationale:_ Requiring high-risk users to remediate their risk before regaining access prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention. Requiring phishing-resistant MFA ensures the remediation itself cannot be defeated by phishing, and requiring reauthentication on every sign-in ensures that existing sessions held by an attacker cannot persist.
+- _Last modified:_ November 2026
+- _Note:_ Users identified as high-risk by Microsoft Entra ID Protection can be required to remediate their risk via a Microsoft Entra ID Conditional Access policy using the "Require risk remediation" grant control. Users with passwords are prompted to complete a secure password change after successful multifactor authentication, while passwordless users have their sessions revoked and must reauthenticate. The grant control automatically requires an authentication strength (combined using AND) and applies a sign-in frequency session control of "Every time". For this policy, the authentication strength must allow only phishing-resistant methods. The legacy "Require multifactor authentication" grant control is not accepted in place of "Require risk remediation". User risk and sign-in risk conditions must not be combined in the same policy. This policy replaces the block-based policy from MS.AAD.2.1v1. Users, groups, or guest user types that cannot use phishing-resistant MFA may be exempted from this policy by listing them in the configuration file; every exemption MUST be targeted by a policy that meets MS.AAD.2.2v2, which requires MFA.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
-#### MS.AAD.2.2v1
+#### MS.AAD.2.2v2
+Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
+
+<!--Policy: MS.AAD.2.2v2; Criticality: SHALL -->
+<!--ExclusionType: CapExclusions-->
+- _Rationale:_ Accounts that cannot use phishing-resistant MFA and are exempted from MS.AAD.2.1v2 must still remediate user risk, otherwise a compromised account would retain access. This policy ensures those accounts remediate their risk with MFA rather than being left without a risk-based control.
+- _Last modified:_ November 2026
+- _Note:_ This policy is only applicable when users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file. The policy must target every exempted user, group, and guest user type (or all users), must not exclude them, and must use the "Require risk remediation" grant control with an authentication strength that allows MFA methods that are not phishing-resistant, combined using AND, with a sign-in frequency of "Every time". The legacy "Require multifactor authentication" grant control is not accepted in place of "Require risk remediation". User risk and sign-in risk conditions must not be combined in the same policy. This policy replaces the notification policy MS.AAD.2.2v1, which is now MS.AAD.2.3v2.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
+- _MITRE ATT&CK TTP Mapping:_
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+
+#### MS.AAD.2.3v2
 A notification SHOULD be sent to the administrator when high-risk users are detected.
 
-[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msaad22v1-instructions)
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#msaad23v2-instructions)
 
-<!--Policy: MS.AAD.2.2v1; Criticality: SHOULD -->
+<!--Policy: MS.AAD.2.3v2; Criticality: SHOULD -->
 - _Rationale:_ Notification enables the administrator to monitor the event and remediate the risk. This helps organizations proactively respond to cyber intrusions as they occur.
-- _Last modified:_ June 2023
+- _Last modified:_ November 2026
+- _Note:_ This policy was previously MS.AAD.2.2v1 and was renumbered to keep the user risk policies together. The requirement is unchanged.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
     - [T1078.004: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
 
-#### MS.AAD.2.3v1
+#### MS.AAD.2.4v1
 Sign-ins detected as high-risk SHALL be blocked.
 
 [![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
 [![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
 [![Configurable](https://img.shields.io/badge/Configurable-005288)](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions)
 
-<!--Policy: MS.AAD.2.3v1; Criticality: SHALL -->
+<!--Policy: MS.AAD.2.4v1; Criticality: SHALL -->
 <!--ExclusionType: CapExclusions-->
 - _Rationale:_ Blocking sign-in attempts detected as high-risk prevents compromised accounts from accessing the tenant.
-- _Last modified:_ June 2023
+- _Last modified:_ November 2026
+- _Note:_ This policy was previously MS.AAD.2.3v1 and was renumbered to keep the user risk policies together. The requirement is unchanged.
 - _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2(12), AC-2(13)
 - _MITRE ATT&CK TTP Mapping:_
   - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
@@ -211,23 +230,56 @@ Before enabling this policy, [investigate and remediate any active user risks](h
   Conditions > User risk > Configure > <b>Yes</b> > Configure user risk levels needed for policy to be enforced > <b>High</b>
 
   Access controls > Grant > <b>Grant access</b> > <b>Require risk remediation</b>
-  (<b>Require authentication strength</b> is selected automatically; choose the strength appropriate for your organization)
+  (<b>Require authentication strength</b> is selected automatically; select <b>Phishing-resistant MFA</b> or a custom strength that allows only phishing-resistant methods)
 
   Session > <b>Sign-in frequency</b> > <b>Every time</b>
   (applied automatically when Require risk remediation is selected and is mandatory)
 </pre>
 
-2.  Do not configure sign-in risk in this policy. Create a separate policy for sign-in risk (see MS.AAD.2.3v1).
+2.  Do not use the legacy **Require multifactor authentication** grant control in place of **Require risk remediation**. Although Microsoft Entra accepts it for user risk, it is not accepted by this policy.
 
-3.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).
+3.  Do not configure sign-in risk in this policy. Create a separate policy for sign-in risk (see MS.AAD.2.4v1).
 
-4.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.
+4.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).
 
-#### MS.AAD.2.2v1 Instructions
+5.  If any other users, groups, or guest user types are excluded from this policy because they cannot use phishing-resistant MFA, list them in the configuration file as exclusions for MS.AAD.2.1v2 and then include them in a second policy that requires MFA, as described in the MS.AAD.2.2v2 instructions below.
+
+6.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.
+
+#### MS.AAD.2.2v2 Instructions
+
+This policy is only needed if users, groups, or guest user types are excluded from the MS.AAD.2.1v2 policy and listed as exclusions for MS.AAD.2.1v2 in the configuration file. Every user, group, and guest user type excluded from the MS.AAD.2.1v2 policy MUST be included in this policy so that they remediate user risk using MFA.
+
+1.  Create a conditional access policy that requires the excluded users to remediate their risk. Configure the following policy settings in the new conditional access policy per the values below:
+
+<pre>
+  Users > Include > <b>Select users and groups</b> > select every user, group, and guest or external user type excluded from the MS.AAD.2.1v2 policy
+  (or <b>All users</b>, in which case this policy is evaluated together with the MS.AAD.2.1v2 policy)
+
+  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>
+
+  Conditions > User risk > Configure > <b>Yes</b> > Configure user risk levels needed for policy to be enforced > <b>High</b>
+
+  Access controls > Grant > <b>Grant access</b> > <b>Require risk remediation</b>
+  (<b>Require authentication strength</b> is selected automatically; select <b>Multifactor authentication</b> or a custom strength that allows MFA methods that are not phishing-resistant)
+
+  Session > <b>Sign-in frequency</b> > <b>Every time</b>
+  (applied automatically when Require risk remediation is selected and is mandatory)
+</pre>
+
+2.  Do not exclude the users, groups, or guest user types that are excluded from the MS.AAD.2.1v2 policy.
+
+3.  Do not use the legacy **Require multifactor authentication** grant control in place of **Require risk remediation**, and do not configure sign-in risk in this policy.
+
+4.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).
+
+5.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.
+
+#### MS.AAD.2.3v2 Instructions
 
 1.  [Configure Microsoft Entra ID Protection to send a regularly monitored security mailbox email notification](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-notifications#configure-users-at-risk-detected-alerts) when user accounts are determined to be high-risk.
 
-#### MS.AAD.2.3v1 Instructions
+#### MS.AAD.2.4v1 Instructions
 
 1.  Create a Conditional Access policy blocking sign-ins determined high-risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy per the values below:
 

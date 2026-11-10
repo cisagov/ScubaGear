@@ -173,6 +173,22 @@ InModuleScope Utility {
             }
         }
     }
+    Describe -Tag 'Utility' -Name "Invoke-GraphDirectly Conditional Access request headers" {
+        BeforeAll {
+            Mock Invoke-ScubaGraphRequest -MockWith { @{ value = @() } }
+        }
+
+        # Without this header Graph can map newer grant-control values (e.g. riskRemediation) to unknownFutureValue,
+        # which would make correctly configured policies fail the MS.AAD.2.1v2 and MS.AAD.2.2v2 checks.
+        It "requests newer grant-control enum values in <EnvName>" -ForEach ($environments | ForEach-Object { @{ EnvName = $_.Name } }) {
+            $null = Invoke-GraphDirectly -Commandlet 'Get-MgBetaIdentityConditionalAccessPolicy' -M365Environment $EnvName
+
+            Should -Invoke Invoke-ScubaGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Uri -match '/beta/identity/conditionalAccess/policies$' -and
+                $Headers['Prefer'] -eq 'include-unknown-enum-members'
+            }
+        }
+    }
 }
 
 AfterAll {

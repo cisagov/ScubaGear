@@ -22,6 +22,30 @@ the existing replacement settings are retained and the legacy entry is removed;
 legacy exclusions are not merged automatically. Review the replacement policy
 before saving, especially when the file contained both versions.
 
+The Entra ID risk-based policies were renumbered; importing a configuration with the old IDs maps
+them (from `mappings\scuba-baseline-policy-migrations.csv`) as follows:
+
+| Legacy ID | Current ID |
+|-----------|------------|
+| `MS.AAD.2.1v1` | `MS.AAD.2.1v2` |
+| `MS.AAD.2.2v1` | `MS.AAD.2.3v2` |
+| `MS.AAD.2.3v1` | `MS.AAD.2.4v1` |
+
+A file that contains several legacy IDs is migrated entry by entry, so old keys are never chained
+into each other. `MS.AAD.2.2v2` is a new policy and is not a migration target. If you carry over
+exemptions for `MS.AAD.2.1v2`, the policy must now require phishing-resistant MFA and every
+exempted user, group, or guest user type must be targeted by a policy that meets `MS.AAD.2.2v2`.
+
+### Exemptions and dependent policies
+
+`MS.AAD.2.2v2` reads the users, groups, and guest user types exempted from `MS.AAD.2.1v2`. On the
+**Exclusions** tab, the `MS.AAD.2.1v2` card explains this, and the `MS.AAD.2.2v2` card states that
+it reads the `MS.AAD.2.1v2` exemptions (exclusions added to `MS.AAD.2.2v2` apply only to its own
+policy). The notes come from `schemaMetadata.policyExclusionRelationships` in
+`ScubaConfigSchema.json`. When you click **Preview & Generate** and `MS.AAD.2.1v2` has exemptions
+while `MS.AAD.2.2v2` is listed under **Omit Policies**, the app shows a warning (the preview is still
+generated) because the exempted accounts would then have no compensating control assessed.
+
 ![ScubaGear Assessment Process Diagram](../images/scubaconfigapp_main.png)
 
 ## Main Function

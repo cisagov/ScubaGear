@@ -127,6 +127,8 @@ Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values 
 New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,securitysuite"
 ```
 
+Use `-ExclusionPolicy` to generate templates only for specific policies. Policies whose assessment reads another policy's exemptions are generated together with it, so `-ExclusionPolicy MS.AAD.2.1v2` also generates the `MS.AAD.2.2v2` template. `-OmitPolicy`, `-AnnotatePolicy`, and `-ExclusionPolicy` map a replaced policy ID to its replacement (with a warning) and skip removed policies.
+
 The generated file can then be manually edited to add your specific configuration settings.
 
 ## Annotate Policies
@@ -271,13 +273,27 @@ CapExclusions are supported for the following policies:
 
 - MS.AAD.1.1v1
 - MS.AAD.2.1v2
-- MS.AAD.2.3v1
+- MS.AAD.2.2v2
+- MS.AAD.2.4v1
 - MS.AAD.3.1v1
 - MS.AAD.3.2v2
 - MS.AAD.3.6v1
 - MS.AAD.3.7v1
 - MS.AAD.3.8v1
 - MS.AAD.3.9v1
+
+Users, groups, and guest user types exempted in `MS.AAD.2.1v2` do not have to use phishing-resistant MFA to remediate user risk, but they must be targeted by a conditional access policy that meets `MS.AAD.2.2v2`, which requires MFA. ScubaGear reads the `MS.AAD.2.1v2` exemptions from the configuration file when evaluating `MS.AAD.2.2v2`. `MS.AAD.2.2v2` is not applicable when `MS.AAD.2.1v2` has no exemptions. Do not repeat the exempted principals under `MS.AAD.2.2v2`; `CapExclusions` under `MS.AAD.2.2v2` apply only to the MFA policy itself (for example, emergency access accounts). If `MS.AAD.2.1v2` has exemptions and `MS.AAD.2.2v2` is listed in `OmitPolicy`, ScubaGear warns that the exempted principals have no risk remediation policy assessed.
+
+#### Renumbered Entra ID policies
+
+The Entra ID risk-based policies were renumbered so the two user risk policies are sequential. Update `Aad`, `AnnotatePolicy`, and `OmitPolicy` entries that use the old IDs; settings under an old ID are ignored.
+
+| Old ID | New ID | Policy |
+| --- | --- | --- |
+| `MS.AAD.2.2v1` | `MS.AAD.2.3v2` | Notification when high-risk users are detected |
+| `MS.AAD.2.3v1` | `MS.AAD.2.4v1` | Block high-risk sign-ins |
+
+`MS.AAD.2.2v2` is a new policy (MFA risk remediation for users exempted from `MS.AAD.2.1v2`). The full list of replaced policy IDs is in [scuba-baseline-policy-migrations.csv](../../PowerShell/ScubaGear/mappings/scuba-baseline-policy-migrations.csv). ScubaGear warns when a configuration uses a replaced ID, the Configuration UI remaps the IDs when you import a file, and `New-SCuBAConfig` maps them for `-OmitPolicy`, `-AnnotatePolicy`, and `-ExclusionPolicy`.
 
 #### Agent Conditional Access Policy Exclusions
 

@@ -45,6 +45,8 @@ These boolean fields toggle top-level app capabilities at startup.
 | `MaximumResults` | int | Maximum number of past ScubaGear result folders to surface in the results reader |
 | `OnlineBaselineSchemaURL` | string | Raw URL to the published `ScubaBaselines.json` file in the ScubaGear schemas folder. Used exclusively when `PullOnlineBaselines` is `true`. |
 | `PolicyMigrationsCSVPath` | string | Relative path to the CSV file that defines legacy-to-current policy ID mappings |
+| `ConfigSchemaPath` | string | Relative path to `ScubaConfigSchema.json`. The app reads `schemaMetadata.policyExclusionRelationships` from it (parent policy -> dependent policies that read its exemptions, plus an explanatory note) |
+| `policyExemptionRelationships.exemptionFields` | string[] | Exclusion fields (for example `Users`, `Groups`, `GuestUserTypes`) that count as exemptions of a parent policy when the app warns that a dependent policy is omitted |
 
 ---
 
@@ -215,8 +217,12 @@ Informational message templates written to the debug log during normal operation
 ```
 
 `{0}`, `{1}` etc. are replaced at runtime with context-specific values using the PowerShell
-`-f` format operator. These messages are not shown to the user -- they appear only in the
-debug panel.
+`-f` format operator. Most of these messages are not shown to the user -- they appear only in the
+debug panel. The `PolicyExemption*` entries are user-facing: `PolicyExemptionParentNote` and
+`PolicyExemptionDependentNote` are the info notes on Exclusion cards for policies related through
+`schemaMetadata.policyExclusionRelationships`, and `PolicyExemptionOmittedWarning` /
+`PolicyExemptionWarningsPrefix` form the non-blocking warning shown after **Preview & Generate** when a
+parent policy has exemptions but a dependent policy is listed in Omit Policies.
 
 ---
 
@@ -464,6 +470,7 @@ to, and how they are filtered.
 | `cardName` | Short label used in card titles and success/removal messages |
 | `showFieldType` | When true, the field type selector is shown on the card |
 | `showDescription` | When true, the description textarea is shown on the card |
+| `showExemptionRelationshipNote` | When true, cards of this control type show an info note for policies related through `schemaMetadata.policyExclusionRelationships` (the parent policy's schema note, or the dependent policy's "reads the exemptions of" note) |
 | `supportsAllProducts` | When true, this control type applies across all selected products (used in policy migration to identify annotation/omission YAML keys) |
 | `filterAllLabel` / `filterConfiguredLabel` / `filterNotConfiguredLabel` | Labels for the three filter states in the policy card list |
 

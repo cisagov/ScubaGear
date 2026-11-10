@@ -788,6 +788,241 @@ InModuleScope Diff {
         }
     }
 
+    Describe -Tag 'Diff' -Name 'Same-product policy renumber alignment (AAD 2.2/2.3)' {
+        BeforeAll {
+            $script:NewAadSide = {
+                param($Controls)
+                $list = @($Controls | ForEach-Object {
+                    [pscustomobject]@{
+                        'Control ID'     = $_.Id
+                        'Requirement'    = "Requirement for $($_.Id)."
+                        'Result'         = $_.Result
+                        'OriginalResult' = $_.Result
+                        'Criticality'    = 'Shall'
+                        'Details'        = 'Details text.'
+                    }
+                })
+                return [pscustomobject]@{
+                    MetaData = [pscustomobject]@{ ReportUUID = 'x'; TimestampZulu = 'y'; ToolVersion = 'z' }
+                    Summary  = [pscustomobject]@{}
+                    Results  = [pscustomobject]@{
+                        AAD = @([pscustomobject]@{ GroupName = 'Legacy Authentication'; GroupNumber = '2'; Controls = $list })
+                    }
+                }
+            }
+            $script:GetAad = {
+                param($Diff, $Before, $After)
+                @($Diff.Diff.AAD | Where-Object {
+                    ($Before -and $_.'Control ID (Before)' -eq $Before) -or ($After -and $_.'Control ID (After)' -eq $After)
+                })
+            }
+        }
+
+        Context 'Renumbered run pair' {
+            BeforeAll {
+                $b = & $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.1v1'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.2v1'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v1'; Result = 'Fail' }
+                )
+                $a = & $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.1v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.2v2'; Result = 'Fail' },
+                    @{ Id = 'MS.AAD.2.3v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.4v1'; Result = 'Pass' }
+                )
+                $script:DiffR = Compare-ScubaResults -Before $b -After $a
+            }
+
+            It 'Aligns MS.AAD.2.2v1 to MS.AAD.2.3v2 and compares the results' {
+                $rec = @(& $GetAad $DiffR $null 'MS.AAD.2.3v2')
+                $rec.Count | Should -Be 1
+                $rec[0].'Control ID (Before)' | Should -Be 'MS.AAD.2.2v1'
+                $rec[0].Migrated | Should -BeTrue
+                $rec[0].MigratedFromId | Should -Be 'MS.AAD.2.2v1'
+                $rec[0].MigratedFromProduct | Should -Be 'AAD'
+                $rec[0].Classification | Should -Be 'Unchanged'
+            }
+
+            It 'Aligns MS.AAD.2.3v1 to MS.AAD.2.4v1 and classifies the result change' {
+                $rec = @(& $GetAad $DiffR $null 'MS.AAD.2.4v1')
+                $rec.Count | Should -Be 1
+                $rec[0].'Control ID (Before)' | Should -Be 'MS.AAD.2.3v1'
+                $rec[0].Migrated | Should -BeTrue
+                $rec[0].MigratedFromId | Should -Be 'MS.AAD.2.3v1'
+                $rec[0].Classification | Should -Be 'NewPass'
+            }
+
+            It 'Reports the new MS.AAD.2.2v2 policy as NewPolicy with no before counterpart' {
+                $rec = @(& $GetAad $DiffR $null 'MS.AAD.2.2v2')
+                $rec.Count | Should -Be 1
+                $rec[0].Classification | Should -Be 'NewPolicy'
+                $rec[0].'Control ID (Before)' | Should -BeNullOrEmpty
+                $rec[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            }
+
+            It 'Leaves MS.AAD.2.1 on the normal PolicyVersionUpdate path' {
+                $rec = @(& $GetAad $DiffR 'MS.AAD.2.1v1' $null)
+                $rec.Count | Should -Be 1
+                $rec[0].'Control ID (After)' | Should -Be 'MS.AAD.2.1v2'
+                $rec[0].Classification | Should -Be 'PolicyVersionUpdate'
+                $rec[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            }
+
+            It 'Leaves a Migrated stub for each retired policy, pointing at its replacement' {
+                $stub22 = @(& $GetAad $DiffR 'MS.AAD.2.2v1' $null | Where-Object { $_.Classification -eq 'Migrated' })
+                $stub22.Count | Should -Be 1
+                $stub22[0].MigratedToId | Should -Be 'MS.AAD.2.3v2'
+                $stub22[0].MigratedToProduct | Should -Be 'AAD'
+                $stub22[0].'Control ID (After)' | Should -BeNullOrEmpty
+                $stub23 = @(& $GetAad $DiffR 'MS.AAD.2.3v1' $null | Where-Object { $_.Classification -eq 'Migrated' })
+                $stub23.Count | Should -Be 1
+                $stub23[0].MigratedToId | Should -Be 'MS.AAD.2.4v1'
+            }
+
+            It 'Produces exactly one record per policy on each side' {
+                @($DiffR.Diff.AAD).Count | Should -Be 6
+                $DiffR.Summary.AAD['Migrated'] | Should -Be 2
+                $DiffR.Summary.AAD['NewPolicy'] | Should -Be 1
+                $DiffR.Summary.AAD['PolicyVersionUpdate'] | Should -Be 1
+                $DiffR.Summary.AAD['Unchanged'] | Should -Be 1
+                $DiffR.Summary.AAD['NewPass'] | Should -Be 1
+            }
+        }
+
+        Context 'Alignment preconditions' {
+            It 'Compares normally when both runs already use the new IDs' {
+                $ids = @('MS.AAD.2.1v2','MS.AAD.2.2v2','MS.AAD.2.3v2','MS.AAD.2.4v1')
+                $b = & $NewAadSide @($ids | ForEach-Object { @{ Id = $_; Result = 'Fail' } })
+                $a = & $NewAadSide @($ids | ForEach-Object { @{ Id = $_; Result = 'Pass' } })
+                $diff = Compare-ScubaResults -Before $b -After $a
+                @($diff.Diff.AAD).Count | Should -Be 4
+                foreach ($rec in $diff.Diff.AAD) {
+                    $rec.Classification | Should -Be 'NewPass'
+                    $rec.PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+                    $rec.PSObject.Properties['MigratedToId'] | Should -BeNullOrEmpty
+                }
+            }
+
+            It 'Does not align when the before run lacks the renumbered policies' {
+                $b = & $NewAadSide @(@{ Id = 'MS.AAD.1.1v1'; Result = 'Pass' })
+                $a = & $NewAadSide @(
+                    @{ Id = 'MS.AAD.1.1v1'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.4v1'; Result = 'Pass' }
+                )
+                { $script:DiffN = Compare-ScubaResults -Before $b -After $a } | Should -Not -Throw
+                @($DiffN.Diff.AAD).Count | Should -Be 3
+                foreach ($rec in $DiffN.Diff.AAD) {
+                    $rec.PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+                    $rec.PSObject.Properties['MigratedToId'] | Should -BeNullOrEmpty
+                }
+                (& $GetAad $DiffN $null 'MS.AAD.2.3v2')[0].Classification | Should -Be 'NewPolicy'
+                (& $GetAad $DiffN $null 'MS.AAD.2.4v1')[0].Classification | Should -Be 'NewPolicy'
+            }
+
+            It 'Does not align when the after run has no AAD product' {
+                $b = & $NewAadSide @(@{ Id = 'MS.AAD.2.2v1'; Result = 'Pass' })
+                $a = [pscustomobject]@{
+                    MetaData = [pscustomobject]@{ ReportUUID = 'x'; TimestampZulu = 'y'; ToolVersion = 'z' }
+                    Summary  = [pscustomobject]@{}
+                    Results  = [pscustomobject]@{
+                        Teams = @([pscustomobject]@{ GroupName = 'G'; GroupNumber = '1'; Controls = @(
+                            [pscustomobject]@{ 'Control ID' = 'MS.TEAMS.1.1v1'; Requirement = 'r'; Result = 'Pass'; OriginalResult = 'Pass'; Criticality = 'Shall'; Details = 'd' }) })
+                    }
+                }
+                $diff = Compare-ScubaResults -Before $b -After $a
+                $diff.Diff.AAD[0].Classification | Should -Be 'RemovedPolicy'
+                $diff.Diff.AAD[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            }
+
+            It 'Does not align when the after run still carries the old full ID' {
+                $b = & $NewAadSide @(@{ Id = 'MS.AAD.2.2v1'; Result = 'Pass' })
+                $a = & $NewAadSide @(@{ Id = 'MS.AAD.2.2v1'; Result = 'Fail' })
+                $diff = Compare-ScubaResults -Before $b -After $a
+                @($diff.Diff.AAD).Count | Should -Be 1
+                $diff.Diff.AAD[0].Classification | Should -Be 'NewFail'
+                $diff.Diff.AAD[0].PSObject.Properties['Migrated'] | Should -BeNullOrEmpty
+            }
+
+            It 'Only aligns the policies whose replacement exists in the after run' {
+                $b = & $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.2v1'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v1'; Result = 'Pass' }
+                )
+                $a = & $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.2v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.4v1'; Result = 'Pass' }
+                )
+                $diff = Compare-ScubaResults -Before $b -After $a
+                # 2.3v1 -> 2.4v1 aligns. 2.2v1 has no 2.3v2 replacement, so it
+                # keeps its base-ID pairing with 2.2v2 (a version update).
+                (& $GetAad $diff 'MS.AAD.2.3v1' 'MS.AAD.2.4v1' | Where-Object { $_.Migrated }).Count | Should -Be 1
+                $pair = @(& $GetAad $diff 'MS.AAD.2.2v1' 'MS.AAD.2.2v2')
+                $pair.Count | Should -Be 1
+                $pair[0].Classification | Should -Be 'PolicyVersionUpdate'
+            }
+        }
+
+        Context 'Chain safety' {
+            It 'Applies the 2.2v1 -> 2.3v2 and 2.3v1 -> 2.4v1 moves simultaneously without clobbering' {
+                $beforeMaps = [ordered]@{ AAD = Get-ScubaControlMap (& $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.2v1'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v1'; Result = 'Fail' }
+                )).Results.AAD }
+                $afterMaps = [ordered]@{ AAD = Get-ScubaControlMap (& $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.2v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.4v1'; Result = 'Pass' }
+                )).Results.AAD }
+
+                Invoke-ScubaPolicyRenumberAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
+
+                $m = $beforeMaps['AAD']
+                $m.Contains('MS.AAD.2.2') | Should -BeFalse
+                $m['MS.AAD.2.3'].FullId | Should -Be 'MS.AAD.2.2v1'
+                $m['MS.AAD.2.3'].MigratedFromId | Should -Be 'MS.AAD.2.2v1'
+                $m['MS.AAD.2.3'].Result | Should -Be 'Pass'
+                $m['MS.AAD.2.4'].FullId | Should -Be 'MS.AAD.2.3v1'
+                $m['MS.AAD.2.4'].MigratedFromId | Should -Be 'MS.AAD.2.3v1'
+                $m['MS.AAD.2.4'].Result | Should -Be 'Fail'
+                $m['MS.AAD.2.2v1'].MigratedToId | Should -Be 'MS.AAD.2.3v2'
+                $m['MS.AAD.2.3v1'].MigratedToId | Should -Be 'MS.AAD.2.4v1'
+                @($m.Keys).Count | Should -Be 4
+            }
+
+            It 'Skips a move whose target slot is held by a policy that is not moving' {
+                # 2.3v1 stays put (no 2.4v1 in the after run), so 2.2v1 must not
+                # overwrite its before-side slot.
+                $beforeMaps = [ordered]@{ AAD = Get-ScubaControlMap (& $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.2v1'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v1'; Result = 'Fail' }
+                )).Results.AAD }
+                $afterMaps = [ordered]@{ AAD = Get-ScubaControlMap (& $NewAadSide @(
+                    @{ Id = 'MS.AAD.2.2v2'; Result = 'Pass' },
+                    @{ Id = 'MS.AAD.2.3v2'; Result = 'Pass' }
+                )).Results.AAD }
+
+                Invoke-ScubaPolicyRenumberAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
+
+                $m = $beforeMaps['AAD']
+                @($m.Keys).Count | Should -Be 2
+                $m['MS.AAD.2.2'].FullId | Should -Be 'MS.AAD.2.2v1'
+                $m['MS.AAD.2.3'].FullId | Should -Be 'MS.AAD.2.3v1'
+                $m['MS.AAD.2.2'].PSObject.Properties['MigratedFromId'] | Should -BeNullOrEmpty
+            }
+        }
+
+        Context 'Renumber table' {
+            It 'Maps full IDs within the AAD product only' {
+                @($script:PolicyRenumberMap.Keys) | Should -Be @('AAD')
+                $script:PolicyRenumberMap['AAD']['MS.AAD.2.2v1'] | Should -Be 'MS.AAD.2.3v2'
+                $script:PolicyRenumberMap['AAD']['MS.AAD.2.3v1'] | Should -Be 'MS.AAD.2.4v1'
+                $script:PolicyRenumberMap['AAD'].Count | Should -Be 2
+            }
+        }
+    }
+
     Describe -Tag 'Diff' -Name 'Version drift within a product' {
         It 'Classifies a base ID at v1 vs v2 as PolicyVersionUpdate (never NewPolicy/RemovedPolicy)' {
             function New-VerResults {

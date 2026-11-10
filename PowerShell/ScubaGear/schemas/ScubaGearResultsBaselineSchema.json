@@ -119,10 +119,10 @@
       },
       {
         "id": "MS.AAD.2.1v2",
-        "name": "Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in",
+        "name": "Users detected as high risk SHALL be required to remediate risk using phishing-resistant MFA, and reauthenticate on every sign-in",
         "category": "Risk Based Policies",
-        "description": "Users detected as high risk SHALL be required to remediate risk, and reauthenticate on every sign-in",
-        "rationale": "Requiring high-risk users to remediate their risk prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention",
+        "description": "Users detected as high risk SHALL be required to remediate risk using phishing-resistant MFA, and reauthenticate on every sign-in",
+        "rationale": "Requiring high-risk users to remediate their risk with phishing-resistant MFA prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention",
         "exclusionField": "CapExclusions",
         "requiresLicense": "Microsoft Entra ID P2",
         "exceptions": null,
@@ -153,7 +153,10 @@
               "builtInControls": [
                 "riskRemediation"
               ],
-              "authenticationStrength": "required",
+              "authenticationStrength": {
+                "id": "00000000-0000-0000-0000-000000000004",
+                "displayName": "Phishing-resistant MFA"
+              },
               "operator": "AND"
             },
             "sessionControls": {
@@ -179,7 +182,10 @@
           "grantControls.builtInControls": [
             "riskRemediation"
           ],
-          "grantControls.authenticationStrength": "required",
+          "grantControls.authenticationStrength": {
+            "id": "00000000-0000-0000-0000-000000000004",
+            "displayName": "Phishing-resistant MFA"
+          },
           "grantControls.operator": "AND",
           "sessionControls.signInFrequency.isEnabled": true,
           "sessionControls.signInFrequency.frequencyInterval": "everyTime"
@@ -214,7 +220,7 @@
                 "riskRemediation"
               ],
               "authenticationStrength": {
-                "id": "<AUTHENTICATION_STRENGTH_POLICY_ID>"
+                "id": "00000000-0000-0000-0000-000000000004"
               }
             },
             "sessionControls": {
@@ -241,16 +247,135 @@
           "8. Target resources: Include → All resources (formerly 'All cloud apps')",
           "9. Conditions: User risk → Configure 'Yes' → Select 'High'",
           "10. Do not configure Sign-in risk in this policy",
-          "11. Access controls: Grant → Select 'Grant access' → 'Require risk remediation' (Require authentication strength is selected automatically; choose the strength appropriate for your organization)",
+          "11. Access controls: Grant → Select 'Grant access' → 'Require risk remediation' (Require authentication strength is selected automatically; select 'Phishing-resistant MFA' or a custom strength that allows only phishing-resistant methods). Do not use the legacy 'Require multifactor authentication' control",
           "12. Session: Sign-in frequency → 'Every time' (applied automatically and mandatory)",
-          "13. Enable policy: Select 'Report-only' for testing",
-          "14. Monitor report-only results for 24-48 hours",
-          "15. Change to 'On' after validating no false positives"
+          "13. Users, groups, or guest user types excluded because they cannot use phishing-resistant MFA must be listed as exclusions for MS.AAD.2.1v2 in the configuration file and targeted by the MS.AAD.2.2v2 policy",
+          "14. Enable policy: Select 'Report-only' for testing",
+          "15. Monitor report-only results for 24-48 hours",
+          "16. Change to 'On' after validating no false positives"
         ],
-        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with an authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy"
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with a phishing-resistant authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy. Users, groups, and guest user types exempted here (CapExclusions) must also be targeted by a policy that meets MS.AAD.2.2v2 (MFA)"
       },
       {
-        "id": "MS.AAD.2.2v1",
+        "id": "MS.AAD.2.2v2",
+        "name": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in",
+        "category": "Risk Based Policies",
+        "description": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in",
+        "rationale": "Accounts that cannot use phishing-resistant MFA and are exempted from MS.AAD.2.1v2 must still remediate user risk using MFA",
+        "exclusionField": "CapExclusions",
+        "requiresLicense": "Microsoft Entra ID P2",
+        "exceptions": "Not applicable when no users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file",
+        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+        "validationLogic": {
+          "type": "conditionalAccessPolicy",
+          "requiresPolicy": true,
+          "policyMustExist": true,
+          "requirements": {
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": [
+                  "All"
+                ]
+              },
+              "applications": {
+                "includeApplications": [
+                  "All"
+                ]
+              },
+              "userRiskLevels": [
+                "high"
+              ],
+              "signInRiskLevels": []
+            },
+            "grantControls": {
+              "builtInControls": [
+                "riskRemediation"
+              ],
+              "operator": "AND",
+              "anyOf": [
+                {
+                  "authenticationStrength": {
+                    "id": "00000000-0000-0000-0000-000000000002"
+                  }
+                },
+                {
+                  "authenticationStrength": {
+                    "id": "00000000-0000-0000-0000-000000000003"
+                  }
+                }
+              ]
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "frequencyInterval": "everyTime"
+              }
+            }
+          }
+        },
+        "buildInstructions": {
+          "description": "Create a Conditional Access policy requiring the users exempted from MS.AAD.2.1v2 to remediate high user risk using MFA",
+          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+          "apiMethodCreate": "POST",
+          "payloadTemplate": {
+            "displayName": "ScubaGear: Require MFA Risk Remediation for High Risk Users Exempted from Phishing-Resistant MFA",
+            "state": "enabled",
+            "conditions": {
+              "users": {
+                "includeUsers": [
+                  "<USERS_EXEMPTED_FROM_MS.AAD.2.1v2>"
+                ],
+                "includeGroups": [
+                  "<GROUPS_EXEMPTED_FROM_MS.AAD.2.1v2>"
+                ]
+              },
+              "applications": {
+                "includeApplications": [
+                  "All"
+                ]
+              },
+              "userRiskLevels": [
+                "high"
+              ]
+            },
+            "grantControls": {
+              "operator": "AND",
+              "builtInControls": [
+                "riskRemediation"
+              ],
+              "authenticationStrength": {
+                "id": "00000000-0000-0000-0000-000000000002"
+              }
+            },
+            "sessionControls": {
+              "signInFrequency": {
+                "isEnabled": true,
+                "frequencyInterval": "everyTime",
+                "authenticationType": "primaryAndSecondaryAuthentication"
+              }
+            }
+          }
+        },
+        "remediationSteps": [
+          "1. Identify the users, groups, and guest user types excluded from the MS.AAD.2.1v2 policy and listed as MS.AAD.2.1v2 exclusions in the configuration file",
+          "2. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
+          "3. Go to Protection → Conditional Access → Policies",
+          "4. Click 'New policy' to create a new Conditional Access policy",
+          "5. Name: 'MS.AAD.2.2v2 - ScubaGear: Require MFA Risk Remediation for Exempted Users'",
+          "6. Users: Include → the users, groups, and guest or external user types excluded from MS.AAD.2.1v2 (or All users); do not exclude them",
+          "7. Target resources: Include → All resources (formerly 'All cloud apps')",
+          "8. Conditions: User risk → Configure 'Yes' → Select 'High'",
+          "9. Do not configure Sign-in risk in this policy",
+          "10. Access controls: Grant → Select 'Grant access' → 'Require risk remediation' (Require authentication strength is selected automatically; select 'Multifactor authentication' or a custom strength that allows MFA methods that are not phishing-resistant). Do not use the legacy 'Require multifactor authentication' control",
+          "11. Session: Sign-in frequency → 'Every time' (applied automatically and mandatory)",
+          "12. Enable policy: Select 'Report-only' for testing",
+          "13. Change to 'On' after validating no false positives"
+        ],
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. Evaluated only when MS.AAD.2.1v2 has exemptions in the configuration file. ScubaGear passes a policy that targets 'All' users OR explicitly includes every user, group, and guest user type exempted from MS.AAD.2.1v2 (and does not exclude them); the analyzer cannot know those exempted principals, so it models the 'All users' scope and the built-in MFA / Passwordless MFA authentication strengths. Exclusions detected here (CapExclusions) apply only to the MFA policy itself (for example break-glass accounts) and are NOT the principals exempted from MS.AAD.2.1v2, which are configured under MS.AAD.2.1v2"
+      },
+      {
+        "id": "MS.AAD.2.3v2",
         "name": "A notification SHOULD be sent to the administrator when high-risk users are detected",
         "exclusionField": "none",
         "apiPermissionRef": "Get-MgBetaRiskyUser",
@@ -277,7 +402,7 @@
         "notes": "This setting is configured through the Entra admin center, not via Graph API. Manual validation required."
       },
       {
-        "id": "MS.AAD.2.3v1",
+        "id": "MS.AAD.2.4v1",
         "name": "Sign-ins detected as high risk SHALL be blocked",
         "exclusionField": "CapExclusions",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",

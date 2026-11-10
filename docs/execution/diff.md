@@ -212,6 +212,42 @@ and the unaligned EXO and Teams originals as `RemovedPolicy`.
 > Defender or EXO section whose every assessed policy migrated out is still
 > rendered, entirely as `Migrated` rows.
 
+## Renumbered policies within a product
+
+Some policies were renumbered inside the same product. The new baseline **reuses
+the old base numbers for different policies**, so matching on base ID alone would
+pair unrelated policies (for example, the old `MS.AAD.2.2v1` notification policy
+against the new `MS.AAD.2.2v2` MFA policy) and report them as
+`PolicyVersionUpdate`. The renumbered policies are therefore matched on their
+**full ID** and reported as **migrated**, not as a removed policy plus a new one.
+The table is derived from the same
+[scuba-baseline-policy-migrations.csv](../../PowerShell/ScubaGear/mappings/scuba-baseline-policy-migrations.csv):
+
+| Old (Entra ID) | New (Entra ID) |
+|---|---|
+| `MS.AAD.2.2v1` | `MS.AAD.2.3v2` |
+| `MS.AAD.2.3v1` | `MS.AAD.2.4v1` |
+
+A pair is aligned only when the before run contains the old full ID, the after run
+contains the new full ID, and neither run carries both forms. The moves are applied
+together, so the chain (`2.2v1 → 2.3v2`, `2.3v1 → 2.4v1`) cannot overwrite itself.
+
+The output follows the [cross-product migration](#legacy-to-security-suite-migration)
+conventions, except that both records stay in the same product's section:
+
+- The comparison record has `Control ID (Before)` set to the retired ID and
+  `Control ID (After)` to the new ID, carries `Migrated`, `MigratedFromId`, and
+  `MigratedFromProduct` (`AAD`), and is classified by its **result**; the
+  `PolicyVersionUpdate` check is skipped.
+- The retired policy also appears as a before-only `Migrated` record with
+  `MigratedToId` / `MigratedToProduct` (`AAD`) and empty after columns.
+- The new `MS.AAD.2.2v2` policy has no counterpart in the before run and reports
+  as `NewPolicy`. `MS.AAD.2.1v1 → MS.AAD.2.1v2` is a plain version bump and
+  remains a `PolicyVersionUpdate`.
+
+Two runs that both already use the new IDs are compared normally, and a before
+run without the old policies is not aligned.
+
 ## Diff Key Terminology
 
 Every base control ID present in either file is assigned exactly one

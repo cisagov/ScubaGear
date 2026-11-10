@@ -125,6 +125,85 @@ function Get-ScAExclusionValueMap {
     return $result
 }
 
+function Get-ScAExclusionRelationship {
+    <#
+    .SYNOPSIS
+    Returns the exclusion relationship for a PARENT control (@{ Dependents; Note }), or $null
+    when the control is not a parent. Driven by schemaMetadata.policyExclusionRelationships
+    in the canonical config schema (loaded by Import-ScAConfigurableMap).
+    #>
+    param([Parameter(Mandatory)][string]$ControlId)
+
+    if ($syncHash.ScAExclusionRelationships -and $syncHash.ScAExclusionRelationships.ContainsKey($ControlId)) {
+        return $syncHash.ScAExclusionRelationships[$ControlId]
+    }
+    return $null
+}
+
+function Get-ScAExclusionFollowUp {
+    <#
+    .SYNOPSIS
+    Returns follow-up recommendation text for a parent control whose exemptions are read by
+    dependent policies (e.g. exemptions from MS.AAD.2.1v2 must also be targeted by MS.AAD.2.2v2).
+    .DESCRIPTION
+    Returns an empty array unless the control is a parent in policyExclusionRelationships AND
+    exemptions/exclusions are actually being recommended or configured for it.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$ControlId,
+        [bool]$HasExclusions
+    )
+
+    if (-not $HasExclusions) { return @() }
+    $rel = Get-ScAExclusionRelationship -ControlId $ControlId
+    if (-not $rel) { return @() }
+    $dependents = @($rel.Dependents) -join ', '
+    $text = if ($rel.Note) { [string]$rel.Note } else { "Exemptions from $ControlId are also read by: $dependents." }
+    return @("Follow-up ($dependents): $text")
+}
+
+function Get-ScAYamlDependentStub {
+    <#
+    .SYNOPSIS
+    Builds a commented-out exclusion stub for each dependent of a parent control, to follow the
+    parent's exclusion block in generated YAML.
+    .DESCRIPTION
+    The stub is commented so the generated file stays valid (an empty exclusion key is not).
+    Dependents listed in -ExistingControlIds already have a block and are skipped. Returns ''
+    when the control is not a parent or the dependent supports no exclusion type.
+    #>
+    param(
+        [Parameter(Mandatory)][string]$ControlId,
+        [string[]]$ExistingControlIds = @(),
+        [string]$Indent = '  '
+    )
+
+    $rel = Get-ScAExclusionRelationship -ControlId $ControlId
+    if (-not $rel) { return '' }
+
+    $sb = [System.Text.StringBuilder]::new()
+    foreach ($dependent in @($rel.Dependents)) {
+        if (@($ExistingControlIds) -contains $dependent) { continue }
+        if (-not ($syncHash.ScAConfigurableMap -and $syncHash.ScAConfigurableMap.ContainsKey($dependent))) { continue }
+        $types = @($syncHash.ScAConfigurableMap[$dependent])
+        if (@($types).Count -eq 0) { continue }
+        $field = [string]$types[0]
+
+        if ($rel.Note) { [void]$sb.AppendLine("$Indent# $($rel.Note)") }
+        [void]$sb.AppendLine("$Indent# ${dependent}:")
+        [void]$sb.AppendLine("$Indent#   ${field}:")
+        $firstField = @(Get-ScAExclusionFieldDefinitions -ExclusionField $field) | Select-Object -First 1
+        if ($firstField) {
+            $name = if ($firstField.value) { [string]$firstField.value } else { [string]$firstField.name }
+            [void]$sb.AppendLine("$Indent#     ${name}:")
+            [void]$sb.AppendLine("$Indent#       - <object-id>")
+        } else {
+            [void]$sb.AppendLine("$Indent#     - <value>")
+        }
+    }
+    return $sb.ToString()
+}
+
 function Build-ScAYamlExclusionsBlock {
     <#
     .SYNOPSIS
@@ -511,6 +590,22 @@ function Get-ScubaAnalyzerConfigYaml {
             if ($entry) { Add-ScAYamlExclusionField -Builder $sb -ExclusionField $entry.ExclusionField -ExclusionValues $entry.ExclusionValues -DisplayNameLookup $DisplayNameLookup }
             foreach ($field in $keptFields) {
                 Add-ScAYamlNode -Builder $sb -Value ([ordered]@{ $field = $importedFields[$field] }) -Indent 4 -DisplayNameLookup $DisplayNameLookup
+            }
+
+            # A parent policy with exemptions (e.g. MS.AAD.2.1v2) is followed by its dependent
+            # policy's exclusion stub (e.g. MS.AAD.2.2v2) unless that control has its own block.
+            if (Get-ScAExclusionRelationship -ControlId $controlId) {
+                $parentHasExemptions = [bool]$entry
+                if (-not $parentHasExemptions -and $importedFields -is [System.Collections.IDictionary]) {
+                    $exclusionTypes = if ($syncHash.ScAConfigurableMap -and $syncHash.ScAConfigurableMap.ContainsKey($controlId)) { @($syncHash.ScAConfigurableMap[$controlId]) } else { @() }
+                    foreach ($field in @($keptFields | Where-Object { $exclusionTypes -contains $_ })) {
+                        if (-not (Test-ScAConfigValueEmpty $importedFields[$field])) { $parentHasExemptions = $true }
+                    }
+                }
+                if ($parentHasExemptions) {
+                    $stub = Get-ScAYamlDependentStub -ControlId $controlId -ExistingControlIds $controlIds
+                    if ($stub) { [void]$sb.Append($stub) }
+                }
             }
         }
         [void]$sb.AppendLine("")

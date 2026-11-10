@@ -527,7 +527,61 @@ class ScubaConfigValidator {
         # Warn when deprecated Defender product name or migrated Defender policy IDs are used
         [ScubaConfigValidator]::ValidateDefenderMigration($ConfigObject, $Validation)
 
+        # Warn when a policy's exemptions are configured but a policy that depends on them is omitted
+        [ScubaConfigValidator]::ValidateExemptionDependencies($ConfigObject, $Validation)
+
         return [PSCustomObject]$Validation
+    }
+
+    # Warns when a policy has exemptions configured but a dependent policy that reads those exemptions
+    # (schemaMetadata.policyExclusionRelationships, e.g. MS.AAD.2.2v2 reads the MS.AAD.2.1v2 exemptions)
+    # is listed in OmitPolicy. The exempted users, groups, or guest user types would then have no
+    # compensating control assessed.
+    hidden static [void] ValidateExemptionDependencies([object]$ConfigObject, [hashtable]$Validation) {
+        $Schema = [ScubaConfigValidator]::GetSchema()
+        if (-not $Schema.schemaMetadata -or -not $Schema.schemaMetadata.policyExclusionRelationships) {
+            return
+        }
+
+        # Reads a member from a hashtable/dictionary or PSCustomObject; $null when it is absent.
+        $GetMember = {
+            param($Object, $Name)
+            if ($null -eq $Object) { return $null }
+            if ($Object -is [System.Collections.IDictionary]) {
+                foreach ($Key in $Object.Keys) { if ($Key -ieq $Name) { return $Object[$Key] } }
+                return $null
+            }
+            if ($Object.PSObject -and $Object.PSObject.Properties[$Name]) { return $Object.PSObject.Properties[$Name].Value }
+            return $null
+        }
+
+        $OmitPolicy = & $GetMember $ConfigObject 'OmitPolicy'
+        if ($null -eq $OmitPolicy) { return }
+        $OmittedIds = @([ScubaConfigValidator]::GetObjectKeys($OmitPolicy))
+        if ($OmittedIds.Count -eq 0) { return }
+
+        $Relationships = $Schema.schemaMetadata.policyExclusionRelationships
+        foreach ($ParentId in $Relationships.PSObject.Properties.Name) {
+            if ($ParentId -eq '_comment') { continue }
+
+            # Find the parent's configured exemptions in its product section (e.g. Aad -> MS.AAD.2.1v2).
+            $ProductSection = & $GetMember $ConfigObject (($ParentId -split '\.')[1].Substring(0, 1).ToUpper() + ($ParentId -split '\.')[1].Substring(1).ToLower())
+            $ParentConfig = & $GetMember $ProductSection $ParentId
+            $HasExemptions = $false
+            foreach ($ExclusionType in @([ScubaConfigValidator]::GetObjectKeys((& $GetMember $ParentConfig 'CapExclusions')))) {
+                $Values = @(& $GetMember (& $GetMember $ParentConfig 'CapExclusions') $ExclusionType) | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }
+                if ($Values.Count -gt 0 -and $ExclusionType -in @('Users', 'Groups', 'GuestUserTypes')) { $HasExemptions = $true }
+            }
+            if (-not $HasExemptions) { continue }
+
+            foreach ($DependentId in @($Relationships.$ParentId.dependents)) {
+                if ($OmittedIds -contains $DependentId) {
+                    $ProductLabel = ($ParentId -split '\.')[1]
+                    $ProductLabel = $ProductLabel.Substring(0, 1).ToUpper() + $ProductLabel.Substring(1).ToLower()
+                    [void]$Validation.Warnings.Add("$ProductLabel exclusion warning: $ParentId has exemptions configured but $DependentId is omitted in OmitPolicy. $($Relationships.$ParentId.note)")
+                }
+            }
+        }
     }
 
     # Validates that products not supporting exclusions don't have exclusion configurations
@@ -595,11 +649,29 @@ class ScubaConfigValidator {
                 if ($Migrations.ContainsKey($Key) -and -not $ReportedIds.ContainsKey($Key)) {
                     $ReportedIds[$Key] = $true
                     $NewId = $Migrations[$Key].NewId
-                    if ([string]::IsNullOrWhiteSpace($NewId) -or $NewId -eq 'None') {
-                        [void]$Validation.Warnings.Add("Policy migration warning: Policy ID '$ConfigId' has been removed and is no longer assessed by ScubaGear. Remove it from your configuration. $DocRef")
+                    $HasNewId = -not ([string]::IsNullOrWhiteSpace($NewId) -or $NewId -eq 'None')
+                    $OldProduct = ($ConfigId -split '\.')[1].ToUpper()
+                    $NewProduct = if ($HasNewId -and $NewId -match '^MS\.([A-Za-z]+)\.') { $Matches[1].ToUpper() } else { $null }
+
+                    # The Defender-to-Security Suite transition guidance only applies to policies that moved out
+                    # of the Defender/Exchange/Teams baselines. Same-product renumbers and version bumps (for
+                    # example MS.AAD.2.3v1 -> MS.AAD.2.4v1) get a general policy-update message instead.
+                    $IsDefenderTransition = ($OldProduct -eq 'DEFENDER') -or ($NewProduct -eq 'SECURITYSUITE') -or (-not $HasNewId -and $OldProduct -in @('EXO', 'TEAMS'))
+                    $UpdateDocRef = "See mappings\scuba-baseline-policy-migrations.csv for the full list of replaced policies."
+
+                    if (-not $HasNewId) {
+                        if ($IsDefenderTransition) {
+                            [void]$Validation.Warnings.Add("Policy migration warning: Policy ID '$ConfigId' has been removed and is no longer assessed by ScubaGear. Remove it from your configuration. $DocRef")
+                        }
+                        else {
+                            [void]$Validation.Warnings.Add("Policy update warning: Policy ID '$ConfigId' has been removed and is no longer assessed by ScubaGear. Remove it from your configuration. $UpdateDocRef")
+                        }
+                    }
+                    elseif ($IsDefenderTransition) {
+                        [void]$Validation.Warnings.Add("Policy migration warning: Policy ID '$ConfigId' has been migrated to '$NewId'. Update your configuration to use the new policy ID. $DocRef")
                     }
                     else {
-                        [void]$Validation.Warnings.Add("Policy migration warning: Policy ID '$ConfigId' has been migrated to '$NewId'. Update your configuration to use the new policy ID. $DocRef")
+                        [void]$Validation.Warnings.Add("Policy update warning: Policy ID '$ConfigId' has been replaced by '$NewId' (renumbered or versioned). Update your configuration to use the new policy ID; settings under the old ID are ignored. $UpdateDocRef")
                     }
                 }
             }

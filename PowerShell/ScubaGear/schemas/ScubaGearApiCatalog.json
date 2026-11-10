@@ -475,7 +475,7 @@
         "endpointPath": "/beta/identity/conditionalAccess/policies",
         "parameters": [],
         "apiFilter": "",
-        "apiHeader": [],
+        "apiHeader": [{"Prefer":"include-unknown-enum-members"}],
         "leastPermissions": ["Policy.Read.All"],
         "higherPermissions": [],
         "spRolePermissions": [],
