@@ -1,3 +1,5 @@
+using module '..\..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearOAuthScope, Get-ScubaGearServiceEndpoint
 
 function Get-ExchangeOnlineScope {
@@ -12,7 +14,8 @@ function Get-ExchangeOnlineScope {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -31,7 +34,8 @@ function Get-ComplianceScope {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -185,7 +189,8 @@ function Get-ComplianceApiEndpoint {
         [string]$TenantDomain,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $true)]
@@ -230,7 +235,8 @@ function Get-ExchangeOnlineApiEndpoint {
         [string]$TenantDomain,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod")]
+        [ValidateNotNullOrEmpty()]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $true)]
