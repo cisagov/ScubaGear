@@ -1374,14 +1374,12 @@ Outbound spam is not covered by the preset policies, so these steps need to be t
     3. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**
     4. Under **Notifications** ensure the following setting **Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups** is checked and at least one email recipient is specified.
     5. Click **Save**.
-6. **Anti-spam outbound policy (Default)** automatically has the lowest priority among outbound spam policies. Enabled custom outbound spam policies with a higher priority may take precedence over the default policy for users within their scope. Review all enabled custom outbound spam policies to ensure that users covered by this baseline are subject to the required limits. 
-    1. Click Edit protection settings
-    2. Ensure the following settings are set to the recommended level or more restrictive:
+6. **Anti-spam outbound policy (Default)** automatically has the lowest priority among outbound spam policies. Enabled custom outbound spam policies with a higher priority may take precedence over the default policy for users within their scope. Review all enabled custom outbound spam policies to ensure that users covered by this baseline are subject to the required limits. Click each custom outbound spam policy to open the policy summary, then do the following steps:
+    1. Ensure the following settings are set to the recommended level or more restrictive:
       - Set an external message limit: 500
       - Set an internal message limit: 1000
       - Set a daily message limit: 1000
-    4. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**     
-    3. Click **Save**.
+    2. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**     
 #### MS.SECURITYSUITE.9.2v1 Instructions
 
 1. Sign in to Microsoft 365 Defender.
