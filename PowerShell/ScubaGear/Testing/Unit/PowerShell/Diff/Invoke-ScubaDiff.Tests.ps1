@@ -957,7 +957,7 @@ InModuleScope Diff {
                 $diff = Compare-ScubaResults -Before $b -After $a
                 # 2.3v1 -> 2.4v1 aligns. 2.2v1 has no 2.3v2 replacement, so it
                 # keeps its base-ID pairing with 2.2v2 (a version update).
-                (& $GetAad $diff 'MS.AAD.2.3v1' 'MS.AAD.2.4v1' | Where-Object { $_.Migrated }).Count | Should -Be 1
+                @(& $GetAad $diff 'MS.AAD.2.3v1' 'MS.AAD.2.4v1' | Where-Object { $_.Migrated }).Count | Should -Be 1
                 $pair = @(& $GetAad $diff 'MS.AAD.2.2v1' 'MS.AAD.2.2v2')
                 $pair.Count | Should -Be 1
                 $pair[0].Classification | Should -Be 'PolicyVersionUpdate'

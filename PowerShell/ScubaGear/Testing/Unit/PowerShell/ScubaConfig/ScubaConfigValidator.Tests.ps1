@@ -386,13 +386,11 @@ OutPath: $($test.Path)
 
     Context "Policy exemptions and renumbered policy IDs" {
         BeforeAll {
-            # The validator parses YAML with ConvertFrom-Yaml from the powershell-yaml module.
-            Import-Module powershell-yaml -ErrorAction Stop
-
-            # Writes a config file, validates it, and returns the combined warning text.
+            # Writes a JSON config file (parsed natively, so no YAML module is needed), validates it,
+            # and returns the combined warning text.
             function script:Get-ValidationWarningText {
-                param([string]$Content, [string]$Extension = '.yaml')
-                $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), $Extension)
+                param([string]$Content)
+                $TempFile = [System.IO.Path]::ChangeExtension([System.IO.Path]::GetTempFileName(), '.json')
                 try {
                     Set-Content -Path $TempFile -Value $Content
                     $Result = [ScubaConfigValidator]::ValidateYamlFile($TempFile)
@@ -412,47 +410,54 @@ OutPath: $($test.Path)
 
         It "Should warn when MS.AAD.2.1v2 has exemptions and MS.AAD.2.2v2 is omitted" {
             $Warnings = Get-ValidationWarningText @"
-ProductNames: [aad]
-Aad:
-  MS.AAD.2.1v2:
-    CapExclusions:
-      Users:
-        - 49b4dcdf-1f90-41a7-9dd7-5e3c3609b425
-OmitPolicy:
-  MS.AAD.2.2v2:
-    Rationale: Covered elsewhere
+{
+  "ProductNames": ["aad"],
+  "Aad": {
+    "MS.AAD.2.1v2": {
+      "CapExclusions": { "Users": ["49b4dcdf-1f90-41a7-9dd7-5e3c3609b425"] }
+    }
+  },
+  "OmitPolicy": {
+    "MS.AAD.2.2v2": { "Rationale": "Covered elsewhere" }
+  }
+}
 "@
             $Warnings | Should -Match "MS\.AAD\.2\.1v2 has exemptions configured but MS\.AAD\.2\.2v2 is omitted"
         }
 
         It "Should not warn when MS.AAD.2.1v2 has exemptions and MS.AAD.2.2v2 is not omitted" {
             $Warnings = Get-ValidationWarningText @"
-ProductNames: [aad]
-Aad:
-  MS.AAD.2.1v2:
-    CapExclusions:
-      Groups:
-        - 49b4dcdf-1f90-41a7-9dd7-5e3c3609b425
+{
+  "ProductNames": ["aad"],
+  "Aad": {
+    "MS.AAD.2.1v2": {
+      "CapExclusions": { "Groups": ["49b4dcdf-1f90-41a7-9dd7-5e3c3609b425"] }
+    }
+  }
+}
 "@
             $Warnings | Should -Not -Match "is omitted in OmitPolicy"
         }
 
         It "Should not warn when MS.AAD.2.2v2 is omitted but MS.AAD.2.1v2 has no exemptions" {
             $Warnings = Get-ValidationWarningText @"
-ProductNames: [aad]
-Aad:
-  MS.AAD.2.1v2:
-    CapExclusions:
-      Users: []
-OmitPolicy:
-  MS.AAD.2.2v2:
-    Rationale: Not applicable
+{
+  "ProductNames": ["aad"],
+  "Aad": {
+    "MS.AAD.2.1v2": {
+      "CapExclusions": { "Users": [] }
+    }
+  },
+  "OmitPolicy": {
+    "MS.AAD.2.2v2": { "Rationale": "Not applicable" }
+  }
+}
 "@
             $Warnings | Should -Not -Match "is omitted in OmitPolicy"
         }
 
         It "Should use the general policy-update message for a renumbered Entra policy ID" {
-            $Warnings = Get-ValidationWarningText -Extension '.json' -Content @"
+            $Warnings = Get-ValidationWarningText @"
 {
   "ProductNames": ["aad"],
   "Aad": {
@@ -467,7 +472,7 @@ OmitPolicy:
         }
 
         It "Should keep the Defender transition message for policies migrated to Security Suite" {
-            $Warnings = Get-ValidationWarningText -Extension '.json' -Content @"
+            $Warnings = Get-ValidationWarningText @"
 {
   "ProductNames": ["securitysuite"],
   "OmitPolicy": {
