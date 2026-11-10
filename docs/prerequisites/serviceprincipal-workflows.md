@@ -123,50 +123,28 @@ Get-ScubaGearAppPermission `
 ```
 
 > [!NOTE]
-> When `powerbi` is selected, the setup command enables the service principal access to Power BI
-> **read-only admin APIs** tenant settings and
-> associates the service principal with an allowed Entra security group. If
-> existing allowed groups are configured, you can select one or create/use
-> ScubaGear's dedicated group. The [manual Power BI setup steps](noninteractive.md#power-bi-tenant-setting)
-> remain available when configuring a service principal without the ScubaGear
-> helper commands.
+> With `powerbi` selected, setup and remediation configure **read-only admin
+> API access** using an existing allowed group or by creating/reusing
+> `ScubaGear PowerBI Service Principals`. Other allowed groups are preserved.
+>
+> - **Duplicate names:** Choose the intended group using its object ID.
+> - **Deleted groups:** Setup asks before removing stale Power BI references;
+>   declining stops Power BI setup. No Entra groups are deleted. Unattended
+>   runs require manual cleanup first.
+> - **Removing Power BI access:** When `powerbi` is not selected, remediation
+>   removes the service principal from allowed groups where it is a direct
+>   member. Deleted groups are skipped; no groups are deleted and the Power BI
+>   tenant setting stays unchanged. Other group lookup errors stop removal.
+>
+> `Get-ScubaGearAppPermission` audits access without making changes.
+> Use `-WhatIf` with setup/remediation commands to preview changes.
+> [Manual setup](noninteractive.md#power-bi-tenant-setting) is also available.
 
-> [!TIP]
-> If the Power BI read-only Admin API tenant setting is already enabled for
-> specific groups, but your service principal is not a member of any of them,
-> `Get-ScubaGearAppPermission` shows that the service principal needs Power BI
-> access. When you create the service principal or apply the suggested fix
-> interactively, you can add it to an existing allowed group or create or use
-> ScubaGear's dedicated group.
->
-> ScubaGear's dedicated group is named `ScubaGear PowerBI Service Principals`;
-> it is not a built-in Entra group. ScubaGear reuses an existing group with
-> that name or creates one if needed, adds the service principal to it, and
-> includes it in the tenant setting while preserving existing allowed groups.
-> The group-selection prompt appears only when applying changes with
-> `New-ScubaGearServicePrincipal` or `Set-ScubaGearAppPermission`, not when using
-> `-WhatIf`. `Get-ScubaGearAppPermission` is read-only and does not support
-> `-WhatIf`.
->
-> Power BI can still list a group in the **Service principals can access
-> read-only admin APIs** tenant setting after the group has been deleted from
-> Entra ID. When ScubaGear encounters a group it cannot find in Entra ID during
-> setup, it warns you and excludes that group from selection. Before configuring
-> access, interactive setup asks whether to remove the stale entry from the
-> Power BI tenant setting. This removes only the Power BI reference, not an
-> Entra group. Declining or pressing Enter stops Power BI configuration without
-> changing group membership or the tenant setting.
->
-> If valid allowed groups remain, interactive setup lets you select one and,
-> when the dedicated group is not already listed, offers to create or reuse
-> `ScubaGear PowerBI Service Principals` instead. If no valid allowed groups
-> remain, setup proceeds with that dedicated-group workflow without a
-> group-selection prompt.
->
-> Confirmed cleanup and the selected or new group's access are saved in one
-> tenant-setting update; other allowed groups are preserved.
-> Unattended setup does not approve stale-entry removal automatically. Remove
-> stale entries from the Power BI tenant setting manually first.
+> [!NOTE]
+> **GCC High:** If an update returns `FeatureNotAvailable`, follow the warning
+> to allow the specified group in the Power BI admin portal and remove any
+> identified stale references. Then rerun `Get-ScubaGearAppPermission` to
+> verify access.
 
 **Expected result:** Status should show "No action needed - service principal is correctly configured."
 
