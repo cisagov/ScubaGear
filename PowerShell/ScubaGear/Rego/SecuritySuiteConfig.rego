@@ -1519,14 +1519,14 @@ NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
     AlertPolicy.Disabled == false
-    Setting := "Disabled must be false"
+    Setting := "The policy must be enabled"
 }
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
     AlertPolicy.NotificationEnabled == true
-    Setting := "NotificationEnabled must be true"
+    Setting := "Notifications must be enabled"
 }
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
@@ -1576,7 +1576,7 @@ ReportDetails9_2 := sprintf(
 }
 
 ReportDetails9_2 := sprintf(
-    "Requirement not met.\n\nThe following outbound spam alert policies have non-compliant settings:\n\n%s",
+    "Requirement not met.\n\nThe following alert policies are non-compliant for the following reasons:\n\n%s",
     [concat("\n\n", sort([Detail | Detail := NonCompliantAlertPolicyDetails[_]]))]
 ) if {
     count(MissingAlertPolicies) == 0
@@ -1584,7 +1584,7 @@ ReportDetails9_2 := sprintf(
 }
 
 ReportDetails9_2 := sprintf(
-    "Requirement not met.\n\nThe following required outbound spam alert policies are missing:\n- %s\n\nThe following outbound spam alert policies have non-compliant settings:\n\n%s",
+    "Requirement not met.\n\nThe following required alert policies are missing:\n- %s\n\nThe following alert policies are non-compliant for the following reasons:\n\n%s",
     [
         concat("\n- ", sort([Policy | Policy := MissingAlertPolicies[_]])),
         concat("\n\n", sort([Detail | Detail := NonCompliantAlertPolicyDetails[_]]))
