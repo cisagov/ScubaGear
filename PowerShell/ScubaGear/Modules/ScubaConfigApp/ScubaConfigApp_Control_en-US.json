@@ -141,7 +141,7 @@
     "ScubaRunReady": "Ready to run ScubaGear {0}",
     "PowerShellVersionRequired": "PowerShell {0} required",
     "PolicyExemptionParentNote": "Note: {0}",
-    "PolicyExemptionDependentNote": "Note: {0} reads the exemptions configured for {1}. Do not repeat them here; exclusions added here apply only to the {0} policy itself (for example, break-glass accounts).",
+    "PolicyExemptionDependentNote": "Note: {0} reads the exemptions configured for {1}. List an account here only if it is intentionally excluded from both policies: an account exempted under both {1} and {0} is an approved exception and needs no MFA coverage. Other exclusions added here apply only to the {0} policy itself.",
     "PolicyExemptionOmittedWarning": "{0} has exemptions configured but {1} is listed in Omit Policies. The exempted users, groups, or guest user types would have no compensating control assessed. {2}",
     "PolicyExemptionWarningsPrefix": "The configuration preview was generated, but please review the following:{0}"
   },

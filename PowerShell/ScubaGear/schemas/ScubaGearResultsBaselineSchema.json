@@ -249,12 +249,12 @@
           "10. Do not configure Sign-in risk in this policy",
           "11. Access controls: Grant → Select 'Grant access' → 'Require risk remediation' (Require authentication strength is selected automatically; select 'Phishing-resistant MFA' or a custom strength that allows only phishing-resistant methods). Do not use the legacy 'Require multifactor authentication' control",
           "12. Session: Sign-in frequency → 'Every time' (applied automatically and mandatory)",
-          "13. Users, groups, or guest user types excluded because they cannot use phishing-resistant MFA must be listed as exclusions for MS.AAD.2.1v2 in the configuration file and targeted by the MS.AAD.2.2v2 policy",
+          "13. Users, groups, or guest user types excluded because they cannot use phishing-resistant MFA must be listed as exclusions for MS.AAD.2.1v2 in the configuration file and targeted by the MS.AAD.2.2v2 policy, unless they are also listed as exclusions for MS.AAD.2.2v2 as an approved exception to both policies",
           "14. Enable policy: Select 'Report-only' for testing",
           "15. Monitor report-only results for 24-48 hours",
           "16. Change to 'On' after validating no false positives"
         ],
-        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with a phishing-resistant authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy. Users, groups, and guest user types exempted here (CapExclusions) must also be targeted by a policy that meets MS.AAD.2.2v2 (MFA)"
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with a phishing-resistant authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy. Users, groups, and guest user types exempted here (CapExclusions) must also be targeted by a policy that meets MS.AAD.2.2v2 (MFA), unless they are also exempted from MS.AAD.2.2v2 as an approved exception to both policies"
       },
       {
         "id": "MS.AAD.2.2v2",
@@ -264,7 +264,7 @@
         "rationale": "Accounts that cannot use phishing-resistant MFA and are exempted from MS.AAD.2.1v2 must still remediate user risk using MFA",
         "exclusionField": "CapExclusions",
         "requiresLicense": "Microsoft Entra ID P2",
-        "exceptions": "Not applicable when no users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file",
+        "exceptions": "Not applicable when no users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.2v2",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
         "validationLogic": {
           "type": "conditionalAccessPolicy",
@@ -372,7 +372,7 @@
           "12. Enable policy: Select 'Report-only' for testing",
           "13. Change to 'On' after validating no false positives"
         ],
-        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. Evaluated only when MS.AAD.2.1v2 has exemptions in the configuration file. ScubaGear passes a policy that targets 'All' users OR explicitly includes every user, group, and guest user type exempted from MS.AAD.2.1v2 (and does not exclude them); the analyzer cannot know those exempted principals, so it models the 'All users' scope and the built-in MFA / Passwordless MFA authentication strengths. Exclusions detected here (CapExclusions) apply only to the MFA policy itself (for example break-glass accounts) and are NOT the principals exempted from MS.AAD.2.1v2, which are configured under MS.AAD.2.1v2"
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. Evaluated only when MS.AAD.2.1v2 has exemptions in the configuration file that are not also exempted from MS.AAD.2.2v2. ScubaGear passes a policy that targets 'All' users OR explicitly includes every user, group, and guest user type exempted from MS.AAD.2.1v2 (and does not exclude them); the analyzer cannot know those exempted principals, so it models the 'All users' scope and the built-in MFA / Passwordless MFA authentication strengths. Exclusions detected here (CapExclusions) apply to the MFA policy itself (for example break-glass accounts). A principal exempted under both MS.AAD.2.1v2 and MS.AAD.2.2v2 is an approved exception to both policies and needs no MFA coverage"
       },
       {
         "id": "MS.AAD.2.3v2",

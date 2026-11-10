@@ -53,7 +53,7 @@
       "_comment": "Maps a policy ID to the dependent policy IDs whose assessment reads that policy's configured exemptions. Config tooling uses this to add the dependent template, warn when a dependent is omitted, and explain the relationship.",
       "MS.AAD.2.1v2": {
         "dependents": ["MS.AAD.2.2v2"],
-        "note": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 must be targeted by a conditional access policy that meets MS.AAD.2.2v2 (MFA). MS.AAD.2.2v2 reads the MS.AAD.2.1v2 exemptions, so do not repeat them under MS.AAD.2.2v2; exclusions under MS.AAD.2.2v2 apply only to the MFA policy itself."
+        "note": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 must be targeted by a conditional access policy that meets MS.AAD.2.2v2 (MFA), unless they are also exempted from MS.AAD.2.2v2 as an approved exception to both policies (for example, emergency access accounts). MS.AAD.2.2v2 reads the MS.AAD.2.1v2 exemptions, so list the principals that need MFA coverage only under MS.AAD.2.1v2; exclusions under MS.AAD.2.2v2 apply to the MFA policy itself and, for principals also exempted from MS.AAD.2.1v2, remove the MFA coverage requirement."
       }
     },
 

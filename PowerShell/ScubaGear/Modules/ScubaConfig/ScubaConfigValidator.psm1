@@ -560,26 +560,36 @@ class ScubaConfigValidator {
         $OmittedIds = @([ScubaConfigValidator]::GetObjectKeys($OmitPolicy))
         if ($OmittedIds.Count -eq 0) { return }
 
+        # Returns the exempted principals configured for a policy as "Type:value" keys.
+        $GetExemptions = {
+            param($PolicyId)
+            $Section = & $GetMember $ConfigObject (($PolicyId -split '\.')[1].Substring(0, 1).ToUpper() + ($PolicyId -split '\.')[1].Substring(1).ToLower())
+            $CapExclusions = & $GetMember (& $GetMember $Section $PolicyId) 'CapExclusions'
+            foreach ($ExclusionType in @('Users', 'Groups', 'GuestUserTypes')) {
+                foreach ($Value in @(& $GetMember $CapExclusions $ExclusionType)) {
+                    if (-not [string]::IsNullOrWhiteSpace([string]$Value)) { "${ExclusionType}:$Value".ToLower() }
+                }
+            }
+        }
+
         $Relationships = $Schema.schemaMetadata.policyExclusionRelationships
         foreach ($ParentId in $Relationships.PSObject.Properties.Name) {
             if ($ParentId -eq '_comment') { continue }
 
-            # Find the parent's configured exemptions in its product section (e.g. Aad -> MS.AAD.2.1v2).
-            $ProductSection = & $GetMember $ConfigObject (($ParentId -split '\.')[1].Substring(0, 1).ToUpper() + ($ParentId -split '\.')[1].Substring(1).ToLower())
-            $ParentConfig = & $GetMember $ProductSection $ParentId
-            $HasExemptions = $false
-            foreach ($ExclusionType in @([ScubaConfigValidator]::GetObjectKeys((& $GetMember $ParentConfig 'CapExclusions')))) {
-                $Values = @(& $GetMember (& $GetMember $ParentConfig 'CapExclusions') $ExclusionType) | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }
-                if ($Values.Count -gt 0 -and $ExclusionType -in @('Users', 'Groups', 'GuestUserTypes')) { $HasExemptions = $true }
-            }
-            if (-not $HasExemptions) { continue }
+            $ParentExemptions = @(& $GetExemptions $ParentId)
+            if ($ParentExemptions.Count -eq 0) { continue }
 
             foreach ($DependentId in @($Relationships.$ParentId.dependents)) {
-                if ($OmittedIds -contains $DependentId) {
-                    $ProductLabel = ($ParentId -split '\.')[1]
-                    $ProductLabel = $ProductLabel.Substring(0, 1).ToUpper() + $ProductLabel.Substring(1).ToLower()
-                    [void]$Validation.Warnings.Add("$ProductLabel exclusion warning: $ParentId has exemptions configured but $DependentId is omitted in OmitPolicy. $($Relationships.$ParentId.note)")
-                }
+                if ($OmittedIds -notcontains $DependentId) { continue }
+
+                # An account exempted from both policies is an approved exception to both and has no gap.
+                $DependentExemptions = @(& $GetExemptions $DependentId)
+                $Uncovered = @($ParentExemptions | Where-Object { $DependentExemptions -notcontains $_ })
+                if ($Uncovered.Count -eq 0) { continue }
+
+                $ProductLabel = ($ParentId -split '\.')[1]
+                $ProductLabel = $ProductLabel.Substring(0, 1).ToUpper() + $ProductLabel.Substring(1).ToLower()
+                [void]$Validation.Warnings.Add("$ProductLabel exclusion warning: $ParentId has exemptions configured but $DependentId is omitted in OmitPolicy. $($Relationships.$ParentId.note)")
             }
         }
     }

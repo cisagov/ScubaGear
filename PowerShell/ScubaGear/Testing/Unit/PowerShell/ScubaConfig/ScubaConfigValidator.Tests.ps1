@@ -456,6 +456,46 @@ OutPath: $($test.Path)
             $Warnings | Should -Not -Match "is omitted in OmitPolicy"
         }
 
+        It "Should not warn when every MS.AAD.2.1v2 exemption is also an approved exemption for MS.AAD.2.2v2" {
+            $Warnings = Get-ValidationWarningText @"
+{
+  "ProductNames": ["aad"],
+  "Aad": {
+    "MS.AAD.2.1v2": {
+      "CapExclusions": { "Users": ["49b4dcdf-1f90-41a7-9dd7-5e3c3609b425"] }
+    },
+    "MS.AAD.2.2v2": {
+      "CapExclusions": { "Users": ["49B4DCDF-1F90-41A7-9DD7-5E3C3609B425"] }
+    }
+  },
+  "OmitPolicy": {
+    "MS.AAD.2.2v2": { "Rationale": "Emergency access account excluded from both" }
+  }
+}
+"@
+            $Warnings | Should -Not -Match "is omitted in OmitPolicy"
+        }
+
+        It "Should warn when only some MS.AAD.2.1v2 exemptions are also approved for MS.AAD.2.2v2" {
+            $Warnings = Get-ValidationWarningText @"
+{
+  "ProductNames": ["aad"],
+  "Aad": {
+    "MS.AAD.2.1v2": {
+      "CapExclusions": { "Users": ["49b4dcdf-1f90-41a7-9dd7-5e3c3609b425", "65fea286-22d3-42f9-b4ca-93a6f75817d4"] }
+    },
+    "MS.AAD.2.2v2": {
+      "CapExclusions": { "Users": ["49b4dcdf-1f90-41a7-9dd7-5e3c3609b425"] }
+    }
+  },
+  "OmitPolicy": {
+    "MS.AAD.2.2v2": { "Rationale": "Partial" }
+  }
+}
+"@
+            $Warnings | Should -Match "MS\.AAD\.2\.1v2 has exemptions configured but MS\.AAD\.2\.2v2 is omitted"
+        }
+
         It "Should use the general policy-update message for a renumbered Entra policy ID" {
             $Warnings = Get-ValidationWarningText @"
 {

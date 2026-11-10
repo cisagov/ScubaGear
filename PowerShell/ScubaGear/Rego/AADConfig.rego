@@ -343,10 +343,29 @@ PrimaryExemptGroups := ConvertToSet(object.get(
 PrimaryExemptGuestTypes := ConvertToSet(object.get(
     input, ["scuba_config", "Aad", "MS.AAD.2.1v2", "CapExclusions", "GuestUserTypes"], []))
 
-default PrimaryHasExemptions := false
+# Principals that are also exempted from MS.AAD.2.2v2 in the config file are an approved gap:
+# they are intentionally excluded from both the phishing-resistant and the MFA policy (for
+# example emergency access accounts), so no MFA coverage is required for them.
+SecondaryExemptUsers := ConvertToSet(object.get(
+    input, ["scuba_config", "Aad", "MS.AAD.2.2v2", "CapExclusions", "Users"], []))
 
-PrimaryHasExemptions if {
-    count(PrimaryExemptUsers) + count(PrimaryExemptGroups) + count(PrimaryExemptGuestTypes) > 0
+SecondaryExemptGroups := ConvertToSet(object.get(
+    input, ["scuba_config", "Aad", "MS.AAD.2.2v2", "CapExclusions", "Groups"], []))
+
+SecondaryExemptGuestTypes := ConvertToSet(object.get(
+    input, ["scuba_config", "Aad", "MS.AAD.2.2v2", "CapExclusions", "GuestUserTypes"], []))
+
+# The principals exempted from MS.AAD.2.1v2 that must be targeted by an MFA policy
+CoverageRequiredUsers := PrimaryExemptUsers - SecondaryExemptUsers
+
+CoverageRequiredGroups := PrimaryExemptGroups - SecondaryExemptGroups
+
+CoverageRequiredGuestTypes := PrimaryExemptGuestTypes - SecondaryExemptGuestTypes
+
+default RequiresMFACoverage := false
+
+RequiresMFACoverage if {
+    count(CoverageRequiredUsers) + count(CoverageRequiredGroups) + count(CoverageRequiredGuestTypes) > 0
 }
 
 # The policy targets everyone
@@ -357,29 +376,29 @@ TargetsPrimaryExemptions(policy) if {
 # The policy explicitly includes every exempted user, group, and guest user type
 TargetsPrimaryExemptions(policy) if {
     IncludedUsers := ConvertToSet(object.get(policy.Conditions.Users, "IncludeUsers", []))
-    count(PrimaryExemptUsers - IncludedUsers) == 0
+    count(CoverageRequiredUsers - IncludedUsers) == 0
     IncludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "IncludeGroups", []))
-    count(PrimaryExemptGroups - IncludedGroups) == 0
+    count(CoverageRequiredGroups - IncludedGroups) == 0
     IncludesAllPrimaryExemptGuestTypes(policy)
 }
 
 IncludesAllPrimaryExemptGuestTypes(_) if {
-    count(PrimaryExemptGuestTypes) == 0
+    count(CoverageRequiredGuestTypes) == 0
 }
 
 IncludesAllPrimaryExemptGuestTypes(policy) if {
     Guests := object.get(policy.Conditions.Users, "IncludeGuestsOrExternalUsers", null)
     Guests != null
     IncludedTypes := ConvertToSet(split(Guests.GuestOrExternalUserTypes, ","))
-    count(PrimaryExemptGuestTypes - IncludedTypes) == 0
+    count(CoverageRequiredGuestTypes - IncludedTypes) == 0
 }
 
-# The policy must not exclude any of the users or groups that are exempted from MS.AAD.2.1v2
+# The policy must not exclude any of the users or groups that require MFA coverage
 ExcludesNoPrimaryExemptions(policy) if {
     ExcludedUsers := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeUsers", []))
-    count(PrimaryExemptUsers & ExcludedUsers) == 0
+    count(CoverageRequiredUsers & ExcludedUsers) == 0
     ExcludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeGroups", []))
-    count(PrimaryExemptGroups & ExcludedGroups) == 0
+    count(CoverageRequiredGroups & ExcludedGroups) == 0
 }
 
 # If policy matches basic conditions, special conditions,
@@ -434,7 +453,7 @@ RemediateHighRiskMFANeedsConfigUpdate contains {
     eval.status == "near_miss"
 }
 
-# First test is for the N/A case: nothing is exempted from MS.AAD.2.1v2
+# First test is for the N/A case: no principal exempted from MS.AAD.2.1v2 requires MFA coverage
 tests contains {
     "PolicyId": PolicyId,
     "Criticality": "Shall",
@@ -445,8 +464,8 @@ tests contains {
 } if {
     PolicyId := "MS.AAD.2.2v2"
     # regal ignore:line-length
-    Reason := "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file. See %v for more info"
-    PrimaryHasExemptions == false
+    Reason := "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.2v2. See %v for more info"
+    RequiresMFACoverage == false
 }
 
 # Pass if at least 1 policy meets all conditions & has correct licence.
@@ -459,7 +478,7 @@ tests contains {
     "NearMisses": RemediateHighRiskMFANeedsConfigUpdate,
     "RequirementMet": Status
 } if {
-    PrimaryHasExemptions == true
+    RequiresMFACoverage == true
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     NearMissReportDetails := CapNearMissDetails(
         RemediateHighRiskMFA,

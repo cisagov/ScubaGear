@@ -1139,7 +1139,7 @@ MFAUserRiskPolicyForUsers(users) := json.patch(MFAUserRiskPolicy, [
 
 NotApplicableDetails := concat(" ", [
     "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2",
-    "in the configuration file. See %v for more info"
+    "in the configuration file without also being exempted from MS.AAD.2.2v2. See %v for more info"
 ])
 
 test_NotApplicableNoExemptions_Correct if {
@@ -1246,7 +1246,33 @@ test_ExemptGroupNotTargeted_Incorrect if {
     TestResult("MS.AAD.2.2v2", Output, NoPolicyDetails, false) == true
 }
 
+# A user exempted from MS.AAD.2.1v2 who is excluded from the MFA policy without being approved
+# under MS.AAD.2.2v2 is an uncovered gap
 test_ExemptUserExcluded_Incorrect if {
+    CAP := json.patch(MFAUserRiskPolicy,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [ExemptUser]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"].CapExclusions.Users as [ExemptUser]
+
+    TestResult("MS.AAD.2.2v2", Output, NoPolicyDetails, false) == true
+}
+
+# Approved gap: a user exempted from both MS.AAD.2.1v2 and MS.AAD.2.2v2 needs no MFA coverage
+test_ExemptUserApprovedInBoth_NotApplicable if {
+    Output := aad.tests with input.conditional_access_policies as [UserRiskPolicy]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"].CapExclusions.Users as [ExemptUser]
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.Users as [ExemptUser]
+
+    TestResult("MS.AAD.2.2v2", Output, CheckedSkippedDetails("MS.AAD.2.2v2", NotApplicableDetails), true) == true
+}
+
+test_ExemptUserApprovedInBothAndExcluded_NotApplicable if {
     CAP := json.patch(MFAUserRiskPolicy,
                 [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [ExemptUser]}])
 
@@ -1257,7 +1283,68 @@ test_ExemptUserExcluded_Incorrect if {
                         with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.Users as [ExemptUser]
 
+    TestResult("MS.AAD.2.2v2", Output, CheckedSkippedDetails("MS.AAD.2.2v2", NotApplicableDetails), true) == true
+}
+
+test_ExemptGroupApprovedInBoth_NotApplicable if {
+    Output := aad.tests with input.conditional_access_policies as [UserRiskPolicy]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"].CapExclusions.Groups as [ExemptGroup]
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.Groups as [ExemptGroup]
+
+    TestResult("MS.AAD.2.2v2", Output, CheckedSkippedDetails("MS.AAD.2.2v2", NotApplicableDetails), true) == true
+}
+
+test_ExemptGuestTypeApprovedInBoth_NotApplicable if {
+    Output := aad.tests with input.conditional_access_policies as [UserRiskPolicy]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"].CapExclusions.GuestUserTypes as ["b2bCollaborationGuest"]
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.GuestUserTypes as ["b2bCollaborationGuest"]
+
+    TestResult("MS.AAD.2.2v2", Output, CheckedSkippedDetails("MS.AAD.2.2v2", NotApplicableDetails), true) == true
+}
+
+# Only the principals exempted from MS.AAD.2.1v2 and not approved under MS.AAD.2.2v2 need MFA coverage
+test_OneApprovedOneCovered_Correct if {
+    CAP := json.patch(MFAUserRiskPolicy,
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [ExemptUser]}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"].CapExclusions.Users as [ExemptUser, "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.Users as [ExemptUser]
+
+    TestResult("MS.AAD.2.2v2", Output, MeetsRequirementsDetails, true) == true
+}
+
+test_OneApprovedOtherNotTargeted_Incorrect if {
+    CAP := json.patch(MFAUserRiskPolicyForUsers([ExemptUser]),
+                [{"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": []}])
+
+    Output := aad.tests with input.conditional_access_policies as [CAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.1v2"].CapExclusions.Users as [ExemptUser, "65fea286-22d3-42f9-b4ca-93a6f75817d4"]
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.Users as [ExemptUser]
+
     TestResult("MS.AAD.2.2v2", Output, NoPolicyDetails, false) == true
+}
+
+# Approved under MS.AAD.2.2v2 only (not exempted from MS.AAD.2.1v2): behaves as a normal exclusion
+test_ApprovedInSecondaryOnly_NotApplicable if {
+    Output := aad.tests with input.conditional_access_policies as [UserRiskPolicy]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.2v2"].CapExclusions.Users as [ExemptUser]
+
+    TestResult("MS.AAD.2.2v2", Output, CheckedSkippedDetails("MS.AAD.2.2v2", NotApplicableDetails), true) == true
 }
 
 test_OtherUserExclusionNoExempt_Incorrect if {

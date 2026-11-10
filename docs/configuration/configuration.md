@@ -282,7 +282,21 @@ CapExclusions are supported for the following policies:
 - MS.AAD.3.8v1
 - MS.AAD.3.9v1
 
-Users, groups, and guest user types exempted in `MS.AAD.2.1v2` do not have to use phishing-resistant MFA to remediate user risk, but they must be targeted by a conditional access policy that meets `MS.AAD.2.2v2`, which requires MFA. ScubaGear reads the `MS.AAD.2.1v2` exemptions from the configuration file when evaluating `MS.AAD.2.2v2`. `MS.AAD.2.2v2` is not applicable when `MS.AAD.2.1v2` has no exemptions. Do not repeat the exempted principals under `MS.AAD.2.2v2`; `CapExclusions` under `MS.AAD.2.2v2` apply only to the MFA policy itself (for example, emergency access accounts). If `MS.AAD.2.1v2` has exemptions and `MS.AAD.2.2v2` is listed in `OmitPolicy`, ScubaGear warns that the exempted principals have no risk remediation policy assessed.
+Users, groups, and guest user types exempted in `MS.AAD.2.1v2` do not have to use phishing-resistant MFA to remediate user risk, but they must be targeted by a conditional access policy that meets `MS.AAD.2.2v2`, which requires MFA. ScubaGear reads the `MS.AAD.2.1v2` exemptions from the configuration file when evaluating `MS.AAD.2.2v2`. `MS.AAD.2.2v2` is not applicable when no exempted principal needs MFA coverage. List the principals that need MFA coverage only under `MS.AAD.2.1v2`. A user, group, or guest user type that is intentionally excluded from **both** policies (for example, an emergency access account) is an approved exception: list it under `CapExclusions` for both `MS.AAD.2.1v2` and `MS.AAD.2.2v2`, and it does not need MFA coverage.
+
+```yaml
+Aad:
+  MS.AAD.2.1v2:
+    CapExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Emergency access account, excluded from both policies
+  MS.AAD.2.2v2:
+    CapExclusions:
+      Users:
+        - "12345678-1234-1234-1234-123456789012"  # Same account, approved exception to the MFA policy
+```
+
+Other `CapExclusions` under `MS.AAD.2.2v2` apply to the MFA policy itself. If `MS.AAD.2.1v2` has exemptions and `MS.AAD.2.2v2` is listed in `OmitPolicy`, ScubaGear warns that the exempted principals have no risk remediation policy assessed.
 
 #### Renumbered Entra ID policies
 
