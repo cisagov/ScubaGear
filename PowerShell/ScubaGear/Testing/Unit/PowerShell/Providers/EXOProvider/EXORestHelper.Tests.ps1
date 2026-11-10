@@ -78,18 +78,32 @@ Describe -Tag 'EXORestHelper' -Name 'M365Environment validation' {
 
     Context 'Reads supported environments from the schema at call time' {
         It 'Accepts an environment added to the schema in memory and rejects it after restore' {
-            $Schema = [ScubaConfig]::GetConfigSchema()
-            $OriginalEnvironments = $Schema.properties.M365Environment.enum
+            # PowerShell caches the parsed helper, so when other test files reload ScubaConfig in the same session,
+            # the ValidateScript can bind to an older [ScubaConfig] type than this file or the module scope sees.
+            # Mutate the schema of the exact type each ValidateScript resolves.
+            $ValidatorTypes = @('Get-ExchangeOnlineScope', 'Get-ExchangeOnlineApiEndpoint') | ForEach-Object {
+                $Attribute = (Get-Command $_).Parameters['M365Environment'].Attributes |
+                    Where-Object { $_ -is [System.Management.Automation.ValidateScriptAttribute] }
+                $Attribute.ScriptBlock.Ast.Find({
+                    param($Node) $Node -is [System.Management.Automation.Language.TypeExpressionAst]
+                }, $true).TypeName.GetReflectionType()
+            } | Select-Object -Unique
+            $Schemas = @($ValidatorTypes | ForEach-Object { $_::GetConfigSchema() })
+            $OriginalEnvironments = @($Schemas | ForEach-Object { , $_.properties.M365Environment.enum })
             try {
-                $Schema.properties.M365Environment.enum = @($OriginalEnvironments) + 'testcloud'
+                for ($i = 0; $i -lt $Schemas.Count; $i++) {
+                    $Schemas[$i].properties.M365Environment.enum = @($OriginalEnvironments[$i]) + 'testcloud'
+                }
                 Get-ExchangeOnlineScope -M365Environment 'testcloud' | Should -Be 'https://scope.test/.default'
                 Get-ExchangeOnlineApiEndpoint @script:EndpointParams -M365Environment 'testcloud' | Should -Be 'https://backend.test/InvokeCommand'
             }
             finally {
-                $Schema.properties.M365Environment.enum = $OriginalEnvironments
+                for ($i = 0; $i -lt $Schemas.Count; $i++) {
+                    $Schemas[$i].properties.M365Environment.enum = $OriginalEnvironments[$i]
+                }
             }
 
-            [ScubaConfig]::GetSupportedEnvironments() | Should -Not -Contain 'testcloud'
+            $ValidatorTypes | ForEach-Object { $_::GetSupportedEnvironments() | Should -Not -Contain 'testcloud' }
             { Get-ExchangeOnlineScope -M365Environment 'testcloud' } | Should -Throw -ErrorId 'ParameterArgumentValidationError*'
         }
     }
