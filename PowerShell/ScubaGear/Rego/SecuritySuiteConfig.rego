@@ -1357,30 +1357,6 @@ tests contains {
 # MS.SECURITYSUITE.9.1v1
 #--
 
-DefaultPolicyAdditonalRequirements(Policy) if {
-    Policy.Name != "Default"
-}
-
-DefaultPolicyAdditonalRequirements(Policy) if {
-    Policy.Name == "Default"
-    Policy.BccSuspiciousOutboundMail == true
-    count(Policy.BccSuspiciousOutboundAdditionalRecipients) >= 1
-}
-
-# Identify compliant outbound spam policies
-OutboundSpamPoliciesWithCompliantLimits contains OutboundSpamPolicy.Identity if {
-    some OutboundSpamPolicy in input.outbound_spam_policies
-
-    # All policies must meet the recipient limits and blocking action
-    OutboundSpamPolicy.RecipientLimitExternalPerHour <= 500
-    OutboundSpamPolicy.RecipientLimitInternalPerHour <= 1000
-    OutboundSpamPolicy.RecipientLimitPerDay <= 1000
-    OutboundSpamPolicy.ActionWhenThresholdReached == "BlockUser"
-
-    # Apply additional requirements only to the default policy
-    DefaultPolicyAdditonalRequirements(OutboundSpamPolicy)
-}
-
 # Always audit the default outbound spam policy
 AppliedOutboundSpamPolicies contains OutboundSpamPolicy.Identity if {
     some OutboundSpamPolicy in input.outbound_spam_policies
@@ -1394,17 +1370,118 @@ AppliedOutboundSpamPolicies contains Rule.HostedOutboundSpamFilterPolicy if {
     Rule.HostedOutboundSpamFilterPolicy != "Default"
 }
 
-NonCompliantOutboundSpamPolicies :=
-    AppliedOutboundSpamPolicies - OutboundSpamPoliciesWithCompliantLimits
+# Identify non-compliant settings for each policy
 
-Status9_1 := count(NonCompliantOutboundSpamPolicies) == 0 if {
-    count(AppliedOutboundSpamPolicies) > 0
+NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    some Policy in input.outbound_spam_policies
+    Policy.RecipientLimitExternalPerHour > 500
+    Setting := "RecipientLimitExternalPerHour must be 500 or less"
+}
+
+NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    some Policy in input.outbound_spam_policies
+    Policy.RecipientLimitInternalPerHour > 1000
+    Setting := "RecipientLimitInternalPerHour must be 1000 or less"
+}
+
+NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    some Policy in input.outbound_spam_policies
+    Policy.RecipientLimitPerDay > 1000
+    Setting := "RecipientLimitPerDay must be 1000 or less"
+}
+
+NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    some Policy in input.outbound_spam_policies
+    Policy.ActionWhenThresholdReached != "BlockUser"
+    Setting := "ActionWhenThresholdReached must be BlockUser"
+}
+
+# Apply additional requirements only to the default policy
+
+NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    some Policy in input.outbound_spam_policies
+    Policy.Name == "Default"
+    object.get(Policy, "BccSuspiciousOutboundMail", false) != true
+    Setting := "BccSuspiciousOutboundMail must be enabled"
+}
+
+NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    some Policy in input.outbound_spam_policies
+    Policy.Name == "Default"
+    count(object.get(Policy, "BccSuspiciousOutboundAdditionalRecipients", [])) < 1
+    Setting := "At least one recipient must be configured in BccSuspiciousOutboundAdditionalRecipients"
+}
+
+CompliantOutboundSpamPolicies contains Policy.Identity if {
+    some Policy in input.outbound_spam_policies
+    Policy.Identity in AppliedOutboundSpamPolicies
+    count(NonCompliantOutboundSpamPolicySettings[Policy.Identity]) == 0
+}
+
+# Identify non-compliant enabled outbound spam policies
+NonCompliantOutboundSpamPolicies :=
+    AppliedOutboundSpamPolicies - CompliantOutboundSpamPolicies
+
+# Identify non-compliant enabled custom outbound spam policies
+NonCompliantCustomOutboundSpamPolicies :=
+    NonCompliantOutboundSpamPolicies - {"Default"}
+
+Status9_1 := true if {
+    count(NonCompliantOutboundSpamPolicies) == 0
 } else := false
+
+# Identify non-compliant settings of the default policy
+DefaultPolicyNonCompliantSettings := NonCompliantOutboundSpamPolicySettings["Default"] if {
+    some Policy in input.outbound_spam_policies
+    Policy.Name == "Default"
+}
+
+# Default policy is compliant and there are no enabled custom policies
+ReportDetails9_1 := "Requirement met. The default outbound spam policy is compliant and there are no enabled custom outbound spam policies." if {
+    count(NonCompliantOutboundSpamPolicies) == 0
+    count(AppliedOutboundSpamPolicies) == 1
+}
+
+# Default policy and all enabled custom policies are compliant
+ReportDetails9_1 := "Requirement met. The default outbound spam policy is compliant and all enabled custom outbound spam policies are compliant." if {
+    count(NonCompliantOutboundSpamPolicies) == 0
+    count(AppliedOutboundSpamPolicies) > 1
+}
+
+# Default policy is compliant, but enabled custom policies are not compliant
+ReportDetails9_1 := sprintf(
+    "Requirement not met.\n\nThe default outbound spam policy is compliant, but the following enabled custom outbound spam policies are not compliant: \n\t- %s",
+    [concat("\n\t- ", sort([Policy | Policy := NonCompliantCustomOutboundSpamPolicies[_]]))]
+) if {
+    not NonCompliantOutboundSpamPolicies["Default"]
+    count(NonCompliantCustomOutboundSpamPolicies) > 0
+}
+
+# Default policy is not compliant, but all enabled custom policies are compliant
+ReportDetails9_1 := sprintf(
+    "Requirement not met.\n\nThe default outbound spam policy is not compliant for the following reasons:\n\t- %s",
+    [concat("\n\t- ", sort(NonCompliantOutboundSpamPolicySettings["Default"]))]
+) if {
+    NonCompliantOutboundSpamPolicies["Default"]
+    count(NonCompliantCustomOutboundSpamPolicies) == 0
+}
+
+# Default policy and one or more enabled custom policies are not compliant
+ReportDetails9_1 := sprintf(
+    "Requirement not met.\n\nThe default outbound spam policy is not compliant for the following reasons:\n\t- %s\n\nThe following enabled custom outbound spam policies are also not compliant:\n\t- %s",
+    [
+        concat("\n\t- ", sort([Setting | Setting := DefaultPolicyNonCompliantSettings[_]])),
+        concat("\n\t- ", sort([Policy | Policy := NonCompliantCustomOutboundSpamPolicies[_]]))
+    ]
+) if {
+    NonCompliantOutboundSpamPolicies["Default"]
+    count(NonCompliantCustomOutboundSpamPolicies) > 0
+}
 
 ActualValue9_1 := {
     "AppliedPolicies": AppliedOutboundSpamPolicies,
-    "CompliantPolicies": AppliedOutboundSpamPolicies & OutboundSpamPoliciesWithCompliantLimits,
-    "NonCompliantPolicies": NonCompliantOutboundSpamPolicies
+    "CompliantPolicies": CompliantOutboundSpamPolicies,
+    "NonCompliantPolicies": NonCompliantOutboundSpamPolicies,
 }
 
 tests contains {
@@ -1412,50 +1489,124 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-HostedOutboundSpamFilterPolicy", "Get-HostedOutboundSpamFilterRule"],
     "ActualValue": ActualValue9_1,
-    "ReportDetails": ReportDetailsBoolean(Status9_1),
+    "ReportDetails": ReportDetails9_1,
     "RequirementMet": Status9_1
 }
+
 #--
 
 #
 # MS.SECURITYSUITE.9.2v1
 #--
 
-RequiredOutboundSpamAlertPolicies := {
+# Required outbound spam alert policies
+RequiredAlertPolicies := {
     "User restricted from sending email",
     "Email sending limit exceeded",
     "Suspicious email sending patterns detected"
 }
 
-CompliantOutboundSpamAlertPolicies contains AlertPolicy.Name if {
+# Identify existing required alert policies
+
+ExistingAlertPolicies contains AlertPolicy.Name if {
     some AlertPolicy in input.protection_alerts
-    AlertPolicy.Name in RequiredOutboundSpamAlertPolicies
-    AlertPolicy.Disabled == false
-    AlertPolicy.NotificationEnabled == true
-    count(AlertPolicy.NotifyUser) >= 1
+    AlertPolicy.Name in RequiredAlertPolicies
 }
 
-NonCompliantOutboundSpamAlertPolicies :=
-    RequiredOutboundSpamAlertPolicies - CompliantOutboundSpamAlertPolicies
+# Identify non-compliant settings for each alert policy
 
-Status9_2 := count(NonCompliantOutboundSpamAlertPolicies) == 0
+NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
+    some AlertPolicy in input.protection_alerts
+    AlertPolicy.Name in RequiredAlertPolicies
+    AlertPolicy.Disabled == false
+    Setting := "Disabled must be false"
+}
+
+NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
+    some AlertPolicy in input.protection_alerts
+    AlertPolicy.Name in RequiredAlertPolicies
+    AlertPolicy.NotificationEnabled == true
+    Setting := "NotificationEnabled must be true"
+}
+
+NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
+    some AlertPolicy in input.protection_alerts
+    AlertPolicy.Name in RequiredAlertPolicies
+    count(AlertPolicy.NotifyUser) >= 1
+    Setting := "At least one notification recipient must be configured in NotifyUser"
+}
+
+# Identify compliant alert policies
+
+CompliantAlertPolicies contains AlertPolicy.Name if {
+    some AlertPolicy in input.protection_alerts
+    AlertPolicy.Name in RequiredAlertPolicies
+    count(NonCompliantAlertPolicySettings[AlertPolicy.Name]) == 0
+}
+
+MissingAlertPolicies :=
+    RequiredAlertPolicies - ExistingAlertPolicies
+
+NonCompliantAlertPolicies :=
+    RequiredAlertPolicies - CompliantAlertPolicies
+
+MisconfiguredAlertPolicies :=
+    NonCompliantAlertPolicies - MissingAlertPolicies
+
+NonCompliantAlertPolicyDetails contains Detail if {
+    some Policy in MisconfiguredAlertPolicies
+    Settings := sort([Setting | Setting := NonCompliantAlertPolicySettings[Policy][_]])
+    Detail := sprintf("%s:\n\t- %s",[Policy, concat("\n\t- ", Settings)])
+}
+
+Status9_2 := true if {
+    count(NonCompliantAlertPolicies) == 0
+} else := false
+
+ReportDetails9_2 := "Requirement met. All required outbound spam alert policies are compliant." if {
+    Status9_2
+}
+
+ReportDetails9_2 := sprintf(
+    "Requirement not met.\n\nThe following required outbound spam alert policies are missing:\n\t- %s",
+    [concat("\n- ", sort([Policy | Policy := MissingAlertPolicies[_]]))]
+) if {
+    count(MissingAlertPolicies) > 0
+    count(MisconfiguredAlertPolicies) == 0
+}
+
+ReportDetails9_2 := sprintf(
+    "Requirement not met.\n\nThe following outbound spam alert policies have non-compliant settings:\n\n%s",
+    [concat("\n\n", sort([Detail | Detail := NonCompliantAlertPolicyDetails[_]]))]
+) if {
+    count(MissingAlertPolicies) == 0
+    count(MisconfiguredAlertPolicies) > 0
+}
+
+ReportDetails9_2 := sprintf(
+    "Requirement not met.\n\nThe following required outbound spam alert policies are missing:\n- %s\n\nThe following outbound spam alert policies have non-compliant settings:\n\n%s",
+    [
+        concat("\n- ", sort([Policy | Policy := MissingAlertPolicies[_]])),
+        concat("\n\n", sort([Detail | Detail := NonCompliantAlertPolicyDetails[_]]))
+    ]
+) if {
+    count(MissingAlertPolicies) > 0
+    count(MisconfiguredAlertPolicies) > 0
+}
+
+# Actual value
 
 ActualValue9_2 := {
-    "CompliantAlertPolicies": CompliantOutboundSpamAlertPolicies,
-    "NonCompliantAlertPolicies": NonCompliantOutboundSpamPolicies
+    "ExistingAlertPolicies": ExistingAlertPolicies,
+    "MissingAlertPolicies": MissingAlertPolicies,
+    "CompliantAlertPolicies": CompliantAlertPolicies,
+    "NonCompliantAlertPolicies": NonCompliantAlertPolicies
 }
-
-ReportDetails9_2 := "Requirement met" if {
-    Status9_2
-} else := sprintf(
-    "Requirement not met, the following alert policies are not compliant: %s",
-    [concat(", ", sort(NonCompliantOutboundSpamAlertPolicies))]
-)
 
 tests contains {
     "PolicyId": "MS.SECURITYSUITE.9.2v1",
     "Criticality": "Should",
-    "Commandlet": ["Get-HostedOutboundSpamFilterPolicy", "Get-HostedOutboundSpamFilterRule"],
+    "Commandlet": ["Get-ProtectionAlert"],
     "ActualValue": ActualValue9_2,
     "ReportDetails": ReportDetails9_2,
     "RequirementMet": Status9_2
