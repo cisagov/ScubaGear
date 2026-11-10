@@ -1415,7 +1415,7 @@ NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
 CompliantOutboundSpamPolicies contains Policy.Identity if {
     some Policy in input.outbound_spam_policies
     Policy.Identity in AppliedOutboundSpamPolicies
-    count(NonCompliantOutboundSpamPolicySettings[Policy.Identity]) == 0
+    count(object.get(NonCompliantOutboundSpamPolicySettings, Policy.Identity, set())) == 0
 }
 
 # Identify non-compliant enabled outbound spam policies
@@ -1518,21 +1518,21 @@ ExistingAlertPolicies contains AlertPolicy.Name if {
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
-    AlertPolicy.Disabled == false
+    AlertPolicy.Disabled != false
     Setting := "The policy must be enabled"
 }
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
-    AlertPolicy.NotificationEnabled == true
+    AlertPolicy.NotificationEnabled != true
     Setting := "Notifications must be enabled"
 }
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
-    count(AlertPolicy.NotifyUser) >= 1
+    count(AlertPolicy.NotifyUser) == 0
     Setting := "At least one notification recipient must be configured in NotifyUser"
 }
 
@@ -1541,7 +1541,7 @@ NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
 CompliantAlertPolicies contains AlertPolicy.Name if {
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
-    count(NonCompliantAlertPolicySettings[AlertPolicy.Name]) == 0
+    count(object.get(NonCompliantAlertPolicySettings, AlertPolicy.Name, set())) == 0
 }
 
 MissingAlertPolicies :=
@@ -1553,9 +1553,19 @@ NonCompliantAlertPolicies :=
 MisconfiguredAlertPolicies :=
     NonCompliantAlertPolicies - MissingAlertPolicies
 
+# Keep remediation steps in the order administrators should address them.
+AlertPolicySettingOrder := [
+    "The policy must be enabled",
+    "Notifications must be enabled",
+    "At least one notification recipient must be configured in NotifyUser"
+]
+
 NonCompliantAlertPolicyDetails contains Detail if {
     some Policy in MisconfiguredAlertPolicies
-    Settings := sort([Setting | Setting := NonCompliantAlertPolicySettings[Policy][_]])
+    Settings := [Setting |
+        some Setting in AlertPolicySettingOrder
+        Setting in NonCompliantAlertPolicySettings[Policy]
+    ]
     Detail := sprintf("%s:\n\t- %s",[Policy, concat("\n\t- ", Settings)])
 }
 
@@ -1594,7 +1604,6 @@ ReportDetails9_2 := sprintf(
     count(MisconfiguredAlertPolicies) > 0
 }
 
-# Actual value
 
 ActualValue9_2 := {
     "ExistingAlertPolicies": ExistingAlertPolicies,
