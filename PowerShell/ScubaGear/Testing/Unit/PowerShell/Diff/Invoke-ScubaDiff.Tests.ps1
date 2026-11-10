@@ -813,7 +813,8 @@ InModuleScope Diff {
             }
             $script:FindAad = {
                 param($Diff, $BeforeOrAfterId)
-                @($Diff.Diff.AAD | Where-Object {
+                # The leading comma keeps a single match an array on Windows PowerShell 5.1.
+                return , @($Diff.Diff.AAD | Where-Object {
                     $_.'Control ID (Before)' -eq $BeforeOrAfterId -or $_.'Control ID (After)' -eq $BeforeOrAfterId
                 })
             }
@@ -860,8 +861,10 @@ InModuleScope Diff {
             $renumbered.Count | Should -Be 1
             $renumbered[0].'Control ID (Before)' | Should -Be 'MS.AAD.2.3v1'
             $renumbered[0].Classification | Should -Be 'Unchanged'
-            $holder = & $FindAad $diff 'MS.AAD.2.3v1' | Where-Object { -not $_.'Control ID (Before)' }
-            $holder.Classification | Should -Be 'NewPolicy'
+            $holders = & $FindAad $diff 'MS.AAD.2.3v1'
+            $holder = @($holders | Where-Object { -not $_.'Control ID (Before)' })
+            $holder.Count | Should -Be 1
+            $holder[0].Classification | Should -Be 'NewPolicy'
             (& $FindAad $diff 'MS.AAD.2.5v1')[0].Classification | Should -Be 'NewPolicy'
         }
 
