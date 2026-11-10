@@ -155,19 +155,19 @@ explains that instead and points you at the remediation steps.
 > Keep only the exclusions you can **justify** - documented break-glass accounts, approved
 > service accounts, and so on. Delete the rest and fix the tenant instead.
 
-#### Exemptions that a second policy must cover (MS.AAD.2.1v2 and MS.AAD.2.2v2)
+#### Exemptions that a second policy must cover (MS.AAD.2.1v2 and MS.AAD.2.5v1)
 
 Some controls are linked: the users, groups, and guest user types you **exempt** from
 `MS.AAD.2.1v2` (phishing-resistant risk remediation) must be targeted by a second Conditional
-Access policy that meets `MS.AAD.2.2v2` (risk remediation with MFA). `MS.AAD.2.2v2` reads those
+Access policy that meets `MS.AAD.2.5v1` (risk remediation with MFA). `MS.AAD.2.5v1` reads those
 exemptions from the `MS.AAD.2.1v2` section of the configuration, so do not repeat them under
-`MS.AAD.2.2v2`. The relationship is defined in `schemaMetadata.policyExclusionRelationships` of
+`MS.AAD.2.5v1`. The relationship is defined in `schemaMetadata.policyExclusionRelationships` of
 `ScubaConfigSchema.json`.
 
 When the analyzer suggests exemptions for such a control, it adds a **Follow-up** recommendation
 that repeats this requirement, and the Control YAML and Configuration YAML show a commented-out
-`MS.AAD.2.2v2` stub below the `MS.AAD.2.1v2` block. Uncomment the stub only to exclude accounts
-from the `MS.AAD.2.2v2` policy itself (for example, break-glass accounts). For `MS.AAD.2.2v2` the
+`MS.AAD.2.5v1` stub below the `MS.AAD.2.1v2` block. Uncomment the stub only to exclude accounts
+from the `MS.AAD.2.5v1` policy itself (for example, break-glass accounts). For `MS.AAD.2.5v1` the
 analyzer models the "all users" scope and the built-in Multifactor authentication and Passwordless
 MFA authentication strengths; it cannot know which principals you exempted, so confirm that the
 policy includes all of them.

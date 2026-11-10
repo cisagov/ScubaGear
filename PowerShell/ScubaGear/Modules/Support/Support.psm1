@@ -1617,9 +1617,9 @@ function New-SCuBAConfig {
     exclusion sections, e.g., MS.AAD.1.1v1. When omitted, every exclusion-supporting policy for the
     selected products is generated. Tab completion is available and is populated from the ScubaGear
     configuration schema. Policies whose assessment reads another policy's exemptions are generated
-    together with that policy: requesting MS.AAD.2.1v2 also generates MS.AAD.2.2v2, because the users,
+    together with that policy: requesting MS.AAD.2.1v2 also generates MS.AAD.2.5v1, because the users,
     groups, and guest user types exempted from MS.AAD.2.1v2 must be targeted by a policy that meets
-    MS.AAD.2.2v2. Retired policy IDs are handled as described for OmitPolicy.
+    MS.AAD.2.5v1. Retired policy IDs are handled as described for OmitPolicy.
     .Parameter AnnotatePolicy
     A comma-separated list of policies to annotate in the ScubaGear report, e.g., MS.AAD.1.1v1.
     Entries are added under the AnnotatePolicy section; the required comment must be added manually
@@ -1954,7 +1954,7 @@ function New-SCuBAConfig {
 
     # Policy IDs that exist in the current baselines and the legacy -> replacement mappings. They let the
     # OmitPolicy, AnnotatePolicy, and ExclusionPolicy parameters recognize an ID that has been replaced or
-    # renumbered (for example MS.AAD.2.3v1 -> MS.AAD.2.4v1) instead of silently generating an entry
+    # renumbered (for example MS.AAD.2.1v1 -> MS.AAD.2.1v2) instead of silently generating an entry
     # that no longer matches any policy.
     $CurrentPolicyIds = @{}
     $BaselinesPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\schemas\ScubaBaselines.json"
@@ -2148,7 +2148,7 @@ function New-SCuBAConfig {
             $RequestedExclusionPolicy += $RequestedPolicy
         }
 
-        # A policy's exemptions can be read by dependent policies (for example MS.AAD.2.2v2 reads the
+        # A policy's exemptions can be read by dependent policies (for example MS.AAD.2.5v1 reads the
         # MS.AAD.2.1v2 exemptions), so the dependent templates are generated alongside the requested policy.
         $GeneratedExclusionPolicy = @($RequestedExclusionPolicy)
         $Relationships = $Schema.schemaMetadata.policyExclusionRelationships

@@ -127,7 +127,7 @@ Parameters can be passed to the `New-SCuBAConfig` cmdlet to pre-populate values 
 New-SCuBAConfig -Organization "example.onmicrosoft.com" -ProductNames "aad,securitysuite"
 ```
 
-Use `-ExclusionPolicy` to generate templates only for specific policies. Policies whose assessment reads another policy's exemptions are generated together with it, so `-ExclusionPolicy MS.AAD.2.1v2` also generates the `MS.AAD.2.2v2` template. `-OmitPolicy`, `-AnnotatePolicy`, and `-ExclusionPolicy` map a replaced policy ID to its replacement (with a warning) and skip removed policies.
+Use `-ExclusionPolicy` to generate templates only for specific policies. Policies whose assessment reads another policy's exemptions are generated together with it, so `-ExclusionPolicy MS.AAD.2.1v2` also generates the `MS.AAD.2.5v1` template. `-OmitPolicy`, `-AnnotatePolicy`, and `-ExclusionPolicy` map a replaced policy ID (for example `MS.AAD.2.1v1`, now `MS.AAD.2.1v2`) to its replacement (with a warning) and skip removed policies.
 
 The generated file can then be manually edited to add your specific configuration settings.
 
@@ -273,8 +273,8 @@ CapExclusions are supported for the following policies:
 
 - MS.AAD.1.1v1
 - MS.AAD.2.1v2
-- MS.AAD.2.2v2
-- MS.AAD.2.4v1
+- MS.AAD.2.3v1
+- MS.AAD.2.5v1
 - MS.AAD.3.1v1
 - MS.AAD.3.2v2
 - MS.AAD.3.6v1
@@ -282,7 +282,7 @@ CapExclusions are supported for the following policies:
 - MS.AAD.3.8v1
 - MS.AAD.3.9v1
 
-Users, groups, and guest user types exempted in `MS.AAD.2.1v2` do not have to use phishing-resistant MFA to remediate user risk, but they must be targeted by a conditional access policy that meets `MS.AAD.2.2v2`, which requires MFA. ScubaGear reads the `MS.AAD.2.1v2` exemptions from the configuration file when evaluating `MS.AAD.2.2v2`. `MS.AAD.2.2v2` is not applicable when no exempted principal needs MFA coverage. List the principals that need MFA coverage only under `MS.AAD.2.1v2`. A user, group, or guest user type that is intentionally excluded from **both** policies (for example, an emergency access account) is an approved exception: list it under `CapExclusions` for both `MS.AAD.2.1v2` and `MS.AAD.2.2v2`, and it does not need MFA coverage.
+Users, groups, and guest user types exempted in `MS.AAD.2.1v2` do not have to use phishing-resistant MFA to remediate user risk, but they must be targeted by a conditional access policy that meets `MS.AAD.2.5v1`, which requires MFA. ScubaGear reads the `MS.AAD.2.1v2` exemptions from the configuration file when evaluating `MS.AAD.2.5v1`. `MS.AAD.2.5v1` is not applicable when no exempted principal needs MFA coverage. List the principals that need MFA coverage only under `MS.AAD.2.1v2`. A user, group, or guest user type that is intentionally excluded from **both** policies (for example, an emergency access account) is an approved exception: list it under `CapExclusions` for both `MS.AAD.2.1v2` and `MS.AAD.2.5v1`, and it does not need MFA coverage.
 
 ```yaml
 Aad:
@@ -290,24 +290,13 @@ Aad:
     CapExclusions:
       Users:
         - "12345678-1234-1234-1234-123456789012"  # Emergency access account, excluded from both policies
-  MS.AAD.2.2v2:
+  MS.AAD.2.5v1:
     CapExclusions:
       Users:
         - "12345678-1234-1234-1234-123456789012"  # Same account, approved exception to the MFA policy
 ```
 
-Other `CapExclusions` under `MS.AAD.2.2v2` apply to the MFA policy itself. If `MS.AAD.2.1v2` has exemptions and `MS.AAD.2.2v2` is listed in `OmitPolicy`, ScubaGear warns that the exempted principals have no risk remediation policy assessed.
-
-#### Renumbered Entra ID policies
-
-The Entra ID risk-based policies were renumbered so the two user risk policies are sequential. Update `Aad`, `AnnotatePolicy`, and `OmitPolicy` entries that use the old IDs; settings under an old ID are ignored.
-
-| Old ID | New ID | Policy |
-| --- | --- | --- |
-| `MS.AAD.2.2v1` | `MS.AAD.2.3v2` | Notification when high-risk users are detected |
-| `MS.AAD.2.3v1` | `MS.AAD.2.4v1` | Block high-risk sign-ins |
-
-`MS.AAD.2.2v2` is a new policy (MFA risk remediation for users exempted from `MS.AAD.2.1v2`). The full list of replaced policy IDs is in [scuba-baseline-policy-migrations.csv](../../PowerShell/ScubaGear/mappings/scuba-baseline-policy-migrations.csv). ScubaGear warns when a configuration uses a replaced ID, the Configuration UI remaps the IDs when you import a file, and `New-SCuBAConfig` maps them for `-OmitPolicy`, `-AnnotatePolicy`, and `-ExclusionPolicy`.
+Other `CapExclusions` under `MS.AAD.2.5v1` apply to the MFA policy itself. If `MS.AAD.2.1v2` has exemptions and `MS.AAD.2.5v1` is listed in `OmitPolicy`, ScubaGear warns that the exempted principals have no risk remediation policy assessed.
 
 #### Agent Conditional Access Policy Exclusions
 

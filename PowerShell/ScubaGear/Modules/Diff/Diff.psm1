@@ -160,19 +160,6 @@ $script:PolicyMigrationMap = [ordered]@{
 # report.
 $script:PolicyMigrationTargetProduct = 'SecuritySuite'
 
-# Same-product policy renumbering, keyed by product and then by *full* control ID
-# (old -> new). Derived from mappings\scuba-baseline-policy-migrations.csv, rows
-# whose Old ID and New ID are in the same product. Matching must be by full ID, not
-# base ID: the renumbering reuses the old base numbers for different policies (the
-# new MS.AAD.2.2v2 is an unrelated MFA user-risk policy occupying the old 2.2 slot,
-# and MS.AAD.2.3v2 is the old 2.2v1 notification policy).
-$script:PolicyRenumberMap = [ordered]@{
-    'AAD' = [ordered]@{
-        'MS.AAD.2.2v1' = 'MS.AAD.2.3v2'
-        'MS.AAD.2.3v1' = 'MS.AAD.2.4v1'
-    }
-}
-
 function Get-ScubaBaseControlId {
     <#
     .Description
@@ -763,119 +750,6 @@ function Invoke-ScubaPolicyMigrationAlignment {
     }
 }
 
-function Invoke-ScubaPolicyRenumberAlignment {
-    <#
-    .Description
-    Aligns same-product policy renumbering (see $script:PolicyRenumberMap) across
-    the two runs. Control maps are keyed by base ID, but a renumbering reuses old
-    base IDs for different policies, so a plain base-ID match would pair unrelated
-    policies. Moves are therefore matched by FULL ID: the before run must carry the
-    old full ID and the after run the new full ID.
-
-    Operates on the per-product control maps in place. A matched before-side entry
-    is re-keyed under the new base ID and tagged with MigratedFromId /
-    MigratedFromProduct, so it is compared against the new policy and classified as
-    a migrated pair. A stub tagged MigratedToId / MigratedToProduct is left in the
-    same product, keyed by the retired *full* ID (never a base ID, so it cannot
-    collide with a real entry at the reused base ID), so the retired policy still
-    shows up as a before-only 'Migrated' record.
-
-    All moves are collected first and applied in two phases (remove every old key,
-    then insert), so a chain such as 2.2v1 -> 2.3v2 and 2.3v1 -> 2.4v1 cannot have
-    one move overwrite another's key. A move is skipped when either run carries
-    both forms (before already has the new full ID, after still has the old one),
-    or when its target base ID in the before run is held by a policy that is not
-    itself moving.
-    .Functionality
-    Internal
-    #>
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [System.Collections.Specialized.OrderedDictionary]
-        $BeforeMaps,
-
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [System.Collections.Specialized.OrderedDictionary]
-        $AfterMaps
-    )
-
-    foreach ($product in @($script:PolicyRenumberMap.Keys)) {
-        if (-not $BeforeMaps.Contains($product)) { continue }
-        if (-not $AfterMaps.Contains($product)) { continue }
-
-        $beforeMap = $BeforeMaps[$product]
-        $afterMap = $AfterMaps[$product]
-        $entries = $script:PolicyRenumberMap[$product]
-
-        $moves = @()
-        foreach ($oldFull in @($entries.Keys)) {
-            $newFull = $entries[$oldFull]
-            $oldBase = Get-ScubaBaseControlId $oldFull
-            $newBase = Get-ScubaBaseControlId $newFull
-
-            if (-not $beforeMap.Contains($oldBase) -or $beforeMap[$oldBase].FullId -ne $oldFull) { continue }
-            if (-not $afterMap.Contains($newBase) -or $afterMap[$newBase].FullId -ne $newFull) { continue }
-            if ($beforeMap.Contains($newBase) -and $beforeMap[$newBase].FullId -eq $newFull) { continue }
-            if ($afterMap.Contains($oldBase) -and $afterMap[$oldBase].FullId -eq $oldFull) { continue }
-
-            $moves += [pscustomobject]@{
-                OldFull = $oldFull
-                NewFull = $newFull
-                OldBase = $oldBase
-                NewBase = $newBase
-            }
-        }
-
-        # Drop any move whose target slot is held by a before-side policy that is
-        # not moving away; dropping one move can free or occupy another's slot, so
-        # repeat until stable.
-        do {
-            $vacated = @($moves | ForEach-Object { $_.OldBase })
-            $kept = @($moves | Where-Object { -not $beforeMap.Contains($_.NewBase) -or $vacated -contains $_.NewBase })
-            $changed = ($kept.Count -ne $moves.Count)
-            $moves = $kept
-        } while ($changed)
-
-        if ($moves.Count -eq 0) { continue }
-
-        # Phase 1: capture and remove every moving entry before anything is inserted.
-        $captured = @()
-        foreach ($move in $moves) {
-            $captured += [pscustomobject]@{ Move = $move; Entry = $beforeMap[$move.OldBase] }
-        }
-        foreach ($move in $moves) { $beforeMap.Remove($move.OldBase) }
-
-        # Phase 2: insert the re-keyed entries and the retired-policy stubs.
-        foreach ($item in $captured) {
-            $move = $item.Move
-            $entry = $item.Entry
-            Add-Member -InputObject $entry -NotePropertyName 'MigratedFromId' -NotePropertyValue $entry.FullId -Force
-            Add-Member -InputObject $entry -NotePropertyName 'MigratedFromProduct' -NotePropertyValue $product -Force
-            $beforeMap[$move.NewBase] = $entry
-
-            # A fresh object (not $entry) keeps the two records' migration markers
-            # from aliasing each other.
-            $beforeMap[$move.OldFull] = [pscustomobject]@{
-                FullId            = $entry.FullId
-                BaseId            = $entry.BaseId
-                Version           = $entry.Version
-                Result            = $entry.Result
-                OriginalResult    = $entry.OriginalResult
-                Criticality       = $entry.Criticality
-                Requirement       = $entry.Requirement
-                Details           = $entry.Details
-                GroupName         = $entry.GroupName
-                GroupNumber       = $entry.GroupNumber
-                MigratedToId      = $afterMap[$move.NewBase].FullId
-                MigratedToProduct = $product
-            }
-        }
-    }
-}
-
 function Get-ScubaAnnotationEntry {
     <#
     .Description
@@ -1019,7 +893,6 @@ function Compare-ScubaResults {
     foreach ($product in $afterProducts) { $afterMaps[$product] = Get-ScubaControlMap $After.Results.$product }
 
     Invoke-ScubaPolicyMigrationAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
-    Invoke-ScubaPolicyRenumberAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
 
     # Each product is compared independently and matched by name only. A product
     # present in only one file has all of its controls reported as NewPolicy (only
@@ -1706,7 +1579,6 @@ Export-ModuleMember -Function @(
     'Get-ScubaOrderedProducts',
     'Get-ScubaControlMap',
     'Invoke-ScubaPolicyMigrationAlignment',
-    'Invoke-ScubaPolicyRenumberAlignment',
     'Get-ScubaAnnotationEntry',
     'Get-ScubaDiffFileEncoding'
 )

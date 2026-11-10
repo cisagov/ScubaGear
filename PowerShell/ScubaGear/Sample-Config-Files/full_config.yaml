@@ -101,11 +101,11 @@ Aad:
   # Users detected as high risk SHALL be required to remediate risk using phishing-resistant MFA, and reauthenticate on every sign-in.
   MS.AAD.2.1v2: *CommonCapExclusions
 
-  # Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in.
-  MS.AAD.2.2v2: *CommonCapExclusions
-
   # Sign-ins detected as high risk SHALL be blocked.
-  MS.AAD.2.4v1: *CommonCapExclusions
+  MS.AAD.2.3v1: *CommonCapExclusions
+
+  # Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in.
+  MS.AAD.2.5v1: *CommonCapExclusions
 
   # Phishing-resistant MFA SHALL be enforced for all users.
   MS.AAD.3.1v1: &MfaCapExclusions

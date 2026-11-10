@@ -249,22 +249,121 @@
           "10. Do not configure Sign-in risk in this policy",
           "11. Access controls: Grant → Select 'Grant access' → 'Require risk remediation' (Require authentication strength is selected automatically; select 'Phishing-resistant MFA' or a custom strength that allows only phishing-resistant methods). Do not use the legacy 'Require multifactor authentication' control",
           "12. Session: Sign-in frequency → 'Every time' (applied automatically and mandatory)",
-          "13. Users, groups, or guest user types excluded because they cannot use phishing-resistant MFA must be listed as exclusions for MS.AAD.2.1v2 in the configuration file and targeted by the MS.AAD.2.2v2 policy, unless they are also listed as exclusions for MS.AAD.2.2v2 as an approved exception to both policies",
+          "13. Users, groups, or guest user types excluded because they cannot use phishing-resistant MFA must be listed as exclusions for MS.AAD.2.1v2 in the configuration file and targeted by the MS.AAD.2.5v1 policy, unless they are also listed as exclusions for MS.AAD.2.5v1 as an approved exception to both policies",
           "14. Enable policy: Select 'Report-only' for testing",
           "15. Monitor report-only results for 24-48 hours",
           "16. Change to 'On' after validating no false positives"
         ],
-        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with a phishing-resistant authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy. Users, groups, and guest user types exempted here (CapExclusions) must also be targeted by a policy that meets MS.AAD.2.2v2 (MFA), unless they are also exempted from MS.AAD.2.2v2 as an approved exception to both policies"
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. riskRemediation must be combined with a phishing-resistant authentication strength using AND, and user risk and sign-in risk must not be combined in the same policy. Users, groups, and guest user types exempted here (CapExclusions)         must also be targeted by a policy that meets MS.AAD.2.5v1 (MFA), unless they are also exempted from MS.AAD.2.5v1 as an approved exception to both policies"
       },
       {
-        "id": "MS.AAD.2.2v2",
-        "name": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in",
+                "id": "MS.AAD.2.2v1",
+                "name": "A notification SHOULD be sent to the administrator when high-risk users are detected",
+                "exclusionField": "none",
+                "apiPermissionRef": "Get-MgBetaRiskyUser",
+                "validationLogic": {
+                  "type": "identityProtectionSetting",
+                  "requiresPolicy": false,
+                  "policyMustExist": false,
+                  "requirements": {
+                    "notificationEnabled": true,
+                    "notificationType": "usersAtRiskDetected"
+                  }
+                },
+                "buildInstructions": {
+                  "description": "Configure Identity Protection notifications for high-risk users",
+                  "apiResourceCreate": null,
+                  "apiMethodCreate": null,
+                  "manualConfiguration": true,
+                  "configurationSteps": [
+                    "Navigate to Microsoft Entra admin center",
+                    "Select Protection > Identity Protection > User risk policy",
+                    "Configure notifications to send alerts to administrators"
+                  ]
+                },
+                "notes": "This setting is configured through the Entra admin center, not via Graph API. Manual validation required."
+              },
+              {
+                "id": "MS.AAD.2.3v1",
+                "name": "Sign-ins detected as high risk SHALL be blocked",
+                "exclusionField": "CapExclusions",
+                "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
+                "validationLogic": {
+                  "type": "conditionalAccessPolicy",
+                  "requiresPolicy": true,
+                  "policyMustExist": true,
+                  "requirements": {
+                    "state": "enabled",
+                    "conditions": {
+                      "users": {
+                        "includeUsers": [
+                          "All"
+                        ]
+                      },
+                      "applications": {
+                        "includeApplications": [
+                          "All"
+                        ]
+                      },
+                      "signInRiskLevels": [
+                        "high"
+                      ]
+                    },
+                    "grantControls": {
+                      "builtInControls": [
+                        "block"
+                      ],
+                      "operator": "OR"
+                    }
+                  }
+                },
+                "buildInstructions": {
+                  "description": "Create a Conditional Access policy blocking high-risk sign-ins",
+                  "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
+                  "apiMethodCreate": "POST",
+                  "payloadTemplate": {
+                    "displayName": "ScubaGear: Block High Risk Sign-Ins",
+                    "state": "enabled",
+                    "conditions": {
+                      "users": {
+                        "includeUsers": [
+                          "All"
+                        ],
+                        "excludeUsers": [],
+                        "excludeGroups": []
+                      },
+                      "applications": {
+                        "includeApplications": [
+                          "All"
+                        ]
+                      },
+                      "signInRiskLevels": [
+                        "high"
+                      ]
+                    },
+                    "grantControls": {
+                      "operator": "OR",
+                      "builtInControls": [
+                        "block"
+                      ]
+                    }
+                  },
+                  "exclusionHandling": [
+                    "conditions.users.excludeUsers",
+                    "conditions.users.excludeGroups"
+                  ]
+                },
+                "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection"
+              },
+              {
+                "id": "MS.AAD.2.5v1",
+                "name": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in",
         "category": "Risk Based Policies",
         "description": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in",
         "rationale": "Accounts that cannot use phishing-resistant MFA and are exempted from MS.AAD.2.1v2 must still remediate user risk using MFA",
         "exclusionField": "CapExclusions",
         "requiresLicense": "Microsoft Entra ID P2",
-        "exceptions": "Not applicable when no users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.2v2",
+        "exceptions": "Not applicable when no users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.5v1",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
         "validationLogic": {
           "type": "conditionalAccessPolicy",
@@ -362,7 +461,7 @@
           "2. Navigate to the Entra Admin Center (https://entra.microsoft.com)",
           "3. Go to Protection → Conditional Access → Policies",
           "4. Click 'New policy' to create a new Conditional Access policy",
-          "5. Name: 'MS.AAD.2.2v2 - ScubaGear: Require MFA Risk Remediation for Exempted Users'",
+          "5. Name: 'MS.AAD.2.5v1 - ScubaGear: Require MFA Risk Remediation for Exempted Users'",
           "6. Users: Include → the users, groups, and guest or external user types excluded from MS.AAD.2.1v2 (or All users); do not exclude them",
           "7. Target resources: Include → All resources (formerly 'All cloud apps')",
           "8. Conditions: User risk → Configure 'Yes' → Select 'High'",
@@ -372,109 +471,10 @@
           "12. Enable policy: Select 'Report-only' for testing",
           "13. Change to 'On' after validating no false positives"
         ],
-        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. Evaluated only when MS.AAD.2.1v2 has exemptions in the configuration file that are not also exempted from MS.AAD.2.2v2. ScubaGear passes a policy that targets 'All' users OR explicitly includes every user, group, and guest user type exempted from MS.AAD.2.1v2 (and does not exclude them); the analyzer cannot know those exempted principals, so it models the 'All users' scope and the built-in MFA / Passwordless MFA authentication strengths. Exclusions detected here (CapExclusions) apply to the MFA policy itself (for example break-glass accounts). A principal exempted under both MS.AAD.2.1v2 and MS.AAD.2.2v2 is an approved exception to both policies and needs no MFA coverage"
-      },
-      {
-        "id": "MS.AAD.2.3v2",
-        "name": "A notification SHOULD be sent to the administrator when high-risk users are detected",
-        "exclusionField": "none",
-        "apiPermissionRef": "Get-MgBetaRiskyUser",
-        "validationLogic": {
-          "type": "identityProtectionSetting",
-          "requiresPolicy": false,
-          "policyMustExist": false,
-          "requirements": {
-            "notificationEnabled": true,
-            "notificationType": "usersAtRiskDetected"
-          }
-        },
-        "buildInstructions": {
-          "description": "Configure Identity Protection notifications for high-risk users",
-          "apiResourceCreate": null,
-          "apiMethodCreate": null,
-          "manualConfiguration": true,
-          "configurationSteps": [
-            "Navigate to Microsoft Entra admin center",
-            "Select Protection > Identity Protection > User risk policy",
-            "Configure notifications to send alerts to administrators"
-          ]
-        },
-        "notes": "This setting is configured through the Entra admin center, not via Graph API. Manual validation required."
-      },
-      {
-        "id": "MS.AAD.2.4v1",
-        "name": "Sign-ins detected as high risk SHALL be blocked",
-        "exclusionField": "CapExclusions",
-        "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
-        "validationLogic": {
-          "type": "conditionalAccessPolicy",
-          "requiresPolicy": true,
-          "policyMustExist": true,
-          "requirements": {
-            "state": "enabled",
-            "conditions": {
-              "users": {
-                "includeUsers": [
-                  "All"
-                ]
+        "notes": "Requires Microsoft Entra ID P2 license for Identity Protection features. Evaluated only when MS.AAD.2.1v2 has exemptions in the configuration file that are not also exempted from MS.AAD.2.5v1. ScubaGear passes a policy that targets 'All' users OR explicitly includes every user, group, and guest user type exempted from MS.AAD.2.1v2 (and does not exclude them); the analyzer cannot know those exempted principals, so it models the 'All users' scope and the built-in MFA / Passwordless MFA authentication strengths. Exclusions detected here (CapExclusions) apply to the MFA policy itself (for example break-glass accounts).         A principal exempted under both MS.AAD.2.1v2 and MS.AAD.2.5v1 is an approved exception to both policies and needs no MFA coverage"
               },
-              "applications": {
-                "includeApplications": [
-                  "All"
-                ]
-              },
-              "signInRiskLevels": [
-                "high"
-              ]
-            },
-            "grantControls": {
-              "builtInControls": [
-                "block"
-              ],
-              "operator": "OR"
-            }
-          }
-        },
-        "buildInstructions": {
-          "description": "Create a Conditional Access policy blocking high-risk sign-ins",
-          "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
-          "apiMethodCreate": "POST",
-          "payloadTemplate": {
-            "displayName": "ScubaGear: Block High Risk Sign-Ins",
-            "state": "enabled",
-            "conditions": {
-              "users": {
-                "includeUsers": [
-                  "All"
-                ],
-                "excludeUsers": [],
-                "excludeGroups": []
-              },
-              "applications": {
-                "includeApplications": [
-                  "All"
-                ]
-              },
-              "signInRiskLevels": [
-                "high"
-              ]
-            },
-            "grantControls": {
-              "operator": "OR",
-              "builtInControls": [
-                "block"
-              ]
-            }
-          },
-          "exclusionHandling": [
-            "conditions.users.excludeUsers",
-            "conditions.users.excludeGroups"
-          ]
-        },
-        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection"
-      },
-      {
-        "id": "MS.AAD.3.1v1",
+              {
+                "id": "MS.AAD.3.1v1",
         "name": "Phishing-resistant MFA SHALL be enforced for all users",
         "exclusionField": "CapExclusions",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",

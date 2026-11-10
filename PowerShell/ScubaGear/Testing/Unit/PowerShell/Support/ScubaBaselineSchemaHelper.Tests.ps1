@@ -127,8 +127,8 @@ License text.
             Should -Be 'The DLP policy SHOULD include an action to block access to sensitive information by restricted applications and unwanted Bluetooth applications.'
     }
 
-    It 'preserves all 95 policy notes and their nested text' {
-        @($policies | ForEach-Object { $_.notes } | Where-Object { $_ }).Count | Should -Be 95
+    It 'preserves all 93 policy notes and their nested text' {
+        @($policies | ForEach-Object { $_.notes } | Where-Object { $_ }).Count | Should -Be 93
         ($policies | Where-Object id -eq 'MS.SECURITYSUITE.3.5v1').notes[0] |
             Should -Match 'This action can only be included if at least one device is onboarded'
     }

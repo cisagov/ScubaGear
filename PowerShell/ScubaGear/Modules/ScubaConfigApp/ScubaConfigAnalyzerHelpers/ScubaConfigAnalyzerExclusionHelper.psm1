@@ -144,7 +144,7 @@ function Get-ScAExclusionFollowUp {
     <#
     .SYNOPSIS
     Returns follow-up recommendation text for a parent control whose exemptions are read by
-    dependent policies (e.g. exemptions from MS.AAD.2.1v2 must also be targeted by MS.AAD.2.2v2).
+    dependent policies (e.g. exemptions from MS.AAD.2.1v2 must also be targeted by MS.AAD.2.5v1).
     .DESCRIPTION
     Returns an empty array unless the control is a parent in policyExclusionRelationships AND
     exemptions/exclusions are actually being recommended or configured for it.
@@ -593,7 +593,7 @@ function Get-ScubaAnalyzerConfigYaml {
             }
 
             # A parent policy with exemptions (e.g. MS.AAD.2.1v2) is followed by its dependent
-            # policy's exclusion stub (e.g. MS.AAD.2.2v2) unless that control has its own block.
+            # policy's exclusion stub (e.g. MS.AAD.2.5v1) unless that control has its own block.
             if (Get-ScAExclusionRelationship -ControlId $controlId) {
                 $parentHasExemptions = [bool]$entry
                 if (-not $parentHasExemptions -and $importedFields -is [System.Collections.IDictionary]) {

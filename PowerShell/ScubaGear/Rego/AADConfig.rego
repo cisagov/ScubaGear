@@ -230,22 +230,22 @@ tests contains {
 #--
 
 #
-# MS.AAD.2.3v2
+# MS.AAD.2.2v1
 #--
 
 # At this time we are unable to test for X because of Y
 tests contains {
-    "PolicyId": "MS.AAD.2.3v2",
+    "PolicyId": "MS.AAD.2.2v1",
     "Criticality": "Should/Not-Implemented",
     "Commandlet": [],
     "ActualValue": [],
-    "ReportDetails": NotCheckedDetails("MS.AAD.2.3v2"),
+    "ReportDetails": NotCheckedDetails("MS.AAD.2.2v1"),
     "RequirementMet": false
 }
 #--
 
 #
-# MS.AAD.2.4v1
+# MS.AAD.2.3v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -267,10 +267,10 @@ SignInBlockedBaseCheck(policy) if {
 # Only match policies with user and group exclusions per the confile file
 SignInBlockedEval(policy) := result if {
     checks := [
-        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
-        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
-        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
     ]
     result := CapEval(SignInBlockedBaseCheck(policy), checks)
 }
@@ -295,7 +295,7 @@ SignInBlockedNeedsConfigUpdate contains {
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.4v1",
+    "PolicyId": "MS.AAD.2.3v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": SignInBlocked,
@@ -328,7 +328,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.2.2v2
+# MS.AAD.2.5v1
 #--
 
 # Users, groups, and guest user types exempted from MS.AAD.2.1v2 in the config file.
@@ -343,17 +343,17 @@ PrimaryExemptGroups := ConvertToSet(object.get(
 PrimaryExemptGuestTypes := ConvertToSet(object.get(
     input, ["scuba_config", "Aad", "MS.AAD.2.1v2", "CapExclusions", "GuestUserTypes"], []))
 
-# Principals that are also exempted from MS.AAD.2.2v2 in the config file are an approved gap:
+# Principals that are also exempted from MS.AAD.2.5v1 in the config file are an approved gap:
 # they are intentionally excluded from both the phishing-resistant and the MFA policy (for
 # example emergency access accounts), so no MFA coverage is required for them.
 SecondaryExemptUsers := ConvertToSet(object.get(
-    input, ["scuba_config", "Aad", "MS.AAD.2.2v2", "CapExclusions", "Users"], []))
+    input, ["scuba_config", "Aad", "MS.AAD.2.5v1", "CapExclusions", "Users"], []))
 
 SecondaryExemptGroups := ConvertToSet(object.get(
-    input, ["scuba_config", "Aad", "MS.AAD.2.2v2", "CapExclusions", "Groups"], []))
+    input, ["scuba_config", "Aad", "MS.AAD.2.5v1", "CapExclusions", "Groups"], []))
 
 SecondaryExemptGuestTypes := ConvertToSet(object.get(
-    input, ["scuba_config", "Aad", "MS.AAD.2.2v2", "CapExclusions", "GuestUserTypes"], []))
+    input, ["scuba_config", "Aad", "MS.AAD.2.5v1", "CapExclusions", "GuestUserTypes"], []))
 
 # The principals exempted from MS.AAD.2.1v2 that must be targeted by an MFA policy
 CoverageRequiredUsers := PrimaryExemptUsers - SecondaryExemptUsers
@@ -428,10 +428,10 @@ RemediateHighRiskMFABaseCheck(policy) if {
 # Only match policies with user and group exclusions per the confile file
 RemediateHighRiskMFAEval(policy) := result if {
     checks := [
-        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
-        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
-        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.2v2")},
+        {"label": "user exclusions",  "ok":         UserExclusionsFullyExempt(policy, "MS.AAD.2.5v1")},
+                {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.5v1")},
+                {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.5v1")},
+                {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.5v1")},
     ]
     result := CapEval(RemediateHighRiskMFABaseCheck(policy), checks)
 }
@@ -462,15 +462,15 @@ tests contains {
     "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
     "RequirementMet": true
 } if {
-    PolicyId := "MS.AAD.2.2v2"
+    PolicyId := "MS.AAD.2.5v1"
     # regal ignore:line-length
-    Reason := "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.2v2. See %v for more info"
+    Reason := "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.5v1. See %v for more info"
     RequiresMFACoverage == false
 }
 
 # Pass if at least 1 policy meets all conditions & has correct licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.2v2",
+    "PolicyId": "MS.AAD.2.5v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": RemediateHighRiskMFA,

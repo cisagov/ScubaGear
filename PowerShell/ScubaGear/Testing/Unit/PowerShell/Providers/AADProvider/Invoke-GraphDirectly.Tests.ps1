@@ -179,7 +179,7 @@ InModuleScope Utility {
         }
 
         # Without this header Graph can map newer grant-control values (e.g. riskRemediation) to unknownFutureValue,
-        # which would make correctly configured policies fail the MS.AAD.2.1v2 and MS.AAD.2.2v2 checks.
+        # which would make correctly configured policies fail the MS.AAD.2.1v2 and MS.AAD.2.5v1 checks.
         It "requests newer grant-control enum values in <EnvName>" -ForEach ($environments | ForEach-Object { @{ EnvName = $_.Name } }) {
             $null = Invoke-GraphDirectly -Commandlet 'Get-MgBetaIdentityConditionalAccessPolicy' -M365Environment $EnvName
 

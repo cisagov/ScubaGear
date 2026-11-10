@@ -534,7 +534,7 @@ class ScubaConfigValidator {
     }
 
     # Warns when a policy has exemptions configured but a dependent policy that reads those exemptions
-    # (schemaMetadata.policyExclusionRelationships, e.g. MS.AAD.2.2v2 reads the MS.AAD.2.1v2 exemptions)
+    # (schemaMetadata.policyExclusionRelationships, e.g. MS.AAD.2.5v1 reads the MS.AAD.2.1v2 exemptions)
     # is listed in OmitPolicy. The exempted users, groups, or guest user types would then have no
     # compensating control assessed.
     hidden static [void] ValidateExemptionDependencies([object]$ConfigObject, [hashtable]$Validation) {
@@ -665,7 +665,7 @@ class ScubaConfigValidator {
 
                     # The Defender-to-Security Suite transition guidance only applies to policies that moved out
                     # of the Defender/Exchange/Teams baselines. Same-product renumbers and version bumps (for
-                    # example MS.AAD.2.3v1 -> MS.AAD.2.4v1) get a general policy-update message instead.
+                    # example MS.AAD.3.2v1 -> MS.AAD.3.2v2) get a general policy-update message instead.
                     $IsDefenderTransition = ($OldProduct -eq 'DEFENDER') -or ($NewProduct -eq 'SECURITYSUITE') -or (-not $HasNewId -and $OldProduct -in @('EXO', 'TEAMS'))
                     $UpdateDocRef = "See mappings\scuba-baseline-policy-migrations.csv for the full list of replaced policies."
 

@@ -1,4 +1,4 @@
-Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relationships (MS.AAD.2.1v2 / MS.AAD.2.2v2)' {
+Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relationships (MS.AAD.2.1v2 / MS.AAD.2.5v1)' {
     BeforeAll {
         $scubaGearRoot = (Resolve-Path "$PSScriptRoot\..\..\..\..").Path
         $configAppRoot = Join-Path $scubaGearRoot 'Modules\ScubaConfigApp'
@@ -78,7 +78,7 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
         $script:helperModules | Remove-Module -Force -ErrorAction SilentlyContinue
     }
 
-    Context 'Baseline validation entries for the renumbered risk policies' {
+    Context 'Baseline validation entries for the risk policies' {
         It 'models MS.AAD.2.1v2 with a phishing-resistant authentication strength' {
             $entry = $baseline.baselineValidations.aad | Where-Object id -EQ 'MS.AAD.2.1v2'
             $requirements = $entry.validationLogic.requirements
@@ -90,8 +90,8 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $entry.exclusionField | Should -Be 'CapExclusions'
         }
 
-        It 'models MS.AAD.2.2v2 with structured requirements the generic engine can evaluate' {
-            $entry = $baseline.baselineValidations.aad | Where-Object id -EQ 'MS.AAD.2.2v2'
+        It         'models MS.AAD.2.5v1 with structured requirements the generic engine can evaluate' {
+                    $entry = $baseline.baselineValidations.aad | Where-Object id -EQ 'MS.AAD.2.5v1'
             $requirements = $entry.validationLogic.requirements
             $entry.validationLogic.type | Should -Be 'conditionalAccessPolicy'
             $entry.exclusionField | Should -Be 'CapExclusions'
@@ -108,20 +108,19 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $entry.exceptions | Should -Match 'MS\.AAD\.2\.1v2'
         }
 
-        It 'keeps MS.AAD.2.3v2 (notification) and MS.AAD.2.4v1 (block) after the renumber' {
+        It 'keeps MS.AAD.2.2v1 (notification) and MS.AAD.2.3v1 (block) alongside the MFA policy MS.AAD.2.5v1' {
             $aad = $baseline.baselineValidations.aad
-            $notification = $aad | Where-Object id -EQ 'MS.AAD.2.3v2'
+            $notification = $aad | Where-Object id -EQ 'MS.AAD.2.2v1'
             $notification.validationLogic.type | Should -Be 'identityProtectionSetting'
             $notification.exclusionField | Should -Be 'none'
-            $block = $aad | Where-Object id -EQ 'MS.AAD.2.4v1'
+            $block = $aad | Where-Object id -EQ 'MS.AAD.2.3v1'
             $block.validationLogic.requirements.grantControls.builtInControls | Should -Contain 'block'
             @($block.validationLogic.requirements.conditions.signInRiskLevels) | Should -Be @('high')
-            @($aad | Where-Object { $_.id -in @('MS.AAD.2.2v1', 'MS.AAD.2.3v1') }).Count | Should -Be 0
         }
 
         It 'only lists policies in the baseline that exist in the config schema exclusion mappings' {
             $mappings = $configSchema.schemaMetadata.policyExclusionMappings
-            foreach ($id in 'MS.AAD.2.1v2', 'MS.AAD.2.2v2', 'MS.AAD.2.4v1') {
+            foreach ($id in 'MS.AAD.2.1v2', 'MS.AAD.2.3v1', 'MS.AAD.2.5v1') {
                 $mappings.$id | Should -Contain 'CapExclusions'
                 ($baseline.baselineValidations.aad | Where-Object id -EQ $id).exclusionField | Should -Be 'CapExclusions'
             }
@@ -136,32 +135,32 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             (Get-ScAActionClassification -PolicyAnalysis $mfaAnalysis).Action | Should -Be 'FIX_POLICY'
         }
 
-        It 'MS.AAD.2.2v2 accepts <Name> authentication strength' -ForEach @(
+        It         'MS.AAD.2.5v1 accepts <Name> authentication strength' -ForEach @(
             @{ Name = 'the built-in MFA'; Strength = 'mfa' }
             @{ Name = 'the built-in Passwordless MFA'; Strength = 'passwordless' }
         ) {
-            $analysis = Get-Analysis 'MS.AAD.2.2v2' (New-RiskPolicy (Get-Variable $Strength -ValueOnly))
+                    $analysis = Get-Analysis 'MS.AAD.2.5v1' (New-RiskPolicy (Get-Variable $Strength -ValueOnly))
             $analysis.TotalPoliciesFound | Should -Be 1
             $analysis.AllPolicies[0].Issues | Should -BeNullOrEmpty
             $analysis.AllPolicies[0].MeetsCriteria | Should -BeTrue
             (Get-ScAActionClassification -PolicyAnalysis $analysis).Action | Should -Be 'NONE'
         }
 
-        It 'MS.AAD.2.2v2 flags a phishing-resistant-only strength as a setting issue' {
-            $analysis = Get-Analysis 'MS.AAD.2.2v2' (New-RiskPolicy $phishingResistant)
+        It         'MS.AAD.2.5v1 flags a phishing-resistant-only strength as a setting issue' {
+                    $analysis = Get-Analysis 'MS.AAD.2.5v1' (New-RiskPolicy $phishingResistant)
             $analysis.AllPolicies[0].SettingIssueCount | Should -BeGreaterThan 0
             ($analysis.AllPolicies[0].Issues -join ' ') | Should -Match 'authenticationStrength|Authentication'
             (Get-ScAActionClassification -PolicyAnalysis $analysis).Action | Should -Be 'FIX_POLICY'
         }
 
-        It 'MS.AAD.2.2v2 no longer reports the free-text scope as a failed requirement' {
-            $analysis = Get-Analysis 'MS.AAD.2.2v2' (New-RiskPolicy $mfa)
+        It         'MS.AAD.2.5v1 no longer reports the free-text scope as a failed requirement' {
+                    $analysis = Get-Analysis 'MS.AAD.2.5v1' (New-RiskPolicy $mfa)
             ($analysis.AllPolicies[0].Issues -join ' ') | Should -Not -Match 'exempted from'
             ($analysis.AllPolicies[0].Issues -join ' ') | Should -Not -Match 'includeUsers'
         }
 
-        It 'MS.AAD.2.2v2 reports excluded break-glass accounts as config exclusions for the MFA policy itself' {
-            $analysis = Get-Analysis 'MS.AAD.2.2v2' (New-RiskPolicy $mfa -ExcludeUsers @('bg1'))
+        It         'MS.AAD.2.5v1 reports excluded break-glass accounts as config exclusions for the MFA policy itself' {
+                    $analysis = Get-Analysis 'MS.AAD.2.5v1' (New-RiskPolicy $mfa -ExcludeUsers @('bg1'))
             $match = $analysis.AllPolicies[0]
             $match.SettingIssueCount | Should -Be 0
             $match.ExcludedPrincipalCount | Should -Be 1
@@ -169,8 +168,8 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             (Get-ScAActionClassification -PolicyAnalysis $analysis).Action | Should -Be 'ADD_EXCLUSIONS'
         }
 
-        It 'MS.AAD.2.2v2 models the all-users scope only (a policy that includes only a group is not a candidate)' {
-            $analysis = Get-Analysis 'MS.AAD.2.2v2' (New-RiskPolicy $mfa -IncludeUsers @() -IncludeGroups @('exempt-group'))
+        It         'MS.AAD.2.5v1 models the all-users scope only (a policy that includes only a group is not a candidate)' {
+                    $analysis = Get-Analysis 'MS.AAD.2.5v1' (New-RiskPolicy $mfa -IncludeUsers @() -IncludeGroups @('exempt-group'))
             $analysis.TotalPoliciesFound | Should -Be 0
         }
     }
@@ -181,7 +180,7 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $expected = $configSchema.schemaMetadata.policyExclusionRelationships.'MS.AAD.2.1v2'
             @($relationship.Dependents) | Should -Be @($expected.dependents)
             $relationship.Note | Should -Be $expected.note
-            Get-ScAExclusionRelationship -ControlId 'MS.AAD.2.2v2' | Should -BeNullOrEmpty
+            Get-ScAExclusionRelationship -ControlId 'MS.AAD.2.5v1' | Should -BeNullOrEmpty
             Get-ScAExclusionRelationship -ControlId 'MS.AAD.3.1v1' | Should -BeNullOrEmpty
         }
 
@@ -189,23 +188,23 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $note = $configSchema.schemaMetadata.policyExclusionRelationships.'MS.AAD.2.1v2'.note
             $followUp = @(Get-ScAExclusionFollowUp -ControlId 'MS.AAD.2.1v2' -HasExclusions $true)
             $followUp.Count | Should -Be 1
-            $followUp[0] | Should -Match '^Follow-up \(MS\.AAD\.2\.2v2\): '
+            $followUp[0] | Should -Match '^Follow-up \(MS\.AAD\.2\.5v1\): '
             $followUp[0] | Should -Match ([regex]::Escape($note))
             @(Get-ScAExclusionFollowUp -ControlId 'MS.AAD.2.1v2' -HasExclusions $false).Count | Should -Be 0
-            @(Get-ScAExclusionFollowUp -ControlId 'MS.AAD.2.2v2' -HasExclusions $true).Count | Should -Be 0
+            @(Get-ScAExclusionFollowUp -ControlId 'MS.AAD.2.5v1' -HasExclusions $true).Count | Should -Be 0
             @(Get-ScAExclusionFollowUp -ControlId 'MS.AAD.3.1v1' -HasExclusions $true).Count | Should -Be 0
         }
 
         It 'builds a commented dependent stub that keeps the YAML valid' {
             $stub = Get-ScAYamlDependentStub -ControlId 'MS.AAD.2.1v2'
-            $stub | Should -Match '(?m)^  # MS\.AAD\.2\.2v2:'
+            $stub | Should -Match '(?m)^  # MS\.AAD\.2\.5v1:'
             $stub | Should -Match '(?m)^  #   CapExclusions:'
             $stub | Should -Match '(?m)^  #     Users:'
             ($stub -split "`r?`n" | Where-Object { $_ }) | ForEach-Object { $_ | Should -Match '^\s*#' }
         }
 
         It 'skips the stub when the dependent already has its own block, and for non-parent policies' {
-            Get-ScAYamlDependentStub -ControlId 'MS.AAD.2.1v2' -ExistingControlIds @('MS.AAD.2.2v2') | Should -BeNullOrEmpty
+            Get-ScAYamlDependentStub -ControlId 'MS.AAD.2.1v2' -ExistingControlIds @('MS.AAD.2.5v1') | Should -BeNullOrEmpty
             Get-ScAYamlDependentStub -ControlId 'MS.AAD.3.1v1' | Should -BeNullOrEmpty
         }
 
@@ -228,32 +227,32 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $finding = $analysis.Findings | Where-Object ControlId -EQ 'MS.AAD.2.1v2'
             $finding.ConfigAction | Should -Be 'EXCLUDE'
             $finding.DetectedExclusionValues.Users | Should -Contain '11111111-1111-1111-1111-111111111111'
-            ($finding.Recommendations -join "`n") | Should -Match 'Follow-up \(MS\.AAD\.2\.2v2\)'
+            ($finding.Recommendations -join "`n") |                         Should -Match 'Follow-up \(MS\.AAD\.2\.5v1\)'
             $finding.YamlBlock | Should -Match '(?m)^  MS\.AAD\.2\.1v2:'
-            $finding.YamlBlock | Should -Match '(?m)^  # MS\.AAD\.2\.2v2:'
+                                    $finding.YamlBlock | Should -Match '(?m)^  # MS\.AAD\.2\.5v1:'
 
             $yaml = Get-ScubaAnalyzerConfigYaml -Analysis $analysis
             $yaml | Should -Match '(?m)^  MS\.AAD\.2\.1v2:\r?\n    CapExclusions:\r?\n      Users:\r?\n        - 11111111-1111-1111-1111-111111111111'
-            $yaml | Should -Match '(?m)^  # MS\.AAD\.2\.2v2:'
-            $yaml | Should -Not -Match '(?m)^  MS\.AAD\.2\.2v2:'
+            $yaml | Should -Match '(?m)^  # MS\.AAD\.2\.5v1:'
+                        $yaml | Should -Not -Match '(?m)^  MS\.AAD\.2\.5v1:'
         }
 
         It 'shows the follow-up stub in the per-control YAML text' {
             $policy = New-RiskPolicy $phishingResistant -ExcludeUsers @('11111111-1111-1111-1111-111111111111')
             $analysis = Invoke-Analysis (New-ResultsFile -ControlIds 'MS.AAD.2.1v2' -Policies @($policy))
             $finding = $analysis.Findings | Where-Object ControlId -EQ 'MS.AAD.2.1v2'
-            New-ScubaAnalyzerControlYamlText -Finding $finding -ExclusionValues $finding.DetectedExclusionValues | Should -Match '(?m)^  # MS\.AAD\.2\.2v2:'
+            New-ScubaAnalyzerControlYamlText -Finding $finding -ExclusionValues $finding.DetectedExclusionValues | Should -Match '(?m)^  # MS\.AAD\.2\.5v1:'
         }
 
         It 'does not add the stub when the dependent policy has its own exclusions' {
             $parent = New-RiskPolicy $phishingResistant -ExcludeUsers @('11111111-1111-1111-1111-111111111111') -Name 'Phishing-resistant' -Id 'p1'
             $dependent = New-RiskPolicy $mfa -ExcludeUsers @('22222222-2222-2222-2222-222222222222') -Name 'MFA' -Id 'p2'
-            $analysis = Invoke-Analysis (New-ResultsFile -ControlIds 'MS.AAD.2.1v2', 'MS.AAD.2.2v2' -Policies @($parent, $dependent))
+            $analysis = Invoke-Analysis (New-ResultsFile             -ControlIds             'MS.AAD.2.1v2', 'MS.AAD.2.5v1' -Policies @($parent, $dependent))
             $yaml = Get-ScubaAnalyzerConfigYaml -Analysis $analysis
             $yaml | Should -Match '(?m)^  MS\.AAD\.2\.1v2:'
-            $yaml | Should -Match '(?m)^  MS\.AAD\.2\.2v2:\r?\n    CapExclusions:\r?\n      Users:\r?\n        - 22222222-2222-2222-2222-222222222222'
-            $yaml | Should -Not -Match '(?m)^  # MS\.AAD\.2\.2v2:'
-            $dependentFinding = $analysis.Findings | Where-Object ControlId -EQ 'MS.AAD.2.2v2'
+                                    $yaml | Should -Match '(?m)^  MS\.AAD\.2\.5v1:\r?\n    CapExclusions:\r?\n      Users:\r?\n        - 22222222-2222-2222-2222-222222222222'
+                                    $yaml | Should -Not -Match '(?m)^  # MS\.AAD\.2\.5v1:'
+                                    $dependentFinding = $analysis.Findings | Where-Object ControlId -EQ 'MS.AAD.2.5v1'
             ($dependentFinding.Recommendations -join "`n") | Should -Not -Match 'Follow-up'
         }
 
@@ -263,7 +262,7 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $finding = $analysis.Findings | Where-Object ControlId -EQ 'MS.AAD.2.1v2'
             ($finding.Recommendations -join "`n") | Should -Not -Match 'Follow-up'
             $finding.YamlBlock | Should -BeNullOrEmpty
-            Get-ScubaAnalyzerConfigYaml -Analysis $analysis | Should -Not -Match 'MS\.AAD\.2\.2v2'
+            Get-ScubaAnalyzerConfigYaml -Analysis $analysis | Should -Not -Match 'MS\.AAD\.2\.5v1'
         }
 
         It 'adds the stub for exemptions already configured in the imported results configuration' {
@@ -274,10 +273,10 @@ Describe -Tag 'Analyzer' -Name 'Config Analyzer handles policy exemption relatio
             $analysis = Invoke-Analysis (New-ResultsFile -ControlIds 'MS.AAD.2.1v2' -Policies @(New-RiskPolicy $phishingResistant) -ScubaConfig $scubaConfig -Result 'Pass')
             $finding = $analysis.Findings | Where-Object ControlId -EQ 'MS.AAD.2.1v2'
             $finding.ConfiguredExclusionValues.Groups | Should -Contain '33333333-3333-3333-3333-333333333333'
-            ($finding.Recommendations -join "`n") | Should -Match 'Follow-up \(MS\.AAD\.2\.2v2\)'
+            ($finding.Recommendations -join "`n") |                         Should -Match 'Follow-up \(MS\.AAD\.2\.5v1\)'
             $yaml = Get-ScubaAnalyzerConfigYaml -Analysis $analysis
             $yaml | Should -Match '33333333-3333-3333-3333-333333333333'
-            $yaml | Should -Match '(?m)^  # MS\.AAD\.2\.2v2:'
+                                    $yaml | Should -Match '(?m)^  # MS\.AAD\.2\.5v1:'
         }
     }
 }

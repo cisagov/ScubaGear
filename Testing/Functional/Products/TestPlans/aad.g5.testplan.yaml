@@ -276,21 +276,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false
 
-  # No exemptions are configured for MS.AAD.2.1v2 in cached runs, so this policy is not applicable.
-  # The applicable cases (exemptions targeted, not targeted, MFA strength) are covered by the Rego unit tests
-  # because Invoke-SCuBACached does not accept a configuration file.
-  - PolicyId: MS.AAD.2.2v2
+  - PolicyId: MS.AAD.2.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.2v2 Not-applicable case - no exemptions configured for MS.AAD.2.1v2
-        Preconditions: []
-        Postconditions: []
-        ExpectedResult: true
-
-  - PolicyId: MS.AAD.2.4v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - low risk sign ins are blocked
+      - TestDescription: MS.AAD.2.3v1 Non-Compliant case - low risk sign ins are blocked
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -314,7 +303,7 @@ TestPlan:
                     - block
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.4v1 Compliant case - high risk sign ins are blocked
+      - TestDescription: MS.AAD.2.3v1 Compliant case - high risk sign ins are blocked
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -337,6 +326,17 @@ TestPlan:
                 GrantControls:
                   BuiltInControls:
                     - block
+        Postconditions: []
+        ExpectedResult: true
+
+  # No exemptions are configured for MS.AAD.2.1v2 in cached runs, so this policy is not applicable.
+  # The applicable cases (exemptions targeted, not targeted, MFA strength) are covered by the Rego unit tests
+  # because Invoke-SCuBACached does not accept a configuration file.
+  - PolicyId: MS.AAD.2.5v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.AAD.2.5v1 Not-applicable case - no exemptions configured for MS.AAD.2.1v2
+        Preconditions: []
         Postconditions: []
         ExpectedResult: true
 

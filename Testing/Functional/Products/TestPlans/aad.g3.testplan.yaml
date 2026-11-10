@@ -8,22 +8,22 @@ TestPlan:
         Postconditions: []
         ExpectedResult: false
 
-  # No exemptions are configured for MS.AAD.2.1v2 in cached runs, so this policy is not applicable
-  - PolicyId: MS.AAD.2.2v2
+  - PolicyId: MS.AAD.2.3v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.2v2 Not-applicable case - no exemptions configured for MS.AAD.2.1v2
-        Preconditions: []
-        Postconditions: []
-        ExpectedResult: true
-
-  - PolicyId: MS.AAD.2.4v1
-    TestDriver: ScubaCached
-    Tests:
-      - TestDescription: MS.AAD.2.4v1 No P2 license case
+      - TestDescription: MS.AAD.2.3v1 No P2 license case
         Preconditions: []
         Postconditions: []
         ExpectedResult: false
+
+  # No exemptions are configured for MS.AAD.2.1v2 in cached runs, so this policy is not applicable
+  - PolicyId: MS.AAD.2.5v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.AAD.2.5v1 Not-applicable case - no exemptions configured for MS.AAD.2.1v2
+        Preconditions: []
+        Postconditions: []
+        ExpectedResult: true
 
   - PolicyId: MS.AAD.7.4v1
     TestDriver: ScubaCached

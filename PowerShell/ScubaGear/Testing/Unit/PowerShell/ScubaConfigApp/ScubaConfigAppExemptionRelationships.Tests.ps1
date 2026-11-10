@@ -121,7 +121,7 @@ Describe -Tag 'Helpers' -Name 'ScubaConfigApp policy exemption relationships (pa
                 param($control, $relationship)
                 $script:syncHash = [hashtable]::Synchronized(@{
                     UIConfigs = $control
-                    PolicyExclusionRelationships = @{ 'MS.AAD.2.1v2' = @{ Dependents = @('MS.AAD.2.2v2'); Note = $relationship.note } }
+                    PolicyExclusionRelationships = @{ 'MS.AAD.2.1v2' = @{ Dependents = @('MS.AAD.2.5v1'); Note = $relationship.note } }
                     ExclusionData = [ordered]@{}
                     OmissionData  = [ordered]@{}
                 })
@@ -136,10 +136,10 @@ Describe -Tag 'Helpers' -Name 'ScubaConfigApp policy exemption relationships (pa
             InModuleScope ScubaConfigAppCommonUIHelper -Parameters @{ Field = $Field; Values = $Values; relationship = $relationship } {
                 param($Field, $Values, $relationship)
                 $script:syncHash.ExclusionData['Aad'] = [ordered]@{ 'MS.AAD.2.1v2' = [ordered]@{ CapExclusions = [ordered]@{ $Field = $Values } } }
-                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.2v2' = [ordered]@{ Rationale = 'not needed' } } }
+                                                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.5v1' = [ordered]@{ Rationale = 'not needed' } } }
                 $warnings = @(Get-PolicyExemptionDependencyWarning)
                 $warnings.Count | Should -Be 1
-                $warnings[0] | Should -Match 'MS\.AAD\.2\.1v2 has exemptions configured but MS\.AAD\.2\.2v2 is listed in Omit Policies'
+                                $warnings[0] | Should -Match 'MS\.AAD\.2\.1v2 has exemptions configured but MS\.AAD\.2\.5v1 is listed in Omit Policies'
                 $warnings[0] | Should -Match ([regex]::Escape($relationship.note))
             }
         }
@@ -161,7 +161,7 @@ Describe -Tag 'Helpers' -Name 'ScubaConfigApp policy exemption relationships (pa
 
         It 'does not warn when the parent has no exemptions' {
             InModuleScope ScubaConfigAppCommonUIHelper {
-                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.2v2' = [ordered]@{ Rationale = 'not needed' } } }
+                        $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.5v1' = [ordered]@{ Rationale = 'not needed' } } }
                 @(Get-PolicyExemptionDependencyWarning).Count | Should -Be 0
                 $script:syncHash.ExclusionData['Aad'] = [ordered]@{ 'MS.AAD.2.1v2' = [ordered]@{ CapExclusions = [ordered]@{ Users = @() } } }
                 @(Get-PolicyExemptionDependencyWarning).Count | Should -Be 0
@@ -171,7 +171,7 @@ Describe -Tag 'Helpers' -Name 'ScubaConfigApp policy exemption relationships (pa
         It 'ignores exclusion fields that are not exemptions of principals' {
             InModuleScope ScubaConfigAppCommonUIHelper {
                 $script:syncHash.ExclusionData['Aad'] = [ordered]@{ 'MS.AAD.2.1v2' = [ordered]@{ CapExclusions = [ordered]@{ Applications = @('app1') } } }
-                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.2v2' = [ordered]@{ Rationale = 'not needed' } } }
+                                                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.5v1' = [ordered]@{ Rationale = 'not needed' } } }
                 @(Get-PolicyExemptionDependencyWarning).Count | Should -Be 0
             }
         }
@@ -188,7 +188,7 @@ Describe -Tag 'Helpers' -Name 'ScubaConfigApp policy exemption relationships (pa
             InModuleScope ScubaConfigAppCommonUIHelper {
                 $script:syncHash.PolicyExclusionRelationships = @{}
                 $script:syncHash.ExclusionData['Aad'] = [ordered]@{ 'MS.AAD.2.1v2' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('u1') } } }
-                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.2v2' = [ordered]@{ Rationale = 'not needed' } } }
+                                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.5v1' = [ordered]@{ Rationale = 'not needed' } } }
                 @(Get-PolicyExemptionDependencyWarning).Count | Should -Be 0
             }
         }
@@ -205,12 +205,12 @@ Describe -Tag 'Helpers' -Name 'ScubaConfigApp policy exemption relationships (pa
                 }
                 $script:syncHash.GeneralSettingsData = @{ ProductNames = @('aad') }
                 $script:syncHash.ExclusionData['Aad'] = [ordered]@{ 'MS.AAD.2.1v2' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('u1') } } }
-                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{ 'MS.AAD.2.2v2' = [ordered]@{ Rationale = 'not needed' } } }
+                $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{                 'MS.AAD.2.5v1' = [ordered]@{ Rationale = 'not needed' } } }
                 $result = Invoke-RequiredFieldValidation
                 $result.IsValid | Should -BeTrue
                 $result.Errors.Count | Should -Be 0
                 @($result.Warnings).Count | Should -Be 1
-                $result.Warnings[0] | Should -Match 'MS\.AAD\.2\.2v2 is listed in Omit Policies'
+                $result.Warnings[0] | Should -Match 'MS\.AAD\.2\.5v1 is listed in Omit Policies'
 
                 $script:syncHash.OmissionData['Aad'] = [ordered]@{ OmitPolicy = [ordered]@{} }
                 @((Invoke-RequiredFieldValidation).Warnings).Count | Should -Be 0

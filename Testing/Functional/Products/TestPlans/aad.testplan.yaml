@@ -81,10 +81,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.2.3v2
+  - PolicyId: MS.AAD.2.2v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.3v2 Not Checked
+      - TestDescription: MS.AAD.2.2v1 Not Checked
         Preconditions: []
         Postconditions: []
         IsNotChecked: true
