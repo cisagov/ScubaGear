@@ -1,5 +1,5 @@
 $UtilityModulePath = Join-Path -Path $PSScriptRoot -ChildPath "../../../PowerShell/ScubaGear/Modules/Utility/Utility.psm1" -Resolve
-Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom, Get-HttpResponseDetails
+Import-Module $UtilityModulePath -Function Get-Utf8NoBom, Set-Utf8NoBom, Get-HttpResponseDetails, Get-HttpRetryInfo
 
 function Get-FunctionalTestHeaderValue {
   param(
@@ -262,10 +262,12 @@ function Invoke-FunctionalExoRestRequest {
 
     } catch {
       $Message = $_.Exception.Message
+      $RetryInfo = Get-HttpRetryInfo -Exception $_.Exception
 
-      # Detect HTTP status codes from Invoke-FunctionalTestRestRequest exception messages
-      $StatusCode = 0
-      if ($Message -match 'status code (\d+)') {
+      # Invoke-FunctionalTestRestRequest rethrows the original web exception, so the real status code is on
+      # the response. The message match only covers the errors it throws itself ("unexpected HTTP status code 500").
+      $StatusCode = $RetryInfo.StatusCode
+      if ($StatusCode -eq 0 -and $Message -match 'status code (\d+)') {
         $StatusCode = [int]$Matches[1]
       }
 
@@ -277,17 +279,18 @@ function Invoke-FunctionalExoRestRequest {
         return $null
       }
 
-      # Retry on transient HTTP errors
-      $IsTransient = $StatusCode -in @(429, 500, 502, 503, 504)
+      # Retry on transient HTTP errors and on requests that never got a response (timeouts, dropped connections).
+      # A retried New-* that actually went through the first time fails with "already exists", which is no worse
+      # than failing on the timeout.
+      $IsTransient = $RetryInfo.IsNetworkError -or ($StatusCode -in @(429, 500, 502, 503, 504))
       if ($IsTransient -and $Attempt -lt $MaxRetries) {
         $Delay = $BaseDelaySeconds * [math]::Pow(2, $Attempt - 1)
-
-        # Honor Retry-After for 429
-        if ($StatusCode -eq 429 -and $Message -match 'Retry-After:\s*(\d+)') {
-          $Delay = [math]::Max($Delay, [int]$Matches[1])
+        if ($RetryInfo.RetryAfterSeconds -gt 0) {
+          $Delay = [math]::Max($Delay, $RetryInfo.RetryAfterSeconds)
         }
 
-        Write-Information "[EXO] $CmdletName failed with HTTP $StatusCode (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
+        $Reason = if ($RetryInfo.IsNetworkError) { "got no response ($Message)" } else { "failed with HTTP $StatusCode" }
+        Write-Information "[EXO] $CmdletName $Reason (attempt $Attempt/$MaxRetries). Retrying in ${Delay}s..." -InformationAction Continue
         Start-Sleep -Seconds $Delay
         continue
       }
