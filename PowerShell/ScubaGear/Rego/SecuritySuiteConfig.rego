@@ -1557,7 +1557,7 @@ MisconfiguredAlertPolicies :=
 AlertPolicySettingOrder := [
     "The policy must be enabled",
     "Notifications must be enabled",
-    "At least one notification recipient must be configured in NotifyUser"
+    "At least one notification recipient must be configured"
 ]
 
 NonCompliantAlertPolicyDetails contains Detail if {
