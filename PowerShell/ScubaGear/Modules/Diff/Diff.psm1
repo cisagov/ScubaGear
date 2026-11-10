@@ -162,16 +162,14 @@ $script:PolicyMigrationTargetProduct = 'SecuritySuite'
 
 # Same-product renumbering, keyed by product and then by *base* control ID on both
 # sides (old -> new). Unlike the table above, source and target are the same
-# product, so a base ID can be vacated by one policy and taken by another: the
-# sign-in risk policy MS.AAD.2.3 became MS.AAD.2.4 when the user risk policies were
-# inserted ahead of it. Entries run in the order listed, so a chain of shifts must
-# be listed highest number first; that way each old ID is moved out before the
-# policy that takes its number is moved in.
-# Derived from mappings\scuba-baseline-policy-migrations.csv.
+# product, so a base ID can be vacated by one policy and taken by another. Entries
+# run in the order listed, so a chain of shifts must be listed highest number
+# first; that way each old ID is moved out before the policy that takes its number
+# is moved in. Add a row here, matching the Old ID -> New ID row in
+# mappings\scuba-baseline-policy-migrations.csv, when a policy is renumbered
+# within its product. No policy is currently renumbered.
 $script:PolicyRenumberMap = [ordered]@{
-    'AAD' = [ordered]@{
-        'MS.AAD.2.3' = 'MS.AAD.2.4'
-    }
+    'AAD' = [ordered]@{}
 }
 
 function Get-ScubaBaseControlId {

@@ -229,7 +229,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.2.4v1
+# MS.AAD.2.3v2
 #--
 
 # If policy matches basic conditions & special conditions, the exclusions
@@ -251,9 +251,9 @@ PasswordlessSignInRiskBaseCheck(policy) if {
 
 # Exclusions are not checked against the config file when selecting candidate
 # policies so the users excluded from a policy that would otherwise meet this
-# control can still be evaluated by MS.AAD.2.5v1. Users that authenticate with
+# control can still be evaluated by MS.AAD.2.4v1. Users that authenticate with
 # a password may be excluded from this policy, those users are checked in
-# MS.AAD.2.5v1.
+# MS.AAD.2.4v1.
 PasswordlessCandidatePolicies contains CAPolicy if {
     some CAPolicy in input.conditional_access_policies
     PasswordlessSignInRiskBaseCheck(CAPolicy)
@@ -262,10 +262,10 @@ PasswordlessCandidatePolicies contains CAPolicy if {
 # Only match policies with user and group exclusions per the confile file
 PasswordlessSignInRiskEval(policy) := result if {
     checks := [
-        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
-        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
-        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
-        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.4v1")},
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.3v2")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.3v2")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.3v2")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.3v2")},
     ]
     result := CapEval(PasswordlessSignInRiskBaseCheck(policy), checks)
 }
@@ -294,7 +294,7 @@ PasswordlessSignInRiskNeedsConfigUpdate contains {
 # Pass if at least 1 policy meets all conditions & has correct
 # licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.4v1",
+    "PolicyId": "MS.AAD.2.3v2",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PasswordlessSignInRiskNames,
@@ -326,7 +326,7 @@ tests contains {
 #--
 
 #
-# MS.AAD.2.5v1
+# MS.AAD.2.4v1
 #--
 
 # If policy matches basic conditions, special conditions,
@@ -349,10 +349,10 @@ PasswordSignInRiskPolicies contains CAPolicy if {
     ###
 
     # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.5v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.5v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.5v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.5v1") == true
+    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.4v1") == true
+    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.4v1") == true
+    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.4v1") == true
+    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.4v1") == true
 }
 
 HasIncludedUsersOrGroups(CAPolicy) := true if {
@@ -366,14 +366,14 @@ PasswordSignInRiskNames contains CAPolicy.DisplayName if {
     some CAPolicy in PasswordSignInRiskPolicies
 }
 
-# When a policy meets MS.AAD.2.4v1 those policies are used, otherwise the candidate
+# When a policy meets MS.AAD.2.3v2 those policies are used, otherwise the candidate
 # policies are used so users excluded from a policy that fails only because the
 # exclusions are not in the config file are still evaluated
 PasswordlessScopePolicies := PasswordlessSignInRiskPolicies if {
     Count(PasswordlessSignInRiskPolicies) > 0
 } else := PasswordlessCandidatePolicies
 
-# Users and groups excluded from the MS.AAD.2.4v1 policy. These are
+# Users and groups excluded from the MS.AAD.2.3v2 policy. These are
 # the users that authenticate with a password.
 PasswordlessExcludedIds contains Id if {
     some CAPolicy in PasswordlessScopePolicies
@@ -415,7 +415,7 @@ PasswordSignInRiskTargetsAll := true if {
     ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
 }
 
-# Users and groups excluded from the MS.AAD.2.4v1 policy that are not
+# Users and groups excluded from the MS.AAD.2.3v2 policy that are not
 # targeted by a policy meeting this control. Users excluded from both policies
 # are not included because those exclusions are validated against the config file.
 UncoveredPasswordIds contains Id if {
@@ -430,7 +430,7 @@ PasswordSignInRiskDetails(Policies, Uncovered) := ReportDetailsArrayLicenseWarni
 } else := Details if {
     Count(Uncovered) > 0
     UncoveredMessage := concat(": ", [
-        "The following user(s) or group(s) are excluded from the MS.AAD.2.4v1 policy but not targeted by a policy that meets this requirement",
+        "The following user(s) or group(s) are excluded from the MS.AAD.2.3v2 policy but not targeted by a policy that meets this requirement",
         concat(", ", Uncovered)
     ])
     Details := concat(". ", [ReportFullDetailsArray(Policies, SignInRiskDescriptionStr), UncoveredMessage, CAPLINK])
@@ -438,14 +438,14 @@ PasswordSignInRiskDetails(Policies, Uncovered) := ReportDetailsArrayLicenseWarni
     Count(Policies) == 0
     PasswordlessCoversAllUsers
     Details := concat(". ", [
-        "No users or groups are excluded from the MS.AAD.2.4v1 policy, so a separate policy for password users is not required",
+        "No users or groups are excluded from the MS.AAD.2.3v2 policy, so a separate policy for password users is not required",
         CAPLINK
     ])
 } else := ReportDetailsArrayLicenseWarningCap(Policies, SignInRiskDescriptionStr)
 
 SignInRiskDescriptionStr := "conditional access policy(s) found that meet(s) all requirements"
 
-# True if a policy meets MS.AAD.2.4v1 and does not exclude any users or groups,
+# True if a policy meets MS.AAD.2.3v2 and does not exclude any users or groups,
 # so every user is covered by the passwordless policy
 default PasswordlessCoversAllUsers := false
 PasswordlessCoversAllUsers := true if {
@@ -454,7 +454,7 @@ PasswordlessCoversAllUsers := true if {
 }
 
 # A policy for password users is required unless every user is covered by the
-# MS.AAD.2.4v1 policy
+# MS.AAD.2.3v2 policy
 default PasswordSignInRiskRequirementMet := false
 PasswordSignInRiskRequirementMet := true if {
     Count(PasswordSignInRiskNames) > 0
@@ -464,11 +464,11 @@ PasswordSignInRiskRequirementMet := true if {
     PasswordlessCoversAllUsers
 }
 
-# Pass if all users are covered by the MS.AAD.2.4v1 policy with no exclusions,
+# Pass if all users are covered by the MS.AAD.2.3v2 policy with no exclusions,
 # otherwise pass if at least 1 policy meets all conditions & all users excluded
-# from the MS.AAD.2.4v1 policy are targeted. Requires correct licence.
+# from the MS.AAD.2.3v2 policy are targeted. Requires correct licence.
 tests contains {
-    "PolicyId": "MS.AAD.2.5v1",
+    "PolicyId": "MS.AAD.2.4v1",
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PasswordSignInRiskNames,

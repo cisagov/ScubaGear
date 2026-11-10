@@ -41,7 +41,7 @@ using module '..\..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1
             Container = $TestContainers
         }
         Filter = @{
-            Tag = @("MS.AAD.2.4v1")
+            Tag = @("MS.AAD.2.3v2")
         }
         Output = @{
             Verbosity = 'Detailed'

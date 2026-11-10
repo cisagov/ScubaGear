@@ -790,6 +790,12 @@ InModuleScope Diff {
 
     Describe -Tag 'Diff' -Name 'Policy renumber alignment' {
         BeforeAll {
+            # The shipped table lists no renumbered policy, so exercise the alignment
+            # with a fixture entry and restore the real table afterwards.
+            $script:ShippedRenumberMap = $script:PolicyRenumberMap
+            $script:PolicyRenumberMap = [ordered]@{
+                'AAD' = [ordered]@{ 'MS.AAD.2.3' = 'MS.AAD.2.4' }
+            }
             $script:NewAadSide = {
                 param($Controls)
                 # $Controls: array of @{ Id = ...; Result = ... }
@@ -818,6 +824,10 @@ InModuleScope Diff {
                     $_.'Control ID (Before)' -eq $BeforeOrAfterId -or $_.'Control ID (After)' -eq $BeforeOrAfterId
                 })
             }
+        }
+
+        AfterAll {
+            $script:PolicyRenumberMap = $script:ShippedRenumberMap
         }
 
         It 'Compares the retired MS.AAD.2.3v1 against MS.AAD.2.4v1' {
@@ -891,7 +901,9 @@ InModuleScope Diff {
             (& $FindAad $diff 'MS.AAD.2.4v1')[0].Classification | Should -Be 'RemovedPolicy'
             (& $FindAad $diff 'MS.AAD.2.3v1')[0].Classification | Should -Be 'NewPolicy'
         }
+    }
 
+    Describe -Tag 'Diff' -Name 'Shipped policy renumber table' {
         It 'Keeps every renumber entry in its own product and in agreement with the migration CSV' {
             $csvPath = Join-Path -Path $PSScriptRoot -ChildPath '../../../../mappings/scuba-baseline-policy-migrations.csv'
             $rows = Import-Csv -LiteralPath $csvPath

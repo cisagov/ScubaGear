@@ -184,15 +184,16 @@ align anything.
 A policy that kept its meaning but changed number inside its own product would
 otherwise report as `RemovedPolicy` plus an unrelated `NewPolicy`, or be compared
 against a different policy that now holds the old number. A second, same-product
-table handles this. It is also derived from the mapping CSV:
+table (`$script:PolicyRenumberMap` in `Diff.psm1`) handles this, with one row per
+renumbered policy that matches its Old ID and New ID row in the mapping CSV. No
+policy is currently renumbered, so the table is empty and nothing is aligned this
+way.
 
-| Old | New |
-|---|---|
-| `MS.AAD.2.3v1` | `MS.AAD.2.4v1` |
+For a policy listed in the table:
 
-The pair is reported exactly like a migrated pair: `Control ID (Before)` keeps the
+- The pair is reported exactly like a migrated pair: `Control ID (Before)` keeps the
 old ID, the record carries `Migrated`, `MigratedFromId`, and `MigratedFromProduct`
-(`AAD`) with a **migrated** badge, and it is classified by its result rather than
+(the policy's own product) with a **migrated** badge, and it is classified by its result rather than
 as `PolicyVersionUpdate`. Unlike a Security Suite migration, no `Migrated` stub is
 left under the old number, because the after run may carry a different policy
 there; that policy reports as `NewPolicy`. The pair is only aligned when the
