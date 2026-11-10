@@ -446,7 +446,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.2.3v2",
+        "PolicyId":  "MS.AAD.2.4v1",
         "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Medium and High Risk Sign-ins SHALL require Phishing-resistant MFA. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  true
     },
@@ -458,7 +458,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.2.4v1",
+        "PolicyId":  "MS.AAD.2.5v1",
         "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - Medium and High Risk Sign-ins SHALL require MFA for Password Users. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  true
     },

@@ -253,7 +253,7 @@
         "notes": "This setting is configured through the Entra admin center, not via Graph API. Manual validation required."
       },
       {
-        "id": "MS.AAD.2.3v2",
+        "id": "MS.AAD.2.4v1",
         "name": "Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA and reauthentication every time for passwordless users",
         "exclusionField": "CapExclusions",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
@@ -292,7 +292,7 @@
           }
         },
         "buildInstructions": {
-          "description": "Create a Conditional Access policy requiring phishing-resistant MFA and reauthentication every time for medium and high risk sign-ins. Exclude the users and groups that authenticate with a password; they are covered by MS.AAD.2.4v1",
+          "description": "Create a Conditional Access policy requiring phishing-resistant MFA and reauthentication every time for medium and high risk sign-ins. Exclude the users and groups that authenticate with a password; they are covered by MS.AAD.2.5v1",
           "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
           "apiMethodCreate": "POST",
           "payloadTemplate": {
@@ -332,10 +332,10 @@
             "conditions.users.excludeGroups"
           ]
         },
-        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. Users and groups that authenticate with a password MAY be excluded but must be targeted by a policy that meets MS.AAD.2.4v1"
+        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. Users and groups that authenticate with a password MAY be excluded but must be targeted by a policy that meets MS.AAD.2.5v1"
       },
       {
-        "id": "MS.AAD.2.4v1",
+        "id": "MS.AAD.2.5v1",
         "name": "Sign-ins detected as medium or high risk SHALL require MFA and reauthentication every time for users who authenticate with a password",
         "exclusionField": "CapExclusions",
         "apiPermissionRef": "Get-MgBetaIdentityConditionalAccessPolicy",
@@ -366,7 +366,7 @@
           }
         },
         "buildInstructions": {
-          "description": "Create a Conditional Access policy requiring MFA and reauthentication every time for medium and high risk sign-ins. Include every user and group excluded from the MS.AAD.2.3v2 policy",
+          "description": "Create a Conditional Access policy requiring MFA and reauthentication every time for medium and high risk sign-ins. Include every user and group excluded from the MS.AAD.2.4v1 policy",
           "apiResourceCreate": "/beta/identity/conditionalAccess/policies",
           "apiMethodCreate": "POST",
           "payloadTemplate": {
@@ -403,7 +403,7 @@
             "conditions.users.excludeGroups"
           ]
         },
-        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. A policy is not required when the MS.AAD.2.3v2 policy excludes no users or groups. Otherwise conditions.users.includeUsers and includeGroups must target every user and group excluded from the MS.AAD.2.3v2 policy"
+        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. A policy is not required when the MS.AAD.2.4v1 policy excludes no users or groups. Otherwise conditions.users.includeUsers and includeGroups must target every user and group excluded from the MS.AAD.2.4v1 policy"
       },
       {
         "id": "MS.AAD.3.1v1",

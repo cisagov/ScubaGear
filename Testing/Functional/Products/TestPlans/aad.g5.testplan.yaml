@@ -55,10 +55,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.2.3v2
+  - PolicyId: MS.AAD.2.4v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.3v2 Non-Compliant case - only high risk sign ins require phishing-resistant MFA
+      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - only high risk sign ins require phishing-resistant MFA
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -94,7 +94,7 @@ TestPlan:
                     Value: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.3v2 Non-Compliant case - sign in frequency is not every time
+      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - sign in frequency is not every time
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -130,7 +130,7 @@ TestPlan:
                     Value: 4
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.3v2 Compliant case - medium and high risk sign ins require phishing-resistant MFA every time
+      - TestDescription: MS.AAD.2.4v1 Compliant case - medium and high risk sign ins require phishing-resistant MFA every time
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -167,10 +167,10 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
-  - PolicyId: MS.AAD.2.4v1
+  - PolicyId: MS.AAD.2.5v1
     TestDriver: ScubaCached
     Tests:
-      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - only high risk sign ins require MFA
+      - TestDescription: MS.AAD.2.5v1 Non-Compliant case - only high risk sign ins require MFA
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -208,7 +208,7 @@ TestPlan:
                     Value: null
         Postconditions: []
         ExpectedResult: false
-      - TestDescription: MS.AAD.2.4v1 Compliant case - all users covered by MS.AAD.2.3v2 with no exclusions
+      - TestDescription: MS.AAD.2.5v1 Compliant case - all users covered by MS.AAD.2.4v1 with no exclusions
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -244,7 +244,7 @@ TestPlan:
                     Value: null
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.2.4v1 Compliant case - medium and high risk sign ins require MFA every time
+      - TestDescription: MS.AAD.2.5v1 Compliant case - medium and high risk sign ins require MFA every time
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:

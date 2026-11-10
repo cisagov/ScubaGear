@@ -215,7 +215,7 @@ Invoke-Pester -Configuration $Config
 
 AAD functional testing for specific test cases: when developing or if you are testing pull requests you may need to execute just a single baseline policy in the respective YAML test plan file. To do that you will add Pester filter tags to the PesterConfig parameter. 
 
-Use the following example execution script to run a test against AAD policy MS.AAD.2.3v2 using a service principal. This policy is only in the g5 variant test plan, so the `Variant` parameter must be set.
+Use the following example execution script to run a test against AAD policy MS.AAD.2.4v1 using a service principal. This policy is only in the g5 variant test plan, so the `Variant` parameter must be set.
 ```
 $TestContainers = @()
 
@@ -226,7 +226,7 @@ $PesterConfig = @{
 		Container = $TestContainers
 	}
   Filter = @{
-	 	Tag = @("MS.AAD.2.3v2")
+	 	Tag = @("MS.AAD.2.4v1")
 	}
   Output = @{
 		Verbosity = 'Detailed'

@@ -160,6 +160,20 @@ $script:PolicyMigrationMap = [ordered]@{
 # report.
 $script:PolicyMigrationTargetProduct = 'SecuritySuite'
 
+# Same-product renumbering, keyed by product and then by *base* control ID on both
+# sides (old -> new). Unlike the table above, source and target are the same
+# product, so a base ID can be vacated by one policy and taken by another: the
+# sign-in risk policy MS.AAD.2.3 became MS.AAD.2.4 when the user risk policies were
+# inserted ahead of it. Entries run in the order listed, so a chain of shifts must
+# be listed highest number first; that way each old ID is moved out before the
+# policy that takes its number is moved in.
+# Derived from mappings\scuba-baseline-policy-migrations.csv.
+$script:PolicyRenumberMap = [ordered]@{
+    'AAD' = [ordered]@{
+        'MS.AAD.2.3' = 'MS.AAD.2.4'
+    }
+}
+
 function Get-ScubaBaseControlId {
     <#
     .Description
@@ -750,6 +764,67 @@ function Invoke-ScubaPolicyMigrationAlignment {
     }
 }
 
+function Invoke-ScubaPolicyRenumberAlignment {
+    <#
+    .Description
+    Aligns policies that were renumbered within their own product (see
+    $script:PolicyRenumberMap) so the old-numbered policy in the before run is
+    compared against the new-numbered policy in the after run, instead of being
+    reported as RemovedPolicy alongside an unrelated NewPolicy or, worse, being
+    compared against a different policy that now holds the old number.
+
+    Operates on the per-product control maps in place: the before-side entry is
+    re-keyed under the new base ID and tagged with MigratedFromId /
+    MigratedFromProduct, so the record is badged and classified like any other
+    migrated pair (the version-suffix check is skipped). The old base ID is
+    removed from the before map rather than left as a stub, because the after run
+    may carry a different policy under that same base ID.
+
+    A pair is only aligned when the before run has the old-numbered policy, the
+    after run has the new-numbered one, and the before run does not already
+    carry the new number. A before run that already uses the new numbering
+    is compared as-is.
+    .Functionality
+    Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [System.Collections.Specialized.OrderedDictionary]
+        $BeforeMaps,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [System.Collections.Specialized.OrderedDictionary]
+        $AfterMaps
+    )
+
+    foreach ($product in @($script:PolicyRenumberMap.Keys)) {
+        if (-not $BeforeMaps.Contains($product)) { continue }
+        if (-not $AfterMaps.Contains($product)) { continue }
+
+        $productBefore = $BeforeMaps[$product]
+        $productAfter = $AfterMaps[$product]
+
+        $entries = $script:PolicyRenumberMap[$product]
+        foreach ($oldBase in @($entries.Keys)) {
+            $newBase = $entries[$oldBase]
+
+            if (-not $productBefore.Contains($oldBase)) { continue }
+            if (-not $productAfter.Contains($newBase)) { continue }
+            if ($productBefore.Contains($newBase)) { continue }
+
+            $entry = $productBefore[$oldBase]
+            Add-Member -InputObject $entry -NotePropertyName 'MigratedFromId' -NotePropertyValue $entry.FullId -Force
+            Add-Member -InputObject $entry -NotePropertyName 'MigratedFromProduct' -NotePropertyValue $product -Force
+
+            $productBefore.Remove($oldBase)
+            $productBefore[$newBase] = $entry
+        }
+    }
+}
+
 function Get-ScubaAnnotationEntry {
     <#
     .Description
@@ -893,6 +968,7 @@ function Compare-ScubaResults {
     foreach ($product in $afterProducts) { $afterMaps[$product] = Get-ScubaControlMap $After.Results.$product }
 
     Invoke-ScubaPolicyMigrationAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
+    Invoke-ScubaPolicyRenumberAlignment -BeforeMaps $beforeMaps -AfterMaps $afterMaps
 
     # Each product is compared independently and matched by name only. A product
     # present in only one file has all of its controls reported as NewPolicy (only
@@ -1307,7 +1383,7 @@ function New-ScubaDiffReport {
             # so a reader can tell the before result came from a different policy.
             $isMigratedRow = ($r.PSObject.Properties['Migrated'] -and $r.Migrated)
             if ($isMigratedRow) {
-                $idDisplay += " <span class=""migrated-badge"" title=""Aligned across the legacy to Security Suite policy migration"">migrated</span>"
+                $idDisplay += " <span class=""migrated-badge"" title=""Aligned across a policy migration or renumbering"">migrated</span>"
             }
 
             $groupDisplay = & $enc (("$($r.GroupNumber) $($r.GroupName)").Trim())
@@ -1579,6 +1655,7 @@ Export-ModuleMember -Function @(
     'Get-ScubaOrderedProducts',
     'Get-ScubaControlMap',
     'Invoke-ScubaPolicyMigrationAlignment',
+    'Invoke-ScubaPolicyRenumberAlignment',
     'Get-ScubaAnnotationEntry',
     'Get-ScubaDiffFileEncoding'
 )

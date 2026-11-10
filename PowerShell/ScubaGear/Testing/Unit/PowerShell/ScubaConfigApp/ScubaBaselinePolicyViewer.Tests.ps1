@@ -294,7 +294,7 @@ Describe 'Baseline viewer appendix navigation' {
     It 'appends appendix entries after policies without changing policy counts' {
         foreach ($header in $navigationItems) { $header.IsExpanded = $true }
         & $updateNavigationDisplay
-        @($policySelector.Items | Where-Object Type -eq 'Policy').Count | Should -Be 109
+        @($policySelector.Items | Where-Object Type -eq 'Policy').Count | Should -Be 110
         @($policySelector.Items | Where-Object Type -eq 'Appendix').Count | Should -Be 5
         $aadItems = @($policySelector.Items | Where-Object ProductKey -eq 'aad')
         $aadItems[-2].Appendix.name | Should -Be $baseline.appendices.aad[0].name
@@ -327,7 +327,7 @@ Describe 'Baseline viewer appendix navigation' {
         . $initializeNavigation
         foreach ($header in $navigationItems) { $header.IsExpanded = $true }
         & $updateNavigationDisplay
-        @($policySelector.Items | Where-Object Type -eq 'Policy').Count | Should -Be 109
+        @($policySelector.Items | Where-Object Type -eq 'Policy').Count | Should -Be 110
         @($policySelector.Items | Where-Object Type -eq 'Appendix').Count | Should -Be 0
     }
 
