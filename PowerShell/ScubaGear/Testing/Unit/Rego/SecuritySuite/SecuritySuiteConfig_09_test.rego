@@ -3,7 +3,6 @@ package securitysuite_test
 import rego.v1
 import data.securitysuite
 import data.utils.key.TestResult
-import data.utils.key.PASS
 
 #
 # Policy MS.SECURITYSUITE.9.1v1
@@ -15,7 +14,7 @@ test_OutboundSpamLimits_DefaultPolicy_Correct if {
         with input.outbound_spam_policies as [CompliantDefaultOutboundSpamPolicy]
         with input.outbound_spam_rules as []
 
-    TestResult("MS.SECURITYSUITE.9.1v1", Output, PASS, true) == true
+    TestResult("MS.SECURITYSUITE.9.1v1", Output, "Requirement met. The default outbound spam policy is compliant and there are no enabled custom outbound spam policies.", true) == true
 }
 
 # Default policy does not meet all limits
@@ -32,7 +31,7 @@ test_OutboundSpamLimits_DefaultPolicy_Incorrect_V1 if {
     TestResult(
         "MS.SECURITYSUITE.9.1v1",
         Output,
-        "Requirement not met",
+        "Requirement not met.\n\nThe default outbound spam policy is not compliant for the following reasons:\n\t- External message limit must be 500 or less",
         false
     ) == true
 }
@@ -58,7 +57,7 @@ test_OutboundSpamLimits_DefaultPolicy_Incorrect_V2 if {
     TestResult(
         "MS.SECURITYSUITE.9.1v1",
         Output,
-        "Requirement not met",
+        "Requirement not met.\n\nThe default outbound spam policy is not compliant for the following reasons:\n\t- \"Restriction placed on users who reach the message limit\" must be set to \"Restrict the user from sending mail\"",
         false
     ) == true
 }
@@ -80,7 +79,7 @@ test_OutboundSpamCopy_Disabled if {
     TestResult(
         "MS.SECURITYSUITE.9.1v1",
         Output,
-        "Requirement not met",
+        "Requirement not met.\n\nThe default outbound spam policy is not compliant for the following reasons:\n\t- \"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\" must be enabled",
         false
     ) == true
 }
@@ -99,7 +98,7 @@ test_OutboundSpamLimits_CustomPolicy_Correct if {
             "HostedOutboundSpamFilterPolicy": "Custom Policy"
         }]
 
-    TestResult("MS.SECURITYSUITE.9.1v1", Output, PASS, true) == true
+    TestResult("MS.SECURITYSUITE.9.1v1", Output, "Requirement met. The default outbound spam policy is compliant and all enabled custom outbound spam policies are compliant.", true) == true
 }
 
 # Enabled custom policy does not meet all limits
@@ -123,7 +122,7 @@ test_OutboundSpamLimits_CustomPolicy_Incorrect_V1 if {
     TestResult(
         "MS.SECURITYSUITE.9.1v1",
         Output,
-        "Requirement not met",
+        "Requirement not met.\n\nThe default outbound spam policy is compliant, but the following enabled custom outbound spam policies are not compliant: \n\t- Custom Policy",
         false
     ) == true
 }
@@ -149,7 +148,7 @@ test_OutboundSpamLimits_CustomPolicy_Incorrect_V2 if {
     TestResult(
         "MS.SECURITYSUITE.9.1v1",
         Output,
-        "Requirement not met",
+        "Requirement not met.\n\nThe default outbound spam policy is compliant, but the following enabled custom outbound spam policies are not compliant: \n\t- Custom Policy",
         false
     ) == true
 }
@@ -170,7 +169,7 @@ test_OutboundSpamAlerts_AllCorrect if {
             SuspiciousPatternsAlert
         ]
 
-    TestResult("MS.SECURITYSUITE.9.2v1", Output, PASS, true) == true
+    TestResult("MS.SECURITYSUITE.9.2v1", Output, "Requirement met. All required outbound spam alert policies are compliant.", true) == true
 }
 
 # All required alerts are not enabled
@@ -187,7 +186,7 @@ test_OutboundSpamAlerts_RestrictedSenderAlertDisabled if {
             SuspiciousPatternsAlert
         ]
 
-    ReportDetailString := "Requirement not met, the following alert policies are not compliant: User restricted from sending email"
+    ReportDetailString := "Requirement not met.\n\nThe following alert policies are non-compliant for the following reasons:\n\nUser restricted from sending email:\n\t- The policy must be enabled"
 
     TestResult(
         "MS.SECURITYSUITE.9.2v1",
@@ -212,7 +211,7 @@ test_OutboundSpamAlerts_NotificationsDisabled if {
             SuspiciousPatternsAlert
         ]
 
-    ReportDetailString := "Requirement not met, the following alert policies are not compliant: Email sending limit exceeded"
+    ReportDetailString := "Requirement not met.\n\nThe following alert policies are non-compliant for the following reasons:\n\nEmail sending limit exceeded:\n\t- Notifications must be enabled\n\t- At least one notification recipient must be configured"
 
     TestResult(
         "MS.SECURITYSUITE.9.2v1",
@@ -230,7 +229,7 @@ test_OutboundSpamAlerts_MissingPolicy if {
             EmailLimitAlert
         ]
 
-    ReportDetailString := "Requirement not met, the following alert policies are not compliant: Suspicious email sending patterns detected"
+    ReportDetailString := "Requirement not met.\n\nThe following required outbound spam alert policies are missing:\n\t- Suspicious email sending patterns detected"
 
     TestResult(
         "MS.SECURITYSUITE.9.2v1",
