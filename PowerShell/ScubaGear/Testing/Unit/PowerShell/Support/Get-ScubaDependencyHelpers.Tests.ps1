@@ -390,5 +390,40 @@ InModuleScope 'Support' {
                 $alias.ResolvedCommandName | Should -Be 'Install-ScubaDependencies'
             }
         }
+
+        Context "Install-ScubaDependencies multi-repository support (Issue #2560)" {
+            It "Should resolve latest acceptable version when multiple repositories return results" {
+                Mock Get-PSRepository { return [PSCustomObject]@{ Trusted = $true; InstallationPolicy = 'Trusted' } }
+                Mock Get-ScubaRequiredModuleList {
+                    return @(
+                        [PSCustomObject]@{
+                            ModuleName = 'powershell-yaml'
+                            ModuleVersion = [version]'0.4.2'
+                            MaximumVersion = [version]'0.4.12'
+                        }
+                    )
+                }
+                Mock Get-ScubaModuleDependencyStatus {
+                    return [PSCustomObject]@{
+                        Installed = $true
+                        VersionsInRange = @([version]'0.4.7')
+                        BestVersionToKeep = [version]'0.4.7'
+                        HighestVersion = [version]'0.4.7'
+                        VersionsAboveMaximum = @()
+                    }
+                }
+                # Simulate multiple repositories returning results (System.Object[] array)
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PSGallery' },
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PrivateGallery' }
+                    )
+                }
+                Mock Install-ScubaModule { }
+
+                # Should execute without throwing "Cannot convert System.Object[] to System.Version"
+                { Install-ScubaDependencies } | Should -Not -Throw
+            }
+        }
     }
 }

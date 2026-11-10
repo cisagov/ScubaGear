@@ -1008,7 +1008,7 @@ function Install-ScubaDependencies {
         Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
     }
     else {
-        $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
+        $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property InstallationPolicy
         if ($($Policy.InstallationPolicy) -ne "Trusted") {
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
             Write-Output "PSGallery is trusted."
@@ -1043,7 +1043,11 @@ function Install-ScubaDependencies {
 
             # Check if ANY installed version is in the acceptable range
             if ($ModuleStatus.VersionsInRange.Count -gt 0) {
-                $LatestAcceptableVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
+                $foundModules = Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion -Repository PSGallery -ErrorAction SilentlyContinue
+                if (-not $foundModules) {
+                    $foundModules = Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion -ErrorAction Stop
+                }
+                $LatestAcceptableVersion = [Version]($foundModules | Sort-Object { [version]$_.Version } -Descending | Select-Object -First 1).Version
 
                 # Best acceptable version already installed (computed by the common helper)
                 $BestInstalledVersion = $ModuleStatus.BestVersionToKeep
@@ -2817,7 +2821,8 @@ function Reset-ScubaGearDependencies {
                 $latestAcceptable = $null
                 if (-not $SkipUpdate) {
                     try {
-                        $latestAcceptable = [version](Find-Module -Name $moduleName -MinimumVersion $minVersion -MaximumVersion $maxVersion -Repository PSGallery -ErrorAction Stop).Version
+                        $foundLatest = Find-Module -Name $moduleName -MinimumVersion $minVersion -MaximumVersion $maxVersion -Repository PSGallery -ErrorAction Stop
+                        $latestAcceptable = [version]($foundLatest | Sort-Object { [version]$_.Version } -Descending | Select-Object -First 1).Version
                     }
                     catch {
                         $result.Warnings += "Could not determine the latest acceptable version for ${moduleName}: $($_.Exception.Message)"
