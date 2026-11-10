@@ -357,13 +357,13 @@ TargetsPrimaryExemptions(policy) if {
 # The policy explicitly includes every exempted user, group, and guest user type
 TargetsPrimaryExemptions(policy) if {
     IncludedUsers := ConvertToSet(object.get(policy.Conditions.Users, "IncludeUsers", []))
-    IncludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "IncludeGroups", []))
     count(PrimaryExemptUsers - IncludedUsers) == 0
+    IncludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "IncludeGroups", []))
     count(PrimaryExemptGroups - IncludedGroups) == 0
     IncludesAllPrimaryExemptGuestTypes(policy)
 }
 
-IncludesAllPrimaryExemptGuestTypes(policy) if {
+IncludesAllPrimaryExemptGuestTypes(_) if {
     count(PrimaryExemptGuestTypes) == 0
 }
 
@@ -377,8 +377,8 @@ IncludesAllPrimaryExemptGuestTypes(policy) if {
 # The policy must not exclude any of the users or groups that are exempted from MS.AAD.2.1v2
 ExcludesNoPrimaryExemptions(policy) if {
     ExcludedUsers := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeUsers", []))
-    ExcludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeGroups", []))
     count(PrimaryExemptUsers & ExcludedUsers) == 0
+    ExcludedGroups := ConvertToSet(object.get(policy.Conditions.Users, "ExcludeGroups", []))
     count(PrimaryExemptGroups & ExcludedGroups) == 0
 }
 
