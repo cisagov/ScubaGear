@@ -978,6 +978,7 @@ function Get-ScubaGearAppPermission {
     }
 
     if($ProductNames -contains '*'){
+        # Expand to implemented products only
         $ProductNames = @([ScubaConfig]::GetSupportedProducts())
     }
 
@@ -1348,6 +1349,7 @@ function Get-ScubaGearAppPermission {
             $SPRoleAssignment.RoleName
         }
     )
+    # Keep the result as an array so Count checks also work for one role in Windows PowerShell 5.1.
     $ExtraRoleAssignments = @(
         if ($SPRoleAssignment.PSObject.Properties['ExtraRoles'] -and $SPRoleAssignment.ExtraRoles -ne $false) {
             $SPRoleAssignment.ExtraRoles
@@ -1610,6 +1612,7 @@ function Set-ScubaGearAppPermission {
         $delegatedPermissions = $InputObject.DelegatedPermissions
         $CurrentDelegatedGrants = $InputObject.CurrentDelegatedGrants
         $MissingRoles = $InputObject.MissingRoles
+        # Keep the result as an array so Count checks also work for one role in Windows PowerShell 5.1.
         $DetectedExtraRoles = @(
             if ($InputObject.PSObject.Properties['ExtraRoles'] -and $InputObject.ExtraRoles -ne $false) {
                 $InputObject.ExtraRoles
@@ -1644,6 +1647,7 @@ function Set-ScubaGearAppPermission {
             if (-not $InputObject.ProductNames -or @($InputObject.ProductNames).Count -eq 0) {
                 Write-Warning "Cannot determine required directory roles without ProductNames; skipping extra-role removal."
             } else {
+                # Recheck against this run's products before removing any reported extra role.
                 $RequiredRoleNames = @(Get-ScubaGearServicePrincipalRole -Product $InputObject.ProductNames -Environment $M365Environment)
                 $RoleAssignmentsToRemove = @(
                     $DetectedExtraRoles | Where-Object {
@@ -2496,6 +2500,7 @@ function Get-ServicePrincipalMemberGroupIds {
     }
 
     $MatchedGroupIds = @()
+    # Graph checkMemberGroups accepts at most 20 group IDs per request.
     for ($Offset = 0; $Offset -lt $UniqueGroupIds.Count; $Offset += 20) {
         $BatchSize = [Math]::Min(20, $UniqueGroupIds.Count - $Offset)
         $GroupIdBatch = @($UniqueGroupIds[$Offset..($Offset + $BatchSize - 1)])
@@ -2610,6 +2615,7 @@ function Get-PowerBIAppRegistrationState {
             if ($gid) { [string]$gid }
         })
 
+        # checkMemberGroups is transitive, so distinguish nested membership from direct group membership below.
         # Check membership using checkMemberGroups API
         if ($AllowedGroupIds.Count -gt 0) {
             try {
@@ -2652,6 +2658,7 @@ function Get-PowerBIAppRegistrationState {
 
         return [PSCustomObject]@{
             PowerBIRegistered = [bool]($SettingEnabled -and $HasGroupMembership)
+            # A failed check is unknown, not proof that the service principal is not a member.
             GroupMembership   = if ($HasGroupMembership) { $true } elseif ($MembershipCheckFailed) { $null } else { $false }
         }
     }
@@ -2804,16 +2811,25 @@ function Set-PowerBIAppRegistration {
                 return
             }
 
-            $MatchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
-                -GroupIds $AllowedGroupIds -M365Environment $M365Environment)
-
             $DirectMemberships = @()
+            $LiveAllowedGroupIds = @()
             foreach ($grp in $ExistingGroups) {
                 $groupId = if ($grp.graphId) { $grp.graphId } else { $grp.id }
                 if ([string]::IsNullOrEmpty($groupId)) { continue }
-                if (@($DirectMemberships | ForEach-Object { $_.GroupId }) -contains [string]$groupId) { continue }
+                if ($LiveAllowedGroupIds -contains [string]$groupId) { continue }
 
-                $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $groupId
+                try {
+                    $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $groupId
+                } catch {
+                    if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) {
+                        $groupName = if ($grp.name) { $grp.name } elseif ($grp.displayName) { $grp.displayName } else { $groupId }
+                        Write-Warning "Power BI allowed group '$groupName' ($groupId) was not found in Microsoft Entra ID. Skipping it during service principal removal; the tenant-setting entry was not changed."
+                        continue
+                    }
+                    throw "Unable to inspect Power BI allowed group '$groupId' during removal: $($_.Exception.Message)"
+                }
+
+                $LiveAllowedGroupIds += [string]$groupId
                 $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
                 $servicePrincipalMember = $members | Where-Object {
                     ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID)
@@ -2827,6 +2843,15 @@ function Set-PowerBIAppRegistration {
                 }
             }
 
+            if ($LiveAllowedGroupIds.Count -eq 0) {
+                Write-Verbose "No live allowed Power BI security groups were found."
+                return
+            }
+
+            $MatchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
+                -GroupIds $LiveAllowedGroupIds -M365Environment $M365Environment)
+
+            # The transitive check finds nested memberships; only direct memberships can be removed here.
             $DirectGroupIds = @($DirectMemberships | ForEach-Object { $_.GroupId })
             $IndirectGroupIds = @($MatchedGroupIds | Where-Object { $DirectGroupIds -notcontains $_ })
             if ($IndirectGroupIds.Count -gt 0) {
@@ -2848,6 +2873,7 @@ function Set-PowerBIAppRegistration {
                         throw "Unable to resolve the group-member removal endpoint for environment '$M365Environment'."
                     }
                     $deleteUri = $deleteUri.Replace('{memberId}', $ServicePrincipalID)
+                    # Without /$ref, Graph may delete the directory object instead of only its group membership.
                     if (-not [System.Uri]::IsWellFormedUriString($deleteUri, [System.UriKind]::Absolute) -or
                         -not $deleteUri.EndsWith('/$ref')) {
                         throw 'The group-member removal endpoint must be an absolute URI ending in /$ref.'
@@ -2869,7 +2895,7 @@ function Set-PowerBIAppRegistration {
             }
 
             $RemainingGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
-                -GroupIds $AllowedGroupIds -M365Environment $M365Environment)
+                -GroupIds $LiveAllowedGroupIds -M365Environment $M365Environment)
             if ($RemainingGroupIds.Count -gt 0) {
                 throw "Service principal '$AppID' is still included in Power BI allowed group(s) '$($RemainingGroupIds -join ', ')' after removing direct memberships. Check for nested group membership and retry."
             }
@@ -2924,6 +2950,7 @@ function Set-PowerBIAppRegistration {
                         if ($settingEnabled -and $staleGroups.Count -eq 0) { break }
                     }
                 } catch {
+                    # Only a 404 identifies a missing group; other failures must not be treated as stale references.
                     if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) {
                         $missingGroupName = if ($grp.name) { $grp.name } elseif ($grp.displayName) { $grp.displayName } else { $grpId }
                         $staleGroups += [PSCustomObject]@{ Id = [string]$grpId; Name = $missingGroupName }
@@ -2943,6 +2970,7 @@ function Set-PowerBIAppRegistration {
         if ($staleGroups.Count -gt 0) {
             $staleGroupDescriptions = ($staleGroups | ForEach-Object { "'$($_.Name)' ($($_.Id))" } | Select-Object -Unique) -join ', '
             if (-not $WhatIfPreference) {
+                # Stale-reference cleanup changes tenant settings, so even -Force cannot approve it implicitly.
                 if ($Force -or -not [Environment]::UserInteractive) {
                     throw "Removing stale Power BI group references requires interactive confirmation. Remove $staleGroupDescriptions from the Power BI tenant setting manually, or rerun setup interactively."
                 }
@@ -2957,6 +2985,7 @@ function Set-PowerBIAppRegistration {
                 } until ($cleanupChoice -match '^(y|yes)$')
             }
             $staleGroupIds = @($staleGroups | Select-Object -ExpandProperty Id -Unique)
+            # Remove by object ID so a different valid group with the same display name is preserved.
             $ExistingGroups = @($ExistingGroups | Where-Object {
                 $groupId = if ($_.graphId) { $_.graphId } else { $_.id }
                 [string]$groupId -notin $staleGroupIds
@@ -2969,14 +2998,20 @@ function Set-PowerBIAppRegistration {
         $targetGroupName = $null
 
         # Check if the dedicated $GroupName already exists in the selectable groups
-        $existingDedicatedGroupIndex = -1
+        $existingDedicatedGroupIndexes = @()
+        $existingDedicatedGroupIds = @()
         for ($i = 0; $i -lt $selectableGroups.Count; $i++) {
             $g = $selectableGroups[$i]
             $gName = if ($g.name) { $g.name } else { $g.displayName }
-            if ($gName -eq $GroupName) {
-                $existingDedicatedGroupIndex = $i
-                break
+            $gId = if ($g.graphId) { $g.graphId } else { $g.id }
+            if ($gName -eq $GroupName -and $gId -and $gId -notin $existingDedicatedGroupIds) {
+                $existingDedicatedGroupIndexes += $i
+                $existingDedicatedGroupIds += [string]$gId
             }
+        }
+
+        if ($existingDedicatedGroupIds.Count -gt 1 -and ($Force -or -not [Environment]::UserInteractive)) {
+            throw "Multiple allowed Power BI groups are named '$GroupName' (IDs: $($existingDedicatedGroupIds -join ', ')). Rerun interactively to select a group."
         }
 
         if ($selectableGroups.Count -gt 0 -and -not $Force -and [Environment]::UserInteractive) {
@@ -2989,13 +3024,27 @@ function Set-PowerBIAppRegistration {
                 Write-Information "  [$($i + 1)] $gName (ID: $gId)" -InformationAction Continue
             }
 
-            if ($existingDedicatedGroupIndex -ge 0) {
-                # Dedicated group already in the allowed list: only choose among existing groups, default to the dedicated group
-                $defaultIndex = $existingDedicatedGroupIndex + 1
+            if ($existingDedicatedGroupIndexes.Count -gt 0) {
+                # Require an explicit selection when duplicate dedicated-group names are already allowed.
                 Write-Information "" -InformationAction Continue
-                $choice = Read-Host "Select an option [1-$($selectableGroups.Count)] (Default: $defaultIndex)"
-                if ([string]::IsNullOrWhiteSpace($choice)) {
-                    $choice = "$defaultIndex"
+                if ($existingDedicatedGroupIds.Count -gt 1) {
+                    Write-Information "Multiple allowed groups are named '$GroupName'; select using the displayed object IDs." -InformationAction Continue
+                    do {
+                        $choice = Read-Host "Select an option [1-$($selectableGroups.Count)] (required; C to cancel)"
+                        if ($choice -match '^[cC]$') {
+                            throw "Power BI group selection was cancelled."
+                        }
+                        $choiceIndex = 0
+                        $validChoice = [int]::TryParse($choice, [ref]$choiceIndex) -and $choiceIndex -ge 1 -and $choiceIndex -le $selectableGroups.Count
+                        if (-not $validChoice) { Write-Warning "Enter a number from 1 to $($selectableGroups.Count), or C to cancel." }
+                    } until ($validChoice)
+                } else {
+                    # A unique dedicated group remains the default selection.
+                    $defaultIndex = $existingDedicatedGroupIndexes[0] + 1
+                    $choice = Read-Host "Select an option [1-$($selectableGroups.Count)] (Default: $defaultIndex)"
+                    if ([string]::IsNullOrWhiteSpace($choice)) {
+                        $choice = "$defaultIndex"
+                    }
                 }
 
                 if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $selectableGroups.Count) {
@@ -3026,8 +3075,8 @@ function Set-PowerBIAppRegistration {
 
         # If not selected via prompt (or in non-interactive/force mode)
         if (-not $isExistingGroupSelected) {
-            if ($existingDedicatedGroupIndex -ge 0) {
-                $chosenGroup = $selectableGroups[$existingDedicatedGroupIndex]
+            if ($existingDedicatedGroupIndexes.Count -gt 0) {
+                $chosenGroup = $selectableGroups[$existingDedicatedGroupIndexes[0]]
                 $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
                 $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { $GroupName }
                 $isExistingGroupSelected = $true
@@ -3076,11 +3125,36 @@ function Set-PowerBIAppRegistration {
             }
             else {
                 # Find or create dedicated group in Entra
-                $group = (Invoke-GraphDirectly -Commandlet Get-MgBetaGroup -M365Environment $M365Environment -queryParams @{
+                $matchingGroups = @((Invoke-GraphDirectly -Commandlet Get-MgBetaGroup -M365Environment $M365Environment -queryParams @{
                     '$filter' = "displayName eq '$GroupName'"
-                }).Value
+                }).Value)
 
-                if (-not $group) {
+                if ($matchingGroups.Count -gt 1) {
+                    $matchingGroupIds = @($matchingGroups | ForEach-Object { if ($_.Id) { [string]$_.Id } else { [string]$_.id } })
+                    if ($Force -or -not [Environment]::UserInteractive) {
+                        throw "Multiple Entra groups are named '$GroupName' (IDs: $($matchingGroupIds -join ', ')). Rerun interactively to select a group."
+                    }
+
+                    Write-Information "Multiple Entra groups are named '$GroupName':" -InformationAction Continue
+                    for ($i = 0; $i -lt $matchingGroups.Count; $i++) {
+                        $matchId = if ($matchingGroups[$i].Id) { $matchingGroups[$i].Id } else { $matchingGroups[$i].id }
+                        Write-Information "  [$($i + 1)] ID: $matchId" -InformationAction Continue
+                    }
+                    do {
+                        $choice = Read-Host "Select a group [1-$($matchingGroups.Count)], or C to cancel"
+                        if ($choice -match '^[cC]$') {
+                            throw "Power BI group selection was cancelled."
+                        }
+                        $choiceIndex = 0
+                        $validChoice = [int]::TryParse($choice, [ref]$choiceIndex) -and $choiceIndex -ge 1 -and $choiceIndex -le $matchingGroups.Count
+                        if (-not $validChoice) { Write-Warning "Enter a number from 1 to $($matchingGroups.Count), or C to cancel." }
+                    } until ($validChoice)
+                    $group = $matchingGroups[$choiceIndex - 1]
+                } elseif ($matchingGroups.Count -eq 1) {
+                    $group = $matchingGroups[0]
+                }
+
+                if (-not $matchingGroups.Count) {
                     Write-Verbose "Creating Entra security group '$GroupName'"
                     $groupBody = @{
                         displayName     = $GroupName
@@ -3143,13 +3217,34 @@ function Set-PowerBIAppRegistration {
                     enabled               = $true
                     enabledSecurityGroups = @($groupsToConfigure)
                 }
+                # Preserve existing optional fields, including explicit $false values, in the tenant-setting update.
                 foreach ($propertyName in @('excludedSecurityGroups', 'properties', 'delegateToCapacity', 'delegateToDomain', 'delegateToWorkspace')) {
                     if ($ReadAdminAPISetting -and $ReadAdminAPISetting.PSObject.Properties[$propertyName] -and $null -ne $ReadAdminAPISetting.$propertyName) {
                         $Body[$propertyName] = $ReadAdminAPISetting.$propertyName
                     }
                 }
                 $jsonBody = $Body | ConvertTo-Json -Depth 10
-                $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method "POST" -Endpoint $Endpoint -Body $jsonBody
+                try {
+                    $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method "POST" -Endpoint $Endpoint -Body $jsonBody
+                }
+                catch {
+                    # PS 5.1 may omit ErrorDetails; the error-code header survives response-body logging.
+                    $ResponseHeaders = $_.Exception.Response.Headers
+                    $ResponseErrorCode = if ($ResponseHeaders -is [System.Net.WebHeaderCollection]) {
+                        $ResponseHeaders['x-ms-public-api-error-code']
+                    } else {
+                        $ResponseHeaders | Where-Object { $_.Key -eq 'x-ms-public-api-error-code' } | ForEach-Object { $_.Value }
+                    }
+                    if ($M365Environment -eq 'gcchigh' -and
+                        ($_.ErrorDetails.Message -match '"errorCode"\s*:\s*"FeatureNotAvailable"' -or
+                         @($ResponseErrorCode) -contains 'FeatureNotAvailable')) {
+                        $manualCleanup = if ($staleGroups.Count -gt 0) {
+                            " Remove stale allowed-group reference(s) $staleGroupDescriptions from the Power BI tenant setting."
+                        } else { "" }
+                        Write-Warning "Power BI tenant-setting update returned 'FeatureNotAvailable' in GCC High. In the Power BI admin portal (Tenant settings > Admin API settings), enable 'Service principals can access read-only admin APIs' and include security group '$targetGroupName' ($targetGroupId) in the allowed security groups.$manualCleanup Then run Get-ScubaGearAppPermission to verify access."
+                    }
+                    throw
+                }
                 Write-Output "Successfully updated Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs' with group '$targetGroupName'."
             }
         }
@@ -3255,6 +3350,7 @@ function New-ScubaGearServicePrincipal {
     Try {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
+            # Expand to implemented products only
             $ProductNames = @([ScubaConfig]::GetSupportedProducts())
         }
 
