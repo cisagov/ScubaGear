@@ -28,6 +28,28 @@ TestPlan:
         Postconditions: []
         ExpectedResult: true
 
+  - PolicyId: MS.TEAMS.1.3v1
+    TestDriver: RunScuba
+    Tests:
+      - TestDescription: MS.TEAMS.1.3v1 Non-compliant - AutoAdmittedUsers = Everyone
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AllowPSTNUsersToBypassLobby = $false }
+          - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AutoAdmittedUsers = "Everyone" }
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.3v1 Non-compliant - AllowPSTNUsersToBypassLobby = true
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AllowPSTNUsersToBypassLobby = $true }
+          - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AutoAdmittedUsers = "EveryoneInCompany" }
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.TEAMS.1.3v1 Compliant - dial-in users cannot bypass the lobby and not everyone is auto admitted
+        Preconditions:
+          - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AllowPSTNUsersToBypassLobby = $false }
+          - Command: Set-CsTeamsMeetingPolicyRest -Identity Global -Settings @{ AutoAdmittedUsers = "EveryoneInCompany" }
+        Postconditions: []
+        ExpectedResult: true
+
   - PolicyId: MS.TEAMS.1.4v1
     TestDriver: RunScuba
     Tests:
