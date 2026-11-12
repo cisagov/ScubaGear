@@ -54,6 +54,10 @@ InModuleScope Connection {
                     }
                 }
             }
+            function Resolve-ScubaOrganization {throw 'this will be mocked'}
+            Mock Resolve-ScubaOrganization -MockWith {
+                return ,@((Invoke-GraphDirectly -Commandlet 'Get-MgBetaOrganization').Value)
+            }
             function Get-MsalAccessToken {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
                 param($Scope, $ClientId, $Tenant, $M365Environment, $CertificateThumbprint, $AppID)

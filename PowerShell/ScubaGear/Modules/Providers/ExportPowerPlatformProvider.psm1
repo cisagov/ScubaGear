@@ -1,4 +1,4 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable, Invoke-ScubaRestMethod
 
 function Export-PowerPlatformProvider {
     <#
@@ -30,7 +30,7 @@ function Export-PowerPlatformProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "PowerPlatformRestHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    $TenantDetails = $Tracker.TryCommand("Get-MgBetaOrganization", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
+    $TenantDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
     $TenantId = if ($TenantDetails.Id) { $TenantDetails.Id } else { "" }
 
     $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
@@ -60,7 +60,7 @@ function Export-PowerPlatformProvider {
     $PowerPlatformSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerPlatformUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
-    # tenant_id added for testing purposes
+    # tenant_id is used by MS.POWERPLATFORM.2.1v1
     # Note the spacing and the last comma in the json is important
     $json = @"
     "tenant_id": "$TenantID",

@@ -322,6 +322,52 @@ function Invoke-GraphDirectly {
     }
 }
 
+function Resolve-ScubaOrganization {
+    <#
+    .SYNOPSIS
+    Returns the tenant's organization record (GET /beta/organization), calling Microsoft Graph at most once per Graph session.
+
+    .Description
+    Connection, the AAD and Power Platform providers, and the risky permissions helpers all need the
+    organization record. The first call reads it through Invoke-GraphDirectly and caches it on the shared
+    Graph session ($Global:ScubaGearState.Session.Organization); later calls return the cached record.
+    Connect-GraphHelper replaces the session on every sign-in and Disconnect-ScubaGraph clears it, so a
+    cached record never outlives the tenant connection it was read from.
+
+    The record is returned in the same shape as (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization).Value.
+
+    .Parameter M365Environment
+    The M365 environment used to resolve the Graph endpoint for the first, uncached call.
+
+    .Functionality
+    Internal
+    #>
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Organization is cached on the cross-module MSAL session singleton')]
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $M365Environment
+    )
+
+    $Session = $Global:ScubaGearState.Session
+    if (-not $Session) {
+        throw 'Microsoft Graph is not connected. Call Connect-GraphHelper first.'
+    }
+    if ($null -ne $Session.Organization) {
+        Write-Debug "Using cached organization record from the Graph session"
+        return ,$Session.Organization
+    }
+
+    $Organization = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
+    if ($null -eq $Organization -or @($Organization).Count -eq 0) {
+        throw 'Microsoft Graph returned no organization record for the connected tenant.'
+    }
+    $Session.Organization = $Organization
+    return ,$Organization
+}
+
 Function ConvertFrom-GraphHashtable {
     <#
     .SYNOPSIS
@@ -1498,6 +1544,7 @@ Export-ModuleMember -Function @(
     'Get-Utf8NoBom',
     'Set-Utf8NoBom',
     'Invoke-GraphDirectly',
+    'Resolve-ScubaOrganization',
     'ConvertFrom-GraphHashtable',
     'Invoke-GraphBatchRequest',
     'Invoke-ScubaRestMethod',

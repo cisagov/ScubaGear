@@ -60,13 +60,11 @@ InModuleScope AADRiskyPermissionsHelper {
                     }
                 }
             } -ModuleName AADRiskyPermissionsHelper
-            Mock Invoke-GraphDirectly {
-                return @{
-                    "Value" = @{
-                        "Id" = "00000000-0000-0000-0000-000000000000"
-                    }
-                }
-            } -ParameterFilter { $Commandlet -eq "Get-MgBetaOrganization" -and $M365Environment -eq "gcc" } -ModuleName AADRiskyPermissionsHelper
+            Mock Resolve-ScubaOrganization {
+                return ,@([pscustomobject]@{
+                    "Id" = "00000000-0000-0000-0000-000000000000"
+                })
+            } -ParameterFilter { $M365Environment -eq "gcc" } -ModuleName AADRiskyPermissionsHelper
             Mock Invoke-GraphDirectly {
                 return $MockResourcePermissionCache
             }

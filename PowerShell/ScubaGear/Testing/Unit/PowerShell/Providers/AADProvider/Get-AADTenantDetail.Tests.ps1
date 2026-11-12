@@ -3,23 +3,21 @@ Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "$($ProviderPath)/Export
 
 InModuleScope ExportAADProvider {
     BeforeAll {
-        Mock Invoke-GraphDirectly {
-            return [pscustomobject]@{
-                Value = @(
-                    [pscustomobject]@{
-                        DisplayName = "DisplayName";
-                        Id = "TenantId";
-                        MobileDeviceManagementAuthority = $null;
-                        VerifiedDomains = @(
-                            [pscustomobject]@{
-                                IsInitial = $true;
-                                Name = "DomainName";
-                            }
-                        )
-                    }
-                )
-            }
-        } -ParameterFilter { $commandlet -eq "Get-MgBetaOrganization" -or $Uri -match "/organization" } -ModuleName ExportAADProvider
+        Mock Resolve-ScubaOrganization {
+            return ,@(
+                [pscustomobject]@{
+                    DisplayName = "DisplayName";
+                    Id = "TenantId";
+                    MobileDeviceManagementAuthority = $null;
+                    VerifiedDomains = @(
+                        [pscustomobject]@{
+                            IsInitial = $true;
+                            Name = "DomainName";
+                        }
+                    )
+                }
+            )
+        } -ModuleName ExportAADProvider
 
         function Test-SCuBAValidJson {
             param (
@@ -44,6 +42,19 @@ InModuleScope ExportAADProvider {
             $TenantDetails.DisplayName | Should -Be "DisplayName"
             $TenantDetails.DomainName | Should -Be "DomainName"
             $TenantDetails.TenantId | Should -Be "TenantId"
+        }
+
+        It "reads the organization through the session cache instead of calling Graph directly" {
+            Mock Invoke-GraphDirectly {} -ModuleName ExportAADProvider
+            $null = Get-AADTenantDetail -M365Environment Commercial
+
+            Should -Invoke Resolve-ScubaOrganization -ModuleName ExportAADProvider -Times 1 -Exactly
+            Should -Invoke Invoke-GraphDirectly -ModuleName ExportAADProvider -Times 0 -Exactly
+        }
+
+        It "keeps AADAdditionalData as an array of organization records" {
+            $Json = Get-AADTenantDetail -M365Environment Commercial
+            $Json | Should -Match '"AADAdditionalData":\s*\['
         }
     }
 }
