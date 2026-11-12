@@ -37,6 +37,10 @@ The checklist below is used by the development team when it prepares a new relea
 - [ ] Check and update copyright dates in [manifest](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/ScubaGear.psd1) as needed
 - [ ] If baselines changed, update `baseline_version` in [Orchestrator module](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Modules/Orchestrator.psm1)
 - [ ] Update and redact the sample report using the redaction tool and manual review
+- [ ] If the sample report was updated or the `Invoke-SCuBADiff` logic changed, decide as a team whether to regenerate the [sample diff output](https://github.com/cisagov/ScubaGear/tree/main/PowerShell/ScubaGear/Sample-Reports/DiffReports)
+  - Agree on the before file: keep it pinned to the current baseline (the v1.6.0 sample report), or move it forward to the previous release's sample report
+  - The after file is this release's sample report
+  - If regenerating, follow the steps in the sample diff [README](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/Sample-Reports/DiffReports/README.md) and update its source files, generation details, and classification summary to match the new output
 - [ ] Check README for any necessary changes and documentation updates as needed
 - [ ] Build initial release candidate by manually triggering `Build and Sign Release` action with expected release name (vX.X.X) and release version (X.X.X) based on semantic versioning
 - [ ] Conduct automated release testing of each baseline
