@@ -373,16 +373,23 @@ PasswordlessScopePolicies := PasswordlessSignInRiskPolicies if {
     Count(PasswordlessSignInRiskPolicies) > 0
 } else := PasswordlessCandidatePolicies
 
-# Users and groups excluded from the MS.AAD.2.3v2 policy. These are
-# the users that authenticate with a password.
-PasswordlessExcludedIds contains Id if {
-    some CAPolicy in PasswordlessScopePolicies
+# Users and groups excluded by a policy
+ExcludedUserAndGroupIds(CAPolicy) := {Id |
     some Id in CAPolicy.Conditions.Users.ExcludeUsers
+} | {Id |
+    some Id in CAPolicy.Conditions.Users.ExcludeGroups
 }
 
+# Users and groups excluded from the MS.AAD.2.3v2 policy. These are
+# the users that authenticate with a password. When more than one policy is
+# in scope, an ID is only excluded if every one of those policies excludes it,
+# otherwise another policy still covers that user or group.
 PasswordlessExcludedIds contains Id if {
     some CAPolicy in PasswordlessScopePolicies
-    some Id in CAPolicy.Conditions.Users.ExcludeGroups
+    some Id in ExcludedUserAndGroupIds(CAPolicy)
+    every OtherPolicy in PasswordlessScopePolicies {
+        Id in ExcludedUserAndGroupIds(OtherPolicy)
+    }
 }
 
 # Users and groups excluded from a policy that meets this control
@@ -435,6 +442,14 @@ PasswordSignInRiskDetails(Policies, Uncovered) := ReportDetailsArrayLicenseWarni
     ])
     Details := concat(". ", [ReportFullDetailsArray(Policies, SignInRiskDescriptionStr), UncoveredMessage, CAPLINK])
 } else := Details if {
+    Count(Policies) > 0
+    Count(PasswordlessScopePolicies) == 0
+    Details := concat(". ", [
+        ReportFullDetailsArray(Policies, SignInRiskDescriptionStr),
+        "No enabled policy that meets the MS.AAD.2.3v2 requirements was found, so the users and groups that must be targeted by this policy cannot be determined",
+        CAPLINK
+    ])
+} else := Details if {
     Count(Policies) == 0
     PasswordlessCoversAllUsers
     Details := concat(". ", [
@@ -454,9 +469,11 @@ PasswordlessCoversAllUsers := true if {
 }
 
 # A policy for password users is required unless every user is covered by the
-# MS.AAD.2.3v2 policy
+# MS.AAD.2.3v2 policy. Without an enabled MS.AAD.2.3v2 policy there is no way to
+# know which users are excluded from it, so this control cannot be met.
 default PasswordSignInRiskRequirementMet := false
 PasswordSignInRiskRequirementMet := true if {
+    Count(PasswordlessScopePolicies) > 0
     Count(PasswordSignInRiskNames) > 0
 }
 
@@ -466,7 +483,8 @@ PasswordSignInRiskRequirementMet := true if {
 
 # Pass if all users are covered by the MS.AAD.2.3v2 policy with no exclusions,
 # otherwise pass if at least 1 policy meets all conditions & all users excluded
-# from the MS.AAD.2.3v2 policy are targeted. Requires correct licence.
+# from the MS.AAD.2.3v2 policy are targeted. Fails if no enabled MS.AAD.2.3v2
+# policy exists. Requires correct licence.
 tests contains {
     "PolicyId": "MS.AAD.2.4v1",
     "Criticality": "Shall",

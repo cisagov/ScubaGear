@@ -403,7 +403,7 @@
             "conditions.users.excludeGroups"
           ]
         },
-        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. A policy is not required when the MS.AAD.2.3v2 policy excludes no users or groups. Otherwise conditions.users.includeUsers and includeGroups must target every user and group excluded from the MS.AAD.2.3v2 policy"
+        "notes": "Requires Microsoft Entra ID P2 license for sign-in risk detection. Requires an enabled policy that meets MS.AAD.2.3v2; without one the control fails. A policy is not required when every enabled MS.AAD.2.3v2 policy excludes no users or groups. Otherwise conditions.users.includeUsers and includeGroups must target every user and group excluded from all of the MS.AAD.2.3v2 policies"
       },
       {
         "id": "MS.AAD.3.1v1",

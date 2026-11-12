@@ -244,7 +244,7 @@ TestPlan:
                     Value: null
         Postconditions: []
         ExpectedResult: true
-      - TestDescription: MS.AAD.2.4v1 Compliant case - medium and high risk sign ins require MFA every time
+      - TestDescription: MS.AAD.2.4v1 Non-Compliant case - MFA policy exists but no enabled MS.AAD.2.3v2 policy exists
         Preconditions:
           - Command: UpdateCachedConditionalAccessPolicyByName
             Splat:
@@ -281,7 +281,7 @@ TestPlan:
                     Type: null
                     Value: null
         Postconditions: []
-        ExpectedResult: true
+        ExpectedResult: false
 
   - PolicyId: MS.AAD.7.4v1
     TestDriver: ScubaCached

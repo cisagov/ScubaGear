@@ -1028,7 +1028,7 @@ test_PasswordSignInRisk_BuiltInMFA_Correct if {
                 [{"op": "replace", "path": "GrantControls/BuiltInControls", "value": ["mfa"]},
                 {"op": "replace", "path": "GrantControls/AuthenticationStrength", "value": null}])
 
-    Output := aad.tests with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [SignInRiskPasswordless, CAP]
                         with input.service_plans as ServicePlans
 
     TestResult("MS.AAD.2.4v1", Output, SignInRiskPassedStr("Password Policy"), true) == true
@@ -1038,7 +1038,7 @@ test_PasswordSignInRisk_ExemptExclusions_Correct if {
     CAP := json.patch(SignInRiskPassword,
                 [{"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": [SignInRiskGroupB]}])
 
-    Output := aad.tests with input.conditional_access_policies as [CAP]
+    Output := aad.tests with input.conditional_access_policies as [SignInRiskPasswordless, CAP]
                         with input.service_plans as ServicePlans
                         with input.scuba_config.Aad["MS.AAD.2.4v1"] as ScubaConfig
                         with input.scuba_config.Aad["MS.AAD.2.4v1"].CapExclusions.Groups as [SignInRiskGroupB]
@@ -1156,6 +1156,78 @@ test_PasswordSignInRisk_PasswordlessPolicyInvalid_Incorrect if {
                         with input.service_plans as ServicePlans
 
     TestResult("MS.AAD.2.4v1", Output, SignInRiskFailedStr, false) == true
+}
+
+SignInRiskNoPasswordlessStr := concat("", [
+    "1 conditional access policy(s) found that meet(s) all requirements:<br/>Password Policy. ",
+    "No enabled policy that meets the MS.AAD.2.3v2 requirements was found, so the users and groups ",
+    "that must be targeted by this policy cannot be determined. <a href='#caps'>View all CA policies</a>"
+])
+
+# Without an MS.AAD.2.3v2 policy there are no exclusions to check, a password policy alone is not enough
+test_PasswordSignInRisk_NoPasswordlessPolicy_Incorrect if {
+    PasswordCAP := json.patch(SignInRiskPassword,
+                [{"op": "replace", "path": "Conditions/Users/IncludeGroups", "value": [SignInRiskGroupB]}])
+
+    Output := aad.tests with input.conditional_access_policies as [PasswordCAP]
+                        with input.service_plans as ServicePlans
+
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskFailedStr, false) == true
+    TestResult("MS.AAD.2.4v1", Output, SignInRiskNoPasswordlessStr, false) == true
+}
+
+# A report-only MS.AAD.2.3v2 policy does not enforce anything, so it can not cover any user
+test_PasswordSignInRisk_PasswordlessReportOnly_Incorrect if {
+    PasswordlessCAP := json.patch(SignInRiskPasswordless,
+                [{"op": "replace", "path": "State", "value": "enabledForReportingButNotEnforced"},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [SignInRiskUserA]}])
+    PasswordCAP := json.patch(SignInRiskPassword,
+                [{"op": "replace", "path": "Conditions/Users/IncludeGroups", "value": [SignInRiskGroupB]}])
+
+    Output := aad.tests with input.conditional_access_policies as [PasswordlessCAP, PasswordCAP]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.3v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.3v2"].CapExclusions.Users as [SignInRiskUserA]
+
+    TestResult("MS.AAD.2.3v2", Output, SignInRiskFailedStr, false) == true
+    TestResult("MS.AAD.2.4v1", Output, SignInRiskNoPasswordlessStr, false) == true
+}
+
+# Two policies meet MS.AAD.2.3v2 and only one excludes the user, the other still covers them
+test_PasswordSignInRisk_ExcludedFromOnlyOnePasswordlessPolicy_Correct if {
+    PasswordlessCAPA := json.patch(SignInRiskPasswordless,
+                [{"op": "replace", "path": "DisplayName", "value": "Passwordless Policy A"},
+                {"op": "add", "path": "Conditions/Users/ExcludeUsers", "value": [SignInRiskUserA]}])
+    PasswordlessCAPB := json.patch(SignInRiskPasswordless,
+                [{"op": "replace", "path": "DisplayName", "value": "Passwordless Policy B"}])
+
+    Output := aad.tests with input.conditional_access_policies as [PasswordlessCAPA, PasswordlessCAPB]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.3v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.3v2"].CapExclusions.Users as [SignInRiskUserA]
+
+    TestResult("MS.AAD.2.4v1", Output, SignInRiskNotRequiredStr, true) == true
+}
+
+# Only IDs excluded by every MS.AAD.2.3v2 policy need to be targeted by this control
+test_PasswordSignInRisk_ExcludedFromAllPasswordlessPolicies_Incorrect if {
+    PasswordlessCAPA := json.patch(SignInRiskPasswordless,
+                [{"op": "replace", "path": "DisplayName", "value": "Passwordless Policy A"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": [SignInRiskGroupA, SignInRiskGroupB]}])
+    PasswordlessCAPB := json.patch(SignInRiskPasswordless,
+                [{"op": "replace", "path": "DisplayName", "value": "Passwordless Policy B"},
+                {"op": "add", "path": "Conditions/Users/ExcludeGroups", "value": [SignInRiskGroupA]}])
+
+    Output := aad.tests with input.conditional_access_policies as [PasswordlessCAPA, PasswordlessCAPB]
+                        with input.service_plans as ServicePlans
+                        with input.scuba_config.Aad["MS.AAD.2.3v2"] as ScubaConfig
+                        with input.scuba_config.Aad["MS.AAD.2.3v2"].CapExclusions.Groups as [SignInRiskGroupA, SignInRiskGroupB]
+
+    ReportDetailStr := SignInRiskNotTargetedStr(
+        "0 conditional access policy(s) found that meet(s) all requirements",
+        SignInRiskGroupA
+    )
+    TestResult("MS.AAD.2.4v1", Output, ReportDetailStr, false) == true
 }
 
 test_PasswordSignInRisk_NoPolicies_Incorrect if {

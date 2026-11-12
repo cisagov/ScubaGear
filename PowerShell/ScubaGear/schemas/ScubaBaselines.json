@@ -1,5 +1,5 @@
 {
-  "Version": "2.11.10 [updated 11/10/2026]",
+  "Version": "2.11.12 [updated 11/12/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -261,7 +261,7 @@
         "annotationField": "Annotations",
         "rationale": "Users who authenticate with a password cannot use a passwordless method to remediate a risky sign-in. Requiring MFA and reauthentication every time allows these users to prove their identity while preventing attackers who have compromised a password from accessing the tenant.",
         "notes": [
-          "This control checks that every user and group excluded from the policy for [MS.AAD.2.3v2](#msaad23v2) is targeted by a policy that meets this control. If no users or groups are excluded from the policy for MS.AAD.2.3v2, all users are covered by that policy and a separate policy for this control is not required. Users and groups excluded from both policies must be listed in the [configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions). The users and groups excluded from the policy for MS.AAD.2.3v2 are checked even when that policy does not meet its control because of exclusions missing from the configuration. In that case the report for this control lists the excluded users and groups that no policy for this control targets."
+          "This control checks that every user and group excluded from the policy for [MS.AAD.2.3v2](#msaad23v2) is targeted by a policy that meets this control. This control requires an enabled policy that meets MS.AAD.2.3v2, the users covered by this control cannot be determined without one. A report-only or disabled policy does not count. If more than one policy meets MS.AAD.2.3v2, a user or group is only treated as excluded when every one of those policies excludes it, because any other policy still covers that user or group. If no users or groups are excluded from the policy for MS.AAD.2.3v2, all users are covered by that policy and a separate policy for this control is not required. Users and groups excluded from both policies must be listed in the [configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions). The users and groups excluded from the policy for MS.AAD.2.3v2 are checked even when that policy does not meet its control because of exclusions missing from the configuration. In that case the report for this control lists the excluded users and groups that no policy for this control targets."
         ],
         "criticality": "SHALL",
         "lastModified": "October 2026",
