@@ -3189,3 +3189,219 @@ TestPlan:
                     EnableSafeList: false
         Postconditions: []
         ExpectedResult: true
+  - PolicyId: MS.SECURITYSUITE.9.1v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.9.1v1 Compliant case - Default outbound spam policy is compliant
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                outbound_spam_policies:
+                  - Name: Default
+                    Identity: Default
+                    RecipientLimitExternalPerHour: 500
+                    RecipientLimitInternalPerHour: 1000
+                    RecipientLimitPerDay: 1000
+                    ActionWhenThresholdReached: BlockUser
+                    BccSuspiciousOutboundMail: true
+                    BccSuspiciousOutboundAdditionalRecipients:
+                      - security@example.com
+                outbound_spam_rules: []
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.9.1v1 Non-Compliant case - Default outbound spam policy exceeds the external recipient limit
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                outbound_spam_policies:
+                  - Name: Default
+                    Identity: Default
+                    RecipientLimitExternalPerHour: 501
+                    RecipientLimitInternalPerHour: 1000
+                    RecipientLimitPerDay: 1000
+                    ActionWhenThresholdReached: BlockUser
+                    BccSuspiciousOutboundMail: true
+                    BccSuspiciousOutboundAdditionalRecipients:
+                      - security@example.com
+                outbound_spam_rules: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.9.1v1 Non-Compliant case - Default outbound spam policy does not block the user
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                outbound_spam_policies:
+                  - Name: Default
+                    Identity: Default
+                    RecipientLimitExternalPerHour: 500
+                    RecipientLimitInternalPerHour: 1000
+                    RecipientLimitPerDay: 1000
+                    ActionWhenThresholdReached: Alert
+                    BccSuspiciousOutboundMail: true
+                    BccSuspiciousOutboundAdditionalRecipients:
+                      - security@example.com
+                outbound_spam_rules: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.9.1v1 Non-Compliant case - Default outbound spam policy does not send a copy of suspicious outbound messages
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                outbound_spam_policies:
+                  - Name: Default
+                    Identity: Default
+                    RecipientLimitExternalPerHour: 500
+                    RecipientLimitInternalPerHour: 1000
+                    RecipientLimitPerDay: 1000
+                    ActionWhenThresholdReached: BlockUser
+                    BccSuspiciousOutboundMail: false
+                    BccSuspiciousOutboundAdditionalRecipients: []
+                outbound_spam_rules: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.9.1v1 Compliant case - Enabled custom outbound spam policy is compliant
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                outbound_spam_policies:
+                  - Name: Default
+                    Identity: Default
+                    RecipientLimitExternalPerHour: 500
+                    RecipientLimitInternalPerHour: 1000
+                    RecipientLimitPerDay: 1000
+                    ActionWhenThresholdReached: BlockUser
+                    BccSuspiciousOutboundMail: true
+                    BccSuspiciousOutboundAdditionalRecipients:
+                      - security@example.com
+                  - Name: FunctionalTest OutboundSpamPolicy
+                    Identity: FunctionalTest OutboundSpamPolicy
+                    RecipientLimitExternalPerHour: 400
+                    RecipientLimitInternalPerHour: 900
+                    RecipientLimitPerDay: 900
+                    ActionWhenThresholdReached: BlockUser
+                outbound_spam_rules:
+                  - State: Enabled
+                    HostedOutboundSpamFilterPolicy: FunctionalTest OutboundSpamPolicy
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.9.1v1 Non-Compliant case - Enabled custom outbound spam policy is not compliant
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                outbound_spam_policies:
+                  - Name: Default
+                    Identity: Default
+                    RecipientLimitExternalPerHour: 500
+                    RecipientLimitInternalPerHour: 1000
+                    RecipientLimitPerDay: 1000
+                    ActionWhenThresholdReached: BlockUser
+                    BccSuspiciousOutboundMail: true
+                    BccSuspiciousOutboundAdditionalRecipients:
+                      - security@example.com
+                  - Name: FunctionalTest OutboundSpamPolicy
+                    Identity: FunctionalTest OutboundSpamPolicy
+                    RecipientLimitExternalPerHour: 501
+                    RecipientLimitInternalPerHour: 900
+                    RecipientLimitPerDay: 900
+                    ActionWhenThresholdReached: BlockUser
+                outbound_spam_rules:
+                  - State: Enabled
+                    HostedOutboundSpamFilterPolicy: FunctionalTest OutboundSpamPolicy
+        Postconditions: []
+        ExpectedResult: false
+  - PolicyId: MS.SECURITYSUITE.9.2v1
+    TestDriver: ScubaCached
+    Tests:
+      - TestDescription: MS.SECURITYSUITE.9.2v1 Compliant case - All required outbound spam alert policies are compliant
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: User restricted from sending email
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+                  - Name: Email sending limit exceeded
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+        Postconditions: []
+        ExpectedResult: true
+      - TestDescription: MS.SECURITYSUITE.9.2v1 Non-Compliant case - Required alert policy is disabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: User restricted from sending email
+                    Disabled: true
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+                  - Name: Email sending limit exceeded
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.9.2v1 Non-Compliant case - Required alert policy does not have notifications enabled
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: User restricted from sending email
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+                  - Name: Email sending limit exceeded
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - security@example.com
+                  - Name: Suspicious email sending patterns detected
+                    Disabled: false
+                    NotificationEnabled: false
+                    NotifyUser: []
+        Postconditions: []
+        ExpectedResult: false
+      - TestDescription: MS.SECURITYSUITE.9.2v1 Non-Compliant case - Required alert polocy is missing
+        Preconditions:
+          - Command: UpdateProviderExport
+            Splat:
+              Updates:
+                protection_alerts:
+                  - Name: User restricted from sending email
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - cloudsecurity@cisaent.onmicrosoft.com
+                  - Name: Email sending limit exceeded
+                    Disabled: false
+                    NotificationEnabled: true
+                    NotifyUser:
+                      - cloudsecurity@cisaent.onmicrosoft.com
+        Postconditions: []
+        ExpectedResult: false
+        
