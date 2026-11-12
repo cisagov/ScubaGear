@@ -352,18 +352,19 @@ function Resolve-ScubaOrganization {
     )
 
     $Session = $Global:ScubaGearState.Session
-    if ($Session -and $null -ne $Session.Organization) {
+    if (-not $Session) {
+        throw 'Microsoft Graph is not connected. Call Connect-GraphHelper first.'
+    }
+    if ($null -ne $Session.Organization) {
         Write-Debug "Using cached organization record from the Graph session"
         return ,$Session.Organization
     }
 
     $Organization = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
-    if ($null -eq $Organization) {
-        return
+    if ($null -eq $Organization -or @($Organization).Count -eq 0) {
+        throw 'Microsoft Graph returned no organization record for the connected tenant.'
     }
-    if ($Session) {
-        $Session.Organization = $Organization
-    }
+    $Session.Organization = $Organization
     return ,$Organization
 }
 

@@ -55,18 +55,25 @@ InModuleScope Utility {
             Should -Invoke Invoke-GraphDirectly -Times 2 -Exactly -ParameterFilter { $Commandlet -eq 'Get-MgBetaOrganization' }
         }
 
-        It 'does not cache when there is no Graph session' {
+        It 'throws before calling Microsoft Graph when there is no session' {
             $Global:ScubaGearState.Session = $null
-            $null = Resolve-ScubaOrganization -M365Environment 'commercial'
-            $null = Resolve-ScubaOrganization -M365Environment 'commercial'
 
-            Should -Invoke Invoke-GraphDirectly -Times 2 -Exactly -ParameterFilter { $Commandlet -eq 'Get-MgBetaOrganization' }
+            { Resolve-ScubaOrganization -M365Environment 'commercial' } | Should -Throw '*Microsoft Graph is not connected*'
+
+            Should -Invoke Invoke-GraphDirectly -Times 0 -Exactly
         }
 
-        It 'does not cache an empty response' {
+        It 'throws without caching a null organization response' {
             Mock Invoke-GraphDirectly { return [pscustomobject]@{ Value = $null } } -ParameterFilter { $Commandlet -eq 'Get-MgBetaOrganization' }
 
-            Resolve-ScubaOrganization -M365Environment 'commercial' | Should -BeNullOrEmpty
+            { Resolve-ScubaOrganization -M365Environment 'commercial' } | Should -Throw '*returned no organization record*'
+            $Global:ScubaGearState.Session.Organization | Should -BeNullOrEmpty
+        }
+
+        It 'throws without caching an empty organization array' {
+            Mock Invoke-GraphDirectly { return [pscustomobject]@{ Value = @() } } -ParameterFilter { $Commandlet -eq 'Get-MgBetaOrganization' }
+
+            { Resolve-ScubaOrganization -M365Environment 'commercial' } | Should -Throw '*returned no organization record*'
             $Global:ScubaGearState.Session.Organization | Should -BeNullOrEmpty
         }
     }

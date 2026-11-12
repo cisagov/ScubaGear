@@ -30,16 +30,7 @@ function Export-PowerPlatformProvider {
     Import-Module (Join-Path -Path $HelperFolderPath -ChildPath "PowerPlatformRestHelper.psm1")
     $Tracker = Get-CommandTracker
 
-    # Recorded under the Get-MgBetaOrganization name so the report's command lists are unchanged.
-    try {
-        $TenantDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
-        $Tracker.AddSuccessfulCommand("Get-MgBetaOrganization")
-    }
-    catch {
-        Write-Warning "Error running Get-MgBetaOrganization: $($_.Exception.Message)`n$($_.ScriptStackTrace)"
-        $Tracker.AddUnSuccessfulCommand("Get-MgBetaOrganization")
-        $TenantDetails = @()
-    }
+    $TenantDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
     $TenantId = if ($TenantDetails.Id) { $TenantDetails.Id } else { "" }
 
     $DomainInfo = Get-TenantDomainInfo -TenantDetails $TenantDetails -M365Environment $M365Environment
@@ -69,7 +60,7 @@ function Export-PowerPlatformProvider {
     $PowerPlatformSuccessfulCommands = ConvertTo-Json @($Tracker.GetSuccessfulCommands())
     $PowerPlatformUnSuccessfulCommands = ConvertTo-Json @($Tracker.GetUnSuccessfulCommands())
 
-    # tenant_id added for testing purposes
+    # tenant_id is used by MS.POWERPLATFORM.2.1v1
     # Note the spacing and the last comma in the json is important
     $json = @"
     "tenant_id": "$TenantID",
