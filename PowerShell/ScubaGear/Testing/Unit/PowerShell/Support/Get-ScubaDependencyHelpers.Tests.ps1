@@ -379,6 +379,97 @@ InModuleScope 'Support' {
             }
         }
 
+        Context "Get-ScubaLatestAcceptableModuleVersion" {
+            It "Should use the highest version when several repositories return the module" {
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.5'; Repository = 'PSGallery' }
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.12'; Repository = 'PSGallery' }
+                    )
+                }
+
+                $version = Get-ScubaLatestAcceptableModuleVersion -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+
+                $version | Should -Be ([version]'0.4.12')
+            }
+
+            It "Should keep the PSGallery version when that repository returns a match" {
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.12'; Repository = 'PrivateGallery' }
+                    )
+                }
+                Mock Find-Module -ParameterFilter { $Repository -eq 'PSGallery' } {
+                    return [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PSGallery' }
+                }
+
+                $version = Get-ScubaLatestAcceptableModuleVersion -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+
+                $version | Should -Be ([version]'0.4.7')
+                Should -Invoke Find-Module -Times 1 -ParameterFilter { $Repository -eq 'PSGallery' }
+                Should -Invoke Find-Module -Times 0 -ParameterFilter { -not $Repository }
+            }
+
+            It "Should use the highest version from the remaining repositories when PSGallery has no match" {
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.5'; Repository = 'PrivateGallery' }
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.12'; Repository = 'PrivateGallery' }
+                    )
+                }
+                Mock Find-Module -ParameterFilter { $Repository -eq 'PSGallery' } { throw 'No match was found in PSGallery.' }
+
+                $version = Get-ScubaLatestAcceptableModuleVersion -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+
+                $version | Should -Be ([version]'0.4.12')
+            }
+        }
+
+        Context "Install-ScubaDependencies repository handling" {
+            BeforeEach {
+                Mock Get-ScubaRequiredModuleList {
+                    return @(
+                        [PSCustomObject]@{
+                            ModuleName     = 'powershell-yaml'
+                            ModuleVersion  = [version]'0.4.2'
+                            MaximumVersion = [version]'0.4.12'
+                        }
+                    )
+                }
+                Mock Get-ScubaModuleDependencyStatus {
+                    return [PSCustomObject]@{
+                        Installed            = $true
+                        VersionsInRange      = @([version]'0.4.7')
+                        BestVersionToKeep    = [version]'0.4.7'
+                        HighestVersion       = [version]'0.4.7'
+                        VersionsAboveMaximum = @()
+                    }
+                }
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PSGallery' }
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PrivateGallery' }
+                    )
+                }
+                Mock Install-ScubaModule { }
+                Mock Set-PSRepository { }
+            }
+
+            It "Should not throw or re-trust PSGallery when several repositories return the same module" {
+                Mock Get-PSRepository { return [PSCustomObject]@{ InstallationPolicy = 'Trusted' } }
+
+                { Install-ScubaDependencies -NoOPA -NoMSAL } | Should -Not -Throw
+                Should -Invoke Set-PSRepository -Times 0
+            }
+
+            It "Should trust PSGallery only when its installation policy is not Trusted" {
+                Mock Get-PSRepository { return [PSCustomObject]@{ InstallationPolicy = 'Untrusted' } }
+
+                { Install-ScubaDependencies -NoOPA -NoMSAL } | Should -Not -Throw
+                Should -Invoke Set-PSRepository -Times 1 -ParameterFilter { $Name -eq 'PSGallery' -and $InstallationPolicy -eq 'Trusted' }
+            }
+        }
+
         Context "Install-ScubaDependencies alias" {
             It "Should expose Install-ScubaDependencies as a function" {
                 Get-Command -Name 'Install-ScubaDependencies' -CommandType Function | Should -Not -BeNullOrEmpty
