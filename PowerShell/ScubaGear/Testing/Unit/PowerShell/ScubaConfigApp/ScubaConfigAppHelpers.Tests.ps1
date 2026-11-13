@@ -656,6 +656,198 @@
             }
         }
 
+        Context 'Invoke-PolicyMigration - several legacy AAD policy keys (stubbed map)' {
+            BeforeEach {
+                InModuleScope ScubaConfigAppImportHelper -Parameters @{ cfg = $uiCfgPath } {
+                    param($cfg)
+                    $script:syncHash = [hashtable]::Synchronized(@{
+                        UIConfigPath = $cfg
+                        UIConfigs    = @{
+                            baselineControls = @(
+                                [PSCustomObject]@{ supportsAllProducts = $true; yamlValue = 'OmitPolicy' }
+                                [PSCustomObject]@{ supportsAllProducts = $true; yamlValue = 'AnnotatePolicy' }
+                            )
+                            policyMigration = @{
+                                cacheFileName            = 'ScubaConfigApp_PolicyMigrationMap.json'
+                                csvColumns               = [PSCustomObject]@{ oldId = 'Old ID'; newId = 'New ID'; rationale = 'Removal Rationale' }
+                                migrationTypes           = [PSCustomObject]@{ removed = 'Removed'; decoupled = 'Decoupled'; direct = 'Direct'; versionBump = 'VersionBump' }
+                                reportMaxLinesPerSection = 15
+                                localeReportWindow       = [PSCustomObject]@{
+                                    sections = [PSCustomObject]@{
+                                        migrated  = [PSCustomObject]@{ prefix = 'MIGRATED' }
+                                        decoupled = [PSCustomObject]@{ prefix = 'DECOUPLED' }
+                                        dropped   = [PSCustomObject]@{ prefix = 'DROPPED' }
+                                        skipped   = [PSCustomObject]@{ prefix = 'SKIPPED' }
+                                    }
+                                }
+                            }
+                        }
+                    })
+                }
+                # Mirrors the rows in mappings\scuba-baseline-policy-migrations.csv (checked against the CSV below).
+                Mock -ModuleName ScubaConfigAppImportHelper Get-PolicyMigrationMap {
+                    $map = @{}
+                    foreach ($pair in @(@('MS.AAD.2.1v1', 'MS.AAD.2.1v2'), @('MS.AAD.3.2v1', 'MS.AAD.3.2v2'))) {
+                        $map[$pair[0]] = [PSCustomObject]@{
+                            oldPolicyId = $pair[0]; oldProduct = 'Aad'; newPolicyId = $pair[1]; newProduct = 'Aad'
+                            allNewPolicyIds = @($pair[1]); migrationNote = 'N/A'; migrationType = 'Direct'
+                        }
+                    }
+                    return $map
+                }
+            }
+
+            It 'Should map each legacy key in an exclusion block to its own new key when both legacy keys exist' {
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.2.1v1' = [ordered]@{ Marker = 'from-2.1v1' }
+                        'MS.AAD.3.2v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg1') } }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                @($result['Aad'].Keys | Sort-Object) -join ',' | Should -Be 'MS.AAD.2.1v2,MS.AAD.3.2v2'
+                $result['Aad']['MS.AAD.2.1v2']['Marker'] | Should -Be 'from-2.1v1'
+                $result['Aad']['MS.AAD.3.2v2']['CapExclusions']['Users'] | Should -Be 'bg1'
+                InModuleScope ScubaConfigAppImportHelper {
+                    $script:syncHash.MigrationLog.Count | Should -Be 2
+                    ($script:syncHash.MigrationLog | Where-Object { $_ -match '^MIGRATED exclusion \[Aad\]\[MS\.AAD\.2\.1v1\] .* \[Aad\]\[MS\.AAD\.2\.1v2\]' }).Count | Should -Be 1
+                    ($script:syncHash.MigrationLog | Where-Object { $_ -match '^MIGRATED exclusion \[Aad\]\[MS\.AAD\.3\.2v1\] .* \[Aad\]\[MS\.AAD\.3\.2v2\]' }).Count | Should -Be 1
+                    ($script:syncHash.MigrationLog | Where-Object { $_ -match 'SKIPPED|DROPPED' }).Count | Should -Be 0
+                }
+            }
+
+            It 'Should not treat the current MS.AAD.2.2v1, MS.AAD.2.3v1 and MS.AAD.2.5v1 policies as legacy or overwrite them' {
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.2.1v2' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('exempt1') } }
+                        'MS.AAD.2.5v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg-mfa') } }
+                        'MS.AAD.2.2v1' = [ordered]@{ Marker = 'notification' }
+                        'MS.AAD.2.3v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg-block') } }
+                        'MS.AAD.3.2v1' = [ordered]@{ Marker = 'legacy' }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                $result['Aad']['MS.AAD.2.1v2']['CapExclusions']['Users'] | Should -Be 'exempt1'
+                $result['Aad']['MS.AAD.2.5v1']['CapExclusions']['Users'] | Should -Be 'bg-mfa'
+                $result['Aad']['MS.AAD.2.2v1']['Marker'] | Should -Be 'notification'
+                $result['Aad']['MS.AAD.2.3v1']['CapExclusions']['Users'] | Should -Be 'bg-block'
+                $result['Aad']['MS.AAD.3.2v2']['Marker'] | Should -Be 'legacy'
+                $result['Aad'].Keys -contains 'MS.AAD.3.2v1' | Should -BeFalse
+            }
+
+            It 'Should keep an already configured MS.AAD.2.1v2 and still migrate MS.AAD.3.2v1 to MS.AAD.3.2v2' {
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.2.1v1' = [ordered]@{ Marker = 'legacy' }
+                        'MS.AAD.2.1v2' = [ordered]@{ Marker = 'already-set' }
+                        'MS.AAD.3.2v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg-mfa') } }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                $result['Aad']['MS.AAD.2.1v2']['Marker'] | Should -Be 'already-set'
+                $result['Aad']['MS.AAD.3.2v2']['CapExclusions']['Users'] | Should -Be 'bg-mfa'
+                $result['Aad'].Keys -contains 'MS.AAD.2.1v1' | Should -BeFalse
+                InModuleScope ScubaConfigAppImportHelper {
+                    ($script:syncHash.MigrationLog | Where-Object { $_ -match '^SKIPPED|^MIGRATED exclusion \[Aad\]\[MS\.AAD\.2\.1v1\]' }).Count | Should -BeGreaterThan 0
+                    ($script:syncHash.MigrationLog | Where-Object { $_ -match '^MIGRATED exclusion \[Aad\]\[MS\.AAD\.3\.2v1\] .* \[Aad\]\[MS\.AAD\.3\.2v2\]' }).Count | Should -Be 1
+                }
+            }
+
+            It 'Should remap both legacy keys in OmitPolicy and AnnotatePolicy without chaining' -ForEach @(
+                @{ Section = 'OmitPolicy' }
+                @{ Section = 'AnnotatePolicy' }
+            ) {
+                $config = [ordered]@{
+                    $Section = [ordered]@{
+                        'MS.AAD.2.1v1' = @{ Comment = 'risk block' }
+                        'MS.AAD.3.2v1' = @{ Comment = 'mfa' }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                @($result[$Section].Keys | Sort-Object) -join ',' | Should -Be 'MS.AAD.2.1v2,MS.AAD.3.2v2'
+                $result[$Section]['MS.AAD.2.1v2']['Comment'] | Should -Be 'risk block'
+                $result[$Section]['MS.AAD.3.2v2']['Comment'] | Should -Be 'mfa'
+                InModuleScope ScubaConfigAppImportHelper -Parameters @{ Section = $Section } {
+                    param($Section)
+                    ($script:syncHash.MigrationLog | Where-Object { $_ -match "^MIGRATED $Section" }).Count | Should -Be 2
+                }
+            }
+
+            It 'Should migrate exclusions and omissions of one file that contains both legacy keys' {
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.3.2v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg-mfa') } }
+                    }
+                    'OmitPolicy' = [ordered]@{
+                        'MS.AAD.2.1v1' = @{ Rationale = 'risk block handled elsewhere' }
+                        'MS.AAD.3.2v1' = @{ Rationale = 'mfa handled elsewhere' }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                $result['Aad'].Keys -contains 'MS.AAD.3.2v2' | Should -BeTrue
+                $result['OmitPolicy']['MS.AAD.2.1v2']['Rationale'] | Should -Be 'risk block handled elsewhere'
+                $result['OmitPolicy']['MS.AAD.3.2v2']['Rationale'] | Should -Be 'mfa handled elsewhere'
+            }
+        }
+
+        Context 'Invoke-PolicyMigration - AAD risk policies (live migrations CSV)' {
+            BeforeAll {
+                $script:migrationRows = @(Import-Csv -Path (Join-Path $helpersPath '..\..\..\mappings\scuba-baseline-policy-migrations.csv'))
+            }
+
+            BeforeEach {
+                InModuleScope ScubaConfigAppImportHelper -Parameters @{ cfg = $uiCfgPath } {
+                    param($cfg)
+                    $uiConfigs = Get-Content $cfg -Raw | ConvertFrom-Json
+                    $baselines = (Get-Content (Join-Path (Split-Path $cfg -Parent) $uiConfigs.LocalBaselineSchemaPath) -Raw | ConvertFrom-Json).baselines
+                    $script:syncHash = [hashtable]::Synchronized(@{ UIConfigPath = $cfg; UIConfigs = $uiConfigs; Baselines = $baselines })
+                }
+                $cacheFile = Join-Path $env:TEMP 'ScubaConfigApp_PolicyMigrationMap.json'
+                if (Test-Path $cacheFile) { Remove-Item $cacheFile -Force }
+            }
+
+            It 'Should list MS.AAD.2.1v1 -> MS.AAD.2.1v2 in the migrations CSV' {
+                ($migrationRows | Where-Object 'Old ID' -EQ 'MS.AAD.2.1v1').'New ID' | Should -Be 'MS.AAD.2.1v2'
+            }
+
+            It 'Should not contain a migration target that is itself a legacy ID (no chains)' {
+                $oldIds = @($migrationRows | ForEach-Object { $_.'Old ID'.Trim() })
+                $newIds = @($migrationRows | ForEach-Object { [regex]::Matches($_.'New ID', 'MS\.[A-Z]+\.\d+\.\d+v\d+') | ForEach-Object { $_.Value } })
+                @($newIds | Where-Object { $oldIds -contains $_ }) | Should -BeNullOrEmpty
+            }
+
+            It 'Should map the legacy risk policy and leave the current MS.AAD.2.x policies alone' {
+                $map = Get-PolicyMigrationMap
+                $map['MS.AAD.2.1v1'].newPolicyId | Should -Be 'MS.AAD.2.1v2'
+                foreach ($id in 'MS.AAD.2.1v2', 'MS.AAD.2.2v1', 'MS.AAD.2.3v1', 'MS.AAD.2.5v1') {
+                    $map.ContainsKey($id) | Should -BeFalse
+                }
+            }
+
+            It 'Should migrate a config containing both legacy keys using the live map' {
+                $config = [ordered]@{
+                    'Aad' = [ordered]@{
+                        'MS.AAD.2.1v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg-risk') } }
+                        'MS.AAD.2.5v1' = [ordered]@{ CapExclusions = [ordered]@{ Users = @('bg-mfa') } }
+                    }
+                    'OmitPolicy' = [ordered]@{
+                        'MS.AAD.2.1v1' = @{ Rationale = 'risk block handled elsewhere' }
+                        'MS.AAD.2.2v1' = @{ Rationale = 'notification handled elsewhere' }
+                    }
+                }
+                $result = Invoke-PolicyMigration -Config $config
+                $result['Aad']['MS.AAD.2.1v2']['CapExclusions']['Users'] | Should -Be 'bg-risk'
+                $result['Aad']['MS.AAD.2.5v1']['CapExclusions']['Users'] | Should -Be 'bg-mfa'
+                $result['OmitPolicy']['MS.AAD.2.1v2']['Rationale'] | Should -Be 'risk block handled elsewhere'
+                $result['OmitPolicy']['MS.AAD.2.2v1']['Rationale'] | Should -Be 'notification handled elsewhere'
+                $result['Aad'].Keys -contains 'MS.AAD.2.1v1' | Should -BeFalse
+                InModuleScope ScubaConfigAppImportHelper {
+                    $script:syncHash.MigrationPendingReview.Contains('Exclusions|MS.AAD.2.1v2') | Should -BeTrue
+                    $script:syncHash.MigrationPendingReview.Contains('Omissions|MS.AAD.2.1v2')  | Should -BeTrue
+                }
+            }
+        }
+
         Context 'Get-PolicyMigrationMap - live removedpolicies.md' {
             BeforeEach {
                 InModuleScope ScubaConfigAppImportHelper -Parameters @{ cfg = $uiCfgPath } {

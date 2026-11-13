@@ -769,6 +769,7 @@ Function Invoke-RequiredFieldValidation {
     $validationResults = @{
         IsValid = $true
         Errors = @()
+        Warnings = @()
         TabsToNavigate = @()
     }
 
@@ -900,6 +901,9 @@ Function Invoke-RequiredFieldValidation {
             Write-DebugOutput -Message "Migration pending review blocks generate: $pendingList" -Source $MyInvocation.MyCommand -Level "Info"
         }
 
+        # Non-blocking: a parent policy's exemptions are not assessed when the policy that reads them is omitted
+        $validationResults.Warnings += @(Get-PolicyExemptionDependencyWarning)
+
         Write-DebugOutput -Message "Validation completed. Valid: $($validationResults.IsValid), Errors: $($validationResults.Errors.Count)" -Source $MyInvocation.MyCommand -Level "Info"
 
     } catch {
@@ -909,6 +913,78 @@ Function Invoke-RequiredFieldValidation {
     }
 
     return $validationResults
+}
+
+Function Get-PolicyExemptionDependencyWarning {
+    <#
+    .SYNOPSIS
+    Returns warnings for parent policies that have exemptions configured while a dependent policy is omitted.
+    .DESCRIPTION
+    Uses $syncHash.PolicyExclusionRelationships (loaded from schemaMetadata.policyExclusionRelationships
+    by Import-PolicyExclusionRelationship). For every parent policy that has exemptions in
+    $syncHash.ExclusionData (the exclusion fields listed in policyExemptionRelationships.exemptionFields
+    of the control JSON) and a dependent policy that is a key in $syncHash.OmissionData, one warning
+    string is returned (localeInfoMessages.PolicyExemptionOmittedWarning). Warnings never block generation.
+    #>
+    $relationships = $syncHash.PolicyExclusionRelationships
+    if (-not $relationships -or $relationships.Count -eq 0) { return @() }
+
+    $exemptionFields = @($syncHash.UIConfigs.policyExemptionRelationships.exemptionFields | Where-Object { $_ })
+
+    # Collects every dictionary key of a nested data structure
+    $getKeys = $null
+    $getKeys = {
+        param($Data)
+        if ($Data -is [System.Collections.IDictionary]) {
+            foreach ($key in $Data.Keys) {
+                [string]$key
+                & $getKeys $Data[$key]
+            }
+        }
+    }
+
+    # True when an exemption field below the given exclusion data holds at least one value
+    $hasExemptions = $null
+    $hasExemptions = {
+        param($Data)
+        if ($Data -isnot [System.Collections.IDictionary]) { return $false }
+        foreach ($key in $Data.Keys) {
+            if ($key -in $exemptionFields) {
+                if (@($Data[$key] | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) }).Count -gt 0) { return $true }
+            } elseif (& $hasExemptions $Data[$key]) {
+                return $true
+            }
+        }
+        return $false
+    }
+
+    $omittedIds = @(& $getKeys $syncHash.OmissionData)
+    if ($omittedIds.Count -eq 0) { return @() }
+
+    $template = $syncHash.UIConfigs.localeInfoMessages.PolicyExemptionOmittedWarning
+    if (-not $template) { $template = '{0} has exemptions configured but {1} is omitted. {2}' }
+
+    $warnings = @()
+    foreach ($parentId in @($relationships.Keys | Sort-Object)) {
+        $parentConfigured = $false
+        if ($syncHash.ExclusionData -is [System.Collections.IDictionary]) {
+            foreach ($productSection in $syncHash.ExclusionData.Values) {
+                if ($productSection -is [System.Collections.IDictionary] -and $productSection.Contains($parentId) -and (& $hasExemptions $productSection[$parentId])) {
+                    $parentConfigured = $true
+                    break
+                }
+            }
+        }
+        if (-not $parentConfigured) { continue }
+
+        foreach ($dependentId in @($relationships[$parentId].Dependents)) {
+            if ($omittedIds -contains $dependentId) {
+                $warnings += ($template -f $parentId, $dependentId, $relationships[$parentId].Note).Trim()
+            }
+        }
+    }
+
+    return $warnings
 }
 
 Function Find-TabForField {

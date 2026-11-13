@@ -171,6 +171,11 @@
         "actionMessageRef": "defenderMigration"
       },
       {
+        "name": "Policy ID update warnings",
+        "pattern": "^Policy\\s+update\\s+warning:",
+        "actionMessageRef": "policyUpdate"
+      },
+      {
         "name": "Other warnings",
         "pattern": "",
         "actionMessageRef": "default"
@@ -184,6 +189,11 @@
       ],
       "opaPath": [
         "Please install OPA using 'Install-OPAforSCuBA' or place the executable in one of the following locations above."
+      ],
+      "policyUpdate": [
+        "One or more policy IDs in your configuration have been renumbered, versioned, or removed. Settings under a retired policy ID are ignored.",
+        "Update your configuration file to use the replacement policy IDs and remove entries for policies that no longer exist. Importing the file into the ScubaGear Configuration Editor ('Start-ScubaConfigApp') remaps them automatically.",
+        "Refer to the mapping file [mappings\\scuba-baseline-policy-migrations.csv] for the old and new policy IDs."
       ],
       "defenderMigration": [
         "The Defender product has been renamed to 'securitysuite' and many Defender, Exchange Online, and Teams policies were migrated into the MS.SECURITYSUITE.* baseline.",

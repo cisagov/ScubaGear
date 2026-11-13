@@ -52,13 +52,16 @@ function Import-ScAConfigurableMap {
     .SYNOPSIS
     Loads per-policy exclusion mappings + product capabilities from the canonical ScubaGear
     config schema so configurability is JSON-driven (never hardcoded). Populates
-    $syncHash.ScAConfigurableMap (control id -> supported exclusion types) and
+    $syncHash.ScAConfigurableMap (control id -> supported exclusion types),
+    $syncHash.ScAExclusionRelationships (parent control id -> @{ Dependents; Note }, from
+    schemaMetadata.policyExclusionRelationships) and
     $syncHash.ScAProductCapabilities. Safe when the schema is missing (empty maps).
     #>
     param([string]$ConfigSchemaPath)
 
     $syncHash.ScAConfigurableMap     = @{}
     $syncHash.ScAProductCapabilities = @{}
+    $syncHash.ScAExclusionRelationships = @{}
     # Ensure the config schema path is valid before attempting to import.
     if (-not $ConfigSchemaPath -or -not (Test-Path $ConfigSchemaPath)) {
         Write-Verbose "Config schema not found - configurability tagging disabled."
@@ -70,6 +73,16 @@ function Import-ScAConfigurableMap {
         if ($meta.policyExclusionMappings) {
             foreach ($p in $meta.policyExclusionMappings.PSObject.Properties) {
                 if ($p.Name -notmatch '^_') { $syncHash.ScAConfigurableMap[$p.Name] = @($p.Value) }
+            }
+        }
+        # Parent policy -> dependent policies that read its exemptions, plus an explanatory note.
+        if ($meta.policyExclusionRelationships) {
+            foreach ($p in $meta.policyExclusionRelationships.PSObject.Properties) {
+                if ($p.Name -match '^_') { continue }
+                $syncHash.ScAExclusionRelationships[$p.Name] = @{
+                    Dependents = @($p.Value.dependents | Where-Object { $_ })
+                    Note       = [string]$p.Value.note
+                }
             }
         }
         # Read and parse the product capabilities from the config schema JSON.

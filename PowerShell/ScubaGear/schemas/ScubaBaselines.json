@@ -1,5 +1,5 @@
 {
-  "Version": "2.10.20 [updated 10/20/2026]",
+  "Version": "2.10.23 [updated 10/23/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -73,20 +73,20 @@
         ]
       },
       {
-        "id": "MS.AAD.2.1v1",
-        "name": "Users detected as high risk SHALL be blocked.",
+        "id": "MS.AAD.2.1v2",
+        "name": "Users detected as high risk SHALL be required to remediate risk using phishing-resistant MFA, and reauthenticate on every sign-in.",
         "policySection": "Risk-based Policies",
         "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the term [\"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "rationale": "Blocking high-risk users may prevent compromised accounts from accessing the tenant.",
+        "rationale": "Requiring high-risk users to remediate their risk before regaining access prevents compromised accounts from accessing the tenant while allowing legitimate users to recover without administrator intervention. Requiring phishing-resistant MFA ensures the remediation itself cannot be defeated by phishing, and requiring reauthentication on every sign-in ensures that existing sessions held by an attacker cannot persist.",
         "notes": [
-          "Users identified as high-risk by Microsoft Entra ID Identity Protection can be blocked from accessing the system via a Microsoft Entra ID Conditional Access policy. A high-risk user will be blocked until an administrator remediates their account."
+          "Users identified as high-risk by Microsoft Entra ID Protection can be required to remediate their risk via a Microsoft Entra ID Conditional Access policy using the \"Require risk remediation\" grant control. Users with passwords are prompted to complete a secure password change after successful multifactor authentication, while passwordless users have their sessions revoked and must reauthenticate. The grant control automatically requires an authentication strength (combined using AND) and applies a sign-in frequency session control of \"Every time\". For this policy, the authentication strength must allow only phishing-resistant methods. The legacy \"Require multifactor authentication\" grant control is not accepted in place of \"Require risk remediation\". User risk and sign-in risk conditions must not be combined in the same policy. This policy replaces the block-based policy from MS.AAD.2.1v1. Users, groups, or guest user types that cannot use phishing-resistant MFA may be exempted from this policy by listing them in the configuration file; every exemption MUST be targeted by a policy that meets MS.AAD.2.5v1, which requires MFA, unless it is also exempted from MS.AAD.2.5v1 in the configuration file (for example, an emergency access account that is intentionally excluded from both policies)."
         ],
         "criticality": "SHALL",
-        "lastModified": "June 2023",
-        "implementation": "1.  Create a conditional access policy blocking users categorized as high-risk by the Identity Protection service. Configure the following policy settings in the new conditional access policy per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > <b>High</b>\n\n  Access controls > Grant > <b>Block access</b>\n</pre>",
+        "lastModified": "November 2026",
+        "implementation": "Before enabling this policy, [investigate and remediate any active user risks](https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-remediate-unblock). Users must be registered for Microsoft Entra multifactor authentication to self-remediate, and hybrid users synced from on-premises require password writeback to be enabled. Users who are not registered are blocked until an administrator remediates their risk.\n\n1.  Create a conditional access policy that requires users categorized as high-risk by the Identity Protection service to remediate their risk. Configure the following policy settings in the new conditional access policy per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > Configure > <b>Yes</b> > Configure user risk levels needed for policy to be enforced > <b>High</b>\n\n  Access controls > Grant > <b>Grant access</b> > <b>Require risk remediation</b>\n  (<b>Require authentication strength</b> is selected automatically; select <b>Phishing-resistant MFA</b> or a custom strength that allows only phishing-resistant methods)\n\n  Session > <b>Sign-in frequency</b> > <b>Every time</b>\n  (applied automatically when Require risk remediation is selected and is mandatory)\n</pre>\n\n2.  Do not use the legacy **Require multifactor authentication** grant control in place of **Require risk remediation**. Although Microsoft Entra accepts it for user risk, it is not accepted by this policy.\n\n3.  Do not configure sign-in risk in this policy. Create a separate policy for sign-in risk (see MS.AAD.2.3v1).\n\n4.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).\n\n5.  If any other users, groups, or guest user types are excluded from this policy because they cannot use phishing-resistant MFA, list them in the configuration file as exclusions for MS.AAD.2.1v2 and then include them in a second policy that requires MFA, as described in the MS.AAD.2.5v1 instructions below.\n\n6.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.",
         "mitreMapping": [
           {
             "Name": "T1078: Valid Accounts",
@@ -101,6 +101,10 @@
           {
             "Name": "What are risk detections?",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
+          },
+          {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           },
           {
             "Name": "Simulating risk detections in Identity Protection",
@@ -160,6 +164,10 @@
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
           },
           {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
+          },
+          {
             "Name": "Simulating risk detections in Identity Protection",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk"
           },
@@ -205,6 +213,74 @@
           {
             "Name": "What are risk detections?",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
+          },
+          {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
+          },
+          {
+            "Name": "Simulating risk detections in Identity Protection",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk"
+          },
+          {
+            "Name": "Self-remediation experience with Microsoft Entra ID Protection and Conditional Access",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience"
+          }
+        ],
+        "licenseRequirements": [
+          "Requires a Microsoft Entra ID P2 license"
+        ],
+        "badges": [
+          {
+            "label": "BOD 25-01 Requirement",
+            "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
+            "color": "C41230"
+          },
+          {
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
+          },
+          {
+            "label": "Configurable",
+            "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
+            "color": "005288"
+          }
+        ]
+      },
+      {
+        "id": "MS.AAD.2.5v1",
+        "name": "Users, groups, and guest user types exempted from MS.AAD.2.1v2 SHALL be required to remediate high user risk using MFA, and reauthenticate on every sign-in.",
+        "policySection": "Risk-based Policies",
+        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the term [\"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
+        "exclusionField": "CapExclusions",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "rationale": "Accounts that cannot use phishing-resistant MFA and are exempted from MS.AAD.2.1v2 must still remediate user risk, otherwise a compromised account would retain access. This policy ensures those accounts remediate their risk with MFA rather than being left without a risk-based control.",
+        "notes": [
+          "This policy is only applicable when users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file without also being exempted from MS.AAD.2.5v1. A user, group, or guest user type that is listed in the configuration file under both MS.AAD.2.1v2 and MS.AAD.2.5v1 is an approved exception to both policies and does not need MFA coverage. The policy must target every other exempted user, group, and guest user type (or all users), must not exclude them, and must use the \"Require risk remediation\" grant control with an authentication strength that allows MFA methods that are not phishing-resistant, combined using AND, with a sign-in frequency of \"Every time\". The legacy \"Require multifactor authentication\" grant control is not accepted in place of \"Require risk remediation\". User risk and sign-in risk conditions must not be combined in the same policy."
+        ],
+        "criticality": "SHALL",
+        "lastModified": "November 2026",
+        "implementation": "This policy is only needed if users, groups, or guest user types are excluded from the MS.AAD.2.1v2 policy and listed as exclusions for MS.AAD.2.1v2 in the configuration file. Every user, group, and guest user type excluded from the MS.AAD.2.1v2 policy MUST be included in this policy so that they remediate user risk using MFA. The exception is an account that is intentionally excluded from both policies, such as an emergency access account: list it under the exclusions for both MS.AAD.2.1v2 and MS.AAD.2.5v1 in the configuration file, and it does not need to be included in this policy.\n\n1.  Create a conditional access policy that requires the excluded users to remediate their risk. Configure the following policy settings in the new conditional access policy per the values below:\n\n<pre>\n  Users > Include > <b>Select users and groups</b> > select every user, group, and guest or external user type excluded from the MS.AAD.2.1v2 policy\n  (or <b>All users</b>, in which case this policy is evaluated together with the MS.AAD.2.1v2 policy)\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > User risk > Configure > <b>Yes</b> > Configure user risk levels needed for policy to be enforced > <b>High</b>\n\n  Access controls > Grant > <b>Grant access</b> > <b>Require risk remediation</b>\n  (<b>Require authentication strength</b> is selected automatically; select <b>Multifactor authentication</b> or a custom strength that allows MFA methods that are not phishing-resistant)\n\n  Session > <b>Sign-in frequency</b> > <b>Every time</b>\n  (applied automatically when Require risk remediation is selected and is mandatory)\n</pre>\n\n2.  Do not exclude the users, groups, or guest user types that are excluded from the MS.AAD.2.1v2 policy, unless they are also listed as exclusions for MS.AAD.2.5v1 in the configuration file as an approved exception to both policies.\n\n3.  Do not use the legacy **Require multifactor authentication** grant control in place of **Require risk remediation**, and do not configure sign-in risk in this policy.\n\n4.  Exclude emergency access or break-glass accounts from the policy, in accordance with the [Conditional Access policy exclusions guidance](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions).\n\n5.  Set **Enable policy** to **Report-only**, review the results using [policy impact or report-only mode](https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-conditional-access-report-only#reviewing-results), and then set **Enable policy** to **On**.",
+        "mitreMapping": [
+          {
+            "Name": "T1078: Valid Accounts",
+            "Url": "https://attack.mitre.org/techniques/T1078/"
+          },
+          {
+            "Name": "T1078.004: Cloud Accounts",
+            "Url": "https://attack.mitre.org/techniques/T1078/004/"
+          }
+        ],
+        "resources": [
+          {
+            "Name": "What are risk detections?",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
+          },
+          {
+            "Name": "Configure Microsoft Entra ID Protection risk policies",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           },
           {
             "Name": "Simulating risk detections in Identity Protection",

@@ -285,6 +285,8 @@ function New-ScubaAnalyzerControlYamlText {
             [void]$sb.AppendLine("      # No entries detected. Add approved $($Finding.ExclusionField) here.")
         }
     }
+    # A parent control's exemptions must also be targeted by its dependent policy: add that policy's stub.
+    if ($didEmit) { [void]$sb.Append((Get-ScAYamlDependentStub -ControlId $Finding.ControlId)) }
     return $sb.ToString()
 }
 

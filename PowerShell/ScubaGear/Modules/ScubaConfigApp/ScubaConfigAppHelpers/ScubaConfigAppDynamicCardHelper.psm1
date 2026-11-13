@@ -950,6 +950,76 @@ function Add-FieldListControl {
     }
 }
 
+Function Import-PolicyExclusionRelationship {
+    <#
+    .SYNOPSIS
+    Loads parent/dependent policy exemption relationships from the config schema.
+    .DESCRIPTION
+    Reads schemaMetadata.policyExclusionRelationships from the canonical ScubaGear config schema
+    (ConfigSchemaPath in the control JSON) into $syncHash.PolicyExclusionRelationships, a hashtable
+    keyed by parent policy ID with the values @{ Dependents = @(<policy ids>); Note = '<text>' }.
+    A dependent policy reads the exemptions configured for its parent policy.
+    The table stays empty when the schema or the metadata is missing.
+    #>
+    param(
+        [string]$ConfigSchemaPath
+    )
+
+    $syncHash.PolicyExclusionRelationships = @{}
+    if (-not $ConfigSchemaPath -or -not (Test-Path $ConfigSchemaPath)) { return }
+
+    try {
+        $metadata = (Get-Content -Path $ConfigSchemaPath -Raw | ConvertFrom-Json).schemaMetadata
+        if ($metadata -and $metadata.policyExclusionRelationships) {
+            foreach ($relationship in $metadata.policyExclusionRelationships.PSObject.Properties) {
+                if ($relationship.Name -match '^_') { continue }
+                $syncHash.PolicyExclusionRelationships[$relationship.Name] = @{
+                    Dependents = @($relationship.Value.dependents | Where-Object { $_ })
+                    Note       = [string]$relationship.Value.note
+                }
+            }
+        }
+    } catch {
+        Write-DebugOutput -Message ("Failed to read policy exclusion relationships from {0}: {1}" -f $ConfigSchemaPath, $_.Exception.Message) -Source $MyInvocation.MyCommand -Level "Warning"
+    }
+}
+
+Function Get-PolicyExclusionRelationshipNote {
+    <#
+    .SYNOPSIS
+    Returns the info note for a policy that takes part in an exemption relationship, or $null.
+    .DESCRIPTION
+    For a parent policy the note is the schema note (localeInfoMessages.PolicyExemptionParentNote).
+    For a dependent policy it states that the policy reads the parent's exemptions
+    (localeInfoMessages.PolicyExemptionDependentNote). A policy can be both; the notes are joined by newlines.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PolicyId
+    )
+
+    $relationships = $syncHash.PolicyExclusionRelationships
+    if (-not $relationships -or $relationships.Count -eq 0) { return $null }
+
+    $messages = $syncHash.UIConfigs.localeInfoMessages
+    $notes = @()
+
+    if ($relationships.ContainsKey($PolicyId) -and $relationships[$PolicyId].Note) {
+        $template = if ($messages.PolicyExemptionParentNote) { $messages.PolicyExemptionParentNote } else { '{0}' }
+        $notes += ($template -f $relationships[$PolicyId].Note)
+    }
+
+    foreach ($parentId in @($relationships.Keys | Sort-Object)) {
+        if (@($relationships[$parentId].Dependents) -contains $PolicyId) {
+            $template = if ($messages.PolicyExemptionDependentNote) { $messages.PolicyExemptionDependentNote } else { '{0} reads the exemptions configured for {1}.' }
+            $notes += ($template -f $PolicyId, $parentId)
+        }
+    }
+
+    if ($notes.Count -eq 0) { return $null }
+    return ($notes -join "`n")
+}
+
 # Updated Function to create a field card UI element that handles multiple fields
 Function New-FieldListCard {
     <#
@@ -1025,6 +1095,10 @@ Function New-FieldListCard {
     # Resolve controlType for this card so migration keys are scope-specific
     $controlType   = $syncHash.UIConfigs.baselineControls | Where-Object { $_.cardName -eq $CardName } | Select-Object -First 1 -ExpandProperty controlType
     $migrationKey  = "$controlType|$PolicyId"
+
+    # Whether this kind of card explains policy exemption relationships (set per baselineControl in the control JSON)
+    $cardControlConfig = $syncHash.UIConfigs.baselineControls | Where-Object { $_.cardName -eq $CardName } | Select-Object -First 1
+    $showRelationshipNote = [bool]($cardControlConfig -and $cardControlConfig.PSObject.Properties['showExemptionRelationshipNote'] -and $cardControlConfig.showExemptionRelationshipNote)
 
     # Apply migration-pending styling if this policy was auto-migrated and not yet reviewed
     $isMigrationPending = $syncHash.MigrationPendingReview -and $syncHash.MigrationPendingReview.Contains($migrationKey)
@@ -1141,6 +1215,20 @@ Function New-FieldListCard {
     $detailsPanel.Visibility = "Collapsed"
     $detailsPanel.Margin = "24,12,0,0"
     [System.Windows.Controls.Grid]::SetRow($detailsPanel, 1)
+
+    # Info note for policies related through schemaMetadata.policyExclusionRelationships
+    if ($showRelationshipNote) {
+        $relationshipNote = Get-PolicyExclusionRelationshipNote -PolicyId $PolicyId
+        if ($relationshipNote) {
+            $relationshipNoteText = New-Object System.Windows.Controls.TextBlock
+            $relationshipNoteText.Text = $relationshipNote
+            $relationshipNoteText.FontSize = 11
+            $relationshipNoteText.Foreground = $syncHash.Window.FindResource("AccentBrush")
+            $relationshipNoteText.TextWrapping = "Wrap"
+            $relationshipNoteText.Margin = "0,0,0,12"
+            [void]$detailsPanel.Children.Add($relationshipNoteText)
+        }
+    }
 
     # Create tab control for multiple inputFields if more than one
     if ($validInputFields.Count -gt 1) {

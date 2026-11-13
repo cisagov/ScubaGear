@@ -215,18 +215,18 @@ Invoke-Pester -Configuration $Config
 
 AAD functional testing for specific test cases: when developing or if you are testing pull requests you may need to execute just a single baseline policy in the respective YAML test plan file. To do that you will add Pester filter tags to the PesterConfig parameter. 
 
-Use the following example execution script to run a test against AAD policy MS.AAD.2.1v1 using a service principal. 
+Use the following example execution script to run a test against AAD policy MS.AAD.2.1v2 using a service principal. The risk-based policy tests (MS.AAD.2.1v2, MS.AAD.2.3v1, and MS.AAD.2.5v1) are in the `g5` variant test plan, so `Variant = "g5"` must be included in the container data; the default AAD test plan does not contain them.
 ```
 $TestContainers = @()
 
-$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "D17F58D66DC5750EF78F25FF04CCE88DE730BCA6"; AppId = "1947b06c-46a9-4ff2-80c8-27261e58868b"; TenantDomain = "MyG5tenant.onmicrosoft.com"; TenantDisplayName = "My G5 tenant"; ProductName = "aad"; M365Environment = "gcc" }
+$TestContainers += New-PesterContainer -Path "Testing/Functional/Products" -Data @{ Thumbprint = "D17F58D66DC5750EF78F25FF04CCE88DE730BCA6"; AppId = "1947b06c-46a9-4ff2-80c8-27261e58868b"; TenantDomain = "MyG5tenant.onmicrosoft.com"; TenantDisplayName = "My G5 tenant"; ProductName = "aad"; M365Environment = "gcc"; Variant = "g5" }
 
 $PesterConfig = @{
   Run = @{
 		Container = $TestContainers
 	}
   Filter = @{
-	 	Tag = @("MS.AAD.2.1v1")
+	 	Tag = @("MS.AAD.2.1v2")
 	}
   Output = @{
 		Verbosity = 'Detailed'

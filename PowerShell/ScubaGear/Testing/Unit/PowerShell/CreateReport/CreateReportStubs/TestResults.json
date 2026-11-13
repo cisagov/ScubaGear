@@ -255,7 +255,7 @@
                            "Get-MgBetaIdentityConditionalAccessPolicy"
                        ],
         "Criticality":  "Shall",
-        "PolicyId":  "MS.AAD.2.1v1",
+        "PolicyId":  "MS.AAD.2.1v2",
         "ReportDetails":  "0 conditional access policy(s) found that meet(s) all requirements. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
         "RequirementMet":  false
     },
@@ -448,6 +448,18 @@
         "Criticality":  "Shall",
         "PolicyId":  "MS.AAD.2.3v1",
         "ReportDetails":  "1 conditional access policy(s) found that meet(s) all requirements:\u003cbr/\u003eLive - High Risk Sign-ins SHALL be Blocked. \u003ca href=\u0027#caps\u0027\u003eView all CA policies\u003c/a\u003e.",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  [
+
+                        ],
+        "Commandlet":  [
+                           "Get-MgBetaIdentityConditionalAccessPolicy"
+                       ],
+        "Criticality":  "Shall",
+        "PolicyId":  "MS.AAD.2.5v1",
+        "ReportDetails":  "This policy is only applicable if users, groups, or guest user types are exempted from MS.AAD.2.1v2 in the configuration file. See \u003ca href=\"https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#msaad25v1\" target=\"_blank\"\u003eSecure Configuration Baseline policy\u003c/a\u003e for more info",
         "RequirementMet":  true
     },
     {
@@ -4005,5 +4017,4 @@
         "RequirementMet":  true
     }
 ]
-
 
