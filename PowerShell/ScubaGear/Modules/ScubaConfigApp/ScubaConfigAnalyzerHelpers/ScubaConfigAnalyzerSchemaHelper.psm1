@@ -264,6 +264,43 @@ function Remove-ScAHtml {
     return $clean.Trim()
 }
 
+function Import-ScADocumentedBaselines {
+    <#
+    .SYNOPSIS
+    Loads policy id -> documented policy from ScubaBaselines.json.
+    The analyzer uses this for the policy statement, section, and criticality
+    instead of keeping a second copy of that text in the validation schema.
+    #>
+    param([string]$Path)
+
+    $map = @{}
+    if (-not $Path -or -not (Test-Path -LiteralPath $Path)) { return $map }
+
+    $document = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+    if (-not $document.baselines) { return $map }
+
+    foreach ($product in $document.baselines.PSObject.Properties) {
+        foreach ($policy in @($product.Value)) {
+            if ($policy.id) { $map[[string]$policy.id] = $policy }
+        }
+    }
+    return $map
+}
+
+function ConvertTo-ScACriticalityLabel {
+    <#
+    .SYNOPSIS
+    Turns a baseline criticality (SHALL / SHOULD) into the label the analyzer shows.
+    #>
+    param([AllowNull()][string]$Criticality)
+
+    switch -Regex ([string]$Criticality) {
+        '^SHALL$'  { return 'Shall' }
+        '^SHOULD$' { return 'Should' }
+        default    { return ([string]$Criticality).Trim() }
+    }
+}
+
 function Get-ScAValidationSchema {
     <#
     .SYNOPSIS
