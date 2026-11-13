@@ -13,18 +13,33 @@
 <!-- Mention any related issue(s) here using appropriate keywords such -->
 <!-- as "closes" or "resolves" to auto-close them on merge. -->
 
-## 🧪 Testing ##
+## 🧪 How the Developer Tested These Changes ##
+
+<!-- Describe how you tested the changes included in this PR, including any scenarios that were involved -->
+<!-- No need to be super long or detailed. We can just to be sure that you tested various scenarios -->
+
+<!-- If you made code changes, confirm that you tested in the requisite environments and authentication types -->
+<!-- If you did not made code changes, you can remove these checkboxes -->
+I tested these changes in the following environments:
+- [ ] G5
+- [ ] E5
+- [ ] G3
+- [ ] GCC High
+
+I tested with:
+- [ ] Interactive Authentication.
+- [ ] Non-Interactive Authentication.
+
+<!-- How did you test your changes? Include screenshots if that helps the reviewers. -->
+
 
 <!-- How did you test your changes? How could someone else test this PR? -->
-<!-- Include details of your testing environment, and the tests you ran to -->
-<!-- see how your change affects other areas of the code, etc. -->
 
-<!--
-## 📷 Screenshots (if appropriate) ##
+## 🔍 How the PR Reviewer Can Test These Changes ##
 
-Uncomment this section if a screenshot is needed.
-
--->
+<!-- Provide test scenarios and testing instructions so that the reviewers will know how to validate this PR. -->
+<!-- Instructions that are step-by-step are easiest to follow. -->
+<!-- Screenshots are always helpful if they provide value to your scenarios. -->
 
 ## ✅ Pre-approval checklist ##
 
