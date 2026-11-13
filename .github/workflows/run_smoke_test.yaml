@@ -9,6 +9,16 @@ on:
         types: [opened, reopened, synchronize]
         branches:
             - "main"
+        paths-ignore:
+            - "docs/**"
+            - "Testing/docs/**"
+            - "*.md"
+            - "images/**"
+
+# One smoke run per PR (or branch for manual/API dispatch); newer runs cancel older ones.
+concurrency:
+    group: smoke-test-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 permissions: read-all
 
