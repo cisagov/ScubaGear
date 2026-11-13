@@ -371,6 +371,9 @@ function Invoke-ScubaTenantScan {
     # Load the baseline and analyzer schemas into memory.
     $baselineSchema = Get-Content $BaselineSchemaPath -Raw | ConvertFrom-Json
     $analyzerSchema = Get-Content $AnalyzerControlPath -Raw | ConvertFrom-Json
+    # Policy statement, section, and criticality come from the generated baseline
+    # document. The validation schema keeps the check logic, not a second copy of the wording.
+    $documentedBaselines = Import-ScADocumentedBaselines -Path (Join-Path (Split-Path -Parent $BaselineSchemaPath) 'ScubaBaselines.json')
 
     # Load analyzer rules (product map, friendly names, CA condition rules) from the schema.
     Import-ScAAnalyzerRules -AnalyzerSchema $analyzerSchema
@@ -528,8 +531,12 @@ function Invoke-ScubaTenantScan {
             # Determine the baseline exclusion field, remediation steps, requirement text, and criticality for the current control.
             $baselineExclusionField = if ($control.exclusionField) { $control.exclusionField } else { 'none' }
             $remediation    = if ($control.remediationSteps) { @($control.remediationSteps) } elseif ($control.buildInstructions.configurationSteps) { @($control.buildInstructions.configurationSteps) } else { @() }
-            $requirementTxt = if ($control.name) { $control.name } else { $controlId }
-            $criticality    = if ($requirementTxt -match 'SHALL') { 'Shall' } elseif ($requirementTxt -match 'SHOULD') { 'Should' } else { '' }
+            $documented     = if ($documentedBaselines.ContainsKey($controlId)) { $documentedBaselines[$controlId] } else { $null }
+            $requirementTxt = if ($documented -and $documented.name) { [string]$documented.name } elseif ($control.name) { [string]$control.name } else { $controlId }
+            $criticality    = if ($documented -and $documented.criticality) {
+                ConvertTo-ScACriticalityLabel $documented.criticality
+            } elseif ($requirementTxt -match 'SHALL') { 'Shall' } elseif ($requirementTxt -match 'SHOULD') { 'Should' } else { '' }
+            $groupName      = if ($documented -and $documented.policySection) { [string]$documented.policySection } elseif ($control.category) { [string]$control.category } else { '' }
 
             # This tool only emits exclusion/allow-list YAML, and only when config can
             # actually make the control pass (ConfigAction = EXCLUDE). The config-schema
@@ -584,7 +591,7 @@ function Invoke-ScubaTenantScan {
                 Product            = $prodLower
                 ProductConfigKey   = $configKey
                 ControlId          = $controlId
-                GroupName          = if ($control.category) { $control.category } else { '' }
+                GroupName          = $groupName
                 GroupNumber        = ''
                 GroupReferenceURL  = ''
                 Requirement        = $requirementTxt
@@ -609,7 +616,7 @@ function Invoke-ScubaTenantScan {
                 YamlBlock          = $yamlBlock
                 HasValidation      = $true
                 BuildInstructions  = $control.buildInstructions
-                Category           = if ($control.category) { $control.category } else { '' }
+                Category           = $groupName
             }
         }
     }

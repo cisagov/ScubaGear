@@ -907,9 +907,9 @@
       },
       {
         "id": "MS.AAD.7.4v1",
-        "name": "Permanent active role assignments SHALL be limited",
-        "category": "Privileged Identity Management",
-        "description": "Permanent active role assignments SHALL be limited to emergency access accounts",
+        "name": "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.",
+        "category": "Highly Privileged User Access",
+        "description": "Permanent active role assignments SHALL NOT be allowed for highly privileged roles.",
         "exclusionField": "RoleExclusions",
         "apiPermissionRef": "Get-MgRoleManagementDirectoryRoleAssignment",
         "validationLogic": {

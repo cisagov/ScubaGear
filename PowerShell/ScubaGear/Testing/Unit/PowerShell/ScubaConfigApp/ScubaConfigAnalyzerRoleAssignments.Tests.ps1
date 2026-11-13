@@ -132,6 +132,9 @@ Describe -Tag 'Analyzer' -Name 'MS.AAD.7.4v1 privileged role assignments' {
     It 'gives a live scan the same role-assignment guidance and RoleExclusions' {
         $withData = Invoke-ScubaTenantScan -Product aad -TenantData (New-PrivilegedRaw -PimGroupEnrolled $true) @paths
         $finding = @($withData.Findings | Where-Object ControlId -EQ 'MS.AAD.7.4v1')[0]
+        $finding.Requirement | Should -Be 'Permanent active role assignments SHALL NOT be allowed for highly privileged roles.'
+        $finding.GroupName | Should -Be 'Highly Privileged User Access'
+        $finding.Criticality | Should -Be 'Shall'
         $finding.Result | Should -Be 'Fail'
         $finding.RequiresAction | Should -Be 'FIX_TENANT'
         $finding.ConfigAction | Should -Be 'EXCLUDE'
@@ -142,6 +145,9 @@ Describe -Tag 'Analyzer' -Name 'MS.AAD.7.4v1 privileged role assignments' {
 
         $withoutData = Invoke-ScubaTenantScan -Product aad -TenantData @{} @paths
         $manual = @($withoutData.Findings | Where-Object ControlId -EQ 'MS.AAD.7.4v1')[0]
+        $manual.Requirement | Should -Be 'Permanent active role assignments SHALL NOT be allowed for highly privileged roles.'
+        $manual.GroupName | Should -Be 'Highly Privileged User Access'
+        $manual.Criticality | Should -Be 'Shall'
         $manual.Result | Should -Be 'Manual'
         $manual.RequiresAction | Should -Not -Be 'CREATE_POLICY'
         $manual.RootCause | Should -Match 'not Conditional Access'
