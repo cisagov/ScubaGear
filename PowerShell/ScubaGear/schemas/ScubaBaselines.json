@@ -1,5 +1,5 @@
 {
-  "Version": "2.10.20 [updated 10/20/2026]",
+  "Version": "2.11.13 [updated 11/13/2026]",
   "DebugMode": "None",
   "baselines": {
     "aad": [
@@ -76,7 +76,7 @@
         "id": "MS.AAD.2.1v1",
         "name": "Users detected as high risk SHALL be blocked.",
         "policySection": "Risk-based Policies",
-        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the term [\"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
+        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the terms [\"medium risk\" and \"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denote the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
@@ -109,6 +109,10 @@
           {
             "Name": "Self-remediation experience with Microsoft Entra ID Protection and Conditional Access",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience"
+          },
+          {
+            "Name": "Configure risk policies in Microsoft Entra ID Protection",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           }
         ],
         "licenseRequirements": [
@@ -136,7 +140,7 @@
         "id": "MS.AAD.2.2v1",
         "name": "A notification SHOULD be sent to the administrator when high-risk users are detected.",
         "policySection": "Risk-based Policies",
-        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the term [\"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
+        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the terms [\"medium risk\" and \"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denote the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
         "exclusionField": "none",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
@@ -166,6 +170,10 @@
           {
             "Name": "Self-remediation experience with Microsoft Entra ID Protection and Conditional Access",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience"
+          },
+          {
+            "Name": "Configure risk policies in Microsoft Entra ID Protection",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           }
         ],
         "licenseRequirements": [
@@ -180,17 +188,20 @@
         ]
       },
       {
-        "id": "MS.AAD.2.3v1",
-        "name": "Sign-ins detected as high-risk SHALL be blocked.",
+        "id": "MS.AAD.2.3v2",
+        "name": "Sign-ins detected as medium or high risk SHALL require phishing-resistant MFA and reauthentication every time for passwordless users.",
         "policySection": "Risk-based Policies",
-        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the term [\"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denotes the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
+        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the terms [\"medium risk\" and \"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denote the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
         "exclusionField": "CapExclusions",
         "omissionField": "Omissions",
         "annotationField": "Annotations",
-        "rationale": "Blocking sign-in attempts detected as high-risk prevents compromised accounts from accessing the tenant.",
+        "rationale": "Requiring a phishing-resistant authentication every time a sign-in is detected as risky allows legitimate users to remediate the risk while preventing attackers who have compromised an account from accessing the tenant.",
+        "notes": [
+          "Users who authenticate with a password MAY be excluded from the Conditional Access policy for this control, provided the users and groups excluded are listed in the [policy's configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions). Every user or group excluded this way MUST be targeted by a policy that meets [MS.AAD.2.4v1](#msaad24v1). If the policy excludes a user or group that is not listed in the configuration exclusions, the policy does not meet this control and the report lists the policy as a near miss."
+        ],
         "criticality": "SHALL",
-        "lastModified": "June 2023",
-        "implementation": "1.  Create a Conditional Access policy blocking sign-ins determined high-risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Sign-in risk > <b>High</b>\n\n  Access controls > Grant > <b>Block access</b>\n</pre>",
+        "lastModified": "October 2026",
+        "implementation": "1.  Create a Conditional Access policy requiring phishing-resistant MFA and reauthentication for sign-ins determined medium or high risk by the Identity Protection service. Configure the following policy settings in the new Conditional Access policy per the values below:\n\n<pre>\n  Users > Include > <b>All users</b>\n\n  Users > Exclude > <b>Users and groups</b> > <b>Emergency access (break-glass) accounts, and the users and groups that authenticate with a password</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Sign-in risk > Configure > <b>Yes</b> > <b>High</b> and <b>Medium</b>\n\n  Access controls > Grant > <b>Grant access</b> > <b>Require authentication strength</b> > <b>Phishing-resistant MFA</b>\n\n  Session > <b>Sign-in frequency</b> > <b>Every time</b>\n</pre>\n\n2.  Add the users and groups excluded from the policy, other than emergency access accounts, to the [configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions) for MS.AAD.2.3v2 and MS.AAD.2.4v1. Create the policy for [MS.AAD.2.4v1](#msaad24v1-instructions) to cover them.",
         "mitreMapping": [
           {
             "Name": "T1078: Valid Accounts",
@@ -213,6 +224,74 @@
           {
             "Name": "Self-remediation experience with Microsoft Entra ID Protection and Conditional Access",
             "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience"
+          },
+          {
+            "Name": "Configure risk policies in Microsoft Entra ID Protection",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
+          }
+        ],
+        "licenseRequirements": [
+          "Requires a Microsoft Entra ID P2 license"
+        ],
+        "badges": [
+          {
+            "label": "BOD 25-01 Requirement",
+            "linkUrl": "https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services",
+            "color": "C41230"
+          },
+          {
+            "label": "Automated Check",
+            "linkUrl": "#key-terminology",
+            "color": "5E9732"
+          },
+          {
+            "label": "Configurable",
+            "linkUrl": "../../../docs/configuration/configuration.md#conditional-access-policy-exclusions",
+            "color": "005288"
+          }
+        ]
+      },
+      {
+        "id": "MS.AAD.2.4v1",
+        "name": "Sign-ins detected as medium or high risk SHALL require MFA and reauthentication every time for users who authenticate with a password.",
+        "policySection": "Risk-based Policies",
+        "sectionDescription": "This section provides policies that reduce security risks related to potentially compromised user accounts. These policies combine Microsoft Entra ID Protection and Microsoft Entra ID Conditional Access. Microsoft Entra ID Protection uses numerous signals to detect the risk level for each user or sign-in and determine if an account may have been compromised.\n\n- _Additional mitigations to reduce risks associated with the authentication of workload identities:_ Although not covered in this baseline due to the need for an additional non-standard license, Microsoft provides support for mitigating risks related to workload identities (Microsoft Entra ID applications or service principals). Agencies should strongly consider implementing this feature as workload identities present many of the same risks as interactive user access and are commonly used in modern systems. CISA encourages organizations to [apply Conditional Access policies to workload identities](https://learn.microsoft.com/en-us/entra/identity/conditional-access/workload-identity).\n\n- _Note:_ In this section, the terms [\"medium risk\" and \"high risk\"](https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks) denote the risk level applied by the Microsoft Entra ID Protection service to a user account or sign-in event.",
+        "exclusionField": "CapExclusions",
+        "omissionField": "Omissions",
+        "annotationField": "Annotations",
+        "rationale": "Users who authenticate with a password cannot use a passwordless method to remediate a risky sign-in. Requiring MFA and reauthentication every time allows these users to prove their identity while preventing attackers who have compromised a password from accessing the tenant.",
+        "notes": [
+          "This control checks that every user and group excluded from the policy for [MS.AAD.2.3v2](#msaad23v2) is targeted by a policy that meets this control. This control requires an enabled policy that meets MS.AAD.2.3v2, the users covered by this control cannot be determined without one. A report-only or disabled policy does not count. If more than one policy meets MS.AAD.2.3v2, a user or group is only treated as excluded when every one of those policies excludes it, because any other policy still covers that user or group. Exclusions are matched by object ID and group membership is not resolved, so a user excluded from one policy who is also a member of a group excluded from another is not reported. If no users or groups are excluded from the policy for MS.AAD.2.3v2, all users are covered by that policy and a separate policy for this control is not required. Users and groups excluded from both policies must be listed in the [configuration exclusions](../../../docs/configuration/configuration.md#conditional-access-policy-exclusions). The users and groups excluded from the policy for MS.AAD.2.3v2 are checked even when that policy does not meet its control because of exclusions missing from the configuration. In that case the report for this control lists the excluded users and groups that no policy for this control targets."
+        ],
+        "criticality": "SHALL",
+        "lastModified": "October 2026",
+        "implementation": "If no users or groups are excluded from the policy for [MS.AAD.2.3v2](#msaad23v2-instructions), all users are covered by that policy and this policy is not required.\n\n1.  Create a Conditional Access policy requiring MFA and reauthentication for sign-ins determined medium or high risk by the Identity Protection service for the users who authenticate with a password. Configure the following policy settings in the new Conditional Access policy per the values below:\n\n<pre>\n  Users > Include > <b>Select users and groups</b> > <b>The users and groups excluded from the policy for MS.AAD.2.3v2 that authenticate with a password</b>\n\n  Users > Exclude > <b>Users and groups</b> > <b>Emergency access (break-glass) accounts</b>\n\n  Target resources > Include > <b>All resources (formerly 'All cloud apps') </b>\n\n  Conditions > Sign-in risk > Configure > <b>Yes</b> > <b>High</b> and <b>Medium</b>\n\n  Access controls > Grant > <b>Grant access</b> > <b>Require authentication strength</b> > <b>Multifactor authentication</b>\n\n  Session > <b>Sign-in frequency</b> > <b>Every time</b>\n</pre>",
+        "mitreMapping": [
+          {
+            "Name": "T1078: Valid Accounts",
+            "Url": "https://attack.mitre.org/techniques/T1078/"
+          },
+          {
+            "Name": "T1078.004: Cloud Accounts",
+            "Url": "https://attack.mitre.org/techniques/T1078/004/"
+          }
+        ],
+        "resources": [
+          {
+            "Name": "What are risk detections?",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-risks"
+          },
+          {
+            "Name": "Simulating risk detections in Identity Protection",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-simulate-risk"
+          },
+          {
+            "Name": "Self-remediation experience with Microsoft Entra ID Protection and Conditional Access",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/concept-identity-protection-user-experience"
+          },
+          {
+            "Name": "Configure risk policies in Microsoft Entra ID Protection",
+            "Url": "https://learn.microsoft.com/en-us/entra/id-protection/howto-identity-protection-configure-risk-policies"
           }
         ],
         "licenseRequirements": [
