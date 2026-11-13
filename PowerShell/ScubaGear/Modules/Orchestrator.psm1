@@ -346,6 +346,8 @@ function Invoke-SCuBA {
         # Handling it at that single # convergence point ensures products from either source are
         # normalized identically.
 
+        Write-Warning "Test warning in Orchestrator.psm1"
+
         # Default execution ParameterSet
         if ($PSCmdlet.ParameterSetName -eq 'Report'){
 
