@@ -31,9 +31,10 @@ InModuleScope Orchestrator {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', 'OutFolderPath')]
                 $OutFolderPath = "./"
             }
-            It 'With -ProductNames "aad", should not throw' {
-                $ScubaConfig.ProductNames = @("aad")
+            It 'Counts a single product name as one product' {
+                $ScubaConfig.ProductNames = 'aad'
                 { Invoke-RunRego -ScubaConfig $ScubaConfig -ParentPath $ParentPath -OutFolderPath $OutFolderPath } | Should -Not -Throw
+                Should -Invoke -CommandName Write-Progress -Exactly -Times 1 -ParameterFilter { $Status -like '*1 of 1 *' -and $PercentComplete -eq 100 }
             }
             It 'With -ProductNames "securitysuite", should not throw' {
                 $ScubaConfig.ProductNames = @("securitysuite")
