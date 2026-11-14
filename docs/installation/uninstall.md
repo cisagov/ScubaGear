@@ -15,19 +15,15 @@ To uninstall ScubaGear, follow these steps:
 
 Square brackets reflect the example outputs, below numbered.
 
-1. Import the support module via the statement `Import-Module PowerShell/ScubaGear/Modules/Support/Support.psm1`. [1]
-2. List installed dependencies using the `Get-ScubaGearDependencyStatus` function. [2] Note that OPA is not a module, and is listed with modules for completeness only.
-3. Invoke help via `Get-Help Remove-ScubaModuleVersion`. [3]
-4. With exception of OPA, use the `Remove-ScubaModuleVersion` function to remove an installed module, passing the `ModuleName` and `Version` parameters as identified in the output of number 3, above. Note the results returned in the `Removed` and `Warning` properties. [4]
-5. Use the `Get-ScubaDependencyStatus` function to verify removal. [5]
+1. List installed dependencies using the `Get-ScubaGearDependencyStatus` function. 
+2. Invoke help via `Get-Help Remove-ScubaModuleVersion`.
+3. With exception of OPA, use the `Remove-ScubaModuleVersion` function to remove an installed module, passing the `ModuleName` and `Version` parameters as identified in the output of number 3, above. Note the results returned in the `Removed` and `Warning` properties.
+4. Use the `Get-ScubaDependencyStatus` function to verify removal.
+
+**Note**: that OPA is not a module, and is listed with modules for completeness only.
 
 ### Example outputs ###
-1. Import the support module via the statement `Import-Module PowerShell/ScubaGear/Modules/Support/Support.psm1`.
-```PowerShell
-PS C:\Users\user\github.com\ScubaGear> Import-Module .\PowerShell\ScubaGear\Modules\Support\Support.psm1
-```
-
-2. List installed dependencies using the `Get-ScubaGearDependencyStatus` function.
+1. List installed dependencies using the `Get-ScubaGearDependencyStatus` function.
 ```PowerShell
 PS C:\Users\user\github.com\ScubaGear> Get-ScubaGearDependencyStatus
 
@@ -42,7 +38,7 @@ ScubaGear                        True               1 1.8.0           OK        
 PS C:\Users\user\github.com\ScubaGear>
 ```
 
-3. Invoke help via `Get-Help Remove-ScubaModuleVersion`, and familiarize yourself with the purpose and syntax of the `Remove-ScubaModuleVersion` function.
+2. Invoke help via `Get-Help Remove-ScubaModuleVersion`, if helpful.
 ```PowerShell
 PS C:\Users\user\github.com\ScubaGear> Get-Help Remove-ScubaModuleVersion
 
@@ -76,7 +72,7 @@ REMARKS
 PS C:\Users\user\github.com\ScubaGear>
 ```
 
-4. Use the Remove-ScubaModuleVersion function to remove an installed module, passing the ModuleName and Version parameters.
+3. Use the Remove-ScubaModuleVersion function to remove an installed module, passing the ModuleName and Version parameters.
 ```PowerShell
 PS C:\Users\user\github.com\ScubaGear> Remove-ScubaModuleVersion -ModuleName powershell-yaml -Version 0.4.12
 
@@ -88,7 +84,7 @@ Removed Warning
 PS C:\Users\user\github.com\ScubaGear>
 ```
 
-5. Use the `Get-ScubaDependencyStatus` function to verify removal.
+4. Use the `Get-ScubaDependencyStatus` function to verify removal.
 ```PowerShell
 PS C:\Users\user\github.com\ScubaGear> Get-ScubaGearDependencyStatus
 
