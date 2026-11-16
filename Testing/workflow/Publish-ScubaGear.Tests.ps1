@@ -105,18 +105,35 @@ Describe "Edit-ManifestFile" {
 }
 
 Describe "New-ArrayOfFilePaths" {
-  It "should copy of the files paths into the array" {
-    # Pick any location, doesn't matter.
-    $Location = Get-Location
-    $SourcePath = Join-Path -Path $Location -ChildPath "/PowerShell/ScubaGear/Modules/Connection"
-    # For this location, count the PowerShell files.
-    # There are 2 (at this time).
-    # Create an array with the method
+  It "should include scripts, manifests, and format files" {
+    $SourcePath = Join-Path -Path $TestDrive -ChildPath "sign-candidates"
+    New-Item -ItemType Directory -Path $SourcePath | Out-Null
+    @(
+      'Module.ps1'
+      'Module.psm1'
+      'Module.psd1'
+      'Module.Format.ps1xml'
+      'readme.md'
+    ) | ForEach-Object {
+      New-Item -ItemType File -Path (Join-Path -Path $SourcePath -ChildPath $_) | Out-Null
+    }
+
     $ArrayOfFilePaths = New-ArrayOfFilePaths -ModuleDestinationPath $SourcePath
-    # The resulting array should not be empty.
+
     $ArrayOfFilePaths | Should -Not -BeNullOrEmpty
-    # It should 2 files.
-    $ArrayOfFilePaths.Length | Should -Be 2
+    $ArrayOfFilePaths.Count | Should -Be 4
+    ($ArrayOfFilePaths | Where-Object { $_.Extension -eq '.ps1xml' }).Name |
+      Should -Be 'Module.Format.ps1xml'
+    ($ArrayOfFilePaths | Where-Object { $_.Extension -eq '.md' }) |
+      Should -BeNullOrEmpty
+  }
+
+  It "should throw when no signable files are present" {
+    $SourcePath = Join-Path -Path $TestDrive -ChildPath "no-sign-candidates"
+    New-Item -ItemType Directory -Path $SourcePath | Out-Null
+    New-Item -ItemType File -Path (Join-Path -Path $SourcePath -ChildPath 'readme.md') | Out-Null
+
+    { New-ArrayOfFilePaths -ModuleDestinationPath $SourcePath } | Should -Throw
   }
 }
 

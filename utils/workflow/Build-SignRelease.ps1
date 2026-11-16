@@ -59,7 +59,7 @@ function New-ModuleSignature {
   $FileListFileName = New-FileList `
     -ArrayOfFilePaths $ArrayOfFilePaths
 
-  Write-Warning "Calling AzureSignTool function to sign scripts, manifest, and modules..."
+  Write-Warning "Calling AzureSignTool function to sign scripts, manifest, modules, and format files..."
   Use-AzureSignTool `
     -AzureKeyVaultUrl $AzureKeyVaultUrl `
     -CertificateName $CertificateName `
