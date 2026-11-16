@@ -165,7 +165,7 @@ function Publish-ScubaGearModule {
     $FileListFileName = New-FileList `
     -ArrayOfFilePaths $ArrayOfFilePaths
 
-    Write-Warning "Calling AzureSignTool function to sign scripts, manifest, and modules..."
+    Write-Warning "Calling AzureSignTool function to sign scripts, manifest, modules, and format files..."
     Use-AzureSignTool `
       -AzureKeyVaultUrl $AzureKeyVaultUrl `
       -CertificateName $CertificateName `
@@ -360,7 +360,9 @@ function New-ArrayOfFilePaths {
     $ModuleDestinationPath
  )
 
-  $FileExtensions = "*.ps1", "*.psm1", "*.psd1"  # Array of extensions to match on
+  # Format files (.ps1xml) are loaded through FormatsToProcess and are subject to
+  # execution-policy checks, so they must be signed with the scripts and manifest.
+  $FileExtensions = "*.ps1", "*.psm1", "*.psd1", "*.ps1xml"
   $ArrayOfFilePaths = @()
   $ArrayOfFilePaths = Get-ChildItem -Recurse -Path $ModuleDestinationPath -Include $FileExtensions
 
@@ -373,7 +375,7 @@ function New-ArrayOfFilePaths {
     Write-Warning "Found $($ArrayOfFilePaths.Count) files to sign"
   }
   else {
-    $ErrorMessage = "Failed to find any .ps1, .psm1, or .psd1 files."
+    $ErrorMessage = "Failed to find any .ps1, .psm1, .psd1, or .ps1xml files."
     Write-Error $ErrorMessage
     throw $ErrorMessage
   }
