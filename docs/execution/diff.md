@@ -149,7 +149,8 @@ For a migrated pair:
   produces `PolicyVersionUpdate` is skipped, because the two IDs come from
   different policy families and their suffixes are not comparable.
 - Three fields are added: `Migrated` (always `true`), `MigratedFromId` (the
-  retired full ID), and `MigratedFromProduct` (`Defender` or `EXO`).
+  retired full ID), and `MigratedFromProduct` (`Defender` or `EXO`, or the
+  product itself for a [renumbered policy](#renumbered-policies-within-a-product)).
 
 The retired policy **also stays in its own product's section**, as a `Migrated`
 record, so a Defender or EXO section never silently loses a policy:
@@ -176,6 +177,28 @@ replacement, and neither run carries both. Two post-migration runs, or a
 transitional run carrying the old and new policy side by side, are compared
 as-is with no migration applied. The alias is directional: passing the files in
 reverse order (Security Suite as *before*, Defender or EXO as *after*) does not
+align anything.
+
+### Renumbered policies within a product
+
+A policy that kept its meaning but changed number inside its own product would
+otherwise report as `RemovedPolicy` plus an unrelated `NewPolicy`, or be compared
+against a different policy that now holds the old number. A second, same-product
+table (`$script:PolicyRenumberMap` in `Diff.psm1`) handles this, with one row per
+renumbered policy that matches its Old ID and New ID row in the mapping CSV. No
+policy is currently renumbered, so the table is empty and nothing is aligned this
+way.
+
+For a policy listed in the table:
+
+- The pair is reported exactly like a migrated pair: `Control ID (Before)` keeps the
+old ID, the record carries `Migrated`, `MigratedFromId`, and `MigratedFromProduct`
+(the policy's own product) with a **migrated** badge, and it is classified by its result rather than
+as `PolicyVersionUpdate`. Unlike a Security Suite migration, no `Migrated` stub is
+left under the old number, because the after run may carry a different policy
+there; that policy reports as `NewPolicy`. The pair is only aligned when the
+before run has the old number, the after run has the new one, and the before run
+does not already use the new number. Passing the files in reverse order does not
 align anything.
 
 ### What is deliberately not migrated
