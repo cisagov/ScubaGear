@@ -133,7 +133,10 @@ Describe "New-ArrayOfFilePaths" {
     New-Item -ItemType Directory -Path $SourcePath | Out-Null
     New-Item -ItemType File -Path (Join-Path -Path $SourcePath -ChildPath 'readme.md') | Out-Null
 
-    { New-ArrayOfFilePaths -ModuleDestinationPath $SourcePath } | Should -Throw
+    # The function Write-Errors before throwing. Suppress that stream so the
+    # expected failure does not look like a failed test in the console.
+    { New-ArrayOfFilePaths -ModuleDestinationPath $SourcePath -ErrorAction SilentlyContinue } |
+      Should -Throw
   }
 }
 
