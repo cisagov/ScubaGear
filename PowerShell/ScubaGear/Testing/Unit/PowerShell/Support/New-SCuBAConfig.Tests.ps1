@@ -149,6 +149,95 @@ InModuleScope Support {
                 { New-SCuBAConfig @ExclusionArgs } | Should -Not -Throw
                 Should -Invoke -CommandName Write-Warning -Exactly -Times 1
             }
+
+            It 'Silently generates the dependent policy template for a policy whose exemptions it reads' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $ExclusionArgs = $CMDArgs.Clone()
+                $ExclusionArgs['ExclusionPolicy'] = @("MS.AAD.2.1v2")
+                New-SCuBAConfig @ExclusionArgs
+
+                $Script:CapturedConfig['Aad'].Contains('MS.AAD.2.1v2') | Should -BeTrue
+                $Script:CapturedConfig['Aad'].Contains('MS.AAD.2.5v1') | Should -BeTrue
+                $Script:CapturedConfig['Aad'].Contains('MS.AAD.1.1v1') | Should -BeFalse
+                Should -Invoke -CommandName Write-Warning -Exactly -Times 0
+            }
+
+            It 'Does not generate the parent template when only the dependent policy is requested' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $ExclusionArgs = $CMDArgs.Clone()
+                $ExclusionArgs['ExclusionPolicy'] =                 @("MS.AAD.2.5v1")
+                New-SCuBAConfig @ExclusionArgs
+
+                                $Script:CapturedConfig['Aad'].Contains('MS.AAD.2.5v1') | Should -BeTrue
+                $Script:CapturedConfig['Aad'].Contains('MS.AAD.2.1v2') | Should -BeFalse
+            }
+        }
+
+        Context "When retired policy IDs are provided" {
+            It 'Maps a replaced ID in OmitPolicy to its replacement and warns' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $OmitArgs = $CMDArgs.Clone()
+                $OmitArgs['OmitPolicy'] = @("MS.AAD.3.2v1")
+                New-SCuBAConfig @OmitArgs
+
+                $Script:CapturedConfig['OmitPolicy'].Contains('MS.AAD.3.2v2') | Should -BeTrue
+                $Script:CapturedConfig['OmitPolicy'].Contains('MS.AAD.3.2v1') | Should -BeFalse
+                Should -Invoke -CommandName Write-Warning -ParameterFilter { $Message -match 'MS\.AAD\.3\.2v1.*migrated to MS\.AAD\.3\.2v2' } -Exactly -Times 1
+            }
+
+            It 'Maps a replaced ID in AnnotatePolicy to its replacement' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $AnnotateArgs = $CMDArgs.Clone()
+                $AnnotateArgs['AnnotatePolicy'] = @("MS.AAD.3.2v1")
+                New-SCuBAConfig @AnnotateArgs
+
+                $Script:CapturedConfig['AnnotatePolicy'].Contains('MS.AAD.3.2v2') | Should -BeTrue
+                $Script:CapturedConfig['AnnotatePolicy'].Contains('MS.AAD.3.2v1') | Should -BeFalse
+            }
+
+            It 'Maps a replaced ID in ExclusionPolicy to its replacement' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $ExclusionArgs = $CMDArgs.Clone()
+                $ExclusionArgs['ExclusionPolicy'] = @("MS.AAD.3.2v1")
+                New-SCuBAConfig @ExclusionArgs
+
+                $Script:CapturedConfig['Aad'].Contains('MS.AAD.3.2v2') | Should -BeTrue
+                $Script:CapturedConfig['Aad'].Contains('MS.AAD.3.2v1') | Should -BeFalse
+            }
+
+            It 'Skips a removed policy ID with a warning' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $OmitArgs = $CMDArgs.Clone()
+                $OmitArgs['OmitPolicy'] = @("MS.EXO.8.3v1")
+                New-SCuBAConfig @OmitArgs
+
+                $Script:CapturedConfig.Contains('OmitPolicy') | Should -BeFalse
+                Should -Invoke -CommandName Write-Warning -ParameterFilter { $Message -match 'MS\.EXO\.8\.3v1.*has been removed' } -Exactly -Times 1
+            }
+
+            It 'Leaves a current policy ID unchanged' {
+                $Script:CapturedConfig = $null
+                Mock -ModuleName Support -CommandName ConvertTo-Yaml { $Script:CapturedConfig = $args[0]; return "yaml" }
+
+                $OmitArgs = $CMDArgs.Clone()
+                $OmitArgs['OmitPolicy'] = @("MS.AAD.3.2v2")
+                New-SCuBAConfig @OmitArgs
+
+                $Script:CapturedConfig['OmitPolicy'].Contains('MS.AAD.3.2v2') | Should -BeTrue
+                Should -Invoke -CommandName Write-Warning -ParameterFilter { $Message -match 'migrated' } -Exactly -Times 0
+            }
         }
 
         Context "When policy IDs are provided in the AnnotatePolicy parameter" {

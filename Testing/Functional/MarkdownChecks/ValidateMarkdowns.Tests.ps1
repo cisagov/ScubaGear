@@ -11,7 +11,7 @@ $MarkdownCases = @(
     @{Product = "si"; MarkdownFileName = "si.md"; BaselinePath = $BaselinePath}
 )
 $ImportCases = @(
-    @{Product = "aad"; GroupCount = 9; PolicyCount = 34; BaselinePath = $BaselinePath}
+    @{Product = "aad"; GroupCount = 9; PolicyCount = 35; BaselinePath = $BaselinePath}
     @{Product = "securitysuite"; GroupCount = 8; PolicyCount = 24; BaselinePath = $BaselinePath}
     @{Product = "exo"; GroupCount = 8; PolicyCount = 12; BaselinePath = $BaselinePath}
     @{Product = "powerbi"; GroupCount = 7; PolicyCount = 8; BaselinePath = $BaselinePath}

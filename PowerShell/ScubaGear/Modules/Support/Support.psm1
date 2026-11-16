@@ -1610,16 +1610,21 @@ function New-SCuBAConfig {
     A comma-separated list of policies to exclude from the ScubaGear report, e.g., MS.AAD.1.1v1.
     Note that the rationales will need to be manually added to the resulting config file.
     Tab completion is available for this parameter and is populated from the ScubaGear baselines.
+    A policy ID that has been renumbered or replaced (see mappings/scuba-baseline-policy-migrations.csv) is
+    mapped to its replacement with a warning; policies that were removed or split are skipped with a warning.
     .Parameter ExclusionPolicy
     A comma-separated list of exclusion-supporting policy IDs to include in the generated config's
     exclusion sections, e.g., MS.AAD.1.1v1. When omitted, every exclusion-supporting policy for the
     selected products is generated. Tab completion is available and is populated from the ScubaGear
-    configuration schema.
+    configuration schema. Policies whose assessment reads another policy's exemptions are generated
+    together with that policy: requesting MS.AAD.2.1v2 also generates MS.AAD.2.5v1, because the users,
+    groups, and guest user types exempted from MS.AAD.2.1v2 must be targeted by a policy that meets
+    MS.AAD.2.5v1. Retired policy IDs are handled as described for OmitPolicy.
     .Parameter AnnotatePolicy
     A comma-separated list of policies to annotate in the ScubaGear report, e.g., MS.AAD.1.1v1.
     Entries are added under the AnnotatePolicy section; the required comment must be added manually
     to the resulting config file. Tab completion is available and is populated from the ScubaGear
-    baselines.
+    baselines. Retired policy IDs are handled as described for OmitPolicy.
     .Parameter SkipDoH
     When $true, ScubaGear will not retry failed DNS queries over DNS-over-HTTPS. Default is $false.
     .Parameter PreferredDnsResolvers
@@ -1947,6 +1952,54 @@ function New-SCuBAConfig {
         }
     }
 
+    # Policy IDs that exist in the current baselines and the legacy -> replacement mappings. They let the
+    # OmitPolicy, AnnotatePolicy, and ExclusionPolicy parameters recognize an ID that has been replaced or
+    # renumbered (for example MS.AAD.2.1v1 -> MS.AAD.2.1v2) instead of silently generating an entry
+    # that no longer matches any policy.
+    $CurrentPolicyIds = @{}
+    $BaselinesPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\schemas\ScubaBaselines.json"
+    if (Test-Path -Path $BaselinesPath) {
+        $CurrentBaselines = (Get-Content -Path $BaselinesPath -Raw | ConvertFrom-Json).baselines
+        foreach ($BaselineProduct in $CurrentBaselines.PSObject.Properties.Name) {
+            foreach ($BaselinePolicy in $CurrentBaselines.$BaselineProduct) {
+                $CurrentPolicyIds[$BaselinePolicy.id.ToUpper()] = $true
+            }
+        }
+    }
+    $PolicyMigrations = @{}
+    $MigrationsPath = Join-Path -Path $PSScriptRoot -ChildPath "..\..\mappings\scuba-baseline-policy-migrations.csv"
+    if (Test-Path -Path $MigrationsPath) {
+        foreach ($Row in (Import-Csv -Path $MigrationsPath)) {
+            $OldId = ([string]$Row.'Old ID').Trim()
+            if ($OldId) {
+                $PolicyMigrations[$OldId.ToUpper()] = [string]$Row.'New ID'
+            }
+        }
+    }
+
+    # Returns the policy ID to use for a requested ID, or $null when the ID should be skipped. An ID that is
+    # still in the current baselines is returned unchanged. A retired ID with exactly one replacement is
+    # replaced (with a warning); retired IDs that were removed or split are skipped with a warning.
+    function Resolve-LegacyPolicyId {
+        param([string]$PolicyId, [string]$ParameterName)
+        $Key = $PolicyId.ToUpper()
+        if ($CurrentPolicyIds.ContainsKey($Key) -or -not $PolicyMigrations.ContainsKey($Key)) {
+            return $PolicyId
+        }
+        $NewIds = @([regex]::Matches($PolicyMigrations[$Key], 'MS\.[A-Za-z]+\.\d+\.\d+[Vv]\d+') | ForEach-Object { $_.Value })
+        if ($NewIds.Count -eq 1) {
+            Write-Warning "The policy, $PolicyId, in the $ParameterName parameter has been migrated to $($NewIds[0]). Using $($NewIds[0])."
+            return $NewIds[0]
+        }
+        if ($NewIds.Count -eq 0) {
+            Write-Warning "The policy, $PolicyId, in the $ParameterName parameter has been removed and is no longer assessed. Skipping."
+        }
+        else {
+            Write-Warning "The policy, $PolicyId, in the $ParameterName parameter was replaced by multiple policies ($($NewIds -join ', ')). Specify the replacement policies instead. Skipping."
+        }
+        return $null
+    }
+
     # Discover schema-defined product namespaces for exclusion generation.
     $Schema = $null
     $NamespaceExclusionFields = @{}
@@ -1999,6 +2052,8 @@ function New-SCuBAConfig {
             Write-Warning $Warning
             Continue
         }
+        $Policy = Resolve-LegacyPolicyId -PolicyId $Policy -ParameterName 'OmitPolicy'
+        if ($null -eq $Policy) { Continue }
         $Product = ($Policy -Split "\.")[1]
         # Here's where the product name is validated
         if (-not ($SelectedProducts -Contains $Product)) {
@@ -2049,6 +2104,8 @@ function New-SCuBAConfig {
             Write-Warning $Warning
             Continue
         }
+        $Policy = Resolve-LegacyPolicyId -PolicyId $Policy -ParameterName 'AnnotatePolicy'
+        if ($null -eq $Policy) { Continue }
         # Extract the product component from the policy ID and ensure it is among the selected products.
         $Product = ($Policy -Split "\.")[1]
         # Convert the product component to lowercase for comparison with the selected products list.
@@ -2080,16 +2137,42 @@ function New-SCuBAConfig {
 
     # Build the per-product exclusion sections directly from the configuration schema.
     if ($null -ne $Schema) {
+        # Replace retired policy IDs in ExclusionPolicy with their replacements. Entries that are not
+        # policy IDs are left alone so the existing unmatched-entry warning below still reports them.
+        $RequestedExclusionPolicy = @()
+        foreach ($RequestedPolicy in $ExclusionPolicy) {
+            if ($RequestedPolicy -match "^ms\.[a-z]+\.[0-9]+\.[0-9]+v[0-9]+$") {
+                $RequestedPolicy = Resolve-LegacyPolicyId -PolicyId $RequestedPolicy -ParameterName 'ExclusionPolicy'
+                if ($null -eq $RequestedPolicy) { continue }
+            }
+            $RequestedExclusionPolicy += $RequestedPolicy
+        }
+
+        # A policy's exemptions can be read by dependent policies (for example MS.AAD.2.5v1 reads the
+        # MS.AAD.2.1v2 exemptions), so the dependent templates are generated alongside the requested policy.
+        $GeneratedExclusionPolicy = @($RequestedExclusionPolicy)
+        $Relationships = $Schema.schemaMetadata.policyExclusionRelationships
+        if ($RequestedExclusionPolicy.Count -gt 0 -and $null -ne $Relationships) {
+            foreach ($ParentId in $Relationships.PSObject.Properties.Name) {
+                if ($ParentId -eq '_comment' -or $RequestedExclusionPolicy -notcontains $ParentId) { continue }
+                foreach ($DependentId in @($Relationships.$ParentId.dependents)) {
+                    if ($GeneratedExclusionPolicy -notcontains $DependentId) {
+                        $GeneratedExclusionPolicy += $DependentId
+                    }
+                }
+            }
+        }
+
         # policyExclusionMappings is the authoritative list of concrete policy IDs and the exclusion
         # type(s) each supports. Emit an empty template for every selected policy. When specific
-        # ExclusionPolicy IDs are requested, only those are generated.
+        # ExclusionPolicy IDs are requested, only those (and their dependents) are generated.
         $MatchedExclusions = @()
         $PolicyExclusionMappings = $Schema.schemaMetadata.policyExclusionMappings
         # Iterate through each policy ID in the policy exclusion mappings to build the exclusion sections.
         foreach ($PolicyId in $PolicyExclusionMappings.PSObject.Properties.Name) {
             if ($PolicyId -eq '_comment') { continue }
             # Skip any policies that are not part of the requested exclusion policies, if any are specified.
-            if ($ExclusionPolicy.Count -gt 0 -and ($ExclusionPolicy -notcontains $PolicyId)) { continue }
+            if ($ExclusionPolicy.Count -gt 0 -and ($GeneratedExclusionPolicy -notcontains $PolicyId)) { continue }
 
             # Extract the product short name from the policy ID and ensure it is among the selected products.
             $ProductShortName = ($PolicyId -split '\.')[1].ToLower()
@@ -2124,7 +2207,7 @@ function New-SCuBAConfig {
         # Warn about any requested ExclusionPolicy entries that were not generated.
         if ($ExclusionPolicy.Count -gt 0) {
             # Identify any exclusion policies that were requested but not matched in the generated configuration.
-            $UnmatchedExclusions = $ExclusionPolicy | Where-Object { $MatchedExclusions -notcontains $_ }
+            $UnmatchedExclusions = $RequestedExclusionPolicy | Where-Object { $MatchedExclusions -notcontains $_ }
             if ($UnmatchedExclusions) {
                 $Warning = "The following ExclusionPolicy entries were not added because they do not "
                 $Warning += "support an exclusion, are not encompassed by the selected ProductNames, or "

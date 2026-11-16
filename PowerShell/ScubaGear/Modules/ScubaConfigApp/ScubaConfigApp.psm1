@@ -510,6 +510,10 @@ Function Start-SCuBAConfigApp {
             Write-Error "Failed to load baseline configuration. Please ensure Rego files and baseline markdown files are available."
         }
 
+        # Policy exemption relationships (parent policy -> dependent policies) come from the config schema metadata
+        $configSchemaFile = if ($syncHash.UIConfigs.ConfigSchemaPath) { Join-Path $ModuleBasePath $syncHash.UIConfigs.ConfigSchemaPath } else { $null }
+        Import-PolicyExclusionRelationship -ConfigSchemaPath $configSchemaFile
+
         # Add global event handlers to all UI controls after everything is loaded
         $syncHash.PreviewTab.IsEnabled = $false
         If($syncHash.UIConfigs.EnableScubaRun){
@@ -957,6 +961,13 @@ Function Start-SCuBAConfigApp {
                     If($syncHash.UIConfigs.EnableScubaRun){
                         $syncHash.ScubaRunTab.IsEnabled = $true
                         Test-ScubaRunReadiness
+                    }
+
+                    # Non-blocking warnings (e.g. a policy's exemptions are not assessed because the policy that reads them is omitted)
+                    if (@($validationResults.Warnings).Count -gt 0) {
+                        $formattedWarnings = $validationResults.Warnings | ForEach-Object { "`n - $_" }
+                        Write-DebugOutput -Message "Validation produced $(@($validationResults.Warnings).Count) warning(s)" -Source $MyInvocation.MyCommand -Level "Warning"
+                        $syncHash.ShowMessageBox.Invoke(($syncHash.UIConfigs.localeInfoMessages.PolicyExemptionWarningsPrefix -f ($formattedWarnings -join '')), $syncHash.UIConfigs.localeTitles.Warning, [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Warning)
                     }
                 }
             }) #end Dispatcher.Invoke

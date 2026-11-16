@@ -250,6 +250,9 @@ function Invoke-ScubaConfigAnalysis {
                         -Description $requirementTxt -ExclusionValues $exclusionValues -ExclusionDefinitions $syncHash.ScAExclusionDefinitions
                 } else { "" }
 
+                # A parent control's exemptions must also be targeted by its dependent policy: follow with that policy's stub.
+                if ($yamlBlock -and $hasExclusionValues) { $yamlBlock += Get-ScAYamlDependentStub -ControlId $controlId }
+
                 # Surface the effective exclusion field on the finding so the UI shows the
                 # right block instead of 'none' when config exclusions apply.
                 $exclusionField = if ($effExclusionField -and ($configInfo.ConfigAction -eq 'EXCLUDE' -or $hasExclusionValues)) { $effExclusionField } else { $baselineExclusionField }
@@ -259,6 +262,8 @@ function Invoke-ScubaConfigAnalysis {
                 if ($configInfo.ConfigAction -eq 'FIX_TENANT') {
                     $recommendations += "This control can't be made to pass with ScubaGear configuration. Align the tenant setting (see remediation steps), or omit the policy in the ScubaGear Config App (this analyzer does not generate omissions)."
                 }
+                # Exemptions from a parent control must also be targeted by its dependent policy.
+                $recommendations += @(Get-ScAExclusionFollowUp -ControlId $controlId -HasExclusions $hasExclusionValues)
 
                 # Build the finding object with all relevant details.
                 $findings += [pscustomobject]@{
@@ -565,6 +570,9 @@ function Invoke-ScubaTenantScan {
                     -Description $requirementTxt -ExclusionValues $exclusionValues -ExclusionDefinitions $syncHash.ScAExclusionDefinitions
             } else { "" }
 
+            # A parent control's exemptions must also be targeted by its dependent policy: follow with that policy's stub.
+            if ($yamlBlock) { $yamlBlock += Get-ScAYamlDependentStub -ControlId $controlId }
+
             # Determine the effective exclusion field based on the configuration action.
             $exclusionField = if ($configInfo.ConfigAction -eq 'EXCLUDE' -and $effExclusionField) { $effExclusionField } else { $baselineExclusionField }
 
@@ -585,6 +593,8 @@ function Invoke-ScubaTenantScan {
             if ($configInfo.ConfigAction -eq 'FIX_TENANT') {
                 $recommendations += "This control can't be made to pass with ScubaGear configuration. Align the tenant setting, or omit the policy in the ScubaGear Config App (this analyzer does not generate omissions)."
             }
+            # Exemptions from a parent control must also be targeted by its dependent policy.
+            $recommendations += @(Get-ScAExclusionFollowUp -ControlId $controlId -HasExclusions $hasExclusionValues)
 
             # Append the findings for this control to the overall findings array.
             $findings += [pscustomobject]@{
