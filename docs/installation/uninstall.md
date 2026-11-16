@@ -13,7 +13,6 @@ To uninstall ScubaGear, follow these steps:
 
 ### Uninstall dependencies
 
-Square brackets reflect the example outputs, below numbered.
 
 1. List installed dependencies using the `Get-ScubaGearDependencyStatus` function. 
 2. Invoke help via `Get-Help Remove-ScubaModuleVersion`.
