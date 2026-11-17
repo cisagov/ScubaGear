@@ -1568,7 +1568,7 @@ NonCompliantAlertPolicyDetails contains Detail if {
     Detail := sprintf("%s:\n\t- %s",[Policy, concat("\n\t- ", Settings)])
 }
 
-default Status9_1 := false
+default Status9_2 := false
 Status9_2 := true if {
     count(NonCompliantAlertPolicies) == 0
 }
