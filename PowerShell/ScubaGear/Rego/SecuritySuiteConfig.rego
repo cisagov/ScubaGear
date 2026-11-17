@@ -1372,43 +1372,45 @@ AppliedOutboundSpamPolicies contains Rule.HostedOutboundSpamFilterPolicy if {
 # Identify non-compliant settings for each policy
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    Setting := "External message limit must be 500 or less"
     some Policy in input.outbound_spam_policies
     Policy.RecipientLimitExternalPerHour > 500
-    Setting := "External message limit must be 500 or less"
 }
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    Setting := "Internal message limit must be 1000 or less"
     some Policy in input.outbound_spam_policies
     Policy.RecipientLimitInternalPerHour > 1000
-    Setting := "Internal message limit must be 1000 or less"
 }
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    Setting := "Daily message limit must be 1000 or less"
     some Policy in input.outbound_spam_policies
     Policy.RecipientLimitPerDay > 1000
-    Setting := "Daily message limit must be 1000 or less"
 }
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    Setting := "\"Restriction placed on users who reach the message limit\" 
+    must be set to \"Restrict the user from sending mail\""
     some Policy in input.outbound_spam_policies
-    Policy.ActionWhenThresholdReached != "BlockUser"
-    Setting := "\"Restriction placed on users who reach the message limit\" must be set to \"Restrict the user from sending mail\""
-}
+    Policy.ActionWhenThresholdReached != "BlockUser"}
 
 # Apply additional requirements only to the default policy
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    Setting := "\"Send a copy of suspicious outbound messages or message 
+    that exceeds these limits to these users or groups\" must be enabled"
     some Policy in input.outbound_spam_policies
     Policy.Name == "Default"
     object.get(Policy, "BccSuspiciousOutboundMail", false) != true
-    Setting := "\"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\" must be enabled"
 }
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
+    Setting := "Under At least one recipient must be configured under 
+    \"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\""
     some Policy in input.outbound_spam_policies
     Policy.Name == "Default"
     count(object.get(Policy, "BccSuspiciousOutboundAdditionalRecipients", [])) < 1
-    Setting := "Under At least one recipient must be configured under \"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\""
 }
 
 CompliantOutboundSpamPolicies contains Policy.Identity if {
@@ -1425,9 +1427,10 @@ NonCompliantOutboundSpamPolicies :=
 NonCompliantCustomOutboundSpamPolicies :=
     NonCompliantOutboundSpamPolicies - {"Default"}
 
+default Status9_1 := false
 Status9_1 := true if {
     count(NonCompliantOutboundSpamPolicies) == 0
-} else := false
+} 
 
 # Identify non-compliant settings of the default policy
 DefaultPolicyNonCompliantSettings := NonCompliantOutboundSpamPolicySettings["Default"] if {
@@ -1515,24 +1518,24 @@ ExistingAlertPolicies contains AlertPolicy.Name if {
 # Identify non-compliant settings for each alert policy
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
+    Setting := "The policy must be enabled"
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
     AlertPolicy.Disabled != false
-    Setting := "The policy must be enabled"
 }
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
+    Setting := "Notifications must be enabled"
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
     AlertPolicy.NotificationEnabled != true
-    Setting := "Notifications must be enabled"
 }
 
 NonCompliantAlertPolicySettings[AlertPolicy.Name] contains Setting if {
+    Setting := "At least one notification recipient must be configured"
     some AlertPolicy in input.protection_alerts
     AlertPolicy.Name in RequiredAlertPolicies
     count(AlertPolicy.NotifyUser) == 0
-    Setting := "At least one notification recipient must be configured"
 }
 
 # Identify compliant alert policies
@@ -1568,9 +1571,10 @@ NonCompliantAlertPolicyDetails contains Detail if {
     Detail := sprintf("%s:\n\t- %s",[Policy, concat("\n\t- ", Settings)])
 }
 
+default Status9_1 := false
 Status9_2 := true if {
     count(NonCompliantAlertPolicies) == 0
-} else := false
+}
 
 ReportDetails9_2 := "Requirement met. All required outbound spam alert policies are compliant." if {
     Status9_2
