@@ -1366,7 +1366,7 @@ Outbound spam is not covered by the preset policies, so these steps need to be t
 3. Select Threat policies.
 4. Under Policies, select Anti-spam.
 5. Click **Anti-spam outbound policy (Default)** to open the policy summary. _Note:_ These settings must be applied to **Anti-spam outbound policy (Default)** because although the setting **Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups** is available when creating custom outbound spam policies, Microsoft states that it does not function in custom policies.
-    1. Click Edit protection settings
+    1. Click Edit protection settings.
     2. Ensure the following settings are set to the recommended level or more restrictive:
       - Set an external message limit: 500
       - Set an internal message limit: 1000
@@ -1379,14 +1379,15 @@ Outbound spam is not covered by the preset policies, so these steps need to be t
       - Set an external message limit: 500
       - Set an internal message limit: 1000
       - Set a daily message limit: 1000
-    2. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**     
+    2. Ensure the setting **Restriction placed on users who reach the message limit** is set to **Restrict the user from sending mail**.  
+    3. Click **Save**.   
 #### MS.SECURITYSUITE.9.2v1 Instructions
 
 1. Sign in to Microsoft 365 Defender.
 2. Under Email & collaboration, select Policies & rules.
 3. Select Alert policies.
 4. Perform the following actions for policies **User restricted from sending email**, **Email sending limit exceeded** and **Suspicious email sending patterns detected**
-    1. Click on the policy to open the policy summary 
+    1. Click on the policy to open the policy summary. 
     2. Ensure **Status** is toggled to **On**. 
     3. Click **Edit policy**.
       - Under **Decide if you want to notify people when this alert is triggered** ensure **Opt-In for email notifications** is checked.
