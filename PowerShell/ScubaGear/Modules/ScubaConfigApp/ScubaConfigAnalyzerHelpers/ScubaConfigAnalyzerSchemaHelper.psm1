@@ -35,12 +35,12 @@ function Resolve-ScASchemaPath {
 function Resolve-ScAConfigSchemaPath {
     <#
     .SYNOPSIS
-    Resolves the canonical ScubaGear config schema (Modules/ScubaConfig/ScubaConfigSchema.json),
+    Resolves the canonical ScubaGear config schema (schemas/ScubaConfigSchema.json),
     the single source of truth for which policies are configurable via exclusions/allow-lists.
     #>
-    # Engine lives in Modules/ScubaConfigApp/ScubaConfigAnalyzer -> config schema is two levels
+    # Engine lives in Modules/ScubaConfigApp/ScubaConfigAnalyzer -> schemas folder is three levels
     # up (resolve from the analyzer root, not this helper folder).
-    $candidate = Join-Path $syncHash.ScAModuleRoot '..\..\ScubaConfig\ScubaConfigSchema.json'
+    $candidate = Join-Path $syncHash.ScAModuleRoot '..\..\..\schemas\ScubaConfigSchema.json'
     if (Test-Path $candidate) { return (Resolve-Path $candidate).Path }
 
     # Return the candidate path even if it doesn't exist (caller can handle the missing file).
@@ -131,6 +131,9 @@ function Import-ScAAnalyzerRules {
             $syncHash.ScAExclusionDefinitions[$exclusion.Name] = $exclusion.Value
         }
     }
+
+    # Imported-config keys that are paths on the machine that produced the results.
+    $syncHash.ScAMachineSpecificConfigKeys = if ($AnalyzerSchema.importedConfig.machineSpecificKeys) { @($AnalyzerSchema.importedConfig.machineSpecificKeys) } else { @() }
 }
 
 function Import-ScAApiCatalog {
@@ -259,6 +262,43 @@ function Remove-ScAHtml {
     $clean = [System.Net.WebUtility]::HtmlDecode($clean)
     # Trim any leading or trailing whitespace from the cleaned text.
     return $clean.Trim()
+}
+
+function Import-ScADocumentedBaselines {
+    <#
+    .SYNOPSIS
+    Loads policy id -> documented policy from ScubaBaselines.json.
+    The analyzer uses this for the policy statement, section, and criticality
+    instead of keeping a second copy of that text in the validation schema.
+    #>
+    param([string]$Path)
+
+    $map = @{}
+    if (-not $Path -or -not (Test-Path -LiteralPath $Path)) { return $map }
+
+    $document = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json
+    if (-not $document.baselines) { return $map }
+
+    foreach ($product in $document.baselines.PSObject.Properties) {
+        foreach ($policy in @($product.Value)) {
+            if ($policy.id) { $map[[string]$policy.id] = $policy }
+        }
+    }
+    return $map
+}
+
+function ConvertTo-ScACriticalityLabel {
+    <#
+    .SYNOPSIS
+    Turns a baseline criticality (SHALL / SHOULD) into the label the analyzer shows.
+    #>
+    param([AllowNull()][string]$Criticality)
+
+    switch -Regex ([string]$Criticality) {
+        '^SHALL$'  { return 'Shall' }
+        '^SHOULD$' { return 'Should' }
+        default    { return ([string]$Criticality).Trim() }
+    }
 }
 
 function Get-ScAValidationSchema {

@@ -17,7 +17,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 Additional terminology in this document specific to their respective SCBs are to be interpreted as described in the following:
 
 1. [Microsoft Entra ID](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/aad.md#key-terminology)
-2. [Defender](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/defender.md#key-terminology)
+2. Defender  [Note: This baseline was removed for release 2.0.0. Its key terminology can be found in the Security Suite baseline. ]
 3. [Exchange Online](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/exo.md#key-terminology)
 4. [Power BI](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerbi.md#key-terminology)
 5. [Power Platform](https://github.com/cisagov/ScubaGear/blob/main/PowerShell/ScubaGear/baselines/powerplatform.md#key-terminology)

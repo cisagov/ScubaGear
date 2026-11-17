@@ -9,13 +9,15 @@ import data.utils.key.FilterArray
 import data.utils.key.ConvertToSetWithKey
 import data.utils.key.ConvertToSet
 import data.utils.aad.ReportFullDetailsArray
-import data.utils.aad.ReportDetailsArrayLicenseWarningCap
 import data.utils.aad.ReportDetailsArrayLicenseWarning
 import data.utils.aad.UserExclusionsFullyExempt
 import data.utils.aad.GroupExclusionsFullyExempt
 import data.utils.aad.AppExclusionsFullyExempt
+import data.utils.aad.AgentExclusionsFullyExempt
 import data.utils.aad.GuestUserExclusionsFullyExempt
 import data.utils.aad.Aad2P2Licenses
+import data.utils.aad.AgentLicenses
+import data.utils.aad.LicenseDataAvailable
 import data.utils.aad.IsPhishingResistantMFA
 import data.utils.aad.IsGeneralMFA
 import data.utils.aad.CAPLINK
@@ -23,6 +25,9 @@ import data.utils.aad.DomainReportDetails
 import data.utils.aad.INT_MAX
 import data.utils.key.Count
 import data.utils.aad.EnsureTrimmedArray
+import data.utils.aad.CapEval
+import data.utils.aad.CapNearMissDetails
+import data.utils.aad.NearMissAnalyzerDetails
 
 
 #############
@@ -44,29 +49,48 @@ MEMBERUSER := "a0b1b346-4d3e-4e8b-98f8-753987be4970"
 # MS.AAD.1.1v1
 #--
 
-# If policy matches basic conditions, special conditions,
-# & all exclusions are intentional, save the policy name
-LegacyAuthentication contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+# Check the basic and special conditions for the policy
+LegacyAuthenticationBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    "other" in CAPolicy.Conditions.ClientAppTypes
-    "exchangeActiveSync" in CAPolicy.Conditions.ClientAppTypes
-    "block" in CAPolicy.GrantControls.BuiltInControls
+    "other" in policy.Conditions.ClientAppTypes
+    "exchangeActiveSync" in policy.Conditions.ClientAppTypes
+    "block" in policy.GrantControls.BuiltInControls
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.1.1v1") == true
+# Only match policies with user and group exclusions per the confile file
+LegacyAuthenticationEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.1.1v1")},
+    ]
+    result := CapEval(LegacyAuthenticationBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+LegacyAuthentication contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := LegacyAuthenticationEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+LegacyAuthenticationNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := LegacyAuthenticationEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -75,10 +99,26 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": LegacyAuthentication,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(LegacyAuthentication, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": LegacyAuthenticationNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        LegacyAuthentication,
+        LegacyAuthenticationNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(LegacyAuthentication, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(LegacyAuthentication) > 0
 }
 #--
@@ -93,26 +133,46 @@ tests contains {
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-BlockHighRisk contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+BlockHighRiskBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    "high" in CAPolicy.Conditions.UserRiskLevels
-    "block" in CAPolicy.GrantControls.BuiltInControls
+    "high" in policy.Conditions.UserRiskLevels
+    "block" in policy.GrantControls.BuiltInControls
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.1v1") == true
+# Only match policies with user and group exclusions per the confile file
+BlockHighRiskEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.1v1")},
+    ]
+    result := CapEval(BlockHighRiskBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+BlockHighRisk contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := BlockHighRiskEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+BlockHighRiskNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := BlockHighRiskEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
@@ -122,10 +182,26 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": BlockHighRisk,
-    "ReportDetails": ReportDetailsArrayLicenseWarningCap(BlockHighRisk, DescriptionString),
+    "ReportDetails": ReportDetails,
+    "NearMisses": BlockHighRiskNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        BlockHighRisk,
+        BlockHighRiskNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportDetailsArrayLicenseWarning(BlockHighRisk, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Conditions := [
         Count(Aad2P2Licenses) > 0,
         Count(BlockHighRisk) > 0
@@ -155,26 +231,46 @@ tests contains {
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-SignInBlocked contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+SignInBlockedBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    "high" in CAPolicy.Conditions.SignInRiskLevels
-    "block" in CAPolicy.GrantControls.BuiltInControls
+    "high" in policy.Conditions.SignInRiskLevels
+    "block" in policy.GrantControls.BuiltInControls
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.2.3v1") == true
+# Only match policies with user and group exclusions per the confile file
+SignInBlockedEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.2.3v1")},
+    ]
+    result := CapEval(SignInBlockedBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+SignInBlocked contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := SignInBlockedEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+SignInBlockedNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := SignInBlockedEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions & has correct
@@ -184,10 +280,26 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": SignInBlocked,
-    "ReportDetails": ReportDetailsArrayLicenseWarningCap(SignInBlocked, DescriptionString),
+    "ReportDetails": ReportDetails,
+    "NearMisses": SignInBlockedNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        SignInBlocked,
+        SignInBlockedNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportDetailsArrayLicenseWarning(SignInBlocked, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Conditions := [
         Count(Aad2P2Licenses) > 0,
         Count(SignInBlocked) > 0
@@ -207,25 +319,45 @@ tests contains {
 # If policy matches basic conditions, special conditions,
 # all exclusions are intentional, & none but acceptable MFA
 # are allowed, save the policy name
-PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+PhishingResistantMFAPoliciesBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    IsPhishingResistantMFA(CAPolicy) == true
+    IsPhishingResistantMFA(policy) == true
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.1v1") == true
+# Only match policies with user and group exclusions per the confile file
+PhishingResistantMFAPoliciesEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.1v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.1v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.1v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.1v1")},
+    ]
+    result := CapEval(PhishingResistantMFAPoliciesBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+PhishingResistantMFAPolicies contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := PhishingResistantMFAPoliciesEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+PhishingResistantMFAPoliciesNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := PhishingResistantMFAPoliciesEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -234,10 +366,26 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": PhishingResistantMFAPoliciesNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        PhishingResistantMFAPolicies,
+        PhishingResistantMFAPoliciesNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(PhishingResistantMFAPolicies, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(PhishingResistantMFAPolicies) > 0
 }
 #--
@@ -248,25 +396,45 @@ tests contains {
 
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+NonSpecificMFAPoliciesBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    IsGeneralMFA(CAPolicy) == true
+    IsGeneralMFA(policy) == true
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.2v2") == true
+# Only match policies with user and group exclusions per the confile file
+NonSpecificMFAPoliciesEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.2v2")},
+    ]
+    result := CapEval(NonSpecificMFAPoliciesBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+NonSpecificMFAPolicies contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := NonSpecificMFAPoliciesEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+NonSpecificMFAPoliciesNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := NonSpecificMFAPoliciesEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -275,10 +443,26 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": NonSpecificMFAPolicies,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": NonSpecificMFAPoliciesNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        NonSpecificMFAPolicies,
+        NonSpecificMFAPoliciesNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(NonSpecificMFAPolicies, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(NonSpecificMFAPolicies) > 0
 }
 #--
@@ -363,6 +547,7 @@ tests contains {
 #--
 
 # Returns the auth policy migration state object
+default AuthenticationPolicyMigrationState := null
 AuthenticationPolicyMigrationState := PolicyMigrationState if {
     some Setting in input.authentication_method
     PolicyMigrationState := Setting.authentication_method_policy.PolicyMigrationState
@@ -426,27 +611,47 @@ PrivRolesSet := ConvertToSetWithKey(input.privileged_roles, "RoleTemplateId")
 # privliged roles are included in policy & not excluded.
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+PhishingResistantMFAPrivilegedRolesBaseCheck(policy) if {
     ### Common checks for conditional access policies
     ### We don't check IncludeUsers All because this is a role based policy
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
     # Make sure all the necessary roles are included
-    Count(PrivRolesSet - ConvertToSet(CAPolicy.Conditions.Users.IncludeRoles)) == 0
-    IsPhishingResistantMFA(CAPolicy) == true
+    Count(PrivRolesSet - ConvertToSet(policy.Conditions.Users.IncludeRoles)) == 0
+    IsPhishingResistantMFA(policy) == true
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.6v1") == true
+# Only match policies with user and group exclusions per the confile file
+PhishingResistantMFAPrivilegedRolesEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.6v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.6v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.6v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.6v1")},
+    ]
+    result := CapEval(PhishingResistantMFAPrivilegedRolesBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+PhishingResistantMFAPrivilegedRoles contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := PhishingResistantMFAPrivilegedRolesEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+PhishingResistantMFAPrivilegedRolesNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := PhishingResistantMFAPrivilegedRolesEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -455,10 +660,26 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": PhishingResistantMFAPrivilegedRoles,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(PhishingResistantMFAPrivilegedRoles, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": PhishingResistantMFAPrivilegedRolesNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        PhishingResistantMFAPrivilegedRoles,
+        PhishingResistantMFAPrivilegedRolesNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(PhishingResistantMFAPrivilegedRoles, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(PhishingResistantMFAPrivilegedRoles) > 0
 }
 #--
@@ -469,28 +690,51 @@ tests contains {
 
 # If policy matches basic conditions, & needed strings
 # are in bult in controls, save the policy name
-ManagedDeviceAuth contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+ManagedDeviceAuthBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    "compliantDevice" in CAPolicy.GrantControls.BuiltInControls
-    "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls
-    Count(CAPolicy.GrantControls.BuiltInControls) == 2
-    CAPolicy.GrantControls.Operator == "OR"
-    ###
+    "compliantDevice" in policy.GrantControls.BuiltInControls
+    "domainJoinedDevice" in policy.GrantControls.BuiltInControls
+    Count(policy.GrantControls.BuiltInControls) == 2
+    policy.GrantControls.Operator == "OR"
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.7v1") == true
+    ### not a policy scoped to a specific user action
+    Count(policy.Conditions.Applications.IncludeUserActions) == 0
+    ###
+}
+
+# Only match policies with user and group exclusions per the confile file
+ManagedDeviceAuthEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.7v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.7v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.7v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.7v1")},
+    ]
+    result := CapEval(ManagedDeviceAuthBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+ManagedDeviceAuth contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := ManagedDeviceAuthEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+ManagedDeviceAuthNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := ManagedDeviceAuthEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -499,10 +743,26 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": ManagedDeviceAuth,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": ManagedDeviceAuthNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        ManagedDeviceAuth,
+        ManagedDeviceAuthNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(ManagedDeviceAuth, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(ManagedDeviceAuth) > 0
 }
 #--
@@ -512,30 +772,50 @@ tests contains {
 #--
 
 # Checks to ensure a managed device is required to perform MFA registration
-RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+RequireManagedDeviceMFABaseCheck(policy) if {
     ### Common checks for conditional access policies
     ### We don't check IncludeApplications and ExcludeApplications because they are not relevant when you have an IncludeUserActions node
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
+    ContainsValue(policy.Conditions.Applications.IncludeUserActions, "urn:user:registersecurityinfo") == true
 
     Conditions := [
-        "compliantDevice" in CAPolicy.GrantControls.BuiltInControls,
-        "domainJoinedDevice" in CAPolicy.GrantControls.BuiltInControls,
+        "compliantDevice" in policy.GrantControls.BuiltInControls,
+        "domainJoinedDevice" in policy.GrantControls.BuiltInControls,
     ]
     Count(FilterArray(Conditions, true)) > 0
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.8v1") == true
+# Only match policies with user and group exclusions per the confile file
+RequireManagedDeviceMFAEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.8v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.8v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.8v1")},
+    ]
+    result := CapEval(RequireManagedDeviceMFABaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+RequireManagedDeviceMFA contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := RequireManagedDeviceMFAEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+RequireManagedDeviceMFANeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := RequireManagedDeviceMFAEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -544,10 +824,26 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": RequireManagedDeviceMFA,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": RequireManagedDeviceMFANeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        RequireManagedDeviceMFA,
+        RequireManagedDeviceMFANeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(RequireManagedDeviceMFA, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(RequireManagedDeviceMFA) > 0
 }
 #--
@@ -557,26 +853,46 @@ tests contains {
 #--
 
 # Checks to ensure a managed device is required to perform MFA registration
-RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+RequireDeviceCodeBlockBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Users.IncludeUsers, "All") == true
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    Count(CAPolicy.Conditions.Users.ExcludeRoles) == 0
-    CAPolicy.State == "enabled"
+    ContainsValue(policy.Conditions.Users.IncludeUsers, "All") == true
+    ContainsValue(policy.Conditions.Applications.IncludeApplications, "All") == true
+    Count(policy.Conditions.Users.ExcludeRoles) == 0
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    CAPolicy.Conditions.AuthenticationFlows.TransferMethods == "deviceCodeFlow"
-    "block" in CAPolicy.GrantControls.BuiltInControls
+    policy.Conditions.AuthenticationFlows.TransferMethods == "deviceCodeFlow"
+    "block" in policy.GrantControls.BuiltInControls
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    UserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
-    GroupExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
-    GuestUserExclusionsFullyExempt(CAPolicy, "MS.AAD.3.9v1") == true
+# Only match policies with user and group exclusions per the confile file
+RequireDeviceCodeBlockEval(policy) := result if {
+    checks := [
+        {"label": "user exclusions",  "ok": UserExclusionsFullyExempt(policy, "MS.AAD.3.9v1")},
+        {"label": "group exclusions", "ok": GroupExclusionsFullyExempt(policy, "MS.AAD.3.9v1")},
+        {"label": "app exclusions",   "ok": AppExclusionsFullyExempt(policy, "MS.AAD.3.9v1")},
+        {"label": "guest exclusions", "ok": GuestUserExclusionsFullyExempt(policy, "MS.AAD.3.9v1")},
+    ]
+    result := CapEval(RequireDeviceCodeBlockBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+RequireDeviceCodeBlock contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := RequireDeviceCodeBlockEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+RequireDeviceCodeBlockNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := RequireDeviceCodeBlockEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 # Pass if at least 1 policy meets all conditions
@@ -585,10 +901,26 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": RequireDeviceCodeBlock,
-    "ReportDetails": concat(". ", [ReportFullDetailsArray(RequireDeviceCodeBlock, DescriptionString), CAPLINK]),
+    "ReportDetails": ReportDetails,
+    "NearMisses": RequireDeviceCodeBlockNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
     DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+    NearMissReportDetails := CapNearMissDetails(
+        RequireDeviceCodeBlock,
+        RequireDeviceCodeBlockNeedsConfigUpdate,
+    )
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in [
+            ReportFullDetailsArray(RequireDeviceCodeBlock, DescriptionString),
+            NearMissReportDetails,
+            CAPLINK,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ]
+        ReportDetail != ""
+    ])
     Status := Count(RequireDeviceCodeBlock) > 0
 }
 #--
@@ -688,7 +1020,7 @@ default DescriptionStr := "authorization policies found that allow non-admin use
 DescriptionStr := "authorization policies found that allow Microsoft to manage consent settings" if {
     count([x | some x in BadDefaultGrantPolicies; x != null]) > 0
 } else := concat(" ", [
-    "authorization policies found that allow non-admin users to consent to", 
+    "authorization policies found that allow non-admin users to consent to",
     "third-party applications with risky delegated permission classifications"
  ]) if {
     count([x | some x in RiskyDelegatedPermissionClassifications; x != null]) > 0
@@ -823,8 +1155,21 @@ PasswordAdditionFullyBlocked := true if {
     }
 }
 
+# True when the specified scope contains a passwordAddition restriction, not an empty array.
+PasswordAdditionInScope(ScopeName) if {
+    Policy := input.default_app_management_policy[0]
+    some Restriction in Policy[ScopeName].PasswordCredentials
+    Restriction.RestrictionType == "passwordAddition"
+}
+
+# Issue: either scope (Application or Service Principal) has no passwordAddition restriction.
+PasswordAdditionIssues contains "Application policy \"Block password addition\" is not enabled" if {
+    some ScopeName in ["ApplicationRestrictions", "ServicePrincipalRestrictions"]
+    not PasswordAdditionInScope(ScopeName)
+}
+
 # Issue: a passwordAddition restriction is not enabled at all.
-PasswordAdditionIssues contains "Password addition not blocked" if {
+PasswordAdditionIssues contains "Application policy \"Block password addition\" is not enabled" if {
     some Restriction in PasswordAdditionRestrictions
     Restriction.State != "enabled"
 }
@@ -858,7 +1203,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
     "ActualValue": PasswordAdditionIssues,
-    "ReportDetails": ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString),
+    "ReportDetails": ReportDetailsString(
+        Status,
+        ReportFullDetailsArray(PasswordAdditionIssues, DescriptionString)
+    ),
     "RequirementMet": Status
 } if {
     DescriptionString := "Password addition restriction(s) not meeting requirements"
@@ -899,7 +1247,7 @@ PasswordLifetimeRestrictions contains Restriction if {
 }
 
 # Issue: a passwordLifetime restriction is not enabled.
-PasswordLifetimeIssues contains "Password lifetime not restricted" if {
+PasswordLifetimeIssues contains "Application policy \"Restrict max password lifetime\" is not enabled" if {
     some Restriction in PasswordLifetimeRestrictions
     Restriction.State != "enabled"
 }
@@ -915,12 +1263,12 @@ PasswordLifetimeIssues contains Issue if {
 
 # Issue: passwordLifetime restriction is missing entirely from one or both scopes.
 # When the portal toggle is OFF, the entry is omitted rather than present-but-disabled.
-PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
+PasswordLifetimeIssues contains "Application policy \"Restrict max password lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not PasswordLifetimeInScope(Policy.ApplicationRestrictions.PasswordCredentials)
 }
 
-PasswordLifetimeIssues contains "Password lifetime not restricted for apps" if {
+PasswordLifetimeIssues contains "Application policy \"Restrict max password lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not PasswordLifetimeInScope(Policy.ServicePrincipalRestrictions.PasswordCredentials)
 }
@@ -1005,7 +1353,7 @@ CertificateLifetimeRestrictions contains Restriction if {
 }
 
 # Issue: an asymmetricKeyLifetime restriction is not enabled.
-CertificateLifetimeIssues contains "Certificate lifetime not restricted" if {
+CertificateLifetimeIssues contains "Application policy \"Restrict max certificate lifetime\" is not enabled" if {
     some Restriction in CertificateLifetimeRestrictions
     Restriction.State != "enabled"
 }
@@ -1020,12 +1368,12 @@ CertificateLifetimeIssues contains Issue if {
 }
 
 # Issue: asymmetricKeyLifetime restriction is missing entirely from one or both scopes.
-CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
+CertificateLifetimeIssues contains "Application policy \"Restrict max certificate lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not CertificateLifetimeInScope(Policy.ApplicationRestrictions.KeyCredentials)
 }
 
-CertificateLifetimeIssues contains "Certificate lifetime not restricted for apps" if {
+CertificateLifetimeIssues contains "Application policy \"Restrict max certificate lifetime\" is not enabled" if {
     Policy := input.default_app_management_policy[0]
     not CertificateLifetimeInScope(Policy.ServicePrincipalRestrictions.KeyCredentials)
 }
@@ -1062,7 +1410,10 @@ tests contains {
     "Criticality": "Should",
     "Commandlet": ["Get-MgBetaPolicyDefaultAppManagementPolicy"],
     "ActualValue": CertificateLifetimeIssues,
-    "ReportDetails": ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString),
+    "ReportDetails": ReportDetailsString(
+        Status,
+        ReportFullDetailsArray(CertificateLifetimeIssues, DescriptionString)
+    ),
     "RequirementMet": Status
 } if {
     DescriptionString := "certificate lifetime restriction(s) not meeting requirements"
@@ -1100,7 +1451,7 @@ RootDomainFor(Domain) := Root.Id if {
 }
 
 # For tenants created before Oct 2021, passwordValidityPeriodInDays is set to INT_MAX (2147483647), indicating passwords never expire.
-# For tenants created after Oct 2021, passwordValidityPeriodInDays is set to null by default, which also indicates passwords never expire. 
+# For tenants created after Oct 2021, passwordValidityPeriodInDays is set to null by default, which also indicates passwords never expire.
 PasswordNeverExpires(Domain) if Domain.PasswordValidityPeriodInDays == INT_MAX
 PasswordNeverExpires(Domain) if is_null(Domain.PasswordValidityPeriodInDays)
 
@@ -1201,7 +1552,7 @@ NotGlobalAdmins contains User.DisplayName if {
     some User in input.privileged_users
     not "Global Administrator" in User.roles
 }
-# Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error 
+# Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error
 default GetScoreDescription := "All privileged users are Global Admin"
 GetScoreDescription := concat("", [
     "Least Privilege Score = ", Score, " (should be 1 or less)",
@@ -1615,28 +1966,55 @@ tests contains {
 # MS.AAD.9.1v1
 #--
 
+# Agent policies target "All" or "AllAgentIdResources" resources. The preview Graph API
+# returns this field as a string, so EnsureTrimmedArray normalizes it to an array.
+AIAgentsResourceScope(policy) if {
+    some resource in EnsureTrimmedArray(policy.Conditions.Applications.IncludeApplications)
+    resource in {"All", "AllAgentIdResources"}
+}
+
 # If policy matches basic conditions, special conditions,
 # & all exclusions are intentional, save the policy name
-AIAgents contains CAPolicy.DisplayName if {
-    some CAPolicy in input.conditional_access_policies
-
+AIAgentsBaseCheck(policy) if {
     ### Common checks for conditional access policies
-    ContainsValue(CAPolicy.Conditions.Applications.IncludeApplications, "All") == true
-    CAPolicy.State == "enabled"
+    AIAgentsResourceScope(policy)
+    policy.State == "enabled"
     ###
 
     ### Conditional access checks specific to this policy
-    "all" in CAPolicy.Conditions.ClientAppTypes
-    # CAPolicy.Conditions.AgentIdRiskLevels is a string, which can contain multiple values
+    "all" in policy.Conditions.ClientAppTypes
+    # policy.Conditions.AgentIdRiskLevels is a string, which can contain multiple values
     # The helper function EnsureTrimmedArray turns the string into a comma delimited list
     # with leading and trailing spaces removed
-    "high" in EnsureTrimmedArray(CAPolicy.Conditions.AgentIdRiskLevels)
-    "block" in CAPolicy.GrantControls.BuiltInControls
-    "All" in CAPolicy.Conditions.ClientApplications.IncludeAgentIdServicePrincipals
+    "high" in EnsureTrimmedArray(policy.Conditions.AgentIdRiskLevels)
+    "block" in policy.GrantControls.BuiltInControls
+    "All" in EnsureTrimmedArray(policy.Conditions.ClientApplications.IncludeAgentIdServicePrincipals)
     ###
+}
 
-    # Only match policies with user and group exclusions per the confile file
-    AppExclusionsFullyExempt(CAPolicy, "MS.AAD.9.1v1") == true
+# Only match policies whose agent exclusions are approved in the config file.
+AIAgentsEval(policy) := result if {
+    checks := [
+        {"label": "agent exclusions", "ok": AgentExclusionsFullyExempt(policy, "MS.AAD.9.1v1")},
+    ]
+    result := CapEval(AIAgentsBaseCheck(policy), checks)
+}
+
+# Evaluate each conditional access policy to see if any meet the conditions
+AIAgents contains CAPolicy.DisplayName if {
+    some CAPolicy in input.conditional_access_policies
+    eval := AIAgentsEval(CAPolicy)
+    eval.status == "pass"
+}
+
+# Check if any conditional access policies meet the conditions but have missing exclusions
+AIAgentsNeedsConfigUpdate contains {
+    "PolicyName": CAPolicy.DisplayName,
+    "MissingExclusionTypes": eval.MissingExclusionTypes,
+} if {
+    some CAPolicy in input.conditional_access_policies
+    eval := AIAgentsEval(CAPolicy)
+    eval.status == "near_miss"
 }
 
 default AAD_9_1_Not_Applicable_Due_To_Environment := false
@@ -1668,6 +2046,39 @@ tests contains {
     AAD_9_1_Not_Applicable_Due_To_Environment == true
 }
 
+default AAD_9_1_Not_Applicable_Due_To_License := false
+
+# Returns true if the tenant has no license that provides AI agent conditional access
+# (Microsoft Agent 365 or Microsoft 365 E7), so the policy cannot be implemented.
+AAD_9_1_Not_Applicable_Due_To_License := true if {
+    # GCC High and DoD are reported by the environment check above
+    not input.scuba_config.M365Environment in {"gcchigh", "dod"}
+    # Only N/A if no valid policies are found, future proofing in case a policy exists anyway
+    Count(AIAgents) == 0
+    # Only N/A if the license data was collected and shows no agent license
+    LicenseDataAvailable
+    Count(AgentLicenses) == 0
+    # Only N/A if the tenant does have Entra ID P2, otherwise the P2 license error is reported
+    Count(Aad2P2Licenses) > 0
+}
+
+# N/A case for a tenant without the required agent license
+tests contains {
+    "PolicyId": PolicyId,
+    "Criticality": "Shall/Not-Implemented",
+    "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy", "Get-MgBetaSubscribedSku"],
+    "ActualValue": [],
+    "ReportDetails": CheckedSkippedDetails(PolicyId, Reason),
+    "RequirementMet": false
+} if {
+    PolicyId := "MS.AAD.9.1v1"
+    Reason := concat(" ", [
+    "This policy requires a Microsoft Agent 365 or Microsoft 365 E7 license, which was not found",
+    "in this tenant. See %v for more info"
+    ])
+    AAD_9_1_Not_Applicable_Due_To_License == true
+}
+
 # Pass if at least 1 policy meets all conditions & has correct
 # license.
 tests contains {
@@ -1675,11 +2086,36 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-MgBetaIdentityConditionalAccessPolicy"],
     "ActualValue": AIAgents,
-    "ReportDetails": ReportDetailsArrayLicenseWarningCap(AIAgents, DescriptionString),
+    "ReportDetails": ReportDetails,
+    "NearMisses": AIAgentsNeedsConfigUpdate,
     "RequirementMet": Status
 } if {
-    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
     AAD_9_1_Not_Applicable_Due_To_Environment == false
+    AAD_9_1_Not_Applicable_Due_To_License == false
+    NearMissReportDetails := CapNearMissDetails(
+        AIAgents,
+        AIAgentsNeedsConfigUpdate,
+    )
+
+    DescriptionString := "conditional access policy(s) found that meet(s) all requirements"
+
+    # Only include the CAP link if there are is a valid P2 license
+    CapLinkArray := [
+        CAPLINK |
+        Count(Aad2P2Licenses) > 0
+    ]
+    # Concatenate the report details into one string and remove any empty strings
+    ReportDetails := concat(". ", [
+        ReportDetail |
+        some ReportDetail in array.flatten([
+            ReportDetailsArrayLicenseWarning(AIAgents, DescriptionString),
+            NearMissReportDetails,
+            CapLinkArray,
+            NearMissAnalyzerDetails(NearMissReportDetails)
+        ])
+        ReportDetail != ""
+    ])
+
     Conditions := [
         Count(Aad2P2Licenses) > 0,
         Count(AIAgents) > 0

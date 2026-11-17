@@ -279,6 +279,30 @@ CapExclusions are supported for the following policies:
 - MS.AAD.3.8v1
 - MS.AAD.3.9v1
 
+#### Agent Conditional Access Policy Exclusions
+
+`MS.AAD.9.1v1` evaluates agent-only Conditional Access policies. Use
+`AgentExclusions.Agents` to acknowledge justified agent exclusions. These values
+must be the excluded agents' **service-principal object IDs**, not application
+(client) IDs. User, group, and application exclusions do not apply to this policy.
+
+```yaml
+Aad:
+  MS.AAD.9.1v1:
+    AgentExclusions:
+      Agents:
+        - "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+```
+
+Every excluded agent must appear in this list for the policy to pass. No entry is
+needed when the policy excludes no agents. An unapproved exclusion produces a
+near-miss result; approval does not waive incorrect policy settings.
+
+The provider normalizes the preview API's whitespace-separated
+`ExcludeAgentIdServicePrincipals` value to an array before creating report data and
+provider results. Existing arrays are preserved, and cached results containing
+the string form remain supported by Rego and the Config Analyzer.
+
 #### Privileged User Policy Exclusions
 
 In addition to defining exclusions for conditional access policies, the configuration also supports user or group exclusions related to Entra Id policy section 7 which is related to highly privileged user access. The `RoleExclusions` key supports both a `Users` and `Groups` list with each entry representing the UUID of a user or group from the tenant that will be excluded from the respective policy check.

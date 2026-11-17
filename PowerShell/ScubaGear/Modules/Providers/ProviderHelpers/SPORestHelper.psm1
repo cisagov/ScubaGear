@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearRestEndpoint
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearRestEndpoint, Get-ScubaRestRetryDefaults
 
 function Get-SPOTenantRest {
     <#
@@ -24,6 +24,7 @@ function Get-SPOTenantRest {
 
     # SharePoint CSOM-style REST endpoint for tenant properties
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-SPOTenantRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
     # accept header https://learn.microsoft.com/en-us/sharepoint/dev/sp-add-ins/complete-basic-operations-using-sharepoint-rest-endpoints#properties-used-in-rest-requests
     $SPOContentType = "application/json;odata=verbose"
@@ -33,7 +34,7 @@ function Get-SPOTenantRest {
     # Without odata=verbose the response would be a flat JSON object ($Response directly),
     # or a collection under $Response.value. We use odata=verbose here to get the
     # strongly-typed tenant object.
-    $Response = (Invoke-ScubaRestMethod -BaseUrl $AdminUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" -ContentType $SPOContentType -Accept $SPOContentType).d
+    $Response = (Invoke-ScubaRestMethod -BaseUrl $AdminUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" -ContentType $SPOContentType -Accept $SPOContentType @Retry).d
 
     return $Response
 }

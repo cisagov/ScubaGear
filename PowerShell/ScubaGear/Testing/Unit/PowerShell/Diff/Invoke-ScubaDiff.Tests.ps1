@@ -930,6 +930,15 @@ InModuleScope Diff {
             $seen | Should -Be $expectedSubset
         }
     }
+    Describe -Tag 'Diff' -Name 'Import-ScubaResultsFile' {
+        It 'Keeps MetaData.TimestampZulu as the ISO-8601 text from the file' {
+            $FixtureFile = Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures\PairA-Before.json'
+            $results = Import-ScubaResultsFile -LiteralPath $FixtureFile
+            $results.MetaData.TimestampZulu | Should -BeOfType [string]
+            $results.MetaData.TimestampZulu | Should -Be '2026-01-01T00:00:00.000Z'
+        }
+    }
+
     Describe -Tag 'Diff' -Name 'Get-ScubaDiffRunTimestamp' {
         It 'Parses a ScubaResults Zulu timestamp as UTC' {
             $parsed = Get-ScubaDiffRunTimestamp -Timestamp '2026-01-01T00:00:00.000Z'

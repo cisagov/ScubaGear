@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearRestEndpoint, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearRestEndpoint, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaRestRetryDefaults
 
 function Get-PowerBIBaseUrl {
     <#
@@ -58,7 +58,8 @@ function Get-PowerBITenantSettingsRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerBITenantSettingsRest'
-    Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Retry = Get-ScubaRestRetryDefaults
+    Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
 }
 
 Export-ModuleMember -Function @(

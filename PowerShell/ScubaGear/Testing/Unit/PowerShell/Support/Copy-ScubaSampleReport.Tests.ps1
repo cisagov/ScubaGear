@@ -5,7 +5,7 @@ InModuleScope Support {
         $SampleFiles = @(
             "BaselineReports.html",
             "ProviderSettingsExport.json",
-            "TestResults.json"
+            "RegoOutput.json"
         )
         $SampleFolders = @(
             "individualReports"

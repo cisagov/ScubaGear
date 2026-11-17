@@ -20,7 +20,9 @@ REPORTARRAYMAXCOUNT := 20
 P2WARNINGSTR :=
     "**NOTE: Your tenant does not have a Microsoft Entra ID P2 license, which is required for this feature**"
 
-CAPLINK := "<a href='#caps'>View all CA policies</a>."
+CAPLINK := "<a href='#caps'>View all CA policies</a>"
+
+ANALYZERURL := "https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfiganalyzer.md"
 
 INT_MAX := 2147483647
 
@@ -69,6 +71,41 @@ ReportFullDetailsArray(Array, String) := Details if {
 Aad2P2Licenses contains ServicePlan.ServicePlanId if {
     some ServicePlan in input.service_plans
     ServicePlan.ServicePlanName == "AAD_PREMIUM_P2"
+}
+
+#################################################################################
+# Microsoft Agent 365 / Microsoft 365 E7 license detection (MS.AAD.9.1v1)       #
+#################################################################################
+
+# SKU part numbers that provide AI agent conditional access. These match the
+# String_Id values in Modules/CreateReport/MicrosoftLicenseToProductNameMappings.csv.
+AGENT_LICENSE_SKUS := {"AGENT_365", "MICROSOFT_365_E7"}
+
+# The subscribed SKUs as an array. A tenant with a single SKU is exported as one
+# object rather than a one-element array.
+default LicenseSkus := []
+
+LicenseSkus := [input.license_information] if {
+    is_object(input.license_information)
+}
+
+LicenseSkus := input.license_information if {
+    is_array(input.license_information)
+}
+
+# True only when SKU data was collected. Missing data does not prove a license is absent.
+default LicenseDataAvailable := false
+
+LicenseDataAvailable if {
+    count(LicenseSkus) > 0
+}
+
+# SKUs that provide agent conditional access and have enabled units. A lapsed
+# subscription remains listed but reports zero enabled units.
+AgentLicenses contains Sku.SkuId if {
+    some Sku in LicenseSkus
+    Sku.SkuPartNumber in AGENT_LICENSE_SKUS
+    object.get(Sku, ["PrepaidUnits", "Enabled"], 0) > 0
 }
 
 # Returns license warning if license not present as results may be wrong,
@@ -154,6 +191,28 @@ AppExclusionsFullyExempt(Policy, PolicyID) := true if {
 AppExclusionsFullyExempt(Policy, PolicyID) := true if {
     count({x | some x in Policy.Conditions.Applications.ExcludeApplications}) == 0
     count({y | y := input.scuba_config.Aad[PolicyID].CapExclusions.Applications}) == 0
+}
+
+# Preview exports may contain whitespace-separated IDs; cached exports still need
+# to work after the provider starts normalizing this field to an array.
+AgentExclusionArray(value) := value if {
+    is_array(value)
+} else := [id |
+    some id in regex.split(`\s+`, trim_space(value))
+    id != ""
+] if {
+    is_string(value)
+} else := [] if {
+    value == null
+}
+
+default AgentExclusionsFullyExempt(_, _) := false
+
+AgentExclusionsFullyExempt(Policy, PolicyID) := true if {
+    raw := object.get(Policy, ["Conditions", "ClientApplications", "ExcludeAgentIdServicePrincipals"], null)
+    excluded := ConvertToSet(AgentExclusionArray(raw))
+    allowed := ConvertToSet(object.get(input, ["scuba_config", "Aad", PolicyID, "AgentExclusions", "Agents"], []))
+    count(excluded - allowed) == 0
 }
 
 default GuestUserExclusionsFullyExempt(_, _) := false
@@ -298,3 +357,85 @@ DomainReportDetails(Status, Metadata) := PASS if {
         FederatedDomainWarning(Metadata.FederatedDomains)
     ])
 } else := FAIL
+
+############################################
+# Shared helper functions for identifying near misses in CAP exclusions and reporting them
+############################################
+
+# Returns a list of the labels of the exclusions types that failed
+CapMissingLabels(checks) := [c.label |
+    some c in checks
+    not c.ok
+]
+
+# Sets status to pass if the base check is ok and there are no missing exclusion types
+CapEval(base_ok, checks) := {
+    "status": "pass",
+    "MissingExclusionTypes": missing,
+} if {
+    base_ok == true
+    missing := CapMissingLabels(checks)
+    count(missing) == 0
+}
+
+# Sets status to near_miss if the base check is ok and there are missing exclusion types
+CapEval(base_ok, checks) := {
+    "status": "near_miss",
+    "MissingExclusionTypes": missing,
+} if {
+    base_ok == true
+    missing := CapMissingLabels(checks)
+    count(missing) > 0
+}
+
+# Sets status to fail if the base check is not ok
+CapEval(base_ok, checks) := {
+    "status": "fail",
+    "MissingExclusionTypes": missing,
+} if {
+    base_ok == false
+    missing := CapMissingLabels(checks)
+}
+
+# Generates the near miss messages and returns them as a list of strings
+CapNearMissMessages(near_miss_objects) := [msg |
+    some obj in near_miss_objects
+    msg := sprintf(
+        "%s would pass if the config file is updated to include: %s",
+        [obj.PolicyName, concat(", ", obj.MissingExclusionTypes)],
+    )
+]
+
+# Returns an empty string for the near miss details because the check passed
+CapNearMissDetails(actual_value, _) := NearMissDetails if {
+    count(actual_value) > 0
+    NearMissDetails := ""
+}
+
+# Returns a string with the near miss details because 
+#   the check failed and 
+#   there are some near miss policies
+CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
+    count(actual_value) == 0
+    count(near_miss_objects) > 0
+    near_miss_messages := CapNearMissMessages(near_miss_objects)
+    NearMissDetails := sprintf("<br/><br/><strong>Near miss: </strong> %s", [concat("; ", near_miss_messages)])
+}
+
+# Returns an empty string for the near miss details because 
+#   the check failed and 
+#   there are no near miss policies
+CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
+    count(actual_value) == 0
+    count(near_miss_objects) == 0
+    NearMissDetails := ""
+}
+
+ScubaAnalyzerDetails := sprintf(
+    `<a href="%s" target="_blank">Run the Start-SCuBAConfigAnalyzer cmdlet</a> and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file.`,
+    [ANALYZERURL]
+)
+
+NearMissAnalyzerDetails(near_miss_details) := ScubaAnalyzerDetails if {
+    near_miss_details != ""
+} else := ""

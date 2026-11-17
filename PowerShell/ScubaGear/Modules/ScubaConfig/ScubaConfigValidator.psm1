@@ -56,7 +56,9 @@ class ScubaConfigValidator {
     # Loads and caches JSON schema file for configuration validation
     hidden static [void] LoadSchema() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
-        $SchemaPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigSchema.json"
+        # Module path is ...\Modules\ScubaConfig; the schema lives in ...\schemas
+        # Construct the full path to the schema file.
+        $SchemaPath = Join-Path -Path $ModulePath -ChildPath "..\..\schemas\ScubaConfigSchema.json"
 
         if (-not (Test-Path $SchemaPath)) {
             throw "Schema file not found: $SchemaPath"
@@ -74,7 +76,9 @@ class ScubaConfigValidator {
     # Loads and caches default configuration values from JSON file
     hidden static [void] LoadDefaults() {
         $ModulePath = [ScubaConfigValidator]::_Cache['ModulePath']
-        $DefaultsPath = Join-Path -Path $ModulePath -ChildPath "ScubaConfigDefaults.json"
+        # Module path is ...\Modules\ScubaConfig; the defaults live in ...\schemas
+        # Construct the full path to the defaults file.
+        $DefaultsPath = Join-Path -Path $ModulePath -ChildPath "..\..\schemas\ScubaConfigDefaults.json"
 
         if (-not (Test-Path $DefaultsPath)) {
             throw "Defaults file not found: $DefaultsPath"
@@ -556,8 +560,8 @@ class ScubaConfigValidator {
     }
 
     # Warns when a configuration still references the deprecated Defender product name
-    # or contains policy IDs that have migrated to the Security Suite baseline.
-    # The Defender product has been renamed to "securitysuite" and many of its policies
+    # or contains policy IDs that have migrated to the Security Suite baseline. The Defender
+    #  product has been replaced by Security Suite (securitysuite), and many of its policies
     # (along with several EXO and Teams policies) were decoupled and migrated into the
     # MS.SECURITYSUITE.* baseline. See mappings\scuba-baseline-policy-migrations.csv.
     hidden static [void] ValidateDefenderMigration([object]$ConfigObject, [hashtable]$Validation) {
@@ -567,7 +571,7 @@ class ScubaConfigValidator {
         if ($ConfigObject.ProductNames) {
             foreach ($Product in $ConfigObject.ProductNames) {
                 if ($Product -is [string] -and $Product.Trim().ToLower() -eq 'defender') {
-                    [void]$Validation.Warnings.Add("Defender migration warning: The product name 'defender' is deprecated and has been renamed to 'securitysuite'. ScubaGear will run 'securitysuite' in its place. Update ProductNames to use 'securitysuite'. $DocRef")
+                    [void]$Validation.Warnings.Add("Defender migration warning: 'defender' is no longer a product name. It was temporarily an alias for the Security Suite baseline, but is now removed. Update ProductNames to use 'securitysuite'. $DocRef")
                     break
                 }
             }

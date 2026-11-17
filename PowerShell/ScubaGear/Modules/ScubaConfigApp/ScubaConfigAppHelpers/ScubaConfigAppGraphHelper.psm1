@@ -1,4 +1,8 @@
-﻿Function Update-GraphStatusIndicator {
+﻿[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
+param()
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../Connection/ConnectHelpers.psm1') -Function Disconnect-ScubaGraph, Invoke-ScubaGraphRequest -Force
+
+Function Update-GraphStatusIndicator {
     <#
     .SYNOPSIS
     Updates the Graph connection status indicator in the UI.
@@ -58,7 +62,7 @@ Function Initialize-GraphStatusIndicator {
 
             if ($result -eq [System.Windows.MessageBoxResult]::Yes) {
                 try {
-                    Disconnect-MgGraph -ErrorAction Stop
+                    Disconnect-ScubaGraph -ErrorAction Stop
                     $syncHash.GraphConnected = $false
                     Update-GraphStatusIndicator -IsConnected $false
 
@@ -119,6 +123,9 @@ Function Invoke-GraphQueryWithFilter {
     # Create runspace
     $runspace = [runspacefactory]::CreateRunspace()
     $runspace.Open()
+    # This runspace starts empty: give it the caller's Graph session and the module that provides the request command.
+    $runspace.SessionStateProxy.SetVariable('ScubaGearState', $Global:ScubaGearState)
+    $runspace.SessionStateProxy.SetVariable('ConnectHelpersPath', (Join-Path $PSScriptRoot '../../Connection/ConnectHelpers.psm1'))
 
     Write-DebugOutput "Created new runspace for Graph query" -Source "Invoke-GraphQueryWithFilter" -Level "Verbose"
 
@@ -131,6 +138,8 @@ Function Invoke-GraphQueryWithFilter {
         param($QueryType, $GraphConfig, $FilterString, $SearchString, $Top)
 
         try {
+            Import-Module $ConnectHelpersPath -Function Invoke-ScubaGraphRequest -ErrorAction Stop
+
             # Get query configuration
             $queryConfig = $GraphConfig.$QueryType
             if (-not $queryConfig) {
@@ -183,7 +192,7 @@ Function Invoke-GraphQueryWithFilter {
             #Write-DebugOutput -Message "Graph Query URI: $($queryParams.Uri)" -Source $MyInvocation.MyCommand -Level "Information"
 
             # Execute the Graph request
-            $result = Invoke-MgGraphRequest @queryParams -OutputType PSObject
+            $result = Invoke-ScubaGraphRequest @queryParams -OutputType PSObject
 
             # Return the result
             return @{
@@ -920,7 +929,7 @@ Function Resolve-GraphIdsBatch {
     try {
         $uri  = "$($syncHash.GraphEndpoint)/v1.0/directoryObjects/getByIds?`$select=id,displayName"
         $body = @{ ids = @($Ids); types = $types } | ConvertTo-Json -Compress -Depth 3
-        $response = Invoke-MgGraphRequest -Method POST -Uri $uri -Body $body -ContentType "application/json" -OutputType PSObject
+        $response = Invoke-ScubaGraphRequest -Method POST -Uri $uri -Body $body -ContentType "application/json" -OutputType PSObject
 
         foreach ($obj in $response.value) {
             if ($obj.id -and $obj.displayName) {

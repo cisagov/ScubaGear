@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath "..\Utility")
 
 function Get-RegoResult {
@@ -150,18 +152,19 @@ function New-Report {
     The report Home page and link tree will be named BaselineReports.html
     .Functionality
     Internal
+    .Notes
+    The BaselineName default values are pulled from the ScubaConfig schema.
     #>
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Teams", "EXO", "SecuritySuite", "AAD", "PowerPlatform", "SharePoint", "PowerBI", IgnoreCase = $false)]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetProductBaselineNames() })]
         [string]
         $BaselineName,
 
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("Microsoft Teams", "Exchange Online", "Security Suite", "Azure Active Directory", "Microsoft Power Platform", "SharePoint Online", "Microsoft Power BI", IgnoreCase = $false)]
         [string]
         $FullName,
 
@@ -199,8 +202,8 @@ function New-Report {
         [object]
         $SecureBaselines
     )
-
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    # Retrieve the Scuba GitHub URL from the configuration schema
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
 
     $ProductSecureBaseline = $SecureBaselines.$BaselineName
 
@@ -271,6 +274,7 @@ function New-Report {
 
             if ($null -ne $Test){
                 $MissingCommands = $Test.Commandlet | Where-Object {$SettingsExport."$($BaselineName)_successful_commands" -notcontains $_}
+
                 $Result = Get-RegoResult -Test $Test -MissingCommands $MissingCommands -Control $Control
 
                 $Config = $SettingsExport.scuba_config
@@ -314,6 +318,7 @@ function New-Report {
                         "Result"= "Omitted"
                         "Criticality"= $Test.Criticality
                         "Details"= $Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"=$Result.DisplayString
                         "OmittedEvaluationDetails"=$Result.Details
                         "IncorrectResult"="N/A"
@@ -345,6 +350,7 @@ function New-Report {
                         "Result"= "Incorrect result"
                         "Criticality"= $Test.Criticality
                         "Details"= $Result.Details
+                        "NearMisses"=@($Test.NearMisses)
                         "OmittedEvaluationResult"="N/A"
                         "OmittedEvaluationDetails"="N/A"
                         "IncorrectResult"=$Result.DisplayString
@@ -650,18 +656,8 @@ function New-Report {
     # Handle SecuritySuite-specific reporting
     if ($BaselineName -eq "securitysuite") {
         $SecuritySuiteConfig = $SettingsExport.scuba_config.SecuritySuite
-        $DefenderConfig = $SettingsExport.scuba_config.Defender
-
         $SensitiveUserConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.1v1'
-        if ($null -eq $SensitiveUserConfig) {
-            $SensitiveUserConfig = $DefenderConfig.'MS.DEFENDER.2.1v1'
-        }
-
         $PartnerDomainConfig = $SecuritySuiteConfig.'MS.SECURITYSUITE.2.3v1'
-        if ($null -eq $PartnerDomainConfig) {
-            $PartnerDomainConfig = $DefenderConfig.'MS.DEFENDER.2.3v1'
-        }
-
         $SensitiveUsers = @()
         if ($null -ne $SensitiveUserConfig -and $null -ne $SensitiveUserConfig.SensitiveUsers) {
             $SensitiveUsers = @($SensitiveUserConfig.SensitiveUsers)
@@ -907,7 +903,7 @@ function Import-SecureBaseline{
     param (
         [Parameter(Mandatory=$true)]
         [ValidateNotNullOrEmpty()]
-        [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', IgnoreCase = $false)]
+        [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", 'powerbi', 'si', IgnoreCase = $false)]
         [string[]]
         $ProductNames,
         [Parameter(Mandatory = $false)]
@@ -954,11 +950,19 @@ function Import-SecureBaseline{
                     }
 
                     # This assumes that the value is on the immediate next line after the ID and ends in a period.
+                    # A closing quote after that period (.") is still the end of the sentence.
                     $LineAdvance = 1;
                     $MaxLineSearch = 20;
                     $Value = ([string]$MdLines[$LineNumber+$LineAdvance]).Trim()
                     $IsMalformedDescription = $false
                     $IsList = $false
+                    # Straight and curly quotes. Trimmed only to detect the terminator; $Value itself is unchanged.
+                    $ClosingQuotes = [char[]]@(
+                        '"',
+                        "'",
+                        [char]0x201D, # right double quote
+                        [char]0x2019  # right single quote
+                    )
 
                     try {
                         if ([string]::IsNullOrWhiteSpace($Value)){
@@ -969,7 +973,7 @@ function Import-SecureBaseline{
 
                         # Processing multiline description.
                         # TODO: Improve processing GitHub issue #526
-                        while ($Value.Substring($Value.Length-1,1) -ne "."){
+                        while (-not $Value.TrimEnd($ClosingQuotes).EndsWith('.')){
                             $LineAdvance++
 
                             if ($Value -match [regex]::Escape("<!--")){
@@ -1197,7 +1201,7 @@ function Get-IndicatorHtml {
         return ""
     }
 
-    $ScubaGitHubUrl = "https://github.com/cisagov/ScubaGear"
+    $ScubaGitHubUrl = [ScubaConfig]::GetScubaGitHubUrl()
     $IndicatorHtml = "<div class='policy-indicators'>"
 
     foreach ($Indicator in $Indicators) {

@@ -22,7 +22,7 @@ Function Get-ScubaGearPermissions {
         The switch to indicate that the permissions are to be retrieved for a service principal.
 
     .PARAMETER Product
-        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'defender', 'securitysuite', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline. 'securitysuite' is an alias for 'defender' (the Security Suite).
+        The product for which the permissions are to be retrieved. Options are 'aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'powerplatform'. Can be an array of products and used in pipeline. 'securitysuite' replaces 'defender'.
 
     .PARAMETER Environment
         The Environment for which the permissions are to be retrieved. Options are 'commercial', 'gcc', 'gcchigh', 'dod'. Default is 'commercial'.
@@ -48,10 +48,6 @@ Function Get-ScubaGearPermissions {
         NAME: Get-ScubaGearPermissions
         VERSION: 3.0
 
-        USE TO FIND PERMS:
-            (Find-MgGraphCommand -Command Get-MgBetaPolicyRoleManagementPolicyAssignment).Permissions | Select Name, IsLeastPrivilege
-            Find-MgGraphPermission -All
-
         CHANGELOG:
         2024-10-03 - Initial version
         2024-12-20 - Added pipeline and multi-product support
@@ -69,7 +65,7 @@ Function Get-ScubaGearPermissions {
         [switch]$ServicePrincipal,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'ServicePrincipal',ValueFromPipeline=$true)]
-        [ValidateSet('aad', 'exo', 'defender', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', 'teamsunified', '*')]
+        [ValidateSet('aad', 'exo', 'securitysuite', 'teams', 'sharepoint', 'scubatank', 'powerplatform', 'teamsunified', '*')]
         [string[]]$Product,
 
         [Parameter(Mandatory = $false)]
@@ -361,6 +357,7 @@ Function Get-ServicePrincipalPermissions {
     return $deduplicatedPermissions | Select-Object -Property LeastPermissions, ResourceAPIAppID, scubaGearProduct -Unique
 }
 
+Export-ModuleMember -Function Get-ScubaGearPermissions, Get-ScubaGearEntraMinimumPermissions, Get-ServicePrincipalPermissions
 function Get-ScubaGearProductRecord {
     <#
     .SYNOPSIS
@@ -467,7 +464,7 @@ function Get-ScubaGearEndpointRest {
         otherwise the host is shown with a <tenant> placeholder.
 
     .PARAMETER ProductNames
-        The products to include. Accepts the same values as Invoke-SCuBA. 'defender' is treated as
+        The products to include. Accepts the same values as Invoke-SCuBA. 'defender' has been replaced by
         'securitysuite', and '*' (the default) selects every product ScubaGear tests.
 
     .PARAMETER M365Environment
@@ -505,7 +502,7 @@ function Get-ScubaGearEndpointRest {
     [OutputType([PSCustomObject], [string])]
     param(
         [Parameter(Mandatory = $false)]
-        [ValidateSet('teams', 'exo', 'defender', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
+        [ValidateSet('teams', 'exo', 'securitysuite', 'aad', 'powerplatform', 'sharepoint', 'powerbi', '*', IgnoreCase = $false)]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory = $false)]
@@ -528,9 +525,9 @@ function Get-ScubaGearEndpointRest {
     )
 
     $AllProducts = 'aad', 'securitysuite', 'exo', 'powerplatform', 'sharepoint', 'teams', 'powerbi'
-    $Products = if ($ProductNames -contains '*') { $AllProducts } else { $ProductNames -replace '^defender$', 'securitysuite' }
+    $Products = if ($ProductNames -contains '*') { $AllProducts } else { $ProductNames }
     $Products = @($Products | Sort-Object -Unique)
-
+    
     # Teams also reads its tenant settings from the unified settings host, which the catalog lists as its own product.
     $CatalogProducts = @($Products | ForEach-Object { $_; if ($_ -eq 'teams') { 'teamsunified' } })
 

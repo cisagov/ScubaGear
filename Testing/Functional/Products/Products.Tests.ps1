@@ -1,3 +1,5 @@
+using module '..\..\..\PowerShell\ScubaGear\Modules\ScubaConfig\ScubaConfig.psm1'
+
 <#
     .SYNOPSIS
     Test script for MS365 Teams product.
@@ -79,7 +81,7 @@ param (
     [Parameter(Mandatory = $true,  ParameterSetName = 'Auto')]
     [Parameter(Mandatory = $true, ParameterSetName = 'Manual')]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("teams", "exo", "defender", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", IgnoreCase = $false)]
+    [ValidateSet("teams", "exo", "securitysuite", "aad", "powerplatform", "sharepoint", "powerbi", "si", IgnoreCase = $false)]
     [string]
     $ProductName,
     [Parameter(ParameterSetName = 'Auto')]
@@ -96,7 +98,7 @@ param (
     $Variant = [string]::Empty
 )
 
-$script:ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+$script:ExecutionProductName = $ProductName
 
 BeforeDiscovery {
     $DefaultTestPlanPath = Join-Path -Path $PSScriptRoot -ChildPath "TestPlans/$ExecutionProductName.testplan.yaml"
@@ -131,6 +133,7 @@ BeforeAll {
     Import-Module $ScubaModule
     Import-Module $ConnectionModule
     Import-Module $ConnectHelpersPath
+    $script:ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
     Import-Module Selenium
 
     # Dot source utility functions
@@ -138,14 +141,15 @@ BeforeAll {
 
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', 'ProductDetails', Justification = 'False positive as rule does not scan child scopes')]
   $ProductDetails = @{
-        aad = "Azure Active Directory"
-      defender = "Security Suite"
-      securitysuite = "Security Suite"
+        aad = "Microsoft Entra ID"
+        defender = "Security Suite"
+        securitysuite = "Security Suite"
         exo = "Exchange Online"
         powerbi = "Microsoft Power BI"
         powerplatform = "Microsoft Power Platform"
         sharepoint = "SharePoint Online"
         teams = "Microsoft Teams"
+        si = "Super Intelligence"
     }
 
     # SharePoint functional tests: acquire SPO REST token for precondition Set-SPOTenant calls.
@@ -171,7 +175,7 @@ BeforeAll {
             $script:SPOAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "9bc3ab49-b65d-410a-85ad-de819febfddc" `
+                -ClientId $script:ClientIdHash.sharepoint `
                 -Scope "$($script:SPOAdminUrl)/.default"
         }
     }
@@ -196,7 +200,7 @@ BeforeAll {
             $script:PPAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -ClientId $script:ClientIdHash.powerplatform `
                 -Scope $PPScope
         }
     }
@@ -221,7 +225,7 @@ BeforeAll {
             $script:TeamsAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "12128f48-ec9e-42f0-b203-ea49fb6af367" `
+                -ClientId $script:ClientIdHash.teams `
                 -Scope $TeamsScope
         }
     }
@@ -246,7 +250,7 @@ BeforeAll {
             $script:PBIAccessToken = Get-MsalAccessToken `
                 -Tenant $TenantDomain `
                 -M365Environment $M365Environment `
-                -ClientId "1950a258-227b-4e31-a9cf-717495945fc2" `
+                -ClientId $script:ClientIdHash.powerbi `
                 -Scope $PBIScope
         }
     }
@@ -285,14 +289,15 @@ BeforeAll {
     }
 
   function RunScuba() {
-        $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+        $ExecutionProductName = $ProductName
         if (-not [string]::IsNullOrEmpty($Thumbprint))
         {
             Invoke-SCuBA -CertificateThumbPrint $Thumbprint -AppId $AppId -Organization $TenantDomain -Productnames $ExecutionProductName -OutPath . -Quiet -KeepIndividualJSON -SilenceBODWarnings
         }
         else {
             if ($ProductName -eq 'exo') {
-                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
+                # Keep the interactive session so the run does not sign in again for every policy.
+                Invoke-SCuBA -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -DisconnectOnExit:$false -Quiet -KeepIndividualJSON -SilenceBODWarnings
             }
             else {
                 Invoke-SCuBA -Login $false -Productnames $ExecutionProductName -OutPath . -M365Environment $M365Environment -Quiet -KeepIndividualJSON -SilenceBODWarnings
@@ -312,7 +317,7 @@ Describe "Policy Checks for <ProductName>" {
             # Select which TestDriver to use for a given test plan. TestDriver names (e.g. RunScuba, ScubaCached) must
             # match exactly (including case) the ones used in TestPlans.
             if ($ConfigFileName -and ('RunScuba' -eq $TestDriver)){
-                $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductName = $ProductName
                 $FullPath = Join-Path -Path $PSScriptRoot -ChildPath "TestConfigurations/$ExecutionProductName/$PolicyId/$ConfigFileName"
 
                 $ScubaConfig = Get-Content -Path $FullPath | ConvertFrom-Yaml
@@ -321,6 +326,10 @@ Describe "Policy Checks for <ProductName>" {
                     $ScubaConfig.CertificateThumbprint = $Thumbprint
                     $ScubaConfig.AppID = $AppId
                     $ScubaConfig.Organization = $TenantDomain
+                }
+                else {
+                    # Keep the interactive session so the run does not sign in again for every policy.
+                    $ScubaConfig.DisconnectOnExit = $false
                 }
 
                 $ScubaConfig.M365Environment = $M365Environment
@@ -367,7 +376,7 @@ Describe "Policy Checks for <ProductName>" {
                 }
 
                 # Call Scuba cached with the modified provider JSON as an input which gets passed to Rego
-                $ExecutionProductName = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductName = $ProductName
                 Invoke-SCuBACached -Productnames $ExecutionProductName -ExportProvider $false -OutPath "$script:OutputFolder" -OutProviderFileName 'ModifiedProviderSettingsExport' -Quiet -KeepIndividualJSON -SilenceBODWarnings
 
                 # Save the ModifiedProviderSettingsExport so that it can be referenced during dev testing of functional test scenarios
@@ -431,7 +440,7 @@ Describe "Policy Checks for <ProductName>" {
 
                 # Check final HTML output
                 $FoundPolicy = $false
-                $ExecutionProductNameForLookup = if ($ProductName -eq "defender") { "securitysuite" } else { $ProductName }
+                $ExecutionProductNameForLookup = $ProductName
                 $ExecutionProductNameForLookup | Should -Not -BeNullOrEmpty -Because "execution product name must be set for policy [$PolicyId]"
                 $DetailLinkText = $ProductDetails[$ExecutionProductNameForLookup]
                 $DetailLinkText | Should -Not -BeNullOrEmpty -Because "product detail link text must exist for execution product [$ExecutionProductNameForLookup]"

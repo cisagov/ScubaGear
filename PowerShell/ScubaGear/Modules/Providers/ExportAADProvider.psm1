@@ -33,6 +33,10 @@ function Export-AADProvider {
     $AllPolicies = $Tracker.TryCommand("Get-MgBetaIdentityConditionalAccessPolicy", @{"M365Environment"=$M365Environment; "GraphDirect"=$true})
 
     Import-Module $PSScriptRoot/ProviderHelpers/AADConditionalAccessHelper.psm1
+    # Convert all policies to the agent cap exclusion array format for further processing
+    # currently agent exclusion output as string with spaces per exclusion
+    # This conversion ensures that the policies are in a format compatible with the agent CAP exclusion processing
+    $AllPolicies = @($AllPolicies | ConvertTo-AgentCapExclusionArray)
     $CapHelper = Get-CapTracker
     $CapTableData = $CapHelper.ExportCapPolicies($AllPolicies) # Used in generating the CAP html in the report
 
@@ -556,7 +560,7 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
             $DirectoryObject = Invoke-GraphDirectly -Commandlet "Get-MgBetaDirectoryObject" -M365Environment $M365Environment -id $ObjectId
         } catch {
             # If the object was probably recently deleted from the directory we ignore it. Otherwise an unhandled 404 causes the tool to crash.
-            if ($_.Exception.Message -match "Request_ResourceNotFound") {
+            if ($_.Exception.Message -match "Request_ResourceNotFound|\b404\b|Not Found") {
                 Write-Warning "Processing privileged users. Resource $ObjectId may have been recently deleted from the directory because it was not found."
                 return  # Exit the function to ignore this resource and keep the flow going.
             }
@@ -643,7 +647,17 @@ function LoadObjectDataIntoPrivilegedUserHashtable {
         if ($TenantHasPremiumLicense) {
             # Get the users that are assigned to the PIM group as Eligible members
             # This will retrieve information from the Graph API directly and not use the cmdlet. API information is contained within the Permissions JSON file.
-            $PIMGroupMembers = (Invoke-GraphDirectly -Commandlet "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" -M365Environment $M365Environment -Id $GroupId).Value
+            try {
+                $PIMGroupMembers = (Invoke-GraphDirectly -Commandlet "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" -M365Environment $M365Environment -Id $GroupId).Value
+            }
+            catch {
+                if ($_.Exception.Message -match "Request_ResourceNotFound|\b404\b|Not Found") {
+                    $PIMGroupMembers = @()
+                }
+                else {
+                    throw
+                }
+            }
 
             foreach ($GroupMember in $PIMGroupMembers) {
 
