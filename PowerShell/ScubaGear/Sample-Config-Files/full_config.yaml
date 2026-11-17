@@ -30,7 +30,9 @@ M365Environment: commercial
 LogIn: true
 
 # DisconnectOnExit deletes the authentication tokens from the local system that were used to connect to the Microsoft APIs
-DisconnectOnExit: false
+# when ScubaGear finishes. This is the default. Set it to false to keep the session so that another run in the same
+# PowerShell window signs in silently, and run Disconnect-SCuBATenant before switching tenants or credentials.
+DisconnectOnExit: true
 
 # The following fields are used to authenticate to the M365 environment using service principal authentication.
 # Uncomment the following lines to use AppID and CertificateThumbprint for ServicePrincipal authentication.
@@ -137,6 +139,13 @@ Aad:
         - 2a8adc58-b7c5-4086-a5cc-244b8df40ce8 # Example User 2
       Groups:
         - 4a471183-d934-4fb4-b1b3-d9525e0e1b45 # Example Group 2
+
+  # Risky AI agents SHALL be blocked
+  MS.AAD.9.1v1:
+    AgentExclusions:
+      Agents:
+        - 73575e48-4466-4a02-bce7-bd973eca5992 # Example Agent Object 1
+        - de840f91-aa4a-4ea4-b433-bede07e41e97 # Example Agent Blueprint Object 1
 
 # ========================
 # EXCLUSIONS : EXO SAMPLE

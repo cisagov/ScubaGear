@@ -126,7 +126,7 @@ function ConvertTo-ScATenantGovernancePolicy {
     # name); fall back to the id only when the policy exposes no strength display name.
     if (-not $properties.Contains('AuthenticationStrength')) {
         $authStrengthId = Get-ScATenantGovernanceValue -InputObject $Policy -Path 'GrantControls.AuthenticationStrength.Id'
-        # If the authentication strength ID is not found, set it to an empty string to avoid null values. 
+        # If the authentication strength ID is not found, set it to an empty string to avoid null values.
         Add-ScATenantGovernanceProperty -Properties $properties -Name 'AuthenticationStrength' -Value $authStrengthId
     }
 
@@ -238,7 +238,7 @@ function Update-ScubaAnalyzerTenantGovernanceJson {
     The 'ScubaGear baseline policies only' checkbox scopes the output to the analyzer-matched policies.
     #>
     if (-not $syncHash.GenerateTenantGovernanceConfig -or -not $syncHash.TenantGovernanceJson_TextBox -or -not $syncHash.Analysis) { return }
-    
+
     # Prepare a lookup table for display names, defaulting to an empty dictionary if not available.
     $displayNameLookup = if ($syncHash.Analysis.DisplayNameLookup -is [System.Collections.IDictionary]) { $syncHash.Analysis.DisplayNameLookup } else { @{} }
     # Prepare a lookup table for user principal names, defaulting to an empty dictionary if not available.

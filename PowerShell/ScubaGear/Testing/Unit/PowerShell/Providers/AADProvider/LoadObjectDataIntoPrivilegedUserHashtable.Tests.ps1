@@ -32,6 +32,22 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers.Count | Should -Be 0
         }
 
+        It 'Deleted user triggers REST 404 Not Found exception' {
+            $PrivilegedUsers = @{}
+
+            Mock Invoke-GraphDirectly {
+                throw [System.Exception]::new("The remote server returned an error: (404) Not Found.")
+            } -ParameterFilter { $commandlet -eq "Get-MgBetaDirectoryObject" } -ModuleName ExportAADProvider
+            Mock Write-Warning { }
+
+            LoadObjectDataIntoPrivilegedUserHashtable -RoleName "Global Administrator" `
+                -PrivilegedUsers $PrivilegedUsers -ObjectId ([Guid]::NewGuid().Guid) `
+                -TenantHasPremiumLicense $true -M365Environment "gcc"
+
+            Should -Invoke -CommandName Write-Warning -Times 1
+            $PrivilegedUsers.Count | Should -Be 0
+        }
+
         It 'Objecttype is a user' {
             # Set up the parameters for the test
             $RoleName = "Global Administrator"  # Mock role
@@ -79,6 +95,36 @@ InModuleScope ExportAADProvider {
             $PrivilegedUsers[$ObjectId].DisplayName | Should -Be "John Doe"
             $PrivilegedUsers[$ObjectId].OnPremisesImmutableId | Should -Be "ABC123"
             $PrivilegedUsers[$ObjectId].roles | Should -Contain $RoleName
+        }
+
+        It 'retains active group members when the PIM eligibility endpoint returns 404' {
+            $PrivilegedUsers = @{}
+            $GroupMemberId = [Guid]::NewGuid().Guid
+
+            Mock Invoke-GraphDirectly {
+                param($Commandlet)
+                switch ($Commandlet) {
+                    "Get-MgBetaGroupMember" {
+                        [pscustomobject]@{ Value = @([pscustomobject]@{
+                            Id = $GroupMemberId
+                            "@odata.type" = "#microsoft.graph.user"
+                        }) }
+                    }
+                    "Get-MgBetaUser" {
+                        [pscustomobject]@{ DisplayName = "Test User"; OnPremisesImmutableId = $null }
+                    }
+                    "Get-MgBetaIdentityGovernancePrivilegedAccessGroupEligibilityScheduleInstance" {
+                        throw [System.Exception]::new("The remote server returned an error: (404) Not Found.")
+                    }
+                }
+            } -ModuleName ExportAADProvider
+
+            LoadObjectDataIntoPrivilegedUserHashtable -Objecttype "group" -RoleName "Global Administrator" `
+                -PrivilegedUsers $PrivilegedUsers -ObjectId ([Guid]::NewGuid().Guid) `
+                -TenantHasPremiumLicense $true -M365Environment "gcc"
+
+            $PrivilegedUsers.Count | Should -Be 1
+            $PrivilegedUsers[$GroupMemberId].roles | Should -Contain "Global Administrator"
         }
 
         It 'Objecttype is a group' {

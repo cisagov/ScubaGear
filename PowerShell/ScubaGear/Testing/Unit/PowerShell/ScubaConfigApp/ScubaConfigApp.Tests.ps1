@@ -23,18 +23,6 @@ InModuleScope ScubaConfigApp {
                             link = "https://github.com/cisagov/ScubaGear/baselines/aad.md"
                         }
                     )
-                    defender = @(
-                        @{
-                            id = "MS.DEFENDER.1.1v1"
-                            name = "Test Defender Policy 1"
-                            rationale = "Test rationale for Defender policy"
-                            criticality = "SHALL"
-                            exclusionField = "SensitiveAccounts"
-                            omissionField = "Omissions"
-                            annotationField = "Annotations"
-                            link = "https://github.com/cisagov/ScubaGear/baselines/defender.md"
-                        }
-                    )
                     exo = @(
                         @{
                             id = "MS.EXO.1.1v1"

@@ -61,10 +61,6 @@ DefenderMirrorDetails(PolicyId) := sprintf(
     concat(" ", [
     "A custom product can be used to fulfill this policy requirement.",
     "If a custom product is used, a 3rd party assessment tool or manual review is needed to ensure compliance.",
-    "If you are using Defender for Office 365 to implement this policy,",
-    "ensure when running ScubaGear that 'defender' is an argument to the -ProductNames parameter.",
-    "Then, review the corresponding Defender policy that fulfills",
-    "the requirements of this policy on the Defender ScubaGear HTML report.",
     "See the %v for instructions on a manual check."
     ]),
     [PolicyLink(PolicyId)]

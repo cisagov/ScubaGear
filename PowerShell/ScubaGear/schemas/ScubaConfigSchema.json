@@ -1,0 +1,606 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "_comment": "JSON Schema for ScubaGear configuration validation with metadata-driven exclusion type validation",
+  "version": "1.0.0",
+  "type": "object",
+
+  "schemaMetadata": {
+    "version": "1.0.1",
+    "lastUpdated": "2026-01-12",
+
+    "ignoreProperties": [
+      "_comment: Properties to ignore during validation (PowerShell metadata and internal properties)",
+      "IsReadOnly",
+      "IsFixedSize",
+      "IsSynchronized",
+      "Keys",
+      "Values",
+      "SyncRoot",
+      "Count",
+      "_PreValidationWarnings",
+      "AllProductNames",
+      "OPAVersion",
+      "OPAExecutable",
+      "Quiet",
+      "SilenceBODWarnings",
+      "DarkMode",
+      "Verbose",
+      "Debug",
+      "ScubaGitHubUrl",
+      "IndividualReportFolderName"
+      ],
+
+    "policyExclusionMappings": {
+      "_comment": "Maps policy IDs to their supported exclusion types for automated validation",
+      "MS.AAD.1.1v1": ["CapExclusions"],
+      "MS.AAD.2.1v1": ["CapExclusions"],
+      "MS.AAD.2.3v1": ["CapExclusions"],
+      "MS.AAD.3.1v1": ["CapExclusions"],
+      "MS.AAD.3.2v2": ["CapExclusions"],
+      "MS.AAD.3.6v1": ["CapExclusions"],
+      "MS.AAD.3.7v1": ["CapExclusions"],
+      "MS.AAD.3.8v1": ["CapExclusions"],
+      "MS.AAD.3.9v1": ["CapExclusions"],
+      "MS.AAD.7.4v1": ["RoleExclusions"],
+      "MS.AAD.9.1v1": ["AgentExclusions"],
+      "MS.SECURITYSUITE.2.1v1": ["SensitiveUsers"],
+      "MS.SECURITYSUITE.2.3v1": ["PartnerDomains"],
+      "MS.EXO.1.1v2": ["AllowedForwardingDomains"]
+    },
+
+    "deprecatedProductAliases": {
+      "defender": "securitysuite"
+    },
+    "reportProductNames": {
+      "aad":           { "baselineName": "AAD",           "displayName": "Microsoft Entra ID",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 1 },
+      "sharepoint":    { "baselineName": "SharePoint",    "displayName": "SharePoint Online",        "tenantDetailProvider": "aad",           "tenantDetailPriority": 2 },
+      "powerbi":       { "baselineName": "PowerBI",       "displayName": "Microsoft Power BI",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 3 },
+      "teams":         { "baselineName": "Teams",         "displayName": "Microsoft Teams",          "tenantDetailProvider": "teams",         "tenantDetailPriority": 4 },
+      "powerplatform": { "baselineName": "PowerPlatform", "displayName": "Microsoft Power Platform", "tenantDetailProvider": "powerplatform", "tenantDetailPriority": 5 },
+      "exo":           { "baselineName": "EXO",           "displayName": "Exchange Online",          "tenantDetailProvider": "exo",           "tenantDetailPriority": 6 },
+      "securitysuite": { "baselineName": "SecuritySuite", "displayName": "Security Suite",           "tenantDetailProvider": "exo",           "tenantDetailPriority": 7 },
+      "si":            { "baselineName": "SI",            "displayName": "Super Intelligence",       "tenantDetailProvider": "aad",           "tenantDetailPriority": 8 }
+    },
+    "productCapabilities": {
+      "Aad": {
+        "supportsExclusions": true,
+        "supportedExclusionTypes": ["CapExclusions", "RoleExclusions", "AgentExclusions"]
+      },
+      "SecuritySuite": {
+        "supportsExclusions": true,
+        "supportedExclusionTypes": ["SensitiveAccounts", "SensitiveUsers", "PartnerDomains"]
+      },
+      "Exo": {
+        "supportsExclusions": true,
+        "supportedExclusionTypes": ["AllowedForwardingDomains", "PartnerDomains", "AgencyDomains"]
+      },
+      "PowerPlatform": {
+        "supportsExclusions": false,
+        "supportedExclusionTypes": []
+      },
+      "SharePoint": {
+        "supportsExclusions": false,
+        "supportedExclusionTypes": []
+      },
+      "Teams": {
+        "supportsExclusions": false,
+        "supportedExclusionTypes": []
+      }
+    }
+  },
+
+  "properties": {
+    "OrgName": {
+      "_comment": "Organization display name for documentation purposes",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "caseSensitive": false
+    },
+
+    "OrgUnitName": {
+      "_comment": "Organizational unit or department name",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "caseSensitive": false
+    },
+
+    "Description": {
+      "_comment": "Detailed description of this configuration file, its purpose, and any special considerations",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "caseSensitive": false
+    },
+
+    "ProductNames": {
+      "_comment": "List of Microsoft 365 products to assess. Use ['*'] to include all products.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi", "si", "*"]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "caseSensitive": false
+    },
+
+    "M365Environment": {
+      "_comment": "Microsoft 365 environment type for authentication",
+      "type": "string",
+      "enum": ["commercial", "gcc", "gcchigh", "dod"],
+      "caseSensitive": false
+    },
+
+    "LogIn": {
+      "_comment": "Whether to prompt for credentials during execution",
+      "type": "boolean",
+      "caseSensitive": false
+    },
+
+    "DisconnectOnExit": {
+      "_comment": "Whether to disconnect from Microsoft services on exit",
+      "type": "boolean",
+      "caseSensitive": false
+    },
+
+    "Organization": {
+      "_comment": "Tenant domain name (FQDN) for service principal authentication",
+      "$ref": "#/definitions/patterns/orgDomain",
+      "caseSensitive": false
+    },
+
+    "AppID": {
+      "_comment": "Entra ID Application (client) ID for service principal authentication",
+      "$ref": "#/definitions/patterns/appGuid",
+      "caseSensitive": false
+    },
+
+    "CertificateThumbprint": {
+      "_comment": "Certificate thumbprint for service principal authentication (40 hex characters)",
+      "$ref": "#/definitions/patterns/thumbprint",
+      "caseSensitive": false
+    },
+
+    "KeepIndividualJSON": {
+      "_comment": "Whether to keep individual JSON result files for each product",
+      "type": "boolean",
+      "caseSensitive": false
+    },
+
+    "OPAPath": {
+      "_comment": "Path to OPA executable directory - must exist (ScubaGear cannot run without OPA)",
+      "$ref": "#/definitions/patterns/folderPath",
+      "pathMustExist": true,
+      "caseSensitive": false
+    },
+
+    "OutPath": {
+      "_comment": "Output directory path for assessment results - will be created if it doesn't exist",
+      "$ref": "#/definitions/patterns/folderPath",
+      "pathMustExist": false,
+      "caseSensitive": true
+    },
+
+    "OutFolderName": {
+      "_comment": "Output folder name for assessment results",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "minLength": 1
+    },
+
+    "OutProviderFileName": {
+      "_comment": "Provider settings export filename (without extension)",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
+    },
+
+    "OutRegoFileName": {
+      "_comment": "Rego test results filename (without extension)",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": true
+    },
+
+    "OutReportName": {
+      "_comment": "HTML report filename (without extension)",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
+    },
+
+    "OutJsonFileName": {
+      "_comment": "JSON results filename (without extension)",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
+    },
+
+    "OutCsvFileName": {
+      "_comment": "CSV results filename (without extension)",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
+    },
+
+    "OutActionPlanFileName": {
+      "_comment": "Action plan filename (without extension)",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$",
+      "caseSensitive": false
+    },
+
+    "NumberOfUUIDCharactersToTruncate": {
+      "_comment": "Number of UUID characters to truncate in output for readability",
+      "type": "integer",
+      "enum": [0, 13, 18, 36],
+      "caseSensitive": false
+    },
+
+    "PreferredDnsResolvers": {
+      "_comment": "Preferred DNS resolver IP addresses for DNS queries",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/patterns/ipv4"
+      },
+      "caseSensitive": false
+    },
+
+    "SkipDoH": {
+      "_comment": "Skip DNS over HTTPS for failed DNS queries",
+      "type": "boolean",
+      "caseSensitive": false
+    },
+
+    "Aad": {
+      "_comment": "Microsoft Entra ID (Azure AD) exclusion configurations",
+      "type": "object",
+      "patternProperties": {
+        "^MS\\.AAD\\.[0-9]+\\.[0-9]+v[0-9]+$": {
+          "type": "object",
+          "properties": {
+            "CapExclusions": {
+              "$ref": "#/definitions/exclusionTypes/CapExclusions"
+            },
+            "AgentExclusions": {
+              "$ref": "#/definitions/exclusionTypes/AgentExclusions"
+            },
+            "RoleExclusions": {
+              "$ref": "#/definitions/exclusionTypes/RoleExclusions"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "caseSensitive": true
+    },
+
+    "SecuritySuite": {
+      "_comment": "Security Suite exclusion configurations",
+      "type": "object",
+      "patternProperties": {
+        "^MS\\.SECURITYSUITE\\.[0-9]+\\.[0-9]+v[0-9]+$": {
+          "type": "object",
+          "properties": {
+            "SensitiveUsers": {
+              "$ref": "#/definitions/exclusionTypes/SensitiveUsers"
+            },
+            "PartnerDomains": {
+              "$ref": "#/definitions/exclusionTypes/DomainList"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "caseSensitive": true
+    },
+
+    "Exo": {
+      "_comment": "Exchange Online exclusion configurations",
+      "type": "object",
+      "patternProperties": {
+        "^MS\\.EXO\\.[0-9]+\\.[0-9]+v[0-9]+$": {
+          "type": "object",
+          "properties": {
+            "AllowedForwardingDomains": {
+              "$ref": "#/definitions/exclusionTypes/DomainList"
+            },
+            "PartnerDomains": {
+              "$ref": "#/definitions/exclusionTypes/DomainList"
+            },
+            "AgencyDomains": {
+              "$ref": "#/definitions/exclusionTypes/DomainList"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "caseSensitive": true
+    },
+
+    "PowerPlatform": {
+      "_comment": "Power Platform - does not support exclusions",
+      "type": "object",
+      "patternProperties": {},
+      "additionalProperties": false,
+      "caseSensitive": true
+    },
+
+    "SharePoint": {
+      "_comment": "SharePoint & OneDrive - does not support exclusions",
+      "type": "object",
+      "patternProperties": {},
+      "additionalProperties": false,
+      "caseSensitive": true
+    },
+
+    "Teams": {
+      "_comment": "Microsoft Teams - does not support exclusions",
+      "type": "object",
+      "patternProperties": {},
+      "additionalProperties": false,
+      "caseSensitive": true
+    },
+
+    "OmitPolicy": {
+      "_comment": "Policies to omit from assessment with required rationale",
+      "type": "object",
+      "patternProperties": {
+        "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
+          "oneOf": [
+            {
+              "_comment": "Detailed omission configuration with expiration date",
+              "type": "object",
+              "properties": {
+                "Rationale": {
+                  "_comment": "Reason for omitting this policy (REQUIRED)",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "Expiration": {
+                  "_comment": "Date after which policy should no longer be omitted (yyyy-mm-dd)",
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+                }
+              },
+              "required": ["Rationale"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "caseSensitive": false
+    },
+
+    "AnnotatePolicy": {
+      "_comment": "Policy annotations for adding context to assessment results",
+      "type": "object",
+      "patternProperties": {
+        "^[Mm][Ss]\\.[a-zA-Z]+\\.[0-9]+\\.[0-9]+[Vv][0-9]+$": {
+          "oneOf": [
+            {
+              "_comment": "Detailed annotation with remediation tracking",
+              "type": "object",
+              "properties": {
+                "Comment": {
+                  "_comment": "Contextual comment about this policy",
+                  "type": "string",
+                  "minLength": 1
+                },
+                "RemediationDate": {
+                  "_comment": "Expected or actual remediation date (yyyy-mm-dd)",
+                  "type": "string",
+                  "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+                },
+                "IncorrectResult": {
+                  "_comment": "Flag indicating if the assessment result is incorrect",
+                  "type": "boolean"
+                }
+              },
+              "required": ["Comment"],
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "caseSensitive": false
+    }
+  },
+
+  "additionalProperties": true,
+
+  "definitions": {
+    "patterns": {
+      "guid": {
+        "_comment": "Standard GUID format with hyphens",
+        "type": "string",
+        "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+        "friendlyName": "GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)"
+      },
+      "fqdn": {
+        "_comment": "Display name followed by @ and fully qualified domain name",
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "friendlyName": "displayname@fqdn format"
+      },
+      "appGuid": {
+        "_comment": "GUID with optional braces or parentheses",
+        "type": "string",
+        "pattern": "^[{(]?[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[)}]?$",
+        "friendlyName": "Application GUID format"
+      },
+      "thumbprint": {
+        "_comment": "SHA-1 certificate thumbprint as 40 hexadecimal characters",
+        "type": "string",
+        "pattern": "^[A-Fa-f0-9]{40}$",
+        "friendlyName": "Certificate thumbprint (40 hex characters)"
+      },
+      "ipv4": {
+        "_comment": "Standard IPv4 address (e.g., 192.168.1.1)",
+        "type": "string",
+        "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+        "friendlyName": "IPv4 address format"
+      },
+      "filename": {
+        "_comment": "Filename with alphanumeric characters, underscores, and hyphens only",
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9_-]+$",
+        "friendlyName": "Alphanumeric filename (no extension)"
+      },
+      "folderPath": {
+        "_comment": "Directory path with existence validation (Windows, Unix, or UNC). Properties using this ref should set 'pathMustExist': true (error if missing) or false (warning if missing, directory will be created)",
+        "type": "string",
+        "pattern": "^([a-zA-Z]:[\\\\\/]|\\\\\\\\|\\.\\.?[\\\\\/]|[\\\\\/]).*$|^\\.\\.?$|^[^:*?\"<>|][^:*?\"<>|]*$",
+        "testPath": true,
+        "friendlyName": "Directory path"
+      },
+      "sensitiveUser": {
+        "_comment": "Sensitive user format: display name followed by semicolon and email",
+        "type": "string",
+        "pattern": "^.+;[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "friendlyName": "DisplayName;EmailAddress format"
+      },
+      "orgDomain": {
+        "_comment": "Fully qualified domain name for organization",
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\\.[a-zA-Z]{2,4}$|^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9](\\.[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])+\\.[a-zA-Z]{2,4}$",
+        "friendlyName": "Organization domain name (FQDN with 2-4 char TLD)"
+      },
+      "date": {
+        "_comment": "ISO 8601 date format",
+        "type": "string",
+        "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+        "friendlyName": "Date in yyyy-mm-dd format"
+      },
+      "upn": {
+        "_comment": "Standard email address format for UPNs",
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+        "friendlyName": "User Principal Name (email format)"
+      },
+      "guestUserType": {
+        "_comment": "Valid guest user types for Conditional Access exclusions",
+        "pattern": "^(internalGuest|b2bCollaborationGuest|b2bCollaborationMember|b2bDirectConnectUser|otherExternalUser|serviceProvider)$",
+        "type": "string",
+        "friendlyName": "Guest user type"
+      }
+    },
+
+    "exclusionTypes": {
+      "AgentExclusions": {
+        "_comment": "Approved agent service-principal object IDs for agent Conditional Access policies",
+        "type": "object",
+        "properties": {
+          "Agents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "CapExclusions": {
+        "_comment": "Conditional Access Policy exclusions (GUIDs only)",
+        "type": "object",
+        "properties": {
+          "Users": {
+            "_comment": "User Object IDs (GUIDs) to exclude",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          },
+          "Groups": {
+            "_comment": "Group Object IDs (GUIDs) to exclude",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          },
+          "Applications": {
+            "_comment": "Cloud app IDs to exclude from Conditional Access policies. Each entry must be either a valid GUID (e.g. '00000004-0000-0ff1-ce00-000000000000') or an alphanumeric named app string (e.g. 'Office365'). Malformed GUIDs will fail validation.",
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "_comment": "Valid GUID format",
+                  "$ref": "#/definitions/patterns/guid"
+                },
+                {
+                  "_comment": "Named app string (alphanumeric only, e.g. 'Office365', 'MicrosoftAdminPortals')",
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9]+$",
+                  "minLength": 1
+                }
+              ]
+            },
+            "uniqueItems": true
+          },
+          "GuestUserTypes": {
+            "_comment": "Guest/external user types to exclude from Conditional Access policies. Values correspond to GuestOrExternalUserTypes in the MS Graph CAP schema.",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guestUserType"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      },
+
+      "RoleExclusions": {
+        "_comment": "Privileged role assignment exclusions (GUIDs only)",
+        "type": "object",
+        "properties": {
+          "Users": {
+            "_comment": "User Object IDs (GUIDs) to exclude from role checks",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          },
+          "Groups": {
+            "_comment": "Group Object IDs (GUIDs) to exclude from role checks",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/patterns/guid"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false
+      },
+
+      "SensitiveUsers": {
+        "_comment": "List of sensitive users in DisplayName;Email format",
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/patterns/sensitiveUser"
+        },
+        "uniqueItems": true
+      },
+
+      "DomainList": {
+        "_comment": "List of domain names",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uniqueItems": true
+      }
+    }
+  }
+}

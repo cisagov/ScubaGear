@@ -3898,6 +3898,36 @@
         "RequirementMet":  true
     },
     {
+        "ActualValue":  {
+                            "AppliedPolicies":  [],
+                            "CompliantPolicies":  [],
+                            "NonCompliantPolicies":  []
+                        },
+        "Commandlet":  [
+                           "Get-HostedOutboundSpamFilterPolicy",
+                           "Get-HostedOutboundSpamFilterRule"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.SECURITYSUITE.9.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  {
+                            "ExistingAlertPolicies":  [],
+                            "MissingAlertPolicies":  [],
+                            "CompliantAlertPolicies":  [],
+                            "NonCompliantAlertPolicies":  []
+                        },
+        "Commandlet":  [
+                           "Get-ProtectionAlert"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.SECURITYSUITE.9.2v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
         "ActualValue":  [
 
                         ],
@@ -3921,6 +3951,86 @@
                        ],
         "Criticality":  "Shall",
         "PolicyId":  "MS.SECURITYSUITE.5.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.1.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.2.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.3.1v1",
+        "ReportDetails":  "Requirement not met",
+        "RequirementMet":  false
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.4.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.4.2v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.5.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  false,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.6.1v1",
+        "ReportDetails":  "Requirement met",
+        "RequirementMet":  true
+    },
+    {
+        "ActualValue":  true,
+        "Commandlet":  [
+                           "Get-PowerBITenantSettingsRest"
+                       ],
+        "Criticality":  "Should",
+        "PolicyId":  "MS.POWERBI.7.1v1",
         "ReportDetails":  "Requirement met",
         "RequirementMet":  true
     }

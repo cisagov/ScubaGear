@@ -1,5 +1,5 @@
 {
-  "Version": "2.8.12 (build 1500)",
+  "Version": "2.10.28 (build 1728)",
   "DebugMode": true,
   "AutoSaveProgress": false,
   "EnableSearchAndFilter": true,
@@ -12,7 +12,7 @@
   "EnablePolicyViewer": true,
   "OnlineBaselineSchemaURL": "https://raw.githubusercontent.com/cisagov/ScubaGear/main/PowerShell/ScubaGear/schemas/ScubaBaselines.json",
   "LocalBaselineSchemaPath": "..\\..\\schemas\\ScubaBaselines.json",
-  "DefaultConfigsSchemaPath": "..\\ScubaConfig\\ScubaConfigDefaults.json",
+  "DefaultConfigsSchemaPath": "..\\..\\schemas\\ScubaConfigDefaults.json",
   "PolicyMigrationsCSVPath": "..\\..\\mappings\\scuba-baseline-policy-migrations.csv",
   "WalkthroughMarkdownPath": "..\\..\\..\\..\\docs\\configuration\\scubaconfigapp-walkthrough.md",
   "WalkthroughGitHubUrl": "https://github.com/cisagov/ScubaGear/blob/main/docs/configuration/scubaconfigapp-walkthrough.md",
@@ -51,7 +51,9 @@
           "heading": "REMOVED - NO REPLACEMENT ({0}):"
         },
         "skipped": {
-          "prefix":  "SKIPPED"
+          "prefix":  "SKIPPED",
+          "heading": "LEGACY POLICY RESOLVED - TARGET ALREADY CONFIGURED ({0}):",
+          "body": "The legacy policy entry was removed. Existing target settings were retained; legacy values were not merged. Review the target settings before saving."
         }
       }
     }
@@ -206,7 +208,7 @@
     "ValidationErrors": "Please correct the validation errors before proceeding.",
     "GraphError": "Error retrieving data from Graph: {0}",
     "CloseConfirmation": "Are you sure you want to close the ScubaGear Configuration Editor?\n\nYou will lose all entered information.\n\nTo save your data, click 'Preview & Generate' button and click 'Download YAML'.",
-    "GraphNotConnected": "Microsoft Graph is not connected.`n`nTo connect Graph, restart the application with the -Online parameter or use Connect-MgGraph manually."
+    "GraphNotConnected": "Microsoft Graph is not connected.`n`nRestart the application with the -Online parameter to connect."
   },
   "localeStatusMessages": {
     "GraphConnected": "Graph Connected",
@@ -293,7 +295,7 @@
     "OutReportsName_TextBox": "ScubaReports",
     "OpaPath_TextBox": ".",
     "LogIn_CheckBox": true,
-    "DisconnectOnExit`_CheckBox": false
+    "DisconnectOnExit`_CheckBox": true
   },
   "products": [
     {
@@ -306,7 +308,7 @@
     {
       "id": "SecuritySuite",
       "name": "SecuritySuite",
-      "displayName": "Security Suite (defender)",
+      "displayName": "Security Suite (securitysuite)",
       "supportsExclusions": true,
       "showInApp": true
     },
@@ -616,6 +618,21 @@
     ]
   },
   "inputTypes": {
+    "AgentCapExclusions": {
+      "name": "Conditional Access Policy Excluded Risky Agents",
+      "value": "AgentExclusions",
+      "description": "Exclude risky agent identities and/or agent blueprints from agent-only conditional access policies",
+      "fields": [
+        {
+          "type": "array",
+          "name": "Agent Service Principal Object IDs",
+          "value": "Agents",
+          "description": "Object IDs of risky excluded agent identities and/or agent blueprints",
+          "valueType": "guid",
+          "required": false
+        }
+      ]
+    },
     "CapExclusions": {
       "name": "Conditional Access Policy Excluded Groups, Users, Applications, and Guest User Types",
       "value": "CapExclusions",

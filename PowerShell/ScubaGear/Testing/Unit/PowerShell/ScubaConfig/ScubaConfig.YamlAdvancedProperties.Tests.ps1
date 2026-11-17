@@ -96,7 +96,7 @@ Describe "ScubaConfigValidator Basic Validation" {
         $script:ValidConfigYaml = @"
 ProductNames:
   - aad
-  - defender
+  - securitysuite
 M365Environment: commercial
 OrgName: Test Organization
 Description: Test configuration for validation
@@ -111,8 +111,8 @@ Aad:
     RoleExclusions:
       Users:
         - 11111111-2222-3333-4444-555555555555
-Defender:
-  MS.DEFENDER.1.1v1:
+SecuritySuite:
+  MS.SECURITYSUITE.1.1v1:
     SensitiveAccounts:
       IncludedUsers:
         - user@example.com
@@ -140,13 +140,13 @@ Aad:
 
     $script:InvalidUpnConfigYaml = @"
 ProductNames:
-  - defender
+  - securitysuite
 M365Environment: commercial
 OrgName: Test Organization
 Description: Test configuration with invalid UPNs
 
-Defender:
-  MS.DEFENDER.1.1v1:
+SecuritySuite:
+  MS.SECURITYSUITE.1.1v1:
     SensitiveAccounts:
       IncludedUsers:
         - not-an-email

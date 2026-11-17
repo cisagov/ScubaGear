@@ -28,6 +28,34 @@ the structural half of it automatically.
 The engine hard-codes nothing about individual policies. To add or change a control you edit the
 JSON, not the `.psm1`.
 
+### Adding an exclusion field
+
+The analyzer's exclusion fields are defined in
+[`ScubaConfigAnalyzer_Control_en-US.json`](../../PowerShell/ScubaGear/Modules/ScubaConfigApp/ScubaConfigAnalyzer_Control_en-US.json):
+
+- `exclusionDefinitions.<type>.fields` declares the named fields copied into findings
+  and emitted in YAML. Each field uses `value` as its key, falling back to `name`.
+- `conditionalAccessAnalysis.exclusionDetectors.rules` maps each field to a policy
+  property with `field`, `policyPath`, `valueKind`, and `requiresExclusionType`.
+- The control's baseline `exclusionField` selects the definition. Keep the config
+  schema's policy mapping and allowed properties in sync with it.
+
+CA detection, candidate-policy selection, and YAML generation use these definitions;
+they do not maintain separate PowerShell lists of users, groups, agents, or other
+field names. Adding a named field with an existing detector value format requires
+JSON changes, not edits to those PowerShell helpers. A detector that finds values
+for an undeclared field reports a metadata error rather than silently losing them.
+New value formats or evaluation semantics may still require interpreter changes,
+and ScubaGear's authoritative Rego checks must support the new exclusion.
+
+Non-Conditional-Access (provider) exclusion types declare their detectors under
+`exclusionDefinitions.<type>.analysis.detectors`. Each detector has a `flagWhen`
+condition and a `valueFrom` path; matching values become exclusion candidates. A
+detector marked `"nonExcludable": true` instead reports a problem the config file cannot
+waive (for example the default remote domain `*` for `MS.EXO.1.1v2`). Those values are
+never offered as exclusions: the control fails with a tenant-fix action, and if they are
+the only findings no exclusion YAML is generated.
+
 ## Important: drift severity depends on how the analyzer is invoked
 
 The analyzer has two entry points, and they use the JSON very differently. Understanding this

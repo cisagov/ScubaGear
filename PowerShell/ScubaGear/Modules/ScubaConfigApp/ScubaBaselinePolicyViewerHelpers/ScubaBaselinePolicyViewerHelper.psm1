@@ -314,6 +314,7 @@ Function Show-ScubaBaselinePolicyHelper {
 
                 # Create navigation items with expand/collapse functionality
                 $allPolicyData = @{}
+                $allAppendixData = @{}
                 $navigationItems = [System.Collections.ArrayList]::new()
 
                 foreach ($productKey in ($jsonData.baselines | Get-Member -MemberType NoteProperty | Select-Object -ExpandProperty Name | Sort-Object)) {
@@ -327,6 +328,7 @@ Function Show-ScubaBaselinePolicyHelper {
 
                     # Store policy data for this product
                     $allPolicyData[$productKey] = $policies
+                    $allAppendixData[$productKey] = @($jsonData.appendices.$productKey | Where-Object { $_ })
 
                     # Add product header (initially collapsed)
                     [void]$navigationItems.Add([PSCustomObject]@{
@@ -339,6 +341,20 @@ Function Show-ScubaBaselinePolicyHelper {
                         ProductKey = $productKey
                         Type = "ProductHeader"
                     })
+                }
+
+                $getMatchingAppendices = {
+                    param($productKey, $filterText = "", $criticality = "all")
+
+                    # Appendices are guidance, not SHALL/SHOULD controls.
+                    if ($criticality -eq "all") {
+                        foreach ($appendix in $allAppendixData[$productKey]) {
+                            if ([string]::IsNullOrEmpty($filterText) -or
+                                "$($appendix.name) $($appendix.content)".ToLowerInvariant().Contains($filterText.ToLowerInvariant())) {
+                                $appendix
+                            }
+                        }
+                    }
                 }
 
                 # Function to rebuild the navigation display based on expansion states
@@ -363,14 +379,13 @@ Function Show-ScubaBaselinePolicyHelper {
                                 # Apply criticality filter
                                 $criticalityMatch = $true
                                 if ($criticalityFilter -ne "all") {
-                                    $policyText = "$($policy.id) $($policy.name) $($policy.rationale) $($policy.implementation)".ToLower()
+                                    $policyText = "$($policy.id) $($policy.name) $($policy.rationale) $($policy.notes) $($policy.implementation)".ToLower()
                                     if ($criticalityFilter -eq "shall") {
                                         $criticalityMatch = $policyText.Contains("shall")
                                     } elseif ($criticalityFilter -eq "should") {
                                         $criticalityMatch = $policyText.Contains("should")
                                     }
                                 }
-
                                 if ($textMatch -and $criticalityMatch) {
 
                                     [void]$displayItems.Add([PSCustomObject]@{
@@ -385,11 +400,47 @@ Function Show-ScubaBaselinePolicyHelper {
                                     })
                                 }
                             }
+                            foreach ($appendix in (& $getMatchingAppendices $productItem.ProductKey $filterText $criticalityFilter)) {
+                                [void]$displayItems.Add([PSCustomObject]@{
+                                    DisplayText = "   $($appendix.name)"
+                                    TextColor = "#374151"
+                                    FontWeight = "Normal"
+                                    IsPolicy = $false
+                                    IsExpanded = $false
+                                    Policy = $null
+                                    Appendix = $appendix
+                                    ProductKey = $productItem.ProductKey
+                                    Type = "Appendix"
+                                })
+                            }
                         }
                     }
 
                     $policySelector.ItemsSource = $displayItems
                 }
+
+                $navigateToAppendix = {
+                    param($anchor)
+
+                    $productKey = $policySelector.SelectedItem.ProductKey
+                    $appendix = $allAppendixData[$productKey] | Where-Object anchor -eq $anchor | Select-Object -First 1
+                    if (-not $appendix) {
+                        Write-Warning "Baseline appendix not found for '$productKey': $anchor"
+                        return
+                    }
+                    $filterTextBox.Text = ""
+                    $criticalityFilter.SelectedIndex = 0
+                    & $updateNavigationDisplay
+                    $appendixItem = $policySelector.Items | Where-Object {
+                        $_.Type -eq "Appendix" -and $_.ProductKey -eq $productKey -and $_.Appendix.anchor -eq $anchor
+                    } | Select-Object -First 1
+                    if (-not $appendixItem) {
+                        Write-Warning "Baseline appendix navigation entry not found for '$productKey': $anchor"
+                        return
+                    }
+                    $policySelector.SelectedItem = $appendixItem
+                    $policySelector.ScrollIntoView($appendixItem)
+                }.GetNewClosure()
 
                 # Bind items to ListBox (initially all collapsed)
                 #$allNavigationItems = $navigationItems
@@ -469,7 +520,7 @@ Function Show-ScubaBaselinePolicyHelper {
 
                                 $criticalityMatch = $true
                                 if ($selectedCriticality -ne "all") {
-                                    $policyText = "$($policy.id) $($policy.name) $($policy.rationale) $($policy.implementation)".ToLower()
+                                    $policyText = "$($policy.id) $($policy.name) $($policy.rationale) $($policy.notes) $($policy.implementation)".ToLower()
                                     if ($selectedCriticality -eq "shall") {
                                         $criticalityMatch = $policyText.Contains("shall")
                                     } elseif ($selectedCriticality -eq "should") {
@@ -485,7 +536,7 @@ Function Show-ScubaBaselinePolicyHelper {
                             }
 
                             # Temporarily expand products that have matches
-                            if ($hasMatchingPolicy) {
+                            if ($hasMatchingPolicy -or @(& $getMatchingAppendices $productItem.ProductKey $filterText $selectedCriticality).Count -gt 0) {
                                 $productItem.IsExpanded = $true
                             }
                         }
@@ -525,7 +576,7 @@ Function Show-ScubaBaselinePolicyHelper {
 
                                 $criticalityMatch = $true
                                 if ($selectedCriticality -ne "all") {
-                                    $policyText = "$($policy.id) $($policy.name) $($policy.rationale) $($policy.implementation)".ToLower()
+                                    $policyText = "$($policy.id) $($policy.name) $($policy.rationale) $($policy.notes) $($policy.implementation)".ToLower()
                                     if ($selectedCriticality -eq "shall") {
                                         $criticalityMatch = $policyText.Contains("shall")
                                     } elseif ($selectedCriticality -eq "should") {
@@ -541,8 +592,9 @@ Function Show-ScubaBaselinePolicyHelper {
                             }
 
                             # Temporarily expand products that have matches
-                            if ($hasMatchingPolicy) {
+                            if ($hasMatchingPolicy -or @(& $getMatchingAppendices $productItem.ProductKey $filterText $selectedCriticality).Count -gt 0) {
                                 $productItem.IsExpanded = $true
+                                $hasMatches = $true
                             }
                         }
 
@@ -584,7 +636,7 @@ Function Show-ScubaBaselinePolicyHelper {
                     param($text, $margin = "0,4,0,4")
 
                     # Check if this is a note (starts with > or >>)
-                    $isNote = $text -match '^\s*>{1,2}\s'
+                    $isNote = $text -match '^\s*>{1,2}\s' -and $text -notmatch '(?m)^[ \t]*[^>\s]'
 
                     if ($isNote) {
                         # Create a border container for notes
@@ -596,7 +648,7 @@ Function Show-ScubaBaselinePolicyHelper {
                         $border.Margin = $margin
 
                         # Remove the > or >> prefix from the text
-                        $cleanText = $text -replace '^\s*>{1,2}\s*', ''
+                        $cleanText = $text -replace '(?m)^[ \t]*>{1,2}[ \t]*', ''
 
                         # Create the text block for the note content
                         $noteTextBlock = New-Object System.Windows.Controls.TextBlock
@@ -625,35 +677,11 @@ Function Show-ScubaBaselinePolicyHelper {
                 $processTextContent = {
                     param($text, $textBlock)
 
-                    # First, handle multiline markdown links specifically (without affecting other newlines)
-                    $multilineLinkPattern = '\[([^\]]*?)\r?\n([^\]]*?)\]\s*\(([^)]*?)\)'
-                    $text = [regex]::Replace($text, $multilineLinkPattern, {
+                    # Keep fenced code out of inline markdown and URL parsing.
+                    $text = [regex]::Replace($text, '(?ms)^[ \t]*```[^\r\n]*\r?\n(.*?)\r?\n[ \t]*```[ \t]*$', {
                         param($match)
-                        $linkText = ($match.Groups[1].Value + $match.Groups[2].Value) -replace '\s+', ' '
-                        $linkUrl = $match.Groups[3].Value -replace '\s+', ''
-                        "[$($linkText.Trim())]($($linkUrl.Trim()))"
-                    }, [System.Text.RegularExpressions.RegexOptions]::Multiline)
-
-                    # Also handle links that might span more than 2 lines
-                    $extendedMultilineLinkPattern = '\[([\s\S]*?)\]\s*\(([\s\S]*?)\)'
-                    $text = [regex]::Replace($text, $extendedMultilineLinkPattern, {
-                        param($match)
-                        $linkText = $match.Groups[1].Value -replace '\r?\n\s*', ' ' -replace '\s+', ' '
-                        $linkUrl = $match.Groups[2].Value -replace '\r?\n\s*', '' -replace '\s+', ''
-                        # Only apply if this actually contains newlines (to avoid affecting normal links)
-                        if ($match.Groups[0].Value -match '\r?\n') {
-                            "[$($linkText.Trim())]($($linkUrl.Trim()))"
-                        } else {
-                            $match.Groups[0].Value
-                        }
-                    }, [System.Text.RegularExpressions.RegexOptions]::Singleline)
-
-                    # Handle escaped pipe characters
-                    $text = $text -replace '\\\|', '|'
-
-                    # Convert standalone URLs to markdown links (but preserve existing markdown links)
-                    $urlPattern = '(?<!\]\()(https?://[^\s\)]+)(?!\))'
-                    $text = [regex]::Replace($text, $urlPattern, '[$1]($1)')
+                        '<pre>' + [System.Net.WebUtility]::HtmlEncode($match.Groups[1].Value) + '</pre>'
+                    })
 
                     # Process <pre> blocks separately to handle <b> tags inside them
                     $prePattern = '<pre>(.*?)</pre>'
@@ -719,7 +747,7 @@ Function Show-ScubaBaselinePolicyHelper {
                         if ($match.Index -gt $lastIndex) {
                             $beforeText = $text.Substring($lastIndex, $match.Index - $lastIndex)
                             if ($beforeText) {
-                                $run = New-Object System.Windows.Documents.Run($beforeText)
+                                $run = New-Object System.Windows.Documents.Run([System.Net.WebUtility]::HtmlDecode($beforeText))
                                 [void]$preTextBlock.Inlines.Add($run)
                             }
                         }
@@ -737,15 +765,9 @@ Function Show-ScubaBaselinePolicyHelper {
                     if ($lastIndex -lt $text.Length) {
                         $remainingText = $text.Substring($lastIndex)
                         if ($remainingText) {
-                            $run = New-Object System.Windows.Documents.Run($remainingText)
+                            $run = New-Object System.Windows.Documents.Run([System.Net.WebUtility]::HtmlDecode($remainingText))
                             [void]$preTextBlock.Inlines.Add($run)
                         }
-                    }
-
-                    # If no bold tags found, add the entire text
-                    if ($boldmatches.Count -eq 0) {
-                        $run = New-Object System.Windows.Documents.Run($text)
-                        [void]$preTextBlock.Inlines.Add($run)
                     }
 
                     # Add the TextBlock to the border, then add border to main TextBlock
@@ -762,10 +784,14 @@ Function Show-ScubaBaselinePolicyHelper {
 
                 # Helper function to process regular text (handles all formatting)
                 $processRegularText = {
-                    param($text, $textBlock)
+                    param($text, $textBlock, [bool]$insideLink = $false)
 
-                    # Combined pattern for markdown bold **text**, italic _text_, HTML bold <b>text</b>, and markdown links [text](url)
-                    $combinedPattern = '(\[([^\]]+)\]\(([^\)]+)\))|(\*\*([^*]+)\*\*)|(_([^_]+)_)|(<b>([^<]*)</b>)'
+                    $text = $text -replace '\\\|', '|'
+                    $text = $text -replace '(?m)^[ \t]*>{1,2}[ \t]*', ''
+                    # Soft source wraps are spaces; paragraph, list and heading boundaries remain.
+                    $text = $text -replace '(?m)(?<![ \r\n])\r?\n[ \t]*(?!(?:[-*+]|\d+[.)]|#{1,6}|>)\s)(?=\S)', ' '
+                    $text = $text -replace '(?m)^#{1,6}[ \t]+', ''
+                    $combinedPattern = '(?<code>`(?<codeText>[^`]+)`)|(?<image><img\b[^>]*>)|(?<link>\[(?<linkText>[^\]]+)\]\((?<linkUrl>[^)]+)\))|(?<bold>\*\*(?<boldText>.+?)\*\*)|(?<italic>(?<!\w)_(?<italicText>\S(?:.*?\S)?)_(?!\w))|(?<htmlBold><b>(?<htmlBoldText>[^<]*)</b>)|(?<url>https?://[^\s<>)`]+)'
                     $lastIndex = 0
                     $formatMatches = [regex]::Matches($text, $combinedPattern)
 
@@ -779,10 +805,56 @@ Function Show-ScubaBaselinePolicyHelper {
                             }
                         }
 
-                        if ($match.Groups[1].Success) {
+                        if ($match.Groups['code'].Success) {
+                            $codeRun = New-Object System.Windows.Documents.Run($match.Groups['codeText'].Value)
+                            $codeRun.FontFamily = New-Object System.Windows.Media.FontFamily("Consolas")
+                            $codeRun.Background = [System.Windows.Media.Brushes]::WhiteSmoke
+                            [void]$textBlock.Inlines.Add($codeRun)
+                        }
+                        elseif ($match.Groups['image'].Success) {
+                            $imageTag = $match.Value
+                            $source = [regex]::Match($imageTag, '\bsrc="([^"]+)"').Groups[1].Value
+                            $altText = [regex]::Match($imageTag, '\balt="([^"]*)"').Groups[1].Value
+                            if ($source.StartsWith('/')) {
+                                $source = $controlConfig.configurationBaselineJsonRawOnlinePath -replace '/PowerShell/ScubaGear/schemas/.*$', $source
+                            }
+                            try {
+                                $image = New-Object System.Windows.Controls.Image
+                                $bitmap = New-Object System.Windows.Media.Imaging.BitmapImage
+                                $bitmap.BeginInit()
+                                $bitmap.CacheOption = [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad
+                                $bitmap.UriSource = [Uri]$source
+                                $bitmap.EndInit()
+                                $image.Source = $bitmap
+                                $image.MaxWidth = 800
+                                $image.Stretch = "Uniform"
+                                $image.ToolTip = $altText
+                                $image.Add_ImageFailed({
+                                    param($eventSender, $eventData)
+                                    Write-Warning "Baseline image failed to load: $($eventData.ErrorException.Message)"
+                                    $eventSender.Visibility = "Collapsed"
+                                })
+                                $container = New-Object System.Windows.Documents.InlineUIContainer($image)
+                                [void]$textBlock.Inlines.Add($container)
+                            } catch {
+                                Write-Warning "Unable to display baseline image '$source': $($_.Exception.Message)"
+                            }
+                            # Keep the source's accessible description available, including offline.
+                            [void]$textBlock.Inlines.Add((New-Object System.Windows.Documents.Run($altText)))
+                        }
+                        elseif ($match.Groups['link'].Success -or $match.Groups['url'].Success) {
                             # This is a markdown link [text](url)
-                            $linkText = $match.Groups[2].Value
-                            $linkUrl = $match.Groups[3].Value
+                            $linkText = ($match.Groups['linkText'].Value -replace '\s+', ' ').Trim()
+                            $linkUrl = $match.Groups['linkUrl'].Value -replace '\s+', ''
+                            if ($match.Groups['url'].Success) {
+                                $linkText = $match.Value
+                                $linkUrl = $match.Value
+                            }
+                            if ($insideLink) {
+                                [void]$textBlock.Inlines.Add((New-Object System.Windows.Documents.Run($linkText)))
+                                $lastIndex = $match.Index + $match.Length
+                                continue
+                            }
 
                             try {
                                 $hyperlink = New-Object System.Windows.Documents.Hyperlink
@@ -790,14 +862,23 @@ Function Show-ScubaBaselinePolicyHelper {
                                 $hyperlink.Foreground = [System.Windows.Media.Brushes]::DodgerBlue
                                 $hyperlink.TextDecorations = [System.Windows.TextDecorations]::Underline
 
-                                $linkRun = New-Object System.Windows.Documents.Run($linkText)
-                                [void]$hyperlink.Inlines.Add($linkRun)
+                                if ($match.Groups['url'].Success) {
+                                    [void]$hyperlink.Inlines.Add((New-Object System.Windows.Documents.Run($linkText)))
+                                } else {
+                                    & $processRegularText $linkText $hyperlink $true
+                                }
 
+                                $appendixNavigator = $navigateToAppendix
                                 $hyperlink.Add_RequestNavigate({
                                     param($eventSender, $eventData)
                                     try {
                                         $null = $eventSender
-                                        $url = $eventData.Uri.AbsoluteUri
+                                        $url = $eventData.Uri.OriginalString
+                                        if ($url.StartsWith('#appendix-')) {
+                                            & $appendixNavigator $url
+                                            $eventData.Handled = $true
+                                            return
+                                        }
 
                                         # Detect internal policy cross-reference links by extracting the policy ID
                                         # directly from the link text (e.g. "MS.SECURITYSUITE.3.1v1 Instructions").
@@ -843,7 +924,10 @@ Function Show-ScubaBaselinePolicyHelper {
                                             [System.Diagnostics.Process]::Start($url)
                                             $eventData.Handled = $true
                                         }
-                                    } catch { $null }
+                                    } catch {
+                                        Write-Warning "Unable to navigate baseline link '$linkUrl': $($_.Exception.Message)"
+                                        $eventData.Handled = $true
+                                    }
                                 }.GetNewClosure())
 
                                 [void]$textBlock.Inlines.Add($hyperlink)
@@ -853,25 +937,28 @@ Function Show-ScubaBaselinePolicyHelper {
                                 [void]$textBlock.Inlines.Add($run)
                             }
                         }
-                        elseif ($match.Groups[4].Success) {
+                        elseif ($match.Groups['bold'].Success) {
                             # This is markdown bold **text**
-                            $boldText = $match.Groups[5].Value
-                            $boldRun = New-Object System.Windows.Documents.Run($boldText)
+                            $boldText = $match.Groups['boldText'].Value
+                            $boldRun = New-Object System.Windows.Documents.Span
                             $boldRun.FontWeight = "Bold"
+                            & $processRegularText $boldText $boldRun $insideLink
                             [void]$textBlock.Inlines.Add($boldRun)
                         }
-                        elseif ($match.Groups[6].Success) {
+                        elseif ($match.Groups['italic'].Success) {
                             # This is markdown italic _text_
-                            $italicText = $match.Groups[7].Value
-                            $italicRun = New-Object System.Windows.Documents.Run($italicText)
+                            $italicText = $match.Groups['italicText'].Value
+                            $italicRun = New-Object System.Windows.Documents.Span
                             $italicRun.FontStyle = "Italic"
+                            & $processRegularText $italicText $italicRun $insideLink
                             [void]$textBlock.Inlines.Add($italicRun)
                         }
-                        elseif ($match.Groups[8].Success) {
+                        elseif ($match.Groups['htmlBold'].Success) {
                             # This is HTML bold <b>text</b>
-                            $boldText = $match.Groups[9].Value
-                            $boldRun = New-Object System.Windows.Documents.Run($boldText)
+                            $boldText = $match.Groups['htmlBoldText'].Value
+                            $boldRun = New-Object System.Windows.Documents.Span
                             $boldRun.FontWeight = "Bold"
+                            & $processRegularText $boldText $boldRun $insideLink
                             [void]$textBlock.Inlines.Add($boldRun)
                         }
 
@@ -907,6 +994,26 @@ Function Show-ScubaBaselinePolicyHelper {
 
                             # Clear selection so the same product can be clicked again
                             $policySelector.SelectedItem = $null
+                        }
+                        elseif ($selectedItem.Type -eq "Appendix") {
+                            $policyTitle.Text = $selectedItem.Appendix.name
+                            $policyDescription.Text = $productNames[$selectedItem.ProductKey]
+                            [void]$badgesPanel.Children.Clear()
+                            foreach ($panel in $dynamicContentPanels.Values) {
+                                [void]$panel.Children.Clear()
+                            }
+                            foreach ($expander in $dynamicExpanders.Values) {
+                                $expander.Visibility = "Collapsed"
+                            }
+                            if ($sampleConfigExpander) {
+                                $sampleConfigExpander.Visibility = "Collapsed"
+                            }
+                            $appendixExpander = $dynamicExpanders["implementation"]
+                            $appendixExpander.Header = $selectedItem.Appendix.name
+                            $appendixExpander.IsExpanded = $true
+                            $appendixExpander.Visibility = "Visible"
+                            $appendixText = & $createTextBlockWithFormatting $selectedItem.Appendix.content "0,0,0,4"
+                            [void]$dynamicContentPanels["implementation"].Children.Add($appendixText)
                         }
                         elseif ($selectedItem.IsPolicy) {
                             # Handle policy selection
@@ -958,9 +1065,9 @@ Function Show-ScubaBaselinePolicyHelper {
                                             }
 
                                             # Handle different data types dynamically
-                                            if ($propertyData -is [array] -and $propertyData.Count -gt 0) {
+                                            if (($propertyData -is [array] -and $propertyData.Count -gt 0) -or ($propertyData.Url -and $propertyData.Name)) {
                                                 # Handle all arrays the same way - check each item
-                                                foreach ($item in $propertyData) {
+                                                foreach ($item in @($propertyData)) {
                                                     if ($item.Url -and $item.Name) {
                                                         # Handle link objects (resources, mitreMapping)
                                                         $linkBlock = New-Object System.Windows.Controls.TextBlock
@@ -969,7 +1076,7 @@ Function Show-ScubaBaselinePolicyHelper {
                                                         $hyperlink.Foreground = [System.Windows.Media.Brushes]::DodgerBlue
 
                                                         $itemName = $item.Name -replace '\r?\n\s*', ' ' -replace '\s+', ' ' -replace '\\\|', '|'
-                                                        [void]$hyperlink.Inlines.Add((New-Object System.Windows.Documents.Run($itemName.Trim())))
+                                                        & $processRegularText $itemName.Trim() $hyperlink $true
 
                                                         $hyperlink.Add_RequestNavigate({
                                                             param($eventSender, $eventData)

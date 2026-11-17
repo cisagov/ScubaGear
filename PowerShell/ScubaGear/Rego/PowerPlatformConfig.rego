@@ -440,6 +440,7 @@ tests contains {
 }
 
 # When tenant isolation has never been configured (returns null)
+# Windows PowerShell 5.1 keeps the response body as the text "null"; PowerShell 7 parses it as a real null.
 tests contains {
     "PolicyId": "MS.POWERPLATFORM.3.1v1",
     "Criticality": "Shall",
@@ -449,7 +450,7 @@ tests contains {
     "RequirementMet": false
 } if {
     some TenantIsolation in input.tenant_isolation
-    TenantIsolation == "null"
+    TenantIsolation in {"null", null}
 }
 
 #--

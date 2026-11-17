@@ -90,6 +90,18 @@ Invoke-SCuBA -ProductNames * `
   -Organization contoso.onmicrosoft.com
 ```
 
+## Confirming Which Account and Tenant Were Used
+
+ScubaGear does not print the account or tenant to the console, so a screenshot of a run does not reveal them. To see which credentials a run used, run `Get-ScubaGearContext`. It is especially useful when you work with more than one tenant or account.
+
+```powershell
+# Run an assessment, then ask which account and tenant it used
+Invoke-SCuBA -ProductNames aad
+Get-ScubaGearContext
+```
+
+ScubaGear disconnects when `Invoke-SCuBA` finishes, so afterwards `Get-ScubaGearContext` shows the credentials the most recent run used, with `Status` set to `Disconnected (last run)`. To see live details such as the tenant name and scopes, run `Invoke-SCuBA` with `-DisconnectOnExit:$false`. See [Confirming which tenant/account you're connected as](../troubleshooting/tenants.md#confirming-which-tenantaccount-youre-connected-as) for example output.
+
 ## Parameters
 
 Now that you know the basics, you can learn more about setting parameters on the [parameters](../configuration/parameters.md) page or by running `Get-Help`:

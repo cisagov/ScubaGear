@@ -1,4 +1,4 @@
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../../Utility/Utility.psm1") -Function Invoke-ScubaRestMethod, Get-ScubaGearServiceEndpoint, Get-ScubaGearOAuthScope, Get-ScubaGearRestEndpoint, Get-ScubaRestRetryDefaults
 
 function Get-PowerPlatformBaseUrl {
     <#
@@ -53,8 +53,9 @@ function Get-PowerPlatformTenantSettingsRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformTenantSettingsRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "POST"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "POST" @Retry
     return $Response
 }
 
@@ -78,8 +79,9 @@ function Get-PowerPlatformEnvironmentsRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformEnvironmentsRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
 
     $Environments = @()
     if ($Response.value) {
@@ -117,8 +119,9 @@ function Get-PowerPlatformDlpPoliciesRest {
     )
 
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformDlpPoliciesRest'
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
 
     # The 2016-11-01 endpoint returns a nested schema (properties.definition) rather than
     # the flat schema (displayName, environmentType, environments at the top level) that
@@ -177,8 +180,9 @@ function Get-PowerPlatformTenantIsolationRest {
     # Correct endpoint sourced from Microsoft.PowerApps.Administration.PowerShell v2.0.216
     # provider: PowerPlatform.Governance/v1, not Microsoft.BusinessAppPlatform
     $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Get-PowerPlatformTenantIsolationRest' -PathParameters @{ TenantId = $TenantId }
+    $Retry = Get-ScubaRestRetryDefaults
 
-    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET"
+    $Response = Invoke-ScubaRestMethod -BaseUrl $BaseUrl -AccessToken $AccessToken -Endpoint $Endpoint -Method "GET" @Retry
     return $Response
 }
 
