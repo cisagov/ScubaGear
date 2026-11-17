@@ -1390,24 +1390,21 @@ NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
 }
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
-    Setting := "\"Restriction placed on users who reach the message limit\" 
-    must be set to \"Restrict the user from sending mail\""
+    Setting := "\"Restriction placed on users who reach the message limit\" must be set to \"Restrict the user from sending mail\""
     some Policy in input.outbound_spam_policies
     Policy.ActionWhenThresholdReached != "BlockUser"}
 
 # Apply additional requirements only to the default policy
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
-    Setting := "\"Send a copy of suspicious outbound messages or message 
-    that exceeds these limits to these users or groups\" must be enabled"
+    Setting := "\"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\" must be enabled"
     some Policy in input.outbound_spam_policies
     Policy.Name == "Default"
     object.get(Policy, "BccSuspiciousOutboundMail", false) != true
 }
 
 NonCompliantOutboundSpamPolicySettings[Policy.Identity] contains Setting if {
-    Setting := "Under At least one recipient must be configured under 
-    \"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\""
+    Setting := "Under At least one recipient must be configured under \"Send a copy of suspicious outbound messages or message that exceeds these limits to these users or groups\""
     some Policy in input.outbound_spam_policies
     Policy.Name == "Default"
     count(object.get(Policy, "BccSuspiciousOutboundAdditionalRecipients", [])) < 1
