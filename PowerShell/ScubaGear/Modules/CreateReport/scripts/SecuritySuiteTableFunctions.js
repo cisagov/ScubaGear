@@ -59,6 +59,15 @@ const RECIPIENT_SCOPE_FIELDS = [
     "ExceptIfRecipientDomainIs"
 ];
 
+const SENDER_SCOPE_FIELDS = [
+    "From",
+    "FromMemberOf",
+    "SenderDomainIs",
+    "ExceptIfFrom",
+    "ExceptIfFromMemberOf",
+    "ExceptIfSenderDomainIs"
+];
+
 const SPAM_ACTION_FIELDS = [
     ["Spam", "SpamAction"],
     ["High confidence spam", "HighConfidenceSpamAction"],
@@ -75,10 +84,12 @@ const COMMA_SEPARATED_COLUMNS = new Set(["Blocked File Types"]);
 const ANTI_MALWARE_TABLE_CLASS = "securitysuite-anti-malware-policies-table";
 const ANTI_PHISH_TABLE_CLASS = "securitysuite-anti-phish-policies-table";
 const ANTI_SPAM_TABLE_CLASS = "securitysuite-anti-spam-policies-table";
+const OUTBOUND_SPAM_TABLE_CLASS = "securitysuite-outbound-spam-policies-table";
 const EXPANDABLE_TABLE_CLASSES = new Set([
     ANTI_MALWARE_TABLE_CLASS,
     ANTI_PHISH_TABLE_CLASS,
-    ANTI_SPAM_TABLE_CLASS
+    ANTI_SPAM_TABLE_CLASS,
+    OUTBOUND_SPAM_TABLE_CLASS
 ]);
 
 // Read by applyScopeAttributes so it doesn't need to know each policy table by name.
@@ -88,6 +99,7 @@ const EXPANDABLE_ROWS_CLASS = "expandable-policy-rows";
 const ANTI_MALWARE_RULE_FIELDS = ["MalwareFilterPolicy", "Policy", "PolicyName"];
 const ANTI_PHISH_RULE_FIELDS = ["AntiPhishPolicy", "Policy", "PolicyName"];
 const ANTI_SPAM_RULE_FIELDS = ["HostedContentFilterPolicy", "Policy", "PolicyName"];
+const OUTBOUND_SPAM_RULE_FIELDS = ["HostedOutboundSpamFilterPolicy", "Policy", "PolicyName"];
 
 // Some EOP list properties come back as objects rather than strings, such as
 // { Sender: { Address } } or { DomainName }, which would render as
@@ -142,15 +154,15 @@ const ruleMatchesPolicy = (rule, policy, ruleFields) => {
 const isProtectionPolicyRuleEnabled = (rule) =>
     isEnabled(rule?.Enabled) || String(rule?.State ?? "").toLowerCase() === "enabled";
 
-const ruleAppliesToAllUsers = (rule, tenantDomains) => {
-    const hasNoRecipientScope = RECIPIENT_SCOPE_FIELDS
+const ruleAppliesToAllUsers = (rule, tenantDomains, scopeFields = RECIPIENT_SCOPE_FIELDS) => {
+    const hasNoRecipientScope = scopeFields
         .every(field => getNonEmptyValues(rule[field]).length === 0);
     if (hasNoRecipientScope) return true;
 
-    const hasOtherRecipientScope = RECIPIENT_SCOPE_FIELDS
-        .filter(field => field !== "RecipientDomainIs")
+    const hasOtherRecipientScope = scopeFields
+        .filter(field => field !== scopeFields[2])
         .some(field => getNonEmptyValues(rule[field]).length > 0);
-    const recipientDomains = getNonEmptyValues(rule.RecipientDomainIs)
+    const recipientDomains = getNonEmptyValues(rule[scopeFields[2]])
         .map(domain => domain.toLowerCase());
     const normalizedTenantDomains = getNonEmptyValues(tenantDomains)
         .map(domain => domain.toLowerCase());
@@ -159,14 +171,14 @@ const ruleAppliesToAllUsers = (rule, tenantDomains) => {
         normalizedTenantDomains.every(domain => recipientDomains.includes(domain));
 };
 
-const formatScopeCounts = (rules) => {
+const formatScopeCounts = (rules, scopeFields = RECIPIENT_SCOPE_FIELDS) => {
     const scopeCounts = [
-        ["Users included", "user", "SentTo"],
-        ["Groups included", "group", "SentToMemberOf"],
-        ["Domains included", "domain", "RecipientDomainIs"],
-        ["Users excluded", "user", "ExceptIfSentTo"],
-        ["Groups excluded", "group", "ExceptIfSentToMemberOf"],
-        ["Domains excluded", "domain", "ExceptIfRecipientDomainIs"]
+        ["Users included", "user", scopeFields[0]],
+        ["Groups included", "group", scopeFields[1]],
+        ["Domains included", "domain", scopeFields[2]],
+        ["Users excluded", "user", scopeFields[3]],
+        ["Groups excluded", "group", scopeFields[4]],
+        ["Domains excluded", "domain", scopeFields[5]]
     ];
 
     return scopeCounts.map(([label, singularNoun, field]) => {
@@ -185,7 +197,7 @@ const getMatchingRules = (policy, ruleFields, ...ruleSets) => ruleSets
 const hasMatchingEnabledRule = (policy, rules, ruleFields) =>
     getMatchingRules(policy, ruleFields, rules).some(isProtectionPolicyRuleEnabled);
 
-const getPolicyApplicability = (policy, policyRules, protectionPolicyRules, acceptedDomains, ruleFields) => {
+const getPolicyApplicability = (policy, policyRules, protectionPolicyRules, acceptedDomains, ruleFields, scopeFields = RECIPIENT_SCOPE_FIELDS) => {
     if (getPresetPolicyType(policy) &&
         !hasMatchingEnabledRule(policy, protectionPolicyRules, ruleFields)) {
         return "Not assigned";
@@ -194,9 +206,9 @@ const getPolicyApplicability = (policy, policyRules, protectionPolicyRules, acce
     const rules = getMatchingRules(policy, ruleFields, policyRules, protectionPolicyRules);
     const tenantDomains = getNonEmptyValues(acceptedDomains);
 
-    if (rules.some(rule => ruleAppliesToAllUsers(rule, tenantDomains))) return "All Users";
+    if (rules.some(rule => ruleAppliesToAllUsers(rule, tenantDomains, scopeFields))) return "All Users";
     if (rules.length > 0) {
-        const scopeCounts = formatScopeCounts(rules);
+        const scopeCounts = formatScopeCounts(rules, scopeFields);
         return scopeCounts.length > 0 ? scopeCounts : "Scoped";
     }
     return isDefaultPolicy(policy) ? "All Users" : "Not available";
@@ -266,6 +278,7 @@ const getPolicySortKey = (policy, priority) => {
  * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
  * @param {Array<string>} ruleFields The rule fields that reference the policy.
  * @param {function} getPolicyColumns Returns the family-specific columns for a policy.
+ * @param {Array<string>} scopeFields Inclusion and exclusion fields for users, groups, and domains.
  * @returns {Array<Object>} Unique policy rows, in the order the policies apply.
  */
 const getProtectionPolicyRows = (
@@ -274,7 +287,8 @@ const getProtectionPolicyRows = (
     protectionPolicyRules,
     acceptedDomains,
     ruleFields,
-    getPolicyColumns
+    getPolicyColumns,
+    scopeFields = RECIPIENT_SCOPE_FIELDS
 ) => {
     const seenPolicies = new Set();
 
@@ -298,7 +312,8 @@ const getProtectionPolicyRows = (
                     policyRules,
                     protectionPolicyRules,
                     acceptedDomains,
-                    ruleFields
+                    ruleFields,
+                    scopeFields
                 ),
                 ...getPolicyColumns(policy)
             }
@@ -411,6 +426,33 @@ const getAntiSpamPolicyRows = (
         "Allowed Domains": getProtectedValues(policy.AllowedSenderDomains)
     })
 );
+
+/**
+ * Converts outbound spam policies into rows with sender scope and the settings
+ * checked by MS.SECURITYSUITE.9.1v1. The default outbound policy is identified
+ * by Name, matching the baseline evaluation.
+ */
+const getOutboundSpamPolicyRows = (outboundSpamPolicies, outboundSpamRules, acceptedDomains) =>
+    getProtectionPolicyRows(
+        normalizeToArray(outboundSpamPolicies)
+            .filter(policy => policy && typeof policy === "object")
+            .map(policy => ({ ...policy, IsDefault: policy.Name === "Default" || isDefaultPolicy(policy) })),
+        outboundSpamRules,
+        [],
+        acceptedDomains,
+        OUTBOUND_SPAM_RULE_FIELDS,
+        policy => ({
+            "Recipient Limits": [
+                ["External per hour", "RecipientLimitExternalPerHour"],
+                ["Internal per hour", "RecipientLimitInternalPerHour"],
+                ["Per day", "RecipientLimitPerDay"]
+            ].map(([label, field]) => ({ label, value: String(policy[field] ?? "N/A") })),
+            "Threshold Action": String(policy.ActionWhenThresholdReached ?? "N/A"),
+            "BCC Suspicious Mail": getEnabledText(policy.BccSuspiciousOutboundMail),
+            "BCC Recipients": getProtectedValues(policy.BccSuspiciousOutboundAdditionalRecipients)
+        }),
+        SENDER_SCOPE_FIELDS
+    );
 
 /**
  * Builds a <li> for one policy list item.
@@ -594,6 +636,8 @@ const appendSecuritySuiteTableSection = (parent, title, columns, rows, tableClas
  * @param {Array<Object>|null} antiPhishRules The exported anti-phish rules.
  * @param {Array<Object>|null} antiSpamPolicies The exported hosted content filter policies.
  * @param {Array<Object>|null} antiSpamRules The exported hosted content filter rules.
+ * @param {Array<Object>|null} outboundSpamPolicies The exported outbound spam policies.
+ * @param {Array<Object>|null} outboundSpamRules The exported outbound spam rules.
  * @param {Array<Object>|null} protectionPolicyRules The exported EOP protection rules.
  * @param {Array<Object>|null} acceptedDomains The tenant's accepted domains.
  */
@@ -606,6 +650,8 @@ const buildSecuritySuiteConfigTables = ({
     antiPhishRules,
     antiSpamPolicies,
     antiSpamRules,
+    outboundSpamPolicies,
+    outboundSpamRules,
     protectionPolicyRules,
     acceptedDomains
 }) => {
@@ -673,5 +719,14 @@ const buildSecuritySuiteConfigTables = ({
         getAntiSpamPolicyRows(antiSpamPolicies, antiSpamRules, protectionPolicyRules, acceptedDomains),
         ANTI_SPAM_TABLE_CLASS,
         "No anti-spam policies were exported."
+    );
+
+    appendSecuritySuiteTableSection(
+        section,
+        "Outbound Spam Protection Policies",
+        ["Policy", "Status", "Priority", "Applicability", "Recipient Limits", "Threshold Action", "BCC Suspicious Mail", "BCC Recipients"],
+        getOutboundSpamPolicyRows(outboundSpamPolicies, outboundSpamRules, acceptedDomains),
+        OUTBOUND_SPAM_TABLE_CLASS,
+        "No outbound spam policies were exported."
     );
 };
