@@ -101,12 +101,7 @@ ReportDetails1_2 := Details if {
 } else := Details if {
     count(NonCompForwardingDomains) > 0
     count(AllowedForwardingDomains) > 0
-    Details := concat(" ", [
-        NonCompDomainsSummary,
-        "NOTE: additionally,",
-        AllowedDomainsSummary,
-        NoticeAboutConfigFile
-    ])
+    Details := $"{NonCompDomainsSummary} NOTE: additionally, {AllowedDomainsSummary} {NoticeAboutConfigFile}"
 } else := Details if {
     count(NonCompForwardingDomains) > 0
     count(AllowedForwardingDomains) == 0

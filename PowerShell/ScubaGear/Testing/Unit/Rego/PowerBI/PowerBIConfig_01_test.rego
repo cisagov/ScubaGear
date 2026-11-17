@@ -88,10 +88,9 @@ test_NoLicense_TenantReasonSurfaced if {
 }
 
 test_NoLicense_UserReasonSurfaced if {
-    Reason := concat(" ", [
-        "Current user does not have a Power BI or Fabric license assigned.",
-        "Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
-    ])
+    ReasonPart1 := "Current user does not have a Power BI or Fabric license assigned."
+    ReasonPart2 := "Assign a license (e.g., Microsoft Fabric (Free), Power BI Pro) to the running user."
+    Reason := $"{ReasonPart1} {ReasonPart2}"
     patched_input := json.patch(PowerbiTenantSettingsJson, [
         {"op": "replace", "path": "/powerbi_license_found", "value": false},
         {"op": "add", "path": "/powerbi_license_reason", "value": Reason}
@@ -102,7 +101,7 @@ test_NoLicense_UserReasonSurfaced if {
     TestResult(
         "MS.POWERBI.1.1v1",
         Output,
-        concat(" ", ["Unable to evaluate tenant setting.", Reason]),
+        $"Unable to evaluate tenant setting. {Reason}",
         false
     ) == true
 }

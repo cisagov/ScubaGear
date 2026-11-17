@@ -1181,7 +1181,7 @@ PasswordAdditionIssues contains Issue if {
     Restriction.State == "enabled"
     not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
     DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    Issue := sprintf("Only applies to apps created after %v", [DateOnly])
+    Issue := $"Only applies to apps created after {DateOnly}"
 }
 
 # Issue: a custom app management policy disables passwordAddition for specific apps,
@@ -1194,7 +1194,7 @@ PasswordAdditionIssues contains Issue if {
     Restriction.State != "enabled"
     count(Restriction.AppliesTo) > 0
     AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
-    Issue := sprintf("Exempted apps: %v", [AppNames])
+    Issue := $"Exempted apps: {AppNames}"
 }
 
 # Pass when no issues were collected.
@@ -1258,7 +1258,7 @@ PasswordLifetimeIssues contains Issue if {
     Restriction.State == "enabled"
     not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
     DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    Issue := sprintf("Password lifetime: only applies to apps created after %v", [DateOnly])
+    Issue := $"Password lifetime: only applies to apps created after {DateOnly}"
 }
 
 # Issue: passwordLifetime restriction is missing entirely from one or both scopes.
@@ -1285,7 +1285,7 @@ PasswordLifetimeIssues contains Issue if {
     Restriction.State == "enabled"
     Days := to_number(trim_prefix(trim_suffix(Restriction.MaxLifetime, "D"), "P"))
     Days > PASSWORD_MAX_DAYS
-    Issue := sprintf("Password lifetime too long: %v days, must be %v or less", [Days, PASSWORD_MAX_DAYS])
+    Issue := $"Password lifetime too long: {Days} days, must be {PASSWORD_MAX_DAYS} or less"
 }
 
 # Issue: a custom app management policy disables passwordLifetime for specific apps.
@@ -1297,7 +1297,7 @@ PasswordLifetimeIssues contains Issue if {
     Restriction.State != "enabled"
     count(Restriction.AppliesTo) > 0
     AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
-    Issue := sprintf("Password lifetime: exempted apps: %v", [AppNames])
+    Issue := $"Password lifetime: exempted apps: {AppNames}"
 }
 
 # N/A path: password addition is fully blocked (5.5 passes), so lifetime doesn't matter.
@@ -1364,7 +1364,7 @@ CertificateLifetimeIssues contains Issue if {
     Restriction.State == "enabled"
     not IsAllAppsDate(Restriction.RestrictForAppsCreatedAfterDateTime)
     DateOnly := FormatRestrictionDate(Restriction.RestrictForAppsCreatedAfterDateTime)
-    Issue := sprintf("Certificate lifetime: only applies to apps created after %v", [DateOnly])
+    Issue := $"Certificate lifetime: only applies to apps created after {DateOnly}"
 }
 
 # Issue: asymmetricKeyLifetime restriction is missing entirely from one or both scopes.
@@ -1389,7 +1389,7 @@ CertificateLifetimeIssues contains Issue if {
     Restriction.State == "enabled"
     Days := to_number(trim_prefix(trim_suffix(Restriction.MaxLifetime, "D"), "P"))
     Days > CERTIFICATE_MAX_DAYS
-    Issue := sprintf("Certificate lifetime too long: %v days, must be %v or less", [Days, CERTIFICATE_MAX_DAYS])
+    Issue := $"Certificate lifetime too long: {Days} days, must be {CERTIFICATE_MAX_DAYS} or less"
 }
 
 # Issue: a custom app management policy disables asymmetricKeyLifetime for specific apps.
@@ -1401,7 +1401,7 @@ CertificateLifetimeIssues contains Issue if {
     Restriction.State != "enabled"
     count(Restriction.AppliesTo) > 0
     AppNames := concat(", ", [App.DisplayName | some App in Restriction.AppliesTo])
-    Issue := sprintf("Exempted apps: %v", [AppNames])
+    Issue := $"Exempted apps: {AppNames}"
 }
 
 # Pass when no issues collected.
