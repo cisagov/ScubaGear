@@ -20,6 +20,8 @@ window.addEventListener('DOMContentLoaded', () => {
         antiPhishRules: getSecuritySuiteData('anti-phish-rules'),
         antiSpamPolicies: getSecuritySuiteData('anti-spam-policies'),
         antiSpamRules: getSecuritySuiteData('anti-spam-rules'),
+        outboundSpamPolicies: getSecuritySuiteData('outbound-spam-policies'),
+        outboundSpamRules: getSecuritySuiteData('outbound-spam-rules'),
         protectionPolicyRules: getSecuritySuiteData('protection-policy-rules'),
         acceptedDomains: getSecuritySuiteData('accepted-domains')
     });

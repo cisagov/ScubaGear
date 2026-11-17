@@ -53,7 +53,7 @@ License text.
             [regex]::Matches((Get-Content $_.FullName -Raw), '(?m)^#### (MS\.[A-Z]+\.\d+\.\d+v\d+)\s*$') |
                 ForEach-Object { $_.Groups[1].Value }
         })
-        $policies.Count | Should -Be 162
+        $policies.Count | Should -Be 164
         Compare-Object ($sourceIds | Sort-Object) ($policies.id | Sort-Object) | Should -BeNullOrEmpty
         @($policies | Where-Object { [string]::IsNullOrWhiteSpace($_.name) }).Count | Should -Be 0
     }
