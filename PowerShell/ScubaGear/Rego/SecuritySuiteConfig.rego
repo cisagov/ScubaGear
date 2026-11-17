@@ -17,7 +17,6 @@ import data.utils.securitysuite.PresetRecipientsCovered
 import data.utils.securitysuite.RuleFieldEmpty
 import data.utils.securitysuite.PresetPolicyCoversAllRecipients
 import data.utils.securitysuite.CustomRuleCoversAllRecipients
-import data.utils.securitysuite.CustomRuleCoversAllSenders
 import data.utils.securitysuite.HighestPriorityActiveAntiMalwarePolicyName
 import data.utils.securitysuite.HighestPriorityActiveSafeAttachmentPolicyName
 import data.utils.securitysuite.UserFriendlyPolicyName
