@@ -12,8 +12,7 @@ default BASELINEVERSION := "main"
 
 BASELINEVERSION := input.module_version
 
-# regal ignore:line-length
-SCUBABASEURL := sprintf("https://github.com/cisagov/ScubaGear/blob/v%v/PowerShell/ScubaGear/baselines/", [BASELINEVERSION])
+SCUBABASEURL := $"https://github.com/cisagov/ScubaGear/blob/v{BASELINEVERSION}/PowerShell/ScubaGear/baselines/"
 
 ########################
 # Not Implemented Link #
@@ -52,9 +51,7 @@ NotCheckedDeprecation :=
 
 
 # Note: Reason must include %v to reference policy in document.
-CheckedSkippedDetails(PolicyId, Reason) := sprintf(
-    concat(" ", [Reason]), [PolicyLink(PolicyId)]
-)
+CheckedSkippedDetails(PolicyId, Reason) := sprintf(Reason, [PolicyLink(PolicyId)])
 
 # 3rd Party Report Details method
 DefenderMirrorDetails(PolicyId) := sprintf(
@@ -72,9 +69,9 @@ ReportDetailsBoolean(true) := "Requirement met"
 ReportDetailsBoolean(false) := "Requirement not met"
 
 # Reporting methods passed Status and appends warning
-ReportDetailsBooleanWarning(true, Warning) := concat(": ", [PASS, Warning])
+ReportDetailsBooleanWarning(true, Warning) := $"{PASS}: {Warning}"
 
-ReportDetailsBooleanWarning(false, Warning) := concat(": ", [FAIL, Warning])
+ReportDetailsBooleanWarning(false, Warning) := $"{FAIL}: {Warning}"
 
 # Returns specified string if Status is false (good for error msg)
 ReportDetailsString(true, _) := PASS

@@ -545,14 +545,14 @@ ResultsFilePath := Path if {
 ResultsFilePath := Path if {
     not input.scuba_config.OutputPath
     Filename := input.scuba_config.OutRegoFileName
-    Path := concat("", ["./", Filename,".json"])
+    Path := $"./{Filename}.json"
 }
 
 # Return results file path when only file path is defined
 ResultsFilePath := Path if {
     not input.scuba_config.OutRegoFileName
     FilePath := input.scuba_config.OutputPath
-    Path := concat("", [FilePath, "/RegoOutput",".json"])
+    Path := $"{FilePath}/RegoOutput.json"
 }
 
 # Return results file path when custom config defined
@@ -572,10 +572,7 @@ ErrorMessage3_2(PresentLocations) := ErrorMessage if {
     LocationsAppliedMsg := "DLP custom policy applied to the following locations: "
     LocationsMissingMsg := ". Custom policy protecting sensitive info types NOT applied to: "
     LicenseNotice := DLPLicenseWarning4_2(MissingLocations)
-    FullPolicyDetailsMsg := concat("", [
-        " For full policy details, see the ActualValue field in the results file: ",
-        ResultsFilePath
-    ])
+    FullPolicyDetailsMsg := $" For full policy details, see the ActualValue field in the results file: {ResultsFilePath}"
     ErrorMessage := concat("", [
         LocationsAppliedMsg, concat(", ", PresentLocations),
         LocationsMissingMsg, concat(", ", MissingLocations),
@@ -590,10 +587,7 @@ ErrorMessage3_2(PresentLocations) := ErrorMessage if {
     count(PresentLocations) == 0
     LocationsMissingMsg := "Custom policy protecting sensitive info types NOT applied to: "
     LicenseNotice := DLPLicenseWarning4_2(MissingLocations)
-    FullPolicyDetailsMsg := concat("", [
-        " For full policy details, see the ActualValue field in the results file: ",
-        ResultsFilePath
-    ])
+    FullPolicyDetailsMsg := $" For full policy details, see the ActualValue field in the results file: {ResultsFilePath}"
     ErrorMessage := concat("", [
         LocationsMissingMsg, concat(", ", MissingLocations),
         ". ",
@@ -1012,14 +1006,11 @@ SpamCascadeStatus := "No active compliant preset. Custom policy evaluation appli
 }
 
 # On pass, describe which tier is applied and what was not evaluated
-ReportDetailsSpamPolicy(true, _, CascadeStatus, _) := concat(" ", [
-    "Requirement met.",
-    CascadeStatus
-])
+ReportDetailsSpamPolicy(true, _, CascadeStatus, _) := $"Requirement met. {CascadeStatus}"
 
 # On fail, lead with the cascade context, then list which policies failed.
 ReportDetailsSpamPolicy(false, FailingPolicies, CascadeStatus, ErrString) := Description([
-    concat("", [CascadeStatus, "."]),
+    $"{CascadeStatus}.",
     ArraySizeStr(FailingPolicies),
     ErrString,
     concat(", ", FailingPolicies)
@@ -1198,7 +1189,7 @@ ReportDetails7_1 := "URL comparison with a block-list is enabled via the standar
     PresetRecipientsCovered
 }
 
-ReportDetails7_1 := concat("", ["URL comparison with a block-list is enabled via policy ", AppliedPolicy, "."]) if {
+ReportDetails7_1 := $"URL comparison with a block-list is enabled via policy {AppliedPolicy}." if {
     not PresetRecipientsCovered
     CustomPolicySafeLinksEnabled
 }
@@ -1235,7 +1226,7 @@ ReportDetails7_2 := "Direct download links are scanned for malware via the stand
     PresetRecipientsCovered
 }
 
-ReportDetails7_2 := concat("", ["Direct download links are scanned for malware via policy ", AppliedPolicy, "."]) if {
+ReportDetails7_2 := $"Direct download links are scanned for malware via policy {AppliedPolicy}." if {
     not PresetRecipientsCovered
     CustomPolicyScanURLsEnabled
 }
@@ -1271,7 +1262,7 @@ ReportDetails7_3 := "User click tracking is enabled via the standard or strict p
     PresetRecipientsCovered
 }
 
-ReportDetails7_3 := concat("", ["User click tracking is enabled via policy ", AppliedPolicy, "."]) if {
+ReportDetails7_3 := $"User click tracking is enabled via policy {AppliedPolicy}." if {
     not PresetRecipientsCovered
     CustomPolicyTrackClicksEnabled
 }

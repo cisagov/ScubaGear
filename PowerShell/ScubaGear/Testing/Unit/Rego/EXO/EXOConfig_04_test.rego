@@ -15,7 +15,7 @@ test_Rdata_Correct if {
     Output := exo.tests with input.spf_records as [SPFRecord]
                         with input.dmarc_records as [DmarcRecords]
 
-    TestResult("MS.EXO.4.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.4.1v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 test_Rdata_Incorrect_V1 if {
@@ -27,7 +27,7 @@ test_Rdata_Incorrect_V1 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.1v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.1v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -39,7 +39,7 @@ test_Rdata_Incorrect_V2 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.1v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.1v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 test_Rdata_Incorrect_V3 if {
@@ -56,7 +56,7 @@ test_Rdata_Incorrect_V3 if {
 
 
     ReportDetailStr := "1 agency domain(s) found in violation: bad.name"
-    TestResult("MS.EXO.4.1v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.1v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 #--
 
@@ -70,7 +70,7 @@ test_Rdata_Correct_V2 if {
     Output := exo.tests with input.spf_records as [SPFRecord]
                         with input.dmarc_records as [DmarcRecords]
 
-    TestResult("MS.EXO.4.2v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.4.2v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 test_Rdata_Incorrect_V4 if {
@@ -89,7 +89,7 @@ test_Rdata_Incorrect_V4 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.2v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.2v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 test_Rdata_Incorrect_V5 if {
@@ -103,7 +103,7 @@ test_Rdata_Incorrect_V5 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.2v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.2v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 #--
 
@@ -118,7 +118,7 @@ test_DMARCReport_Correct_V1 if {
                         with input.dmarc_records as [DmarcRecords]
 
 
-    TestResult("MS.EXO.4.3v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.4.3v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 test_DMARCReport_Incorrect_V1 if {
@@ -132,7 +132,7 @@ test_DMARCReport_Incorrect_V1 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.3v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.3v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 test_DMARCReport_Incorrect_V2 if {
@@ -146,7 +146,7 @@ test_DMARCReport_Incorrect_V2 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.3v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.3v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 # empty rdata
@@ -159,7 +159,7 @@ test_DMARCReport_Incorrect_V3 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.3v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.3v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 #--
 
@@ -179,7 +179,7 @@ test_POC_Correct_V1 if {
     Output := exo.tests with input.spf_records as [SPFRecord]
                         with input.dmarc_records as [DmarcRecord1]
 
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 # 2+ emails in rua= and 1+ in ruf
@@ -195,7 +195,7 @@ test_POC_Correct_V2 if {
     Output := exo.tests with input.spf_records as [SPFRecord]
                         with input.dmarc_records as [DmarcRecord1]
 
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 # Only 1 rua
@@ -210,7 +210,7 @@ test_POC_Incorrect_V1 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 # Only 2 emails in rua no ruf
@@ -226,7 +226,7 @@ test_POC_Incorrect_V2 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 # Only 1 ruf no rua
@@ -240,7 +240,7 @@ test_POC_Incorrect_V3 if {
                         with input.dmarc_records as [DmarcRecord1]
 
     ReportDetailStr := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 # 2 domains 1 fails rua/ruf number
@@ -262,7 +262,7 @@ test_POC_Incorrect_V4 if {
                         with input.dmarc_records as [DmarcRecord1, DmarcRecord2]
 
     ReportDetailStr := "1 agency domain(s) found in violation: example.com"
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 # 2 domains 1 fails rua # of email policy requirement
@@ -284,7 +284,7 @@ test_POC_Incorrect_V5 if {
                         with input.dmarc_records as [DmarcRecord1, DmarcRecord2]
 
     ReportDetailStr := "1 agency domain(s) found in violation: example.com"
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 
 # 2 domains 1 domain failed DNS query. Empty rdata
@@ -304,6 +304,6 @@ test_POC_Incorrect_V6 if {
                         with input.dmarc_records as [DmarcRecord1, DmarcRecord2]
 
     ReportDetailStr := "1 agency domain(s) found in violation: example.com"
-    TestResult("MS.EXO.4.4v1", Output, concat(". ", [ReportDetailStr, DNSLink]), false) == true
+    TestResult("MS.EXO.4.4v1", Output, $"{ReportDetailStr}. {DNSLink}", false) == true
 }
 #--

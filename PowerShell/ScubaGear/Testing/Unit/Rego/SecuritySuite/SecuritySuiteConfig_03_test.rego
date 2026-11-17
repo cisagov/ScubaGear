@@ -129,7 +129,7 @@ test_NoDLPLicense_Incorrect_3_1_V1 if {
     Output := securitysuite.tests with input.defender_license as false
                             with input.defender_dlp_license as false
 
-    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
+    ReportDetailString := $"{FAIL} {DLPLICENSEWARNSTR}"
     TestResult("MS.SECURITYSUITE.3.1v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -348,7 +348,7 @@ test_NoDLPLicense_Incorrect_3_2_V1 if {
     Output := securitysuite.tests with input.defender_license as false
                             with input.defender_dlp_license as false
 
-    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
+    ReportDetailString := $"{FAIL} {DLPLICENSEWARNSTR}"
     TestResult("MS.SECURITYSUITE.3.2v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -471,7 +471,7 @@ test_NoDLPLicense_Incorrect_3_3_V1 if {
     Output := securitysuite.tests with input.defender_license as false
                             with input.defender_dlp_license as false
 
-    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
+    ReportDetailString := $"{FAIL} {DLPLICENSEWARNSTR}"
     TestResult("MS.SECURITYSUITE.3.3v1", Output, ReportDetailString, false) == true
 }
 #--
@@ -538,7 +538,7 @@ test_NoDLPLicense_Incorrect_3_4_V1 if {
     Output := securitysuite.tests with input.defender_license as false
                             with input.defender_dlp_license as false
 
-    ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
+    ReportDetailString := $"{FAIL} {DLPLICENSEWARNSTR}"
     TestResult("MS.SECURITYSUITE.3.4v1", Output, ReportDetailString, false) == true
 }
 #--

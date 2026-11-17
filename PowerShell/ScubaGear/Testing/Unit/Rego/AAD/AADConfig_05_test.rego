@@ -221,7 +221,7 @@ test_PasswordAdditionBlocked_EmptyScopes if {
 
 test_PasswordAdditionBlocked_MissingRestrictionInEachScope if {
     every ScopeName in ["ApplicationRestrictions", "ServicePrincipalRestrictions"] {
-        CredentialsPath := sprintf("%v/PasswordCredentials", [ScopeName])
+        CredentialsPath := $"{ScopeName}/PasswordCredentials"
         every Patch in [
             {"op": "replace", "path": CredentialsPath, "value": []},
             {"op": "replace", "path": CredentialsPath, "value": [{"RestrictionType": "passwordLifetime"}]},

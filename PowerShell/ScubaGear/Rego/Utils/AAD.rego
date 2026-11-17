@@ -59,7 +59,7 @@ ReportFullDetailsArray(Array, String) := Details if {
     ))
     Details := Description([
         ArraySizeStr(Array),
-        concat(":<br/>", [String, TruncatedList]),
+        $"{String}:<br/>{TruncatedList}",
         TruncationWarning
     ])
 }

@@ -201,7 +201,7 @@ NoneEndsWith(coll, search) if {
     print("FAIL: expected no strings to end with '", _AppendComma(search), "' failed for '", exceptions, "'\n")
 }
 
-_QuoteStr(x) := concat("", [`"`, x, `"`]) if is_string(x)
+_QuoteStr(x) := $"\"{x}\"" if is_string(x)
 
 _QuoteStr(x) := x if not is_string(x)
 
