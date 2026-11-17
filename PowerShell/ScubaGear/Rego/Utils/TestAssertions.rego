@@ -201,13 +201,6 @@ NoneEndsWith(coll, search) if {
     print("FAIL: expected no strings to end with '", _AppendComma(search), "' failed for '", exceptions, "'\n")
 }
 
-# METADATA
-# description: Fail with provided message
-Fail(msg) := [][0] if {
-    # regal ignore: print-or-trace-call
-    print(msg)
-}
-
 _QuoteStr(x) := concat("", [`"`, x, `"`]) if is_string(x)
 
 _QuoteStr(x) := x if not is_string(x)
