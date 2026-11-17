@@ -118,7 +118,7 @@ ReportDetails1_2 := Details if {
     # Note that even though this case is compliant, we still have valuable details we can present in the report
     count(NonCompForwardingDomains) == 0
     count(AllowedForwardingDomains) > 0
-    Details := concat(" ", [AllowedDomainsSummary, NoticeAboutConfigFile])
+    Details := $"{AllowedDomainsSummary} {NoticeAboutConfigFile}"
 }
 
 tests contains {

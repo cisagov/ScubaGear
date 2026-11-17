@@ -431,10 +431,10 @@ CapNearMissDetails(actual_value, near_miss_objects) := NearMissDetails if {
     NearMissDetails := ""
 }
 
-ScubaAnalyzerDetails := sprintf(
-    `<a href="%s" target="_blank">Run the Start-SCuBAConfigAnalyzer cmdlet</a> and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file.`,
-    [ANALYZERURL]
-)
+ScubaAnalyzerDetails := sprintf(concat(" ", [
+    `<a href="%s" target="_blank">Run the Start-SCuBAConfigAnalyzer cmdlet</a>`,
+    "and import your ScubaResults JSON file to determine which specific exclusions to add to the configuration file."
+]), [ANALYZERURL])
 
 NearMissAnalyzerDetails(near_miss_details) := ScubaAnalyzerDetails if {
     near_miss_details != ""
