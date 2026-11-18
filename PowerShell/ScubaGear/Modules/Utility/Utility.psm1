@@ -314,10 +314,110 @@ function Invoke-GraphDirectly {
         $graphParams['ContentType'] = 'application/json'
     }
 
+    # Wraps Invoke-MgGraphRequest with diagnostic logging on failure (e.g. HTTP 403 missing permission).
+    # Retry/backoff for throttling (HTTP 429) is intentionally not handled here; that lives in Invoke-GraphBatchRequest.
+    $invokeWithLogging = {
+        param($RequestParams)
+
+        try {
+            return Invoke-MgGraphRequest @RequestParams
+        }
+        catch {
+            $ex = $_.Exception
+
+            # Extract the HTTP status code from the various shapes the Graph SDK/.NET can throw.
+            $statusCode = $null
+            if ($null -ne $ex.Response -and $null -ne $ex.Response.StatusCode) {
+                $statusCode = [int]$ex.Response.StatusCode
+            }
+            elseif (($ex.PSObject.Properties.Name -contains 'StatusCode') -and $null -ne $ex.StatusCode) {
+                $statusCode = [int]$ex.StatusCode
+            }
+
+            # Log the endpoint, status, and response body so a missing permission is diagnosable, then rethrow.
+            Write-ScubaLog -Message "Commandlet $commandlet failed$(if ($statusCode) { " (HTTP $statusCode)" })." -Level Warning -Source "Invoke-GraphDirectly" -Data @{
+                Commandlet   = $commandlet
+                Endpoint     = $RequestParams['Uri']
+                Method       = $RequestParams['Method']
+                StatusCode   = $statusCode
+                ResponseBody = $_.ErrorDetails.Message
+            } -Exception $ex
+            throw
+        }
+    }
+
+    # Wraps Invoke-MgGraphRequest with diagnostic logging on failure (e.g. HTTP 403 missing permission).
+    # Retry/backoff for throttling (HTTP 429) is intentionally not handled here; that lives in Invoke-GraphBatchRequest.
+    $invokeWithLogging = {
+        param($RequestParams)
+
+        try {
+            return Invoke-MgGraphRequest @RequestParams
+        }
+        catch {
+            $ex = $_.Exception
+
+            # Extract the HTTP status code from the various shapes the Graph SDK/.NET can throw.
+            $statusCode = $null
+            if ($null -ne $ex.Response -and $null -ne $ex.Response.StatusCode) {
+                $statusCode = [int]$ex.Response.StatusCode
+            }
+            elseif (($ex.PSObject.Properties.Name -contains 'StatusCode') -and $null -ne $ex.StatusCode) {
+                $statusCode = [int]$ex.StatusCode
+            }
+
+            # Log the endpoint, status, and response body so a missing permission is diagnosable, then rethrow.
+            Write-ScubaLog -Message "Commandlet $commandlet failed$(if ($statusCode) { " (HTTP $statusCode)" })." -Level Warning -Source "Invoke-GraphDirectly" -Data @{
+                Commandlet   = $commandlet
+                Endpoint     = $RequestParams['Uri']
+                Method       = $RequestParams['Method']
+                StatusCode   = $statusCode
+                ResponseBody = $_.ErrorDetails.Message
+            } -Exception $ex
+            throw
+        }
+    }
+
     # Execute the initial request (Invoke-ScubaGraphRequest handles pagination internally)
     $resp = Invoke-ScubaGraphRequest @graphParams
 
     if ($Method -notmatch "DELETE|PATCH") {
+        # If the response is a collection (has a 'value' key)
+        if ($resp -is [hashtable] -and $resp.ContainsKey('value')) {
+            $allItems = [System.Collections.Generic.List[object]]::new()
+            foreach ($item in $resp['value']) {
+                $allItems.Add($item)
+            }
+
+            # Build paging params from the shared set (keep Headers if present, drop Body/ContentType)
+            $pageParams = @{ ErrorAction = 'Stop'; Method = 'GET' }
+            if ($graphParams.ContainsKey('Headers')) {
+                $pageParams['Headers'] = $graphParams['Headers']
+            }
+
+            # Get the next page link from the initial response
+            $nextLink = $resp['@odata.nextLink']
+
+            # Follow pagination until no more pages remain
+            while ($null -ne $nextLink -and $nextLink -ne '') {
+                Write-Debug "Following @odata.nextLink: $nextLink"
+
+                # Update the URI to the next page; all other params (Headers, Method) carry over
+                $pageParams['Uri'] = $nextLink
+                $pageResp = & $invokeWithLogging $pageParams
+
+                # Accumulate results from this page
+                foreach ($item in $pageResp['value']) {
+                    $allItems.Add($item)
+                }
+
+                # Advance to the next page (null when no more pages exist)
+                $nextLink = $pageResp['@odata.nextLink']
+            }
+
+            $resp['value'] = $allItems.ToArray()
+        }
+
         return $resp | ConvertFrom-GraphHashtable
     }
 }
