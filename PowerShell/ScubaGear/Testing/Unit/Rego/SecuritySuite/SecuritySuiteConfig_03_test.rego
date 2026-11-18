@@ -7,6 +7,43 @@ import data.utils.key.PASS
 import data.utils.key.FAIL
 import data.utils.securitysuite.DLPLICENSEWARNSTR
 
+# A Copilot policy can list conventional workloads in its Workload summary even
+# though none of the corresponding conventional location arrays are configured.
+CopilotPromptsPolicy := {
+    "ExchangeLocation": [],
+    "SharePointLocation": [],
+    "TeamsLocation": [],
+    "EndpointDlpLocation": [],
+    "OneDriveLocation": [],
+    "Workload": "Exchange, SharePoint, OneDriveForBusiness, Applications",
+    "Locations": concat("", [
+        `[{"Workload":"Applications","Location":"470f2276-e011-4e9d-a6ec-20768be3a4b0",`,
+        `"Inclusions":[{"Type":"Tenant","Identity":"All"}]}]`
+    ]),
+    "EnforcementPlanes": ["CopilotExperiences"],
+    "Name": "Copilot prompts policy",
+    "Mode": "Enable",
+    "Enabled": true
+}
+
+# Copilot prompt blocking uses RestrictAccess/UploadText rather than BlockAccess.
+CopilotPromptsRule := {
+    "ContentContainsSensitiveInformation": [
+        {"name": "U.S. Social Security Number (SSN)"},
+        {"name": "U.S. Individual Taxpayer Identification Number (ITIN)"},
+        {"name": "Credit Card Number"}
+    ],
+    "Name": "Copilot prompts rule",
+    "Disabled": false,
+    "ParentPolicyName": "Copilot prompts policy",
+    "BlockAccess": false,
+    "BlockAccessScope": null,
+    "RestrictAccess": [{"setting": "UploadText", "value": "Block"}],
+    "NotifyUser": [],
+    "NotifyUserType": "NotSet",
+    "IsAdvancedRule": false
+}
+
 #
 # MS.SECURITYSUITE.3.1v1
 #--
@@ -474,6 +511,102 @@ test_NoDLPLicense_Incorrect_3_3_V1 if {
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
     TestResult("MS.SECURITYSUITE.3.3v1", Output, ReportDetailString, false) == true
 }
+
+# A Copilot-only rule must not be required to use an unsupported BlockAccess action.
+test_BlockAccess_CopilotPromptsPolicy_Correct_V1 if {
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRules, CopilotPromptsRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies, CopilotPromptsPolicy]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    TestResult("MS.SECURITYSUITE.3.3v1", Output, PASS, true) == true
+}
+
+# Adding a Copilot-only policy must not hide a conventional rule that does not block access.
+test_BlockAccess_ConventionalRuleWithCopilotPolicy_Incorrect_V7 if {
+    DlpComplianceRule := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "BlockAccess", "value": false}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRule, CopilotPromptsRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies, CopilotPromptsPolicy]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := concat(" ", [
+        "1 rule(s) found that do(es) not block access or",
+        "associated policy not set to enforce block action: Baseline Rule"
+    ])
+
+    TestResult("MS.SECURITYSUITE.3.3v1", Output, ReportDetailString, false) == true
+}
+
+# Applications must not exempt a mixed policy that has an actual conventional location.
+test_BlockAccess_MixedWorkloadPolicy_Incorrect_V8 if {
+    MixedWorkloadPolicy := json.patch(CopilotPromptsPolicy, [
+        {"op": "add", "path": "ExchangeLocation", "value": ["All"]},
+        {"op": "add", "path": "Name", "value": "Mixed workload policy"}
+    ])
+    MixedWorkloadRule := json.patch(CopilotPromptsRule, [
+        {"op": "add", "path": "Name", "value": "Mixed workload rule"},
+        {"op": "add", "path": "ParentPolicyName", "value": "Mixed workload policy"}
+    ])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRules, MixedWorkloadRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies, MixedWorkloadPolicy]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := concat(" ", [
+        "1 rule(s) found that do(es) not block access or",
+        "associated policy not set to enforce block action: Mixed workload rule"
+    ])
+
+    TestResult("MS.SECURITYSUITE.3.3v1", Output, ReportDetailString, false) == true
+}
+
+# Disabled Copilot policies retain the existing disabled-policy semantics.
+test_BlockAccess_DisabledCopilotPolicy_Correct_V2 if {
+    DisabledCopilotPolicy := json.patch(CopilotPromptsPolicy,
+                                [{"op": "add", "path": "Enabled", "value": false}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRules, CopilotPromptsRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies, DisabledCopilotPolicy]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    TestResult("MS.SECURITYSUITE.3.3v1", Output, PASS, true) == true
+}
+
+# A Copilot-only policy does not satisfy the conventional BlockAccess baseline.
+test_BlockAccess_OnlyCopilotPolicy_Incorrect_V9 if {
+    Output := securitysuite.tests with input.dlp_compliance_rules as [CopilotPromptsRule]
+                            with input.dlp_compliance_policies as [CopilotPromptsPolicy]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    TestResult("MS.SECURITYSUITE.3.3v1", Output, ReportDetailString, false) == true
+}
+
+# A disabled conventional rule does not satisfy the BlockAccess baseline.
+test_BlockAccess_DisabledConventionalRule_Incorrect_V10 if {
+    DisabledDlpComplianceRule := json.patch(DlpComplianceRules,
+                                [{"op": "add", "path": "Disabled", "value": true}])
+
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DisabledDlpComplianceRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := "No DLP policy matching all types found for evaluation."
+    TestResult("MS.SECURITYSUITE.3.3v1", Output, ReportDetailString, false) == true
+}
 #--
 
 #
@@ -539,6 +672,18 @@ test_NoDLPLicense_Incorrect_3_4_V1 if {
                             with input.defender_dlp_license as false
 
     ReportDetailString := concat(" ", [FAIL, DLPLICENSEWARNSTR])
+    TestResult("MS.SECURITYSUITE.3.4v1", Output, ReportDetailString, false) == true
+}
+
+# Notifications are supported for Copilot policies, so 3.4 continues to evaluate this rule.
+test_NotifyUser_CopilotPrompts_Incorrect_V3 if {
+    Output := securitysuite.tests with input.dlp_compliance_rules as [DlpComplianceRules, CopilotPromptsRule]
+                            with input.dlp_compliance_policies as [DlpCompliancePolicies, CopilotPromptsPolicy]
+                            with input.scuba_config as ScubaConfig
+                            with input.defender_license as true
+                            with input.defender_dlp_license as true
+
+    ReportDetailString := "1 rule(s) found that do(es) not notify at least one user: Copilot prompts rule"
     TestResult("MS.SECURITYSUITE.3.4v1", Output, ReportDetailString, false) == true
 }
 #--

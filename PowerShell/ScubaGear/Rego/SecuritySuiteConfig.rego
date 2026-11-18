@@ -628,17 +628,46 @@ tests contains {
 #
 # MS.SECURITYSUITE.3.3v1
 #--
+# BlockAccess applies to rules whose parent policy has at least one configured
+# conventional DLP location. The Workload summary is not authoritative because
+# application-only policies can list conventional workload names while leaving
+# each corresponding location array empty.
+ConventionalDlpLocationFields := {
+    "ExchangeLocation",
+    "SharePointLocation",
+    "OneDriveLocation",
+    "TeamsLocation",
+    "EndpointDlpLocation"
+}
+
+PolicyHasConventionalDlpLocation(Policy) if {
+    some LocationField in ConventionalDlpLocationFields
+    Locations := object.get(Policy, LocationField, [])
+    is_array(Locations)
+    some Location in Locations
+    is_string(Location)
+    Location != ""
+}
+
+BlockAccessApplicableRules := [
+Rule |
+    some Rule in PoliciesWithFullProtection
+    some Policy in input.dlp_compliance_policies
+    Policy.Name == Rule.ParentPolicyName
+    PolicyHasConventionalDlpLocation(Policy)
+]
+
 # Step 3: Ensure that the action for the rules is set to block
 # Save the rule name if BlockAccess is false OR BlockAccess
 # is true & scope is not set to "ALL".
 SensitiveRulesNotBlocking contains Rule.Name if {
-    some Rule in PoliciesWithFullProtection
+    some Rule in BlockAccessApplicableRules
     Rule.BlockAccess == false
     Rule.ParentPolicyName in Rule
 }
 
 SensitiveRulesNotBlocking contains Rule.Name if {
-    some Rule in PoliciesWithFullProtection
+    some Rule in BlockAccessApplicableRules
     Rule.BlockAccess == true
     Rule.ParentPolicyName in Rule
     Rule.BlockAccessScope != "All"
@@ -646,12 +675,12 @@ SensitiveRulesNotBlocking contains Rule.Name if {
 
 # Create the Report details message for policy
 ErrorMessage3_3(Rules) := ReportDetailsArray(false, Rules, ErrorMessage) if {
-    count(PoliciesWithFullProtection) > 0
+    count(BlockAccessApplicableRules) > 0
     ErrorMessage := "rule(s) found that do(es) not block access or associated policy not set to enforce block action:"
 }
 
 ErrorMessage3_3(_) := ErrorMessage if {
-    count(PoliciesWithFullProtection) == 0
+    count(BlockAccessApplicableRules) == 0
     ErrorMessage := "No DLP policy matching all types found for evaluation."
 }
 
@@ -668,7 +697,7 @@ tests contains {
 } if {
     Conditions := [
         count(SensitiveRulesNotBlocking) == 0,
-        count(PoliciesWithFullProtection) > 0
+        count(BlockAccessApplicableRules) > 0
     ]
     Status := count(FilterArray(Conditions, true)) == 2
 }
