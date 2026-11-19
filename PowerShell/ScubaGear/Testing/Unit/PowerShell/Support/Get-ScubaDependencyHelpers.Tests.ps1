@@ -427,12 +427,17 @@ InModuleScope 'Support' {
 
         Context "Set-ScubaPSGalleryTrust" {
             BeforeEach {
+                # PowerShellGet's Set-PSRepository uses dynamic parameters that read
+                # SourceLocation/Location from Get-PSRepository. Incomplete mocks make
+                # parameter binding throw before the Set-PSRepository mock can run.
                 Mock Set-PSRepository { }
             }
 
             It "Should not call Set-PSRepository when PSGallery is already Trusted" {
                 Mock Get-PSRepository {
                     return [PSCustomObject]@{
+                        Name               = 'PSGallery'
+                        SourceLocation     = 'https://www.powershellgallery.com/api/v2'
                         InstallationPolicy = 'Trusted'
                         Trusted            = $true
                     }
@@ -446,6 +451,8 @@ InModuleScope 'Support' {
             It "Should trust PSGallery when its installation policy is not Trusted" {
                 Mock Get-PSRepository {
                     return [PSCustomObject]@{
+                        Name               = 'PSGallery'
+                        SourceLocation     = 'https://www.powershellgallery.com/api/v2'
                         InstallationPolicy = 'Untrusted'
                         Trusted            = $false
                     }
@@ -461,6 +468,8 @@ InModuleScope 'Support' {
             It "Should not change trust when DoNotAutoTrustRepository is set" {
                 Mock Get-PSRepository {
                     return [PSCustomObject]@{
+                        Name               = 'PSGallery'
+                        SourceLocation     = 'https://www.powershellgallery.com/api/v2'
                         InstallationPolicy = 'Untrusted'
                         Trusted            = $false
                     }
