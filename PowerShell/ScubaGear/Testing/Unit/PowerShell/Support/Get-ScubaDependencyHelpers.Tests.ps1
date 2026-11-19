@@ -425,48 +425,50 @@ InModuleScope 'Support' {
             }
         }
 
-        Context "Install-ScubaDependencies repository handling" {
+        Context "Set-ScubaPSGalleryTrust" {
             BeforeEach {
-                Mock Get-ScubaRequiredModuleList {
-                    return @(
-                        [PSCustomObject]@{
-                            ModuleName     = 'powershell-yaml'
-                            ModuleVersion  = [version]'0.4.2'
-                            MaximumVersion = [version]'0.4.12'
-                        }
-                    )
-                }
-                Mock Get-ScubaModuleDependencyStatus {
-                    return [PSCustomObject]@{
-                        Installed            = $true
-                        VersionsInRange      = @([version]'0.4.7')
-                        BestVersionToKeep    = [version]'0.4.7'
-                        HighestVersion       = [version]'0.4.7'
-                        VersionsAboveMaximum = @()
-                    }
-                }
-                Mock Find-Module {
-                    return @(
-                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PSGallery' }
-                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PrivateGallery' }
-                    )
-                }
-                Mock Install-ScubaModule { }
                 Mock Set-PSRepository { }
             }
 
-            It "Should not throw or re-trust PSGallery when several repositories return the same module" {
-                Mock Get-PSRepository { return [PSCustomObject]@{ InstallationPolicy = 'Trusted' } }
+            It "Should not call Set-PSRepository when PSGallery is already Trusted" {
+                Mock Get-PSRepository {
+                    return [PSCustomObject]@{
+                        InstallationPolicy = 'Trusted'
+                        Trusted            = $true
+                    }
+                }
 
-                { Install-ScubaDependencies -NoOPA -NoMSAL } | Should -Not -Throw
+                Set-ScubaPSGalleryTrust
+
                 Should -Invoke Set-PSRepository -Times 0
             }
 
-            It "Should trust PSGallery only when its installation policy is not Trusted" {
-                Mock Get-PSRepository { return [PSCustomObject]@{ InstallationPolicy = 'Untrusted' } }
+            It "Should trust PSGallery when its installation policy is not Trusted" {
+                Mock Get-PSRepository {
+                    return [PSCustomObject]@{
+                        InstallationPolicy = 'Untrusted'
+                        Trusted            = $false
+                    }
+                }
 
-                { Install-ScubaDependencies -NoOPA -NoMSAL } | Should -Not -Throw
-                Should -Invoke Set-PSRepository -Times 1 -ParameterFilter { $Name -eq 'PSGallery' -and $InstallationPolicy -eq 'Trusted' }
+                Set-ScubaPSGalleryTrust
+
+                Should -Invoke Set-PSRepository -Times 1 -ParameterFilter {
+                    $Name -eq 'PSGallery' -and $InstallationPolicy -eq 'Trusted'
+                }
+            }
+
+            It "Should not change trust when DoNotAutoTrustRepository is set" {
+                Mock Get-PSRepository {
+                    return [PSCustomObject]@{
+                        InstallationPolicy = 'Untrusted'
+                        Trusted            = $false
+                    }
+                }
+
+                Set-ScubaPSGalleryTrust -DoNotAutoTrustRepository
+
+                Should -Invoke Set-PSRepository -Times 0
             }
         }
 
