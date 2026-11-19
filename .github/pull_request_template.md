@@ -16,7 +16,7 @@
 ## 🧪 How the Developer Tested These Changes ##
 
 <!-- Describe how you tested the changes in this PR and include any scenarios that were involved -->
-<!-- No need to be super long or detailed. We can just to be sure that you tested various scenarios -->
+<!-- No need to be super long or detailed, the purpose of this section is to ensure the various testing scenarios are documented -->
 
 <!-- If you made code changes, confirm that you tested in the requisite environments and authentication types -->
 <!-- If you did not made code changes, you can remove these checkboxes -->
