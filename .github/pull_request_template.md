@@ -33,7 +33,6 @@ I tested with:
 <!-- How did you test your changes? Include screenshots if that helps the reviewers. -->
 
 
-<!-- How did you test your changes? How could someone else test this PR? -->
 
 ## 🔍 How the PR Reviewer Can Test These Changes ##
 
