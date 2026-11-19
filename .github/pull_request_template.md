@@ -19,7 +19,7 @@
 <!-- No need to be super long or detailed, the purpose of this section is to ensure the various testing scenarios are documented -->
 
 <!-- If you made code changes, confirm that you tested in the requisite environments and authentication types -->
-<!-- If you did not made code changes, you can remove these checkboxes -->
+<!-- If you did not make code changes, you can remove these checkboxes -->
 I tested these changes in the following environments:
 - [ ] G5
 - [ ] E5
