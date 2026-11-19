@@ -949,7 +949,9 @@ function Invoke-ProviderList {
                             $RetVal = Export-TeamsProvider @TeamsProviderParams | Select-Object -Last 1
                         }
                         "si" {
-                            $SIProviderParams = @{}
+                            $SIProviderParams = @{
+                                'M365Environment' = $ScubaConfig.M365Environment
+                            }
                             $RetVal = Export-SIProvider @SIProviderParams | Select-Object -Last 1
                         }
                         default {
