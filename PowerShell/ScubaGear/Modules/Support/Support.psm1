@@ -971,6 +971,38 @@ function Get-ScubaLatestAcceptableModuleVersion {
     return [version]$Latest.Version
 }
 
+function Set-ScubaPSGalleryTrust {
+    <#
+    .SYNOPSIS
+        Trusts the PSGallery repository unless the caller opted out.
+
+    .DESCRIPTION
+        Install-ScubaDependencies needs a trusted PSGallery to install modules
+        without prompts. Callers can pass -DoNotAutoTrustRepository to skip the
+        policy change and only report the current trust state. Trust is decided
+        from InstallationPolicy (not the Trusted boolean) so Untrusted galleries
+        are actually updated.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $DoNotAutoTrustRepository
+    )
+
+    if ($DoNotAutoTrustRepository) {
+        $RepositoryDetails = Get-PSRepository -Name "PSGallery"
+        Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
+        return
+    }
+
+    $Policy = Get-PSRepository -Name "PSGallery"
+    if ($Policy.InstallationPolicy -ne "Trusted") {
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Write-Output "PSGallery is trusted."
+    }
+}
+
 function Install-ScubaDependencies {
     <#
     .SYNOPSIS
@@ -1059,17 +1091,7 @@ function Install-ScubaDependencies {
     $DebugPreference = "Continue"
     $InformationPreference = "Continue"
 
-    if ($DoNotAutoTrustRepository) {
-        $RepositoryDetails = Get-PSRepository -Name "PSGallery"
-        Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
-    }
-    else {
-        $Policy = Get-PSRepository -Name "PSGallery"
-        if ($Policy.InstallationPolicy -ne "Trusted") {
-            Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-            Write-Output "PSGallery is trusted."
-        }
-    }
+    Set-ScubaPSGalleryTrust -DoNotAutoTrustRepository:$DoNotAutoTrustRepository
 
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
