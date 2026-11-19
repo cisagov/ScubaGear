@@ -971,6 +971,31 @@ function Get-ScubaLatestAcceptableModuleVersion {
     return [version]$Latest.Version
 }
 
+function Set-ScubaPSRepository {
+    <#
+    .SYNOPSIS
+        Thin wrapper around Set-PSRepository for PSGallery trust updates.
+
+    .DESCRIPTION
+        Kept separate so unit tests can mock repository policy changes without
+        invoking PowerShellGet's Set-PSRepository dynamic parameter binder.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $InstallationPolicy
+    )
+
+    Set-PSRepository -Name $Name -InstallationPolicy $InstallationPolicy
+}
+
 function Set-ScubaPSGalleryTrust {
     <#
     .SYNOPSIS
@@ -998,7 +1023,7 @@ function Set-ScubaPSGalleryTrust {
 
     $Policy = Get-PSRepository -Name "PSGallery"
     if ($Policy.InstallationPolicy -ne "Trusted") {
-        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Set-ScubaPSRepository -Name "PSGallery" -InstallationPolicy Trusted
         Write-Output "PSGallery is trusted."
     }
 }
