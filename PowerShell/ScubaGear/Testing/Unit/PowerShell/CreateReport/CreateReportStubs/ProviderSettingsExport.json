@@ -15887,6 +15887,8 @@
   ],
   "defender_license": true,
   "securitysuite_successful_commands": [
+    "Get-HostedOutboundSpamFilterPolicy",
+    "Get-HostedOutboundSpamFilterRule",
     "Get-AdminAuditLogConfig",
     "Get-EOPProtectionPolicyRule",
     "Get-MalwareFilterPolicy",
