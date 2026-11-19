@@ -37,7 +37,7 @@
     "OutCsvFileName": "ScubaResults",
     "OutActionPlanFileName": "ActionPlan",
     "NumberOfUUIDCharactersToTruncate": 18,
-    "OPAVersion": "1.20.2",
+    "OPAVersion": "1.22.4",
     "PreferredDnsResolvers": [],
     "SkipDoH": false
   },
