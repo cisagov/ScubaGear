@@ -15,7 +15,7 @@
 
 ## 🧪 How the Developer Tested These Changes ##
 
-<!-- Describe how you tested the changes included in this PR, including any scenarios that were involved -->
+<!-- Describe how you tested the changes in this PR and include any scenarios that were involved -->
 <!-- No need to be super long or detailed. We can just to be sure that you tested various scenarios -->
 
 <!-- If you made code changes, confirm that you tested in the requisite environments and authentication types -->
