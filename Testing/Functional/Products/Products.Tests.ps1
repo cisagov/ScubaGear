@@ -535,7 +535,7 @@ Describe "Policy Checks for <ProductName>" {
                         }
                     }
                     # Security Suite configuration tables are appended to the Security Suite report.
-                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-malware-policies|anti-phish-policies|anti-spam-policies)-table") {
+                    elseif ($null -ne $TableClass -and $TableClass -match "securitysuite-(sensitive-users|partner-domains|anti-malware-policies|anti-phish-policies|anti-spam-policies|outbound-spam-policies)-table") {
                         $ExpectedHeaders = @(if ($TableClass -match "securitysuite-sensitive-users-table") {
                             "Username", "Email"
                         }
@@ -547,6 +547,9 @@ Describe "Policy Checks for <ProductName>" {
                         }
                         elseif ($TableClass -match "securitysuite-anti-spam-policies-table") {
                             "", "Policy", "Status", "Priority", "Applicability", "Spam Actions", "Allowed Senders", "Allowed Domains"
+                        }
+                        elseif ($TableClass -match "securitysuite-outbound-spam-policies-table") {
+                            "", "Policy", "Status", "Priority", "Applicability", "Recipient Limits", "Threshold Action", "BCC Suspicious Mail", "BCC Recipients"
                         }
                         else {
                             "", "Policy", "Status", "Priority", "Applicability", "Impersonation Protection", "Partner Domains Protected", "Safety Tips & Indicators"
@@ -567,7 +570,7 @@ Describe "Policy Checks for <ProductName>" {
 
                             if ($RowData.Count -gt 0) {
                                 $RowData.Count | Should -BeExactly $ExpectedHeaders.Count
-                                if ($TableClass -match "securitysuite-(anti-malware|anti-phish|anti-spam)-policies-table") {
+                                if ($TableClass -match "securitysuite-(anti-malware|anti-phish|anti-spam|outbound-spam)-policies-table") {
                                     $RowData[2].Text | Should -BeIn @("On", "Off", "Always on") -Because "The protection policy Status value must match Defender's own On/Off/Always on wording"
                                 }
                             }
