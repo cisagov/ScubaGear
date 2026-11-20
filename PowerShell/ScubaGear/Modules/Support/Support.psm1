@@ -54,6 +54,11 @@ function Get-ScubaRequiredModuleList {
         is intentionally not listed in RequiredVersions.ps1 but must be installed first so
         that the other packages can be properly evaluated and installed.
 
+    .PARAMETER RequiredModulesPath
+        If provided, specifies a location for where RequiredVersions.ps1 resides. This path 
+        allows a set of module dependencies to be derived from a ScubaGear release that differs 
+        from the installed release.
+
     .OUTPUTS
         ScubaGear.RequiredModule[]
 
@@ -66,30 +71,43 @@ function Get-ScubaRequiredModuleList {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $false)]
-        [switch]$IncludePowerShellGet
+        [switch]$IncludePowerShellGet,
+        [Parameter(Mandatory = $false)]
+        [string]$RequiredModulesPath
     )
 
-    # Since this method is called from the Support module, script root
-    # points to the Support module location. Use script root rather than
-    # Get-Module as this may be called by a script that only imports the
-    # function and not the whole module.
-    $SupportPath = $PSScriptRoot
-    if ([string]::IsNullOrEmpty($SupportPath)) {
-        # Fallback: try to find the ScubaGear module
-        $scubaModule = Get-Module ScubaGear -ErrorAction SilentlyContinue
-        if (-not $scubaModule) {
-            $scubaModule = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ('' -eq $RequiredModulesPath) {
+        # Since this method is called from the Support module, script root
+        # points to the Support module location. Use script root rather than
+        # Get-Module as this may be called by a script that only imports the
+        # function and not the whole module.
+        $SupportPath = $PSScriptRoot
+        if ([string]::IsNullOrEmpty($SupportPath)) {
+            # Fallback: try to find the ScubaGear module
+            $scubaModule = Get-Module ScubaGear -ErrorAction SilentlyContinue
+            if (-not $scubaModule) {
+                $scubaModule = Get-Module ScubaGear -ListAvailable -ErrorAction SilentlyContinue | Select-Object -First 1
+            }
+            if ($scubaModule) {
+                $SupportPath = Join-Path -Path $scubaModule.ModuleBase -ChildPath "Modules\Support"
+            }
+            else {
+                throw "Unable to determine ScubaGear module location. Please ensure ScubaGear module is properly loaded."
+            }
         }
-        if ($scubaModule) {
-            $SupportPath = Join-Path -Path $scubaModule.ModuleBase -ChildPath "Modules\Support"
-        }
-        else {
-            throw "Unable to determine ScubaGear module location. Please ensure ScubaGear module is properly loaded."
+
+        # Scuba module structure means module home is grandparent of support
+        $ScubaModuleDir = Split-Path -Path $(Split-Path -Path $SupportPath -Parent) -Parent
+    } else {
+        # $RequiredModulesPath is provided as a parameter. Scuba module structure means module 
+        # home is the parent of RequiredVersions.ps1.
+        $ScubaModuleDir = if ($RequiredModulesPath.Split('\').Split('/')[-1] -eq 'RequiredVersions.ps1') {
+            Split-Path -Path $RequiredModulesPath -Parent
+         } else { 
+            $RequiredModulesPath
         }
     }
 
-    # Scuba module structure means module home is grandparent of support
-    $ScubaModuleDir = Split-Path -Path $(Split-Path -Path $SupportPath -Parent) -Parent
     $RequiredModulesPath = Join-Path -Path $ScubaModuleDir -ChildPath 'RequiredVersions.ps1'
 
     if (-not (Test-Path -Path $RequiredModulesPath -PathType Leaf)) {
@@ -699,6 +717,11 @@ function Get-ScubaGearDependencyStatus {
         ModuleVersion and MaximumVersion. When omitted, the list is loaded from
         RequiredVersions.ps1 via Get-ScubaRequiredModuleList.
 
+    .PARAMETER RequiredModulesPath
+        If provided, specifies a location for where RequiredVersions.ps1 resides. This path 
+        allows a set of module dependencies to be derived from a ScubaGear release that differs 
+        from the installed release.
+
     .PARAMETER ExcludeOpa
         Do not include the OPA executable status in the results (report PowerShell modules only).
 
@@ -732,11 +755,23 @@ function Get-ScubaGearDependencyStatus {
         [switch]$ExcludeScubaGear,
 
         [Parameter(Mandatory = $false)]
-        [switch]$Quiet
+        [switch]$Quiet,
+
+        [Parameter(Mandatory = $false)]
+        [string]$RequiredModulesPath
     )
 
     if (-not $ModuleList) {
+        if ($RequiredModulesPath) {
+            Write-Verbose -Message "Using RequiredModulesPath $RequiredModulesPath passed from the caller."
+            $ModuleList = Get-ScubaRequiredModuleList -RequiredModulesPath $RequiredModulesPath
+        } else {
         $ModuleList = Get-ScubaRequiredModuleList
+        }
+    } else {
+        if ($RequiredModulesPath) {
+            Write-Warning -Message "RequiredModulesPath was provided, but is ignored because ModuleList was provided."
+        }
     }
 
     # Fetch all required modules in a single Get-Module -ListAvailable call. Querying every
