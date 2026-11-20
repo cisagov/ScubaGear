@@ -60,11 +60,11 @@ function Connect-Tenant {
    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
    $AuthVerbose = @{}
    if ($VerbosePreference -eq 'Continue') { $AuthVerbose.Verbose = $true }
-   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable, Get-ScubaGearServiceEndpoint
+   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl, Get-TeamsUnifiedScope, Get-TeamsUnifiedBaseUrl
-   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl
+   Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/SPORestHelper.psm1 -Function Get-SPOAdminUrl, Get-SPOScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerBIRestHelper.psm1 -Function Get-PowerBIBaseUrl, Get-PowerBIScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/EXORestHelper.psm1 -Function Get-ExchangeOnlineScope, Get-ExchangeOnlineApiEndpoint, Get-ComplianceScope, Get-ComplianceApiEndpoint
 
@@ -322,8 +322,8 @@ function Connect-Tenant {
                            $InitialDomainPrefix = $TenantName.split(".")[0]
                        }
 
-                       $TokenData.SPOAdminUrl = Get-ScubaGearServiceEndpoint -Product sharepoint -Environment $M365Environment -Domain $InitialDomainPrefix
-                       $SPOScope = "$($TokenData.SPOAdminUrl)/.default"
+                       $TokenData.SPOAdminUrl = Get-SPOAdminUrl -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
+                       $SPOScope = Get-SPOScope -M365Environment $M365Environment -InitialDomainPrefix $InitialDomainPrefix
 
                        if ($ServicePrincipalParams.CertThumbprintParams) {
                            $TokenData.SPOAccessToken = Get-MsalAccessToken @AuthVerbose `
