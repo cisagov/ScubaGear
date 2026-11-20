@@ -10,7 +10,7 @@ import data.utils.key.TestResult
 test_PrivilegedUsers_Correct if {
     Output := aad.tests with input.privileged_users as PrivilegedUsers
 
-    ReportDetailString := "2 global admin(s) found:<br/>Test Name 1, Test Name 2"
+    ReportDetailString := "2 global admin(s) found:<br/>Test Name 1 (User1), Test Name 2 (User2)"
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, true) == true
 }
 
@@ -19,7 +19,7 @@ test_PrivilegedUsers_Incorrect_V1 if {
 
     Output := aad.tests with input.privileged_users as Users
 
-    ReportDetailString := "1 global admin(s) found:<br/>Test Name 1"
+    ReportDetailString := "1 global admin(s) found:<br/>Test Name 1 (User1)"
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
 }
 
@@ -34,8 +34,38 @@ test_PrivilegedUsers_Incorrect_V2 if {
                         with input.privileged_users.User9 as {"DisplayName": "Test Name 9", "roles": ["Global Administrator"]}
 
     ReportDetailString := concat(" ", [
-        "9 global admin(s) found:<br/>Test Name 1, Test Name 2, Test Name 3,",
-        "Test Name 4, Test Name 5, Test Name 6, Test Name 7, Test Name 8, Test Name 9"
+        "9 global admin(s) found:<br/>Test Name 1 (User1), Test Name 2 (User2), Test Name 3 (User3),",
+        "Test Name 4 (User4), Test Name 5 (User5), Test Name 6 (User6), Test Name 7 (User7),",
+        "Test Name 8 (User8), Test Name 9 (User9)"
+    ])
+
+    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
+}
+
+# Two different accounts that share a display name are still two global admins
+test_PrivilegedUsers_DuplicateDisplayName_Correct if {
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
+                        with input.privileged_users.User2.DisplayName as "Test Name 1"
+
+    ReportDetailString := "2 global admin(s) found:<br/>Test Name 1 (User1), Test Name 1 (User2)"
+    TestResult("MS.AAD.7.1v1", Output, ReportDetailString, true) == true
+}
+
+# Nine global admins must fail even when two of them share a display name
+test_PrivilegedUsers_DuplicateDisplayName_Incorrect if {
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User4 as {"DisplayName": "Test Name 4", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User5 as {"DisplayName": "Test Name 5", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User6 as {"DisplayName": "Test Name 6", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User7 as {"DisplayName": "Test Name 7", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User8 as {"DisplayName": "Test Name 8", "roles": ["Global Administrator"]}
+                        with input.privileged_users.User9 as {"DisplayName": "Test Name 8", "roles": ["Global Administrator"]}
+
+    ReportDetailString := concat(" ", [
+        "9 global admin(s) found:<br/>Test Name 1 (User1), Test Name 2 (User2), Test Name 3 (User3),",
+        "Test Name 4 (User4), Test Name 5 (User5), Test Name 6 (User6), Test Name 7 (User7),",
+        "Test Name 8 (User8), Test Name 8 (User9)"
     ])
 
     TestResult("MS.AAD.7.1v1", Output, ReportDetailString, false) == true
@@ -121,6 +151,19 @@ test_SecureScore_Incorrect_V4 if {
     TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, false) == true
 }
 
+# Correct because two different non global admin accounts that share a display name
+# are counted separately, giving a ratio of 1
+test_SecureScore_DuplicateDisplayName_Correct if {
+    Output := aad.tests with input.privileged_users as PrivilegedUsers
+                        with input.privileged_users.User3 as {"DisplayName": "Test Name 3", "roles": ["User Administrator"]}
+                        with input.privileged_users.User4 as {"DisplayName": "Test Name 3", "roles": ["User Administrator"]}
+
+    ReportDetailStr := concat("", ["Requirement met: Least Privilege Score = 1 (should be 1 or less)",
+    "\nCalculated by 2 global admins / 2 privileged users without global admin role"])
+
+    TestResult("MS.AAD.7.2v1", Output, ReportDetailStr, true) == true
+}
+
 #--
 # Policy MS.AAD.7.3v1
 #--
@@ -138,7 +181,7 @@ test_OnPremisesImmutableId_Incorrect_V1 if {
 
     Output := aad.tests with input.privileged_users as Users
 
-    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Test Name 1"
+    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Test Name 1 (User1)"
     TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
 }
 
@@ -149,7 +192,20 @@ test_OnPremisesImmutableId_Incorrect_V2 if {
 
     Output := aad.tests with input.privileged_users as Users
 
-    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Test Name 1"
+    ReportDetailString := "1 admin(s) that are not cloud-only found:<br/>Test Name 1 (User1)"
+    TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
+}
+
+# Two federated admins that share a display name are both reported
+test_OnPremisesImmutableId_DuplicateDisplayName_Incorrect if {
+    Users := json.patch(PrivilegedUsers,
+                [{"op": "add", "path": "User1/OnPremisesImmutableId", "value": "HelloWorld"},
+                {"op": "add", "path": "User2/OnPremisesImmutableId", "value": "HelloWorld2"},
+                {"op": "add", "path": "User2/DisplayName", "value": "Test Name 1"}])
+
+    Output := aad.tests with input.privileged_users as Users
+
+    ReportDetailString := "2 admin(s) that are not cloud-only found:<br/>Test Name 1 (User1), Test Name 1 (User2)"
     TestResult("MS.AAD.7.3v1", Output, ReportDetailString, false) == true
 }
 #--
