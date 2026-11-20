@@ -309,6 +309,34 @@ InModuleScope Orchestrator {
                 {Invoke-Scuba @SplatParams} | Should -Throw
             }
         }
+        Context 'SkipLongFunctions' {
+            BeforeEach {
+                Mock Invoke-Connection { @{ ProdAuthFailed = @() } }
+            }
+
+            It 'exposes SkipLongFunctions on Invoke-SCuBA' {
+                $parameter = (Get-Command Invoke-SCuBA).Parameters['SkipLongFunctions']
+                $parameter | Should -Not -BeNullOrEmpty
+                $parameter.SwitchParameter | Should -BeTrue
+                $parameter.ParameterSets.Keys | Should -Contain 'Report'
+                $parameter.ParameterSets.Keys | Should -Contain 'Configuration'
+            }
+
+            It 'leaves SkipLongFunctions false when the switch is omitted' {
+                Invoke-SCuBA -ProductNames aad -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.SkipLongFunctions -eq $false }
+            }
+
+            It 'passes SkipLongFunctions when the switch is set' {
+                Invoke-SCuBA -ProductNames aad -SkipLongFunctions -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.SkipLongFunctions -eq $true }
+            }
+
+            It 'passes false when the switch is explicitly turned off' {
+                Invoke-SCuBA -ProductNames aad -SkipLongFunctions:$false -Quiet -SilenceBODWarnings
+                Should -Invoke Invoke-ProviderList -Times 1 -Exactly -ParameterFilter { $ScubaConfig.SkipLongFunctions -eq $false }
+            }
+        }
     }
 }
 AfterAll {

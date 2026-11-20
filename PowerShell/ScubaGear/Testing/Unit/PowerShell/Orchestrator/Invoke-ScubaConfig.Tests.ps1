@@ -98,6 +98,7 @@ InModuleScope Orchestrator {
                 $script:TestSplat['AppID'] = $ScubaConfig.AppID
                 $script:TestSplat['Organization'] = $ScubaConfig.Organization
                 $script:TestSplat['CertificateThumbprint'] = $ScubaConfig.CertificateThumbprint
+                $script:TestSplat['SkipLongFunctions'] = [bool]$ScubaConfig.SkipLongFunctions
             }
         }
         Mock -ModuleName Orchestrator Invoke-RunRego {
@@ -263,6 +264,64 @@ InModuleScope Orchestrator {
 
             It "Verify parameter, ProductNames, reflects all products"{
                 $script:TestSplat['ProductNames'] | Should -BeExactly @('aad', 'exo', 'powerbi', 'powerplatform', 'securitysuite', 'sharepoint', 'teams') -Because "got $($script:TestSplat['ProductNames'])"
+            }
+        }
+
+        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba keeps SkipLongFunctions from the config file' {
+            BeforeAll {
+                $script:TestSplat = @{}
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('aad')
+                        M365Environment='commercial'
+                        LogIn=$true
+                        DisconnectOnExit=$false
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='ProviderSettingsExport'
+                        OutRegoFileName='RegoOutput'
+                        OutReportName='BaselineReports'
+                        OutJsonFileName='ScubaResults'
+                        Organization='sub.domain.com'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
+                        SkipLongFunctions=$true
+                    }
+                }
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml") -SilenceBODWarnings
+            }
+
+            It 'passes the config file value to the provider list' {
+                $script:TestSplat['SkipLongFunctions'] | Should -BeTrue
+            }
+        }
+
+        Describe -Tag 'Orchestrator' -Name 'Invoke-Scuba lets the command line override SkipLongFunctions' {
+            BeforeAll {
+                $script:TestSplat = @{}
+                function global:ConvertFrom-Yaml {
+                    @{
+                        ProductNames=@('aad')
+                        M365Environment='commercial'
+                        LogIn=$true
+                        DisconnectOnExit=$false
+                        OutPath=$PSScriptRoot
+                        OutFolderName='ScubaReports'
+                        OutProviderFileName='ProviderSettingsExport'
+                        OutRegoFileName='RegoOutput'
+                        OutReportName='BaselineReports'
+                        OutJsonFileName='ScubaResults'
+                        Organization='sub.domain.com'
+                        AppID='12345678-1234-1234-1234-123456789012'
+                        CertificateThumbprint='1234567890ABCDEF1234567890ABCDEF12345678'
+                        SkipLongFunctions=$true
+                    }
+                }
+                Invoke-SCuBA -ConfigFilePath (Join-Path -Path $PSScriptRoot -ChildPath "orchestrator_config_test.yaml") -SkipLongFunctions:$false -SilenceBODWarnings
+            }
+
+            It 'uses the command-line false over the config file true' {
+                $script:TestSplat['SkipLongFunctions'] | Should -BeFalse
             }
         }
     }
