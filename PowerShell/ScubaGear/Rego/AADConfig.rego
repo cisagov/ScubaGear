@@ -1519,9 +1519,15 @@ tests contains {
 # MS.AAD.7.1v1
 #--
 
+# Label a privileged user by display name and Entra object ID.
+# privileged_users is keyed by object ID, so the label is unique per account
+# even when two accounts share a display name. Sets of these labels can
+# therefore be counted without merging distinct users.
+PrivilegedUserLabel(Id, User) := sprintf("%v (%v)", [User.DisplayName, Id])
+
 # Save all users that have the Global Admin role
-GlobalAdmins contains User.DisplayName if {
-    some User in input.privileged_users
+GlobalAdmins contains PrivilegedUserLabel(Id, User) if {
+    some Id, User in input.privileged_users
     "Global Administrator" in User.roles
 }
 
@@ -1548,8 +1554,8 @@ tests contains {
 #--
 
 # Save all users that don't have Global Admin role
-NotGlobalAdmins contains User.DisplayName if {
-    some User in input.privileged_users
+NotGlobalAdmins contains PrivilegedUserLabel(Id, User) if {
+    some Id, User in input.privileged_users
     not "Global Administrator" in User.roles
 }
 # Default case is where all privileged users are Global Admins, and avoids a divide-by-zero error
@@ -1593,8 +1599,8 @@ tests contains {
 
 # Save privileged users that do not have cloud
 # only accounts
-FederatedAdmins contains User.DisplayName if {
-    some User in input.privileged_users
+FederatedAdmins contains PrivilegedUserLabel(Id, User) if {
+    some Id, User in input.privileged_users
     not is_null(User.OnPremisesImmutableId)
 }
 
