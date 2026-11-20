@@ -91,11 +91,14 @@ Continue to the [Power Platform Registration](#power-platform-registration) sect
 
 The Power BI Admin portal must be configured to allow service principal access before ScubaGear can retrieve Power BI settings.
 
+> [!NOTE]
+> The steps in this section are for manual configuration. The automated
+> [service principal helper commands](serviceprincipal-workflows.md#initial-setup-workflow)
+> can configure and audit Power BI access, including the tenant setting and
+> allowed security-group membership.
+
 > [!WARNING]
 > Do **not** add the `Tenant.Read.All` permission from the Power BI Service API to the App Registration. This permission conflicts with the tenant setting approach and will result in HTTP 500 errors (commercial) or HTTP 401 errors (GCC). The security group and tenant setting described below is the only required configuration.
-
-> [!IMPORTANT]
-> Power BI does not allow adding service principals directly to this setting — the SP must be a member of a security group, and that group must be added to the setting.
 
 ### Step 1: Create a Security Group
 

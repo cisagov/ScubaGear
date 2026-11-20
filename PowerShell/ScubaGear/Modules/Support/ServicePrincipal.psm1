@@ -2,8 +2,9 @@ using module '..\ScubaConfig\ScubaConfig.psm1'
 
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../Permissions/PermissionsHelper.psm1') -Force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Connection/ConnectHelpers.psm1") -Function Connect-GraphHelper, Get-MsalAccessToken -force
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod, Get-ScubaGearGraphEndpoint -force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Utility/Utility.psm1") -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest, Invoke-ScubaRestMethod, Get-ScubaGearGraphEndpoint, Get-ScubaGearRestEndpoint, Get-ScubaGearCatalog -force
 Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1") -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope -Force
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath "../Providers/ProviderHelpers/PowerBIRestHelper.psm1") -Function Get-PowerBIBaseUrl, Get-PowerBIScope, Get-PowerBITenantSettingsRest -Force
 
 function Compare-ScubaGearRole {
     <#
@@ -11,7 +12,7 @@ function Compare-ScubaGearRole {
         Compares the service principal roles against the ScubaGearSPRole array.
 
     .DESCRIPTION
-        This function will compare the service principal roles against the ScubaGearSPRole array. If the service principal is missing any roles, the function will return the missing roles.
+        Compares directly assigned directory roles against the required roles, returning missing roles and assignments that are not required.
 
     .PARAMETER ServicePrincipalID
         Used to define the AppID of the service principal that will be checked for roles.
@@ -40,6 +41,9 @@ function Compare-ScubaGearRole {
         - RoleName: Name of the role being checked
         - RoleID: ID of the role being checked
         - Missing: Boolean indicating if the role is missing
+            - MissingRoles: All required directory roles that are missing
+            - CurrentRoles: Current role assignments with assignment IDs
+            - ExtraRoles: Directory role assignments not required for the selected products
 
     .NOTES
         Author       : ScubaGear Team
@@ -51,10 +55,11 @@ function Compare-ScubaGearRole {
         [string]$ServicePrincipalID,
 
         [Parameter(Mandatory = $true)]
+        [AllowEmptyCollection()]
         [string[]]$Roles,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         # Add the SkipConnect parameter
@@ -76,37 +81,63 @@ function Compare-ScubaGearRole {
         Write-Verbose "Skipping Microsoft Graph connection in Compare-ScubaGearRole"
     }
 
-    $roleDefinition = @()
-
-    # Assign the service principal to the directory roles
-    $SPRoleAssignment = (Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleAssignment -M365Environment $M365Environment -queryParams @{
+    $roleAssignments = @((Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleAssignment -M365Environment $M365Environment -queryParams @{
         '$filter' = "principalId eq '$ServicePrincipalID'"
-    }).Value
-    if($Null -ne $SPRoleAssignment){
-        $ISGRRole = Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleDefinition -M365Environment $M365Environment -id $SPRoleAssignment.roleDefinitionId
-    }
+    }).Value)
+    $currentRoles = @(
+        foreach ($assignment in $roleAssignments) {
+            $assignmentId = if ($assignment.Id) { $assignment.Id } else { $assignment.id }
+            $roleDefinitionId = if ($assignment.RoleDefinitionId) { $assignment.RoleDefinitionId } else { $assignment.roleDefinitionId }
+            if (-not $assignmentId -or -not $roleDefinitionId) {
+                throw "Role assignment for service principal '$ServicePrincipalID' did not include its assignment ID and role definition ID."
+            }
 
-    # Initialize variables
-    $RoleName = $null
-    $Missing = $false
+            $roleDefinitionResponse = Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleDefinition `
+                -M365Environment $M365Environment -id $roleDefinitionId
+            $roleDefinitions = if ($roleDefinitionResponse.PSObject.Properties['Value']) {
+                @($roleDefinitionResponse.Value)
+            } else {
+                @($roleDefinitionResponse)
+            }
+            $roleDefinition = $roleDefinitions | Where-Object {
+                $definitionId = if ($_.Id) { $_.Id } else { $_.id }
+                $definitionId -eq $roleDefinitionId
+            } | Select-Object -First 1
+            if (-not $roleDefinition -or -not $roleDefinition.DisplayName) {
+                throw "Could not resolve role definition '$roleDefinitionId' for service principal '$ServicePrincipalID'."
+            }
 
-    if($Roles -notcontains $ISGRRole.DisplayName){
-        # Role is missing
-        ForEach ($Role in $Roles) {
-            $RoleName = $Role
-            $roleDefinition += (Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleDefinition -M365Environment $M365Environment -queryParams @{'$filter' = "displayName eq '$RoleName'"}).Value
+            [PSCustomObject]@{
+                RoleName         = $roleDefinition.DisplayName
+                RoleDefinitionId = $roleDefinitionId
+                AssignmentId     = $assignmentId
+            }
         }
-        $Missing = $True
-    }
+    )
+    $requiredRoleNames = @($Roles | Select-Object -Unique)
+    $currentRoleNames = @($currentRoles | ForEach-Object { $_.RoleName } | Select-Object -Unique)
+    $missingRoles = @($requiredRoleNames | Where-Object { $_ -notin $currentRoleNames })
+    $missingRoleDefinitions = @(
+        foreach ($roleName in $missingRoles) {
+            $definitionResponse = Invoke-GraphDirectly -Commandlet Get-MgRoleManagementDirectoryRoleDefinition `
+                -M365Environment $M365Environment -queryParams @{ '$filter' = "displayName eq '$roleName'" }
+            if ($definitionResponse.PSObject.Properties['Value']) {
+                $definitionResponse.Value
+            } else {
+                $definitionResponse
+            }
+        }
+    )
+    $extraRoles = @($currentRoles | Where-Object { $_.RoleName -notin $requiredRoleNames })
 
-    # Return an object for the role name, ID, and Missing status
-    $RoleObject = [PSCustomObject]@{
-        RoleName = $RoleName
-        RoleID = $roleDefinition.Id
-        Missing = $Missing
+    return [PSCustomObject]@{
+        RoleName    = if ($missingRoles.Count -eq 1) { $missingRoles[0] } else { $missingRoles }
+        RoleID      = @($missingRoleDefinitions | ForEach-Object { $_.Id } | Where-Object { $_ })
+        Missing     = ($missingRoles.Count -gt 0)
+        MissingRoles = if ($missingRoles.Count -gt 0) { $missingRoles } else { $false }
+        CurrentRoles = $currentRoles
+        ExtraRoles   = if ($extraRoles.Count -gt 0) { $extraRoles } else { $false }
     }
-
-    return $RoleObject
 }
 
 function Compare-ScubaGearPermission {
@@ -135,7 +166,7 @@ function Compare-ScubaGearPermission {
         Used to pass in the service principal permissions if already obtained. This can be used to skip the call to Microsoft Graph to get the service principal permissions.
 
     .PARAMETER ProductNames
-        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", and "*". The default is to check for all permissions.
+        Used to filter the required permissions by product. This can be used to only check for permissions required by specific products. Valid values are "aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", "powerbi", and "*". The default is to check for all permissions.
 
     .EXAMPLE
         Compare-ScubaGearPermission -ServicePrincipalID "AppID" -AppRoleIDs $AppRoleIDs -M365Environment commercial
@@ -172,7 +203,7 @@ function Compare-ScubaGearPermission {
         [object]$AppRoleIDs,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -182,7 +213,7 @@ function Compare-ScubaGearPermission {
         [Object]$SPPerms,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]$ProductNames
     )
 
@@ -473,7 +504,7 @@ function Set-ScubaGearRole {
         [string]$roleDefinitionID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -569,7 +600,7 @@ function Get-ScubaGearAppRoleID {
         [object]$ScubaGearSPPermissions,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -694,7 +725,7 @@ function Set-AppRegistrationPermission {
         [array]$ScubaGearSPPermissions,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -884,7 +915,7 @@ function Get-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be assessing and only compare against those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', 'powerbi', '*' (which includes all products)
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames 'aad'
@@ -903,8 +934,10 @@ function Get-ScubaGearAppPermission {
         - MissingPermissions: Array of missing permissions
         - ExtraPermissions: Array of extra permissions
         - MissingRoles: Array of missing directory roles
+        - ExtraRoles: Unneeded directory role assignment objects, including assignment IDs
         - DelegatedPermissions: Array of delegated permissions (if any)
         - PowerPlatformRegistered: Power Platform registration status
+        - PowerBIRegistered: Power BI registration status
         - Status: Overall status message
         - FixPermissionIssues: Command to fix issues (if any exist)
 
@@ -925,11 +958,11 @@ function Get-ScubaGearAppPermission {
         [string]$AppID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]$ProductNames = '*'
     )
 
@@ -937,7 +970,7 @@ function Get-ScubaGearAppPermission {
 
     try {
         # Connect to Microsoft Graph
-        $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes @("Application.Read.All", "RoleManagement.Read.Directory")
+        $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes @("Application.Read.All", "RoleManagement.Read.Directory", "Group.Read.All")
     }
     catch {
         Write-Error "Failed to connect to Microsoft Graph: $($_.Exception.Message)"
@@ -945,8 +978,8 @@ function Get-ScubaGearAppPermission {
     }
 
     if($ProductNames -contains '*'){
-        # If wildcard is specified, include all products
-        $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
+        # Expand to implemented products only
+        $ProductNames = @([ScubaConfig]::GetSupportedProducts())
     }
 
     # Get permissions and roles (these are local operations)
@@ -965,6 +998,11 @@ function Get-ScubaGearAppPermission {
 
     # Check Power Platform registration - always check to report current status
     $PowerPlatformCheck = Test-PowerPlatformAppRegistration -AppID $AppID -TenantId $SP.AppOwnerOrganizationId -M365Environment $M365Environment
+
+    # Check Power BI registration - always check to report current status
+    $PowerBIState = Get-PowerBIAppRegistrationState -AppID $AppID -ServicePrincipalID $SP.Id -TenantId $SP.AppOwnerOrganizationId -M365Environment $M365Environment
+    $PowerBICheck = $PowerBIState.PowerBIRegistered
+    $PowerBIGroupMembership = $PowerBIState.GroupMembership
 
     # STEP 2: Get the application registration
     $appReg = (Invoke-GraphDirectly -Commandlet Get-MgBetaApplication -M365Environment $M365Environment -queryParams @{
@@ -1302,10 +1340,21 @@ function Get-ScubaGearAppPermission {
     }
 
     # Compare the service principal to the directory roles
-    if($Null -ne $ScubaGearSPRole) {
-        Write-Verbose "Comparing service principal roles"
-        $SPRoleAssignment = Compare-ScubaGearRole -ServicePrincipalID $SP.Id -Roles $ScubaGearSPRole -M365Environment $M365Environment -SkipConnect
-    }
+    Write-Verbose "Comparing service principal roles"
+    $SPRoleAssignment = Compare-ScubaGearRole -ServicePrincipalID $SP.Id -Roles @($ScubaGearSPRole) -M365Environment $M365Environment -SkipConnect
+    $MissingRoleNames = @(
+        if ($SPRoleAssignment.PSObject.Properties['MissingRoles'] -and $SPRoleAssignment.MissingRoles -ne $false) {
+            $SPRoleAssignment.MissingRoles
+        } elseif ($SPRoleAssignment.Missing -eq $true) {
+            $SPRoleAssignment.RoleName
+        }
+    )
+    # Keep the result as an array so Count checks also work for one role in Windows PowerShell 5.1.
+    $ExtraRoleAssignments = @(
+        if ($SPRoleAssignment.PSObject.Properties['ExtraRoles'] -and $SPRoleAssignment.ExtraRoles -ne $false) {
+            $SPRoleAssignment.ExtraRoles
+        }
+    )
 
     # Check if Power Platform is registered (only if it's in the product list)
     $powerPlatformOK = $true
@@ -1317,8 +1366,17 @@ function Get-ScubaGearAppPermission {
         $powerPlatformOK = $false
     }
 
+     # Check if Power BI is configured (only if it's in the product list)
+    $powerBIOK = $true
+    if ($ProductNames -contains 'powerbi' -and $PowerBICheck -eq $false) {
+        $powerBIOK = $false
+    }
+    if ($ProductNames -notcontains 'powerbi' -and $PowerBIGroupMembership -ne $false) {
+        $powerBIOK = $false
+    }
+
     # Create Status based on all conditions with detailed information
-    if (($SPMissingPerms -eq $false) -and ($PermissionsNotInManifest -eq $false) -and ($SPExtraPerms -eq $false) -and ($DelegatedPerms -eq $false) -and (-not $SPRoleAssignment.Missing) -and ($powerPlatformOK -eq $true)) {
+    if (($SPMissingPerms -eq $false) -and ($PermissionsNotInManifest -eq $false) -and ($SPExtraPerms -eq $false) -and ($DelegatedPerms -eq $false) -and (-not $SPRoleAssignment.Missing) -and ($ExtraRoleAssignments.Count -eq 0) -and ($powerPlatformOK -eq $true) -and ($powerBIOK -eq $true)) {
         $Status = "No action needed, service principal is setup correctly."
     } else {
         $statusParts = @()
@@ -1358,8 +1416,13 @@ function Get-ScubaGearAppPermission {
         }
 
         # Add missing roles details
-        if ($SPRoleAssignment.Missing -eq $true -and $SPRoleAssignment.RoleName) {
-            $statusParts += "assign missing role [$($SPRoleAssignment.RoleName)]"
+        if ($MissingRoleNames.Count -gt 0) {
+            $statusParts += "assign missing role(s) [$($MissingRoleNames -join ', ')]"
+        }
+
+        if ($ExtraRoleAssignments.Count -gt 0) {
+            $extraRoleNames = @($ExtraRoleAssignments | ForEach-Object { $_.RoleName } | Select-Object -Unique)
+            $statusParts += "remove unneeded directory role assignment(s) [$($extraRoleNames -join ', ')]"
         }
 
         # Add Power Platform registration status if it's registered but not in the product list
@@ -1368,6 +1431,17 @@ function Get-ScubaGearAppPermission {
         }
         elseif ($PowerPlatformCheck -eq $false -and $ProductNames -contains 'powerplatform') {
             $statusParts += "register the app with Power Platform"
+        }
+
+        # Add Power BI registration status
+        if ($PowerBICheck -eq $false -and $ProductNames -contains 'powerbi') {
+            $statusParts += "configure Power BI read-only admin API access (add service principal to allowed Entra security group)"
+        }
+        elseif ($PowerBIGroupMembership -eq $true -and $ProductNames -notcontains 'powerbi') {
+            $statusParts += "remove service principal from Power BI read-only admin API allowed security group(s) (not required for selected products)"
+        }
+        elseif ($null -eq $PowerBIGroupMembership -and $ProductNames -notcontains 'powerbi') {
+            $statusParts += "verify Power BI allowed-group membership (status check failed; see warnings)"
         }
 
         # Combine all parts
@@ -1390,8 +1464,11 @@ function Get-ScubaGearAppPermission {
         ExtraPermissions         = $SPExtraPerms
         ExtraPermissionsDetails  = if ($ExtraPermsWithDetails.Count -gt 0) { $ExtraPermsWithDetails } else { $false }
         DelegatedPermissions     = $DelegatedPerms
-        MissingRoles             = if ($SPRoleAssignment.Missing -eq $true) { @($SPRoleAssignment.RoleName) } else { $False }
+        MissingRoles             = if ($MissingRoleNames.Count -gt 0) { $MissingRoleNames } else { $False }
+        ExtraRoles               = if ($ExtraRoleAssignments.Count -gt 0) { $ExtraRoleAssignments } else { $False }
         PowerPlatformRegistered  = $PowerPlatformCheck
+        PowerBIRegistered        = $PowerBICheck
+        PowerBIGroupMembership   = $PowerBIGroupMembership
         ScubaGearSPPermissions   = $ScubaGearSPPermissions
         CurrentPermissions       = $SPPermsApplication
         CurrentDelegatedGrants   = $SPPermsDelegated
@@ -1400,7 +1477,7 @@ function Get-ScubaGearAppPermission {
     }
 
     # Output the object for pipeline use
-    if($InputObject.MissingPermissions -or $InputObject.PermissionsNotInManifest -or $InputObject.ExtraPermissions -or $InputObject.MissingRoles -or $InputObject.DelegatedPermissions -or ($InputObject.PowerPlatformRegistered -eq $false -and $InputObject.ProductNames -contains 'powerplatform') -or ($InputObject.PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform')) {
+    if($InputObject.MissingPermissions -or $InputObject.PermissionsNotInManifest -or $InputObject.ExtraPermissions -or $InputObject.MissingRoles -or $InputObject.ExtraRoles -or $InputObject.DelegatedPermissions -or ($InputObject.PowerPlatformRegistered -eq $false -and $InputObject.ProductNames -contains 'powerplatform') -or ($InputObject.PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform') -or ($InputObject.PowerBIRegistered -eq $false -and $InputObject.ProductNames -contains 'powerbi') -or ($InputObject.ProductNames -notcontains 'powerbi' -and $InputObject.PowerBIGroupMembership -ne $false)) {
         # Add new property to $InputObject for FixPermissionIssues
         $ProductNamesString = ($ProductNames | ForEach-Object { "'$_'" }) -join ', '
         $InputObject | Add-Member -MemberType NoteProperty -Name FixPermissionIssues -Value "Get-ScubaGearAppPermission -AppID $AppID -M365Environment $M365Environment -ProductNames $ProductNamesString | Set-ScubaGearAppPermission" -Force
@@ -1420,7 +1497,8 @@ function Set-ScubaGearAppPermission {
         2. Accept direct parameters for standalone operation (manual mode)
 
     .PARAMETER InputObject
-        The object output from Get-ScubaGearAppPermission, containing AppID, M365Environment, MissingPermissions, and MissingRoles.
+        The object output from Get-ScubaGearAppPermission, containing AppID, M365Environment, MissingPermissions, MissingRoles, and any unneeded directory role assignments.
+        Remediation removes roles not required by the selected products, regardless of who assigned them.
         Used when piping from Get-ScubaGearAppPermission.
 
     .PARAMETER AppID
@@ -1432,7 +1510,7 @@ function Set-ScubaGearAppPermission {
 
     .PARAMETER ProductNames
         Products to configure permissions for. Required when not using pipeline.
-        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*'
+        Valid values are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', 'powerbi', '*'
 
     .EXAMPLE
         Get-ScubaGearAppPermission -AppID "AppID" -M365Environment commercial -ProductNames "aad" | Set-ScubaGearAppPermission
@@ -1484,14 +1562,14 @@ function Set-ScubaGearAppPermission {
             Mandatory = $true,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(
             Mandatory = $false,
             ParameterSetName = 'Standalone'
         )]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]$ProductNames = '*'
     )
 
@@ -1534,11 +1612,23 @@ function Set-ScubaGearAppPermission {
         $delegatedPermissions = $InputObject.DelegatedPermissions
         $CurrentDelegatedGrants = $InputObject.CurrentDelegatedGrants
         $MissingRoles = $InputObject.MissingRoles
+        # Keep the result as an array so Count checks also work for one role in Windows PowerShell 5.1.
+        $DetectedExtraRoles = @(
+            if ($InputObject.PSObject.Properties['ExtraRoles'] -and $InputObject.ExtraRoles -ne $false) {
+                $InputObject.ExtraRoles
+            }
+        )
         $ServicePrincipalID = $InputObject.ServicePrincipalID
         $ScubaGearSPPermissions = $InputObject.ScubaGearSPPermissions
         $CurrentPermissions = $InputObject.CurrentPermissions
         $AppRoleIDs = $InputObject.AppRoleIDs
         $PowerPlatformRegistered = $InputObject.PowerPlatformRegistered
+        $PowerBIRegistered = $InputObject.PowerBIRegistered
+        $PowerBIGroupMembership = if ($InputObject.PSObject.Properties['PowerBIGroupMembership']) {
+            $InputObject.PowerBIGroupMembership
+        } else {
+            ($PowerBIRegistered -eq $true)
+        }
 
         if (-not $AppID -or -not $M365Environment) {
             Write-Warning "AppID and M365Environment are required."
@@ -1552,11 +1642,28 @@ function Set-ScubaGearAppPermission {
         $hasMissingPerms = ($MissingPermissions -ne $false -and @($MissingPermissions).Count -gt 0)
         $hasPermsNotInManifest = ($PermissionsNotInManifest -ne $false -and @($PermissionsNotInManifest).Count -gt 0)
         $hasMissingRoles = ($MissingRoles -ne $false -and @($MissingRoles).Count -gt 0)
+        $RoleAssignmentsToRemove = @()
+        if ($DetectedExtraRoles.Count -gt 0) {
+            if (-not $InputObject.ProductNames -or @($InputObject.ProductNames).Count -eq 0) {
+                Write-Warning "Cannot determine required directory roles without ProductNames; skipping extra-role removal."
+            } else {
+                # Recheck against this run's products before removing any reported extra role.
+                $RequiredRoleNames = @(Get-ScubaGearServicePrincipalRole -Product $InputObject.ProductNames -Environment $M365Environment)
+                $RoleAssignmentsToRemove = @(
+                    $DetectedExtraRoles | Where-Object {
+                        $_.RoleName -notin $RequiredRoleNames
+                    }
+                )
+            }
+        }
+        $hasExtraRoles = $RoleAssignmentsToRemove.Count -gt 0
         $needsPowerPlatform = ($PowerPlatformRegistered -eq $false)
         $hasUnwantedPowerPlatform = ($PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform')
+        $needsPowerBI = ($InputObject.PSObject.Properties['PowerBIRegistered'] -and $InputObject.PowerBIRegistered -eq $false -and $InputObject.ProductNames -contains 'powerbi')
+        $hasUnwantedPowerBI = ($InputObject.ProductNames -notcontains 'powerbi' -and $PowerBIGroupMembership -ne $false)
 
         # Check if anything needs to be done
-        $needsChanges = $hasDelegatedPerms -or $hasExtraPerms -or $hasMissingPerms -or $hasPermsNotInManifest -or $hasMissingRoles -or $needsPowerPlatform -or $hasUnwantedPowerPlatform
+        $needsChanges = $hasDelegatedPerms -or $hasExtraPerms -or $hasMissingPerms -or $hasPermsNotInManifest -or $hasMissingRoles -or $hasExtraRoles -or $needsPowerPlatform -or $hasUnwantedPowerPlatform -or $needsPowerBI -or $hasUnwantedPowerBI
 
         if (-not $needsChanges) {
             Write-Output "No changes needed - service principal is already configured correctly."
@@ -1570,7 +1677,7 @@ function Set-ScubaGearAppPermission {
         # Only connect if we're actually making changes (not in WhatIf mode)
         if (-not $WhatIfPreference) {
             try {
-                $allScopes = @("Application.ReadWrite.All", "AppRoleAssignment.ReadWrite.All", "RoleManagement.ReadWrite.Directory")
+                $allScopes = @("Application.ReadWrite.All", "AppRoleAssignment.ReadWrite.All", "RoleManagement.ReadWrite.Directory", "Group.ReadWrite.All")
                 $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes $allScopes
                 Write-Verbose "Successfully connected to Microsoft Graph"
             } catch {
@@ -2021,6 +2128,30 @@ function Set-ScubaGearAppPermission {
             }
         }
 
+        # STEP 3b: Remove directory roles not required by the selected products.
+        if ($hasExtraRoles) {
+            foreach ($roleAssignment in $RoleAssignmentsToRemove) {
+                $roleName = $roleAssignment.RoleName
+                $assignmentId = $roleAssignment.AssignmentId
+                if (-not $roleName -or -not $assignmentId) {
+                    Write-Warning "Cannot remove unneeded directory role assignment because its role name or role-assignment ID is missing."
+                    continue
+                }
+
+                if ($PSCmdlet.ShouldProcess($target, "Remove unneeded directory role '$roleName'")) {
+                    try {
+                        Invoke-GraphDirectly -Commandlet Remove-MgRoleManagementDirectoryRoleAssignment `
+                            -M365Environment $M365Environment -id $assignmentId
+                        Write-Output "Removed unneeded directory role assignment: $roleName"
+                    } catch {
+                        Write-Warning "Failed to remove unneeded directory role '$roleName': $($_.Exception.Message)"
+                    }
+                } else {
+                    Write-Output "WhatIf: Would remove unneeded directory role '$roleName' from $AppID"
+                }
+            }
+        }
+
         # STEP 4a: Remove Power Platform registration if it's registered but not in ProductNames
         if ($PowerPlatformRegistered -eq $true -and $InputObject.ProductNames -notcontains 'powerplatform') {
             if ($PSCmdlet.ShouldProcess($target, "Remove Power Platform registration (not required for selected products)")) {
@@ -2073,6 +2204,48 @@ function Set-ScubaGearAppPermission {
                 Write-Output "WhatIf: Would register application with Power Platform"
             }
         }
+
+        # STEP 4c: Fix Power BI configuration if needed
+        if ($InputObject.PSObject.Properties['PowerBIRegistered'] -and $InputObject.PowerBIRegistered -eq $false -and $InputObject.ProductNames -contains 'powerbi') {
+            if ($PSCmdlet.ShouldProcess($target, "Configure Power BI read-only admin API access")) {
+                try {
+                    $sp = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                        '$filter' = "id eq '$ServicePrincipalID'"
+                    }).Value
+
+                    if ($sp) {
+                        $TenantId = $sp.AppOwnerOrganizationId
+                        Write-Verbose "Attempting to configure Power BI read-only admin API access"
+
+                        Set-PowerBIAppRegistration -AppID $AppID -ServicePrincipalID $ServicePrincipalID -TenantId $TenantId -M365Environment $M365Environment
+                        Write-Output "Successfully configured Power BI read-only admin API access"
+                    } else {
+                        Write-Warning "Could not retrieve tenant ID for Power BI configuration"
+                    }
+                } catch {
+                    Write-Warning "Failed to configure Power BI app registration: $($_.Exception.Message)"
+                }
+            } else {
+                Write-Output "WhatIf: Would configure Power BI read-only admin API access"
+            }
+        }
+
+        # STEP 4d: Remove Power BI access if it is not needed for the selected products
+        if ($hasUnwantedPowerBI) {
+            if ($PSCmdlet.ShouldProcess($target, "Remove service principal from Power BI allowed security group(s) (not required for selected products)")) {
+                $sp = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                    '$filter' = "id eq '$ServicePrincipalID'"
+                }).Value
+
+                if (-not $sp) {
+                    throw "Could not retrieve service principal '$ServicePrincipalID' to remove Power BI group membership."
+                }
+
+                Set-PowerBIAppRegistration -AppID $AppID -ServicePrincipalID $ServicePrincipalID -TenantId $sp.AppOwnerOrganizationId -M365Environment $M365Environment -Remove -Confirm:$false
+            } else {
+                Write-Output "WhatIf: Would remove service principal from Power BI allowed security group(s)"
+            }
+        }
     }
 
     end {
@@ -2100,7 +2273,7 @@ function Get-PowerPlatformAdminToken {
         [string]$TenantId,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -2171,7 +2344,7 @@ function Set-PowerPlatformAppRegistration {
         [string]$TenantId,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory = $false)]
@@ -2184,7 +2357,9 @@ function Set-PowerPlatformAppRegistration {
     $Token = Get-PowerPlatformAdminToken -TenantId $TenantId -M365Environment $M365Environment
 
     # BAP management-app endpoint (see: https://learn.microsoft.com/en-us/power-platform/admin/powerplatform-api-create-service-principal).
-    $Endpoint = "/providers/Microsoft.BusinessAppPlatform/adminApplications/$AppID`?api-version=2020-10-01"
+    $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Set-PowerPlatformAppRegistration' -PathParameters @{
+        AppID = $AppID
+    }
 
     $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method $Method -Endpoint $Endpoint
 }
@@ -2233,13 +2408,13 @@ function Test-PowerPlatformAppRegistration {
         [string]$TenantId,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
     try {
         $Token = Get-PowerPlatformAdminToken -TenantId $TenantId -M365Environment $M365Environment
-        $Endpoint = "/providers/Microsoft.BusinessAppPlatform/adminApplications?api-version=2020-10-01"
+        $Endpoint = Get-ScubaGearRestEndpoint -FunctionName 'Test-PowerPlatformAppRegistration'
 
         # List and filter rather than GET by ID, so an unregistered app isn't a noisy 404
         $Response = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Endpoint $Endpoint
@@ -2252,6 +2427,835 @@ function Test-PowerPlatformAppRegistration {
     catch {
         Write-Warning "Failed to check Power Platform registration: $($_.Exception.Message)"
         return $false
+    }
+}
+
+function Get-PowerBIAdminToken {
+    <#
+    .SYNOPSIS
+        Acquires a delegated admin access token and base URL for the Power BI / Fabric Admin REST API.
+
+    .NOTES
+        Configuring tenant settings requires a delegated admin token with Fabric/Power BI Administrator role.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
+        [string]$M365Environment
+    )
+
+    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
+    $PBIClientId = $ClientIdHash.powerbi
+    $Scope       = Get-PowerBIScope -M365Environment $M365Environment
+    $BaseUrl     = Get-PowerBIBaseUrl -M365Environment $M365Environment
+
+    $AccessToken = Get-MsalAccessToken -Scope $Scope -ClientId $PBIClientId -Tenant $TenantId -M365Environment $M365Environment
+
+    return [PSCustomObject]@{
+        BaseUrl     = $BaseUrl
+        AccessToken = $AccessToken
+    }
+}
+
+function Get-ServicePrincipalMemberGroupIds {
+    <#
+    .SYNOPSIS
+        Checks transitive service principal group membership in batches of at most 20 groups.
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ServicePrincipalID,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$GroupIds,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
+        [string]$M365Environment
+    )
+
+    if (@($GroupIds | Where-Object { [string]::IsNullOrWhiteSpace($_) }).Count -gt 0) {
+        throw "Group IDs must not be empty when checking service principal membership."
+    }
+    $UniqueGroupIds = @($GroupIds | Select-Object -Unique)
+    if ($UniqueGroupIds.Count -eq 0) {
+        return @()
+    }
+
+    $Endpoint = Get-ScubaGearGraphEndpoint -CmdletName 'Confirm-MgServicePrincipalMemberGroup' `
+        -Environment $M365Environment -Id $ServicePrincipalID
+    if (-not [System.Uri]::IsWellFormedUriString($Endpoint, [System.UriKind]::Absolute)) {
+        throw "Unable to resolve the checkMemberGroups endpoint for environment '$M365Environment'."
+    }
+
+    $MatchedGroupIds = @()
+    # Graph checkMemberGroups accepts at most 20 group IDs per request.
+    for ($Offset = 0; $Offset -lt $UniqueGroupIds.Count; $Offset += 20) {
+        $BatchSize = [Math]::Min(20, $UniqueGroupIds.Count - $Offset)
+        $GroupIdBatch = @($UniqueGroupIds[$Offset..($Offset + $BatchSize - 1)])
+        $CheckBody = @{ groupIds = $GroupIdBatch } | ConvertTo-Json
+        $CheckResponse = Invoke-GraphDirectly -Uri $Endpoint -Method POST -Body $CheckBody
+        if ($CheckResponse -is [hashtable] -and $CheckResponse.ContainsKey('value') -and $null -ne $CheckResponse['value']) {
+            $BatchMatches = @($CheckResponse['value'])
+        } elseif ($null -ne $CheckResponse -and $CheckResponse.PSObject.Properties['value'] -and $null -ne $CheckResponse.value) {
+            $BatchMatches = @($CheckResponse.value)
+        } else {
+            throw "The checkMemberGroups response did not contain a valid value."
+        }
+        $MatchedGroupIds += @($BatchMatches | ForEach-Object { [string]$_ })
+    }
+
+    return @($MatchedGroupIds | Select-Object -Unique)
+}
+
+function Get-PowerBIAppRegistrationState {
+    <#
+    .SYNOPSIS
+        Gets the Power BI read-only admin API registration and allowed-group membership state.
+
+    .DESCRIPTION
+        Reports whether the Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs'
+        is enabled and whether the service principal is a member of an allowed security group.
+
+    .PARAMETER AppId
+        The application (client) ID of the service principal.
+
+    .PARAMETER ServicePrincipalID
+        The object ID of the service principal in the tenant. If omitted, resolved via AppId.
+
+    .PARAMETER TenantId
+        The tenant ID where the service principal exists.
+
+    .PARAMETER M365Environment
+        The Microsoft 365 environment. Options are commercial, gcc, gcchigh, dod.
+
+    .OUTPUTS
+        Returns the effective registration state and allowed-group membership state.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({
+            if ([guid]::TryParse($_, [ref][guid]::Empty)) {
+                return $true
+            }
+            throw "AppID must be a valid GUID format: $($_)"
+        })]
+        [string]$AppID,
+
+        [Parameter(Mandatory = $false)]
+        [string]$ServicePrincipalID,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
+        [string]$M365Environment
+    )
+
+    try {
+        if ([string]::IsNullOrEmpty($ServicePrincipalID)) {
+            $sp = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                '$filter' = "appId eq '$AppID'"
+            }).Value
+            if (-not $sp) {
+                Write-Warning "Could not find service principal with AppID '$AppID' when checking Power BI access."
+                return [PSCustomObject]@{
+                    PowerBIRegistered = $false
+                    GroupMembership   = $false
+                }
+            }
+            $ServicePrincipalID = $sp.Id
+        }
+
+        $Token = Get-PowerBIAdminToken -TenantId $TenantId -M365Environment $M365Environment
+        $TenantSettingsRaw = Get-PowerBITenantSettingsRest -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken
+
+        $TenantSettings = $TenantSettingsRaw.tenantSettings
+        if (-not $TenantSettings) {
+            throw "Power BI returned no tenant settings."
+        }
+
+        $Setting = $TenantSettings | Where-Object { $_.settingName -eq "AllowServicePrincipalsUseReadAdminAPIs" }
+        $SettingEnabled = ($Setting -and $Setting.enabled -eq $true)
+        if (-not $SettingEnabled) {
+            Write-Verbose "Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs' is not enabled."
+        }
+
+        $AllowedGroups = if ($Setting.PSObject.Properties['enabledSecurityGroups'] -and $Setting.enabledSecurityGroups) {
+            @($Setting.enabledSecurityGroups)
+        } else {
+            @()
+        }
+
+        if ($AllowedGroups.Count -eq 0) {
+            Write-Verbose "Power BI setting 'AllowServicePrincipalsUseReadAdminAPIs' is enabled but has no enabledSecurityGroups specified."
+        }
+
+        $HasGroupMembership = $false
+        $MembershipCheckFailed = $false
+        $AllowedGroupIds = @(foreach ($group in $AllowedGroups) {
+            $gid = if ($group.graphId) { $group.graphId } else { $group.id }
+            if ($gid) { [string]$gid }
+        })
+
+        # checkMemberGroups is transitive, so distinguish nested membership from direct group membership below.
+        # Check membership using checkMemberGroups API
+        if ($AllowedGroupIds.Count -gt 0) {
+            try {
+                $matchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
+                    -GroupIds $AllowedGroupIds -M365Environment $M365Environment)
+
+                if (@($matchedGroupIds).Count -gt 0) {
+                    Write-Verbose "Service principal $AppID is a verified member of allowed Power BI group(s): $($matchedGroupIds -join ', ')."
+                    $HasGroupMembership = $true
+                }
+            } catch {
+                Write-Warning "checkMemberGroups check failed while checking Power BI access: $($_.Exception.Message)"
+                $MembershipCheckFailed = $true
+            }
+        }
+
+        # Additionally: check if the service principal is a direct member of any of the allowed security groups if configured in Power BI Admin Settings
+        foreach ($group in $AllowedGroups) {
+            $groupId = if ($group.graphId) { $group.graphId } else { $group.id }
+            if ([string]::IsNullOrEmpty($groupId)) { continue }
+
+            try {
+                $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $groupId
+                $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
+                if ($members | Where-Object { ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID) }) {
+                    Write-Verbose "Service principal $AppID is a member of allowed Power BI group '$($group.name)' ($groupId)."
+                    $HasGroupMembership = $true
+                    break
+                }
+            }
+            catch {
+                Write-Warning "Unable to check membership of Power BI allowed group '$groupId': $($_.Exception.Message)"
+                $MembershipCheckFailed = $true
+            }
+        }
+
+        if (-not $HasGroupMembership) {
+            Write-Verbose "Service principal $AppID was not found in any of the allowed Power BI security groups."
+        }
+
+        return [PSCustomObject]@{
+            PowerBIRegistered = [bool]($SettingEnabled -and $HasGroupMembership)
+            # A failed check is unknown, not proof that the service principal is not a member.
+            GroupMembership   = if ($HasGroupMembership) { $true } elseif ($MembershipCheckFailed) { $null } else { $false }
+        }
+    }
+    catch {
+        Write-Warning "Failed to check Power BI registration status: $($_.Exception.Message)"
+        return [PSCustomObject]@{
+            PowerBIRegistered = $false
+            GroupMembership   = $null
+        }
+    }
+}
+
+function Test-PowerBIAppRegistration {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({
+            if ([guid]::TryParse($_, [ref][guid]::Empty)) {
+                return $true
+            }
+            throw "AppID must be a valid GUID format: $($_)"
+        })]
+        [string]$AppID,
+
+        [Parameter(Mandatory = $false)]
+        [string]$ServicePrincipalID,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
+        [string]$M365Environment
+    )
+
+    (Get-PowerBIAppRegistrationState @PSBoundParameters).PowerBIRegistered
+}
+
+function Set-PowerBIAppRegistration {
+    <#
+    .SYNOPSIS
+        Configures Power BI read-only admin API access for a service principal.
+
+    .DESCRIPTION
+        Ensures the service principal is a member of an Entra security group allowed to access
+        read-only Power BI admin APIs and that the 'AllowServicePrincipalsUseReadAdminAPIs' tenant
+        setting is enabled. If security groups are already configured in the tenant setting, the user
+        is prompted interactively whether to add the service principal to an existing group or to
+        create and append a dedicated new group. Existing groups are preserved unless the user
+        confirms removal of stale references to groups that cannot be found in Entra ID. Cleanup
+        and the chosen group are saved in one tenant-setting update. With -Remove, the
+        service principal is removed from each allowed group it directly belongs to; the groups and
+        tenant setting are left unchanged.
+
+    .PARAMETER AppId
+        The application (client) ID of the service principal.
+
+    .PARAMETER ServicePrincipalID
+        The object ID of the service principal. If omitted, resolved via AppId.
+
+    .PARAMETER TenantId
+        The tenant ID where the service principal exists.
+
+    .PARAMETER M365Environment
+        The Microsoft 365 environment. Options are commercial, gcc, gcchigh, dod.
+
+    .PARAMETER GroupName
+        The name of the dedicated Entra security group to create/use if appending a new group.
+        Default is "ScubaGear PowerBI Service Principals".
+
+    .PARAMETER Force
+        If specified, suppresses interactive prompts and defaults to creating/appending the dedicated group.
+        Does not authorize stale-reference cleanup; remove stale entries manually before using -Force.
+
+    .PARAMETER Remove
+        Removes the service principal from Power BI allowed security groups without deleting the groups
+        or changing the tenant setting.
+
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({
+            if ([guid]::TryParse($_, [ref][guid]::Empty)) {
+                return $true
+            }
+            throw "AppID must be a valid GUID format: $($_)"
+        })]
+        [string]$AppID,
+
+        [Parameter(Mandatory = $false)]
+        [string]$ServicePrincipalID,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$TenantId,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
+        [string]$M365Environment,
+
+        [Parameter(Mandatory = $false)]
+        [string]$GroupName = "ScubaGear PowerBI Service Principals",
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Force,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$Remove
+    )
+
+    try {
+        if ([string]::IsNullOrEmpty($ServicePrincipalID)) {
+            $sp = (Invoke-GraphDirectly -Commandlet Get-MgServicePrincipal -M365Environment $M365Environment -queryParams @{
+                '$filter' = "appId eq '$AppID'"
+            }).Value
+            if (-not $sp) {
+                throw "Could not find service principal with AppID '$AppID'."
+            }
+            $ServicePrincipalID = $sp.Id
+        }
+
+        $Token = Get-PowerBIAdminToken -TenantId $TenantId -M365Environment $M365Environment
+        $TenantSettingsRaw = Get-PowerBITenantSettingsRest -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken
+
+        $TenantSettings = $TenantSettingsRaw.tenantSettings
+        if (-not $TenantSettings) {
+            throw "Power BI returned no tenant settings."
+        }
+
+        $ReadAdminAPISetting = $TenantSettings | Where-Object { $_.settingName -eq "AllowServicePrincipalsUseReadAdminAPIs" }
+        $ExistingGroups = @(
+            if ($ReadAdminAPISetting -and $ReadAdminAPISetting.PSObject.Properties['enabledSecurityGroups'] -and $ReadAdminAPISetting.enabledSecurityGroups) {
+                $ReadAdminAPISetting.enabledSecurityGroups
+            }
+        )
+
+        if ($Remove) {
+            $AllowedGroupIds = @(foreach ($grp in $ExistingGroups) {
+                $groupId = if ($grp.graphId) { $grp.graphId } else { $grp.id }
+                if ($groupId) { [string]$groupId }
+            })
+            $AllowedGroupIds = @($AllowedGroupIds | Select-Object -Unique)
+
+            if ($AllowedGroupIds.Count -eq 0) {
+                Write-Verbose "No allowed Power BI security groups are configured."
+                return
+            }
+
+            $DirectMemberships = @()
+            $LiveAllowedGroupIds = @()
+            foreach ($grp in $ExistingGroups) {
+                $groupId = if ($grp.graphId) { $grp.graphId } else { $grp.id }
+                if ([string]::IsNullOrEmpty($groupId)) { continue }
+                if ($LiveAllowedGroupIds -contains [string]$groupId) { continue }
+
+                try {
+                    $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $groupId
+                } catch {
+                    if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) {
+                        $groupName = if ($grp.name) { $grp.name } elseif ($grp.displayName) { $grp.displayName } else { $groupId }
+                        Write-Warning "Power BI allowed group '$groupName' ($groupId) was not found in Microsoft Entra ID. Skipping it during service principal removal; the tenant-setting entry was not changed."
+                        continue
+                    }
+                    throw "Unable to inspect Power BI allowed group '$groupId' during removal: $($_.Exception.Message)"
+                }
+
+                $LiveAllowedGroupIds += [string]$groupId
+                $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
+                $servicePrincipalMember = $members | Where-Object {
+                    ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID)
+                } | Select-Object -First 1
+
+                if ($servicePrincipalMember) {
+                    $DirectMemberships += [PSCustomObject]@{
+                        GroupId   = [string]$groupId
+                        GroupName = if ($grp.name) { [string]$grp.name } elseif ($grp.displayName) { [string]$grp.displayName } else { [string]$groupId }
+                    }
+                }
+            }
+
+            if ($LiveAllowedGroupIds.Count -eq 0) {
+                Write-Verbose "No live allowed Power BI security groups were found."
+                return
+            }
+
+            $MatchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
+                -GroupIds $LiveAllowedGroupIds -M365Environment $M365Environment)
+
+            # The transitive check finds nested memberships; only direct memberships can be removed here.
+            $DirectGroupIds = @($DirectMemberships | ForEach-Object { $_.GroupId })
+            $IndirectGroupIds = @($MatchedGroupIds | Where-Object { $DirectGroupIds -notcontains $_ })
+            if ($IndirectGroupIds.Count -gt 0) {
+                throw "Service principal '$AppID' is transitively included in Power BI allowed group(s) '$($IndirectGroupIds -join ', ')' through nested group membership. Remove its membership from the nested group(s) and retry; no direct memberships were removed."
+            }
+
+            $RemovalDeclined = $false
+            foreach ($membership in $DirectMemberships) {
+                $target = "ServicePrincipal $AppID / Power BI Admin APIs"
+                $actionDesc = "Remove service principal from allowed group '$($membership.GroupName)' ($($membership.GroupId))"
+                if ($PSCmdlet.ShouldProcess($target, $actionDesc)) {
+                    if (-not [guid]::TryParse($membership.GroupId, [ref][guid]::Empty) -or
+                        -not [guid]::TryParse($ServicePrincipalID, [ref][guid]::Empty)) {
+                        throw "Group and service principal object IDs must be valid GUIDs."
+                    }
+                    $deleteUri = Get-ScubaGearGraphEndpoint -CmdletName 'Remove-MgGroupMemberByRef' `
+                        -Environment $M365Environment -Id $membership.GroupId
+                    if ([string]::IsNullOrWhiteSpace($deleteUri) -or -not $deleteUri.Contains('{memberId}')) {
+                        throw "Unable to resolve the group-member removal endpoint for environment '$M365Environment'."
+                    }
+                    $deleteUri = $deleteUri.Replace('{memberId}', $ServicePrincipalID)
+                    # Without /$ref, Graph may delete the directory object instead of only its group membership.
+                    if (-not [System.Uri]::IsWellFormedUriString($deleteUri, [System.UriKind]::Absolute) -or
+                        -not $deleteUri.EndsWith('/$ref')) {
+                        throw 'The group-member removal endpoint must be an absolute URI ending in /$ref.'
+                    }
+                    $null = Invoke-GraphDirectly -Uri $deleteUri -Method DELETE
+                    Write-Output "Removed service principal $AppID from Power BI allowed group '$($membership.GroupName)'."
+                } else {
+                    $RemovalDeclined = $true
+                    Write-Output "WhatIf: Would remove service principal $AppID from Power BI allowed group '$($membership.GroupName)' ($($membership.GroupId))."
+                }
+            }
+
+            if ($WhatIfPreference) {
+                return
+            }
+            if ($RemovalDeclined) {
+                Write-Warning "Power BI access may remain for service principal '$AppID' because removal from one or more allowed groups was declined."
+                return
+            }
+
+            $RemainingGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
+                -GroupIds $LiveAllowedGroupIds -M365Environment $M365Environment)
+            if ($RemainingGroupIds.Count -gt 0) {
+                throw "Service principal '$AppID' is still included in Power BI allowed group(s) '$($RemainingGroupIds -join ', ')' after removing direct memberships. Check for nested group membership and retry."
+            }
+
+            if ($DirectMemberships.Count -eq 0) {
+                Write-Verbose "Service principal $AppID is not a direct member of any allowed Power BI security group."
+            }
+            return
+        }
+
+        # Check if the service principal is already a member of any existing allowed group
+        $alreadyMemberGroup = $null
+        $AllowedGroupIds = @(foreach ($grp in $ExistingGroups) {
+            $gid = if ($grp.graphId) { $grp.graphId } else { $grp.id }
+            if ($gid) { [string]$gid }
+        })
+
+        if ($AllowedGroupIds.Count -gt 0) {
+            try {
+                $matchedGroupIds = @(Get-ServicePrincipalMemberGroupIds -ServicePrincipalID $ServicePrincipalID `
+                    -GroupIds $AllowedGroupIds -M365Environment $M365Environment)
+
+                if (@($matchedGroupIds).Count -gt 0) {
+                    $firstMatchedId = @($matchedGroupIds)[0]
+                    $alreadyMemberGroup = $ExistingGroups | Where-Object {
+                        $gid = if ($_.graphId) { $_.graphId } else { $_.id }
+                        $gid -eq $firstMatchedId
+                    }
+                }
+            } catch {
+                throw "Unable to verify Power BI allowed-group membership: $($_.Exception.Message)"
+            }
+        }
+
+        $settingEnabled = [bool]($ReadAdminAPISetting -and $ReadAdminAPISetting.enabled -eq $true)
+        $staleGroups = @()
+        $selectableGroups = @($ExistingGroups)
+        if (-not $alreadyMemberGroup -or -not $settingEnabled) {
+            $selectableGroups = @()
+            foreach ($grp in $ExistingGroups) {
+                $grpId = if ($grp.graphId) { $grp.graphId } else { $grp.id }
+                if ([string]::IsNullOrEmpty($grpId)) {
+                    Write-Warning "A Power BI allowed group has no object ID and cannot be selected. Check the Power BI tenant setting."
+                    continue
+                }
+                try {
+                    $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $grpId
+                    $selectableGroups += $grp
+                    $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
+                    if (-not $alreadyMemberGroup -and ($members | Where-Object { ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID) })) {
+                        $alreadyMemberGroup = $grp
+                        if ($settingEnabled -and $staleGroups.Count -eq 0) { break }
+                    }
+                } catch {
+                    # Only a 404 identifies a missing group; other failures must not be treated as stale references.
+                    if ($_.Exception.Response -and [int]$_.Exception.Response.StatusCode -eq 404) {
+                        $missingGroupName = if ($grp.name) { $grp.name } elseif ($grp.displayName) { $grp.displayName } else { $grpId }
+                        $staleGroups += [PSCustomObject]@{ Id = [string]$grpId; Name = $missingGroupName }
+                        Write-Warning "Power BI allowed group '$missingGroupName' ($grpId) was not found in Microsoft Entra ID. Its Power BI tenant-setting entry may be stale."
+                    } else {
+                        throw "Unable to inspect members of Power BI allowed group '$grpId': $($_.Exception.Message)"
+                    }
+                }
+            }
+        }
+
+        if ($alreadyMemberGroup -and $settingEnabled -and $staleGroups.Count -eq 0) {
+            Write-Output "Service principal $AppID is already an authorized member of allowed group '$($alreadyMemberGroup.name)' ($($alreadyMemberGroup.graphId))."
+            return
+        }
+
+        if ($staleGroups.Count -gt 0) {
+            $staleGroupDescriptions = ($staleGroups | ForEach-Object { "'$($_.Name)' ($($_.Id))" } | Select-Object -Unique) -join ', '
+            if (-not $WhatIfPreference) {
+                # Stale-reference cleanup changes tenant settings, so even -Force cannot approve it implicitly.
+                if ($Force -or -not [Environment]::UserInteractive) {
+                    throw "Removing stale Power BI group references requires interactive confirmation. Remove $staleGroupDescriptions from the Power BI tenant setting manually, or rerun setup interactively."
+                }
+                do {
+                    $cleanupChoice = Read-Host "Remove stale Power BI allowed-group reference(s) $staleGroupDescriptions? No Entra groups will be deleted [y/N]"
+                    if ([string]::IsNullOrWhiteSpace($cleanupChoice) -or $cleanupChoice -match '^(n|no)$') {
+                        throw "Power BI setup stopped because stale-reference cleanup was not confirmed. No group membership or tenant-setting changes were made."
+                    }
+                    if ($cleanupChoice -notmatch '^(y|yes)$') {
+                        Write-Warning "Enter Y or N."
+                    }
+                } until ($cleanupChoice -match '^(y|yes)$')
+            }
+            $staleGroupIds = @($staleGroups | Select-Object -ExpandProperty Id -Unique)
+            # Remove by object ID so a different valid group with the same display name is preserved.
+            $ExistingGroups = @($ExistingGroups | Where-Object {
+                $groupId = if ($_.graphId) { $_.graphId } else { $_.id }
+                [string]$groupId -notin $staleGroupIds
+            })
+        }
+
+        # Determine target group
+        $isExistingGroupSelected = $false
+        $targetGroupId = $null
+        $targetGroupName = $null
+
+        # Check if the dedicated $GroupName already exists in the selectable groups
+        $existingDedicatedGroupIndexes = @()
+        $existingDedicatedGroupIds = @()
+        for ($i = 0; $i -lt $selectableGroups.Count; $i++) {
+            $g = $selectableGroups[$i]
+            $gName = if ($g.name) { $g.name } else { $g.displayName }
+            $gId = if ($g.graphId) { $g.graphId } else { $g.id }
+            if ($gName -eq $GroupName -and $gId -and $gId -notin $existingDedicatedGroupIds) {
+                $existingDedicatedGroupIndexes += $i
+                $existingDedicatedGroupIds += [string]$gId
+            }
+        }
+
+        if ($existingDedicatedGroupIds.Count -gt 1 -and ($Force -or -not [Environment]::UserInteractive)) {
+            throw "Multiple allowed Power BI groups are named '$GroupName' (IDs: $($existingDedicatedGroupIds -join ', ')). Rerun interactively to select a group."
+        }
+
+        if ($selectableGroups.Count -gt 0 -and -not $Force -and [Environment]::UserInteractive) {
+            Write-Information "" -InformationAction Continue
+            Write-Information "Power BI tenant setting 'Service principals can access read-only admin APIs' is currently enabled for the following security group(s):" -InformationAction Continue
+            for ($i = 0; $i -lt $selectableGroups.Count; $i++) {
+                $g = $selectableGroups[$i]
+                $gName = if ($g.name) { $g.name } else { "Unnamed group" }
+                $gId = if ($g.graphId) { $g.graphId } else { $g.id }
+                Write-Information "  [$($i + 1)] $gName (ID: $gId)" -InformationAction Continue
+            }
+
+            if ($existingDedicatedGroupIndexes.Count -gt 0) {
+                # Require an explicit selection when duplicate dedicated-group names are already allowed.
+                Write-Information "" -InformationAction Continue
+                if ($existingDedicatedGroupIds.Count -gt 1) {
+                    Write-Information "Multiple allowed groups are named '$GroupName'; select using the displayed object IDs." -InformationAction Continue
+                    do {
+                        $choice = Read-Host "Select an option [1-$($selectableGroups.Count)] (required; C to cancel)"
+                        if ($choice -match '^[cC]$') {
+                            throw "Power BI group selection was cancelled."
+                        }
+                        $choiceIndex = 0
+                        $validChoice = [int]::TryParse($choice, [ref]$choiceIndex) -and $choiceIndex -ge 1 -and $choiceIndex -le $selectableGroups.Count
+                        if (-not $validChoice) { Write-Warning "Enter a number from 1 to $($selectableGroups.Count), or C to cancel." }
+                    } until ($validChoice)
+                } else {
+                    # A unique dedicated group remains the default selection.
+                    $defaultIndex = $existingDedicatedGroupIndexes[0] + 1
+                    $choice = Read-Host "Select an option [1-$($selectableGroups.Count)] (Default: $defaultIndex)"
+                    if ([string]::IsNullOrWhiteSpace($choice)) {
+                        $choice = "$defaultIndex"
+                    }
+                }
+
+                if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $selectableGroups.Count) {
+                    $chosenGroup = $selectableGroups[[int]$choice - 1]
+                    $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
+                    $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { "Selected Group" }
+                    $isExistingGroupSelected = $true
+                }
+            } else {
+                # Dedicated group not in allowed list: offer existing groups or create & append new
+                $createOptionIndex = $selectableGroups.Count + 1
+                Write-Information "  [$createOptionIndex] Create a new dedicated security group and append it ('$GroupName')" -InformationAction Continue
+                Write-Information "" -InformationAction Continue
+
+                $choice = Read-Host "Select an option [1-$createOptionIndex] (Default: $createOptionIndex)"
+                if ([string]::IsNullOrWhiteSpace($choice)) {
+                    $choice = "$createOptionIndex"
+                }
+
+                if ([int]::TryParse($choice, [ref]$null) -and [int]$choice -ge 1 -and [int]$choice -le $selectableGroups.Count) {
+                    $chosenGroup = $selectableGroups[[int]$choice - 1]
+                    $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
+                    $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { "Selected Group" }
+                    $isExistingGroupSelected = $true
+                }
+            }
+        }
+
+        # If not selected via prompt (or in non-interactive/force mode)
+        if (-not $isExistingGroupSelected) {
+            if ($existingDedicatedGroupIndexes.Count -gt 0) {
+                $chosenGroup = $selectableGroups[$existingDedicatedGroupIndexes[0]]
+                $targetGroupId = if ($chosenGroup.graphId) { $chosenGroup.graphId } else { $chosenGroup.id }
+                $targetGroupName = if ($chosenGroup.name) { $chosenGroup.name } else { $GroupName }
+                $isExistingGroupSelected = $true
+            } else {
+                $targetGroupName = $GroupName
+            }
+        }
+
+        $target = "ServicePrincipal $AppID / Power BI Admin APIs"
+        $actionDesc = if ($isExistingGroupSelected) {
+            "Add service principal to existing allowed group '$targetGroupName' ($targetGroupId)"
+        } else {
+            "Create/use group '$targetGroupName', add service principal, and append to Power BI tenant setting"
+        }
+        if ($staleGroups.Count -gt 0) {
+            $actionDesc += "; remove stale Power BI allowed-group reference(s): $staleGroupDescriptions"
+        }
+
+        if ($PSCmdlet.ShouldProcess($target, $actionDesc)) {
+            $catalog = Get-ScubaGearCatalog
+            $GraphBase = ($catalog | Where-Object { $_.entryType -eq 'graphConnect' -and $_.supportedEnv -contains $M365Environment }).endpointPath
+            if (-not $GraphBase) {
+                throw "Unable to resolve the Microsoft Graph base URL for environment '$M365Environment'."
+            }
+            $groupsToConfigure = @($ExistingGroups)
+            $updateSetting = (-not $settingEnabled -or $staleGroups.Count -gt 0)
+
+            if ($isExistingGroupSelected) {
+                # Add SP to the selected existing group
+                $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $targetGroupId
+                $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
+                if (-not ($members | Where-Object { ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID) })) {
+                    $memberBody = @{
+                        "@odata.id" = "$GraphBase/v1.0/directoryObjects/$ServicePrincipalID"
+                    }
+                    $memberUri = Get-ScubaGearGraphEndpoint -CmdletName 'New-MgGroupMemberByRef' `
+                        -Environment $M365Environment -Id $targetGroupId
+                    if ([string]::IsNullOrWhiteSpace($memberUri)) {
+                        throw "Unable to resolve the group-member addition endpoint for environment '$M365Environment'."
+                    }
+                    $null = Invoke-GraphDirectly -Uri $memberUri -Method POST -Body $memberBody
+                    Write-Output "Successfully added service principal $AppID to group '$targetGroupName'."
+                } else {
+                    Write-Verbose "Service principal $AppID is already a member of group '$targetGroupName'."
+                }
+            }
+            else {
+                # Find or create dedicated group in Entra
+                $matchingGroups = @((Invoke-GraphDirectly -Commandlet Get-MgBetaGroup -M365Environment $M365Environment -queryParams @{
+                    '$filter' = "displayName eq '$GroupName'"
+                }).Value)
+
+                if ($matchingGroups.Count -gt 1) {
+                    $matchingGroupIds = @($matchingGroups | ForEach-Object { if ($_.Id) { [string]$_.Id } else { [string]$_.id } })
+                    if ($Force -or -not [Environment]::UserInteractive) {
+                        throw "Multiple Entra groups are named '$GroupName' (IDs: $($matchingGroupIds -join ', ')). Rerun interactively to select a group."
+                    }
+
+                    Write-Information "Multiple Entra groups are named '$GroupName':" -InformationAction Continue
+                    for ($i = 0; $i -lt $matchingGroups.Count; $i++) {
+                        $matchId = if ($matchingGroups[$i].Id) { $matchingGroups[$i].Id } else { $matchingGroups[$i].id }
+                        Write-Information "  [$($i + 1)] ID: $matchId" -InformationAction Continue
+                    }
+                    do {
+                        $choice = Read-Host "Select a group [1-$($matchingGroups.Count)], or C to cancel"
+                        if ($choice -match '^[cC]$') {
+                            throw "Power BI group selection was cancelled."
+                        }
+                        $choiceIndex = 0
+                        $validChoice = [int]::TryParse($choice, [ref]$choiceIndex) -and $choiceIndex -ge 1 -and $choiceIndex -le $matchingGroups.Count
+                        if (-not $validChoice) { Write-Warning "Enter a number from 1 to $($matchingGroups.Count), or C to cancel." }
+                    } until ($validChoice)
+                    $group = $matchingGroups[$choiceIndex - 1]
+                } elseif ($matchingGroups.Count -eq 1) {
+                    $group = $matchingGroups[0]
+                }
+
+                if (-not $matchingGroups.Count) {
+                    Write-Verbose "Creating Entra security group '$GroupName'"
+                    $groupBody = @{
+                        displayName     = $GroupName
+                        mailEnabled     = $false
+                        mailNickname    = ($GroupName -replace '[^a-zA-Z0-9]', '')
+                        securityEnabled = $true
+                        description     = "Security group for ScubaGear service principal Power BI read-only admin API access"
+                    }
+                    $groupUri = Get-ScubaGearGraphEndpoint -CmdletName 'New-MgGroup' -Environment $M365Environment
+                    if ([string]::IsNullOrWhiteSpace($groupUri)) {
+                        throw "Unable to resolve the group-creation endpoint for environment '$M365Environment'."
+                    }
+                    $createdGroup = Invoke-GraphDirectly -Uri $groupUri -Method POST -Body $groupBody
+                    $targetGroupId = if ($createdGroup.id) { $createdGroup.id } elseif ($createdGroup.Id) { $createdGroup.Id } else { $createdGroup['id'] }
+                    Write-Output "Created Entra security group '$GroupName' ($targetGroupId)."
+                }
+                else {
+                    $targetGroupId = if ($group.Id) { $group.Id } else { $group.id }
+                    Write-Verbose "Found existing Entra security group '$GroupName' ($targetGroupId)."
+                }
+
+                # Add SP as member
+                $membersResponse = Invoke-GraphDirectly -Commandlet Get-MgBetaGroupMember -M365Environment $M365Environment -ID $targetGroupId
+                $members = if ($membersResponse.PSObject.Properties['Value']) { $membersResponse.Value } else { $membersResponse }
+                if (-not ($members | Where-Object { ($_.Id -eq $ServicePrincipalID) -or ($_.id -eq $ServicePrincipalID) -or ($_.AppId -eq $AppID) -or ($_.appId -eq $AppID) })) {
+                    $memberBody = @{
+                        "@odata.id" = "$GraphBase/v1.0/directoryObjects/$ServicePrincipalID"
+                    }
+                    $memberUri = Get-ScubaGearGraphEndpoint -CmdletName 'New-MgGroupMemberByRef' `
+                        -Environment $M365Environment -Id $targetGroupId
+                    if ([string]::IsNullOrWhiteSpace($memberUri)) {
+                        throw "Unable to resolve the group-member addition endpoint for environment '$M365Environment'."
+                    }
+                    $null = Invoke-GraphDirectly -Uri $memberUri -Method POST -Body $memberBody
+                    Write-Output "Successfully added service principal $AppID to group '$targetGroupName'."
+                }
+                else {
+                    Write-Verbose "Service principal $AppID is already a member of group '$targetGroupName'."
+                }
+
+                # Preserve all existing groups and append the new one if not already in the list
+                $groupAlreadyInSetting = $ExistingGroups | Where-Object {
+                    $gid = if ($_.graphId) { $_.graphId } else { $_.id }
+                    $gid -eq $targetGroupId
+                }
+
+                if (-not $groupAlreadyInSetting) {
+                    $NewGroupEntry = [PSCustomObject]@{
+                        graphId = $targetGroupId
+                        name    = $GroupName
+                    }
+                    $groupsToConfigure += $NewGroupEntry
+                    $updateSetting = $true
+                }
+            }
+
+            if ($updateSetting) {
+                $Endpoint = "/v1/admin/tenantsettings/AllowServicePrincipalsUseReadAdminAPIs/update"
+                $Body = @{
+                    enabled               = $true
+                    enabledSecurityGroups = @($groupsToConfigure)
+                }
+                # Preserve existing optional fields, including explicit $false values, in the tenant-setting update.
+                foreach ($propertyName in @('excludedSecurityGroups', 'properties', 'delegateToCapacity', 'delegateToDomain', 'delegateToWorkspace')) {
+                    if ($ReadAdminAPISetting -and $ReadAdminAPISetting.PSObject.Properties[$propertyName] -and $null -ne $ReadAdminAPISetting.$propertyName) {
+                        $Body[$propertyName] = $ReadAdminAPISetting.$propertyName
+                    }
+                }
+                $jsonBody = $Body | ConvertTo-Json -Depth 10
+                try {
+                    $null = Invoke-ScubaRestMethod -BaseUrl $Token.BaseUrl -AccessToken $Token.AccessToken -Method "POST" -Endpoint $Endpoint -Body $jsonBody
+                }
+                catch {
+                    # PS 5.1 may omit ErrorDetails; the error-code header survives response-body logging.
+                    $ResponseHeaders = $_.Exception.Response.Headers
+                    $ResponseErrorCode = if ($ResponseHeaders -is [System.Net.WebHeaderCollection]) {
+                        $ResponseHeaders['x-ms-public-api-error-code']
+                    } else {
+                        $ResponseHeaders | Where-Object { $_.Key -eq 'x-ms-public-api-error-code' } | ForEach-Object { $_.Value }
+                    }
+                    if ($M365Environment -eq 'gcchigh' -and
+                        ($_.ErrorDetails.Message -match '"errorCode"\s*:\s*"FeatureNotAvailable"' -or
+                         @($ResponseErrorCode) -contains 'FeatureNotAvailable')) {
+                        $manualCleanup = if ($staleGroups.Count -gt 0) {
+                            " Remove stale allowed-group reference(s) $staleGroupDescriptions from the Power BI tenant setting."
+                        } else { "" }
+                        Write-Warning "Power BI tenant-setting update returned 'FeatureNotAvailable' in GCC High. In the Power BI admin portal (Tenant settings > Admin API settings), enable 'Service principals can access read-only admin APIs' and include security group '$targetGroupName' ($targetGroupId) in the allowed security groups.$manualCleanup Then run Get-ScubaGearAppPermission to verify access."
+                    }
+                    throw
+                }
+                Write-Output "Successfully updated Power BI tenant setting 'AllowServicePrincipalsUseReadAdminAPIs' with group '$targetGroupName'."
+            }
+        }
+        else {
+            Write-Output "WhatIf: Would configure Power BI read-only admin API access ($actionDesc)"
+        }
+    }
+    catch {
+        $operation = if ($Remove) { "remove Power BI allowed-group membership" } else { "configure Power BI app registration" }
+        Write-Warning "Failed to $($operation): $($_.Exception.Message)"
+        throw
     }
 }
 
@@ -2271,7 +3275,7 @@ function New-ScubaGearServicePrincipal {
 
     .PARAMETER ProductNames
         This allows you to define which products that the Service Principal will be configured for and only apply those needed permissions.
-        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', '*' (which includes all products)
+        Valid options are: 'aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite', 'powerbi', '*' (which includes all products)
 
     .PARAMETER ServicePrincipalName
         Used to define the name of the Service Principal that will be created. The default is "ScubaGear Application"
@@ -2314,6 +3318,7 @@ function New-ScubaGearServicePrincipal {
         - CertExpiresOn: Certificate expiration date
         - CertThumbprint: Certificate thumbprint
         - PowerPlatformRegistered: Power Platform status (if applicable)
+        - PowerBIRegistered: Power BI status (if applicable)
 
     .NOTES
         Author       : ScubaGear Team
@@ -2326,11 +3331,11 @@ function New-ScubaGearServicePrincipal {
         [string]$CertName = "ScubaGearCert-$((Get-Date).ToUniversalTime().ToString('yyyyMMdd-HHmmss'))Z",
 
         [Parameter(Mandatory=$true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment,
 
         [Parameter(Mandatory=$false)]
-        [ValidateSet("aad", "exo", "sharepoint", "teams", "powerplatform", "securitysuite", '*', IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetAllValidProductNames() })]
         [string[]]$ProductNames = '*',
 
         [Parameter(Mandatory=$false)]
@@ -2345,8 +3350,8 @@ function New-ScubaGearServicePrincipal {
     Try {
         # Handle wildcard for ProductNames
         if($ProductNames -contains '*'){
-            # If wildcard is specified, include all products
-            $ProductNames = @('aad', 'exo', 'sharepoint', 'teams', 'powerplatform', 'securitysuite')
+            # Expand to implemented products only
+            $ProductNames = @([ScubaConfig]::GetSupportedProducts())
         }
 
         # Get permissions using the same approach as Get-ScubaGearAppPermission
@@ -2389,12 +3394,15 @@ Creating new ScubaGear Service Principal with the following configuration:
         if ($ProductNames -contains 'powerplatform') {
             $whatIfMessage += "`n  - Power Platform Registration: Yes"
         }
+        if ($ProductNames -contains 'powerbi') {
+            $whatIfMessage += "`n  - Power BI Read-Only Admin API Access: Yes"
+        }
 
         if ($PSCmdlet.ShouldProcess($ServicePrincipalName, $whatIfMessage)) {
             try {
                 # Connect to Microsoft Graph
                 try {
-                    $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes @("Application.ReadWrite.All", "RoleManagement.ReadWrite.Directory", "AppRoleAssignment.ReadWrite.All", "User.Read")
+                    $Null = Connect-GraphHelper -M365Environment $M365Environment -Scopes @("Application.ReadWrite.All", "RoleManagement.ReadWrite.Directory", "AppRoleAssignment.ReadWrite.All", "User.Read", "Group.ReadWrite.All")
                     Write-Verbose "Successfully connected to Microsoft Graph"
                 }
                 catch {
@@ -2550,6 +3558,26 @@ Creating new ScubaGear Service Principal with the following configuration:
                 $AppInfo | Add-Member -MemberType NoteProperty -Name "PowerPlatformRegistered" -Value $false -Force
             }
         }
+
+        # Set up Power BI if it's in the ProductNames
+        if($ProductNames -contains 'powerbi'){
+            try {
+                $appId = ($SP).AppID
+                $TenantID = ($SP).AppOwnerOrganizationID
+
+                Write-Verbose "Setting up Power BI read-only admin API access for the service principal"
+                $pbiSuccess = Set-PowerBIAppRegistration -AppID $appId -ServicePrincipalID ($SP).Id -TenantId $TenantID -M365Environment $M365Environment
+                if ($pbiSuccess) {
+                    Write-Verbose "Power BI read-only admin API setup was successful"
+                    $AppInfo | Add-Member -MemberType NoteProperty -Name "PowerBIRegistered" -Value $true -Force
+                } else {
+                    $AppInfo | Add-Member -MemberType NoteProperty -Name "PowerBIRegistered" -Value $false -Force
+                }
+            } catch {
+                Write-Warning "Failed to configure Power BI read-only admin API access: $($_.Exception.Message)"
+                $AppInfo | Add-Member -MemberType NoteProperty -Name "PowerBIRegistered" -Value $false -Force
+            }
+        }
             return $AppInfo
         } else {
             Write-Output "Operation cancelled by user."
@@ -2607,7 +3635,7 @@ function Get-ScubaGearAppCert {
         [string]$AppID,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -2786,7 +3814,7 @@ function Remove-ScubaGearAppCert {
         [string]$CertThumbprint,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 
@@ -2938,7 +3966,7 @@ function New-ScubaGearAppCert {
         [int]$CertValidityMonths = 6,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $True)]
+        [ValidateScript({ $_ -in [ScubaConfig]::GetSupportedEnvironments() })]
         [string]$M365Environment
     )
 

@@ -47,19 +47,22 @@ This guide helps resolve common issues when working with ScubaGear service princ
 | **Can I have multiple certificates on one service principal?** | Yes! This is recommended for zero-downtime certificate rotation. Add a new certificate before removing the old one. |
 | **What's the difference between Application permissions and Delegated permissions?** | **Application permissions:** Used by service principals running unattended (ScubaGear's requirement)<br>**Delegated permissions:** Used when an application acts on behalf of a signed-in user (not for automation) |
 
----
-
 ### Permission Questions
 
 **Why does Set-ScubaGearAppPermission remove some of my permissions?**
 
 The function enforces **least privilege**. When you specify ProductNames, it removes permissions not required for those products. This is a security best practice.
 
+It also removes any Entra directory role directly assigned to the service
+principal that is not required by the selected products. This includes roles
+assigned manually, such as Global Administrator. Review the
+`-WhatIf` output before applying remediation.
+
 ```powershell
 # Example: You originally set up for all products
 New-ScubaGearServicePrincipal -ProductNames '*'
 
-# Now you only need AAD - extra permissions will be removed (SharePoint, Exchange, etc.)
+# Now you only need AAD - unneeded permissions and roles will be removed
 Get-ScubaGearAppPermission -AppID $AppID -ProductNames 'aad' | Set-ScubaGearAppPermission
 ```
 
