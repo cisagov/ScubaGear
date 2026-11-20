@@ -12,9 +12,11 @@ InModuleScope Connection {
         @{Endpoint = 'dod'}
     ){
         BeforeAll {
+            $Payload = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes('{"aud":"mock-audience","scp":"Mock.Read.All"}')).TrimEnd('=').Replace('+', '-').Replace('/', '_')
+            $script:MockAccessToken = "eyJhbGciOiJSUzI1NiJ9.$Payload.dGVzdA"
             function Connect-GraphHelper {
                 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '', Justification = 'Mock signature must match the command parameters.')]
-                param($ServicePrincipalParams, $M365Environment, $Scopes, $TenantId, [switch]$Discovery)
+                param($ServicePrincipalParams, $M365Environment, $Scopes, $TenantId, [switch]$Discovery, [switch]$PassThru)
                 throw 'this will be mocked'
             }
             Mock Connect-GraphHelper -MockWith {
@@ -30,6 +32,7 @@ InModuleScope Connection {
                         CertificateThumbprint = $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint
                     }
                 }
+                if ($PassThru) { $script:MockAccessToken }
             }
             # SharePoint now uses REST API - no PnP/SPO connection needed
             function Get-ExchangeOnlineApiEndpoint {throw 'this will be mocked'}
@@ -63,7 +66,7 @@ InModuleScope Connection {
                 param($Scope, $ClientId, $Tenant, $M365Environment, $CertificateThumbprint, $AppID)
                 throw 'this will be mocked'
             }
-            Mock Get-MsalAccessToken -MockWith { return "mock-access-token" }
+            Mock Get-MsalAccessToken -MockWith { return $script:MockAccessToken }
             Mock Initialize-Msal -MockWith {}
             Mock -CommandName Write-Progress {
             }
@@ -80,6 +83,7 @@ InModuleScope Connection {
             @{ProductNames = "sharepoint"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
             @{ProductNames = "teams"; Services = @('Get-MsalAccessToken'); EXOHelperCalls = 0}
             @{ProductNames = "powerbi"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
+            @{ProductNames = "si"; Services = @('Connect-GraphHelper'); EXOHelperCalls = 0}
             @{
                 ProductNames = "aad", "securitysuite", "exo", "powerplatform", "sharepoint", "teams", "powerbi"
                 Services = @(
@@ -91,8 +95,16 @@ InModuleScope Connection {
         ){
 
             It "No Service Principal" {
-                $ConnectionResult = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint
+                $ConnectionResult = Connect-Tenant -ProductNames $ProductNames -M365Environment $Endpoint -InformationVariable ConnectionInformation
                 $ConnectionResult.ProdAuthFailed.Count | Should -Be 0
+                $ConnectionResult | Should -BeOfType ([hashtable])
+                if ($ProductNames.Count -eq 1 -and $ProductNames -ne 'powerbi') {
+                    $TokenMessages = @($ConnectionInformation | Where-Object {
+                        $_.MessageData.StartsWith("[$ProductNames] ") -and $_.MessageData.Contains('decoded access token payload:') -and $_.MessageData.Contains('mock-audience')
+                    })
+                    $TokenMessages.Count | Should -BeGreaterThan 0
+                }
+                ($ConnectionInformation.MessageData -join "`n") | Should -Not -Match ([regex]::Escape($script:MockAccessToken))
             }
             It "With Service Principal" {
                 $ServicePrincipalParams.CertThumbprintParams.CertificateThumbprint

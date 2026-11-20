@@ -60,6 +60,8 @@ function Connect-GraphHelper {
     .PARAMETER Discovery
     Discovers the user's tenant and cloud, then establishes the tenant-specific Graph
     session using the same MSAL application and its token cache.
+    .PARAMETER PassThru
+    Returns the acquired Graph access token for authentication troubleshooting.
     .Functionality
     Internal
     .Notes
@@ -91,7 +93,9 @@ function Connect-GraphHelper {
         [string]$TenantId,
 
         [Parameter(Mandatory = $true, ParameterSetName = 'Discovery')]
-        [switch]$Discovery
+        [switch]$Discovery,
+
+        [switch]$PassThru
     )
     $AuthVerbose = @{}
     if ($VerbosePreference -eq 'Continue') { $AuthVerbose.Verbose = $true }
@@ -157,6 +161,186 @@ function Connect-GraphHelper {
     $TokenResult = Get-MsalAccessToken @TokenParameters -PassThru @AuthVerbose
     $Session.Account = $TokenResult.Account
     $Global:ScubaGearState.Session = $Session
+    if ($PassThru) {
+        $TokenResult.AccessToken
+    }
+}
+
+function Write-ScubaAccessTokenPayload {
+    <#
+    .SYNOPSIS
+        Decodes an access token's JWT payload and prints readable claims to the console.
+    .DESCRIPTION
+        Decodes base64url locally, adds friendly names to common claims, expands
+        permission scopes, and displays Unix timestamps as UTC dates. Other claims
+        are preserved. Directory role names in the wids claim are looked up in Graph
+        and printed after the payload. This is a diagnostic decoder; it does not validate signatures
+        or establish whether the token is valid for an API.
+
+        Opaque, encrypted, or malformed tokens produce an informational message
+        without interrupting authentication or printing the encoded token.
+    .PARAMETER AccessToken
+        The access token returned by Get-MsalAccessToken.
+    .PARAMETER Label
+        The product and API name to display before the decoded payload.
+    .EXAMPLE
+        Write-ScubaAccessTokenPayload -AccessToken $AccessToken -Label '[aad] Microsoft Graph'
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]$AccessToken,
+
+        [string]$Label = 'Access token'
+    )
+
+    try {
+        $Parts = $AccessToken.Split('.')
+        if ($Parts.Count -ne 3 -or $Parts[1] -cnotmatch '^[A-Za-z0-9_-]+={0,2}$') {
+            throw 'Expected a JWT payload.'
+        }
+
+        $EncodedPayload = $Parts[1].Replace('-', '+').Replace('_', '/')
+        $EncodedPayload = $EncodedPayload.PadRight($EncodedPayload.Length + (4 - $EncodedPayload.Length % 4) % 4, '=')
+        $PayloadJson = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($EncodedPayload))
+        $Payload = ConvertFrom-Json -InputObject $PayloadJson -ErrorAction Stop
+        if ($Payload -isnot [System.Management.Automation.PSCustomObject]) {
+            throw 'Expected a JSON object.'
+        }
+
+        $ClaimNames = @{
+            aud = 'Audience (aud)'
+            iss = 'Issuer (iss)'
+            tid = 'Tenant ID (tid)'
+            oid = 'Object ID (oid)'
+            appid = 'Application ID (appid)'
+            azp = 'Authorized client ID (azp)'
+            idtyp = 'Identity type (idtyp)'
+            name = 'Name (name)'
+            preferred_username = 'Preferred username (preferred_username)'
+            upn = 'User principal name (upn)'
+            scp = 'Delegated permissions (scp)'
+            roles = 'Application roles (roles)'
+            amr = 'Authentication methods (amr)'
+            iat = 'Issued at (iat)'
+            nbf = 'Not valid before (nbf)'
+            exp = 'Expires at (exp)'
+            ver = 'Token version (ver)'
+        }
+        $FriendlyPayload = [ordered]@{}
+        foreach ($Claim in $Payload.PSObject.Properties) {
+            $ClaimName = if ($ClaimNames.ContainsKey($Claim.Name)) { $ClaimNames[$Claim.Name] } else { $Claim.Name }
+            $Value = $Claim.Value
+            if ($Claim.Name -in @('iat', 'nbf', 'exp')) {
+                $UnixTime = 0L
+                if ([long]::TryParse([string]$Value, [ref]$UnixTime)) {
+                    try {
+                        $UtcTime = [DateTimeOffset]::FromUnixTimeSeconds($UnixTime).UtcDateTime.ToString("yyyy-MM-dd HH:mm:ss 'UTC'")
+                        $Value = "$UtcTime ($Value)"
+                    }
+                    catch {
+                        # Keep the original claim when its timestamp is outside the supported date range.
+                    }
+                }
+            }
+            elseif ($Claim.Name -eq 'scp' -and $Value -is [string]) {
+                $Value = @($Value -split '\s+' | Where-Object { $_ })
+            }
+            $FriendlyPayload[$ClaimName] = $Value
+        }
+        $FormattedPayload = ConvertTo-Json -InputObject $FriendlyPayload -Depth 100
+    }
+    catch {
+        Write-Information "$Label access token payload could not be decoded; expected an unencrypted JWT with a JSON object payload." -InformationAction Continue
+        return
+    }
+
+    Write-Information "$Label decoded access token payload:`n$FormattedPayload" -InformationAction Continue
+    try {
+        Write-ScubaAccessTokenRoles -DecodedToken $Payload -Label $Label
+    }
+    catch {
+        # A diagnostic lookup must not cause the product's authentication to fail.
+        Write-Warning "$Label directory role lookup failed: $($_.Exception.Message)"
+    }
+}
+
+function Write-ScubaAccessTokenRoles {
+    <#
+    .SYNOPSIS
+        Looks up and prints directory role names from a decoded JWT's wids claim.
+    .DESCRIPTION
+        Looks up each wids value using Get-MgBetaDirectoryRoleTemplate through
+        Invoke-GraphDirectly. Prints the complete array of names in claim order.
+        A missing role (HTTP 404 or a response without a displayName) is represented
+        by "Cannot find role". Other lookup errors are propagated to the caller.
+        A missing or empty wids claim requires no Graph requests and prints nothing.
+    .PARAMETER DecodedToken
+        The decoded JWT payload object, including its original wids claim.
+    .PARAMETER Label
+        The product and API name to display before the role names.
+    .PARAMETER M365Environment
+        The Graph environment. Defaults to the connected session's environment,
+        or commercial when there is no session.
+    .EXAMPLE
+        Write-ScubaAccessTokenRoles -DecodedToken $Payload -Label '[aad] Microsoft Graph'
+    .FUNCTIONALITY
+        Internal
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [AllowNull()]
+        [object]$DecodedToken,
+
+        [string]$Label = 'Access token',
+
+        [ValidateSet('commercial', 'gcc', 'gcchigh', 'dod')]
+        [string]$M365Environment
+    )
+
+    if (-not $DecodedToken.wids) {
+        return
+    }
+
+    Import-Module (Join-Path $PSScriptRoot '../Utility/Utility.psm1') -Function Invoke-GraphDirectly
+    if (-not $M365Environment) {
+        $M365Environment = if ($Global:ScubaGearState.Session.M365Environment) {
+            $Global:ScubaGearState.Session.M365Environment
+        } else {
+            'commercial'
+        }
+    }
+
+    $RoleNames = @(
+        foreach ($Wid in $DecodedToken.wids) {
+            try {
+                $Role = Invoke-GraphDirectly -Commandlet Get-MgBetaDirectoryRoleTemplate -ID $Wid -M365Environment $M365Environment -ErrorAction Stop
+                if ([string]::IsNullOrWhiteSpace($Role.displayName)) {
+                    'Cannot find role'
+                }
+                else {
+                    [string]$Role.displayName
+                }
+            }
+            catch {
+                $ResponseProperty = $_.Exception.PSObject.Properties['Response']
+                if ($ResponseProperty -and $ResponseProperty.Value -and [int]$ResponseProperty.Value.StatusCode -eq 404) {
+                    'Cannot find role'
+                }
+                else {
+                    throw
+                }
+            }
+        }
+    )
+
+    $FormattedRoles = ConvertTo-Json -InputObject $RoleNames -Depth 4
+    Write-Information "$Label directory roles (wids):`n$FormattedRoles" -InformationAction Continue
 }
 
 function Get-M365EnvironmentByDomain {
@@ -1333,6 +1517,8 @@ Export-ModuleMember -Function @(
     'Get-M365EnvironmentByDomain',
     'Initialize-Msal',
     'Get-MsalAccessToken',
+    'Write-ScubaAccessTokenPayload',
+    'Write-ScubaAccessTokenRoles',
     'Invoke-ScubaGraphRequest',
     'Get-ScubaMsalManifest',
     'Get-ScubaMsalLibraryPath',

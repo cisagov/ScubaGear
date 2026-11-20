@@ -159,6 +159,7 @@ InModuleScope Connection {
                     M365Environment = 'gcchigh'
                     TokenParameters = @{ Scope = $Scopes; Tenant = '305102d0-7ccc-4007-83bb-ac1f44f8d620' }
                 }
+                if ($PassThru) { 'mock-graph-token' }
             }
             Mock Get-ScubaGearEntraMinimumPermissions { @('Organization.Read.All') }
             Mock Write-Progress {}

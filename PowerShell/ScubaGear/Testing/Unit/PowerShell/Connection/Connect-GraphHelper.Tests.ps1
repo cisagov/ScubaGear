@@ -19,6 +19,24 @@ InModuleScope ConnectHelpers {
             Mock -ModuleName ConnectHelpers Get-MsalAccessToken {'plain-text-token'}
         }
         context 'Without Service Principal'{
+            It 'returns only the access token when PassThru is requested' {
+                Mock Get-MsalAccessToken { [pscustomobject]@{ AccessToken = 'mock-graph-token'; Account = $null } }
+
+                $Result = @(Connect-GraphHelper -M365Environment 'commercial' -PassThru)
+
+                $Result.Count | Should -Be 1
+                $Result[0] | Should -BeExactly 'mock-graph-token'
+                Should -Invoke Get-MsalAccessToken -Times 1 -Exactly
+            }
+
+            It 'keeps the success stream empty without PassThru' {
+                Mock Get-MsalAccessToken { [pscustomobject]@{ AccessToken = 'mock-graph-token'; Account = $null } }
+
+                $Result = @(Connect-GraphHelper -M365Environment 'commercial')
+
+                $Result.Count | Should -Be 0
+            }
+
             It 'reads the Graph client ID from configuration defaults' {
                 $ClientIds = [ScubaConfig]::GetConfigDefaults().AuthenticationClientIdHashtable
                 $SavedClientId = $ClientIds.aad

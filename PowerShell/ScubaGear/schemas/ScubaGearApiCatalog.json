@@ -382,7 +382,7 @@
         "entryType": "graphResource",
         "scubaGearProduct": ["aad"],
         "supportedEnv": ["commercial","gcc","gcchigh","dod"],
-        "endpointPath": "/beta/directoryRoleTemplates",
+        "endpointPath": "/beta/directoryRoleTemplates/{id}",
         "parameters": [],
         "apiFilter": "",
         "apiHeader": [],

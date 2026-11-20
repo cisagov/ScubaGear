@@ -24,7 +24,8 @@ InModuleScope Utility {
         @{ Cmdlet = "Get-MgBetaDirectoryRoleMember"; Path = "directoryRoles/$ID/members"; NeedsID = $true; IdValue = $ID },
         @{ Cmdlet = "Get-MgBetaDirectoryObject"; Path = "directoryObjects/$ID"; NeedsID = $true; IdValue = $ID },
         @{ Cmdlet = "Get-MgBetaServicePrincipal"; Path = "servicePrincipals/$ID"; NeedsID = $true; IdValue = $ID },
-        @{ Cmdlet = "Get-MgBetaDirectoryRoleTemplate"; Path = "directoryRoleTemplates"; NeedsID = $false; IdValue = $null },
+        @{ Cmdlet = "Get-MgBetaDirectoryRoleTemplate"; Path = "directoryRoleTemplates/"; NeedsID = $false; IdValue = $null },
+        @{ Cmdlet = "Get-MgBetaDirectoryRoleTemplate"; Path = "directoryRoleTemplates/$ID"; NeedsID = $true; IdValue = $ID },
         @{ Cmdlet = "Get-MgBetaApplication"; Path = "applications"; NeedsID = $false; IdValue = $null },
         @{ Cmdlet = "Get-MgBetaApplicationFederatedIdentityCredential"; Path = "applications/$ID/federatedIdentityCredentials"; NeedsID = $true; IdValue = $ID }
     )
@@ -156,6 +157,21 @@ InModuleScope Utility {
             $Result.NullableProperty | Should -BeNullOrEmpty
             $Result.Items[0] | Should -BeNullOrEmpty
             $Result.Items[1].Id | Should -Be '1'
+        }
+    }
+
+    Describe -Tag 'Utility' -Name 'Invoke-GraphDirectly directory role template by ID' {
+        BeforeAll {
+            Mock Invoke-ScubaGraphRequest { @{ displayName = 'SharePoint Administrator' } }
+        }
+
+        It 'requests the role template resource and returns its displayName' {
+            $Result = Invoke-GraphDirectly -Commandlet Get-MgBetaDirectoryRoleTemplate -ID 'f28a1f50-f6e7-4571-818b-6a12f2af6b6c' -M365Environment gcc
+
+            $Result.DisplayName | Should -Be 'SharePoint Administrator'
+            Should -Invoke Invoke-ScubaGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Uri -eq 'https://graph.microsoft.com/beta/directoryRoleTemplates/f28a1f50-f6e7-4571-818b-6a12f2af6b6c' -and $Method -eq 'GET'
+            }
         }
     }
 

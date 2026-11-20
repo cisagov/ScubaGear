@@ -18,7 +18,7 @@ Access the mapping with [ScubaConfig]::ScubaDefault('AuthenticationClientIdHasht
 # The MSAL session is the cross-module singleton created in ConnectHelpers.psm1
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidGlobalVars', '', Justification = 'Cross-module singleton required for MSAL session sharing')]
 param()
-Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Initialize-Msal, Get-MsalAccessToken, Invoke-ScubaGraphRequest, Get-ScubaGearContext, Get-ScubaGearRunIdentity, Get-M365EnvironmentByDomain
+Import-Module (Join-Path -Path $PSScriptRoot -ChildPath 'ConnectHelpers.psm1') -Function Connect-GraphHelper, Disconnect-ScubaGraph, Initialize-Msal, Get-MsalAccessToken, Write-ScubaAccessTokenPayload, Invoke-ScubaGraphRequest, Get-ScubaGearContext, Get-ScubaGearRunIdentity, Get-M365EnvironmentByDomain
 
 function Connect-Tenant {
     <#
@@ -82,6 +82,7 @@ function Connect-Tenant {
    # Download & load the MSAL libraries before the product loop. Let the user known up front if any errors.
    Initialize-Msal @AuthVerbose
    $DetectedM365Environment = $null
+   $GraphAccessToken = $null
 
    # If interactive authentication, then discover the M365Environment automatically regardless if the user specified it or not.
    if (-not $ServicePrincipalParams.CertThumbprintParams) {
@@ -96,7 +97,7 @@ function Connect-Tenant {
            # We ask for all the necessary scopes during discovery as the user signs in, so that we don't have to prompt the user for consent in a separate tab.
            $GraphScopes = if ($ProductNames -contains 'aad') { Get-ScubaGearEntraMinimumPermissions } else { @('Organization.Read.All') }
             # Discover the environment and establish the Graph session in one operation.
-           Connect-GraphHelper @AuthVerbose -Discovery -Scopes $GraphScopes
+           $GraphAccessToken = Connect-GraphHelper @AuthVerbose -Discovery -Scopes $GraphScopes -PassThru
            $M365Environment = $Global:ScubaGearState.Session.M365Environment
            $DetectedM365Environment = $M365Environment
            $AADAuthRequired = $false
@@ -153,7 +154,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $GraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Connect-GraphHelper @AuthVerbose @GraphParams
+                       $GraphAccessToken = Connect-GraphHelper @AuthVerbose @GraphParams -PassThru
                    }
                    elseif (-not $Global:ScubaGearState.Session.TokenParameters.CertificateThumbprint) {
                        # A previous scan without aad may have requested only Organization.Read.All.
@@ -161,9 +162,12 @@ function Connect-Tenant {
                        if ($MissingScopes.Count -gt 0) {
                            $TokenParameters = $Global:ScubaGearState.Session.TokenParameters.Clone()
                            $TokenParameters.Scope = @(@($TokenParameters.Scope) + $GraphScopes | Sort-Object -Unique)
-                           $null = Get-MsalAccessToken @AuthVerbose @TokenParameters
+                           $GraphAccessToken = Get-MsalAccessToken @AuthVerbose @TokenParameters
                            $Global:ScubaGearState.Session.TokenParameters = $TokenParameters
                        }
+                   }
+                   if ($GraphAccessToken) {
+                       Write-ScubaAccessTokenPayload -AccessToken $GraphAccessToken -Label '[aad] Microsoft Graph'
                    }
                    $AADAuthRequired = $false
                }
@@ -176,7 +180,7 @@ function Connect-Tenant {
                            if ($ServicePrincipalParams) {
                                $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                            }
-                           Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                           $GraphAccessToken = Connect-GraphHelper @AuthVerbose @LimitedGraphParams -PassThru
                            $AADAuthRequired = $false
                        }
 
@@ -211,6 +215,8 @@ function Connect-Tenant {
                            $TokenData.EXOAccessToken = Get-MsalAccessToken @AuthVerbose @EXOAuthParams
                        }
 
+                       Write-ScubaAccessTokenPayload -AccessToken $TokenData.EXOAccessToken -Label "[$Product] Exchange Online"
+
                        # Resolve the EXO API endpoint (handles redirects)
                        $TokenData.EXOApiEndpoint = Get-ExchangeOnlineApiEndpoint `
                            -TenantId $TenantId `
@@ -241,6 +247,7 @@ function Connect-Tenant {
                                }
                                $TokenData.ComplianceAccessToken = Get-MsalAccessToken @AuthVerbose @ComplianceAuthParams
                            }
+                           Write-ScubaAccessTokenPayload -AccessToken $TokenData.ComplianceAccessToken -Label "[$Product] Compliance"
                            $TokenData.ComplianceApiEndpoint = Get-ComplianceApiEndpoint `
                                -TenantId $TenantId `
                                -TenantDomain $TenantName `
@@ -263,7 +270,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                       $GraphAccessToken = Connect-GraphHelper @AuthVerbose @LimitedGraphParams -PassThru
                        $AADAuthRequired = $false
                    }
 
@@ -299,6 +306,7 @@ function Connect-Tenant {
                        }
                        $TokenData.PPAccessToken = Get-MsalAccessToken @AuthVerbose @PPAuthParams
                    }
+                   Write-ScubaAccessTokenPayload -AccessToken $TokenData.PPAccessToken -Label '[powerplatform] Power Platform'
                    Write-Verbose "Power Platform token acquired successfully"
                }
                "sharepoint" {
@@ -309,7 +317,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams }
                        }
-                       Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                       $GraphAccessToken = Connect-GraphHelper @AuthVerbose @LimitedGraphParams -PassThru
                        $AADAuthRequired = $false
                    }
                    if ($SPOAuthRequired) {
@@ -344,6 +352,7 @@ function Connect-Tenant {
                            }
                            $TokenData.SPOAccessToken = Get-MsalAccessToken @AuthVerbose @SPOAuthParams
                        }
+                       Write-ScubaAccessTokenPayload -AccessToken $TokenData.SPOAccessToken -Label '[sharepoint] SharePoint'
                        Write-Verbose "SharePoint token acquired successfully"
                        $SPOAuthRequired = $false
                    }
@@ -357,7 +366,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                       $GraphAccessToken = Connect-GraphHelper @AuthVerbose @LimitedGraphParams -PassThru
                        $AADAuthRequired = $false
                    }
 
@@ -453,6 +462,7 @@ function Connect-Tenant {
                                }
                                $TokenData.PBIAccessToken = Get-MsalAccessToken @AuthVerbose @PBIAuthParams
                            }
+                           Write-ScubaAccessTokenPayload -AccessToken $TokenData.PBIAccessToken -Label '[powerbi] Power BI'
                            Write-Verbose "Power BI token acquired successfully"
                        }
                    }
@@ -465,7 +475,7 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                       $GraphAccessToken = Connect-GraphHelper @AuthVerbose @LimitedGraphParams -PassThru
                        $AADAuthRequired = $false
                    }
 
@@ -497,6 +507,8 @@ function Connect-Tenant {
                             -Tenant $ServicePrincipalParams.CertThumbprintParams.Organization `
                             -M365Environment $M365Environment
 
+                        Write-ScubaAccessTokenPayload -AccessToken $TokenData.TeamsAccessToken -Label '[teams] Teams Admin'
+
                         # Set auth return values to empty strings since Teams unified setttings API is only available for interactive auth flows.
                         $TokenData.TeamsUnifiedBaseUrl = ""
                         $TokenData.TeamsUnifiedAccessToken = ""
@@ -518,6 +530,8 @@ function Connect-Tenant {
                             -Tenant $TenantName `
                             -M365Environment $M365Environment
 
+                        Write-ScubaAccessTokenPayload -AccessToken $TokenData.TeamsAccessToken -Label '[teams] Teams Admin'
+
                         # Teams unified settings API is only available in environments that are not gcc high and dod.
                         if ($M365Environment -notin @('gcchigh', 'dod')) {
                             # Get the token for the Teams Unified settings API, which is used for some operations that are not available in the standard Teams Admin API
@@ -526,6 +540,7 @@ function Connect-Tenant {
                                 -ClientId $TeamsClientId `
                                 -Tenant $TenantName `
                                 -M365Environment $M365Environment
+                            Write-ScubaAccessTokenPayload -AccessToken $TokenData.TeamsUnifiedAccessToken -Label '[teams] Teams Unified'
                         }
                    }
                }
@@ -540,8 +555,11 @@ function Connect-Tenant {
                        if ($ServicePrincipalParams) {
                            $LimitedGraphParams += @{ServicePrincipalParams = $ServicePrincipalParams}
                        }
-                       Connect-GraphHelper @AuthVerbose @LimitedGraphParams
+                       $GraphAccessToken = Connect-GraphHelper @AuthVerbose @LimitedGraphParams -PassThru
                        $AADAuthRequired = $false
+                   }
+                   if ($GraphAccessToken) {
+                       Write-ScubaAccessTokenPayload -AccessToken $GraphAccessToken -Label '[si] Microsoft Graph'
                    }
                }
                default {
