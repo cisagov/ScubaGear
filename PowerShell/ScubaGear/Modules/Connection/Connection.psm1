@@ -60,7 +60,7 @@ function Connect-Tenant {
    $ClientIdHash = [ScubaConfig]::ScubaDefault('AuthenticationClientIdHashtable')
    $AuthVerbose = @{}
    if ($VerbosePreference -eq 'Continue') { $AuthVerbose.Verbose = $true }
-   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Get-ScubaGearServiceEndpoint
+   Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable, Get-ScubaGearServiceEndpoint
    Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Write-ScubaLog
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/PowerPlatformRestHelper.psm1 -Function Get-PowerPlatformBaseUrl, Get-PowerPlatformScope
    Import-Module -Name $PSScriptRoot/../Providers/ProviderHelpers/TeamsRestHelper.psm1 -Function Get-TeamsScope, Get-TeamsBaseUrl, Get-TeamsUnifiedScope, Get-TeamsUnifiedBaseUrl
@@ -182,7 +182,7 @@ function Connect-Tenant {
 
                        # Resolve tenant info if not already cached
                        if ([string]::IsNullOrEmpty($TenantName)) {
-                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $OrgDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
                            $TenantId = $OrgDetails.Id
                            $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
                            $TenantName = $InitialDomain.Name
@@ -282,7 +282,7 @@ function Connect-Tenant {
                    else {
                        # Resolve tenant name if not already cached from a previous product
                        if ([string]::IsNullOrEmpty($TenantName)) {
-                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $OrgDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
                            $TenantId = $OrgDetails.Id
                            $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
                            $TenantName = $InitialDomain.Name
@@ -315,7 +315,7 @@ function Connect-Tenant {
                    if ($SPOAuthRequired) {
                        # Resolve tenant info if not already cached from a previous product
                        if ([string]::IsNullOrEmpty($TenantName)) {
-                           $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                           $OrgDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
                            $TenantId = $OrgDetails.Id
                            $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
                            $TenantName = $InitialDomain.Name
@@ -436,7 +436,7 @@ function Connect-Tenant {
                            else {
                                # Resolve tenant name if not already cached from a previous product
                                if ([string]::IsNullOrEmpty($TenantName)) {
-                                   $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                                   $OrgDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
                                    $TenantId = $OrgDetails.Id
                                    $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
                                    $TenantName = $InitialDomain.Name
@@ -504,7 +504,7 @@ function Connect-Tenant {
                     else {
                         # Resolve tenant domain name if not already cached from a previous product
                         if ([string]::IsNullOrEmpty($TenantName)) {
-                            $OrgDetails = (Invoke-GraphDirectly -Commandlet Get-MgBetaOrganization -M365Environment $M365Environment).Value
+                            $OrgDetails = Resolve-ScubaOrganization -M365Environment $M365Environment
                             $TenantId = $OrgDetails.Id
                             $InitialDomain = $OrgDetails.VerifiedDomains | Where-Object { $_.isInitial }
                             $TenantName = $InitialDomain.Name
