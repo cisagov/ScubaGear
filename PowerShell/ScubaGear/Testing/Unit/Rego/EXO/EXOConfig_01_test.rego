@@ -68,7 +68,7 @@ test_AutoForwardEnabled_Incorrect_V1 if {
     Domain := json.patch(RemoteDomains, [{"op": "add", "path": "AutoForwardEnabled", "value": true}])
 
     Output := exo.tests with input.remote_domains as [Domain]
-    ReportDetailString := concat(" ", ["1 remote domain allows automatic forwarding: example.com.", NoteAboutConfig])
+    ReportDetailString := $"1 remote domain allows automatic forwarding: example.com. {NoteAboutConfig}"
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 
@@ -80,10 +80,7 @@ test_AutoForwardEnabled_Incorrect_V2 if {
 
 
     Output := exo.tests with input.remote_domains as [Domain, Domain2]
-    ReportDetailString := concat(" ", [
-        "2 remote domains allow automatic forwarding: example.com, example2.com.",
-        NoteAboutConfig
-    ])
+    ReportDetailString := $"2 remote domains allow automatic forwarding: example.com, example2.com. {NoteAboutConfig}"
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 
@@ -134,7 +131,7 @@ test_AutoForwardEnabled_Incorrect_V5 if {
     Output := exo.tests with input.remote_domains as [Domain]
         with input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains as ["*"]
 
-    ReportDetailString := concat(" ", ["1 remote domain allows automatic forwarding: *.", WarningAboutDefaultDomain])
+    ReportDetailString := $"1 remote domain allows automatic forwarding: *. {WarningAboutDefaultDomain}"
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 
@@ -148,11 +145,8 @@ test_AutoForwardEnabled_Incorrect_V6 if {
     Output := exo.tests with input.remote_domains as [Domain, Domain2]
         with input.scuba_config.Exo["MS.EXO.1.1v2"].AllowedForwardingDomains as ["*", "example.com"]
 
-    ReportDetailString := concat("", [
-        "1 remote domain allows automatic forwarding: *. NOTE: additionally, 1 remote domain allows forwarding but is ",
-        "allowed per the ScubaGear config file: example.com. ",
-        WarningAboutDefaultDomain
-    ])
+    ForwardingSummary := "1 remote domain allows automatic forwarding: *. NOTE: additionally, 1 remote domain allows forwarding but is "
+    ReportDetailString := $"{ForwardingSummary}allowed per the ScubaGear config file: example.com. {WarningAboutDefaultDomain}"
     TestResult("MS.EXO.1.1v2", Output, ReportDetailString, false) == true
 }
 #--

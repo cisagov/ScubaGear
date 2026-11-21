@@ -7,7 +7,7 @@ import data.utils.aad.AgentExclusionsFullyExempt
 # SKU entries shaped like the provider's license_information export
 LicenseSku(PartNumber, EnabledUnits) := {
     "SkuPartNumber": PartNumber,
-    "SkuId": concat("-", ["sku", PartNumber]),
+    "SkuId": $"sku-{PartNumber}",
     "ConsumedUnits": 1,
     "PrepaidUnits": {"Enabled": EnabledUnits, "Suspended": 0, "Warning": 0, "LockedOut": 0},
 }

@@ -15,7 +15,7 @@ test_Enabled_Correct_V1 if {
                         with input.dkim_config as [DkimConfig]
                         with input.dkim_records as [DkimRecords]
 
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 # Test with correct default domain
@@ -32,7 +32,7 @@ test_Enabled_Correct_V2 if {
                         with input.dkim_config as [DkimConfig, DkimConfig1]
                         with input.dkim_records as [DkimRecords, DkimRecord1]
 
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 # Test for multiple custom domains
@@ -49,7 +49,7 @@ test_Enabled_Correct_V3 if {
                         with input.dkim_records as [DkimRecords, DkimRecord1]
 
 
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 # Test for no custom domains, just the default domain
@@ -64,7 +64,7 @@ test_Enabled_Correct_V4 if {
                         with input.dkim_records as [DkimRecord1]
 
 
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 # Test with coexistence domain, should be ignored
@@ -80,7 +80,7 @@ test_Enabled_Correct_V5 if {
                         with input.dkim_records as [DkimRecord1]
 
 
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [PASS, DNSLink]), true) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{PASS}. {DNSLink}", true) == true
 }
 
 test_Enabled_Incorrect if {
@@ -94,7 +94,7 @@ test_Enabled_Incorrect if {
 
 
     ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{ReportDetailString}. {DNSLink}", false) == true
 }
 
 test_Rdata_Incorrect_V1 if {
@@ -107,7 +107,7 @@ test_Rdata_Incorrect_V1 if {
                         with input.dkim_records as [DkimRecord1]
 
     ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{ReportDetailString}. {DNSLink}", false) == true
 }
 
 test_Rdata_Incorrect_V2 if {
@@ -120,7 +120,7 @@ test_Rdata_Incorrect_V2 if {
                         with input.dkim_records as [DkimRecord1]
 
     ReportDetailString := "1 agency domain(s) found in violation: test.name"
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{ReportDetailString}. {DNSLink}", false) == true
 }
 
 test_Enabled_Incorrect_V3 if {
@@ -138,7 +138,7 @@ test_Enabled_Incorrect_V3 if {
 
 
     ReportDetailString := "1 agency domain(s) found in violation: test2.name"
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{ReportDetailString}. {DNSLink}", false) == true
 }
 
 # Test with incorrect default domain
@@ -157,6 +157,6 @@ test_Enabled_Incorrect_V4 if {
                         with input.dkim_records as [DkimRecords, DkimRecord1]
 
     ReportDetailString := "1 agency domain(s) found in violation: example.onmicrosoft.com"
-    TestResult("MS.EXO.3.1v1", Output, concat(". ", [ReportDetailString, DNSLink]), false) == true
+    TestResult("MS.EXO.3.1v1", Output, $"{ReportDetailString}. {DNSLink}", false) == true
 }
 #--

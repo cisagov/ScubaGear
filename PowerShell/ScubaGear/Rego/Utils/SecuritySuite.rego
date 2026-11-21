@@ -66,7 +66,7 @@ DLPLicenseWarningString(Status, String) := ReportDetailsString(Status, String) i
     input.defender_dlp_license == true
 }
 
-DLPLicenseWarningString(_, _) := concat(" ", [FAIL, DLPLICENSEWARNSTR]) if {
+DLPLicenseWarningString(_, _) := $"{FAIL} {DLPLICENSEWARNSTR}" if {
     input.defender_dlp_license == false
 }
 

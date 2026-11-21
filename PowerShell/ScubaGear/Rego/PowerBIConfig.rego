@@ -15,7 +15,7 @@ PowerbiLicenseErrorMessage := "Power BI license was not found. Unable to evaluat
     PowerbiLicenseReason == ""
 }
 
-PowerbiLicenseErrorMessage := sprintf("Unable to evaluate tenant setting. %v", [PowerbiLicenseReason]) if {
+PowerbiLicenseErrorMessage := $"Unable to evaluate tenant setting. {PowerbiLicenseReason}" if {
     PowerbiLicenseReason != ""
 }
 
@@ -42,7 +42,7 @@ PowerbiUnavailableActualValue := "Access Denied" if PowerbiAccessDenied
 
 PowerbiUnavailableMessage := PowerbiLicenseErrorMessage if not PowerbiLicenseFound
 
-PowerbiUnavailableMessage := sprintf("Unable to evaluate tenant setting. %v", [PowerbiAccessDeniedReason]) if {
+PowerbiUnavailableMessage := $"Unable to evaluate tenant setting. {PowerbiAccessDeniedReason}" if {
     PowerbiAccessDenied
 }
 

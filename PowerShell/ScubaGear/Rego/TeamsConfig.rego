@@ -75,12 +75,12 @@ ReportDetails1_3(Policy) := PASS if {
 ReportDetails1_3(Policy) := Description if {
     Policy.AutoAdmittedUsers != "Everyone"
     Policy.AllowPSTNUsersToBypassLobby == true
-    Description := concat(": ", [FAIL, "Dial-in users are enabled to bypass the lobby"])
+    Description := $"{FAIL}: Dial-in users are enabled to bypass the lobby"
 }
 
 ReportDetails1_3(Policy) := Description if {
     Policy.AutoAdmittedUsers == "Everyone"
-    Description := concat(": ", [FAIL, "All users are admitted automatically"])
+    Description := $"{FAIL}: All users are admitted automatically"
 }
 
 # If AutoAdmittedUsers != Everyone &
@@ -579,11 +579,7 @@ BuildDefaultAppDetails(SettingValue, _, _, _) := PASS if {
 }
 
 # When org-wide setting is available but non-compliant, show details
-BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
-    "Org-wide tenant setting (Microsoft apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildDefaultAppDetails(SettingValue, TenantDetails, _, _) := $"Org-wide tenant setting (Microsoft apps): {SettingValue}{TenantDetails}" if {
     SettingValue != "Not Checked"
     SettingValue != "Certificate Auth"
     DefaultAppTenantSettingCompliant == false
@@ -601,24 +597,14 @@ BuildDefaultAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := Legac
 }
 
 # When legacy is NOT compliant and tenant setting is not checked, show full message
-BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
-    "Legacy app permission policy check: ",
-    LegacyDetails,
-    ". Org-wide tenant setting (Microsoft apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := Details if {
+    Details := $"Legacy app permission policy check: {LegacyDetails}. Org-wide tenant setting (Microsoft apps): {SettingValue}{TenantDetails}"
     SettingValue == "Not Checked"
     LegacyCompliant == false
 }
 
-BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
-    "Legacy app permission policy check: ",
-    LegacyDetails,
-    ". Org-wide tenant setting (Microsoft apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildDefaultAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := Details if {
+    Details := $"Legacy app permission policy check: {LegacyDetails}. Org-wide tenant setting (Microsoft apps): {SettingValue}{TenantDetails}"
     SettingValue == "Certificate Auth"
     LegacyCompliant == false
 }
@@ -746,11 +732,7 @@ BuildGlobalAppDetails(SettingValue, _, _, _) := PASS if {
 }
 
 # When org-wide setting is available but non-compliant, show details
-BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
-    "Org-wide tenant setting (third-party apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildGlobalAppDetails(SettingValue, TenantDetails, _, _) := $"Org-wide tenant setting (third-party apps): {SettingValue}{TenantDetails}" if {
     SettingValue != "Not Checked"
     SettingValue != "Certificate Auth"
     GlobalAppTenantSettingCompliant == false
@@ -768,24 +750,14 @@ BuildGlobalAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := Legacy
 }
 
 # When legacy is NOT compliant and tenant setting is not checked, show full message
-BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
-    "Legacy app permission policy check: ",
-    LegacyDetails,
-    ". Org-wide tenant setting (third-party apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := Details if {
+    Details := $"Legacy app permission policy check: {LegacyDetails}. Org-wide tenant setting (third-party apps): {SettingValue}{TenantDetails}"
     SettingValue == "Not Checked"
     LegacyCompliant == false
 }
 
-BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
-    "Legacy app permission policy check: ",
-    LegacyDetails,
-    ". Org-wide tenant setting (third-party apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildGlobalAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := Details if {
+    Details := $"Legacy app permission policy check: {LegacyDetails}. Org-wide tenant setting (third-party apps): {SettingValue}{TenantDetails}"
     SettingValue == "Certificate Auth"
     LegacyCompliant == false
 }
@@ -913,11 +885,7 @@ BuildPrivateAppDetails(SettingValue, _, _, _) := PASS if {
 }
 
 # When org-wide setting is available but non-compliant, show details
-BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := concat("", [
-    "Org-wide tenant setting (custom apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildPrivateAppDetails(SettingValue, TenantDetails, _, _) := $"Org-wide tenant setting (custom apps): {SettingValue}{TenantDetails}" if {
     SettingValue != "Not Checked"
     SettingValue != "Certificate Auth"
     PrivateAppTenantSettingCompliant == false
@@ -935,24 +903,14 @@ BuildPrivateAppDetails(SettingValue, _, LegacyDetails, LegacyCompliant) := Legac
 }
 
 # When legacy is NOT compliant and tenant setting is not checked, show full message
-BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
-    "Legacy app permission policy check: ",
-    LegacyDetails,
-    ". Org-wide tenant setting (custom apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := Details if {
+    Details := $"Legacy app permission policy check: {LegacyDetails}. Org-wide tenant setting (custom apps): {SettingValue}{TenantDetails}"
     SettingValue == "Not Checked"
     LegacyCompliant == false
 }
 
-BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := concat("", [
-    "Legacy app permission policy check: ",
-    LegacyDetails,
-    ". Org-wide tenant setting (custom apps): ",
-    SettingValue,
-    TenantDetails
-]) if {
+BuildPrivateAppDetails(SettingValue, TenantDetails, LegacyDetails, LegacyCompliant) := Details if {
+    Details := $"Legacy app permission policy check: {LegacyDetails}. Org-wide tenant setting (custom apps): {SettingValue}{TenantDetails}"
     SettingValue == "Certificate Auth"
     LegacyCompliant == false
 }

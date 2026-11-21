@@ -101,24 +101,16 @@ ReportDetails1_2 := Details if {
 } else := Details if {
     count(NonCompForwardingDomains) > 0
     count(AllowedForwardingDomains) > 0
-    Details := concat(" ", [
-        NonCompDomainsSummary,
-        "NOTE: additionally,",
-        AllowedDomainsSummary,
-        NoticeAboutConfigFile
-    ])
+    Details := $"{NonCompDomainsSummary} NOTE: additionally, {AllowedDomainsSummary} {NoticeAboutConfigFile}"
 } else := Details if {
     count(NonCompForwardingDomains) > 0
     count(AllowedForwardingDomains) == 0
-        Details := concat(" ", [
-            NonCompDomainsSummary,
-            NoticeAboutConfigFile
-        ])
+    Details := $"{NonCompDomainsSummary} {NoticeAboutConfigFile}"
 } else := Details if {
     # Note that even though this case is compliant, we still have valuable details we can present in the report
     count(NonCompForwardingDomains) == 0
     count(AllowedForwardingDomains) > 0
-    Details := concat(" ", [AllowedDomainsSummary, NoticeAboutConfigFile])
+    Details := $"{AllowedDomainsSummary} {NoticeAboutConfigFile}"
 }
 
 tests contains {
@@ -177,7 +169,7 @@ tests contains {
     "Criticality": "Shall",
     "Commandlet": ["Get-ScubaSpfRecord", "Get-AcceptedDomain"],
     "ActualValue": DomainsWithoutSpf,
-    "ReportDetails": concat("", [SpfStatusMessage, DNSLink]),
+    "ReportDetails": $"{SpfStatusMessage}{DNSLink}",
     "RequirementMet": Status
 } if {
     Status := count(DomainsWithoutSpf) == 0
