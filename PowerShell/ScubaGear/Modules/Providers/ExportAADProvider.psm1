@@ -1,4 +1,4 @@
-Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
+Import-Module -Name $PSScriptRoot/../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
 Import-Module -Name $PSScriptRoot/../Utility/ScubaLogging.psm1 -Function Trace-ScubaFunction, Write-ScubaLog
 
 function Export-AADProvider {
@@ -370,8 +370,7 @@ function Get-AADTenantDetail {
         $M365Environment
     )
     try {
-        # Retrieve tenant details using GraphDirectly to reduce reliance on the cmdlet. The cmdlet is used as a reference, it looks up API details within the Permissions JSON file.
-        $OrgInfo = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
+        $OrgInfo = Resolve-ScubaOrganization -M365Environment $M365Environment
         $InitialDomain = $OrgInfo.VerifiedDomains | Where-Object {$_.isInitial}
         if (-not $InitialDomain) {
             $InitialDomain = "AAD: Domain Unretrievable"

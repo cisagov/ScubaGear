@@ -1,4 +1,4 @@
-Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
+Import-Module -Name $PSScriptRoot/../../Utility/Utility.psm1 -Function Invoke-GraphDirectly, Resolve-ScubaOrganization, ConvertFrom-GraphHashtable, Invoke-GraphBatchRequest
 
 # Module-scoped cache for RiskyAppPermissions.json - loaded once, reused across all function calls
 $script:CachedRiskyAppPermissionsJson = $null
@@ -907,7 +907,7 @@ function Format-RiskyThirdPartyServicePrincipals {
     process {
         try {
             $ServicePrincipals = @()
-            $OrgInfo = (Invoke-GraphDirectly -Commandlet "Get-MgBetaOrganization" -M365Environment $M365Environment).Value
+            $OrgInfo = Resolve-ScubaOrganization -M365Environment $M365Environment
 
             foreach ($ServicePrincipal in $RiskySPs) {
                 if ($null -eq $ServicePrincipal) {
