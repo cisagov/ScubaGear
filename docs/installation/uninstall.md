@@ -124,8 +124,19 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus -RequiredModulesPath C:\Users\us
 
 ## Uninstall OPA by deleting the `.scubagear` folder in the user's home directory
 
+Remove OPA exe and Check dependency status; confirm each module shows the correct Status and Action:
 ```PowerShell
-PS C:\Users\user> Remove-Item -Recurse C:\Users\user\.scubagear
+PS C:\Users\user> Remove-Item "$env:USERPROFILE\.scubagear\Tools\*.exe" -Force
+PS C:\Users\user> Get-ScubaGearDependencyStatus
+
+> Run 'Install-ScubaDependencies' to install missing dependencies.
+> Run 'Update-ScubaGear' to update the ScubaGear module itself.
+> 
+> ModuleName                       Installed   Versions HighestVersion  Status     Action
+> ----------                       ---------   -------- --------------  ------     ------
+> powershell-yaml                  True               1 0.4.12          OK         None
+> OPA                              False              0                 MISSING    Install
+> ScubaGear                        False              0                 MISSING    Install
 ```
 
 ## Uninstall ScubaGear itself
