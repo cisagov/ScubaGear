@@ -122,9 +122,9 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus -RequiredModulesPath C:\Users\us
 > ScubaGear                        False              0                 MISSING    Install
 ```
 
-## Uninstall OPA by deleting the `.scubagear` folder in the user's home directory
+## Uninstall OPA
 
-Remove OPA exe and Check dependency status; confirm each module shows the correct Status and Action:
+Remove OPA by clearing executable files from the `.scubagear\Tools` folder in the user's home directory. Check the dependency status. After removing the OPA executable, its status becomes missing, as in the following example:
 ```PowerShell
 PS C:\Users\user> Remove-Item "$env:USERPROFILE\.scubagear\Tools\*.exe" -Force
 PS C:\Users\user> Get-ScubaGearDependencyStatus
