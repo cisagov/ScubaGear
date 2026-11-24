@@ -76,16 +76,32 @@ Describe -Tag 'PermissionsHelper' -Name 'ScubaGearApiCatalog.json structure' {
         $ByType = @{}
         $script:Catalog | Group-Object entryType | ForEach-Object { $ByType[$_.Name] = $_.Count }
         $ByType['graphConnect']  | Should -Be 3  -Because 'Connect-MgGraph base URL, one per environment grouping'
-        $ByType['graphResource'] | Should -Be 45 -Because 'one Graph cmdlet resource record each'
+        $ByType['graphResource'] | Should -Be 50 -Because 'one Graph cmdlet resource record each'
         $ByType['restBase']      | Should -Be 19 -Because 'per-product REST API host records across environments'
-        $ByType['restHelper']    | Should -Be 12 -Because 'provider REST helper functions with a fixed path'
-        $script:Catalog.Count    | Should -Be 79 -Because 'total catalog size; change this only when intentionally adding or removing an API'
+        $ByType['restHelper']    | Should -Be 14 -Because 'provider REST helper functions with a fixed path'
+        $script:Catalog.Count    | Should -Be 86 -Because 'total catalog size; change this only when intentionally adding or removing an API'
     }
 
     It 'has a unique functionName for every graphResource (exactly one entry per Graph cmdlet)' {
         $GraphResource = @($script:Catalog | Where-Object { $_.entryType -eq 'graphResource' } | ForEach-Object { $_.functionName })
         ($GraphResource | Group-Object | Where-Object Count -gt 1 | ForEach-Object Name) | Should -BeNullOrEmpty -Because 'a cmdlet resolving to two different entries is ambiguous'
         $GraphResource.Count | Should -Be (@($GraphResource | Sort-Object -Unique).Count)
+    }
+
+    It 'substitutes the group ID and preserves the member ID placeholder in the group removal path' {
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Utility/Utility.psm1' -Resolve) -Force
+        $Endpoint = Get-ScubaGearGraphEndpoint -CmdletName 'Remove-MgGroupMemberByRef' `
+            -Environment commercial -Id 'group-id'
+
+        $Endpoint | Should -Be 'https://graph.microsoft.com/v1.0/groups/group-id/members/{memberId}/$ref'
+    }
+
+    It 'resolves the catalog-backed Global Reader role-assignment deletion path' {
+        Import-Module (Join-Path -Path $PSScriptRoot -ChildPath '../../../../Modules/Utility/Utility.psm1' -Resolve) -Force
+        $Endpoint = Get-ScubaGearGraphEndpoint -CmdletName 'Remove-MgRoleManagementDirectoryRoleAssignment' `
+            -Environment commercial -Id 'role-assignment-id'
+
+        $Endpoint | Should -Be 'https://graph.microsoft.com/v1.0/roleManagement/directory/roleAssignments/role-assignment-id'
     }
 
     It 'has no duplicate restHelper functionName (Get-ScubaGearRestEndpoint resolves by functionName)' {
