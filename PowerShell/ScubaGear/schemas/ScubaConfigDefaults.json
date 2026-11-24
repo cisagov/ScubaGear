@@ -39,7 +39,8 @@
     "NumberOfUUIDCharactersToTruncate": 18,
     "OPAVersion": "1.22.4",
     "PreferredDnsResolvers": [],
-    "SkipDoH": false
+    "SkipDoH": false,
+    "SkipLongFunctions": false
   },
   "minRequired": [
     "OrgName",

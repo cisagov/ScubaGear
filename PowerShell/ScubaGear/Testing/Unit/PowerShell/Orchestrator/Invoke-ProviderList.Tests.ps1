@@ -6,7 +6,10 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
     BeforeAll {
     function Set-Utf8NoBom {}
     Mock -ModuleName Orchestrator Set-Utf8NoBom {}
-        function Export-AADProvider {}
+        function Export-AADProvider {
+            param([string]$M365Environment, [switch]$SkipLongFunctions)
+            $null = $M365Environment, $SkipLongFunctions
+        }
         Mock -ModuleName Orchestrator Export-AADProvider {}
         function Export-EXOProvider {}
         Mock -ModuleName Orchestrator Export-EXOProvider {}
@@ -79,6 +82,26 @@ Describe -Tag 'Orchestrator' -Name 'Invoke-ProviderList' {
         It 'With -ProductNames "aad", should not throw' {
               $ScubaConfig.ProductNames = @("aad")
                         { Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult } | Should -Not -Throw
+        }
+        It 'passes SkipLongFunctions true to the Entra ID provider' {
+              $ScubaConfig.ProductNames = @('aad')
+              $ScubaConfig | Add-Member -NotePropertyName SkipLongFunctions -NotePropertyValue $true -Force
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -CommandName Export-AADProvider -ModuleName Orchestrator -Times 1 -Exactly -ParameterFilter { $SkipLongFunctions -eq $true }
+        }
+        It 'passes SkipLongFunctions false to the Entra ID provider' {
+              $ScubaConfig.ProductNames = @('aad')
+              $ScubaConfig | Add-Member -NotePropertyName SkipLongFunctions -NotePropertyValue $false -Force
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -CommandName Export-AADProvider -ModuleName Orchestrator -Times 1 -Exactly -ParameterFilter { -not $SkipLongFunctions }
+        }
+        It 'passes SkipLongFunctions false when the config value is absent' {
+              $ScubaConfig.ProductNames = @('aad')
+              if ($ScubaConfig.PSObject.Properties.Name -contains 'SkipLongFunctions') {
+                  $ScubaConfig.PSObject.Properties.Remove('SkipLongFunctions')
+              }
+              Invoke-ProviderList -ScubaConfig $ScubaConfig -TenantDetails $TenantDetails -ModuleVersion $ModuleVersion -OutFolderPath $OutFolderPath -Guid $Guid -ConnectionResult $ConnectionResult
+              Should -Invoke -CommandName Export-AADProvider -ModuleName Orchestrator -Times 1 -Exactly -ParameterFilter { -not $SkipLongFunctions }
         }
         It 'With -ProductNames "securitysuite", should not throw' {
               $ScubaConfig.ProductNames = @("securitysuite")

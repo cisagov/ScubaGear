@@ -70,6 +70,10 @@ OutReportName: BaselineReports
 # queries over DoH (using Cloudflare)
 # SkipDoH: true
 
+# Uncomment to skip the long Entra ID checks for applications and service
+# principals with risky permissions. Other Entra ID checks still run.
+# SkipLongFunctions: true
+
 # An anObject is equivalent to an array of objects in JSON.
 # This is an example of a custom variable that can be used in Rego policies.
 # AnObject:
@@ -298,3 +302,7 @@ PreferredDnsResolvers:
 # Use this parameter if you prefer ScubaGear not retry any failed DNS queries
 # over DoH (using Cloudflare).
 SkipDoH: true
+
+# Leave false to run the Entra ID application and service principal risky
+# permission checks. Set true to omit those two long checks.
+SkipLongFunctions: false
