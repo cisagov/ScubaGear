@@ -379,6 +379,105 @@ InModuleScope 'Support' {
             }
         }
 
+        Context "Get-ScubaLatestAcceptableModuleVersion" {
+            It "Should use the highest version when several repositories return the module" {
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.5'; Repository = 'PSGallery' }
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.12'; Repository = 'PSGallery' }
+                    )
+                }
+
+                $version = Get-ScubaLatestAcceptableModuleVersion -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+
+                $version | Should -Be ([version]'0.4.12')
+            }
+
+            It "Should keep the PSGallery version when that repository returns a match" {
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.12'; Repository = 'PrivateGallery' }
+                    )
+                }
+                Mock Find-Module -ParameterFilter { $Repository -eq 'PSGallery' } {
+                    return [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.7'; Repository = 'PSGallery' }
+                }
+
+                $version = Get-ScubaLatestAcceptableModuleVersion -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+
+                $version | Should -Be ([version]'0.4.7')
+                Should -Invoke Find-Module -Times 1 -ParameterFilter { $Repository -eq 'PSGallery' }
+                Should -Invoke Find-Module -Times 0 -ParameterFilter { -not $Repository }
+            }
+
+            It "Should use the highest version from the remaining repositories when PSGallery has no match" {
+                Mock Find-Module {
+                    return @(
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.5'; Repository = 'PrivateGallery' }
+                        [PSCustomObject]@{ Name = 'powershell-yaml'; Version = '0.4.12'; Repository = 'PrivateGallery' }
+                    )
+                }
+                Mock Find-Module -ParameterFilter { $Repository -eq 'PSGallery' } { throw 'No match was found in PSGallery.' }
+
+                $version = Get-ScubaLatestAcceptableModuleVersion -ModuleName 'powershell-yaml' -MinimumVersion '0.4.2' -MaximumVersion '0.4.12'
+
+                $version | Should -Be ([version]'0.4.12')
+            }
+        }
+
+        Context "Set-ScubaPSGalleryTrust" {
+            BeforeEach {
+                # Mock the thin wrapper instead of Set-PSRepository. PowerShellGet's
+                # Set-PSRepository dynamic parameter binder validates Location and
+                # throws under Pester even when Set-PSRepository itself is mocked.
+                Mock Set-ScubaPSRepository { }
+            }
+
+            It "Should not update trust when PSGallery is already Trusted" {
+                Mock Get-PSRepository {
+                    return [PSCustomObject]@{
+                        Name               = 'PSGallery'
+                        InstallationPolicy = 'Trusted'
+                        Trusted            = $true
+                    }
+                }
+
+                Set-ScubaPSGalleryTrust
+
+                Should -Invoke Set-ScubaPSRepository -Times 0
+            }
+
+            It "Should trust PSGallery when its installation policy is not Trusted" {
+                Mock Get-PSRepository {
+                    return [PSCustomObject]@{
+                        Name               = 'PSGallery'
+                        InstallationPolicy = 'Untrusted'
+                        Trusted            = $false
+                    }
+                }
+
+                Set-ScubaPSGalleryTrust
+
+                Should -Invoke Set-ScubaPSRepository -Times 1 -ParameterFilter {
+                    $Name -eq 'PSGallery' -and $InstallationPolicy -eq 'Trusted'
+                }
+            }
+
+            It "Should not change trust when DoNotAutoTrustRepository is set" {
+                Mock Get-PSRepository {
+                    return [PSCustomObject]@{
+                        Name               = 'PSGallery'
+                        InstallationPolicy = 'Untrusted'
+                        Trusted            = $false
+                    }
+                }
+
+                Set-ScubaPSGalleryTrust -DoNotAutoTrustRepository
+
+                Should -Invoke Set-ScubaPSRepository -Times 0
+            }
+        }
+
         Context "Install-ScubaDependencies alias" {
             It "Should expose Install-ScubaDependencies as a function" {
                 Get-Command -Name 'Install-ScubaDependencies' -CommandType Function | Should -Not -BeNullOrEmpty

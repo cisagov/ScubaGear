@@ -915,6 +915,119 @@ function Remove-ScubaModuleVersion {
     return $outcome
 }
 
+function Get-ScubaLatestAcceptableModuleVersion {
+    <#
+    .SYNOPSIS
+        Returns the newest acceptable published version of a ScubaGear dependency.
+
+    .DESCRIPTION
+        Find-Module returns one object per registered repository when -Repository is omitted.
+        Casting that array's Version property to [version] fails. This helper asks PSGallery
+        first, because Install-ScubaModule installs from PSGallery, and falls back to every
+        registered repository when PSGallery has no match. Multiple results are reduced to
+        the single highest version.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$ModuleName,
+
+        [Parameter(Mandatory = $true)]
+        [version]$MinimumVersion,
+
+        [Parameter(Mandatory = $true)]
+        [version]$MaximumVersion
+    )
+
+    $FindParams = @{
+        Name           = $ModuleName
+        MinimumVersion = $MinimumVersion
+        MaximumVersion = $MaximumVersion
+        ErrorAction    = 'Stop'
+    }
+
+    $Found = @()
+    try {
+        $Found = @(Find-Module @FindParams -Repository PSGallery | Where-Object { $null -ne $_ })
+    }
+    catch {
+        Write-Debug "PSGallery did not return ${ModuleName}: $($_.Exception.Message)"
+    }
+
+    if ($Found.Count -eq 0) {
+        $Found = @(Find-Module @FindParams | Where-Object { $null -ne $_ })
+    }
+
+    $Latest = $Found |
+        Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_.Version) } |
+        Sort-Object -Property @{ Expression = { [version]$_.Version } } -Descending |
+        Select-Object -First 1
+
+    if (-not $Latest) {
+        throw "Could not determine the latest acceptable version for ${ModuleName}."
+    }
+
+    return [version]$Latest.Version
+}
+
+function Set-ScubaPSRepository {
+    <#
+    .SYNOPSIS
+        Thin wrapper around Set-PSRepository for PSGallery trust updates.
+
+    .DESCRIPTION
+        Kept separate so unit tests can mock repository policy changes without
+        invoking PowerShellGet's Set-PSRepository dynamic parameter binder.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $Name,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]
+        $InstallationPolicy
+    )
+
+    Set-PSRepository -Name $Name -InstallationPolicy $InstallationPolicy
+}
+
+function Set-ScubaPSGalleryTrust {
+    <#
+    .SYNOPSIS
+        Trusts the PSGallery repository unless the caller opted out.
+
+    .DESCRIPTION
+        Install-ScubaDependencies needs a trusted PSGallery to install modules
+        without prompts. Callers can pass -DoNotAutoTrustRepository to skip the
+        policy change and only report the current trust state. Trust is decided
+        from InstallationPolicy (not the Trusted boolean) so Untrusted galleries
+        are actually updated.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false)]
+        [switch]
+        $DoNotAutoTrustRepository
+    )
+
+    if ($DoNotAutoTrustRepository) {
+        $RepositoryDetails = Get-PSRepository -Name "PSGallery"
+        Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
+        return
+    }
+
+    $Policy = Get-PSRepository -Name "PSGallery"
+    if ($Policy.InstallationPolicy -ne "Trusted") {
+        Set-ScubaPSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Write-Output "PSGallery is trusted."
+    }
+}
+
 function Install-ScubaDependencies {
     <#
     .SYNOPSIS
@@ -1003,17 +1116,7 @@ function Install-ScubaDependencies {
     $DebugPreference = "Continue"
     $InformationPreference = "Continue"
 
-    if ($DoNotAutoTrustRepository) {
-        $RepositoryDetails = Get-PSRepository -Name "PSGallery"
-        Write-Output "PSGallery is $($RepositoryDetails.Trusted)."
-    }
-    else {
-        $Policy = Get-PSRepository -Name "PSGallery" | Select-Object -Property -InstallationPolicy
-        if ($($Policy.InstallationPolicy) -ne "Trusted") {
-            Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-            Write-Output "PSGallery is trusted."
-        }
-    }
+    Set-ScubaPSGalleryTrust -DoNotAutoTrustRepository:$DoNotAutoTrustRepository
 
     # Start a stopwatch to time module installation elapsed time
     $Stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
@@ -1043,7 +1146,7 @@ function Install-ScubaDependencies {
 
             # Check if ANY installed version is in the acceptable range
             if ($ModuleStatus.VersionsInRange.Count -gt 0) {
-                $LatestAcceptableVersion = [Version](Find-Module -Name $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion).Version
+                $LatestAcceptableVersion = Get-ScubaLatestAcceptableModuleVersion -ModuleName $ModuleName -MinimumVersion $Module.ModuleVersion -MaximumVersion $Module.MaximumVersion
 
                 # Best acceptable version already installed (computed by the common helper)
                 $BestInstalledVersion = $ModuleStatus.BestVersionToKeep
@@ -2817,7 +2920,7 @@ function Reset-ScubaGearDependencies {
                 $latestAcceptable = $null
                 if (-not $SkipUpdate) {
                     try {
-                        $latestAcceptable = [version](Find-Module -Name $moduleName -MinimumVersion $minVersion -MaximumVersion $maxVersion -Repository PSGallery -ErrorAction Stop).Version
+                        $latestAcceptable = Get-ScubaLatestAcceptableModuleVersion -ModuleName $moduleName -MinimumVersion $minVersion -MaximumVersion $maxVersion
                     }
                     catch {
                         $result.Warnings += "Could not determine the latest acceptable version for ${moduleName}: $($_.Exception.Message)"
