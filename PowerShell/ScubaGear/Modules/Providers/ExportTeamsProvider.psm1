@@ -1,3 +1,5 @@
+using module '..\ScubaConfig\ScubaConfig.psm1'
+
 function Export-TeamsProvider {
     <#
     .Description
@@ -13,8 +15,8 @@ function Export-TeamsProvider {
         $CertificateBasedAuth = $false,
 
         [Parameter(Mandatory = $true)]
-        [ValidateSet("commercial", "gcc", "gcchigh", "dod", IgnoreCase = $false)]
         [ValidateNotNullOrEmpty()]
+        [ValidateScript({ $_ -cin [ScubaConfig]::GetSupportedEnvironments() })]
         [string]
         $M365Environment,
 
