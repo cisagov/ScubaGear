@@ -16,6 +16,22 @@ It produces three artifacts:
 3. **`DiffReport.html`** — a self-contained HTML report that highlights the
    diffs with color-coded rows and hides unchanged rows behind a toggle.
 
+## Sample output
+
+A sample of all three artifacts ships with ScubaGear in
+[Sample-Reports/DiffReports](../../PowerShell/ScubaGear/Sample-Reports/DiffReports/README.md).
+It diffs the sanitized v1.6.0 sample report against the sanitized v2.0.0 sample
+report, so it shows the Defender and EXO to Security Suite migration alongside
+`NewPolicy`, `RemovedPolicy`, and `PolicyVersionUpdate` records:
+
+- [DiffReport.html](../../PowerShell/ScubaGear/Sample-Reports/DiffReports/DiffReport.html)
+- [DiffResults.json](../../PowerShell/ScubaGear/Sample-Reports/DiffReports/DiffResults.json)
+- [DiffResults.csv](../../PowerShell/ScubaGear/Sample-Reports/DiffReports/DiffResults.csv)
+
+`Copy-SCuBASampleReport` copies the sample, together with the other sample
+reports, out of the installed module. The folder's README lists the source
+files, the ScubaGear version, and the command used to generate the sample.
+
 ## Usage
 
 Provide the path to the first (earlier) `ScubaResults.json` and the path to the
