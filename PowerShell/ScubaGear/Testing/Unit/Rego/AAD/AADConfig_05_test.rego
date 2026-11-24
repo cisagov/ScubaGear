@@ -212,7 +212,8 @@ test_PasswordAdditionBlocked_EmptyScopes if {
         with input.app_management_policies as []
 
     TestResultContains("MS.AAD.5.5v1", Output, ["Application policy \"Block password addition\" is not enabled"], false) == true
-    aad.PasswordAdditionIssues == {"Application policy \"Block password addition\" is not enabled"} with input.default_app_management_policy as [Policy]
+    aad.PasswordAdditionIssues == {"Application policy \"Block password addition\" is not enabled"}
+        with input.default_app_management_policy as [Policy]
         with input.app_management_policies as []
     aad.PasswordAdditionFullyBlocked == false with input.default_app_management_policy as [Policy]
         with input.app_management_policies as []
@@ -220,7 +221,7 @@ test_PasswordAdditionBlocked_EmptyScopes if {
 
 test_PasswordAdditionBlocked_MissingRestrictionInEachScope if {
     every ScopeName in ["ApplicationRestrictions", "ServicePrincipalRestrictions"] {
-        CredentialsPath := sprintf("%v/PasswordCredentials", [ScopeName])
+        CredentialsPath := $"{ScopeName}/PasswordCredentials"
         every Patch in [
             {"op": "replace", "path": CredentialsPath, "value": []},
             {"op": "replace", "path": CredentialsPath, "value": [{"RestrictionType": "passwordLifetime"}]},

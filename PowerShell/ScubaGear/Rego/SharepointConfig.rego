@@ -29,18 +29,10 @@ SliderSettings(3) := "Existing Guests"
 
 SliderSettings(Value) := "Unknown" if not Value in [0, 1, 2, 3]
 
-NAString(SharingSetting, Negation) := concat("", [
-    "This policy is only applicable if the external sharing slider in the SharePoint admin center is set to ",
-    SharingSetting,
-    ". ",
-    "See %v for more info"
-]) if Negation == false
-else := concat("", [
-    "This policy is only applicable if the external sharing slider in the SharePoint admin center is not set to ",
-    SharingSetting,
-    ". ",
-    "See %v for more info"
-]) if Negation == true
+NA_STRING_PREFIX := "This policy is only applicable if the external sharing slider in the SharePoint admin center is"
+
+NAString(SharingSetting, Negation) := $"{NA_STRING_PREFIX} set to {SharingSetting}. See %v for more info" if Negation == false
+else := $"{NA_STRING_PREFIX} not set to {SharingSetting}. See %v for more info" if Negation == true
 
 # All of the SharePoint settings
 default SPOTenant := {}
@@ -395,21 +387,12 @@ PERMISSION_STRING := "are not limited to view for Anyone"
 FileAndFolderLinkPermission(FileLinkType, FolderLinkType) := PASS if {
     FileLinkType == 1
     FolderLinkType == 1
-} else := concat(": ", [
-    FAIL,
-    concat(" ", ["both files and folders", PERMISSION_STRING])
-]) if {
+} else := $"{FAIL}: both files and folders {PERMISSION_STRING}" if {
     FileLinkType != 1
     FolderLinkType != 1
-} else := concat(": ", [
-    FAIL,
-    concat(" ", ["files", PERMISSION_STRING])
-]) if {
+} else := $"{FAIL}: files {PERMISSION_STRING}" if {
     FileLinkType != 1
-} else := concat(": ", [
-    FAIL,
-    concat(" ", ["folders", PERMISSION_STRING])
-]) if {
+} else := $"{FAIL}: folders {PERMISSION_STRING}" if {
     FolderLinkType != 1
 }
 
@@ -490,15 +473,15 @@ VerificationCodeReAuthExpiration := [PASS, true] if {
 } else := [ErrStr, false] if {
     EmailAttestationRequiredSetting == false
     EmailAttestationReAuthDaysSetting <= 30
-    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled"])])
+    ErrStr := $"{FAIL}: {VERIFICATION_STRING} enabled"
 } else := [ErrStr, false] if {
     EmailAttestationRequiredSetting == true
     EmailAttestationReAuthDaysSetting > 30
-    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "set to 30 days or less"])])
+    ErrStr := $"{FAIL}: {VERIFICATION_STRING} set to 30 days or less"
 } else := [ErrStr, false] if {
     EmailAttestationRequiredSetting == false
     EmailAttestationReAuthDaysSetting > 30
-    ErrStr := concat(": ", [FAIL, concat(" ", [VERIFICATION_STRING, "enabled and set to 30 days or more"])])
+    ErrStr := $"{FAIL}: {VERIFICATION_STRING} enabled and set to 30 days or more"
 } else := [FAIL, false]
 
 # This policy is only applicable if external sharing is set to "Anyone",
