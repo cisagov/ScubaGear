@@ -124,9 +124,15 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus -RequiredModulesPath C:\Users\us
 
 ## Uninstall OPA
 
-Remove OPA by clearing executable files from the `.scubagear\Tools` folder in the user's home directory. Check the dependency status. After removing the OPA executable, its status becomes missing, as in the following example:
+Remove OPA by clearing executable files from the OPA folder, as illustrated in the below example. For alternate OPA installations such as those referenced in JSON configuration or passed as an `-OPAPath` parameter to `Invoke-SCuBA`, or those stored in a YAML configuration file by the Scuba Config App, remove the OPA executable from the custom OPA path. 
+
 ```PowerShell
 PS C:\Users\user> Remove-Item "$env:USERPROFILE\.scubagear\Tools\*.exe" -Force
+```
+
+To verify the default installation is uninstalled, run `Get-ScubaGearDependencyStatus`, and confirm OPA status is missing, as in the following example:
+
+```PowerShell
 PS C:\Users\user> Get-ScubaGearDependencyStatus
 
 > Run 'Install-ScubaDependencies' to install missing dependencies.
