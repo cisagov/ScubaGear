@@ -32,13 +32,11 @@ List the dependencies that are installed. Manual and automated example methods a
 The method in this example fetches the installed module names in the `RequiredVersions.ps1` script, and provides the installed module name, version, and installation path (Module Base). Typical installation paths are inside of the user profile path when installed for Current User, and inside of Program Files path when installed for All Users.
 
 ```PowerShell
-PS C:\Users\user> . C:\Users\user\ScubaGear-1.8.0\PowerShell\ScubaGear\RequiredVersions.ps1
+PS C:\Users\user> . C:\Users\user\ScubaGear-2.0.0\PowerShell\ScubaGear\RequiredVersions.ps1
 PS C:\Users\user> $ModuleList | ForEach-Object { Get-Module -ListAvailable -Name $_.ModuleName } | Select-Object Name, Version, ModuleBase
 
 > Name                           Version ModuleBase
 > ----                           ------- ----------
-> MicrosoftTeams                 7.5.0   C:\Users\user\Documents\WindowsPowerShell\Modules\MicrosoftTeams\7.5.0
-> ExchangeOnlineManagement       3.9.0   C:\Users\user\Documents\WindowsPowerShell\Modules\ExchangeOnlineManagement\3.9.0
 > Microsoft.Graph.Authentication 2.25.0  C:\Users\user\Documents\WindowsPowerShell\Modules\Microsoft.Graph.Authentication\2.25.0
 > powershell-yaml                0.4.12  C:\Users\user\Documents\WindowsPowerShell\Modules\powershell-yaml\0.4.12
 ```
@@ -57,9 +55,10 @@ If the path to `RequiredVersions.ps1` is specified then the function will list m
 PS C:\Users\user> Get-ScubaGearDependencyStatus
 
 > Run 'Update-ScubaGear' to update the ScubaGear module itself.
-> 
+>
 > ModuleName                       Installed   Versions HighestVersion  Status     Action
 > ----------                       ---------   -------- --------------  ------     ------
+> Microsoft.Graph.Authentication   True               1 2.25.0          OK         None
 > powershell-yaml                  True               1 0.4.12          OK         None
 > OPA                              True               1 1.20.2          OK         None
 > ScubaGear                        False              0                 MISSING    Install
@@ -68,9 +67,9 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus
 Optionally, we can also verify that the module's installation folder is gone, as follows:
 
 ```PowerShell
-Get-ChildItem C:\Users\user\Documents\WindowsPowerShell\Modules\MicrosoftTeams\7.5.0
+PS C:\Users\user> Get-ChildItem C:\Users\user\Documents\WindowsPowerShell\Modules\MicrosoftTeams\7.5.0
 
-> Get-ChildItem : Cannot find path 'C:\Users\user\Documents\WindowsPowerShell\Modules\' because it does not exist. 
+> Get-ChildItem : Cannot find path 'C:\Users\user\Documents\WindowsPowerShell\Modules\7.5.0' because it does not exist. 
 ```
 
 #### Example 2: Dependencies for a prior release
@@ -148,7 +147,6 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus
 ## Uninstall ScubaGear itself
 
 ```PowerShell
-# Uninstall ScubaGear
 PS C:\Users\user> Uninstall-Module -Name ScubaGear
 ```
 
