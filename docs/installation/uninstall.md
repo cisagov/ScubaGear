@@ -64,14 +64,6 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus
 > ScubaGear                        False              0                 MISSING    Install
 ```
 
-Optionally, we can also verify that the module's installation folder is gone, as follows:
-
-```PowerShell
-PS C:\Users\user> Get-ChildItem C:\Users\user\Documents\WindowsPowerShell\Modules\MicrosoftTeams\7.5.0
-
-> Get-ChildItem : Cannot find path 'C:\Users\user\Documents\WindowsPowerShell\Modules\7.5.0' because it does not exist. 
-```
-
 #### Example 2: Dependencies for a prior release
 
 ```PowerShell
@@ -119,6 +111,14 @@ PS C:\Users\user> Get-ScubaGearDependencyStatus -RequiredModulesPath C:\Users\us
 > powershell-yaml                  True               1 0.4.12          OK         None
 > OPA                              True               1 1.20.2          OK         None
 > ScubaGear                        False              0                 MISSING    Install
+```
+
+Optionally, we can also verify that the module's installation folder is gone, as follows:
+
+```PowerShell
+PS C:\Users\user> Get-ChildItem C:\Users\user\Documents\WindowsPowerShell\Modules\MicrosoftTeams\7.5.0
+
+> Get-ChildItem : Cannot find path 'C:\Users\user\Documents\WindowsPowerShell\Modules\7.5.0' because it does not exist. 
 ```
 
 ## Uninstall OPA
